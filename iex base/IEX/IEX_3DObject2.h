@@ -3,7 +3,7 @@
 #define IEX_3DOBJECT2_H
 
 #include "Iex_Mesh2.h"
-
+#include <stdarg.h>
 
 class iex3DObj2 : public iex3DObj
 {
@@ -31,6 +31,8 @@ private:
 	Motion_data* motion_data = nullptr;
 
 	void UpdateSkinMeshFrame();
+
+	bool iexMesh_Update_use = true; // iexMesh::Update を使うか
 public:
 	iex3DObj2(char* filename,
 		int number_of_motion_data); // モーションを分ける数
@@ -40,15 +42,19 @@ public:
 
 	void Render();
 
-	void SetMotion(int motion, int data_number);
-
-	void Motion_reset(int data_number);
-
-	void Set_bone_motion(int motion_data, // motiondataの番号
-		int arraysize, // 配列の数
-		int* bone_numbers); // 設定するボーンの番号を配列
-
 	void Animation();
+
+	void SetMotion(int data_number, // Motion_data の番号
+		int motion); // モーション番号
+
+	// 今のモーションを最初から
+	void Motion_reset(int data_number); // Motion_data の番号
+
+	void Set_bone_motion(int motion_data, // Motion_data の番号
+		int num, // ボーンの数
+		...); // 設定するボーンの番号
+
+	void Is_use_iexMesh_Update(bool in){ iexMesh_Update_use = in; }
 };
 
 #endif // !IEX_3DOBJECT2_H
