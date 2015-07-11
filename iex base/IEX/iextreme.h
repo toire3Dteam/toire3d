@@ -812,15 +812,15 @@ public:
 
 	static BOOL SaveObject( LPIEMFILE lpIem, LPSTR filename );
 
-	void Update();
-	void SetMotion( int motion );
+	virtual void Update();
+	virtual void SetMotion(int motion);
 	inline int GetMotion(){ return Motion; }
 	inline WORD GetMotionOffset( int m ){ return M_Offset[m]; }
 
 	inline void SetFrame( int frame ){ dwFrame = frame; }
 	inline int GetFrame(){ return dwFrame; }
 
-	void Animation();
+	virtual void Animation();
 
 	void Render();
 	void Render( DWORD flag, float alpha=-1 );

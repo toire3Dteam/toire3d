@@ -102,6 +102,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="IEX\IEX_3DObject2.cpp" />
+    <ClCompile Include="IEX\IEX_Input2.cpp" />
+    <ClCompile Include="IEX\IEX_Math2.cpp" />
+    <ClCompile Include="IEX\Iex_Mesh2.cpp" />
     <ClCompile Include="IEX\RID_2Drot.cpp" />
     <ClCompile Include="IEX\RID_3dObj.cpp" />
     <ClCompile Include="source\sceneMain.cpp" />
@@ -127,6 +131,10 @@
     <ClCompile Include="source\sceneTitle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="IEX\IEX_3DObject2.h" />
+    <ClInclude Include="IEX\IEX_Input2.h" />
+    <ClInclude Include="IEX\IEX_Math2.h" />
+    <ClInclude Include="IEX\Iex_Mesh2.h" />
     <ClInclude Include="IEX\RID_2Drot.h" />
     <ClInclude Include="IEX\RID_3dObj.h" />
     <ClInclude Include="source\system\Framework.h" />

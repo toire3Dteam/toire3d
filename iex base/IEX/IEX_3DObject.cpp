@@ -113,21 +113,32 @@ void iex3DObj::Animation()
 
 	work = dwFrame;
 	param = dwFrameFlag[dwFrame];
-	if( param & 0x4000 ) param = 0xFFFF;
-	if( param != 0xFFFF ){
+	if( param & 0x4000 ) // 0x4 == 0100
+		param = 0xFFFF;
+
+	if( param != 0xFFFF )
+	{
 		//	アニメーションジャンプ
-		if( param & 0x8000 ){
+		if( param & 0x8000 ) // 0x8 == 1000
+		{
 			SetMotion( param&0xFF );
-		} else dwFrame = param;
-	} else {
+		}
+		else
+			dwFrame = param;
+	}
+	else
+	{
 		dwFrame ++;
-		if( dwFrame >= NumFrame ) dwFrame = 0;
+		if( dwFrame >= NumFrame )
+			dwFrame = 0;
 	}
 
-	if( dwFrame != work ) bChanged = TRUE;
+	if( dwFrame != work )
+		bChanged = TRUE;
 
 	param = dwFrameFlag[dwFrame];
-	if( (param!=0xFFFF) && (param&0x4000) ) Param[(param&0x0F00)>>8] = (u8)(param&0x00FF);
+	if( (param!=0xFFFF) && (param&0x4000) )
+		Param[(param&0x0F00)>>8] = (u8)(param&0x00FF);
 
 }
 

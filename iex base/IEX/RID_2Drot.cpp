@@ -15,8 +15,8 @@ void RID_2DObj::rot_render(float angle)
 	v[0].sy = v[1].sy = 0;
 	v[2].sy = v[3].sy = iexSystem::ScreenHeight - 0.5f;
 
-	sentx = v[1].sx * 0.5;
-	senty = v[2].sy * 0.5;
+	sentx = v[1].sx * 0.5f;
+	senty = v[2].sy * 0.5f;
 
 	for (int num = 0; num < 4; num++)
 	{
@@ -53,8 +53,8 @@ void RID_2DObj::rot_render(float angle, iexShader* shader, char* tech)
 	v[0].sy = v[1].sy = 0;
 	v[2].sy = v[3].sy = iexSystem::ScreenHeight - 0.5f;
 
-	sentx = v[1].sx * 0.5;
-	senty = v[2].sy * 0.5;
+	sentx = v[1].sx * 0.5f;
+	senty = v[2].sy * 0.5f;
 
 	for (int num = 0; num < 4; num++)
 	{
@@ -90,8 +90,8 @@ void RID_2DObj::rot_render(float angle, s32 DstX, s32 DstY, s32 DstW, s32 DstH, 
 	v[0].sy = v[1].sy = (float)DstY;
 	v[2].sy = v[3].sy = (float)(DstY + DstH) - 0.5f;
 
-	sentx = (v[0].sx + v[1].sx) * 0.5;
-	senty = (v[0].sy + v[2].sy) * 0.5;
+	sentx = (v[0].sx + v[1].sx) * 0.5f;
+	senty = (v[0].sy + v[2].sy) * 0.5f;
 
 	for (int num = 0; num < 4; num++)
 	{
@@ -127,8 +127,8 @@ void RID_2DObj::rot_render(float angle, s32 DstX, s32 DstY, s32 DstW, s32 DstH, 
 	v[0].sy = v[1].sy = (float)DstY;
 	v[2].sy = v[3].sy = (float)(DstY + DstH) - 0.5f;
 
-	sentx = (v[0].sx + v[1].sx) * 0.5;
-	senty = (v[0].sy + v[2].sy) * 0.5;
+	sentx = (v[0].sx + v[1].sx) * 0.5f;
+	senty = (v[0].sy + v[2].sy) * 0.5f;
 
 	for (int num = 0; num < 4; num++)
 	{
