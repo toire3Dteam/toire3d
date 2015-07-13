@@ -88,7 +88,7 @@ void iex3DObj2::Render()
 	iexMesh::Render();
 }
 
-void iex3DObj2::SetMotion(int motion, int data_number)
+void iex3DObj2::SetMotion(int data_number, int motion)
 {
 	int		param;
 
@@ -133,7 +133,7 @@ void iex3DObj2::Animation()
 	for (int i = 0; i < (int)number_of_motion_data; i++)
 	{
 		work = motion_data[i].dwFrame;
-		param = dwFrameFlag[motion_data[i].dwFrame];
+		param = dwFrameFlag[work];
 		if (param & 0x4000) // 0x4 == 0100
 			param = 0xFFFF;
 
@@ -142,7 +142,7 @@ void iex3DObj2::Animation()
 			//	アニメーションジャンプ
 			if (param & 0x8000) // 0x8 == 1000
 			{
-				SetMotion(param & 0xFF, i);
+				SetMotion(i, param & 0xFF);
 			}
 			else
 				motion_data[i].dwFrame = param;
