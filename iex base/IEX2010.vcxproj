@@ -129,6 +129,7 @@
     <ClCompile Include="IEX\IEX_Texture.cpp" />
     <ClCompile Include="IEX\IEX_View.cpp" />
     <ClCompile Include="source\sceneTitle.cpp" />
+    <ClCompile Include="source\test\motion_blend_airou.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IEX\IEX_3DObject2.h" />
@@ -143,6 +144,7 @@
     <ClInclude Include="source\system\System.h" />
     <ClInclude Include="IEX\iextreme.h" />
     <ClInclude Include="source\sceneTitle.h" />
+    <ClInclude Include="source\test\motion_blend_airou.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

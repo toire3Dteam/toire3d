@@ -1,7 +1,7 @@
 #include	"iextreme.h"
 #include	"system/system.h"
 #include	"sceneMain.h"
-
+#include "test/motion_blend_airou.h"
 
 //*****************************************************************************************************************************
 //
@@ -48,6 +48,8 @@ bool sceneMain::Initialize()
 	//	ステージ
 	lpStage = new iexMesh("DATA\\BG\\STAGE\\STAGE01.X");
 
+	test_airou = new TEST_airou;
+
 	return true;
 }
 
@@ -55,6 +57,8 @@ sceneMain::~sceneMain()
 {
 	delete  lpStage;
 	delete	view;
+
+	delete test_airou;
 }
 
 //*****************************************************************************************************************************
@@ -81,6 +85,8 @@ void	CameraUpdate( void )
 void	sceneMain::Update()
 {
 	CameraUpdate();
+
+	test_airou->Update();
 }
 
 //*****************************************************************************************************************************
@@ -97,6 +103,8 @@ void	sceneMain::Render()
 
 	//	ステージ
 	lpStage->Render ();
+
+	test_airou->Render();
 }
 
 //*****************************************************************************************************************************
