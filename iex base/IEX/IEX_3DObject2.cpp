@@ -73,7 +73,8 @@ void iex3DObj2::Update()
 	UpdateBoneMatrix();
 	UpdateSkinMesh();
 
-	//iexMesh::Update();
+	if (iexMesh_Update_use)
+		iexMesh::Update();
 	RenderFrame = dwFrame;
 	bChanged = FALSE;
 }
@@ -87,7 +88,7 @@ void iex3DObj2::Render()
 	iexMesh::Render();
 }
 
-void iex3DObj2::SetMotion(int motion, int data_number)
+void iex3DObj2::SetMotion(int data_number, int motion)
 {
 	int		param;
 
@@ -110,12 +111,18 @@ void iex3DObj2::Motion_reset(int data_number)
 	motion_data[data_number].bChanged = TRUE;
 }
 
-void iex3DObj2::Set_bone_motion(int motion_data, int arraysize, int* bone_numbers)
+void iex3DObj2::Set_bone_motion(int motion_data, int num, ...)
 {
-	for (int i = 0; i < arraysize; i++)
+	va_list val;
+	va_start(val, num);
+
+	for (int n = 0; n < num; n++)
 	{
-		bone_motion_number[bone_numbers[i]] = motion_data;
+		int i = va_arg(val, int);
+		bone_motion_number[i] = motion_data;
 	}
+
+	va_end(val);
 }
 
 void iex3DObj2::Animation()
@@ -126,7 +133,7 @@ void iex3DObj2::Animation()
 	for (int i = 0; i < (int)number_of_motion_data; i++)
 	{
 		work = motion_data[i].dwFrame;
-		param = dwFrameFlag[motion_data[i].dwFrame];
+		param = dwFrameFlag[work];
 		if (param & 0x4000) // 0x4 == 0100
 			param = 0xFFFF;
 
@@ -135,7 +142,7 @@ void iex3DObj2::Animation()
 			//	アニメーションジャンプ
 			if (param & 0x8000) // 0x8 == 1000
 			{
-				SetMotion(param & 0xFF, i);
+				SetMotion(i, param & 0xFF);
 			}
 			else
 				motion_data[i].dwFrame = param;
