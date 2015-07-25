@@ -2,6 +2,7 @@
 #include	"system/system.h"
 #include	"sceneMain.h"
 #include "test/motion_blend_airou.h"
+#include "text_loader/character_loader.h"
 
 //*****************************************************************************************************************************
 //
@@ -17,7 +18,7 @@ iexMesh* lpStage = NULL;
 
 
 
-
+TEST_airou *airou;
 
 
 //*****************************************************************************************************************************
@@ -48,7 +49,11 @@ bool sceneMain::Initialize()
 	//	ステージ
 	lpStage = new iexMesh("DATA\\BG\\STAGE\\STAGE01.X");
 
-	test_airou = new TEST_airou;
+	airou = new TEST_airou;
+	Character_loader loader;
+	loader.Open("./DATA/character/airou/airou.txt");
+	loader.Load(airou);
+	loader.Close();
 
 	return true;
 }
@@ -58,7 +63,7 @@ sceneMain::~sceneMain()
 	delete  lpStage;
 	delete	view;
 
-	delete test_airou;
+	delete airou;
 }
 
 //*****************************************************************************************************************************
@@ -86,7 +91,7 @@ void	sceneMain::Update()
 {
 	CameraUpdate();
 
-	test_airou->Update();
+	airou->Update();
 }
 
 //*****************************************************************************************************************************
@@ -104,7 +109,7 @@ void	sceneMain::Render()
 	//	ステージ
 	lpStage->Render ();
 
-	test_airou->Render();
+	airou->Render();
 }
 
 //*****************************************************************************************************************************

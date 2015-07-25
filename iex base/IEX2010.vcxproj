@@ -130,8 +130,11 @@
     <ClCompile Include="IEX\IEX_View.cpp" />
     <ClCompile Include="source\sceneTitle.cpp" />
     <ClCompile Include="source\test\motion_blend_airou.cpp" />
+    <ClCompile Include="source\test\character.cpp" />
+    <ClCompile Include="source\text_loader\character_loader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\test\character.h" />
     <ClInclude Include="IEX\IEX_3DObject2.h" />
     <ClInclude Include="IEX\IEX_Input2.h" />
     <ClInclude Include="IEX\IEX_Math2.h" />
@@ -145,6 +148,8 @@
     <ClInclude Include="IEX\iextreme.h" />
     <ClInclude Include="source\sceneTitle.h" />
     <ClInclude Include="source\test\motion_blend_airou.h" />
+    <ClInclude Include="source\text_loader\character_loader.h" />
+    <ClInclude Include="source\text_loader\text_loader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

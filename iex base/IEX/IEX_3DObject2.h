@@ -50,7 +50,11 @@ public:
 	// 今のモーションを最初から
 	void Motion_reset(int data_number); // Motion_data の番号
 
-	void Set_bone_motion(int motion_data, // Motion_data の番号
+	void Set_bone_motion(int motion_data, int bone)
+	{
+		bone_motion_number[bone] = motion_data;
+	}
+	void Set_bone_motions(int motion_data, // Motion_data の番号
 		int num, // ボーンの数
 		...); // 設定するボーンの番号
 

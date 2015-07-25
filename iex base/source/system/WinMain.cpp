@@ -107,7 +107,7 @@ HWND InitWindow( HINSTANCE hInstance, int nCmdShow )
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-//	_CrtSetBreakAlloc(73);
+//	_CrtSetBreakAlloc(245);
 
 	MSG		msg;
 	HWND	hWnd;

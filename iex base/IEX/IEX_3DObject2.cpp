@@ -1,5 +1,6 @@
 
 #include "IEX_3DObject2.h"
+#include <assert.h>
 
 void iex3DObj2::UpdateSkinMeshFrame()
 {
@@ -56,6 +57,8 @@ void iex3DObj2::UpdateSkinMeshFrame()
 
 iex3DObj2::iex3DObj2(char* filename, int number_of_motion_data) : iex3DObj(filename), number_of_motion_data(number_of_motion_data)
 {
+	assert(number_of_motion_data != 0);
+
 	motion_data = new Motion_data[number_of_motion_data]{};
 	bone_motion_number = new u32[NumBone]{};
 }
@@ -111,7 +114,7 @@ void iex3DObj2::Motion_reset(int data_number)
 	motion_data[data_number].bChanged = TRUE;
 }
 
-void iex3DObj2::Set_bone_motion(int motion_data, int num, ...)
+void iex3DObj2::Set_bone_motions(int motion_data, int num, ...)
 {
 	va_list val;
 	va_start(val, num);

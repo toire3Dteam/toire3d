@@ -4,12 +4,12 @@
 
 class iex3DObj2;
 
-class TEST_airou
+#include "character.h"
+
+class TEST_airou : public Character
 {
 public:
-	iex3DObj2* obj;
-
-	float angle;
+	float angle = 0;
 
 	TEST_airou();
 	~TEST_airou();
@@ -21,7 +21,5 @@ public:
 		WAIT = 0, RUN = 1, ATTACK = 10
 	};
 };
-
-extern TEST_airou* test_airou;
 
 #endif // !MOTION_BLEND_AIROU_H
