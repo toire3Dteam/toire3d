@@ -373,7 +373,7 @@ public:
 	void ClearZ();
 
 	//	‹“_İ’è
-	void Set( Vector& pos, Vector& target );
+	void Set(const Vector& pos, const Vector& target );
 	void Set( float x, float y, float z, float ax, float ay, float az );
 	
 	void SetPos( float x, float y, float z );

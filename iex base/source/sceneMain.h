@@ -1,13 +1,18 @@
-//*****************************************************************************************************************************
-//
-//		ƒƒCƒ“ƒV[ƒ“
-//
-//*****************************************************************************************************************************
+
+#include "system/Scene.h"
+
+class iexView;
+class TEST_airou;
+class iexMesh;
 
 class	sceneMain : public Scene
 {
 private:
-	//iexView*	view;
+	iexView *view = nullptr;
+	TEST_airou *airou = nullptr;
+	iexMesh* lpStage = nullptr;
+
+	void Camera_update();
 public:
 	~sceneMain();
 	//	‰Šú‰»

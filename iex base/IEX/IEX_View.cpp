@@ -35,7 +35,7 @@ void iexView::ClearZ()
 //------------------------------------------------------
 //	éãì_ÅEíçéãì_ê›íË
 //------------------------------------------------------
-void iexView::Set( Vector& pos, Vector& target )
+void iexView::Set(const Vector& pos, const Vector& target )
 {
 	Pos = pos;
 	Target = target;

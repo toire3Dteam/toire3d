@@ -59,7 +59,7 @@ bool Character_loader::Load(Character *character)
 			if (work1[0] == '}') // 終
 			{
 				motion_data++; // 次のグループ
-				if (motion_data >= atoi(work2)) // 終
+				if (motion_data >= 2) // 終
 					break;
 
 				if (!Serch_string(flag[motion_data])) // flag 検索
@@ -69,9 +69,8 @@ bool Character_loader::Load(Character *character)
 
 				continue;
 			}
+			obj->Set_bone_motion(motion_data, atoi(work1));
 		}
-
-		obj->Set_bone_motion(motion_data, 2);
 	}
 	else return false;
 

@@ -3,16 +3,20 @@
 #define MOTION_BLEND_AIROU_H
 
 class iex3DObj2;
+struct Vector3;
 
 #include "character.h"
 
 class TEST_airou : public Character
 {
-public:
-	float angle = 0;
+private:
+	void Move();
+	void Attack();
 
+public:
 	TEST_airou();
 	~TEST_airou();
+
 	void Update();
 	void Render();
 

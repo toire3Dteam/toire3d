@@ -102,7 +102,7 @@ public:
 	int Open(char *filename)
 	{
 		Copy_string(this->filename, 256, filename);
-		file = fopen(filename, "r");
+		fopen_s(&file, filename, "r");
 		return ferror(file);
 	}
 	void Close(){ fclose(file); };
