@@ -108,6 +108,7 @@
     <ClCompile Include="IEX\Iex_Mesh2.cpp" />
     <ClCompile Include="IEX\RID_2Drot.cpp" />
     <ClCompile Include="IEX\RID_3dObj.cpp" />
+    <ClCompile Include="source\collision\collision.cpp" />
     <ClCompile Include="source\sceneMain.cpp" />
     <ClCompile Include="source\system\Framework.cpp" />
     <ClCompile Include="source\system\System.cpp" />
@@ -134,6 +135,7 @@
     <ClCompile Include="source\text_loader\character_loader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\collision\collision.h" />
     <ClInclude Include="source\test\character.h" />
     <ClInclude Include="IEX\IEX_3DObject2.h" />
     <ClInclude Include="IEX\IEX_Input2.h" />

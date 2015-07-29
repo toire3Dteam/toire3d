@@ -4,6 +4,7 @@
 #include	"system/system.h"
 #include "test/motion_blend_airou.h"
 #include "text_loader/character_loader.h"
+#include "collision/collision.h"
 
 bool sceneMain::Initialize()
 {
@@ -32,6 +33,8 @@ bool sceneMain::Initialize()
 	loader.Load(airou);
 	loader.Close();
 
+	collision = new Collision;
+
 	return true;
 }
 
@@ -41,6 +44,8 @@ sceneMain::~sceneMain()
 	delete	view;
 
 	delete airou;
+
+	delete collision;
 }
 
 void sceneMain::Camera_update()
@@ -51,6 +56,10 @@ void sceneMain::Camera_update()
 void	sceneMain::Update()
 {
 	airou->Update();
+
+	collision->Check(lpStage, airou);
+
+	airou->Update_pos();
 
 	Camera_update();
 }

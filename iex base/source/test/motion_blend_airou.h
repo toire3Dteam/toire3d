@@ -10,6 +10,10 @@ struct Vector3;
 class TEST_airou : public Character
 {
 private:
+	void Move_jump();
+	void Move_run();
+	void(TEST_airou::*Move_fp)() = nullptr;
+
 	void Move();
 	void Attack();
 
@@ -22,8 +26,10 @@ public:
 
 	enum
 	{
-		WAIT = 0, RUN = 1, ATTACK = 10
+		WAIT = 0, RUN = 1, JUMP = 4, CLOSE_RANGE_ATTACK = 10, SHOT = 11
 	};
+
+	void Col_vs_stage(const Vector3 &updown, const Vector3 &side) override;
 };
 
 #endif // !MOTION_BLEND_AIROU_H
