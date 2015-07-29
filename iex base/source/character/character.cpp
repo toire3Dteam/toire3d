@@ -24,6 +24,12 @@ void Character::Update_pos()
 }
 
 
+void Character::Render()
+{
+	obj->Render();
+}
+
+
 void Character::Set_object(iex3DObj2 *in){ assert(in != nullptr); delete obj; obj = in; };
 
 
@@ -31,3 +37,16 @@ void Character::Set_pos(const Vector3 &in){ pos = in; }
 const Vector3 &Character::Get_pos(){ return pos; }
 
 const Vector3 &Character::Get_move(){ return move; }
+
+float Character::Get_size_side()
+{
+	return size_side;
+}
+float Character::Get_size_up()
+{
+	return size_up;
+}
+float Character::Get_size_down()
+{
+	return size_down;
+}

@@ -1,7 +1,7 @@
 
 #include "character_loader.h"
 #include <assert.h>
-#include "../test/character.h"
+#include "../character/character.h"
 #include "../../IEX/IEX_3DObject2.h"
 
 bool Character_loader::Load(Character *character)

@@ -5,7 +5,7 @@
 class iex3DObj2;
 struct Vector3;
 
-#include "character.h"
+#include "../character.h"
 
 class TEST_airou : public Character
 {
@@ -26,7 +26,7 @@ public:
 
 	enum
 	{
-		WAIT = 0, RUN = 1, JUMP = 4, CLOSE_RANGE_ATTACK = 10, SHOT = 11
+		WAIT = 0, RUN = 1, JUMP = 2, CLOSE_RANGE_ATTACK = 10, SHOT = 11
 	};
 
 	void Col_vs_stage(const Vector3 &updown, const Vector3 &side) override;

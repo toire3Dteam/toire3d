@@ -1,5 +1,5 @@
 
-#include "motion_blend_airou.h"
+#include "airou.h"
 #include "IEX_3DObject2.h"
 
 TEST_airou::TEST_airou() : Character()
@@ -31,12 +31,6 @@ void TEST_airou::Move_run()
 		return;
 	}
 
-	move.x = 0;
-	if (KEY_Get(KEY_RIGHT))
-		move.x += speed;
-	if (KEY_Get(KEY_LEFT))
-		move.x -= speed;
-
 	if (move.x != 0)
 		obj->SetMotion(LOWER, RUN);
 	else
@@ -45,11 +39,17 @@ void TEST_airou::Move_run()
 
 void TEST_airou::Move_jump()
 {
-
+	obj->SetMotion(LOWER, JUMP);
 }
 
 void TEST_airou::Move()
 {
+	move.x = 0;
+	if (KEY_Get(KEY_RIGHT))
+		move.x += speed;
+	if (KEY_Get(KEY_LEFT))
+		move.x -= speed;
+
 	(this->*Move_fp)();
 
 	accelerator.y -= 0.9f;
@@ -96,6 +96,8 @@ void TEST_airou::Col_vs_stage(const Vector3 &updown, const Vector3 &side)
 				pos.y = updown.y + size_down;
 				Move_fp = &TEST_airou::Move_run;
 			}
+			else
+				Move_fp = &TEST_airou::Move_jump;
 		}
 		else if (move.y > 0) // è„
 		{

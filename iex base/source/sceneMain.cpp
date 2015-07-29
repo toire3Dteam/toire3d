@@ -2,9 +2,10 @@
 #include	"sceneMain.h"
 #include	"iextreme.h"
 #include	"system/system.h"
-#include "test/motion_blend_airou.h"
+#include "character/airou/airou.h"
 #include "text_loader/character_loader.h"
 #include "collision/collision.h"
+#include "character/gimmick/Move_block.h"
 
 bool sceneMain::Initialize()
 {
@@ -35,6 +36,8 @@ bool sceneMain::Initialize()
 
 	collision = new Collision;
 
+	move_block = new Move_block;
+
 	return true;
 }
 
@@ -46,6 +49,8 @@ sceneMain::~sceneMain()
 	delete airou;
 
 	delete collision;
+
+	delete move_block;
 }
 
 void sceneMain::Camera_update()
@@ -56,10 +61,12 @@ void sceneMain::Camera_update()
 void	sceneMain::Update()
 {
 	airou->Update();
+	move_block->Update();
 
 	collision->Check(lpStage, airou);
 
 	airou->Update_pos();
+	move_block->Update_pos();
 
 	Camera_update();
 }
@@ -74,4 +81,6 @@ void	sceneMain::Render()
 	lpStage->Render ();
 
 	airou->Render();
+
+	move_block->Render();
 }

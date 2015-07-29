@@ -2,8 +2,8 @@
 #include "collision.h"
 #include "../../IEX/iextreme.h"
 #include "../../IEX/IEX_3DObject2.h"
-#include "../test/character.h"
-#include "../test/motion_blend_airou.h"
+#include "../character/character.h"
+#include "../character/airou/airou.h"
 
 void Collision::Check(iexMesh *obj, Character *chara)
 {
@@ -18,10 +18,11 @@ void Collision::Check(iexMesh *obj, Character *chara)
 
 void Collision::Check(iexMesh *obj, TEST_airou *chara)
 {
-	Vector3 updown(chara->Get_pos()), side(updown), pos(side + Vector3(0, 0.5f, 0)), ray(0, 0, 0);
+	Vector3 updown(chara->Get_pos()), side(updown), pos(updown), ray(0, 0, 0);
 	float dist(0);
 
 	Vector3 move(chara->Get_move());
+	pos.y += chara->Get_size_down();
 
 	if (move.y != 0)
 	{

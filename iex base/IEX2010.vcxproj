@@ -108,6 +108,7 @@
     <ClCompile Include="IEX\Iex_Mesh2.cpp" />
     <ClCompile Include="IEX\RID_2Drot.cpp" />
     <ClCompile Include="IEX\RID_3dObj.cpp" />
+    <ClCompile Include="source\character\gimmick\Move_block.cpp" />
     <ClCompile Include="source\collision\collision.cpp" />
     <ClCompile Include="source\sceneMain.cpp" />
     <ClCompile Include="source\system\Framework.cpp" />
@@ -130,13 +131,14 @@
     <ClCompile Include="IEX\IEX_Texture.cpp" />
     <ClCompile Include="IEX\IEX_View.cpp" />
     <ClCompile Include="source\sceneTitle.cpp" />
-    <ClCompile Include="source\test\motion_blend_airou.cpp" />
-    <ClCompile Include="source\test\character.cpp" />
+    <ClCompile Include="source\character\airou\airou.cpp" />
+    <ClCompile Include="source\character\character.cpp" />
     <ClCompile Include="source\text_loader\character_loader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\character\gimmick\Move_block.h" />
     <ClInclude Include="source\collision\collision.h" />
-    <ClInclude Include="source\test\character.h" />
+    <ClInclude Include="source\character\character.h" />
     <ClInclude Include="IEX\IEX_3DObject2.h" />
     <ClInclude Include="IEX\IEX_Input2.h" />
     <ClInclude Include="IEX\IEX_Math2.h" />
@@ -149,7 +151,7 @@
     <ClInclude Include="source\system\System.h" />
     <ClInclude Include="IEX\iextreme.h" />
     <ClInclude Include="source\sceneTitle.h" />
-    <ClInclude Include="source\test\motion_blend_airou.h" />
+    <ClInclude Include="source\character\airou\airou.h" />
     <ClInclude Include="source\text_loader\character_loader.h" />
     <ClInclude Include="source\text_loader\text_loader.h" />
   </ItemGroup>
