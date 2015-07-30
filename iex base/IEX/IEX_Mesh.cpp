@@ -435,6 +435,35 @@ int	iexMesh::RayPickUD( Vector3* out, Vector3* pos, Vector3* vec, float *Dist )
 	return	ret;
 }
 
+int	iexMesh::RayPick2(Vector3* out, const Vector3* pos, Vector3* vec, float *Dist)
+{
+	Matrix inv;
+	D3DXMatrixInverse(&inv, NULL, &TransMatrix);
+
+	Vector3 raypos(pos->x * inv._11 + pos->y * inv._21 + pos->z * inv._31 + inv._41,
+		pos->x * inv._12 + pos->y * inv._22 + pos->z * inv._32 + inv._42,
+		pos->x * inv._13 + pos->y * inv._23 + pos->z * inv._33 + inv._43);
+
+	*vec = Vector3(vec->x * inv._11 + vec->y * inv._21 + vec->z * inv._31,
+		vec->x * inv._12 + vec->y * inv._22 + vec->z * inv._32,
+		vec->x * inv._13 + vec->y * inv._23 + vec->z * inv._33);
+
+	vec->Normalize();
+
+	int ret = RayPick(out, &raypos, vec, Dist);
+
+	*out = Vector3(out->x * TransMatrix._11 + out->y * TransMatrix._21 + out->z * TransMatrix._31 + TransMatrix._41,
+		out->x * TransMatrix._12 + out->y * TransMatrix._22 + out->z * TransMatrix._32 + TransMatrix._42,
+		out->x * TransMatrix._13 + out->y * TransMatrix._23 + out->z * TransMatrix._33 + 
+		TransMatrix._43);
+
+	*vec = Vector3(vec->x * TransMatrix._11 + vec->y * TransMatrix._21 + vec->z * TransMatrix._31,
+		vec->x * TransMatrix._12 + vec->y * TransMatrix._22 + vec->z * TransMatrix._32,
+		vec->x * TransMatrix._13 + vec->y * TransMatrix._23 + vec->z * TransMatrix._33);
+
+	return ret;
+}
+
 //**************************************************************************************************
 //
 //	ƒtƒ@ƒCƒ‹“Ç‚Ýž‚Ý
@@ -835,4 +864,3 @@ int	IEX_RayPickMesh( iexMesh* lpMesh, Vector3* out, Vector3* pos, Vector3* vec, 
 	int ret = lpMesh->RayPick( out, pos, vec, Dist );
 	return	ret;
 }
-

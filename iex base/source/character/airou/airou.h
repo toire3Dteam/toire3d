@@ -30,6 +30,7 @@ public:
 	};
 
 	void Col_vs_stage(const Vector3 &updown, const Vector3 &side) override;
+	void Col_vs_gimmick(const Vector3 &block_move, const Vector3 &updown, const Vector3 &side) override;
 };
 
 #endif // !MOTION_BLEND_AIROU_H

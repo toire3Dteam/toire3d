@@ -55,7 +55,7 @@ sceneMain::~sceneMain()
 
 void sceneMain::Camera_update()
 {
-	view->Set(airou->Get_pos() + Vector3(0, 25, -50), airou->Get_pos());
+	view->Set(airou->Get_pos() + Vector3(0, 25, -100), airou->Get_pos());
 }
 
 void	sceneMain::Update()
@@ -63,6 +63,7 @@ void	sceneMain::Update()
 	airou->Update();
 	move_block->Update();
 
+	collision->Check(move_block, airou);
 	collision->Check(lpStage, airou);
 
 	airou->Update_pos();

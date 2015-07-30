@@ -129,3 +129,52 @@ void TEST_airou::Col_vs_stage(const Vector3 &updown, const Vector3 &side)
 		}
 	}
 }
+
+void TEST_airou::Col_vs_gimmick(const Vector3 &block_move, const Vector3 &updown, const Vector3 &side)
+{
+	if (pos.x != side.x)
+	{
+		if (move.x < 0) // ç∂
+		{
+			if (side.x >= pos.x + move.x)
+			{
+				move.x = 0;
+				pos.x = side.x + size_side;
+			}
+		}
+		else if (move.x > 0) // âE
+		{
+			if (side.x <= pos.x + move.x)
+			{
+				move.x = 0;
+				pos.x = side.x - size_side;
+			}
+		}
+	}
+
+	if (pos.y != updown.y)
+	{
+		if (move.y < 0) // â∫
+		{
+			if (updown.y >= pos.y + move.y) // óßÇ¡ÇƒÇÈ
+			{
+				move.y = 0;
+				pos.y = updown.y + size_down;
+
+				move.x += block_move.x;
+				Move_fp = &TEST_airou::Move_run;
+			}
+			else
+				Move_fp = &TEST_airou::Move_jump;
+		}
+		else if (move.y > 0) // è„
+		{
+			if (updown.y <= pos.y + move.y)
+			{
+				move.y = 0;
+				pos.y = updown.y - size_up;
+			}
+		}
+	}
+
+}
