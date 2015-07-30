@@ -3,7 +3,7 @@
 
 class iexView;
 class TEST_airou;
-class iexMesh;
+class iexMesh2;
 class Collision;
 class Move_block;
 
@@ -12,7 +12,7 @@ class	sceneMain : public Scene
 private:
 	iexView *view = nullptr;
 	TEST_airou *airou = nullptr;
-	iexMesh *lpStage = nullptr;
+	iexMesh2 *lpStage = nullptr;
 	Collision *collision = nullptr;
 	Move_block *move_block = nullptr;
 

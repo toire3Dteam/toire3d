@@ -1,10 +1,10 @@
 #include "iextreme.h"
 #include "RID_3dObj.h"
 
-RID_mesh::RID_mesh() : iexMesh()
+RID_mesh::RID_mesh() : iexMesh2()
 {
 }
-RID_mesh::RID_mesh(char *filename) : iexMesh(filename)
+RID_mesh::RID_mesh(char *filename) : iexMesh2(filename)
 {
 }
 
@@ -201,7 +201,7 @@ void RID_3Dobj::Update_01()
 	UpdateBoneMatrix();
 	UpdateSkinMesh();
 
-	iexMesh::Update();
+	iexMesh2::Update();
 	RenderFrame = dwFrame;
 	bChanged = FALSE;
 }

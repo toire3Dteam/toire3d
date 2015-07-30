@@ -77,7 +77,7 @@ void iex3DObj2::Update()
 	UpdateSkinMesh();
 
 	if (iexMesh_Update_use)
-		iexMesh::Update();
+		iexMesh2::Update();
 	RenderFrame = dwFrame;
 	bChanged = FALSE;
 }
@@ -88,7 +88,7 @@ void iex3DObj2::Render()
 	///if (RenderFrame != dwFrame)
 	Update();
 	//	ƒƒCƒ“s—ñİ’è
-	iexMesh::Render();
+	iexMesh2::Render();
 }
 
 void iex3DObj2::SetMotion(int data_number, int motion)

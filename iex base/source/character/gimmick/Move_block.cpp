@@ -5,7 +5,7 @@ Move_block::Move_block() : pos(-5, 15, 0), move(0, 0, 0), angle(0, PI, 0)
 {
 	size = 2;
 
-	mesh = new iexMesh("./DATA/BOX/24bbbb.IMO");
+	mesh = new iexMesh2("./DATA/BOX/24bbbb.IMO");
 
 	move_mode[0] = Vector3(0, 0.1f, 0);
 	move_mode[1] = Vector3(-0.1f, 0, 0);

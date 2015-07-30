@@ -2,7 +2,7 @@
 #ifndef IEX_3DOBJECT2_H
 #define IEX_3DOBJECT2_H
 
-#include "Iex_Mesh2.h"
+#include "iextreme.h"
 #include <stdarg.h>
 
 class iex3DObj2 : public iex3DObj
@@ -32,7 +32,7 @@ private:
 
 	void UpdateSkinMeshFrame();
 
-	bool iexMesh_Update_use = true; // iexMesh::Update を使うか
+	bool iexMesh_Update_use = true; // iexMesh2::Update を使うか
 public:
 	iex3DObj2(char* filename,
 		int number_of_motion_data); // モーションを分ける数

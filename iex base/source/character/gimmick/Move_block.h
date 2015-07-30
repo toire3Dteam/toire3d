@@ -7,7 +7,7 @@
 class Move_block
 {
 private:
-	iexMesh *mesh = nullptr;
+	iexMesh2 *mesh = nullptr;
 
 	Vector3 pos, move, angle;
 	int timer = 0;

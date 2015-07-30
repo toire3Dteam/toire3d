@@ -6,7 +6,7 @@
 #include "../character/airou/airou.h"
 #include "../character/gimmick/Move_block.h"
 
-void Collision::Check(iexMesh *obj, Character *chara)
+void Collision::Check(iexMesh2 *obj, Character *chara)
 {
 	Vector3 out, pos(chara->Get_pos() + Vector3(0, 0.1f, 0)), ray(0, -1, 0);
 	float dist(100);
@@ -17,7 +17,7 @@ void Collision::Check(iexMesh *obj, Character *chara)
 	}
 }
 
-void Collision::Check(iexMesh *obj, TEST_airou *chara)
+void Collision::Check(iexMesh2 *obj, TEST_airou *chara)
 {
 	Vector3 updown(chara->Get_pos()), side(updown), pos(updown), ray(0, 0, 0);
 	float dist(0);

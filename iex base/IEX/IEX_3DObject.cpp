@@ -98,7 +98,7 @@ void iex3DObj::Update()
 	UpdateBoneMatrix();
 	UpdateSkinMesh();
 
-	iexMesh::Update();
+	iexMesh2::Update();
 	RenderFrame = dwFrame;
 	bChanged = FALSE;
 }
@@ -154,7 +154,7 @@ void iex3DObj::Render()
 	//	情報更新
 	if( RenderFrame != dwFrame ) Update();
 	//	メイン行列設定
-	iexMesh::Render();
+	iexMesh2::Render();
 }
 
 //------------------------------------------------------
@@ -165,7 +165,7 @@ void iex3DObj::Render( DWORD flag, float alpha )
 	//	情報更新
 	if( RenderFrame != dwFrame ) Update();
 	//	メイン行列設定
-	iexMesh::Render( flag, alpha );
+	iexMesh2::Render( flag, alpha );
 }
 
 //------------------------------------------------------
@@ -176,7 +176,7 @@ void iex3DObj::Render( iexShader* shader, char* name )
 	//	情報更新
 	if( RenderFrame != dwFrame ) Update();
 	//	メイン行列設定
-	iexMesh::Render( shader, name );
+	iexMesh2::Render( shader, name );
 }
 
 //*****************************************************************************
@@ -428,7 +428,7 @@ BOOL iex3DObj::CreateFromIEM( char* path, LPIEMFILE lpIem )
 	SetAngle( .0f, .0f, .0f );
 	SetScale( 1.0f, 1.0f, 1.0f );
 	dwFlags = 0;
-	iexMesh::Update();
+	iexMesh2::Update();
 	
 	return TRUE;
 }

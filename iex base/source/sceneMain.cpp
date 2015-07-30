@@ -24,7 +24,7 @@ bool sceneMain::Initialize()
 	view->Set( Vector3(0,10.0f,-20.0f), Vector3(0,0,0) );
 
 	//	ステージ
-	lpStage = new iexMesh("DATA\\BG\\STAGE\\STAGE01.X");
+	lpStage = new iexMesh2("DATA\\BG\\STAGE\\STAGE01.X");
 
 	airou = new TEST_airou;
 	airou->Set_pos(Vector3(0, 0, 0));

@@ -1,7 +1,7 @@
 #ifndef RID3DOBJ_H
 #define RID3DOBJ_H
 
-class RID_mesh : public iexMesh
+class RID_mesh : public iexMesh2
 {
 public:
 	RID_mesh();

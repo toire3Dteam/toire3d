@@ -99,9 +99,6 @@
     <ClCompile Include="IEX\IEX_Math2.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="IEX\Iex_Mesh2.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="source\text_loader\character_loader.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -150,9 +147,6 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="IEX\IEX_Math2.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="IEX\Iex_Mesh2.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="source\text_loader\character_loader.h">

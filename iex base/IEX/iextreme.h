@@ -16,13 +16,14 @@
 #define		DIRECTINPUT_VERSION	0x0800 
 #include	<dinput.h>
 
-/*
+#include <stdarg.h>
+
 #if _DEBUG
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
-*/
+
 
 //*****************************************************************************
 //
@@ -650,7 +651,29 @@ public:
 //		メッシュ関連
 //
 //*****************************************************************************************************************************
-class iexMesh {
+
+class iexMesh2_textures
+{
+public:
+	Texture2D** t;
+
+	~iexMesh2_textures();
+	// 空のテクスチャをnumber個作成
+	void Create(int number);
+	// index の テクスチャをロード
+	void Load(int index, char* filename);
+	// number個のテクスチャをロード < 2, filename, filename >
+	void Create_load(int number, ...);
+};
+
+// 注意
+/*
+デストラクターで、lpTextureは消されます
+消したくない場合はlpTextureにnullptrを設定してください
+<Texture_set_null()>
+*/
+
+class iexMesh2 {
 private:
 protected:
 	u32				dwFlags;		//	フラグ
@@ -661,10 +684,10 @@ protected:
 	Vector3			Scale;			//	メッシュスケール
 
 	D3DMATERIAL9	*lpMaterial;	//	材質
-	Texture2D*		*lpTexture;		//	テクスチャ
-	Texture2D*		*lpNormal;		//	法線テクスチャ
-	Texture2D*		*lpSpecular;	//	スペキュラテクスチャ
-	Texture2D*		*lpHeight;		//	高さテクスチャ
+	Texture2D	**lpTexture;		//	テクスチャ
+	Texture2D	**lpNormal;		//	法線テクスチャ
+	Texture2D	**lpSpecular;	//	スペキュラテクスチャ
+	Texture2D	**lpHeight;		//	高さテクスチャ
 	u32				MaterialCount;	//	材質数
 
 	LPD3DXMESH		lpMesh;			//	メッシュ
@@ -676,10 +699,10 @@ public:
 	//------------------------------------------------------
 	//	初期化
 	//------------------------------------------------------
-	iexMesh( char* filename );
-	iexMesh(){ bLoad = FALSE; }
-	iexMesh*	Clone();
-	~iexMesh();
+	iexMesh2( char* filename );
+	iexMesh2(){ bLoad = FALSE; }
+	iexMesh2*	Clone();
+	~iexMesh2();
 
 	//------------------------------------------------------
 	//	読み込み
@@ -726,10 +749,21 @@ public:
 
 	//	情報
 	LPD3DXMESH	GetMesh(){ return lpMesh; }
+
+	//------------------------------------------------------
+	//	テクスチャ関連
+	//------------------------------------------------------
+
+	void Texture_change(iexMesh2_textures& in);
+
+	void Texture_set_null();
+
+	void Get_texture(iexMesh2_textures* out);
+
 	Texture2D*	GetTexture( int n ){ return lpTexture[n]; }
 };
 
-typedef iexMesh IEXMESH, *LPIEXMESH;
+typedef iexMesh2 IEXMESH, *LPIEXMESH;
 
 //*****************************************************************************************************************************
 //
@@ -755,7 +789,7 @@ typedef struct tagIEXANIME2 {
 //------------------------------------------------------
 //	３Ｄオブジェクト
 //------------------------------------------------------
-class iex3DObj : public iexMesh
+class iex3DObj : public iexMesh2
 {
 protected:
 	u8				version;
