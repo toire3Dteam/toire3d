@@ -2,6 +2,12 @@
 #include "airou.h"
 #include "IEX_3DObject2.h"
 
+void TEST_airou::Init_tex()
+{
+	obj->Get_texture(&tex[0]);
+	tex[1].Create_load(1, "DATA/character/airou/tex_airou2.png");
+}
+
 TEST_airou::TEST_airou() : Character()
 {
 	angle = PI*0.5f;
@@ -17,6 +23,7 @@ TEST_airou::TEST_airou() : Character()
 
 TEST_airou::~TEST_airou()
 {
+	obj->Texture_set_null();
 	delete obj;
 }
 
@@ -177,4 +184,14 @@ void TEST_airou::Col_vs_gimmick(const Vector3 &block_move, const Vector3 &updown
 		}
 	}
 
+}
+
+
+
+void TEST_airou::Change_texture()
+{
+	tex_num++;
+	if (tex_num >= 2)
+		tex_num = 0;
+	obj->Texture_change(tex[tex_num]);
 }

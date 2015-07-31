@@ -33,6 +33,7 @@ bool sceneMain::Initialize()
 	loader.Open("./DATA/character/airou/airou.txt");
 	loader.Load(airou);
 	loader.Close();
+	airou->Init_tex();
 
 	collision = new Collision;
 
@@ -70,6 +71,11 @@ void	sceneMain::Update()
 	move_block->Update_pos();
 
 	Camera_update();
+
+	if (KEY_Get(KEY_ENTER) == 3)
+	{
+		airou->Change_texture();
+	}
 }
 
 void	sceneMain::Render()
