@@ -15,12 +15,12 @@ public:
 private:
 };
 
-class RID_3Dobj : public iex3DObj
+class RID_3Dobj : public iex3DObj2
 {
 public:
-	RID_3Dobj() :iex3DObj(){}
-	RID_3Dobj(char* filename) :iex3DObj(filename){}
-	~RID_3Dobj(){ iex3DObj::~iex3DObj(); }
+	RID_3Dobj() :iex3DObj2(){}
+	RID_3Dobj(char* filename) :iex3DObj2(filename){}
+	~RID_3Dobj(){ iex3DObj2::~iex3DObj2(); }
 
 	void Animation(float speed);
 	void Update_01();

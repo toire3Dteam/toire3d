@@ -105,8 +105,6 @@
     <ClCompile Include="IEX\IEX_3DObject2.cpp" />
     <ClCompile Include="IEX\IEX_Input2.cpp" />
     <ClCompile Include="IEX\IEX_Math2.cpp" />
-    <ClCompile Include="IEX\RID_2Drot.cpp" />
-    <ClCompile Include="IEX\RID_3dObj.cpp" />
     <ClCompile Include="source\character\gimmick\Move_block.cpp" />
     <ClCompile Include="source\collision\collision.cpp" />
     <ClCompile Include="source\sceneMain.cpp" />
@@ -141,8 +139,6 @@
     <ClInclude Include="IEX\IEX_3DObject2.h" />
     <ClInclude Include="IEX\IEX_Input2.h" />
     <ClInclude Include="IEX\IEX_Math2.h" />
-    <ClInclude Include="IEX\RID_2Drot.h" />
-    <ClInclude Include="IEX\RID_3dObj.h" />
     <ClInclude Include="source\system\Framework.h" />
     <ClInclude Include="source\system\Scene.h" />
     <ClInclude Include="source\sceneMain.h" />

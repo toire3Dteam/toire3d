@@ -14,7 +14,7 @@ Move_block::Move_block() : pos(-5, 15, 0), move(0, 0, 0), angle(0, PI, 0)
 }
 Move_block::~Move_block()
 {
-
+	delete mesh;
 }
 
 

@@ -677,7 +677,7 @@ class iexMesh2 {
 private:
 protected:
 	u32				dwFlags;		//	フラグ
-	u8				bChanged;		//	変更フラグ
+	BOOL bChanged;
 
 	Vector3			Pos;			//	メッシュ座標
 	Vector3			Angle;			//	メッシュ回転量
@@ -789,20 +789,38 @@ typedef struct tagIEXANIME2 {
 //------------------------------------------------------
 //	３Ｄオブジェクト
 //------------------------------------------------------
-class iex3DObj : public iexMesh2
+class iex3DObj2 : public iexMesh2
 {
 protected:
 	u8				version;
-	u8				Param[16];
 
-	u8				Motion;			//	現在のモーション番号
 	u16				M_Offset[256];	//	モーション先頭フレーム
+	u32 number_of_motion_data = 0;	//	一度に管理できるモーションの数
+	class Motion_data
+	{
+	public:
+		u8 Param[16];
 
-	u32				dwFrame;		//	現在のフレーム
+		u8 Motion = 0; // 現在のモーション番号
+		u32 dwFrame = 0; //	現在のフレーム
+		u8 bChanged = 0; //	変更フラグ
+
+		Motion_data()
+		{
+			for (int i = 0; i < 16; i++)
+			{
+				Param[i] = 0;
+			}
+		}
+	};
+	u32* bone_motion_number; // bone毎のモーションの種類
+
+	Motion_data* motion_data = nullptr;
+
 	u32				NumFrame;		//	総フレーム数
 	u16*			dwFrameFlag;	//	フレーム情報
 
-	u32				RenderFrame;	//	レンダリングフレーム
+	//u32				RenderFrame;	//	レンダリングフレーム
 
 	LPIEXANIME2		lpAnime;		//	ボーンアニメーション
 
@@ -825,16 +843,19 @@ protected:
 	Quaternion*		CurPose;
 	Vector3*		CurPos;
 
+	void UpdateSkinMeshFrame();
+
+	bool iexMesh_Update_use = true; // iexMesh2::Update を使うか
+
 public:
 	void	SetLoadFlag( BOOL bLoad ){ this->bLoad = bLoad; }
-	iex3DObj(){
+	iex3DObj2(){
 		bLoad = FALSE;
-		for( int i=0 ; i<16 ; i++ ) Param[i] = 0;
 	}
-	iex3DObj( char* filename );
-	~iex3DObj();
+	iex3DObj2(char* filename, int number_of_motion_data);
+	~iex3DObj2();
 
-	iex3DObj*	Clone();
+	iex3DObj2*	Clone();
 
 	BOOL LoadObject( char* filename );
 	int LoadiEM( LPIEMFILE lpIem, LPSTR filename );
@@ -848,12 +869,13 @@ public:
 	static BOOL SaveObject( LPIEMFILE lpIem, LPSTR filename );
 
 	virtual void Update();
-	virtual void SetMotion(int motion);
-	inline int GetMotion(){ return Motion; }
+	virtual void SetMotion(int data_number, int motion);
+	inline int GetMotion(int data_num){ return motion_data[data_num].Motion; }
 	inline WORD GetMotionOffset( int m ){ return M_Offset[m]; }
+	void Motion_reset(int data_number);
 
-	inline void SetFrame( int frame ){ dwFrame = frame; }
-	inline int GetFrame(){ return dwFrame; }
+	inline void SetFrame(int data_num, int frame){ motion_data[data_num].dwFrame = frame; }
+	inline int GetFrame(int data_num){ return motion_data[data_num].dwFrame; }
 
 	virtual void Animation();
 
@@ -861,8 +883,8 @@ public:
 	void Render( DWORD flag, float alpha=-1 );
 	void Render( iexShader* shader, char* name );
 
-	inline int GetParam( int n ){ return Param[n]; }
-	inline void SetParam( int n, int p ){ Param[n] = p; }
+	inline int GetParam(int data_num, int n){ return motion_data[data_num].Param[n]; }
+	inline void SetParam(int data_num, int n, int p){ motion_data[data_num].Param[n] = p; }
 
 	inline WORD GetFrameFlag( int frame ){ return dwFrameFlag[frame]; }
 	inline void SetFrameFlag( int frame, WORD p ){ dwFrameFlag[frame] = p; }
@@ -873,13 +895,20 @@ public:
 	inline Vector3*		GetBonePos( int n ){ return &CurPos[n]; }
 	inline int	GetNumBone(){ return NumBone; }
 	inline Matrix*	GetBone( int n ){ return &lpBoneMatrix[n]; }
+	inline 	void Set_bone_motion(int motion_data, int bone)
+	{
+		bone_motion_number[bone] = motion_data;
+	}
+	void iex3DObj2::Set_bone_motions(int motion_data, int num, ...);
 
 	void UpdateSkinMeshFrame( float frame );
 	void UpdateBoneMatrix();
 	void UpdateSkinMesh();
+
+	void Is_use_iexMesh_Update(bool in){ iexMesh_Update_use = in; }
 };
 
-typedef iex3DObj IEX3DOBJ, *LPIEX3DOBJ;
+typedef iex3DObj2 IEX3DOBJ, *LPIEX3DOBJ;
 
 //*****************************************************************************************************************************
 //
