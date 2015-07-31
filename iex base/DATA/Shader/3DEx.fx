@@ -4,6 +4,8 @@
 //
 //**************************************************************************************************
 
+
+
 //------------------------------------------------------
 //		環境関連
 //------------------------------------------------------
@@ -72,6 +74,8 @@ struct VS_BASIC
     float4 Pos    : POSITION;
     float4 Color  : COLOR0;
     float2 Tex	  : TEXCOORD0;
+
+	float4 WorldPos:TEXCOORD1;
 };
 
 struct VS_OUTPUT
@@ -526,3 +530,149 @@ technique lcopy_fx2
     }
 }
 
+
+
+//**************************************************************************************************
+//																									
+//		基本シェーダー	の下に追加	
+//
+//**************************************************************************************************
+
+
+
+//**************************************************************************************************
+//		POINTLIGHT
+//**************************************************************************************************
+//必要な変数
+static float LIGHTMAX = 1;
+float3 P_pos=(float3)0;//まだmainで触ってない
+float3 P_Color=(float3)0;//Color
+float P_Power = 45.0f;//Power
+
+
+//------------------------------------------------------
+//	POINTLIGHT　頂点シェーダー
+//------------------------------------------------------
+VS_BASIC VS_POINTLIGHT(VS_INPUTL In)
+{
+	VS_BASIC Out = (VS_BASIC)0; //Outがピクセルシェーダーに情報を渡す変数。
+
+	float3 P = mul(In.Pos, TransMatrix);//ある頂点のポジションとTransmatrixを掛けて　頂点のポジション→Ｐを作る
+
+		float3x3	mat = TransMatrix;//TRANSMATRIXと化したmat　★追記：：TransMatrixはfloat4のmatはfloat3で　法線はfoat3なので　matをfloat3にしてんだよ。
+
+		
+		float3 N = mul(In.Normal, mat);//ある頂点の法線とmatを掛けて　頂点の法線→Ｎを作る
+		N = normalize(N);//Ｎを正規化して　-１～１の間にする。
+
+	Out.Pos = mul(In.Pos, Projection);//ある頂点のポジションとProjyectionを掛けて　Out.Posに入れていく　
+	Out.Color.rgb = 0.5 + DirLight(LightDir, N);// +HemiLight(N);//DirLighitは法線で光の色を強くHemLightで阪急ライティングの関数を使い　★　阪急ライティングコメントアウト
+	//ピクセルシェーダーに渡す
+	Out.Color.a = 1.0f;//その渡すカラーのアルファ値
+	Out.Tex = In.Tex;//そこ頂点のテクスチャーを　Out.Texに入れる？
+
+	Out.WorldPos = float4(P, 1);
+
+
+	return Out;//ピクセルシェーダーに入れる情報をおくる
+}
+
+//ポイントライトの計算をする関数
+float3 PointLightRate(float3 Pos){
+	float3 col = (float3)0;
+
+	//for (int i = 0; i < 10; i++){
+	float rate = length(P_pos - Pos) / P_Power;//字の間違い注意
+
+	rate = min(1.0f, rate);//1.0からオーバーさせないため
+	rate = max(0, rate);//.0からオーバーさせないため
+	rate = (1.0f - rate);//Rateが弱い所を強くするから　数値を逆に！
+	col += P_Color* rate;
+	//}
+
+	col = min(.75f, col);//1.0からオーバーさせないため(ここの数値をいじると程よいライトになる)
+	col = max(0, col);//.0からオーバーさせないため
+
+	return col;
+}
+
+//------------------------------------------------------
+//	POINTLIGHT　ピクセルシェーダー	
+//------------------------------------------------------
+float4 PS_POINTLIGHT(VS_BASIC In) : COLOR
+{
+
+	float4	OUT;
+	//ここから
+
+	float4 LIGHT;//ライトの色情報
+	LIGHT.rgb = PointLightRate(In.WorldPos);
+	LIGHT.a = .0f;
+
+	//ピクセル色決定
+	OUT = /*In.Color **/ (tex2D(DecaleSamp, In.Tex) + LIGHT);
+
+	return OUT;
+}
+//------------------------------------------------------
+//	POINTLIGHT　テクニック
+//------------------------------------------------------
+technique pointlight
+{
+	pass P0
+	{
+		AlphaBlendEnable = true;//透明度
+		BlendOp = Add;//合成の設定
+		SrcBlend = SrcAlpha;//
+		DestBlend = InvSrcAlpha;//
+		ZWriteEnable = true;//Zバッファを使うか？
+
+		VertexShader = compile vs_3_0 VS_POINTLIGHT();
+		PixelShader = compile ps_3_0 PS_POINTLIGHT();
+	}
+}
+
+
+
+/***********************************************************/
+/*****************ここまでがポイントライト******************/
+/***********************************************************/
+
+
+
+
+//**************************************************************************************************
+//
+//		ＵＶアニメーション用
+//
+//**************************************************************************************************
+
+float uvMove;
+
+VS_OUTPUT VS_UvAni(VS_INPUTL In)
+{
+	VS_OUTPUT Out = (VS_OUTPUT)0;
+
+	Out.Pos = mul(In.Pos, Projection);
+	Out.Color = 1.0f;	//α値
+	//	Out.Color.b = 0.0f;
+	Out.Tex = In.Tex + float2(uvMove, .0f);
+
+	return Out;
+}
+
+technique uvAnim
+{
+	pass P0
+	{
+		AlphaBlendEnable = true;
+		BlendOp = Add;
+		SrcBlend = SrcAlpha;
+		DestBlend = InvSrcAlpha;
+		CullMode = CCW;
+		ZEnable = true;
+
+		VertexShader = compile vs_3_0 VS_UvAni();
+		PixelShader = compile ps_3_0 PS_Basic();
+	}
+}

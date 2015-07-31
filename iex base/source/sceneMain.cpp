@@ -2,7 +2,7 @@
 #include	"sceneMain.h"
 #include	"iextreme.h"
 #include	"system/system.h"
-#include "character/airou/airou.h"
+#include "character/airou/testairou.h"
 #include "text_loader/character_loader.h"
 #include "collision/collision.h"
 #include "character/gimmick/Move_block.h"
@@ -72,7 +72,7 @@ void	sceneMain::Update()
 
 	Camera_update();
 
-	if (KEY_Get(KEY_ENTER) == 3)
+	if (KEY_Get(KEY_ENTER, 0) == 3)
 	{
 		airou->Change_texture();
 	}

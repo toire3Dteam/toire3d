@@ -1,11 +1,15 @@
 #include	"iextreme.h"
 #include	"Framework.h"
-//#include	"sceneMain.h"
-#include	"sceneTitle.h"
+#include	"../TitleScene.h"
+#include	"../sceneMain.h"
+
+#include	"../../IEX/OKB.h"
 
 #define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
+// アイコン変更で使う
+#include	"../resource.h"
+
+#include<crtdbg.h>
 
 //*****************************************************************************************************************************
 //
@@ -13,12 +17,14 @@
 //
 //*****************************************************************************************************************************
 
-char*	AppTitle = "IEX2010";
+char*	AppTitle = "3D";
 
 BOOL	bFullScreen = FALSE;
 DWORD	ScreenMode  = SCREEN720p;
 
 Framework*	MainFrame = NULL;
+
+
 
 //*****************************************************************************************************************************
 //		アプリケーション初期化
@@ -31,12 +37,16 @@ BOOL	InitApp( HWND hWnd )
 	IEX_InitAudio();
 	IEX_InitInput();
 
+	// キーボード入力初期化
+	OKB_Init();
+
 	//	システムの初期化
 	SYSTEM_Initialize();
 	//	メインフレームワーク生成
 	MainFrame = new Framework();
 	//	初期シーン登録
-	MainFrame->ChangeScene( new sceneTitle() );
+	//MainFrame->ChangeScene( new TitleScene() );
+	MainFrame->ChangeScene( new sceneMain() );
 
 	return TRUE;
 }
@@ -76,7 +86,7 @@ HWND InitWindow( HINSTANCE hInstance, int nCmdShow )
 	wc.cbClsExtra    = 0;
 	wc.cbWndExtra    = 0;
 	wc.hInstance     = hInstance;
-	wc.hIcon         = LoadIcon(hInstance, IDI_APPLICATION);
+	wc.hIcon = LoadIcon(hInstance, LPSTR(IDI_ICON1));
 	wc.hCursor       = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH )GetStockObject(BLACK_BRUSH);
 	wc.lpszMenuName  = NULL;
@@ -106,8 +116,11 @@ HWND InitWindow( HINSTANCE hInstance, int nCmdShow )
 //*****************************************************************************************************************************
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
+	// メモリリーク検知器
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-//	_CrtSetBreakAlloc(245);
+
+	// メモリ確保した瞬間検知器
+	//_CrtSetBreakAlloc(90);
 
 	MSG		msg;
 	HWND	hWnd;
@@ -132,9 +145,10 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	delete	MainFrame;
 	SYSTEM_Release();
 	iexSystem::CloseDebugWindow();
-	IEX_ReleaseAudio();
 	IEX_ReleaseInput();
 	IEX_Release();
+	IEX_ReleaseAudio();
+	OKB_Release();
 
 	return 0;
 }

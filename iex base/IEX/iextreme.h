@@ -4,6 +4,20 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define	_CRT_SECURE_NO_DEPRECATE
 
+///////////////////////////////////////////
+//										 //
+//				　マクロ　				 //
+//										 //
+///////////////////////////////////////////
+#define SAFE_DELETE(p) if(p){ delete p;p=nullptr;}
+
+//********************************************
+//機能概要：点と点の距離を取得する
+//引数：Vector Vec1,Vec2 点
+//戻り値：点と点の直線距離
+//********************************************
+float Length(float x, float y, float x2, float y2);
+
 //*****************************************************************************************************************************
 //
 //	IEX Version2010
@@ -12,6 +26,8 @@
 #include	<windows.h>
 #include	<d3dx9.h>
 #include	<dsound.h>
+#include <stdarg.h>
+
 
 #define		DIRECTINPUT_VERSION	0x0800 
 #include	<dinput.h>
@@ -23,7 +39,6 @@
 #include <crtdbg.h>
 #define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
-
 
 //*****************************************************************************
 //
@@ -182,6 +197,9 @@ public:
 	inline Vector3 operator - ( CONST Vector3& v ) const { return Vector3(x-v.x, y-v.y, z-v.z); }
 	inline Vector3 operator * ( FLOAT v ) const { Vector3 ret(x*v, y*v, z*v); return ret; }
 	inline Vector3 operator / ( FLOAT v ) const { Vector3 ret(x/v, y/v, z/v); return ret; }
+
+	//追加分
+	//inline Vector operator *(const float& f){ Vector a = { x * f, y * f, z * f }; return a; }
 
 	BOOL operator == ( CONST Vector3& v ) const { return (x==v.x) && (y==v.y) && (z==v.z); }
 	BOOL operator != ( CONST Vector3& v ) const { return (x!=v.x) || (y!=v.y) || (z!=v.z); }
@@ -534,6 +552,10 @@ public:
 	iex2DObj( char* filename );
 	//	作成
 	iex2DObj( u32 width, u32 height, u8 flag );
+
+	//自作
+	iex2DObj::iex2DObj( char* filename, u8 flag );
+
 	//	解放
 	~iex2DObj(){
 		if( lpSurface ) lpSurface->Release();
@@ -553,6 +575,14 @@ public:
 	void Render( iexShader* shader, char* tech );
 	void Render( s32 DstX, s32 DstY, s32 DstW, s32 DstH, s32 SrcX, s32 SrcY, s32 width, s32 height, u32 dwFlags=RS_COPY, COLOR color=0xFFFFFFFF, float z=.0f );
 	void Render( s32 DstX, s32 DstY, s32 DstW, s32 DstH, s32 SrcX, s32 SrcY, s32 width, s32 height, iexShader* shader, char* tech, COLOR color=0xFFFFFFFF, float z=.0f );
+
+	void Render_reverseX(s32 DstX, s32 DstY, s32 DstW, s32 DstH, s32 SrcX, s32 SrcY, s32 width, s32 height, u32 dwFlags, COLOR color, float z);
+	void Render_scale(float scale, s32 DstX, s32 DstY, s32 DstW, s32 DstH, s32 SrcX, s32 SrcY, s32 width, s32 height, u32 dwFlags = RS_COPY, COLOR color = 0xFFFFFFFF, float z = .0f);
+
+	void rot_render(float rad);
+	void rot_render(float rad, iexShader* shader, char* tech);
+	void rot_render(float rad, s32 DstX, s32 DstY, s32 DstW, s32 DstH, s32 SrcX, s32 SrcY, s32 width, s32 height, u32 dwFlags = RS_COPY, COLOR color = 0xFFFFFFFF, float z = .0f);
+	void rot_render(float rad, s32 DstX, s32 DstY, s32 DstW, s32 DstH, s32 SrcX, s32 SrcY, s32 width, s32 height, iexShader* shader, char* tech, COLOR color = 0xFFFFFFFF, float z = .0f);
 
 };
 
@@ -677,7 +707,7 @@ class iexMesh2 {
 private:
 protected:
 	u32				dwFlags;		//	フラグ
-	BOOL bChanged;
+	u8				bChanged;		//	変更フラグ
 
 	Vector3			Pos;			//	メッシュ座標
 	Vector3			Angle;			//	メッシュ回転量
@@ -714,6 +744,8 @@ public:
 	//	更新
 	//------------------------------------------------------
 	void Update();
+	void Update2(float ang);
+
 
 	//------------------------------------------------------
 	//	描画
@@ -921,7 +953,7 @@ typedef struct tagPARTICLE	{
 
 	int		aFrame;			//	出現フレーム
 	COLOR	aColor;			//	出現カラー
-	
+
 	int		eFrame;			//	消滅フレーム
 	COLOR	eColor;			//	出現カラー
 
@@ -978,11 +1010,11 @@ public:
 	static void Initialize( char* filename, int nParticles );
 	static void Release();
 	//	出現
-	static void Set( LPPARTICLE pd );
-	static void	Set( int type, int aFrame, COLOR aColor, int eFrame, COLOR eColor, int mFrame, COLOR mColor, 
-						LPVECTOR3 Pos, LPVECTOR3 Move, LPVECTOR3 Power, float rotate, float stretch, float scale, u8 flag );
-	static void	Set( int type, int aFrame, float aAlpha, int eFrame, float eAlpha, int mFrame, float mAlpha, 
-						LPVECTOR3 Pos, LPVECTOR3 Move, LPVECTOR3 Power, float r, float g, float b, float scale, u8 flag );
+	static void Set(LPPARTICLE pd);
+	static void	Set(int type, int aFrame, COLOR aColor, int eFrame, COLOR eColor, int mFrame, COLOR mColor,
+		LPVECTOR3 Pos, LPVECTOR3 Move, LPVECTOR3 Power, float rotate, float stretch, float scale, u8 flag);
+	static void	Set(int type, int aFrame, float aAlpha, int eFrame, float eAlpha, int mFrame, float mAlpha,
+		LPVECTOR3 Pos, LPVECTOR3 Move, LPVECTOR3 Power, float r, float g, float b, float scale, u8 flag);
 
 	//	更新
 	static void Update();
@@ -1001,13 +1033,177 @@ public:
 void	IEX_InitText( void );
 void	IEX_ReleaseText( void );
 void	IEX_DrawText( LPSTR str, s32 x, s32 y, s32 width, s32 height, COLOR color, BOOL bMini=FALSE );
+void	IEX_DrawText( s32 x, s32 y, s32 width, s32 height, COLOR color, const char *format, ... );
 
-//*****************************************************************************************************************************
+////*****************************************************************************************************************************
+////
+////		入力関連
+////
+////*****************************************************************************************************************************
 //
-//		入力関連
+////*****************************************************************************
+////		入力デバイス管理
+////*****************************************************************************
+//class iexInputManager
+//{
+//private:
+//	static LPDIRECTINPUT8 pDI;
 //
-//*****************************************************************************************************************************
+//	static int NumDevice;
+//	static DIDEVICEINSTANCE	didi[4];
+//
+//	static BOOL CALLBACK EnumDeviceCallback( const DIDEVICEINSTANCE* pdidi, VOID* pContext );
+//	static BOOL CALLBACK EnumAxes(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID pvRef);
+//
+//public:
+//	static void Initialize();
+//	static LPDIRECTINPUTDEVICE8 GetDevice( int n );
+//
+//	static void Release()
+//	{
+//		if( pDI ) pDI->Release();
+//	}
+//};
+//
+//
+//typedef u8	KEYCODE, *LPKEYCODE;
+//
+//#define	KEY_UP		0
+//#define	KEY_DOWN	1
+//#define	KEY_LEFT		2
+//#define	KEY_RIGHT	3
+//
+//#define	KEY_A		4
+//#define	KEY_B		5
+//#define	KEY_C		6
+//#define	KEY_D		7
+//#define	KEY_X		6
+//#define	KEY_Y		7
+//
+//#define	KEY_L		8
+//#define	KEY_L1		8
+//#define	KEY_L2		10
+//#define	KEY_L3		12
+//
+//#define	KEY_R		9
+//#define	KEY_R1		9
+//#define	KEY_R2		11
+//#define	KEY_R3		13
+//
+//#define	KEY_START	14
+//#define	KEY_SELECT	15
+//#define	KEY_BACK	15
+//
+//#define	KEY_ENTER	14
+//#define	KEY_SPACE	15
+//
+//#define	KEY_B1		4
+//#define	KEY_B2		5
+//#define	KEY_B3		6
+//#define	KEY_B4		7
+//#define	KEY_B5		8
+//#define	KEY_B6		9
+//#define	KEY_B7		10
+//#define	KEY_B8		11
+//#define	KEY_B9		12
+//#define	KEY_B10		13
+//#define	KEY_B11		14
+//#define	KEY_B12		15
+//#define	KEY_B13		16
+//#define	KEY_B14		17
+//#define	KEY_B15		18
+//
+//#define	KEY_AXISX	200
+//#define	KEY_AXISY	201
+//#define	KEY_AXISX2	202
+//#define	KEY_AXISY2	203
+//
+//typedef struct tagKEYSET 
+//{
+//	u8	up, down, left, right;
+//	u8	A, B, X, Y;
+//	u8	L1, L2, L3;
+//	u8	R1, R2, R3;
+//	u8	START, SELECT;
+//} KEYSET, *LPKEYSET;
+//
+//
+//#define	AXIS_X	0
+//#define	AXIS_Y	1
+//#define	AXIS_Z	2
+//#define	AXIS_RX	3
+//#define	AXIS_RY	4
+//#define	AXIS_RZ	5
+//
+//typedef struct tagPADSET 
+//{
+//	u8	lx, ly, rx, ry;
+//	u8	A, B, X, Y;
+//	u8	L1, L2, L3;
+//	u8	R1, R2, R3;
+//	u8	START, SELECT;
+//} PADSET, *LPPADSET;
+//
+//class iexInput
+//{
+//private:
+//	LPDIRECTINPUTDEVICE8 lpDevice;
+//	LPDIRECTINPUTEFFECT	 pEffect;
+//
+//	static const int OrgKeyMap[20];
+//	static const int OrgJoyMap[20];
+//	int KeyMap[20];
+//	int JoyMap[20];
+//	u8	KeyInfo[20], JoyInfo[20];
+//	int		PadAxisX, PadAxisY;
+//	int		PadAxisX2, PadAxisY2;
+//
+//	BOOL InitVibration();
+//
+//
+//public:
+//	static PADSET	ps101;
+//	static PADSET	sixaxis;
+//	static PADSET	xbox360;
+//
+//	iexInput( int n );
+//	~iexInput();
+//
+//	void Asign( KEYSET& keyset );
+//	void PadAsign( PADSET& padset );
+//
+//	void SetInfo();
+//	int Get( KEYCODE key );
+//
+//	void Vibration( u32 gain, float period );
+//};
+//
+//
+////*****************************************************************************
+////		アクセス関数
+////*****************************************************************************
+//void	KEY_Asign( KEYSET& padset );
+//void	KEY_PadAsign( PADSET& padset );
+//
+//void	KEY_SetInfo();
+//int		KEY_Get( KEYCODE key );
+//void	KEY_Vibration( u32 gain, float period );
+//
+//int		KEY_GetAxisX();
+//int		KEY_GetAxisY();
+//int		KEY_GetAxisX2();
+//int		KEY_GetAxisY2();
+//
+//BOOL	IEX_InitInput();
+//void	IEX_ReleaseInput();
+//
+//#define	KEY(x)	KEY_Get(x)
 
+//*****************************************************************************
+//
+//		トイレ入力関連
+//
+//*****************************************************************************
 //*****************************************************************************
 //		入力デバイス管理
 //*****************************************************************************
@@ -1019,16 +1215,16 @@ private:
 	static int NumDevice;
 	static DIDEVICEINSTANCE	didi[4];
 
-	static BOOL CALLBACK EnumDeviceCallback( const DIDEVICEINSTANCE* pdidi, VOID* pContext );
+	static BOOL CALLBACK EnumDeviceCallback(const DIDEVICEINSTANCE* pdidi, VOID* pContext);
 	static BOOL CALLBACK EnumAxes(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID pvRef);
 
 public:
 	static void Initialize();
-	static LPDIRECTINPUTDEVICE8 GetDevice( int n );
+	static LPDIRECTINPUTDEVICE8 GetDevice(int n);
 
 	static void Release()
 	{
-		if( pDI ) pDI->Release();
+		if (pDI) pDI->Release();
 	}
 };
 
@@ -1085,7 +1281,7 @@ typedef u8	KEYCODE, *LPKEYCODE;
 #define	KEY_AXISX2	202
 #define	KEY_AXISY2	203
 
-typedef struct tagKEYSET 
+typedef struct tagKEYSET
 {
 	u8	up, down, left, right;
 	u8	A, B, X, Y;
@@ -1102,7 +1298,7 @@ typedef struct tagKEYSET
 #define	AXIS_RY	4
 #define	AXIS_RZ	5
 
-typedef struct tagPADSET 
+typedef struct tagPADSET
 {
 	u8	lx, ly, rx, ry;
 	u8	A, B, X, Y;
@@ -1133,38 +1329,39 @@ public:
 	static PADSET	sixaxis;
 	static PADSET	xbox360;
 
-	iexInput( int n );
+	iexInput(int n);
 	~iexInput();
 
-	void Asign( KEYSET& keyset );
-	void PadAsign( PADSET& padset );
+	void Asign(KEYSET& keyset);
+	void PadAsign(PADSET& padset);
 
 	void SetInfo();
-	int Get( KEYCODE key );
+	int Get(KEYCODE key);
 
-	void Vibration( u32 gain, float period );
+	void Vibration(u32 gain, float period);
 };
 
 
 //*****************************************************************************
 //		アクセス関数
 //*****************************************************************************
-void	KEY_Asign( KEYSET& padset );
-void	KEY_PadAsign( PADSET& padset );
+void	KEY_Asign(KEYSET& padset, int num);
+void	KEY_PadAsign(PADSET& padset, int num);
 
-void	KEY_SetInfo();
-int		KEY_Get( KEYCODE key );
-void	KEY_Vibration( u32 gain, float period );
+void	KEY_SetInfo(int num);
+int		KEY_Get(KEYCODE key, int num);
+void	KEY_Vibration(u32 gain, float period);
 
-int		KEY_GetAxisX();
-int		KEY_GetAxisY();
-int		KEY_GetAxisX2();
-int		KEY_GetAxisY2();
+int		KEY_GetAxisX(int num);
+int		KEY_GetAxisY(int num);
+int		KEY_GetAxisX2(int num);
+int		KEY_GetAxisY2(int num);
 
 BOOL	IEX_InitInput();
 void	IEX_ReleaseInput();
 
-#define	KEY(x)	KEY_Get(x)
+#define	KEY(x,pad)	KEY_Get(x,pad)
+
 
 
 //*****************************************************************************
@@ -1185,22 +1382,41 @@ void	IEX_ReleaseInput();
 class SoundBuffer
 {
 private:
-	LPBYTE LoadWAV( LPSTR fname, LPDWORD size, LPWAVEFORMATEX wfx);
+	LPBYTE LoadWAV(LPSTR fname, LPDWORD size, LPWAVEFORMATEX wfx);
 	LPDIRECTSOUNDBUFFER		lpBuf;
 	LPDIRECTSOUND3DBUFFER	lpBuf3D;
 
+	DWORD PlayCursor;
+	DWORD BufferSize;
+	WAVEFORMATEX format;
+
 public:
-	SoundBuffer( LPDIRECTSOUND lpDS, char* filename, bool b3D );
+	SoundBuffer(LPDIRECTSOUND lpDS, char* filename, bool b3D);
 	~SoundBuffer();
 
 	LPDIRECTSOUNDBUFFER GetBuf(){ return lpBuf; }
-	void Play( BOOL loop );
+	void Play(BOOL loop);
 	void Stop();
+	void Pause();
 
-	void	SetVolume( int volume );
+	void	SetVolume(int volume);
+	int		GetVolume();
+	void	SetPan(int pan);
+	int		GetPan();
+	void	SetFrequency(int pitch);
+	int		GetFrequency();
 	BOOL	isPlay();
 
-	void	SetPos( Vector3* pos );
+	void	SetPos(Vector3* pos);
+
+	DWORD GetPlayCursor();
+	DWORD GetPlayFrame();
+	int GetPlaySecond();
+	void SetPlaySecond(int sec);
+	DWORD GetSize();
+	int GetLengthSecond();
+	int GetBytesPerSecond();
+
 };
 
 class iexStreamSound
@@ -1225,9 +1441,9 @@ private:
 	s32		param;
 	s32		volume;
 
-	void Initialize( LPDIRECTSOUND lpDS, int rate );
+	void Initialize(LPDIRECTSOUND lpDS, int rate);
 
-	BOOL	OGGRead( LPBYTE dst, unsigned long size );
+	BOOL	OGGRead(LPBYTE dst, unsigned long size);
 
 public:
 	BYTE	type;
@@ -1235,20 +1451,20 @@ public:
 	LPDIRECTSOUNDNOTIFY	lpStrNotify;
 
 
-	iexStreamSound( LPDIRECTSOUND lpDS, LPSTR filename, BYTE mode, int param );
+	iexStreamSound(LPDIRECTSOUND lpDS, LPSTR filename, BYTE mode, int param);
 	~iexStreamSound();
 
-	BOOL	SetBlockOGG( int block );
-	BOOL	SetBlockWAV( int block );
+	BOOL	SetBlockOGG(int block);
+	BOOL	SetBlockWAV(int block);
 
-	BOOL	SetWAV( LPDIRECTSOUND lpDS, char* filename );
-	BOOL	SetOGG( LPDIRECTSOUND lpDS, char* filename );
+	BOOL	SetWAV(LPDIRECTSOUND lpDS, char* filename);
+	BOOL	SetOGG(LPDIRECTSOUND lpDS, char* filename);
 
 	void	Stop();
-	void	SetVolume( int volume );
+	void	SetVolume(int volume);
 	int		GetVolume(){ return volume; }
 
-	void	SetMode( BYTE mode, int param );
+	void	SetMode(BYTE mode, int param);
 	u8		GetMode(){ return mode; }
 	int		GetParam(){ return param; }
 
@@ -1260,7 +1476,7 @@ class iexSound
 {
 private:
 	static const int WavNum = 128;
-	
+
 	HWND	hWndWAV;
 
 	LPDIRECTSOUND8			lpDS;		// DirectSoundオブジェクト
@@ -1274,23 +1490,36 @@ public:
 	iexSound();
 	~iexSound();
 
-	void Set( int no, char* filename, bool b3D=false );
-	void SetPos( int no, Vector3* pos ){ buffer[no]->SetPos(pos); }
-	void Play( int no, BOOL loop=FALSE );
-	void Stop( int no );
+	void Set(int no, char* filename, bool b3D = false);
+	void SetPos(int no, Vector3* pos){ buffer[no]->SetPos(pos); }
+	void Play(int no, BOOL loop = FALSE);
+	void Stop(int no);
+	void Pause(int no);
 
-	void SetListener( Vector3* pos, Vector3* target );
+
+	void SetListener(Vector3* pos, Vector3* target);
 
 
-	void	SetVolume( int no, int volume );
-	BOOL	isPlay( int no );
+	void	SetVolume(int no, int volume);
+	int		GetVolume(int no);
+	void	SetPan(int no, int pan);
+	int		GetPan(int no);
+	void	SetFrequency(int no, int pitch);
+	int		GetFrequency(int no);
 
-	iexStreamSound* PlayStream( char* filename );
-	iexStreamSound* PlayStream( char* filename, BYTE mode, int param );
+	BOOL	isPlay(int no);
+	DWORD	GetPlayCursor(int no);
+	DWORD	GetPlayFrame(int no);
+	int 	GetPlaySecond(int no);
+	void	SetPlaySecond(int no, int sec);
+	DWORD	GetSize(int no);
+	int		GetLengthSecond(int no);
+	int		GetBytesPerSecond(int no);
+
+	iexStreamSound* PlayStream(char* filename);
+	iexStreamSound* PlayStream(char* filename, BYTE mode, int param);
 
 };
-
-
 
 
 
@@ -1496,6 +1725,30 @@ BOOL		IEX_ReleaseStreamSound( LPDSSTREAM lpStream );
 void	IEX_SetStreamSoundVolume( LPDSSTREAM lpStream, s32 volume );
 void	IEX_SetStreamMode( LPDSSTREAM lpStream, u8 mode, s32 param );
 
+///////////////////////////////////////////
+//										 //
+//				Text				     //
+//										 //
+///////////////////////////////////////////
+class Text
+{
+private:
+	LPD3DXFONT font;
+
+public:
+	Text(){ font = 0; };
+	Text(int size, char *font)
+	{
+		Init(size, font);
+	}
+	~Text()
+	{
+		CleanUpModule();
+	}
+	void Init(int size, char *font);
+	void CleanUpModule();
+	void Draw(int x, int y, DWORD color, const char * _Format, ...);
+};
 
 #endif
 

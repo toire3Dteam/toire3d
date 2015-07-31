@@ -33,7 +33,7 @@ sceneTitle::~sceneTitle(){
 //*****************************************************************************************************************************
 void	sceneTitle::Update()
 {
-	if( KEY_Get(KEY_ENTER)==3 ) MainFrame->ChangeScene ( new sceneMain());
+	if( KEY_Get(KEY_ENTER, 0)==3 ) MainFrame->ChangeScene ( new sceneMain());
 }
 
 

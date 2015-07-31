@@ -3,7 +3,7 @@
 #include "../../IEX/iextreme.h"
 #include "../../IEX/IEX_3DObject2.h"
 #include "../character/character.h"
-#include "../character/airou/airou.h"
+#include "../character/airou/testairou.h"
 #include "../character/gimmick/Move_block.h"
 
 void Collision::Check(iexMesh2 *obj, Character *chara)

@@ -1,8 +1,9 @@
 #include	"iextreme.h"
 #include	"system.h"
 #include	"Framework.h"
+#include	"../IEX/OKB.h"
 
-#include	"sceneMain.h"
+#include	"../sceneMain.h"
 #include <time.h>
 
 
@@ -69,8 +70,21 @@ bool Framework::Update()
 	dwCurFrame ++;	//	フレーム数更新
 	dwGameFrame++;	//	ゲームフレーム数更新
 
-	//	更新処理
-	KEY_SetInfo();
+	//	更新処理(トイレ用)
+	for (int i = 0; i < 4; i++)
+	{
+		KEY_SetInfo(i);
+	}
+	//KEY_SetInfo();
+	
+
+//#ifdef _DEBUG
+
+	// キーボード入力更新(このゲームはキーボードを使わないのでデバッグ用)
+	OKB_Update();
+
+//#endif
+
 	if( scene != NULL ) scene->Update();
 
 	return true;

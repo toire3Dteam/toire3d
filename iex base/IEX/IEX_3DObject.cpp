@@ -726,7 +726,7 @@ void	IEX_ObjectFrameNext( LPIEX3DOBJ lpObj )
 //int		IEX_GetObjectMotion( LPIEX3DOBJ lpObj )
 //{
 //	if( !lpObj ) return -1;
-//	return	lpObj->GetMotion();
+//	return	lpObj->GetMotion(0);
 //}
 
 //		À•W•ÏX
