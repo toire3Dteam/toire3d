@@ -5,13 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="ソース ファイル\SYSTEM">
-      <UniqueIdentifier>{0601c5ed-7826-4163-be63-69396eb2ed8d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="リソース ファイル">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
@@ -19,11 +12,14 @@
     <Filter Include="IEX">
       <UniqueIdentifier>{9e8d67d2-7ac9-43ab-8c7a-53c6805e2932}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\SYSTEM">
+      <UniqueIdentifier>{0601c5ed-7826-4163-be63-69396eb2ed8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="シェーダー">
+      <UniqueIdentifier>{2e229673-6c68-4a9c-9103-b17b0264930d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\sceneMain.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="source\system\Framework.cpp">
       <Filter>ソース ファイル\SYSTEM</Filter>
     </ClCompile>
@@ -81,13 +77,31 @@
     <ClCompile Include="IEX\IEX_View.cpp">
       <Filter>IEX</Filter>
     </ClCompile>
-    <ClCompile Include="source\sceneTitle.cpp">
+    <ClCompile Include="source\shadow\ShadowMap.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="IEX\IEX_3DObject2.cpp">
+    <ClCompile Include="source\HDR\HDReffect.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="IEX\IEX_Input2.cpp">
+    <ClCompile Include="IEX\TEXT.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Scene\SceneMain.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="source\camera\Camera.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="IEX\OKB.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="source\player\Airou.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="source\player\BasePlayer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="source\player\PlayerManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="IEX\IEX_Math2.cpp">
@@ -96,181 +110,101 @@
     <ClCompile Include="source\text_loader\character_loader.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="source\collision\collision.cpp">
+    <ClCompile Include="source\utility\fade\Fade.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="source\character\character.cpp">
+    <ClCompile Include="source\utility\sound\sound.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="source\character\gimmick\Move_block.cpp">
+    <ClCompile Include="source\data\CollectionData.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="IEX\OKB.cpp">
+    <ClCompile Include="source\data\LimitedData.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="IEX\TEXT.cpp">
+    <ClCompile Include="source\data\UnlimitedData.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="IEX\TOIRE_Imput.cpp">
+    <ClCompile Include="source\Scene\CharaSelectScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="source\TitleScene.cpp">
+    <ClCompile Include="source\Scene\StageSelectScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="source\Fade.cpp">
+    <ClCompile Include="source\player\Teki.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="source\ModeSelectScene.cpp">
+    <ClCompile Include="IEX\Debug.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="source\CharaSelectScene.cpp">
+    <ClCompile Include="source\timer\Timer.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="source\CollectionScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="source\OptionScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="source\ResultScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="source\BasePlayer.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Camera.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="source\CollectionData.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Effect.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="source\LimitedData.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="source\PlayerManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Sound.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="source\StageSelectScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="source\UnlimitedData.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Airou.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="source\character\airou\testairou.cpp">
+    <ClCompile Include="source\collision\Collision.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\system\Framework.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\system\Scene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\sceneMain.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\system\System.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="IEX\iextreme.h">
       <Filter>IEX</Filter>
     </ClInclude>
-    <ClInclude Include="source\sceneTitle.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="source\system\Framework.h">
+      <Filter>ソース ファイル\SYSTEM</Filter>
     </ClInclude>
-    <ClInclude Include="IEX\IEX_3DObject2.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="source\system\Scene.h">
+      <Filter>ソース ファイル\SYSTEM</Filter>
     </ClInclude>
-    <ClInclude Include="IEX\IEX_Input2.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="source\system\System.h">
+      <Filter>ソース ファイル\SYSTEM</Filter>
     </ClInclude>
-    <ClInclude Include="IEX\IEX_Math2.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="source\shadow\ShadowMap.h" />
+    <ClInclude Include="source\HDR\HDReffect.h" />
+    <ClInclude Include="source\system\DebugDrawManager.h" />
+    <ClInclude Include="source\system\ItDebug.h" />
+    <ClInclude Include="source\Scene\SceneMain.h">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="source\text_loader\character_loader.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\text_loader\text_loader.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\collision\collision.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\character\character.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\character\gimmick\Move_block.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="IEX\OKB.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\resource.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\TitleScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Fade.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\ModeSelectScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\CharaSelectScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\CollectionScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\OptionScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\ResultScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\BasePlayer.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Camera.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\CollectionData.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Effect.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\LimitedData.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\PlayerManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Sound.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\StageSelectScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\UnlimitedData.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Airou.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="source\character\airou\testairou.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
+    <ClInclude Include="source\chara\Airou.h" />
+    <ClInclude Include="source\chara\BasePlayer.h" />
+    <ClInclude Include="source\chara\PlayerManager.h" />
+    <ClInclude Include="source\camera\Camera.h" />
+    <ClInclude Include="IEX\OKB.h" />
+    <ClInclude Include="source\character\airou\testairou.h" />
+    <ClInclude Include="source\character\gimmick\Move_block.h" />
+    <ClInclude Include="source\character\character.h" />
+    <ClInclude Include="source\player\Airou.h" />
+    <ClInclude Include="source\player\BasePlayer.h" />
+    <ClInclude Include="source\player\PlayerManager.h" />
+    <ClInclude Include="IEX\ogg\codec.h" />
+    <ClInclude Include="IEX\ogg\ogg.h" />
+    <ClInclude Include="IEX\ogg\os_types.h" />
+    <ClInclude Include="IEX\ogg\vorbisenc.h" />
+    <ClInclude Include="IEX\ogg\vorbisfile.h" />
+    <ClInclude Include="IEX\IEX_Math2.h" />
+    <ClInclude Include="source\text_loader\character_loader.h" />
+    <ClInclude Include="source\text_loader\text_loader.h" />
+    <ClInclude Include="source\utility\fade\Fade.h" />
+    <ClInclude Include="source\utility\sound\sound.h" />
+    <ClInclude Include="source\utility\DebugDrawManager.h" />
+    <ClInclude Include="source\utility\ItDebug.h" />
+    <ClInclude Include="source\data\CollectionData.h" />
+    <ClInclude Include="source\data\LimitedData.h" />
+    <ClInclude Include="source\data\UnlimitedData.h" />
+    <ClInclude Include="source\Scene\CharaSelectScene.h" />
+    <ClInclude Include="source\Scene\StageSelectScene.h" />
+    <ClInclude Include="source\player\Teki.h" />
+    <ClInclude Include="source\timer\Timer.h" />
+    <ClInclude Include="source\collision\Collision.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DATA\Shader\2D.fx">
+      <Filter>シェーダー</Filter>
+    </None>
+    <None Include="DATA\Shader\3D.fx">
+      <Filter>シェーダー</Filter>
+    </None>
+    <None Include="DATA\Shader\ShadowMap.inc" />
+    <None Include="..\..\PSSM.7z" />
+    <None Include="DATA\Shader\F_PointLight.inc" />
   </ItemGroup>
 </Project>

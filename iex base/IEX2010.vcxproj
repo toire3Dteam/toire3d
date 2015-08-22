@@ -48,6 +48,13 @@
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <EmbedManifest>false</EmbedManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(DXSDK_DIR)Include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(DXSDK_DIR)Lib\x86;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <PreBuildEvent>
       <Command>
@@ -99,33 +106,30 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="IEX\IEX_3DObject2.cpp" />
-    <ClCompile Include="IEX\IEX_Input2.cpp" />
+    <ClCompile Include="IEX\Debug.cpp" />
     <ClCompile Include="IEX\IEX_Math2.cpp" />
     <ClCompile Include="IEX\OKB.cpp" />
-    <ClCompile Include="IEX\TEXT.cpp" />
-    <ClCompile Include="IEX\TOIRE_Imput.cpp" />
-    <ClCompile Include="source\Airou.cpp" />
-    <ClCompile Include="source\BasePlayer.cpp" />
-    <ClCompile Include="source\Camera.cpp" />
-    <ClCompile Include="source\character\gimmick\Move_block.cpp" />
-    <ClCompile Include="source\CharaSelectScene.cpp" />
-    <ClCompile Include="source\CollectionData.cpp" />
-    <ClCompile Include="source\CollectionScene.cpp" />
-    <ClCompile Include="source\collision\collision.cpp" />
-    <ClCompile Include="source\Effect.cpp" />
-    <ClCompile Include="source\Fade.cpp" />
-    <ClCompile Include="source\LimitedData.cpp" />
-    <ClCompile Include="source\ModeSelectScene.cpp" />
-    <ClCompile Include="source\OptionScene.cpp" />
-    <ClCompile Include="source\PlayerManager.cpp" />
-    <ClCompile Include="source\ResultScene.cpp" />
-    <ClCompile Include="source\sceneMain.cpp" />
-    <ClCompile Include="source\Sound.cpp" />
-    <ClCompile Include="source\StageSelectScene.cpp" />
+    <ClCompile Include="IEX\TEXT.cpp">
+      <DeploymentContent>true</DeploymentContent>
+    </ClCompile>
+    <ClCompile Include="source\camera\Camera.cpp" />
+    <ClCompile Include="source\collision\Collision.cpp" />
+    <ClCompile Include="source\data\CollectionData.cpp" />
+    <ClCompile Include="source\data\LimitedData.cpp" />
+    <ClCompile Include="source\data\UnlimitedData.cpp" />
+    <ClCompile Include="source\HDR\HDReffect.cpp" />
+    <ClCompile Include="source\player\Airou.cpp" />
+    <ClCompile Include="source\player\BasePlayer.cpp" />
+    <ClCompile Include="source\player\PlayerManager.cpp" />
+    <ClCompile Include="source\player\Teki.cpp" />
+    <ClCompile Include="source\Scene\CharaSelectScene.cpp" />
+    <ClCompile Include="source\Scene\SceneMain.cpp" />
+    <ClCompile Include="source\Scene\StageSelectScene.cpp" />
+    <ClCompile Include="source\shadow\ShadowMap.cpp" />
     <ClCompile Include="source\system\Framework.cpp" />
     <ClCompile Include="source\system\System.cpp" />
     <ClCompile Include="source\system\WinMain.cpp" />
@@ -145,48 +149,63 @@
     <ClCompile Include="IEX\IEX_System.cpp" />
     <ClCompile Include="IEX\IEX_Texture.cpp" />
     <ClCompile Include="IEX\IEX_View.cpp" />
-    <ClCompile Include="source\sceneTitle.cpp" />
-    <ClCompile Include="source\character\airou\testairou.cpp" />
-    <ClCompile Include="source\character\character.cpp" />
     <ClCompile Include="source\text_loader\character_loader.cpp" />
-    <ClCompile Include="source\TitleScene.cpp" />
-    <ClCompile Include="source\UnlimitedData.cpp" />
+    <ClCompile Include="source\timer\Timer.cpp" />
+    <ClCompile Include="source\utility\fade\Fade.cpp" />
+    <ClCompile Include="source\utility\sound\sound.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="IEX\OKB.h" />
-    <ClInclude Include="source\Airou.h" />
-    <ClInclude Include="source\BasePlayer.h" />
-    <ClInclude Include="source\Camera.h" />
-    <ClInclude Include="source\character\gimmick\Move_block.h" />
-    <ClInclude Include="source\CharaSelectScene.h" />
-    <ClInclude Include="source\CollectionData.h" />
-    <ClInclude Include="source\CollectionScene.h" />
-    <ClInclude Include="source\collision\collision.h" />
-    <ClInclude Include="source\character\character.h" />
-    <ClInclude Include="IEX\IEX_3DObject2.h" />
-    <ClInclude Include="IEX\IEX_Input2.h" />
     <ClInclude Include="IEX\IEX_Math2.h" />
-    <ClInclude Include="source\Effect.h" />
-    <ClInclude Include="source\Fade.h" />
-    <ClInclude Include="source\LimitedData.h" />
-    <ClInclude Include="source\ModeSelectScene.h" />
-    <ClInclude Include="source\OptionScene.h" />
-    <ClInclude Include="source\PlayerManager.h" />
-    <ClInclude Include="source\resource.h" />
-    <ClInclude Include="source\ResultScene.h" />
-    <ClInclude Include="source\Sound.h" />
-    <ClInclude Include="source\StageSelectScene.h" />
+    <ClInclude Include="IEX\ogg\codec.h" />
+    <ClInclude Include="IEX\ogg\ogg.h" />
+    <ClInclude Include="IEX\ogg\os_types.h" />
+    <ClInclude Include="IEX\ogg\vorbisenc.h" />
+    <ClInclude Include="IEX\ogg\vorbisfile.h" />
+    <ClInclude Include="IEX\OKB.h" />
+    <ClInclude Include="source\camera\Camera.h" />
+    <ClInclude Include="source\character\airou\testairou.h" />
+    <ClInclude Include="source\character\character.h" />
+    <ClInclude Include="source\character\gimmick\Move_block.h" />
+    <ClInclude Include="source\chara\Airou.h" />
+    <ClInclude Include="source\chara\BasePlayer.h" />
+    <ClInclude Include="source\chara\PlayerManager.h" />
+    <ClInclude Include="source\collision\Collision.h" />
+    <ClInclude Include="source\data\CollectionData.h" />
+    <ClInclude Include="source\data\LimitedData.h" />
+    <ClInclude Include="source\data\UnlimitedData.h" />
+    <ClInclude Include="source\HDR\HDReffect.h" />
+    <ClInclude Include="source\player\Airou.h" />
+    <ClInclude Include="source\player\BasePlayer.h" />
+    <ClInclude Include="source\player\PlayerManager.h" />
+    <ClInclude Include="source\player\Teki.h" />
+    <ClInclude Include="source\Scene\CharaSelectScene.h" />
+    <ClInclude Include="source\Scene\SceneMain.h" />
+    <ClInclude Include="source\Scene\StageSelectScene.h" />
+    <ClInclude Include="source\shadow\ShadowMap.h" />
+    <ClInclude Include="source\system\DebugDrawManager.h" />
     <ClInclude Include="source\system\Framework.h" />
+    <ClInclude Include="source\system\ItDebug.h" />
     <ClInclude Include="source\system\Scene.h" />
-    <ClInclude Include="source\sceneMain.h" />
     <ClInclude Include="source\system\System.h" />
     <ClInclude Include="IEX\iextreme.h" />
-    <ClInclude Include="source\sceneTitle.h" />
-    <ClInclude Include="source\character\airou\testairou.h" />
     <ClInclude Include="source\text_loader\character_loader.h" />
     <ClInclude Include="source\text_loader\text_loader.h" />
-    <ClInclude Include="source\TitleScene.h" />
-    <ClInclude Include="source\UnlimitedData.h" />
+    <ClInclude Include="source\timer\Timer.h" />
+    <ClInclude Include="source\utility\DebugDrawManager.h" />
+    <ClInclude Include="source\utility\fade\Fade.h" />
+    <ClInclude Include="source\utility\ItDebug.h" />
+    <ClInclude Include="source\utility\sound\sound.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\PSSM.7z" />
+    <None Include="DATA\Shader\2D.fx" />
+    <None Include="DATA\Shader\F_PointLight.inc" />
+    <None Include="DATA\Shader\ShadowMap.inc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DATA\Shader\3D.fx">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

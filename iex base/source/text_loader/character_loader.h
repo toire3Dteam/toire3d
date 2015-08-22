@@ -4,8 +4,7 @@
 
 #include "text_loader.h"
 
-// ‰¼
-class Character;
+class BasePlayer;
 
 class Character_loader : public Text_loader
 {
@@ -17,7 +16,7 @@ public:
 	Character_loader() :Text_loader(){}
 	~Character_loader(){}
 
-	bool Load(Character *character);
+	bool Load(BasePlayer *character);
 };
 
 #endif // !CHARACTER_LOADER_H

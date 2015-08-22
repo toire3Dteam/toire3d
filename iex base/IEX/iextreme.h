@@ -33,12 +33,22 @@ float Length(float x, float y, float x2, float y2);
 #include	<dinput.h>
 
 #include <stdarg.h>
+//へろさん追加
+#include "../source/system/ItDebug.h"
+#include "../source/system/DebugDrawManager.h"
 
+//タイム
+#include <time.h>
+//ファイル
+#include   <fstream>
+
+/*
 #if _DEBUG
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
+*/
 
 //*****************************************************************************
 //
@@ -88,6 +98,7 @@ class iexShader;
 
 #define	SCREEN720p	11
 #define	SCREEN800p	12
+#define SCREEN1080p	13
 
 class iexSystem {
 private:
@@ -203,6 +214,8 @@ public:
 
 	BOOL operator == ( CONST Vector3& v ) const { return (x==v.x) && (y==v.y) && (z==v.z); }
 	BOOL operator != ( CONST Vector3& v ) const { return (x!=v.x) || (y!=v.y) || (z!=v.z); }
+
+	inline void Set(float x, float y, float z){ this->x = x, this->y = y, this->z = z; }
 
 } Vector3, *LPVECTOR3;
 
@@ -365,6 +378,7 @@ public:
 //*****************************************************************************
 class iexView {
 private:
+protected:
 	Matrix	matView;
 	Matrix	matProj;
 
@@ -384,7 +398,7 @@ public:
 	iexView()
 	{
 		SetViewport();
-		SetProjection( D3DX_PI / 4.0f, 0.1f, 1000.0f );
+		SetProjection( D3DX_PI / 4.0f, 0.1f, 3000.0f );
 	}
 
 	//	視界クリア
@@ -1335,7 +1349,7 @@ public:
 	void Asign(KEYSET& keyset);
 	void PadAsign(PADSET& padset);
 
-	void SetInfo();
+	void SetInfo(int n);
 	int Get(KEYCODE key);
 
 	void Vibration(u32 gain, float period);
@@ -1730,24 +1744,89 @@ void	IEX_SetStreamMode( LPDSSTREAM lpStream, u8 mode, s32 param );
 //				Text				     //
 //										 //
 ///////////////////////////////////////////
-class Text
-{
+class Text{
 private:
-	LPD3DXFONT font;
+	static LPD3DXFONT font;
+public:
+	static void Init();
+	static void CleanUpModule();
+	static void Draw(int x, int y, DWORD color, const char * _Format, ...);
+};
+
+///////////////////////////////////////////
+//										 //
+//				Debug				     //
+//										 //
+///////////////////////////////////////////
+class Debug{
+private:
+	static iex2DObj* _128;
+	static int x128, y128;
+	static iex2DObj* _256;
+	static int x256, y256;
+
+	static int speed;
+
+	//球
+	static iexMesh2* ball;
+	static iexMesh2* Hitball;
+
 
 public:
-	Text(){ font = 0; };
-	Text(int size, char *font)
+	static void Init();
+	static void CleanUp();
+	static void Draw128();
+	static void Draw256();
+
+	static void Draw128TRG();
+	static void Draw256TRG();
+
+	//球
+	static void Ball_Render(Vector3 Pos, float Radius, bool Hit);
+};
+/*便利関数ゾーン※今はIEX＿Meshに作成*/
+inline float Length(Vector3 PosA, Vector3 PosB);
+bool Collision_Sphere(Vector3 PosA, float RadiusA, Vector3 PosB, float RadiusB);
+Vector3 LocalBonePos(iex3DObj2* lpObj, int BoneNo);
+Vector3 WorldBonePos(iex3DObj2* lpObj, int BoneNo);
+
+
+class AllEnum{
+public:
+	enum CHARACTER
 	{
-		Init(size, font);
-	}
-	~Text()
+		NO_CHR = -1,
+		CHR_TEKI,
+		CHR_AIROU,
+	};
+
+	enum STAGE
 	{
-		CleanUpModule();
-	}
-	void Init(int size, char *font);
-	void CleanUpModule();
-	void Draw(int x, int y, DWORD color, const char * _Format, ...);
+		STAGE_NORMAL,
+		STAGE_SUICA,
+		STAGE_TOIRE,
+		STAGE_AIROU,
+		STAGE_MANATSU,
+	};
+
+	enum MYMUSIC_PART
+	{
+		BGM_PART_MENU,
+		BGM_PART_BATTLE_FIELD,
+		BGM_PART_SUICA_STAGE,
+		BGM_PART_TOIRE_STAGE,
+		BGM_PART_AIROU_STAGE,
+		BGM_PART_MANATSU_STAGE,
+		MYMUSIC_PART_MAX
+	};
+
+	enum SE_PART
+	{
+		SE_PART_SYSTEM,
+		SE_PART_BATTLE,
+		SE_PART_MAX
+	};
+
 };
 
 #endif

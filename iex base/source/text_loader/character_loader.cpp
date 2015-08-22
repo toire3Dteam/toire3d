@@ -1,10 +1,10 @@
 
 #include "character_loader.h"
 #include <assert.h>
-#include "../character/character.h"
-#include "../../IEX/IEX_3DObject2.h"
+#include "../player/BasePlayer.h"
+#include "../../IEX/iextreme.h"
 
-bool Character_loader::Load(Character *character)
+bool Character_loader::Load(BasePlayer *character)
 {
 	assert(character != nullptr);
 	assert(ferror(file) == 0);
@@ -38,7 +38,7 @@ bool Character_loader::Load(Character *character)
 	{
 		Load_string(work2, 256);
 		Add_string(work1, 256, path, work2); // パス作成
-
+		// 上半身、下半身で固定
 		obj = new iex3DObj2(work1, 2);
 		character->Set_object(obj);
 	}

@@ -42,7 +42,7 @@ void	SYSTEM_Initialize()
 	//KEY_PadAsign( iexInput::xbox360 );	// XBOX360 Controller
 
 	//	シェーダー読み込み
-	shader = new iexShader("DATA\\SHADER\\3DEx.fx");
+	shader = new iexShader("DATA\\SHADER\\3D.fx");
 	shader2D = new iexShader("DATA\\SHADER\\2D.fx");
 	//	パーティクルシステム初期化
 //	iexParticle::Initialize("DATA\\PARTICLE.PNG", 10000 );

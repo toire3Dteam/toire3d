@@ -1,23 +1,24 @@
 #include	"iExtreme.h"
 
-void Text::Init(int size, char *font_){
+LPD3DXFONT Text::font;
+
+void Text::Init(){
 	HFONT hf;
 	D3DXFONT_DESC fd;
 
 	hf = (HFONT)GetStockObject(SYSTEM_FONT);
 	GetObject(hf, sizeof(LOGFONT), (LPSTR)&fd);
-	fd.Height = size;
+	fd.Height = 64;
 	fd.Width = 0;
 	fd.Italic = 0;
 	fd.CharSet = SHIFTJIS_CHARSET;
-	strcpy(fd.FaceName, font_);
+	strcpy(fd.FaceName, "ƒƒCƒŠƒI");
 
 	D3DXCreateFontIndirect(iexSystem::GetDevice(), &fd, &font);
 }
 
 void Text::CleanUpModule(){
-	if (font)
-		font->Release();
+	font->Release();
 }
 
 void Text::Draw(int x, int y, DWORD color, const char * _Format, ...){

@@ -1,13 +1,12 @@
 #include	"iextreme.h"
 #include	"Framework.h"
-#include	"../TitleScene.h"
-#include	"../sceneMain.h"
+#include	"../IEX/OKB.h"
+#include	"../Scene/sceneMain.h"
+#include	"../Scene/CharaSelectScene.h"
 
-#include	"../../IEX/OKB.h"
+// 追加
+#include	"../utility/sound/sound.h"
 
-#define _CRTDBG_MAP_ALLOC
-// アイコン変更で使う
-#include	"../resource.h"
 
 #include<crtdbg.h>
 
@@ -20,7 +19,7 @@
 char*	AppTitle = "3D";
 
 BOOL	bFullScreen = FALSE;
-DWORD	ScreenMode  = SCREEN720p;
+DWORD	ScreenMode = SCREEN720p;
 
 Framework*	MainFrame = NULL;
 
@@ -32,13 +31,25 @@ Framework*	MainFrame = NULL;
 
 BOOL	InitApp( HWND hWnd )
 {
+	srand((unsigned int)time(NULL));
+
 	//	IEXシステム初期化
 	IEX_Initialize( hWnd, bFullScreen, ScreenMode );
 	IEX_InitAudio();
 	IEX_InitInput();
 
+	// テキスト初期化
+	Text::Init();
+
+	//静的Debug関連
+	Debug::Init();
+
 	// キーボード入力初期化
 	OKB_Init();
+
+	// サウンド初期化
+	Init_musics();
+
 
 	//	システムの初期化
 	SYSTEM_Initialize();
@@ -46,7 +57,8 @@ BOOL	InitApp( HWND hWnd )
 	MainFrame = new Framework();
 	//	初期シーン登録
 	//MainFrame->ChangeScene( new TitleScene() );
-	MainFrame->ChangeScene( new sceneMain() );
+	//MainFrame->ChangeScene( new sceneMain() );
+	MainFrame->ChangeScene( new CharaSelectScene() );
 
 	return TRUE;
 }
@@ -86,7 +98,7 @@ HWND InitWindow( HINSTANCE hInstance, int nCmdShow )
 	wc.cbClsExtra    = 0;
 	wc.cbWndExtra    = 0;
 	wc.hInstance     = hInstance;
-	wc.hIcon = LoadIcon(hInstance, LPSTR(IDI_ICON1));
+	wc.hIcon = LoadIcon(hInstance, IDI_APPLICATION);
 	wc.hCursor       = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH )GetStockObject(BLACK_BRUSH);
 	wc.lpszMenuName  = NULL;
@@ -125,7 +137,11 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	MSG		msg;
 	HWND	hWnd;
 
-	if( GetAsyncKeyState(VK_CONTROL)&0x8000 ) bFullScreen = TRUE;
+	if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
+	{
+		ScreenMode = SCREEN1080p;
+		bFullScreen = TRUE;
+	}
 
 	hWnd = InitWindow(hInstance, nCmdShow);
 	InitApp(hWnd);
@@ -141,7 +157,10 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		}
 	}
 
-	//	全解放	
+	//	全解放
+
+	//解放の先頭で静的Debug関連解放
+	Debug::CleanUp();
 	delete	MainFrame;
 	SYSTEM_Release();
 	iexSystem::CloseDebugWindow();
@@ -149,6 +168,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	IEX_Release();
 	IEX_ReleaseAudio();
 	OKB_Release();
+	Text::CleanUpModule();
+	Release_musics();
 
 	return 0;
 }

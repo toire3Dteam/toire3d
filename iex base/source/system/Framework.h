@@ -1,5 +1,7 @@
 #include	"System.h"
 #include	"Scene.h"
+
+// ’Ç‰Á
 #ifndef __FRAMEWORK_H__
 #define __FRAMEWORK_H__
 
@@ -71,8 +73,6 @@ public:
 		scene->Initialize();
 	}
 };
-
-extern	Framework*	MainFrame;
 
 
 

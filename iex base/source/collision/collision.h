@@ -2,20 +2,47 @@
 #ifndef COLLISION_H
 #define COLLISION_H
 
-class iexMesh2;
-class Character;
-class TEST_airou;
-class Move_block;
+#include "iextreme.h"
 
-class Collision
+class BasePlayer;
+
+namespace Collision_shape
 {
-private:
-public:
+	class Base
+	{
+	public:
 
-	void Check(iexMesh2 *obj, Character *chara);
-	void Check(iexMesh2 *obj, TEST_airou *chara);
+		Vector3 pos; // ’†S
 
-	void Check(Move_block *block, TEST_airou *chara);
+		Base() :pos(0, 0, 0){}
+		~Base(){}
+	};
+
+	class Circle : public Base
+	{
+	public:
+
+		float radius; // ”¼Œa
+
+		Circle() :Base(), radius(0.0f){}
+		~Circle(){}
+	};
+
+	class Square : public Base
+	{
+	public:
+
+		float height, // ‚‚³ƒ”¼•ª„
+			width; // •ƒ”¼•ª„
+
+		Square() :Base(), height(0.0f), width(0.0f){}
+		~Square(){}
+	};
+}
+
+namespace Collision
+{
+	void Raypic(iexMesh2 *obj, BasePlayer *player); // ‰~Œ`‚Ì”»’è
 };
 
 #endif // !COLLISION_H

@@ -1,96 +1,90 @@
 
-#include "collision.h"
-#include "../../IEX/iextreme.h"
-#include "../../IEX/IEX_3DObject2.h"
-#include "../character/character.h"
-#include "../character/airou/testairou.h"
-#include "../character/gimmick/Move_block.h"
+#include "Collision.h"
+#include "../player/BasePlayer.h"
 
-void Collision::Check(iexMesh2 *obj, Character *chara)
+void Collision::Raypic(iexMesh2 *obj, BasePlayer *player) // ステージとプレイヤー
 {
-	Vector3 out, pos(chara->Get_pos() + Vector3(0, 0.1f, 0)), ray(0, -1, 0);
-	float dist(100);
+	Vector3 pos(player->Get_pos()), move(player->Get_move());
+	const Collision_shape::Square *square(player->Get_hit_square());
 
-	if (obj->RayPick(&out, &pos, &ray, &dist) != -1)
+	Vector3 hit_pos, ray_pos, ray_vec; float dist;
+
+	if (move.y > 0) // 上
 	{
-		chara->Set_pos(out);
+		ray_pos = pos;
+		ray_pos += square->pos;
+		ray_vec.Set(0, 1, 0);
+		dist = square->height + move.y + 1;
+
+		if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // 当たった
+		{
+			dist = abs(hit_pos.y - ray_pos.y);
+			if (dist <= square->height + move.y)
+			{
+				pos.y = hit_pos.y - square->height - square->pos.y;
+				move.y = 0;
+			}
+		}
 	}
-}
-
-void Collision::Check(iexMesh2 *obj, TEST_airou *chara)
-{
-	Vector3 updown(chara->Get_pos()), side(updown), pos(updown), ray(0, 0, 0);
-	float dist(0);
-
-	Vector3 move(chara->Get_move());
-	pos.y += chara->Get_size_down();
-
-	if (move.y != 0)
+	else if (move.y <= 0) // 下
 	{
-		ray = Vector3(0, 0, 0);
+		ray_pos = pos;
+		ray_pos += square->pos;
+		ray_vec.Set(0, -1, 0);
+		dist = square->height - move.y + 1;
 
-		if (move.y < 0)
-			ray.y = -1;
-		else if (move.y > 0)
-			ray.y = 1;
-
-		dist = 100;
-		obj->RayPick(&updown, &pos, &ray, &dist);
-	}
-
-	if (move.x != 0)
-	{
-		ray = Vector3(0, 0, 0);
-
-		if (move.x < 0)
-			ray.x = -1;
-		else if (move.x > 0)
-			ray.x = 1;
-
-		dist = 100;
-		obj->RayPick(&side, &pos, &ray, &dist);
-	}
-
-	chara->Col_vs_stage(updown, side);
-}
-
-void Collision::Check(Move_block *block, TEST_airou *chara)
-{
-	Vector3 cpos(chara->Get_pos()), updown(cpos), side(cpos), raypos(cpos), ray(0, 0, 0);
-	float dist(0);
-
-	Vector3 move(chara->Get_move());
-	raypos.y += chara->Get_size_down();
-
-	if (move.y != 0)
-	{
-		ray = Vector3(0, 0, 0);
-
-		if (move.y < 0)
-			ray.y = -1;
-		else if (move.y > 0)
-			ray.y = 1;
-
-		dist = 100;
-		if (block->RayPick(&updown, &raypos, &ray, &dist) == -1)
-			updown = cpos;
+		if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // 当たった
+		{
+			dist = abs(hit_pos.y - ray_pos.y);
+			if (dist <= square->height - move.y)
+			{
+				pos.y = hit_pos.y + square->height - square->pos.y;
+				move.y = 0;
+				player->Set_isLand_true();
+			}
+			else
+				player->Set_isLand_false();
+		}
 		else
-			updown.y += 0.01f;
+			player->Set_isLand_false();
+
 	}
 
-	if (move.x != 0)
+	if (move.x > 0) // 右
 	{
-		ray = Vector3(0, 0, 0);
+		ray_pos = pos;
+		ray_pos += square->pos;
+		ray_vec.Set(1, 0, 0);
+		dist = square->width + move.x + 1;
 
-		if (move.x < 0)
-			ray.x = -1;
-		else if (move.x > 0)
-			ray.x = 1;
+		if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // 当たった
+		{
+			dist = abs(hit_pos.x - ray_pos.x);
+			if (dist <= square->width + move.x)
+			{
+				pos.x = hit_pos.x - square->width - square->pos.x;
+				move.x = 0;
+			}
+		}
+	}
+	else if (move.x < 0) // 左
+	{
+		ray_pos = pos;
+		ray_pos += square->pos;
+		ray_vec.Set(-1, 0, 0);
+		dist = square->width - move.x + 1;
 
-		dist = 100;
-		if (block->RayPick(&side, &raypos, &ray, &dist) == -1)
-			side = cpos;
+		if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // 当たった
+		{
+			dist = abs(hit_pos.x - ray_pos.x);
+			if (dist <= square->width - move.x)
+			{
+				pos.x = hit_pos.x + square->width - square->pos.x;
+				move.x = 0;
+			}
+		}
 	}
 
-	chara->Col_vs_gimmick(block->Get_move(), updown, side);
+	player->Set_move(move);
+	player->Set_pos(pos);
 }

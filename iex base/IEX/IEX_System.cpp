@@ -57,7 +57,6 @@ BOOL iexSystem::Initialize( HWND hWnd, BOOL bFullScreen, DWORD ScreenMode )
 
 	d3dpp.EnableAutoDepthStencil		= TRUE;
 	d3dpp.AutoDepthStencilFormat		= D3DFMT_D24S8;
-//	d3dpp.AutoDepthStencilFormat		= D3DFMT_D16;
 
 //	d3dpp.PresentationInterval			= D3DPRESENT_INTERVAL_ONE;
 	d3dpp.PresentationInterval			= D3DPRESENT_INTERVAL_IMMEDIATE;
@@ -121,6 +120,7 @@ void iexSystem::GetScreenRect( DWORD mode, RECT& rc )
 	case SCREEN800:	 rc.right = 800;  rc.bottom = 600;	break;
 	case SCREEN1024: rc.right = 1024; rc.bottom = 768;	break;
 	case SCREEN720p: rc.right = 1280; rc.bottom = 720;	break;
+	case SCREEN1080p:rc.right = 1920, rc.bottom = 1080; break;
 
 	default:
 			rc.right = (mode>>16);

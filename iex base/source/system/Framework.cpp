@@ -3,7 +3,7 @@
 #include	"Framework.h"
 #include	"../IEX/OKB.h"
 
-#include	"../sceneMain.h"
+#include	"../Scene/sceneMain.h"
 #include <time.h>
 
 

@@ -60,11 +60,6 @@ SoundBuffer::SoundBuffer( LPDIRECTSOUND lpDS, char* filename, bool b3D )
 	GlobalFree(lpWBuf);
 	/* 二次バッファのロック解除	*/ 
 	lpBuf->Unlock(lpbuf1, dwbuf1, lpbuf2, dwbuf2); 
-
-	/* 自作初期化 */
-	PlayCursor = 0;
-	BufferSize = size;
-	format = wfx;
 }
 
 SoundBuffer::~SoundBuffer()
@@ -155,7 +150,7 @@ void	SoundBuffer::SetPos( Vector3* pos )
 void SoundBuffer::Play( BOOL loop )
 {
 	lpBuf->Stop();
-	lpBuf->SetCurrentPosition(PlayCursor);
+	lpBuf->SetCurrentPosition(0);
 	//	ループ再生
 	if( loop ) lpBuf->Play(0, 0, DSBPLAY_LOOPING);
 	//	ノーマル再生
@@ -163,8 +158,6 @@ void SoundBuffer::Play( BOOL loop )
 
 //	lpBuf->SetFrequency(8000);
 
-
-	 PlayCursor = 0;
 }
 
 //-------------------------------------------------------------
@@ -175,61 +168,13 @@ void SoundBuffer::Stop()
 	lpBuf->Stop();
 }
 
-void SoundBuffer::Pause()
-{
-	lpBuf->GetCurrentPosition(&PlayCursor, NULL);
-	lpBuf->Stop();
-}
-
 //-------------------------------------------------------------
 //	ボリューム変更
 //-------------------------------------------------------------
 void	SoundBuffer::SetVolume( int volume )
 {
-	lpBuf->SetVolume(volume);
+	lpBuf->SetVolume( volume );
 }
-
-//-------------------------------------------------------------
-//	ボリュームゲッター
-//-------------------------------------------------------------
-int	SoundBuffer::GetVolume()
-{
-	LONG ret;
-	HRESULT a = lpBuf->GetVolume(&ret);
-	return ret;
-}
-
-//-------------------------------------------------------------
-//	ステレオ(左右音)関係
-//-------------------------------------------------------------
-void SoundBuffer::SetPan(int pan)
-{
-	lpBuf->SetPan(pan);
-}
-
-int SoundBuffer::GetPan()
-{
-	LONG ret;
-	lpBuf->GetPan(&ret);
-	return ret;
-}
-
-
-//-------------------------------------------------------------
-//	周波数関係(再生速度・ピッチ)
-//-------------------------------------------------------------
-void SoundBuffer::SetFrequency(int pitch)
-{
-	HRESULT a = lpBuf->SetFrequency(pitch);
-}
-
-int SoundBuffer::GetFrequency()
-{
-	DWORD ret;
-	lpBuf->GetFrequency(&ret);
-	return ret;
-}
-
 
 //-------------------------------------------------------------
 //	再生チェック	
@@ -240,49 +185,6 @@ BOOL	SoundBuffer::isPlay()
 	lpBuf->GetStatus( &dwAns );
 	if( (dwAns&DSBSTATUS_PLAYING) != 0 ) return TRUE;
 	 else return FALSE;
-}
-
-
-//-------------------------------------------------------------
-//	再生位置関係
-//-------------------------------------------------------------
-DWORD SoundBuffer::GetPlayCursor()
-{
-	DWORD ret;
-	lpBuf->GetCurrentPosition(&ret, NULL);
-
-	return ret;
-}
-
-DWORD SoundBuffer::GetPlayFrame()
-{
-	return (GetPlayCursor() / (format.nAvgBytesPerSec / 60));
-}
-
-int SoundBuffer::GetPlaySecond()
-{
-	return (GetPlayCursor() / format.nAvgBytesPerSec);
-}
-
-void SoundBuffer::SetPlaySecond(int sec)
-{
-	DWORD set = sec * format.nAvgBytesPerSec;
-	lpBuf->SetCurrentPosition( set );
-}
-
-DWORD SoundBuffer::GetSize()
-{
-	return BufferSize;
-}
-
-int SoundBuffer::GetLengthSecond()
-{
-	return (BufferSize / format.nAvgBytesPerSec);
-}
-
-int SoundBuffer::GetBytesPerSecond()
-{
-	return format.nAvgBytesPerSec;
 }
 
 //**************************************************************************************************************
@@ -736,16 +638,6 @@ void iexSound::Stop( int no )
 	buffer[no]->Stop();
 }
 
-void iexSound::Pause(int no)
-{
-	//	初期化チェック
-	if (lpDS == NULL) return;
-	//	データが無い！！
-	if (buffer[no] == NULL) return;
-
-	buffer[no]->Pause();
-}
-
 
 /*	ボリュームの設定	*/ 
 void	iexSound::SetVolume( int no, int volume )
@@ -754,58 +646,8 @@ void	iexSound::SetVolume( int no, int volume )
 	if( lpDS == NULL ) return;
 	//	データが無い！！
 	if( buffer[no] == NULL ) return;
-	//	音量セット(0～-10000の範囲)
+	//	音量セット
 	buffer[no]->SetVolume( volume );
-}
-
-int		iexSound::GetVolume(int no)
-{
-	//	初期化チェック
-	if (lpDS == NULL) return 0;
-	//	データが無い！！
-	if (buffer[no] == NULL) return 0;
-	//	音量ゲット(0～-10000の範囲)
-	return buffer[no]->GetVolume();
-}
-
-/*	パン(ステレオ)の設定	*/ 
-void	iexSound::SetPan(int no, int pan)
-{
-	//	初期化チェック
-	if (lpDS == NULL) return;
-	//	データが無い！！
-	if (buffer[no] == NULL) return;
-	//	パンセット(-10000(左)～0(真ん中)～10000(右)の範囲)
-	buffer[no]->SetPan(pan);
-}
-int		iexSound::GetPan(int no)
-{
-	//	初期化チェック
-	if (lpDS == NULL) return 0;
-	//	データが無い！！
-	if (buffer[no] == NULL) return 0;
-	//	現在のパンを返す
-	return buffer[no]->GetPan();
-}
-
-/*	周波数の設定	*/
-void	iexSound::SetFrequency(int no, int pitch)
-{
-	//	初期化チェック
-	if (lpDS == NULL) return;
-	//	データが無い！！
-	if (buffer[no] == NULL) return;
-	//	セット
-	buffer[no]->SetFrequency(pitch);
-}
-int		iexSound::GetFrequency(int no)
-{
-	//	初期化チェック
-	if (lpDS == NULL) return 0;
-	//	データが無い！！
-	if (buffer[no] == NULL) return 0;
-	//	セット
-	return buffer[no]->GetFrequency();
 }
 
 
@@ -820,76 +662,6 @@ BOOL	iexSound::isPlay( int no )
 	return buffer[no]->isPlay();
 }
 
-/*	pos(再生位置)の取得	*/
-DWORD	iexSound::GetPlayCursor(int no)
-{
-	//	初期化チェック
-	if (lpDS == NULL) return 0;
-	//	データが無い！！
-	if (buffer[no] == NULL) return 0;
-
-	return buffer[no]->GetPlayCursor();
-}
-DWORD	iexSound::GetPlayFrame(int no)
-{
-	//	初期化チェック
-	if (lpDS == NULL) return 0;
-	//	データが無い！！
-	if (buffer[no] == NULL) return 0;
-
-	return buffer[no]->GetPlayFrame();
-}
-int		iexSound::GetPlaySecond(int no)
-{
-	//	初期化チェック
-	if (lpDS == NULL) return 0;
-	//	データが無い！！
-	if (buffer[no] == NULL) return 0;
-
-	return buffer[no]->GetPlaySecond();
-}
-
-void	iexSound::SetPlaySecond(int no, int sec)
-{
-	//	初期化チェック
-	if (lpDS == NULL) return;
-	//	データが無い！！
-	if (buffer[no] == NULL) return;
-
-	buffer[no]->SetPlaySecond(sec);
-}
-
-
-DWORD iexSound::GetSize(int no)
-{
-	//	初期化チェック
-	if (lpDS == NULL) return 0;
-	//	データが無い！！
-	if (buffer[no] == NULL) return 0;
-
-	return buffer[no]->GetSize();
-}
-
-int		iexSound::GetLengthSecond(int no)
-{
-	//	初期化チェック
-	if (lpDS == NULL) return 0;
-	//	データが無い！！
-	if (buffer[no] == NULL) return 0;
-
-	return buffer[no]->GetLengthSecond();
-}
-
-
-int		iexSound::GetBytesPerSecond(int no)
-{
-	//	初期化チェック
-	if (lpDS == NULL) return 0;
-	//	データが無い！！
-	if (buffer[no] == NULL) return 0;
-
-	return buffer[no]->GetBytesPerSecond();
-}
 
 void	iexSound::SetListener( Vector3* pos, Vector3* target )
 {
