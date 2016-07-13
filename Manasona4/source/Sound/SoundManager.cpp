@@ -50,7 +50,7 @@ void SoundManager::Initialize()
 	bgm->Initialize();
 
 	// ボリュームの読み込み
-	std::ifstream ifs("DATA/Sound/BGM/volume.txt");
+	std::ifstream ifs("DATA/Sound/volume.txt");
 	MyAssert(ifs, "エラー: ボリューム設定テキストが入ってない");
 
 	// ボリューム読み込み
@@ -357,43 +357,49 @@ BGM_Manager *bgm;
 
 
 
-MyMusicManager::MyMusicManager(MY_MUSIC_ID id)
+MyMusicManager::MyMusicManager(MY_MUSIC_ID id) :m_bPlay(false)
 {
-	// IDごとの、情報が入ってるテキストへのパス
-	static const char *paths[(int)MY_MUSIC_ID::MAX]=
+	// IDごとの、情報が入ってるテキストへのパス ※enumずれないようにする
+	static const char *PATHS[(int)MY_MUSIC_ID::MAX]=
 	{
 		"DATA/Sound/BGM/MyMusic/Select/",
-		"DATA/Sound/BGM/MyMusic/Senjo/"
+		"DATA/Sound/BGM/MyMusic/Senjo/",
+		"DATA/Sound/BGM/MyMusic/Toile/"
 	};
 
 	// ファイル読み込み
-	std::ifstream ifs((char*)(std::string(paths[(int)id]) + "info.txt").c_str());
+	std::ifstream ifs((char*)(std::string(PATHS[(int)id]) + "info.txt").c_str());
 	MyAssert(ifs, "エラー: オレ曲の読み込みに失敗");
 
 	// 終端まで
 	while (!ifs.eof())
 	{
-		char MusicName[256], FileName[256];
+		char MusicName[256], FileName[256], path[256];
 		int percent;
 
 		// オレ曲情報読み取り
 		ifs >> MusicName;
 		ifs >> FileName;
-		sprintf_s(FileName, 256, "%s%s", paths[(int)id], FileName);	// パス作成
+		sprintf_s(path, 256, "%s%s", PATHS[(int)id], FileName);	// パス作成
 		ifs >> percent;
 
 		// リストに突っ込む
-		m_list.push_back(new MyMusic(MusicName, FileName, percent));
+		m_list.push_back(new MyMusic(MusicName, path, percent));
 	}
+
 }
 
 MyMusicManager::~MyMusicManager()
 {
-	m_list.clear();	// リスト消去
+	for (auto it : m_list) delete it;	// リスト消去
+	Stop();			// 曲ストップ
 }
 
 void MyMusicManager::Play()
 {
+	// 2重再生防止
+	if (m_bPlay) return;
+
 	// 結構アレなコードなので、気が向いたら程度に直す
 	int count(0);
 	for (auto &it : m_list)
@@ -408,7 +414,7 @@ void MyMusicManager::Play()
 	int count2(0);
 	for (UINT i = 0; i < m_list.size();i++)
 	{
-		for (int remain = m_list[i]->percent; remain >= 0; remain--)
+		for (int remain = m_list[i]->percent - 1; remain >= 0; remain--)
 		{
 			// 数字格納領域に曲の番号を入れていく
 			numbers[count2++] = i;
@@ -416,7 +422,9 @@ void MyMusicManager::Play()
 	}
 
 	// その数字格納領域の中からランダムで抽選、引いた数字を再生
-	m_pStreamSound = bgm->PlayStream((char*)m_list[numbers[rand() % count]]->path.c_str());
+	int r = (true) ? tdnRandom::Get(0, count - 1) : rand() % count;
+	m_pStreamSound = bgm->PlayStream((char*)m_list[numbers[r]]->path.c_str());
+	m_bPlay = true;	// 再生フラグON
 
 	// 解放
 	delete[] numbers;

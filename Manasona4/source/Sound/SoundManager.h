@@ -138,6 +138,7 @@ enum class MY_MUSIC_ID
 {
 	SELECT,		// セレクト
 	SENJO,		// 戦場
+	TOILE,		// トイレステージ
 	MAX
 };
 
@@ -158,6 +159,7 @@ public:
 
 	std::vector<MyMusic*> *GetList(){ return &m_list; }	// リスト取得
 	void Play();// オレ曲からランダムで再生
+	void Stop(){ if (m_bPlay) m_pStreamSound->Stop(); }// オレ曲停止
 private:
 
 	std::vector<MyMusic*> m_list;	// オレ曲を格納するリスト

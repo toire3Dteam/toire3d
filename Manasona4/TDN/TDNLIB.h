@@ -2712,6 +2712,7 @@ public:
 	//------------------------------------------------------
 	int	RayPick( Vector3* out, Vector3* pos, Vector3* vec, float *Dist );
 	int	RayPickUD( Vector3* out, Vector3* pos, Vector3* vec, float *Dist );
+	int	RayPick2(Vector3* out, const Vector3* pos, Vector3* vec, float *Dist);	// 真夏に入ってたやつ
 
 	struct NearestPointOut
 	{
@@ -2867,13 +2868,3 @@ public:
 };
 
 typedef iex3DObj IEX3DOBJ, *LPIEX3DOBJ;
-
-
-//======================================================
-// 羊ゲーム用定数
-enum class DIR
-{
-	UP, DOWN
-};
-
-const int STAGE_MAX = 3;

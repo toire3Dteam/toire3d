@@ -185,7 +185,7 @@ void Number::Render(int x, int y, int num, NUM_KIND kind)
 			int digitNum = number % 10;	// àÍî‘è¨Ç≥Ç¢åÖÇì¸éË
 			number = (int)(number / 10);// êîílÇÃàÍî‘è¨Ç≥Ç¢åÖÇè¡Ç∑
 
-			m_pic->Render(x - ((count * (32 * PiccScale))*m_picScale), y, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize);// êîéöï`âÊ
+			m_pic->Render(x - ((count * (int)(32 * PiccScale))*m_picScale), y, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize);// êîéöï`âÊ
 
 			if (number <= 0)break;// êîílÇ™ÇOà»â∫Ç…Ç»Ç¡ÇΩÇÁÇ≥ÇÊÇ»ÇÁ
 		}

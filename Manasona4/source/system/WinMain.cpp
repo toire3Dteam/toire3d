@@ -25,7 +25,7 @@ BOOL InitApp(HINSTANCE hInstance, int nCmdShow)									// ƒQ[ƒ€‹N“®‚ÌÅ‰‚Ì
 		MessageBox(0, "ƒEƒBƒ“ƒhƒE‰Šú‰»¸”sB", "System", MB_OK);
 	}
 
-	//tdnSystem::InitD3D();
+	tdnRandom::Initialize();
 	tdnRenderState::Initialize();
 	tdnTexture::Initialize();
 	tdnText::Init();

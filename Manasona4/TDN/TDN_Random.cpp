@@ -11,6 +11,9 @@ void tdnRandom::Initialize()
 {
 	std::random_device device;
 	engine.seed((unsigned long)device());
+
+	// ‚Â‚¢‚Å‚Ésrand‚à
+	srand((unsigned int)time(0));
 }
 
 std::uniform_int_distribution<int> tdnRandom::Make_distribution(int min_num, int max_num)

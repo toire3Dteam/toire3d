@@ -22,7 +22,8 @@ void	SYSTEM_Initialize()
 
 void	SYSTEM_Release()
 {
-	delete	shader2D;
+	delete shader;
+	delete shader2D;
 }
 
 
