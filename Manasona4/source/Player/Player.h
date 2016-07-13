@@ -1,5 +1,9 @@
 #pragma once
 
+// エンティティ関連のインクルード
+#include "../BaseEntity/Entity/BaseGameEntity.h"
+#include "../BaseEntity/State/StateMachine.h"
+
 // 前方宣言
 namespace CollisionShape
 {
@@ -55,12 +59,13 @@ namespace Fighter
 	};
 }
 
-class PlayerManager
+class PlayerManager :public BaseGameEntity
 {
 public:
-	PlayerManager(int NumPlayer);
+	PlayerManager(int NumPlayer, Stage::Base *pStage);
 	~PlayerManager();
-	void Update(Stage::Base *stage);
+	//void Update(Stage::Base *pStage);
+	void Update();
 	void Render();
 
 	int GetNumPlayer(){ return m_NumPlayer; }
@@ -69,4 +74,8 @@ public:
 private:
 	const int m_NumPlayer;
 	Fighter::Base **m_pPlayers;
+	Stage::Base *m_pStage;	// 参照するだけ(Updateの引数でもらってたのだが、BaseGameEntityの継承で引数なしのUpdateを使わないといけなくなったため、メンバ変数に)
+
+	// BaseGameEntiryサブクラスはメッセージを使って通信する
+	bool  HandleMessage(const Message& msg);
 };

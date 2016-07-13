@@ -17,14 +17,23 @@
 
 bool sceneMain::Initialize()
 {
+	// カメラ初期化
+	m_pCamera = new Camera();
+
+	m_fLoadPercentage = .25f;	// ロード割合
+
 	// ステージ初期化
-	Stage::Base::CreateStage(&m_pStage, STAGE_ID::SENJO);	// 関数の中で作ってもらう
+	Stage::Base::CreateStage(&m_pStage, STAGE_ID::SENJO, m_pCamera);	// 関数の中で作ってもらう
+
+	m_fLoadPercentage = .5f;	// ロード割合
 
 	// プレイヤー初期化
-	m_pPlayerMgr = new PlayerManager(4);
+	m_pPlayerMgr = new PlayerManager(4, m_pStage);
 
-	// カメラ初期化
-	m_pCamera = new Camera(m_pStage, m_pPlayerMgr);
+	// プレイヤーの座標のアドレスをカメラに渡してあげる(いじることは絶対に無く、ただ参照するだけ)
+	m_pCamera->SetPlayersPos(m_pPlayerMgr);
+
+	m_fLoadPercentage = 1.0f;	// ロード割合
 
 	// オレ曲初期化
 	m_pMyMusicMgr = new MyMusicManager(MY_MUSIC_ID::TOILE);
@@ -54,7 +63,7 @@ bool sceneMain::Update()
 	m_pStage->Update();
 
 	// プレイヤー更新
-	m_pPlayerMgr->Update(m_pStage);
+	m_pPlayerMgr->Update();
 
 	// エンターでエフェクトカメラ発動してみる
 	if (KeyBoardTRG(KB_ENTER))

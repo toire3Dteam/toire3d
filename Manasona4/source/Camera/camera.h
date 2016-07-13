@@ -6,16 +6,13 @@
 //
 //*****************************************************************************************************************************
 
+// エンティティ関連のインクルード
 #include "../BaseEntity/Entity/BaseGameEntity.h"
 #include "../BaseEntity/State/StateMachine.h"
 
 // 前方宣言
 class PlayerManager;
 class EffectCamera;
-//class Stage::Base;	// ×
-namespace Stage{		// ○
-	class Base;
-}
 
 
 class Camera :public BaseGameEntity
@@ -26,7 +23,7 @@ public:
 	//------------------------------------------------------
 	//	初期化・解放
 	//------------------------------------------------------
-	Camera(Stage::Base *pStage, PlayerManager *pPlayerManager);	// 引数でステージヘッダに宣言してるenumを使うともれなくヘッダーにインクルードが必要なので意地でもそれを阻止する
+	Camera();
 	~Camera();
 
 	//------------------------------------------------------
@@ -39,7 +36,8 @@ public:
 	//	セッター&ゲッター
 	//------------------------------------------------------
 	void Set(const Vector3 &pos, const Vector3 &target){ tdnView::Set(pos, target); }
-
+	void SetStageCameraInfo(char *path);	// ステージごとのスマブラカメラの設定
+	void SetPlayersPos(PlayerManager *pPlayerMgr);
 
 	//------------------------------------------------------
 	//	基本パラメータ(ステートマシンからいじりまくるので、publicにおいとく)
@@ -64,7 +62,7 @@ public:
 		Vector2 MoveMax, MoveMin;// 最大・最少
 	}m_CameraData;
 
-	const int m_NumPlayer;				// 暇があったらどうにかしよ
+	int m_NumPlayer;					// 暇があったらどうにかしよ
 	Vector3 **m_pPlayerPosReferences;	// プレイヤーの座標参照用
 
 	// エフェクトカメラ

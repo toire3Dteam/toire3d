@@ -17,18 +17,10 @@
 //------------------------------------------------------
 //	初期化
 //------------------------------------------------------
-Camera::Camera(Stage::Base *pStage, PlayerManager *pPlayerManager) :BaseGameEntity(ENTITY_ID::CAMERA_MGR),
+Camera::Camera() :BaseGameEntity(ENTITY_ID::CAMERA_MGR),	// エンティティIDの登録
 m_angle(Vector3(0, 0, 0)), m_pos(Vector3(0, 20, -100)), m_ipos(m_pos), m_target(Vector3(0, 0, 0)), m_OrgPos(Vector3(0,0,0)),
-m_NumPlayer(pPlayerManager->GetNumPlayer())
+m_NumPlayer(-1), m_pPlayerPosReferences(nullptr)
 {
-	// スマブラカメラ用にプレイヤー達の座標のアドレスを取得する
-	m_pPlayerPosReferences = new Vector3*[m_NumPlayer];
-	FOR(m_NumPlayer)
-	{
-		// プレイヤーの座標を参照する
-		m_pPlayerPosReferences[i] = pPlayerManager->GetPlayer(i)->GetPosAddress();
-	}
-
 	//	ビュー設定
 	tdnView::Init();
 	m_projection.fovY = D3DX_PI / 4;
@@ -40,12 +32,27 @@ m_NumPlayer(pPlayerManager->GetNumPlayer())
 
 	m_pEffectCamera = new EffectCamera(this);
 
-	// ヘッダーに外部のenum定数を書きたくないので、引数のstageからもらってくる
-	static const char *paths[(int)STAGE_ID::MAX] =
+	/* ステートマシン初期化 */
+	m_pStateMachine = new StateMachine<Camera>(this);
+}
+
+void Camera::SetPlayersPos(PlayerManager *pPlayerMgr)
+{
+	// プレイヤー数取得
+	m_NumPlayer = pPlayerMgr->GetNumPlayer();
+
+	// スマブラカメラ用にプレイヤー達の座標のアドレスを取得する
+	m_pPlayerPosReferences = new Vector3*[m_NumPlayer];
+	FOR(m_NumPlayer)
 	{
-		"DATA/Stage/Senjo/camera.txt"
-	};
-	std::fstream ifs(paths[(int)pStage->GetStageID()]);
+		// プレイヤーの座標を参照する
+		m_pPlayerPosReferences[i] = pPlayerMgr->GetPlayer(i)->GetPosAddress();
+	}
+}
+
+void Camera::SetStageCameraInfo(char *path)
+{
+	std::fstream ifs(path);
 	MyAssert(ifs, "スマブラカメラのテキストパス間違ってるよ！");
 
 	char skip[64];	// 読み飛ばし用変数
@@ -77,8 +84,6 @@ m_NumPlayer(pPlayerManager->GetNumPlayer())
 	ifs >> m_CameraData.MoveMin.x;
 	ifs >> m_CameraData.MoveMin.y;
 
-	/* ステートマシン初期化 */
-	m_pStateMachine = new StateMachine<Camera>(this);
 	// スマブラカメラステージなら
 	if (m_CameraData.bSumabura)
 		m_pStateMachine->SetCurrentState(SumaburaCameraState::GetInstance());
