@@ -1,8 +1,8 @@
 #include "TDNLIB.h"
 #include "Collision.h"
-#include "../Player/Player.h"
+#include "../Player/BasePlayer.h"
 
-void Collision::Raypic(iexMesh *obj, Fighter::Base *player) // ƒXƒe[ƒW‚ÆƒvƒŒƒCƒ„[
+void Collision::Raypic(iexMesh *obj, BasePlayer *player) // ƒXƒe[ƒW‚ÆƒvƒŒƒCƒ„[
 {
 	Vector3 move(player->GetMove());
 
@@ -25,7 +25,7 @@ void Collision::Raypic(iexMesh *obj, Fighter::Base *player) // ƒXƒe[ƒW‚ÆƒvƒŒƒCƒ
 	}
 }
 
-void Collision::RaypicUp(iexMesh *obj, Fighter::Base *player)
+void Collision::RaypicUp(iexMesh *obj, BasePlayer *player)
 {
 	Vector3 pos(player->GetPos()), move(player->GetMove());
 	const CollisionShape::Square *square(player->GetHitSquare());
@@ -53,7 +53,7 @@ void Collision::RaypicUp(iexMesh *obj, Fighter::Base *player)
 		}
 	}
 }
-void Collision::RaypicDown(iexMesh *obj, Fighter::Base *player)
+void Collision::RaypicDown(iexMesh *obj, BasePlayer *player)
 {
 	Vector3 move(player->GetMove());
 
@@ -113,7 +113,7 @@ void Collision::RaypicDown(iexMesh *obj, Fighter::Base *player)
 		}
 	}
 }
-void Collision::RaypicLeft(iexMesh *obj, Fighter::Base *player)
+void Collision::RaypicLeft(iexMesh *obj, BasePlayer *player)
 {
 	Vector3 pos(player->GetPos()), move(player->GetMove());
 	const CollisionShape::Square *square(player->GetHitSquare());
@@ -177,7 +177,7 @@ void Collision::RaypicLeft(iexMesh *obj, Fighter::Base *player)
 		}
 	}
 }
-void Collision::RaypicRight(iexMesh *obj, Fighter::Base *player)
+void Collision::RaypicRight(iexMesh *obj, BasePlayer *player)
 {
 	Vector3 pos(player->GetPos()), move(player->GetMove());
 	const CollisionShape::Square *square(player->GetHitSquare());

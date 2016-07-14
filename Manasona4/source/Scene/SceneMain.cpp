@@ -8,7 +8,8 @@
 #include "../Effect/EffectManager.h"
 #include "../Stage/Stage.h"
 #include "../Camera/camera.h"
-#include "../Player/Player.h"
+#include "../Player/BasePlayer.h"
+#include "../Player/PlayerManager.h"
 #include "../BaseEntity/Message/MessageDispatcher.h"
 
 //******************************************************************

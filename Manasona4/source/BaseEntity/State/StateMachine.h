@@ -46,8 +46,8 @@ public:
 	{}
 
 	// FSMを初期化するときなどに使うセッター
-	void SetCurrentState(State<entity_type>* s) { m_pCurrentState = s; m_pCurrentState->Enter(m_pOwner); }	// Enterを追加
-	void SetGlobalState(State<entity_type>* s) {   m_pGlobalState = s; }
+	void SetCurrentState(State<entity_type>* s) { MyAssert(s, "SetCurrentState　中身がNULL"); m_pCurrentState = s; m_pCurrentState->Enter(m_pOwner); }	// Enterを追加
+	void SetGlobalState(State<entity_type>* s) { MyAssert(s, "SetGlobalState　中身がNULL"); m_pGlobalState = s; }
 	void SetPreviousState(State<entity_type>* s) { m_pPreviousState = s; }
 
 	// FSMを更新するときにこれを呼ぶ

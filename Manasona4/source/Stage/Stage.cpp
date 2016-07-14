@@ -1,6 +1,6 @@
 #include "TDNLIB.h"
 #include "Stage.h"
-#include "../Player/Player.h"
+#include "../Player/BasePlayer.h"
 #include "../Collision/Collision.h"
 #include "../Camera/camera.h"
 
@@ -39,7 +39,7 @@ void Stage::Base::CreateStage(Stage::Base**p,STAGE_ID id, Camera *pCamera)
 	(*p)->Initialize(pCamera);
 }
 
-void Stage::Base::Collision(Fighter::Base *player)
+void Stage::Base::Collision(BasePlayer *player)
 {
 	// —Ž‰ºŽ€”»’è
 	if (player->GetPos().y < m_DeadLineY)

@@ -6,10 +6,7 @@ class Camera;
 // ステージのタイプ
 enum class STAGE_ID{ SENJO, MAX };
 
-namespace Fighter
-{
-	class Base;
-}
+class BasePlayer;
 
 namespace Stage
 {
@@ -29,7 +26,7 @@ namespace Stage
 
 		virtual STAGE_ID GetStageID() = 0;	// ステージのID取得
 
-		void Collision(Fighter::Base *player);
+		void Collision(BasePlayer *player);
 
 	protected:
 		iexMesh *m_pObj;	// メッシュの実体

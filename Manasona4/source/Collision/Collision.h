@@ -1,10 +1,7 @@
 #pragma once
 
 // 前方宣言
-namespace Fighter
-{
-	class Base;
-}
+class BasePlayer;
 
 
 // 形状
@@ -49,11 +46,11 @@ namespace CollisionShape
 namespace Collision
 {
 	// レイピック
-	void Raypic(iexMesh *obj, Fighter::Base *player); // Squareで判定
-	void RaypicUp(iexMesh *obj, Fighter::Base *player);
-	void RaypicDown(iexMesh *obj, Fighter::Base *player);
-	void RaypicLeft(iexMesh *obj, Fighter::Base *player);
-	void RaypicRight(iexMesh *obj, Fighter::Base *player);
+	void Raypic(iexMesh *obj, BasePlayer *player); // Squareで判定
+	void RaypicUp(iexMesh *obj, BasePlayer *player);
+	void RaypicDown(iexMesh *obj, BasePlayer *player);
+	void RaypicLeft(iexMesh *obj, BasePlayer *player);
+	void RaypicRight(iexMesh *obj, BasePlayer *player);
 
 	// 形状で判定
 	bool HitCheck(CollisionShape::Circle* c1, CollisionShape::Circle* c2);

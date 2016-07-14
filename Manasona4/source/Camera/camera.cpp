@@ -3,7 +3,8 @@
 #include "camera.h"
 #include "EffectCamera.h"
 #include "../Stage/Stage.h"
-#include "../Player/Player.h"
+#include "../Player/BasePlayer.h"
+#include "../Player/PlayerManager.h"
 
 //*****************************************************************************************************************************
 //
