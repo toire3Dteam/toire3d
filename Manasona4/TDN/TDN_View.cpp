@@ -27,6 +27,13 @@ float tdnView::Aspect;				//
 *	NULL‚É‚·‚é‚Æ‘S•”Á‚¦‚é
 */
 
+
+void tdnView::Init()
+{
+	SetViewport();
+	SetProjection(D3DX_PI / 3.0f, 0.1f, 3000.0f);
+}
+
 // ‹ŠEƒNƒŠƒA
 void tdnView::Clear(DWORD color, bool bClearZ)
 {

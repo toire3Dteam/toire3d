@@ -1,5 +1,5 @@
 #include	"TDNLIB.h"
-#include	"../source/resource.h"
+//#include	"../source/FileLoader/DragAndDrop.h"
 
 /********************************************/
 //	tdnSystem
@@ -17,11 +17,33 @@ RECT	tdnSystem::ScreenSize;			// スクリーンのサイズ
 D3DFORMAT tdnSystem::ScreenFormat;		// スクリーンのフォーマット
 BOOL tdnSystem::FullScreen;				// フルスクリーンなのか？
 ENDIAN tdnSystem::endian;				// エンディアン(ビッグorリトル)
+RECT tdnSystem::DisplaySize;			// ディスプレイのサイズ格納
 
 /* グローバル変数 */
 //	変換行列
 Matrix		matView;					// ビュー行列
 Matrix		matProjection;				// プロジェクション行列
+
+//BOOL SetClientSize(HWND hWnd, int width, int height)
+//{
+//	// フレーム込みのサイズへ
+//	RECT WindowSize = tdnSystem::GetScreenSize();
+//	AdjustWindowRectEx(&WindowSize, // クライアント領域の座標が入った構造体へのポインタ　フレーム込みの大きさへ変換
+//		WS_OVERLAPPEDWINDOW,		// サイズを計算するウィンドウの を指定
+//		FALSE,						// ウィンドウがメニューを持つかどうかの指定
+//		NULL);						// サイズを計算するウィンドウの拡張ウィンドウスタイルを指定　何か↓でいじって大きさが変わるならここで調整
+//
+//
+//	RECT rw, rc;
+//	::GetWindowRect(hWnd, &rw);
+//	::GetClientRect(hWnd, &rc);
+//
+//	int new_width = (rw.right - rw.left) - (rc.right - rc.left) + width;
+//	int new_height = (rw.bottom - rw.top) - (rc.bottom - rc.top) + height;
+//
+//	return ::SetWindowPos(hWnd, HWND_NOTOPMOST, WindowSize.left, WindowSize.top, new_width, new_height, SWP_SHOWWINDOW);
+//}
+
 
 // ウィンドウプロシージャ(Winmainの様な存在)
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -46,6 +68,71 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		{
 		case VK_ESCAPE: PostMessage(hWnd, WM_CLOSE, 0, 0); return 0;// Escキーを押したらウィンドウを閉じる
 		case VK_F1:		tdnSystem::OpenDebugWindow(); return 0;		// コンソール画面を出す
+		case VK_F2: 
+		{	
+			// 仮想フルスクリーンフラグ
+			static bool VirtualFullScreenFlag = false;
+
+			// フルスクリーンの状態なら弾く
+			if (tdnSystem::GetFullScreen() == TRUE)return 0;
+			
+			// 中心に画面を持ってく処理
+			int centerX = tdnSystem::GetDisplaySize().right / 2 - tdnSystem::GetScreenSize().right / 2;
+			int centerY = tdnSystem::GetDisplaySize().bottom / 2 - tdnSystem::GetScreenSize().bottom / 2;
+
+			// ウィンドウの状態なら仮想フルスクリーン化
+			if (VirtualFullScreenFlag == false)
+			{	
+				// フレーム込みのサイズに変換
+				RECT WindowSize = tdnSystem::GetScreenSize();
+				AdjustWindowRectEx(&WindowSize, WS_OVERLAPPEDWINDOW, FALSE, NULL);
+
+				// スタイル変更
+				LONG lStyle;
+				lStyle = GetWindowLong(hWnd, GWL_STYLE);
+				lStyle = WS_POPUPWINDOW;
+				lStyle = SetWindowLong(hWnd, GWL_STYLE, lStyle);
+
+				// [メモ]　SetWindowPos　windowのサイズよりも大きく表示できない
+				// WS_POPUPなら全力で引き延ばしてフルスクにできる
+				SetWindowPos(hWnd, HWND_TOPMOST, 0, 0,
+					tdnSystem::GetDisplaySize().right,	// 現在のディスプレイサイズ分大きく
+					tdnSystem::GetDisplaySize().bottom,	// 現在のディスプレイサイズ分大きく
+					SWP_SHOWWINDOW | SWP_FRAMECHANGED);
+
+				VirtualFullScreenFlag = true;
+			}
+			else
+			{
+				// フレーム込みのサイズに変換
+				RECT WindowSize = tdnSystem::GetScreenSize();
+				AdjustWindowRectEx(&WindowSize, WS_OVERLAPPEDWINDOW, FALSE, NULL);
+
+				// メモ　反応するのがWS_OVERLAPPEDWINDOWだけだったので　そこから比率を弄る部分だけ抜いた
+				LONG lStyle;
+				lStyle = GetWindowLong(hWnd, GWL_STYLE);
+				lStyle = WS_OVERLAPPEDWINDOW;
+				lStyle &= ~WS_THICKFRAME;
+				lStyle &= ~WS_MAXIMIZEBOX;
+				lStyle = SetWindowLong(hWnd, GWL_STYLE, lStyle);
+
+				SetWindowPos(hWnd, HWND_NOTOPMOST, centerX, centerY,
+					WindowSize.right - WindowSize.left,
+					WindowSize.bottom - WindowSize.top, SWP_SHOWWINDOW | SWP_FRAMECHANGED);
+
+
+				VirtualFullScreenFlag = false;
+			}
+
+		}
+		return 0;
+		case VK_F3:
+		{
+
+
+			
+		}
+		return 0;
 		}
 		break;
 	case WM_MOUSEWHEEL:	// マウスホイールイベント
@@ -77,6 +164,12 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 // ウィンドウを初期化
 BOOL tdnSystem::InitWindow(HINSTANCE hInstance, int nCmdShow, char* AppTitle, DWORD ScreenMode, BOOL isFullScreen)
 {
+	// ディスプレイのサイズ取得
+	DisplaySize.left = 0;
+	DisplaySize.right = GetSystemMetrics(SM_CXSCREEN);
+	DisplaySize.top = 0;
+	DisplaySize.bottom= GetSystemMetrics(SM_CYSCREEN);
+
 	// スクリーンサイズを取得
 	ScreenSize = GetScreenRect(ScreenMode); // モードに合わせサイズを取得
 
@@ -128,13 +221,13 @@ BOOL tdnSystem::InitWindow(HINSTANCE hInstance, int nCmdShow, char* AppTitle, DW
 	wcex.cbClsExtra = 0;										// この構造体に割り当てる余分なメモリを設定し、0で初期化します
 	wcex.cbWndExtra = 0;										// ウィンドウインスタンス(実際のウィンドウ)に割り当てられる 余分なメモリを設定し、0で初期化されます
 	wcex.hInstance = hInstance;									// このクラスのウィンドウプロシージャを含むアプリケーション インスタンスハンドルを設定します。
-	wcex.hIcon = LoadIcon(hInstance, LPSTR(IDI_ICON1));			// アイコンのハンドルを設定します。
+	wcex.hIcon = LoadIcon(hInstance, IDI_APPLICATION);			// アイコンのハンドルを設定します。
 	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);					// カーソルのハンドルを設定します。 
 	wcex.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);	// 背景のハンドルを設定します。 
 	wcex.lpszMenuName = NULL;									// メニューリソースの名前を設定します
 	wcex.lpszClassName = "classname";							// ウィンドウクラスの名前を設定します
 	wcex.hIconSm = NULL;										// スモールアイコンのハンドル
-
+	
 	// 設定したらRegisterClassExで登録!
 	RegisterClassEx(&wcex);
 
@@ -145,17 +238,21 @@ BOOL tdnSystem::InitWindow(HINSTANCE hInstance, int nCmdShow, char* AppTitle, DW
 	// フルスクリーンで描画するか？
 	if (FullScreen == false)
 	{
-		// (?) AdjustWindowRectExの最初以外が意味をなしていない？
-		AdjustWindowRectEx(&WindowSize, // クライアント領域の座標が入った構造体へのポインタ　フレーム込みの大きさへ
-			WS_OVERLAPPEDWINDOW,		// ウィンドウスタイル
-			FALSE,						// メニューを持つかどうかの指定
-			NULL);						// 拡張ウィンドウスタイル
+		//	WindowSizeにこのまま1280*720と入力するとフレーム込みで画面がかわってしまう
+		// それを避ける為に↓のAdjustWindowRectExを使いフレーム込み計算する
+		AdjustWindowRectEx(&WindowSize, // クライアント領域の座標が入った構造体へのポインタ　フレーム込みの大きさへ変換
+			WS_OVERLAPPEDWINDOW,		// サイズを計算するウィンドウの を指定
+			FALSE,						// ウィンドウがメニューを持つかどうかの指定
+			NULL);						// サイズを計算するウィンドウの拡張ウィンドウスタイルを指定　何か↓でいじって大きさが変わるならここで調整
 
-		const	LONG	WindowCoordX = 1920 / 2 - 1280 / 2;
-		const	LONG	WindowCoordY = 1080 / 2 - 720 / 2;
+		// 中心に画面を持ってく処理
+		int centerX = GetDisplaySize().right / 2 - tdnSystem::GetScreenSize().right / 2;
+		int centerY = GetDisplaySize().bottom / 2 - tdnSystem::GetScreenSize().bottom / 2;
 
-		Window = CreateWindowEx(WS_EX_ACCEPTFILES, wcex.lpszClassName, AppTitle, WS_SYSMENU,	// 1.拡張ウィンドウスタイル　2.登録したクラス名　3.ウィンドウ名　4.ウィンドウスタイル
-			WindowCoordX, WindowCoordY, WindowSize.right - WindowSize.left, WindowSize.bottom - WindowSize.top,		// ウィンドウの初期位置やサイズ
+		// [メモ]フレームを消す->WS_POPUP
+		Window = CreateWindowEx(WS_EX_ACCEPTFILES/*| WS_EX_TOPMOST*/, wcex.lpszClassName, AppTitle,
+			WS_OVERLAPPED| WS_CAPTION |WS_SYSMENU| WS_MINIMIZEBOX,	// 1.拡張ウィンドウスタイル　2.登録したクラス名　3.ウィンドウ名　4.ウィンドウスタイル
+			centerX, centerY, WindowSize.right - WindowSize.left, WindowSize.bottom - WindowSize.top,		// ウィンドウの初期位置やサイズ
 			NULL, NULL, hInstance, NULL);														// NULLには特に意味はないアプリケーションのインスタンスハンドルだけ送る
 
 	}
@@ -170,6 +267,7 @@ BOOL tdnSystem::InitWindow(HINSTANCE hInstance, int nCmdShow, char* AppTitle, DW
 	}
 
 	ShowWindow(Window, nCmdShow);	// 指定されたウィンドウの表示状態を設定します。
+	ValidateRect(Window, 0);		// WM_PAINTが呼ばれないようにする
 	UpdateWindow(Window);			// そのウィンドウのクライアント領域を更新します
 
 	// D3D初期化
@@ -181,6 +279,10 @@ BOOL tdnSystem::InitWindow(HINSTANCE hInstance, int nCmdShow, char* AppTitle, DW
 	// エンディアンチェック
 	auto EndianCheck = [](){ int bit = 1; return (*(char*)&bit) ? LITTLE_ENDIAN : BIG_ENDIAN; };
 	endian = EndianCheck();
+
+
+
+
 
 	return TRUE;
 }
@@ -275,6 +377,7 @@ BOOL tdnSystem::InitD3D()
 	// その他
 	// ID3DXLineインターフェイスの生成
 	D3DXCreateLine(tdnSystem::Device, &pLine);
+
 
 	return TRUE;
 }

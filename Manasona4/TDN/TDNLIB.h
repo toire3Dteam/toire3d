@@ -32,6 +32,9 @@
 #include	<random>		// メルセンヌ・ツイスターなどを扱うためのヘッダー
 #include	<list>			// 双方向リストを扱うへっだー
 //#include	<string>		// std::string型を扱うために必要なヘッダー
+#include	<tchar.h>		// 
+#include	<mbstring.h>
+
 
 #include "system\ItDebug.h" // 自動メモリリーク建築
 
@@ -74,6 +77,8 @@ typedef D3DXMATRIX		Matrix;
 typedef IDirect3DTexture9 Texture2D;		// IDirect3DTexture9の略
 typedef IDirect3DSurface9 Surface;			// IDirect3DSurface9の略
 typedef IDirect3DDevice9 DEVICE, *LPDEVICE;	// IDirect3DDevice9の略
+
+typedef IDirect3DCubeTexture9 CubeTex; // キューブテクスチャ
 
 // ハンガリアン記法
 //
@@ -635,8 +640,11 @@ private:
 	static D3DFORMAT ScreenFormat;		// スクリーンのフォーマット
 	static BOOL FullScreen;				// フルスクリーンのフラグ
 
+	static RECT DisplaySize;			// ディスプレイのサイズ
+
 	// エンディアン(システム初期化時にどちらかを判定します)
 	static ENDIAN endian;
+
 
 public:
 	// (?)なぜ値が変わったらまずいデータがグローバルに？	
@@ -650,6 +658,8 @@ public:
 	static inline RECT GetScreenSize(){ return ScreenSize; }			// 画面のサイズ
 	static inline D3DFORMAT GetScreenFormat(){ return ScreenFormat; }	// 画面のフォーマット
 	static inline BOOL GetWindowActive(){ return WindowActive; };		// ウィンドウが今動いているか
+	static inline BOOL GetFullScreen(){ return FullScreen; };			// フルスクリーンか
+	static inline RECT GetDisplaySize() { return DisplaySize; };		// ディスプレイのサイズ
 
 	// ウィンドウメッセージ処理関数
 	//static BOOL Message();
@@ -703,11 +713,7 @@ class tdnView
 {
 public:
 	// 初期化
-	static void Init()
-	{
-		SetViewport();
-		SetProjection(D3DX_PI / 3.5f, 0.1f, 3000.0f);
-	}
+	static void Init();
 
 	//	視界クリア
 	static void Clear(DWORD color = 0, bool bClearZ = true);
@@ -965,6 +971,9 @@ public:
 	void SetValue(char* name, int d);
 	void SetValue(char* name, DWORD d);
 
+	void SetValue(char* name, LPDIRECT3DCUBETEXTURE9* obj);
+	void SetValue(char* name, LPDIRECT3DCUBETEXTURE9& obj);
+
 private:
 	LPD3DXEFFECT pShader;	// エフェクトファイルへのアクセスポインタ
 	D3DXHANDLE	hmWVP;		// 射影変換行列　パラメーターを参照するための効率的な手段を提供します。
@@ -997,10 +1006,14 @@ typedef enum FMT2D
 class tdn2DObj
 {
 public:
+	tdn2DObj();
 	tdn2DObj(const char* fileName);							// ファイルから画像読み込み
 	tdn2DObj(const char* IDName, const char* pArchiveName);	// メモリーから画像読み込み
 	tdn2DObj(UINT width, UINT height, FMT2D fmtFlag);		// レンダーターゲット作成
 	tdn2DObj(Texture2D *texture);							// テクスチャ参照型(主に動画で使う)
+
+	bool LoadFontTexture(LPCSTR character, UINT size, LPCSTR fontName); // 文字テクスチャ作成
+
 
 	~tdn2DObj();											// 画像orレンダーターゲット解放
 
@@ -1356,7 +1369,7 @@ public:
 	void SetAngle(float angle) { m_obj->SetAngle(angle); };
 	void SetARGB(BYTE A, BYTE R, BYTE G, BYTE B) { m_obj->SetARGB(A, R, G, B); };
 	void SetARGB(int A, int R, int G, int B) { m_obj->SetARGB(A, R, G, B); };
-	void SetARGB(DWORD ARGB) { m_obj->SetARGB(ARGB); }; 
+	void SetARGB(DWORD ARGB) { m_obj->SetARGB(ARGB); };
 	void SetAlpha(int A){ m_obj->SetAlpha(A);	}
 	void SetRGB(BYTE R, BYTE G, BYTE B) { m_obj->SetRGB(R,G,B); };
 
@@ -1640,6 +1653,116 @@ private:
 //	public:
 //	Texture2D *texture;
 //};
+
+	/********/
+	/* 作成 */
+	/********/
+
+	struct CreateData
+	{
+		unsigned int      numVertexes;  // 頂点の数
+		unsigned int      vertexSize;   // 頂点構造体のバイト数
+		void              *vertexArray; // 頂点情報（頂点毎）配列
+
+		unsigned int      numIndexes;   // インデックスの数
+		DWORD             *indexArray;  // インデックスの配列
+		
+		unsigned int      numStream;    // ストリーム構造体の数
+		unsigned int      streamSize;   // ストリーム構造体のバイト数
+		void              *streamArray; // 頂点情報（インデックス毎）の配列
+
+		D3DVERTEXELEMENT9 *decl;        // シェーダーに送る頂点構造体の定義
+	};
+	bool Create( const CreateData &data );
+	bool CreateVertex(
+		unsigned int numVertex,    // 頂点数
+		unsigned int vertexSize,   // 頂点構造体のバイト数
+		void *vertexArray );       // 頂点配列
+	bool CreateIndexes(
+		unsigned int numIndexes,   // インデックスの数
+		const DWORD *indexArray ); // インデックス配列
+	bool CreateStream( unsigned int numData, unsigned int dataSize, void *dataArray );
+	bool CreateDeclaration(
+		unsigned int declArySize,  // 頂点構造体のバイト数
+		D3DVERTEXELEMENT9 *decl ); // シェーダー上での頂点構造体の宣言
+
+	// xy平面に正三角形作成
+	bool CreateTriangle(
+		float radius,    // 外接円の半径
+		DWORD color ); 
+	// xy平面に長方形作成
+	bool CreateRectangle(
+		float width,
+		float height,
+		DWORD color );
+	// 正四面体作成
+	bool CreateTriangular(
+		float radius, // 外接円の半径
+		DWORD color );
+	// 直方体作成
+	bool CreateCube(
+		float width,
+		float height,
+		float depth,
+		DWORD color,
+		Vector3 *posList = nullptr,
+		unsigned int numPos = 0 );
+
+	/************/
+	/* 読み込み */
+	/************/
+
+	bool LoadMqo( char *filename );
+
+	/********/
+	/* 更新 */
+	/********/
+
+	// pos, scale, rot からworldMatrix作成
+	void UpdateWorldMatrix();
+
+	/********/
+	/* 描画 */
+	/********/
+
+	void Render( tdnShader *shader, char *technique );
+
+	/*********************/
+	/* セッター ゲッター */
+	/*********************/
+
+	const Vector3& Pos();
+	void Pos( const Vector3& in );
+	const Vector3& Scale();
+	void Scale( const Vector3& in );
+	const Quaternion& Rot();
+	void Rot( const Quaternion& in );
+	const Matrix& WorldMatrix();
+	void WorldMatrix( const Matrix& in );
+
+private:
+	IDirect3DVertexDeclaration9* decl;         // 頂点デコレーション（FVF）
+	unsigned int                 declSize;     // 頂点構造体のバイト数
+
+	IDirect3DVertexBuffer9*      vertexBuffer;
+	unsigned int                 numVertexes;
+
+	IDirect3DIndexBuffer9*       indexBuffer;
+	unsigned int                 numIndexes;
+
+	IDirect3DVertexBuffer9*      streamBuffer; // オブジェクト毎の情報
+	unsigned int                 streamSize;   // streamBuffer の一つのデータのバイト数
+	unsigned int                 numStream;   // streamBuffer の個数
+
+	unsigned int                 numFaces;     // 三角ポリゴン数
+
+	Vector3    pos;
+	Vector3    scale;
+	Quaternion rot;
+	Matrix     worldMatrix;
+	public:
+	Texture2D *texture;
+};
 
 //*****************************************************************************************************************************
 //		tdnInput
@@ -2461,188 +2584,73 @@ public:
 
 
 
-// ファイルディレクトリ列挙に使用される構造体
-typedef struct tagDirectoryInfo
-{
-	// newとかめんどくさくなりそうなのでvector使う
-	//int NumFile;				// ファイルの個数
-	//std::string *FileNames;		// ファイルの名前(可変長)
-	//int NumFolder;				// フォルダの個数
-	//std::string *FolderNames;	// フォルダの名前(可変長)
-
-	// string型での動的配列で、ファイル名とフォルダー名を格納
-	std::vector<std::string> FileNames;		// 列挙されたファイル名
-	std::vector<std::string> FolderNames;	// 列挙されたフォルダ名
-
-	tagDirectoryInfo(){ FileNames.clear(), FolderNames.clear(); }
-	~tagDirectoryInfo(){ FileNames.clear(), FolderNames.clear(); }
-}DirectoryInfo;
-
-class tdnFile
-{
-public:
-
-	/**
-	*@brief			フォルダ(ディレクトリ)作成
-	*@param[in]		*path	example…"DATA/CHR/Airou"ならCHRフォルダにAirouというフォルダが作られる
-	*@return		成功したら「0」フォルダが既に作られていたりして失敗したら「-1」が返る
-	*/
-	static int CreateFolder(char *path);
-
-	/**
-	*@brief					ディレクトリの列挙
-	*@param[in]		*path	ディレクトリパス("DATA/CHR"ならCHRフォルダの中が列挙される)
-	*@param[in]		*out	列挙したファイル名をフォルダー名を格納する構造体へのアドレス
-	*@param[in]		bExt	ファイル名の場合、拡張子をつけるかつけないか
-	*/
-	static void EnumDirectory(char *path, DirectoryInfo *out, bool bExt = true);
-
-	/**
-	*@brief					ファイルの拡張子を返す("tdn.txt"なら.txtが返る)
-	*@param[in]		*path	ファイルパス
-	*/
-	static std::string GetFileExtention(char *path);
-
-	/**
-	*@brief					ファイルパスからファイル名を返す("DATA/Text/tdn.txt"ならtdn.txtが返る)
-	*@param[in]		*path	ファイルパス
-	*@param[in]		bExt	拡張子をくっつけるか　[true: return tdn.txt]　[false: return tdn]
-	*/
-	static std::string GetFileName(char *path, bool bExt = true);
-
-	/**
-	*@brief					ファイルを開くダイアログを作成
-	*@param[in]		*filter	拡張子フィルター example:"TEXT DATA(*.txt)\0 *.txt\0\0"
-	*@return				成功したらダイアログで選択された絶対パスを返す、失敗したら""(空の文字列)
-	*/
-	static std::string OpenFileDialog(char *filter = "すべてのファイル(*.*)\0 * .*\0\0");
-
-	/**
-	*@brief					ファイルを保存するダイアログを作成
-	*@param[in]		*filter	拡張子フィルター example:"TEXT DATA(*.txt)\0 *.txt\0\0"
-	*@return				成功したらダイアログで選択された絶対パスを返す、失敗したら""(空の文字列)
-	*/
-	static std::string SaveFileDialog(char *filter = "すべてのファイル(*.*)\0 * .*\0\0");
-private:
-	static char strFile[256];			// ダイアログを開くときに、前のパスを残したいときとかに
-};
-
-
+//// ファイルディレクトリ列挙に使用される構造体
+//typedef struct tagDirectoryInfo
+//{
+//	// newとかめんどくさくなりそうなのでvector使う
+//	//int NumFile;				// ファイルの個数
+//	//std::string *FileNames;		// ファイルの名前(可変長)
+//	//int NumFolder;				// フォルダの個数
+//	//std::string *FolderNames;	// フォルダの名前(可変長)
+//
+//	// string型での動的配列で、ファイル名とフォルダー名を格納
+//	std::vector<std::string> FileNames;		// 列挙されたファイル名
+//	std::vector<std::string> FolderNames;	// 列挙されたフォルダ名
+//
+//	tagDirectoryInfo(){ FileNames.clear(), FolderNames.clear(); }
+//	~tagDirectoryInfo(){ FileNames.clear(), FolderNames.clear(); }
+//}DirectoryInfo;
+//
+//class tdnFile
+//{
+//public:
+//
+//	/**
+//	*@brief			フォルダ(ディレクトリ)作成
+//	*@param[in]		*path	example…"DATA/CHR/Airou"ならCHRフォルダにAirouというフォルダが作られる
+//	*@return		成功したら「0」フォルダが既に作られていたりして失敗したら「-1」が返る
+//	*/
+//	static int CreateFolder(char *path);
+//
+//	/**
+//	*@brief					ディレクトリの列挙
+//	*@param[in]		*path	ディレクトリパス("DATA/CHR"ならCHRフォルダの中が列挙される)
+//	*@param[in]		*out	列挙したファイル名をフォルダー名を格納する構造体へのアドレス
+//	*@param[in]		bExt	ファイル名の場合、拡張子をつけるかつけないか
+//	*/
+//	static void EnumDirectory(char *path, DirectoryInfo *out, bool bExt = true);
+//
+//	/**
+//	*@brief					ファイルの拡張子を返す("tdn.txt"なら.txtが返る)
+//	*@param[in]		*path	ファイルパス
+//	*/
+//	static std::string GetFileExtention(char *path);
+//
+//	/**
+//	*@brief					ファイルパスからファイル名を返す("DATA/Text/tdn.txt"ならtdn.txtが返る)
+//	*@param[in]		*path	ファイルパス
+//	*@param[in]		bExt	拡張子をくっつけるか　[true: return tdn.txt]　[false: return tdn]
+//	*/
+//	static std::string GetFileName(char *path, bool bExt = true);
+//
+//	/**
+//	*@brief					ファイルを開くダイアログを作成
+//	*@param[in]		*filter	拡張子フィルター example:"TEXT DATA(*.txt)\0 *.txt\0\0"
+//	*@return				成功したらダイアログで選択された絶対パスを返す、失敗したら""(空の文字列)
+//	*/
+//	static std::string OpenFileDialog(char *filter = "すべてのファイル(*.*)\0 * .*\0\0");
+//
+//	/**
+//	*@brief					ファイルを保存するダイアログを作成
+//	*@param[in]		*filter	拡張子フィルター example:"TEXT DATA(*.txt)\0 *.txt\0\0"
+//	*@return				成功したらダイアログで選択された絶対パスを返す、失敗したら""(空の文字列)
+//	*/
+//	static std::string SaveFileDialog(char *filter = "すべてのファイル(*.*)\0 * .*\0\0");
+//private:
+//	static char strFile[256];			// ダイアログを開くときに、前のパスを残したいときとかに
+//};
 
 
-// DirevtShowに関する基底クラスのAll.h的なヘッダー
-#include "DirectShow/baseclasses/streams.h"
-
-// デバッグとリリースで使うライブラリを分けている
-#ifdef _DEBUG
-#pragma comment( lib, "strmbasd.lib" )
-#else
-#pragma comment( lib, "strmbase.lib" )
-#endif
-
-// Define GUID for Texture Renderer
-struct __declspec(uuid("{71771540-2017-11cf-ae26-0020afd79767}")) CLSID_TextureRenderer;
-
-/**
-*@brief		テクスチャに動画を書き込む作業を実際に行うためのクラス。内部処理に利用するもの
-*@author	Yamagoe
-*/
-class TextureRenderer : public CBaseVideoRenderer
-{
-	IDirect3DDevice9	*m_pd3dDevice;
-	Texture2D	*m_pTexture;
-
-	D3DFORMAT		m_TextureFormat;
-
-	BOOL	m_bUseDynamicTextures;	//! @param ダイナミックテクスチャを使うかどうかどうかのフラグ
-
-	LONG	m_lVidWidth;	//! @param ビデオの幅
-	LONG	m_lVidHeight;	//! @param ビデオの高さ
-	LONG	m_lVidPitch;	//! @param ビデオのピッチ
-
-public:
-	TextureRenderer(LPUNKNOWN pUnk, HRESULT *phr);
-	~TextureRenderer();
-
-	void SetDevice(IDirect3DDevice9 * pd3dDevice){ m_pd3dDevice = pd3dDevice; };
-
-	HRESULT CheckMediaType(const CMediaType *pmt);     // Format acceptable?
-	HRESULT SetMediaType(const CMediaType *pmt);       // Video format notification
-	HRESULT DoRenderSample(IMediaSample *pMediaSample); // New video sample
-
-	Texture2D *GetTexture(){ return m_pTexture; };
-
-	void GetVideoDesc(LONG* plVidWidth, LONG* plVidHeight, LONG* plVidPitch)
-	{
-		*plVidWidth = m_lVidWidth;
-		*plVidHeight = m_lVidHeight;
-		*plVidPitch = m_lVidPitch;
-	};
-};
-
-/**
-*@brief		動画ファイルの制御、テクスチャを取得したりするクラス
-*@author		Yamagoe
-*/
-class tdnMovie
-{
-public:
-	tdnMovie(char *filename, bool bSound = false, bool bLoop = true);
-	~tdnMovie();
-
-	// ★テクスチャ取得
-	Texture2D* GetTexture()
-	{
-		return m_pTexture;
-	}
-
-	void Play();	// 再生
-	void Stop();	// 停止
-
-	void LoopUpdate(){ if (m_bLoop && isEndPos())SetTime(0.0); }	// ループ再生する更新
-
-	// ゲッター
-	double GetStopTime(){ double ret; m_pMediaPosition->get_StopTime(&ret); return ret; };				// 終了時間の取得
-	double GetDuration(){ double ret; m_pMediaPosition->get_Duration(&ret); return ret; };				// ストリームの時間幅の取得
-	double GetCurrentPosition(){ double ret; m_pMediaPosition->get_CurrentPosition(&ret); return ret; }	// 現在の再生位置の取得
-	void GetUV(float2 *out) { out->x = m_fu; out->y = m_fv; };
-	bool isEndPos(){ return (GetCurrentPosition() >= GetStopTime()); };
-
-	// セッター
-	void SetTime(double val) { m_pMediaPosition->put_CurrentPosition(val); };				// 現在の再生位置を指定位置にセット
-	void SetSpeed(double val) { m_pMediaPosition->put_Rate(val); };
-	void SetLoop(bool loop){ m_bLoop = loop; }
-private:
-	// 動画をテクスチャ処理してくれるくん
-	TextureRenderer     *m_pTextureRenderer;        // DirectShow Texture renderer
-
-	// Direct3Dとしての変数
-	Texture2D	*m_pTexture;		// 動画のテクスチャ
-
-	IMediaControl		*m_pMediaControl;	// メディア管理
-	IGraphBuilder		*m_pGraphBuilder;	// 
-	IMediaEvent			*m_pMediaEvent;
-	IMediaPosition		*m_pMediaPosition;	// 再生位置
-
-	//IBaseFilter			*m_pVMR9;		// レンダフィルター(VMR9)
-
-	// フィルター接続ヘルパーインターフェース
-	//ICaptureGraphBuilder2 *m_pCaptureGraphBuilder2;
-
-	LONG	m_lWidth;			// 幅  
-	LONG	m_lHeight;			// 高さ
-	LONG	m_lPitch;			// ピッチ
-	FLOAT	m_fu, m_fv;			// 元のムービーのサイズ(幅、高さ) / テクスチャのサイズ(幅、高さ)で算出するUV値
-
-	FILTER_STATE		m_state;	// 自分のステート
-	bool				m_bLoop;	// ループフラグ
-};
-class tdnMovieManager
-{
-public:
-	static void Initialize();
-	static void Release();
-};
 
 
 
@@ -2868,3 +2876,61 @@ public:
 };
 
 typedef iex3DObj IEX3DOBJ, *LPIEX3DOBJ;
+
+
+
+/************************/
+//		tdnFont
+/************************/
+
+const	UINT	CacheQty = 512;			//	文字のキャッシュの数
+
+class tdnFont
+{
+private:
+	tdnFont() {};
+	~tdnFont() {};
+
+public:
+	//	初期化・解放
+	static	void	Initialize();
+	static	void	Release();
+
+	// 文字列描画
+	static	void	RenderString(LPCSTR string, LPCSTR fontName, int fontSize, int drawX, int  drawY, DWORD color, DWORD RenderFlag);
+	// 一文字描画
+	static	Vector2	RenderCharacter(LPCSTR character, LPCSTR fontName, int fontSize, int drawX, int  drawY, DWORD color, DWORD RenderFlag);
+
+	//  簡易
+	static void RenderFont2D(LPCSTR _String, int _FontSize, float _DrawX, float _DrawY, DWORD col);
+
+private:
+
+	//	照合用データ
+	typedef	struct	ReferenceData {
+		bool	isEnable;	//	有効化フラグ
+		char	chara[2];	//	文字
+		UINT	byte;		//	文字のバイト数
+		UINT	size;		//	サイズ
+		LPCSTR	fontName;	//	フォント名
+	}	RefData;
+
+	//	キャッシュ処理用デスク
+	struct	CacheDesc {
+		UINT		nextUseCacheNum;		//	次に使用するキャッシュの番号
+		tdn2DObj*	textureCacheList;		//	文字テクスチャのリスト
+		RefData*	referenceDataList;		//	キャッシュの照合用データリスト
+	};
+
+	//	管理パラメータ
+	static	bool		m_IsInitialized;		//	初期化済みフラグ
+	static	CacheDesc	m_CacheDesc;			//	キャッシュ処理用デスク
+
+
+												/****************************************/
+												//	 2DObjから文字を作るサポート関数
+												/****************************************/
+	static	UINT	SearchCache(LPCSTR chara, UINT size, LPCSTR fontName);
+
+};
+

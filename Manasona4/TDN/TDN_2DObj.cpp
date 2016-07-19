@@ -9,8 +9,24 @@ static const float abjustSize = 0.5f;
 //	2DObj
 /****************************************************/
 
+tdn2DObj::tdn2DObj()
+{
+	// 初期化
+	m_width = m_height = 0;
+	lpSurface = NULL;
+	lpTexture = NULL;
+
+	// ステータス初期化
+	scale = 1.0f;
+	angle = 0.0f;
+	color = 0xFFFFFFFF;
+	centerX = centerY = 0.0f;
+	isTurnOver = false;
+	isShiftCenter = false;
+}
+
 // ファイルから画像読み込み
-tdn2DObj::tdn2DObj(const char* fileName):m_bLoadTexture(true)
+tdn2DObj::tdn2DObj(const char* fileName)
 {
 	// 初期化
 	m_width = m_height = 0;
@@ -47,7 +63,7 @@ tdn2DObj::tdn2DObj(const char* fileName):m_bLoadTexture(true)
 }
 
 // メモリーから画像読み込み
-tdn2DObj::tdn2DObj(const char* IDName, const char* pArchiveName):m_bLoadTexture(true)
+tdn2DObj::tdn2DObj(const char* IDName, const char* pArchiveName)
 {
 	// 初期化
 	m_width = m_height = 0;
@@ -83,7 +99,7 @@ tdn2DObj::tdn2DObj(const char* IDName, const char* pArchiveName):m_bLoadTexture(
 }
 
 // レンダーターゲット(描画先)作成
-tdn2DObj::tdn2DObj(UINT width, UINT height, FMT2D fmtFlag):m_bLoadTexture(true)
+tdn2DObj::tdn2DObj(UINT width, UINT height, FMT2D fmtFlag)
 {
 	//	情報初期化
 	m_width = m_height = 0;
@@ -163,20 +179,100 @@ tdn2DObj::tdn2DObj(UINT width, UINT height, FMT2D fmtFlag):m_bLoadTexture(true)
 
 }
 
-// テクスチャ参照型
-tdn2DObj::tdn2DObj(Texture2D *texture) : lpTexture(texture), m_bLoadTexture(false), scale(1), angle(0), color(0xffffffff), centerX(0), centerY(0), isTurnOver(false), isShiftCenter(false)
+//	文字テクスチャをロード
+bool tdn2DObj::LoadFontTexture(LPCSTR character, UINT charaSize, LPCSTR fontName)
 {
-	MyAssert(texture, "エラー: tdn2DObjのコンストラクタ、テクスチャが空。");
+	//	現在保持しているテクスチャを破棄
+	if (lpTexture != NULL) {
+		lpTexture->Release();
+		lpTexture = NULL;
+	}
 
-	/***************************************/
-	// 読み込んだテクスチャからサイズを保存
-	D3DSURFACE_DESC sd;						// サーフェイスを記述する。
-	lpTexture->GetLevelDesc(0, &sd);		// テクスチャの情報取得
-	m_width = sd.Width;						// メンバ変数にサイズ保存 
-	m_height = sd.Height;
+	//	フォントの生成
+	int	fontsize = charaSize;
+	LOGFONT	lf = { fontsize, 0, 0, 0, 0, 0, 0, 0, SHIFTJIS_CHARSET, OUT_TT_ONLY_PRECIS,
+		CLIP_DEFAULT_PRECIS, PROOF_QUALITY, (FIXED_PITCH | FF_MODERN), "ＭＳ 明朝" };
+	strcpy_s(lf.lfFaceName, fontName);
+	HFONT	hFont;
+	if (!(hFont = CreateFontIndirect(&lf))) {
+		return FALSE;
+	}
 
-	// メインサーフェイスの取得(保存)
-	lpTexture->GetSurfaceLevel(0, &lpSurface);
+	//	デバイスコンテキスト取得
+	HDC hdc = GetDC(NULL);
+	HFONT oldFont = (HFONT)SelectObject(hdc, hFont);
+
+	//	文字コード取得
+	TCHAR *c = _T((LPSTR)character);
+	UINT code = 0;
+	if (IsDBCSLeadByte(*c))
+		code = (BYTE)c[0] << 8 | (BYTE)c[1];
+	else
+		code = c[0];
+
+	//	フォントビットマップ取得
+	TEXTMETRIC	TM;
+	GetTextMetrics(hdc, &TM);
+	GLYPHMETRICS	GM;
+	CONST MAT2	Mat = { { 0, 1 },{ 0, 0 },{ 0, 0 },{ 0, 1 } };
+	DWORD		size = GetGlyphOutline(hdc, code, GGO_GRAY4_BITMAP, &GM, 0, NULL, &Mat);
+	BYTE		*ptr = new BYTE[size];
+	GetGlyphOutline(hdc, code, GGO_GRAY4_BITMAP, &GM, size, ptr, &Mat);
+
+	// デバイスコンテキストとフォントハンドルの開放
+	SelectObject(hdc, oldFont);
+	DeleteObject(hFont);
+	ReleaseDC(NULL, hdc);
+
+	// テクスチャ作成
+	if (FAILED(tdnSystem::GetDevice()->CreateTexture(GM.gmCellIncX, TM.tmHeight, 1,
+		D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT,
+		&lpTexture, NULL)))
+		if (FAILED(tdnSystem::GetDevice()->CreateTexture(GM.gmCellIncX, TM.tmHeight, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &lpTexture, NULL)))
+		{
+			delete[] ptr;	return FALSE;
+		}
+
+	//	テクスチャにフォントビットマップ書き込み
+	D3DLOCKED_RECT	LockedRect;
+	if (FAILED(lpTexture->LockRect(0, &LockedRect, NULL, D3DLOCK_DISCARD)))
+		if (FAILED(lpTexture->LockRect(0, &LockedRect, NULL, 0)))
+		{
+			delete[] ptr;	return FALSE;
+		}
+
+	//	フォント情報の書き込み
+	int	iOfs_x = GM.gmptGlyphOrigin.x;
+	int iOfs_y = TM.tmAscent - GM.gmptGlyphOrigin.y;
+	int iBmp_w = GM.gmBlackBoxX + (4 - (GM.gmBlackBoxX % 4)) % 4;
+	int iBmp_h = GM.gmBlackBoxY;
+	int Level = 17;
+	int	x, y;
+	DWORD	Alpha, Color;
+	FillMemory(LockedRect.pBits, LockedRect.Pitch * TM.tmHeight, 0);
+	for (y = iOfs_y; y < (iOfs_y + iBmp_h); y++) {
+
+		for (x = iOfs_x; x < (int)(iOfs_x + GM.gmBlackBoxX); x++) {
+
+			Alpha = (255 * ptr[x - iOfs_x + iBmp_w * (y - iOfs_y)]) / (Level - 1);
+
+			Color = 0x00ffffff | (Alpha << 24);
+
+			memcpy((BYTE*)LockedRect.pBits + (LockedRect.Pitch * y) + (4 * x), &Color, sizeof(DWORD));
+
+		}
+
+	}
+	//	サーフェイスアンロック
+	lpTexture->UnlockRect(0);
+	delete[] ptr;
+
+	//	パラメータをセット
+	UINT	byte = _mbclen((BYTE*)character);
+	m_width = GM.gmCellIncX;
+	m_height = TM.tmHeight;
+
+	return	TRUE;
 }
 
 //	解放
@@ -184,10 +280,9 @@ tdn2DObj::~tdn2DObj(){
 	if (lpSurface){
 		lpSurface->Release();
 	}
-	if (lpTexture && m_bLoadTexture){
+	if (lpTexture){
 		tdnTexture::Release(lpTexture);
 	}
-	
 }
 
 /*******************************/
@@ -1152,39 +1247,6 @@ void tdn2DObj::SetARGB(DWORD ARGB)
 	//v[0].color = v[1].color = v[2].color = v[3].color = color;
 
 }
-
-void tdn2DObj::SetAlpha(BYTE A)
-{	
-	DWORD orgColor = (color & 0x00ffffff);	
-	color = (A << 24) | orgColor;
-}
-
-// 
-void tdn2DObj::SetAlpha(int A)
-{	
-	BYTE a = (BYTE)Math::Clamp((float)A, 0, 255);
-
-	DWORD orgColor = (color & 0x00ffffff);	
-	color = (a << 24) | orgColor;
-}
-
-void tdn2DObj::SetRGB(BYTE R, BYTE G, BYTE B)
-{
-	DWORD orgColor = (color & 0xff000000);
-	color = (R << 16) | (G << 8) | (B) | orgColor;
-
-}
-
-void tdn2DObj::SetRGB(int R, int G, int B)
-{
-	BYTE r = (BYTE)Math::Clamp((float)R, 0, 255);
-	BYTE g = (BYTE)Math::Clamp((float)G, 0, 255);
-	BYTE b = (BYTE)Math::Clamp((float)B, 0, 255);
-
-	DWORD orgColor = (color & 0xff000000);
-	color = (r << 16) | (g << 8) | (b) | orgColor;
-}
-
 
 void tdn2DObj::SetTurnOver(bool turnFlag)
 {
