@@ -136,7 +136,7 @@ Vector2	tdnFont::RenderCharacter(LPCSTR character, LPCSTR fontName, int fontSize
 
 
 //  ŠÈˆÕ
-void tdnFont::RenderFont2D(LPCSTR _String, int _FontSize, float _DrawX, float _DrawY, DWORD col)
+void tdnFont::RenderFont2D(LPCSTR _String, int _FontSize, int _DrawX, int _DrawY, DWORD col)
 {
 	LPSTR	c_FontName = "HGS‘n‰pŠpÎß¯Ìß‘Ì";
 

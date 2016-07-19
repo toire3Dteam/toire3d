@@ -29,14 +29,7 @@ public:
 	void Render();
 
 	//	シーンの切り替え
-	void ChangeScene(BaseScene* newScene)
-	{
-		//	現在のシーン解放
-		if (m_scene != NULL) delete m_scene;
-		//	シーンの切り替え＆初期化
-		m_scene = newScene;
-		m_scene->Initialize();
-	}
+	void ChangeScene(BaseScene* newScene, bool bLoadingScene = false);
 
 private:
 	// 自分自身

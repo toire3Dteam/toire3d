@@ -1,5 +1,5 @@
 #include	"TDNLIB.h"
-#include	"Framework.h"
+#include	"FrameworkEx.h"
 #include	"../Scene/sceneMain.h"
 #include	"System.h"
 #include	"../Sound/SoundManager.h"
@@ -7,7 +7,7 @@
 //		WinMain
 //*****************************/
 
-Framework*	MainFrame = NULL;			// ƒtƒŒ[ƒ€ƒ[ƒN
+//Framework*	MainFrame = NULL;			// ƒtƒŒ[ƒ€ƒ[ƒN
 
 char*	AppTitle = "^‰Ä(‰¼)";// ƒQ[ƒ€‚Ìƒ^ƒCƒgƒ‹ 
 BOOL	bFullScreen = FALSE;			// ƒtƒ‹ƒXƒNƒŠ[ƒ“‚É‚µ‚Ü‚·‚©H
@@ -36,8 +36,8 @@ BOOL InitApp(HINSTANCE hInstance, int nCmdShow)									// ƒQ[ƒ€‹N“®‚ÌÅ‰‚Ì
 	//IEX‚ÌƒVƒXƒeƒ€ŠÖ”‚ğˆê“IÌ—pA˜b‚µ‡‚¢‚ÅSystem.h‚ğ–•Á‚·‚é‚©Œˆ‚ß‚é
 	SYSTEM_Initialize();
 
-	MainFrame = new Framework();			 // ƒƒCƒ“ƒtƒŒ[ƒ€ƒ[ƒN¶¬
-	MainFrame->ChangeScene(new sceneMain, true); // ‰ŠúƒV[ƒ“
+	//MainFrameEx = new Framework();			 // ƒƒCƒ“ƒtƒŒ[ƒ€ƒ[ƒN¶¬
+	MainFrameEx->ChangeScene(new sceneMain, true); // ‰ŠúƒV[ƒ“
 
 	return TRUE;
 }
@@ -47,7 +47,8 @@ BOOL InitApp(HINSTANCE hInstance, int nCmdShow)									// ƒQ[ƒ€‹N“®‚ÌÅ‰‚Ì
 /****************************/
 BOOL EndApp()																	// ‚±‚Ì’†‚ÅƒVƒXƒeƒ€‚àŠÜ‚ß‚½‘S‚Ä‚ÌŒãˆ—‚ğ‚·‚é‚Ì‚ÅƒNƒ‰ƒX‚Ì’†‚É‚Í“ü‚ê‚ê‚È‚¢
 {
-	delete MainFrame;			// [’ˆÓ]System‚ªRelease‚³‚ê‚é‘O‚ÉÁ‚·–
+	//delete MainFrame;			// [’ˆÓ]System‚ªRelease‚³‚ê‚é‘O‚ÉÁ‚·–
+	MainFrameEx->Release();
 	SYSTEM_Release();
 	tdnSystem::Release();
 	tdnText::CleanUpModule();
@@ -94,7 +95,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		else
 		{
 			// ƒQ[ƒ€‚ÌXVE•`‰æ
-			if (MainFrame->Update()) MainFrame->Render();
+			if (MainFrameEx->Update()) MainFrameEx->Render();
 		}
 
 	}

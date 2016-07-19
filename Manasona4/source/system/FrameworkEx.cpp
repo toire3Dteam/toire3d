@@ -1,4 +1,5 @@
 #include "FrameworkEx.h"
+#include "../Scene/sceneLoading.h"
 #include	"../Sound/SoundManager.h"
 
 // 実体化
@@ -192,4 +193,32 @@ bool FrameworkEx::FPSCtrl()
 	}
 
 	return false;
+}
+
+//*****************************************************************************************************************************
+//		シーンの切り替え
+//*****************************************************************************************************************************
+void FrameworkEx::ChangeScene(BaseScene* newScene, bool bLoadingScene)
+{
+	//	現在のシーン解放
+	if (m_scene != nullptr) delete m_scene;
+	//	シーンの切り替え＆初期化
+
+	// ローディング画面あり
+	if (bLoadingScene)
+	{
+		m_scene = new sceneLoading;
+		m_scene->Initialize(newScene);	// ここで、遷移先のInitializeを呼んでいる。
+	}
+
+	// ローディング画面なし
+	else
+	{
+		m_scene = newScene;
+
+		// Loadingでの2重Initialize阻止
+		if (m_scene->m_bLoad) return;
+
+		m_scene->Initialize();
+	}
 }

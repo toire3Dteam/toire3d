@@ -26,7 +26,7 @@ tdn2DObj::tdn2DObj()
 }
 
 // ファイルから画像読み込み
-tdn2DObj::tdn2DObj(const char* fileName)
+tdn2DObj::tdn2DObj(const char* fileName):m_bLoadTexture(true)
 {
 	// 初期化
 	m_width = m_height = 0;
@@ -63,7 +63,7 @@ tdn2DObj::tdn2DObj(const char* fileName)
 }
 
 // メモリーから画像読み込み
-tdn2DObj::tdn2DObj(const char* IDName, const char* pArchiveName)
+tdn2DObj::tdn2DObj(const char* IDName, const char* pArchiveName):m_bLoadTexture(true)
 {
 	// 初期化
 	m_width = m_height = 0;
@@ -99,7 +99,7 @@ tdn2DObj::tdn2DObj(const char* IDName, const char* pArchiveName)
 }
 
 // レンダーターゲット(描画先)作成
-tdn2DObj::tdn2DObj(UINT width, UINT height, FMT2D fmtFlag)
+tdn2DObj::tdn2DObj(UINT width, UINT height, FMT2D fmtFlag):m_bLoadTexture(true)
 {
 	//	情報初期化
 	m_width = m_height = 0;
@@ -280,9 +280,10 @@ tdn2DObj::~tdn2DObj(){
 	if (lpSurface){
 		lpSurface->Release();
 	}
-	if (lpTexture){
+	if (lpTexture && m_bLoadTexture){
 		tdnTexture::Release(lpTexture);
 	}
+	
 }
 
 /*******************************/
@@ -1247,6 +1248,39 @@ void tdn2DObj::SetARGB(DWORD ARGB)
 	//v[0].color = v[1].color = v[2].color = v[3].color = color;
 
 }
+
+void tdn2DObj::SetAlpha(BYTE A)
+{	
+	DWORD orgColor = (color & 0x00ffffff);	
+	color = (A << 24) | orgColor;
+}
+
+// 
+void tdn2DObj::SetAlpha(int A)
+{	
+	BYTE a = (BYTE)Math::Clamp((float)A, 0, 255);
+
+	DWORD orgColor = (color & 0x00ffffff);	
+	color = (a << 24) | orgColor;
+}
+
+void tdn2DObj::SetRGB(BYTE R, BYTE G, BYTE B)
+{
+	DWORD orgColor = (color & 0xff000000);
+	color = (R << 16) | (G << 8) | (B) | orgColor;
+
+}
+
+void tdn2DObj::SetRGB(int R, int G, int B)
+{
+	BYTE r = (BYTE)Math::Clamp((float)R, 0, 255);
+	BYTE g = (BYTE)Math::Clamp((float)G, 0, 255);
+	BYTE b = (BYTE)Math::Clamp((float)B, 0, 255);
+
+	DWORD orgColor = (color & 0xff000000);
+	color = (r << 16) | (g << 8) | (b) | orgColor;
+}
+
 
 void tdn2DObj::SetTurnOver(bool turnFlag)
 {

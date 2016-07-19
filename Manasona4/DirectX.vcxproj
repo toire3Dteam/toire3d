@@ -135,6 +135,7 @@
     <ClCompile Include="source\Scene\sceneLoading.cpp" />
     <ClCompile Include="source\Scene\SceneMain.cpp" />
     <ClCompile Include="source\Stage\Stage.cpp" />
+    <ClCompile Include="source\system\FrameworkEx.cpp" />
     <ClCompile Include="TDN\DirectShow\baseclasses\amfilter.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClCompile>
@@ -154,9 +155,12 @@
     <ClCompile Include="TDN\TDN_Collision.cpp" />
     <ClCompile Include="TDN\TDN_File.cpp">
       <DeploymentContent>false</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="TDN\TDN_Font.cpp" />
     <ClCompile Include="TDN\TDN_Input.cpp" />
     <ClCompile Include="TDN\TDN_Math.cpp" />
+    <ClCompile Include="TDN\TDN_Mesh.cpp" />
     <ClCompile Include="TDN\TDN_Movie.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -171,7 +175,9 @@
     <ClCompile Include="TDN\TDN_Texture.cpp" />
     <ClCompile Include="TDN\TDN_View.cpp" />
     <ClCompile Include="source\Sound\SoundManager.cpp" />
-    <ClCompile Include="source\system\Framework.cpp" />
+    <ClCompile Include="source\system\Framework.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="source\system\System.cpp" />
     <ClCompile Include="SOURCE\system\WinMain.cpp" />
   </ItemGroup>
@@ -205,6 +211,7 @@
     <ClInclude Include="source\Scene\sceneLoading.h" />
     <ClInclude Include="source\Scene\SceneMain.h" />
     <ClInclude Include="source\Stage\Stage.h" />
+    <ClInclude Include="source\system\FrameworkEx.h" />
     <ClInclude Include="TDN\DirectShow\baseclasses\amextra.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClInclude>
@@ -323,7 +330,9 @@
     <ClInclude Include="TDN\ogg\vorbisfile.h" />
     <ClInclude Include="TDN\TDNLIB.h" />
     <ClInclude Include="source\Sound\SoundManager.h" />
-    <ClInclude Include="source\system\Framework.h" />
+    <ClInclude Include="source\system\Framework.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="source\system\BaseScene.h" />
     <ClInclude Include="source\system\ItDebug.h" />
     <ClInclude Include="source\system\System.h" />

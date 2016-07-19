@@ -1536,123 +1536,12 @@ private:
 
 };
 
-//
-//// 3Dオブジェクト
-//class tdnMesh
-//{
-//public:
-//	tdnMesh();
-//	~tdnMesh();
-//
-//	/********/
-//	/* 作成 */
-//	/********/
-//
-//	struct CreateData
-//	{
-//		unsigned int      numVertexes;  // 頂点の数
-//		unsigned int      vertexSize;   // 頂点構造体のバイト数
-//		void              *vertexArray; // 頂点情報（頂点毎）配列
-//
-//		unsigned int      numIndexes;   // インデックスの数
-//		DWORD             *indexArray;  // インデックスの配列
-//		
-//		unsigned int      numStream;    // ストリーム構造体の数
-//		unsigned int      streamSize;   // ストリーム構造体のバイト数
-//		void              *streamArray; // 頂点情報（インデックス毎）の配列
-//
-//		D3DVERTEXELEMENT9 *decl;        // シェーダーに送る頂点構造体の定義
-//	};
-//	bool Create( const CreateData &data );
-//	bool CreateVertex(
-//		unsigned int numVertex,    // 頂点数
-//		unsigned int vertexSize,   // 頂点構造体のバイト数
-//		void *vertexArray );       // 頂点配列
-//	bool CreateIndexes(
-//		unsigned int numIndexes,   // インデックスの数
-//		const DWORD *indexArray ); // インデックス配列
-//	bool CreateStream( unsigned int numData, unsigned int dataSize, void *dataArray );
-//	bool CreateDeclaration(
-//		unsigned int declArySize,  // 頂点構造体のバイト数
-//		D3DVERTEXELEMENT9 *decl ); // シェーダー上での頂点構造体の宣言
-//
-//	// xy平面に正三角形作成
-//	bool CreateTriangle(
-//		float radius,    // 外接円の半径
-//		DWORD color ); 
-//	// xy平面に長方形作成
-//	bool CreateRectangle(
-//		float width,
-//		float height,
-//		DWORD color );
-//	// 正四面体作成
-//	bool CreateTriangular(
-//		float radius, // 外接円の半径
-//		DWORD color );
-//	// 直方体作成
-//	bool CreateCube(
-//		float width,
-//		float height,
-//		float depth,
-//		DWORD color,
-//		Vector3 *posList = nullptr,
-//		unsigned int numPos = 0 );
-//
-//	/************/
-//	/* 読み込み */
-//	/************/
-//
-//	bool LoadMqo( char *filename );
-//
-//	/********/
-//	/* 更新 */
-//	/********/
-//
-//	// pos, scale, rot からworldMatrix作成
-//	void UpdateWorldMatrix();
-//
-//	/********/
-//	/* 描画 */
-//	/********/
-//
-//	void Render( tdnShader *shader, char *technique );
-//
-//	/*********************/
-//	/* セッター ゲッター */
-//	/*********************/
-//
-//	const Vector3& Pos();
-//	void Pos( const Vector3& in );
-//	const Vector3& Scale();
-//	void Scale( const Vector3& in );
-//	const Quaternion& Rot();
-//	void Rot( const Quaternion& in );
-//	const Matrix& WorldMatrix();
-//	void WorldMatrix( const Matrix& in );
-//
-//private:
-//	IDirect3DVertexDeclaration9* decl;         // 頂点デコレーション（FVF）
-//	unsigned int                 declSize;     // 頂点構造体のバイト数
-//
-//	IDirect3DVertexBuffer9*      vertexBuffer;
-//	unsigned int                 numVertexes;
-//
-//	IDirect3DIndexBuffer9*       indexBuffer;
-//	unsigned int                 numIndexes;
-//
-//	IDirect3DVertexBuffer9*      streamBuffer; // オブジェクト毎の情報
-//	unsigned int                 streamSize;   // streamBuffer の一つのデータのバイト数
-//	unsigned int                 numStream;   // streamBuffer の個数
-//
-//	unsigned int                 numFaces;     // 三角ポリゴン数
-//
-//	Vector3    pos;
-//	Vector3    scale;
-//	Quaternion rot;
-//	Matrix     worldMatrix;
-//	public:
-//	Texture2D *texture;
-//};
+// 3Dオブジェクト
+class tdnMesh
+{
+public:
+	tdnMesh();
+	~tdnMesh();
 
 	/********/
 	/* 作成 */
@@ -1666,39 +1555,39 @@ private:
 
 		unsigned int      numIndexes;   // インデックスの数
 		DWORD             *indexArray;  // インデックスの配列
-		
+
 		unsigned int      numStream;    // ストリーム構造体の数
 		unsigned int      streamSize;   // ストリーム構造体のバイト数
 		void              *streamArray; // 頂点情報（インデックス毎）の配列
 
 		D3DVERTEXELEMENT9 *decl;        // シェーダーに送る頂点構造体の定義
 	};
-	bool Create( const CreateData &data );
+	bool Create(const CreateData &data);
 	bool CreateVertex(
 		unsigned int numVertex,    // 頂点数
 		unsigned int vertexSize,   // 頂点構造体のバイト数
-		void *vertexArray );       // 頂点配列
+		void *vertexArray);       // 頂点配列
 	bool CreateIndexes(
 		unsigned int numIndexes,   // インデックスの数
-		const DWORD *indexArray ); // インデックス配列
-	bool CreateStream( unsigned int numData, unsigned int dataSize, void *dataArray );
+		const DWORD *indexArray); // インデックス配列
+	bool CreateStream(unsigned int numData, unsigned int dataSize, void *dataArray);
 	bool CreateDeclaration(
 		unsigned int declArySize,  // 頂点構造体のバイト数
-		D3DVERTEXELEMENT9 *decl ); // シェーダー上での頂点構造体の宣言
+		D3DVERTEXELEMENT9 *decl); // シェーダー上での頂点構造体の宣言
 
 	// xy平面に正三角形作成
 	bool CreateTriangle(
 		float radius,    // 外接円の半径
-		DWORD color ); 
+		DWORD color);
 	// xy平面に長方形作成
 	bool CreateRectangle(
 		float width,
 		float height,
-		DWORD color );
+		DWORD color);
 	// 正四面体作成
 	bool CreateTriangular(
 		float radius, // 外接円の半径
-		DWORD color );
+		DWORD color);
 	// 直方体作成
 	bool CreateCube(
 		float width,
@@ -1706,13 +1595,13 @@ private:
 		float depth,
 		DWORD color,
 		Vector3 *posList = nullptr,
-		unsigned int numPos = 0 );
+		unsigned int numPos = 0);
 
 	/************/
 	/* 読み込み */
 	/************/
 
-	bool LoadMqo( char *filename );
+	bool LoadMqo(char *filename);
 
 	/********/
 	/* 更新 */
@@ -1725,20 +1614,21 @@ private:
 	/* 描画 */
 	/********/
 
-	void Render( tdnShader *shader, char *technique );
+	void Render(tdnShader *shader, char *technique);
 
 	/*********************/
 	/* セッター ゲッター */
 	/*********************/
 
 	const Vector3& Pos();
-	void Pos( const Vector3& in );
+	void Pos(const Vector3& in);
 	const Vector3& Scale();
-	void Scale( const Vector3& in );
+	void Scale(const Vector3& in);
+	void Scale(float in){ this->Scale(Vector3(in, in, in)); }
 	const Quaternion& Rot();
-	void Rot( const Quaternion& in );
+	void Rot(const Quaternion& in);
 	const Matrix& WorldMatrix();
-	void WorldMatrix( const Matrix& in );
+	void WorldMatrix(const Matrix& in);
 
 private:
 	IDirect3DVertexDeclaration9* decl;         // 頂点デコレーション（FVF）
@@ -1760,7 +1650,7 @@ private:
 	Vector3    scale;
 	Quaternion rot;
 	Matrix     worldMatrix;
-	public:
+public:
 	Texture2D *texture;
 };
 
@@ -2652,6 +2542,178 @@ public:
 
 
 
+// DirevtShowに関する基底クラスのAll.h的なヘッダー
+#include "DirectShow/baseclasses/streams.h"
+
+// デバッグとリリースで使うライブラリを分けている
+#ifdef _DEBUG
+#pragma comment( lib, "strmbasd.lib" )
+#else
+#pragma comment( lib, "strmbase.lib" )
+#endif
+
+// Define GUID for Texture Renderer
+struct __declspec(uuid("{71771540-2017-11cf-ae26-0020afd79767}")) CLSID_TextureRenderer;
+
+/**
+*@brief		テクスチャに動画を書き込む作業を実際に行うためのクラス。内部処理に利用するもの
+*@author	Yamagoe
+*/
+class TextureRenderer : public CBaseVideoRenderer
+{
+	IDirect3DDevice9	*m_pd3dDevice;
+	Texture2D	*m_pTexture;
+
+	D3DFORMAT		m_TextureFormat;
+
+	BOOL	m_bUseDynamicTextures;	//! @param ダイナミックテクスチャを使うかどうかどうかのフラグ
+
+	LONG	m_lVidWidth;	//! @param ビデオの幅
+	LONG	m_lVidHeight;	//! @param ビデオの高さ
+	LONG	m_lVidPitch;	//! @param ビデオのピッチ
+
+public:
+	TextureRenderer(LPUNKNOWN pUnk, HRESULT *phr);
+	~TextureRenderer();
+
+	void SetDevice(IDirect3DDevice9 * pd3dDevice){ m_pd3dDevice = pd3dDevice; };
+
+	HRESULT CheckMediaType(const CMediaType *pmt);     // Format acceptable?
+	HRESULT SetMediaType(const CMediaType *pmt);       // Video format notification
+	HRESULT DoRenderSample(IMediaSample *pMediaSample); // New video sample
+
+	Texture2D *GetTexture(){ return m_pTexture; };
+
+	void GetVideoDesc(LONG* plVidWidth, LONG* plVidHeight, LONG* plVidPitch)
+	{
+		*plVidWidth = m_lVidWidth;
+		*plVidHeight = m_lVidHeight;
+		*plVidPitch = m_lVidPitch;
+	};
+};
+
+/**
+*@brief		動画ファイルの制御、テクスチャを取得したりするクラス
+*@author		Yamagoe
+*/
+class tdnMovie
+{
+public:
+	tdnMovie(char *filename, bool bSound = false, bool bLoop = true);
+	~tdnMovie();
+
+	// ★テクスチャ取得
+	Texture2D* GetTexture()
+	{
+		return m_pTexture;
+	}
+
+	void Play();	// 再生
+	void Stop();	// 停止
+
+	void LoopUpdate(){ if (m_bLoop && isEndPos())SetTime(0.0); }	// ループ再生する更新
+
+	// ゲッター
+	double GetStopTime(){ double ret; m_pMediaPosition->get_StopTime(&ret); return ret; };				// 終了時間の取得
+	double GetDuration(){ double ret; m_pMediaPosition->get_Duration(&ret); return ret; };				// ストリームの時間幅の取得
+	double GetCurrentPosition(){ double ret; m_pMediaPosition->get_CurrentPosition(&ret); return ret; }	// 現在の再生位置の取得
+	void GetUV(float2 *out) { out->x = m_fu; out->y = m_fv; };
+	bool isEndPos(){ return (GetCurrentPosition() >= GetStopTime()); };
+
+	// セッター
+	void SetTime(double val) { m_pMediaPosition->put_CurrentPosition(val); };				// 現在の再生位置を指定位置にセット
+	void SetSpeed(double val) { m_pMediaPosition->put_Rate(val); };
+	void SetLoop(bool loop){ m_bLoop = loop; }
+private:
+	// 動画をテクスチャ処理してくれるくん
+	TextureRenderer     *m_pTextureRenderer;        // DirectShow Texture renderer
+
+	// Direct3Dとしての変数
+	Texture2D	*m_pTexture;		// 動画のテクスチャ
+
+	IMediaControl		*m_pMediaControl;	// メディア管理
+	IGraphBuilder		*m_pGraphBuilder;	// 
+	IMediaEvent			*m_pMediaEvent;
+	IMediaPosition		*m_pMediaPosition;	// 再生位置
+
+	//IBaseFilter			*m_pVMR9;		// レンダフィルター(VMR9)
+
+	// フィルター接続ヘルパーインターフェース
+	//ICaptureGraphBuilder2 *m_pCaptureGraphBuilder2;
+
+	LONG	m_lWidth;			// 幅  
+	LONG	m_lHeight;			// 高さ
+	LONG	m_lPitch;			// ピッチ
+	FLOAT	m_fu, m_fv;			// 元のムービーのサイズ(幅、高さ) / テクスチャのサイズ(幅、高さ)で算出するUV値
+
+	FILTER_STATE		m_state;	// 自分のステート
+	bool				m_bLoop;	// ループフラグ
+	bool				m_bSound;	// サウンドフラグ
+	bool				m_bWMV;		// wmvファイルかどうか
+};
+class tdnMovieManager
+{
+public:
+	static void Initialize();
+	static void Release();
+};
+
+
+/************************/
+//		tdnFont
+/************************/
+
+const	UINT	CacheQty = 512;			//	文字のキャッシュの数
+
+class tdnFont
+{
+private:
+	tdnFont() {};
+	~tdnFont() {};
+
+public:
+	//	初期化・解放
+	static	void	Initialize();
+	static	void	Release();
+
+	// 文字列描画
+	static	void	RenderString(LPCSTR string, LPCSTR fontName, int fontSize, int drawX, int  drawY, DWORD color, DWORD RenderFlag);
+	// 一文字描画
+	static	Vector2	RenderCharacter(LPCSTR character, LPCSTR fontName, int fontSize, int drawX, int  drawY, DWORD color, DWORD RenderFlag);
+
+	//  簡易
+	static void RenderFont2D(LPCSTR _String, int _FontSize, int _DrawX, int _DrawY, DWORD col);
+
+private:
+
+	//	照合用データ
+	typedef	struct	ReferenceData {
+		bool	isEnable;	//	有効化フラグ
+		char	chara[2];	//	文字
+		UINT	byte;		//	文字のバイト数
+		UINT	size;		//	サイズ
+		LPCSTR	fontName;	//	フォント名
+	}	RefData;
+
+	//	キャッシュ処理用デスク
+	struct	CacheDesc {
+		UINT		nextUseCacheNum;		//	次に使用するキャッシュの番号
+		tdn2DObj*	textureCacheList;		//	文字テクスチャのリスト
+		RefData*	referenceDataList;		//	キャッシュの照合用データリスト
+	};
+
+	//	管理パラメータ
+	static	bool		m_IsInitialized;		//	初期化済みフラグ
+	static	CacheDesc	m_CacheDesc;			//	キャッシュ処理用デスク
+
+
+	/****************************************/
+	//	 2DObjから文字を作るサポート関数
+	/****************************************/
+	static	UINT	SearchCache(LPCSTR chara, UINT size, LPCSTR fontName);
+
+};
+
 
 
 
@@ -2876,61 +2938,3 @@ public:
 };
 
 typedef iex3DObj IEX3DOBJ, *LPIEX3DOBJ;
-
-
-
-/************************/
-//		tdnFont
-/************************/
-
-const	UINT	CacheQty = 512;			//	文字のキャッシュの数
-
-class tdnFont
-{
-private:
-	tdnFont() {};
-	~tdnFont() {};
-
-public:
-	//	初期化・解放
-	static	void	Initialize();
-	static	void	Release();
-
-	// 文字列描画
-	static	void	RenderString(LPCSTR string, LPCSTR fontName, int fontSize, int drawX, int  drawY, DWORD color, DWORD RenderFlag);
-	// 一文字描画
-	static	Vector2	RenderCharacter(LPCSTR character, LPCSTR fontName, int fontSize, int drawX, int  drawY, DWORD color, DWORD RenderFlag);
-
-	//  簡易
-	static void RenderFont2D(LPCSTR _String, int _FontSize, float _DrawX, float _DrawY, DWORD col);
-
-private:
-
-	//	照合用データ
-	typedef	struct	ReferenceData {
-		bool	isEnable;	//	有効化フラグ
-		char	chara[2];	//	文字
-		UINT	byte;		//	文字のバイト数
-		UINT	size;		//	サイズ
-		LPCSTR	fontName;	//	フォント名
-	}	RefData;
-
-	//	キャッシュ処理用デスク
-	struct	CacheDesc {
-		UINT		nextUseCacheNum;		//	次に使用するキャッシュの番号
-		tdn2DObj*	textureCacheList;		//	文字テクスチャのリスト
-		RefData*	referenceDataList;		//	キャッシュの照合用データリスト
-	};
-
-	//	管理パラメータ
-	static	bool		m_IsInitialized;		//	初期化済みフラグ
-	static	CacheDesc	m_CacheDesc;			//	キャッシュ処理用デスク
-
-
-												/****************************************/
-												//	 2DObjから文字を作るサポート関数
-												/****************************************/
-	static	UINT	SearchCache(LPCSTR chara, UINT size, LPCSTR fontName);
-
-};
-

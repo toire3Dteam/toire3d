@@ -1,5 +1,5 @@
 #include	"TDNLIB.h"
-#include	"system/Framework.h"
+#include	"system/FrameworkEx.h"
 #include	"sceneLoading.h"
 
 //=============================================================================================
@@ -70,7 +70,7 @@ bool sceneLoading::Update()
 	//ロードが終わったら、シーンをチェンジ
 	if (!isThread)
 	{
-		MainFrame->ChangeScene(m_newScene);
+		MainFrameEx->ChangeScene(m_newScene);
 	}
 
 	return true;
