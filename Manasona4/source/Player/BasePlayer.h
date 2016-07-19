@@ -55,7 +55,7 @@ static const KEYCODE KeyCodeList[(int)PLAYER_INPUT::MAX] = {
 };
 
 // 向き
-enum class DIR { LEFT, RIGHT };
+enum class DIR { LEFT, RIGHT, MAX };
 
 	class BasePlayer: public BaseGameEntity
 	{
@@ -65,6 +65,7 @@ enum class DIR { LEFT, RIGHT };
 		void Control();			// プレイヤーからの入力を受け付ける
 		virtual void Update();	// 基本的な更新
 		void UpdatePos();		// 座標更新(判定後に呼び出す)
+		void Move(); // 動きの制御
 		virtual void Render();
 		
 		bool HandleMessage(const Message& msg); //メッセージを受け取る
@@ -75,10 +76,18 @@ enum class DIR { LEFT, RIGHT };
 		Vector3 *GetPosAddress() { return &m_pos; }
 		int GetInputList(PLAYER_INPUT input) { return m_InputList[(int)input]; }	
 		StateMachine<BasePlayer>* GetFSM()const { return m_pStateMachine; }// ★ステートマシンのアクセサを作る
+		DIR GetDir() { return m_dir; }
+		bool isMaxSpeed() { return (abs(m_move.x) >= m_maxSpeed); }
 
 		// セッター
 		void SetMove(const Vector3 &v) { m_move.Set(v.x, v.y, v.z); }
 		void SetPos(const Vector3 &v) { m_pos.Set(v.x, v.y, v.z); }
+		void SetDir(DIR dir) { m_dir = dir; }
+		void SetMotion(int MotionNo) { if (m_pObj) { if (m_pObj->GetMotion() != MotionNo)m_pObj->SetMotion(MotionNo); } }
+
+		// アクセサー
+		void AddMove(const Vector3 &v) { m_move += v; }
+
 
 		// ステージのあたり判定用
 		CollisionShape::Square *GetHitSquare() { return m_pHitSquare; }
@@ -93,7 +102,9 @@ enum class DIR { LEFT, RIGHT };
 		Vector3 m_move;	// 移動値
 		CollisionShape::Square *m_pHitSquare;	// 四角判定(ステージ衝突で使う)
 		DIR m_dir;				// 左右のフラグ
-		const float m_Gravity;	// 重力値
+		float m_Gravity;		// 重力値
+		float m_maxSpeed;		// キャラクターの最大スピード 
+		float m_angleY;
 
 		int m_InputList[(int)PLAYER_INPUT::MAX]; 	// 押しているキーを格納
 		StateMachine<BasePlayer>* m_pStateMachine; // ★ステートマシン

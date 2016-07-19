@@ -4,7 +4,15 @@
 #include "../Collision/Collision.h"
 #include "../Stage/Stage.h"
 
-BasePlayer::BasePlayer(int deviceID) :BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + deviceID)), m_Gravity(.14f), m_dir(DIR::LEFT), m_deviceID(deviceID), m_pHitSquare(new CollisionShape::Square), m_pObj(nullptr), m_move(VECTOR_ZERO)
+static const float DIR_ANGLE[(int)DIR::MAX] =
+{
+	PI * 1.5f,	// 左向き
+	PI * .5,	// 右向き
+};
+
+BasePlayer::BasePlayer(int deviceID) :BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + deviceID)),
+m_Gravity(.14f), m_maxSpeed(1.0f), m_dir(DIR::LEFT), m_deviceID(deviceID), m_pHitSquare(new CollisionShape::Square),
+m_pObj(nullptr), m_move(VECTOR_ZERO)
 {
 	// デフォルト設定
 	m_pHitSquare->height = 4;
@@ -38,6 +46,8 @@ BasePlayer::BasePlayer(int deviceID) :BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_P
 		m_pos.Set(50, 20, 0);
 		break;
 	}
+
+	m_angleY = DIR_ANGLE[(int)m_dir];
 }
 
 BasePlayer::~BasePlayer()
@@ -58,14 +68,32 @@ void BasePlayer::Update()
 	//if (m_InputList[(int)PLAYER_INPUT::LEFT] == 1) m_move.x = -2;
 	//else m_move.x = 0;
 
+	// 動きの制御
+	Move();
+
+	// アングル補間処理
+	m_angleY = m_angleY*.75f + DIR_ANGLE[(int)m_dir] * .25f;
+
 	// メッシュの更新
 	m_pObj->Animation();
-	m_pObj->SetAngle((m_dir == DIR::LEFT) ? PI * .5f : PI * 1.5f);	// 左右のアングルのセット
+	m_pObj->SetAngle(m_angleY);	// 左右のアングルのセット
 	m_pObj->SetPos(m_pos);
 	m_pObj->Update();
+	
+}
 
+void BasePlayer::Move() 
+{
 	// 移動量更新
 	m_move.y -= m_Gravity;
+	//if (m_move.y <= -3.0f) { m_move.y = -3.0f; } // 落ちる速度を抑制
+	m_move.y = max(-3.0f, m_move.y);// 落ちる速度を抑制
+
+
+	// 左右のMove値
+	m_move.x = Math::Clamp(m_move.x, -m_maxSpeed, m_maxSpeed);
+
+	m_move *= 0.9f;	// 減速(A列車:この値はキャラ固有の値)
 }
 
 void BasePlayer::Control()
