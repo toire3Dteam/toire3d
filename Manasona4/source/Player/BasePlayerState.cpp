@@ -65,6 +65,16 @@ void BasePlayerState::Wait::Execute(BasePlayer * pPerson)
 		return;
 	}
 
+	//////////////////////////////////////////////
+	//	攻撃ボタン
+	//============================================
+	if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
+	{
+		// 攻撃ステートに行く
+		pPerson->GetFSM()->ChangeState(BasePlayerState::RushAttack::GetInstance());
+		return;
+	}
+
 	if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
 	{
 		pPerson->SetDir(DIR::RIGHT);
@@ -138,6 +148,16 @@ void BasePlayerState::Walk::Execute(BasePlayer * pPerson)
 	{
 		// ジャンプステートに行く
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
+		return;
+	}
+
+	//////////////////////////////////////////////
+	//	攻撃ボタン
+	//============================================
+	if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
+	{
+		// 攻撃ステートに行く
+		pPerson->GetFSM()->ChangeState(BasePlayerState::RushAttack::GetInstance());
 		return;
 	}
 
@@ -230,6 +250,16 @@ void BasePlayerState::Run::Execute(BasePlayer * pPerson)
 	{
 		// ジャンプステートに行く
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
+		return;
+	}
+
+	//////////////////////////////////////////////
+	//	攻撃ボタン
+	//============================================
+	if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
+	{
+		// 攻撃ステートに行く
+		pPerson->GetFSM()->ChangeState(BasePlayerState::RushAttack::GetInstance());
 		return;
 	}
 
@@ -696,7 +726,7 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 		if (pPerson->GetRushAttack()->bHit)
 		{
 			// 攻撃ボタン押したら
-			if (pPerson->GetInputList(PLAYER_INPUT::A))
+			if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
 			{
 				// 次のモーションセット
 
@@ -719,7 +749,7 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 		if (pPerson->GetRushAttack()->bHit)
 		{
 			// 攻撃ボタン押したら
-			if (pPerson->GetInputList(PLAYER_INPUT::A))
+			if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
 			{
 				// 次のモーションセット
 
@@ -769,6 +799,12 @@ bool BasePlayerState::RushAttack::OnMessage(BasePlayer * pPerson, const Message 
 	{
 										HIT_ATTACK_INFO *hai = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
 										pPerson->GetRushAttack()->bHit = true;
+										break;
+	}
+		// 攻撃くらったよメッセージ
+	case MESSAGE_TYPE::HIT_DAMAGE:
+	{
+										HIT_DAMAGE_INFO *hdi = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
 										break;
 	}
 	default:
