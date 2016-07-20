@@ -297,10 +297,8 @@ void BasePlayerState::Run::Execute(BasePlayer * pPerson)
 		}
 	}
 
-	Vector3 move = pPerson->GetMove();
-	// 左右のMove値の制御
-	move.x = Math::Clamp(move.x, -pPerson->GetMaxSpeed(), pPerson->GetMaxSpeed());
-	pPerson->SetMove(move);
+	// 移動地制御
+	pPerson->MoveClampX(pPerson->GetMaxSpeed());
 }
 
 void BasePlayerState::Run::Exit(BasePlayer * pPerson)
@@ -528,8 +526,8 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 			}
 
 			// 左右入力
-			if (pPerson->isPushInput(PLAYER_INPUT::LEFT))		add.x = -.25f;
-			else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT)) add.x = .25f;
+			//if (pPerson->isPushInput(PLAYER_INPUT::LEFT))		add.x = -.25f;
+			//else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT)) add.x = .25f;
 
 			// 移動地を足す！
 			pPerson->AddMove(add);
@@ -565,12 +563,15 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 			pPerson->AddMove(Vector3(0.05f, 0.0f, 0.0f));
 		}
 
+		// 移動地制御
+		pPerson->MoveClampX(pPerson->GetMaxSpeed() * 1.1f);
+
 
 		// 地上フラグtrue(着地したら)
 		if (pPerson->isLand())
 		{
 			// 着地ステートに移行
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Land::GetInstance());
 		}
 	}
 }
@@ -591,3 +592,112 @@ bool BasePlayerState::Jump::OnMessage(BasePlayer * pPerson, const Message & msg)
 }
 
 
+/*******************************************************/
+//					着地ステート
+/*******************************************************/
+
+BasePlayerState::Land * BasePlayerState::Land::GetInstance()
+{
+	// ここに変数を作る
+	static BasePlayerState::Land instance;
+	return &instance;
+}
+
+void BasePlayerState::Land::Enter(BasePlayer * pPerson)
+{
+	// ブレーキモーションに変える
+	pPerson->SetMotion(12);
+
+	// 着地時間初期化
+	pPerson->GetJump()->LandTimer = 0;
+
+	// 移動地制御
+	pPerson->MoveClampX(pPerson->GetMaxSpeed());
+}
+
+void BasePlayerState::Land::Execute(BasePlayer * pPerson)
+{
+	// 一定時間着地したら
+	if (++pPerson->GetJump()->LandTimer > 5)
+	{
+		// 方向キーを入力していたら、「走り」ステートへ
+		if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
+		{
+			pPerson->SetDir(DIR::LEFT);
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+		}
+		else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
+		{
+			pPerson->SetDir(DIR::RIGHT);
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+		}
+
+		// 左右方向キーを押してなかったら、「待機」ステートへ
+		else
+		{
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		}
+
+	}
+
+	//////////////////////////////////////////////
+	//	ジャンプボタン
+	//============================================
+	if (pPerson->GetInputList(PLAYER_INPUT::C) == 3 && pPerson->GetJump()->LandTimer > 3)
+	{
+		// ジャンプステートに行く
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
+		return;
+	}
+}
+
+void BasePlayerState::Land::Exit(BasePlayer * pPerson)
+{
+
+}
+
+void BasePlayerState::Land::Render(BasePlayer * pPerson)
+{
+	//tdnText::Draw(20, 690, 0xffffffff, "LandState");
+}
+
+bool BasePlayerState::Land::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	return false;
+}
+
+/*******************************************************/
+//					ラッシュ攻撃ステート
+/*******************************************************/
+
+BasePlayerState::RushAttack * BasePlayerState::RushAttack::GetInstance()
+{
+	// ここに変数を作る
+	static BasePlayerState::RushAttack instance;
+	return &instance;
+}
+
+void BasePlayerState::RushAttack::Enter(BasePlayer * pPerson)
+{
+
+}
+
+void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
+{
+
+}
+
+void BasePlayerState::RushAttack::Exit(BasePlayer * pPerson)
+{
+
+}
+
+void BasePlayerState::RushAttack::Render(BasePlayer * pPerson)
+{
+	//tdnText::Draw(20, 690, 0xffffffff, "RushState");
+}
+
+bool BasePlayerState::RushAttack::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	return false;
+}

@@ -15,10 +15,10 @@ namespace Stage
 
 enum class PLAYER_INPUT
 {
-	A,
-	B,
-	C,
-	D,
+	A,		// 
+	B,		// 
+	C,		// ジャンプ
+	D,		// 
 	RIGHT,
 	LEFT,
 	UP,
@@ -65,6 +65,7 @@ protected:
 		bool bHold;	// しゃがんでる状態
 		int HoldTimer;		// しゃがんでる時間
 		int PlayerHoldTimer;	// しゃがんでる間にプレイヤーからジャンプボタンを受け付ける時間
+		int LandTimer;		// 着地の時間
 	};
 	Jump m_jump;
 
@@ -101,7 +102,7 @@ public:
 
 	// アクセサー
 	void AddMove(const Vector3 &v) { m_move += v; }
-
+	void MoveClampX(float val) { m_move.x = Math::Clamp(m_move.x, -val, val); }
 
 	// ステージのあたり判定用
 	CollisionShape::Square *GetHitSquare() { return m_pHitSquare; }

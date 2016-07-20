@@ -250,4 +250,75 @@ namespace BasePlayerState
 		Jump(const Jump&) {}
 		Jump& operator=(const Jump&) {}
 	};
+
+	/*******************************************************/
+	//					着地ステート
+	/*******************************************************/
+	class Land :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static Land* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+
+		Land() {};
+		~Land() {};
+
+		Land(const Land&) {}
+		Land& operator=(const Land&) {}
+	};
+
+
+	/*******************************************************/
+	//					ラッシュ攻撃ステート
+	/*******************************************************/
+	class RushAttack :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static RushAttack* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+
+		RushAttack() {};
+		~RushAttack() {};
+
+		RushAttack(const RushAttack&) {}
+		RushAttack& operator=(const RushAttack&) {}
+	};
 }

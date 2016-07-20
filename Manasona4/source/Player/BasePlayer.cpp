@@ -8,7 +8,7 @@
 //_/_/_/_/_/_/__/_/__/_/__/_/__
 // 定数
 //_/_/_/_/__/_/__/_/__/_/__/_/_
-const float BasePlayer::c_END_MOVE_LINE = .2f;		// 移動が終わって待機に戻る移動値ライン
+const float BasePlayer::c_END_MOVE_LINE = .25f;		// 移動が終わって待機に戻る移動値ライン
 const float BasePlayer::c_FRONT_BRAKE_LINE = .55f;	// 走り中に操作を離してブレーキに移行するまでの移動値ライン
 const float BasePlayer::c_GRAVITY = .1f;
 const float BasePlayer::c_MAX_JUMP = 2.2f;
@@ -81,7 +81,7 @@ void BasePlayer::Update()
 	Move();
 
 	// アングル補間処理
-	m_angleY = m_angleY*.75f + DIR_ANGLE[(int)m_dir] * .25f;
+	m_angleY = m_angleY*.65f + DIR_ANGLE[(int)m_dir] * .35f;
 
 	// メッシュの更新
 	m_pObj->Animation();
@@ -98,13 +98,18 @@ void BasePlayer::Move()
 	//if (m_move.y <= -3.0f) { m_move.y = -3.0f; } // 落ちる速度を抑制
 	m_move.y = max(-2.75f, m_move.y);// 落ちる速度を抑制
 
+	// 空気抵抗(xの値を徐々に減らしていく)
 	if (m_bLand)
 	{
+		//if (m_move.x > 0)		m_move.x = max(m_move.x - .055f, 0);
+		//else if (m_move.x < 0)	m_move.x = min(m_move.x + .055f, 0);
 		m_move.x *= 0.92f;	// 減速(A列車:この値はキャラ固有の値)
 	}
 	else
-	{
-		m_move.x *= 0.98f;
+	{	
+		//if (m_move.x > 0)		m_move.x = max(m_move.x - .035f, 0);
+		//else if (m_move.x < 0)	m_move.x = min(m_move.x + .035f, 0);
+		m_move.x *= 0.98f;	// 減速(A列車:この値はキャラ固有の値)
 	}
 
 	// 左右のMove値
