@@ -31,6 +31,7 @@ m_pObj(nullptr), m_move(VECTOR_ZERO), m_bLand(false)
 	// 初期化
 	memset(m_InputList, 0, sizeof(m_InputList));
 	ZeroMemory(&m_jump, sizeof(Jump));
+	ZeroMemory(&m_RushAttack, sizeof(RushAttack));
 	// ステートマシン　引数は自分自身のポインタ
 	m_pStateMachine = new StateMachine<BasePlayer>(this);
 	m_pStateMachine->SetGlobalState(BasePlayerState::Global::GetInstance());// グローバル

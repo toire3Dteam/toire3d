@@ -66,8 +66,25 @@ protected:
 		int HoldTimer;		// しゃがんでる時間
 		int PlayerHoldTimer;	// しゃがんでる間にプレイヤーからジャンプボタンを受け付ける時間
 		int LandTimer;		// 着地の時間
+		void Clear()
+		{
+			bHold = true;
+			HoldTimer = PlayerHoldTimer = LandTimer = 0;
+		}
 	};
 	Jump m_jump;
+
+	struct RushAttack
+	{
+		int step;	// 0,1,2で進める
+		bool bHit;	// これがtrueの時にボタンを押すと次の攻撃に行く
+		void Clear()
+		{
+			step = 0;
+			bHit = false;
+		}
+	};
+	RushAttack m_RushAttack;
 
 public:
 	BasePlayer(int deviceID);
@@ -91,6 +108,7 @@ public:
 	bool isMaxSpeed() { return (abs(m_move.x) >= m_maxSpeed); }
 	bool isLand() { return m_bLand; }
 	Jump *GetJump() { return &m_jump; }
+	RushAttack *GetRushAttack() { return &m_RushAttack; }
 	float GetMaxSpeed() { return m_maxSpeed; }
 
 	// セッター

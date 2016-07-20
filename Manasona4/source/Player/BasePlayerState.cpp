@@ -491,9 +491,7 @@ void BasePlayerState::Jump::Enter(BasePlayer * pPerson)
 	pPerson->SetMotion(8);
 
 	// しゃがみフラグ初期化
-	pPerson->GetJump()->bHold = true;
-	pPerson->GetJump()->HoldTimer = 0;
-	pPerson->GetJump()->PlayerHoldTimer = 0;
+	pPerson->GetJump()->Clear();
 }
 
 void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
@@ -679,12 +677,50 @@ BasePlayerState::RushAttack * BasePlayerState::RushAttack::GetInstance()
 
 void BasePlayerState::RushAttack::Enter(BasePlayer * pPerson)
 {
+	// 初撃モーションに変える
+	pPerson->SetMotion(2);
 
+	// ラッシュ攻撃構造体初期化
+	pPerson->GetRushAttack()->Clear();
 }
 
 void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 {
+	switch (pPerson->GetRushAttack()->step)
+	{
+	case 0:	// 1段目
+		// VS他プレイヤー
+		if (true)
+		{
 
+		}
+		// ヒットしてる状態
+		if (pPerson->GetRushAttack()->bHit)
+		{
+			// 攻撃ボタン押したら
+			if (pPerson->GetInputList(PLAYER_INPUT::A))
+			{
+				// 次のモーションセット
+				pPerson->GetRushAttack()->step++;
+			}
+		}
+		else
+		{
+			// フォローモーション
+			if (true)
+			{
+				// 待機モーションに戻る
+				pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+			}
+		}
+		break;
+	case 1:	// 2段目
+
+		break;
+	case 2:	// 3段目
+
+		break;
+	}
 }
 
 void BasePlayerState::RushAttack::Exit(BasePlayer * pPerson)
