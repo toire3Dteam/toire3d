@@ -3,7 +3,6 @@
 // 前方宣言
 class MyMusicManager;
 class Camera;
-class PlayerManager;
 //class Stage::Base;	// ×
 namespace Stage{		// ○
 	class Base;
@@ -24,5 +23,4 @@ private:
 	Stage::Base *m_pStage;			// ステージさん
 	Camera *m_pCamera;				// カメラさん
 	MyMusicManager *m_pMyMusicMgr;	// オレ曲管理さん
-	PlayerManager *m_pPlayerMgr;
 };

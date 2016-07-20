@@ -37,17 +37,17 @@ m_NumPlayer(-1), m_pPlayerPosReferences(nullptr)
 	m_pStateMachine = new StateMachine<Camera>(this);
 }
 
-void Camera::SetPlayersPos(PlayerManager *pPlayerMgr)
+void Camera::SetPlayersPos()
 {
 	// プレイヤー数取得
-	m_NumPlayer = pPlayerMgr->GetNumPlayer();
+	m_NumPlayer = PlayerMgr->GetNumPlayer();
 
 	// スマブラカメラ用にプレイヤー達の座標のアドレスを取得する
 	m_pPlayerPosReferences = new Vector3*[m_NumPlayer];
 	FOR(m_NumPlayer)
 	{
 		// プレイヤーの座標を参照する
-		m_pPlayerPosReferences[i] = pPlayerMgr->GetPlayer(i)->GetPosAddress();
+		m_pPlayerPosReferences[i] = PlayerMgr->GetPlayer(i)->GetPosAddress();
 	}
 }
 

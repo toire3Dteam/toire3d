@@ -2,10 +2,21 @@
 #include "Airou\Airou.h"
 #include "Stage\Stage.h"
 
+// 実体の宣言
+PlayerManager *PlayerManager::pInstance = nullptr;
 
-PlayerManager::PlayerManager(int NumPlayer, Stage::Base *pStage) :BaseGameEntity(ENTITY_ID::PLAYER_MGR),	// エンティティID登録
-m_pStage(pStage), m_NumPlayer(NumPlayer)
+PlayerManager::PlayerManager() :BaseGameEntity(ENTITY_ID::PLAYER_MGR),	// エンティティID登録
+m_pStage(nullptr), m_NumPlayer(1), m_pPlayers(nullptr)
 {
+
+}
+PlayerManager::PlayerManager(const PlayerManager&) :BaseGameEntity(ENTITY_ID::PLAYER_MGR){}
+
+void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage)
+{
+	m_NumPlayer = NumPlayer;
+	m_pStage = pStage;
+
 	// プレイヤ確保
 	m_pPlayers = new BasePlayer*[NumPlayer];
 

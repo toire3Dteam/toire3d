@@ -37,7 +37,7 @@ public:
 	//------------------------------------------------------
 	void Set(const Vector3 &pos, const Vector3 &target){ tdnView::Set(pos, target); }
 	void SetStageCameraInfo(char *path);	// ステージごとのスマブラカメラの設定
-	void SetPlayersPos(PlayerManager *pPlayerMgr);
+	void SetPlayersPos();
 
 	//------------------------------------------------------
 	//	基本パラメータ(ステートマシンからいじりまくるので、publicにおいとく)

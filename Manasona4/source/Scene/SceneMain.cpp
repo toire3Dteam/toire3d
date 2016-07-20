@@ -29,10 +29,11 @@ bool sceneMain::Initialize()
 	m_fLoadPercentage = .5f;	// ロード割合
 
 	// プレイヤー初期化
-	m_pPlayerMgr = new PlayerManager(4, m_pStage);
+	//m_pPlayerMgr = new PlayerManager(4, m_pStage);
+	PlayerMgr->Initialize(4, m_pStage);
 
 	// プレイヤーの座標のアドレスをカメラに渡してあげる(いじることは絶対に無く、ただ参照するだけ)
-	m_pCamera->SetPlayersPos(m_pPlayerMgr);
+	m_pCamera->SetPlayersPos();
 
 	m_fLoadPercentage = 1.0f;	// ロード割合
 
@@ -48,7 +49,7 @@ sceneMain::~sceneMain()
 	delete m_pMyMusicMgr;
 	delete m_pStage;
 	delete m_pCamera;
-	delete m_pPlayerMgr;
+	PlayerMgr->Release();
 }
 
 //******************************************************************
@@ -64,7 +65,7 @@ bool sceneMain::Update()
 	m_pStage->Update();
 
 	// プレイヤー更新
-	m_pPlayerMgr->Update();
+	PlayerMgr->Update();
 
 	// エンターでエフェクトカメラ発動してみる
 	if (KeyBoardTRG(KB_ENTER))
@@ -90,7 +91,7 @@ void sceneMain::Render()
 	m_pStage->Render();
 
 	// プレイヤー
-	m_pPlayerMgr->Render();
+	PlayerMgr->Render();
 
 	tdnText::Draw(0, 30, 0xffffffff, "CameraPos    : %.1f %.1f %.1f", m_pCamera->m_pos.x, m_pCamera->m_pos.y, m_pCamera->m_pos.z);
 	tdnText::Draw(0, 60, 0xffffffff, "CameraTarget : %.1f %.1f %.1f", m_pCamera->m_target.x, m_pCamera->m_target.y, m_pCamera->m_target.z);
