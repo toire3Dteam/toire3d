@@ -79,7 +79,7 @@ void	tdnFont::RenderString(LPCSTR string, LPCSTR fontName, int fontSize, int dra
 		Vector2	drawedSize = RenderCharacter(&string[i], fontName, fontSize, drawCoordX, drawCoordY, color, RenderFlag);
 
 		//	ï`âÊç¿ïWÇÇ∏ÇÁÇ∑
-		x += drawedSize.x;
+		x += (int)drawedSize.x;
 	}
 }
 

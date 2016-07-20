@@ -682,6 +682,9 @@ void BasePlayerState::RushAttack::Enter(BasePlayer * pPerson)
 
 	// ラッシュ攻撃構造体初期化
 	pPerson->GetRushAttack()->Clear();
+
+	// 攻撃ステートを1段目に設定する
+	pPerson->SetAttackState(BASE_ATTACK_STATE::RUSH1);
 }
 
 void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
@@ -689,11 +692,6 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 	switch (pPerson->GetRushAttack()->step)
 	{
 	case 0:	// 1段目
-		// VS他プレイヤー
-		if (true)
-		{
-
-		}
 		// ヒットしてる状態
 		if (pPerson->GetRushAttack()->bHit)
 		{
@@ -701,31 +699,59 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 			if (pPerson->GetInputList(PLAYER_INPUT::A))
 			{
 				// 次のモーションセット
+
+				// 攻撃ステートを2段目に設定する
+				pPerson->SetAttackState(BASE_ATTACK_STATE::RUSH2);
+
 				pPerson->GetRushAttack()->step++;
+				pPerson->GetRushAttack()->bHit = false;
 			}
 		}
-		else
+		// 攻撃終了してたら
+		if (!pPerson->isAttackState())
 		{
-			// フォローモーション
-			if (true)
-			{
-				// 待機モーションに戻る
-				pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
-			}
+			// 待機モーションに戻る
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
 		}
 		break;
 	case 1:	// 2段目
+		// ヒットしてる状態
+		if (pPerson->GetRushAttack()->bHit)
+		{
+			// 攻撃ボタン押したら
+			if (pPerson->GetInputList(PLAYER_INPUT::A))
+			{
+				// 次のモーションセット
 
+				// 攻撃ステートを3段目に設定する
+				pPerson->SetAttackState(BASE_ATTACK_STATE::RUSH3);
+
+				pPerson->GetRushAttack()->step++;
+				pPerson->GetRushAttack()->bHit = false;
+			}
+		}
+		// 攻撃終了してたら
+		if (!pPerson->isAttackState())
+		{
+			// 待機モーションに戻る
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		}
 		break;
 	case 2:	// 3段目
-
+		// 攻撃終了してたら
+		if (!pPerson->isAttackState())
+		{
+			// 待機モーションに戻る
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		}
 		break;
 	}
 }
 
 void BasePlayerState::RushAttack::Exit(BasePlayer * pPerson)
 {
-
+	// ★攻撃ステートをやめさせる
+	pPerson->SetAttackState(BASE_ATTACK_STATE::END);
 }
 
 void BasePlayerState::RushAttack::Render(BasePlayer * pPerson)
@@ -735,5 +761,21 @@ void BasePlayerState::RushAttack::Render(BasePlayer * pPerson)
 
 bool BasePlayerState::RushAttack::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
+	// メッセージタイプ
+	switch (msg.Msg)
+	{
+		// 攻撃当たったよメッセージ
+	case MESSAGE_TYPE::HIT_ATTACK:
+	{
+										HIT_ATTACK_INFO *hai = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+										pPerson->GetRushAttack()->bHit = true;
+										break;
+	}
+	default:
+		return true;
+		break;
+	}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
 	return false;
 }

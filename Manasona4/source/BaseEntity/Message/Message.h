@@ -6,15 +6,23 @@
 enum MESSAGE_TYPE
 {
 	EFFECT_CAMERA,	// エフェクトカメラ発動メッセージ
+	HIT_ATTACK,		// 攻撃がヒットさせた人に送るメッセージ！
+	HIT_DAMAGE,		// 攻撃がヒットした相手に送るメッセージ
+	OTHER,			// その他。
 };
 
-enum class PERSON_TYPE;	// 前方宣言
-// EX_INFO用の構造体
-struct RIPPLE_INFO
+// 攻撃喰らった相手用
+struct HIT_DAMAGE_INFO
 {
-	PERSON_TYPE type;
-	Vector3 pos;
-	float size;
+	Vector2 FlyVector;	// 吹っ飛びベクトル(強さもある)
+	int damage;			// 受けるダメ―ジ(スコア)
+	bool BeInvincible;	// 無敵になるかどうか(たとえば、通常の1.2段目ならfalseだし、3段目ならtrue)
+};
+
+// 攻撃ヒットしたプレイヤー用
+struct HIT_ATTACK_INFO
+{
+	int HitPlayerNo;	// ダメージを与えた相手の番号
 };
 
 // プレイヤーInfo
@@ -59,7 +67,7 @@ struct Message
 	ENTITY_ID          Receiver;
 
 	// メッセージの内容。　（列挙型に設定されているもの）
-	int          Msg;
+	MESSAGE_TYPE          Msg;
 
 	// メッセージの追加情報 (キャラクターが動く→ [追加情報] Xに２移動 )
 	// 追加情報を事前に知ることが不可能なのでVoid*で提供
@@ -71,13 +79,13 @@ struct Message
 	Message() :DispatchTime(-1),
 		Sender(ENTITY_ID::ID_ERROR),
 		Receiver(ENTITY_ID::ID_ERROR),
-		Msg(-1)
+		Msg(MESSAGE_TYPE::OTHER)
 	{}
 
 	Message(double time,
 		ENTITY_ID    sender,
 		ENTITY_ID    receiver,
-		int    msg,
+		MESSAGE_TYPE    msg,
 		void*  info = NULL) : DispatchTime(time),
 		Sender(sender),
 		Receiver(receiver),

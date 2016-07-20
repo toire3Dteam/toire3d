@@ -28,7 +28,7 @@ public:
 	void Dispatch(double  delay,
 		ENTITY_ID    sender,
 		ENTITY_ID    receiver,
-		int    msg,
+		MESSAGE_TYPE    msg,
 		void*  ExtraInfo);
 
 	void DispatchDelayed();

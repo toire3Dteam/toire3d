@@ -8,10 +8,10 @@
 //_/_/_/_/_/_/__/_/__/_/__/_/__
 // 定数
 //_/_/_/_/__/_/__/_/__/_/__/_/_
-const float BasePlayer::c_END_MOVE_LINE = .35f;		// 移動が終わって待機に戻る移動値ライン
+const float BasePlayer::c_END_MOVE_LINE = .25f;		// 移動が終わって待機に戻る移動値ライン
 const float BasePlayer::c_FRONT_BRAKE_LINE = .55f;	// 走り中に操作を離してブレーキに移行するまでの移動値ライン
 const float BasePlayer::c_GRAVITY = .1f;
-const float BasePlayer::c_MAX_JUMP = 2.5f;
+const float BasePlayer::c_MAX_JUMP = 2.2f;
 
 static const float DIR_ANGLE[(int)DIR::MAX] =
 {
@@ -19,9 +19,38 @@ static const float DIR_ANGLE[(int)DIR::MAX] =
 	PI * .5,	// 右向き
 };
 
+// 攻撃フレーム情報読み込み
+void BasePlayer::LoadAttackFrameList(char *filename)
+{
+	std::ifstream ifs(filename);
+	MyAssert(ifs, "アタックフレームのテキスト入ってない");
+
+	FOR((int)BASE_ATTACK_STATE::END)
+	{
+		char skip[64];	// 読み飛ばし用変数
+
+		ifs >> skip;
+
+		// 始動、持続、硬直フレームを読み込み
+		int count(0);
+
+		for (int j = 0; j < (int)ATTACK_FRAME::END; j++)
+		{
+			int frame;
+			ifs >> frame;
+			for (int k = 0; k < frame; k++)
+			{
+				m_AttackFrameList[i][count++] = (ATTACK_FRAME)j;
+			}
+		}
+		// 終端
+		m_AttackFrameList[i][count] = ATTACK_FRAME::END;
+	}
+}
+
 BasePlayer::BasePlayer(int deviceID) :BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + deviceID)),
 m_maxSpeed(1.0f), m_dir(DIR::LEFT), m_deviceID(deviceID), m_pHitSquare(new CollisionShape::Square),
-m_pObj(nullptr), m_move(VECTOR_ZERO), m_bLand(false)
+m_pObj(nullptr), m_move(VECTOR_ZERO), m_bLand(false), m_AttackState(BASE_ATTACK_STATE::END), m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentAttackFrame(0)
 {
 	// デフォルト設定
 	m_pHitSquare->height = 4;
@@ -69,6 +98,17 @@ BasePlayer::~BasePlayer()
 
 void BasePlayer::Update()
 {
+	// 攻撃フレームの更新
+	if (isAttackState())
+	{
+		// フレーム最後まで再生したら
+		if (m_AttackFrameList[m_AttackState][++m_CurrentAttackFrame] == ATTACK_FRAME::END)
+		{
+			// ★攻撃ステート解除
+			m_AttackState = BASE_ATTACK_STATE::END;
+		}
+	}
+
 	// 入力受付
 	Control();
 

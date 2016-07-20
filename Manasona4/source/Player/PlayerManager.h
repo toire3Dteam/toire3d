@@ -28,7 +28,10 @@ private:
 	BasePlayer **m_pPlayers;
 	Stage::Base *m_pStage;	// 参照するだけ(Updateの引数でもらってたのだが、BaseGameEntityの継承で引数なしのUpdateを使わないといけなくなったため、メンバ変数に)
 
-							// BaseGameEntiryサブクラスはメッセージを使って通信する
+	// ★プレイヤーとプレイヤーの攻撃の判定
+	void CollisionPlayerAttack(int my, int you);
+
+	// BaseGameEntiryサブクラスはメッセージを使って通信する
 	bool  HandleMessage(const Message& msg);
 
 	// シングルトンの作法

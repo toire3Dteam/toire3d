@@ -57,6 +57,23 @@ static const KEYCODE KeyCodeList[(int)PLAYER_INPUT::MAX] = {
 // 向き
 enum class DIR { LEFT, RIGHT, MAX };
 
+enum class ATTACK_FRAME
+{
+	START,	// 発生
+	ATTACK,	// 持続(この間に攻撃判定)
+	FOLLOW,	// 硬直(後隙)
+	END	// 終了(このフレームに来たら攻撃終了)
+};
+
+// 全キャラ固有で持つ攻撃タイプ
+enum BASE_ATTACK_STATE
+{
+	RUSH1,	// 通常1段目
+	RUSH2,	// 通常2段目
+	RUSH3,	// 通常3段目
+	END		// 何もなし
+};
+
 class BasePlayer : public BaseGameEntity
 {
 protected:
@@ -86,6 +103,15 @@ protected:
 	};
 	RushAttack m_RushAttack;
 
+	struct AttackData
+	{
+		//Attack_collision shape;		// ★あたり判定の形
+		int damage;	// 与えるダメージ(スコア？)
+		int pierceLV;		// 貫通レベル
+		bool bBeInvincible;	// 無敵になるかどうか(たとえば、通常の1.2段目ならfalseだし、3段目ならtrue)
+		std::string SE_ID;	// 当たったときに鳴らすSE
+	}m_AttackDatas[(int)BASE_ATTACK_STATE::END];
+
 public:
 	BasePlayer(int deviceID);
 	~BasePlayer();
@@ -94,6 +120,9 @@ public:
 	void UpdatePos();		// 座標更新(判定後に呼び出す)
 	void Move(); // 動きの制御
 	virtual void Render();
+
+	// 継承してるやつに強制的に呼ばせる
+	virtual void InitAttackDatas() = 0;
 
 	bool HandleMessage(const Message& msg); //メッセージを受け取る
 
@@ -110,6 +139,17 @@ public:
 	Jump *GetJump() { return &m_jump; }
 	RushAttack *GetRushAttack() { return &m_RushAttack; }
 	float GetMaxSpeed() { return m_maxSpeed; }
+	BASE_ATTACK_STATE GetAttackState(){ return m_AttackState; }
+	AttackData *GetAttackData(){ return &m_AttackDatas[(int)m_AttackState]; }
+	int GetPierceLV(){ return m_AttackDatas[(int)m_AttackState].pierceLV; }
+	LPCSTR GetAttackSE(){ return m_AttackDatas[(int)m_AttackState].SE_ID.c_str(); }
+	bool isAttackState(){ return (m_AttackState != BASE_ATTACK_STATE::END); }
+	bool isAttackFrame()
+	{
+		if (!isAttackState()) return false;
+		return (m_AttackFrameList[m_AttackState][m_CurrentAttackFrame] == ATTACK_FRAME::ATTACK);
+	}
+	int GetInvincibleLV(){ return m_InvincibleLV; }
 
 	// セッター
 	void SetMove(const Vector3 &v) { m_move.Set(v.x, v.y, v.z); }
@@ -117,6 +157,17 @@ public:
 	void SetDir(DIR dir) { m_dir = dir; }
 	void SetMotion(int MotionNo) { if (m_pObj) { if (m_pObj->GetMotion() != MotionNo)m_pObj->SetMotion(MotionNo); } }
 	void SetLand(bool bLand) { m_bLand = bLand; }
+	void SetAttackState(BASE_ATTACK_STATE state)
+	{
+		m_AttackState = state; 
+
+		// 攻撃だったら
+		if (isAttackState())
+		{
+			m_CurrentAttackFrame = 0;	// フレーム0にセット
+		}
+	}
+
 
 	// アクセサー
 	void AddMove(const Vector3 &v) { m_move += v; }
@@ -147,9 +198,16 @@ protected:
 	bool m_bLand;			// 着地フラグ
 	int m_InputList[(int)PLAYER_INPUT::MAX]; 	// 押しているキーを格納
 	StateMachine<BasePlayer>* m_pStateMachine; // ★ステートマシン
+	int m_InvincibleLV;			// 無敵かどうか
+	int m_InvincibleTime;		// 無敵時間		無敵時は0以上の値が入り、0になるまでデクリメントされる
+	int m_CurrentAttackFrame;	// 攻撃フレームリストの中を再生しているフレーム
 
+	static const int FRAME_MAX = 256; // 攻撃のフレームの最大値(これより超えることはないだろう)
+	ATTACK_FRAME m_AttackFrameList[(int)BASE_ATTACK_STATE::END][FRAME_MAX];
+	BASE_ATTACK_STATE m_AttackState;
 
-
+	// 継承してるやつに強制的に呼ばせる
+	void LoadAttackFrameList(char *filename);
 };
 
 
