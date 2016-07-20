@@ -4,6 +4,15 @@
 #include "../Collision/Collision.h"
 #include "../Stage/Stage.h"
 
+
+//_/_/_/_/_/_/__/_/__/_/__/_/__
+// 定数
+//_/_/_/_/__/_/__/_/__/_/__/_/_
+const float BasePlayer::c_END_MOVE_LINE = .2f;		// 移動が終わって待機に戻る移動値ライン
+const float BasePlayer::c_FRONT_BRAKE_LINE = .55f;	// 走り中に操作を離してブレーキに移行するまでの移動値ライン
+const float BasePlayer::c_GRAVITY = .1f;
+const float BasePlayer::c_MAX_JUMP = 2.2f;
+
 static const float DIR_ANGLE[(int)DIR::MAX] =
 {
 	PI * 1.5f,	// 左向き
@@ -11,8 +20,8 @@ static const float DIR_ANGLE[(int)DIR::MAX] =
 };
 
 BasePlayer::BasePlayer(int deviceID) :BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + deviceID)),
-m_Gravity(.14f), m_maxSpeed(1.0f), m_dir(DIR::LEFT), m_deviceID(deviceID), m_pHitSquare(new CollisionShape::Square),
-m_pObj(nullptr), m_move(VECTOR_ZERO)
+m_maxSpeed(1.0f), m_dir(DIR::LEFT), m_deviceID(deviceID), m_pHitSquare(new CollisionShape::Square),
+m_pObj(nullptr), m_move(VECTOR_ZERO), m_bLand(false)
 {
 	// デフォルト設定
 	m_pHitSquare->height = 4;
@@ -21,7 +30,7 @@ m_pObj(nullptr), m_move(VECTOR_ZERO)
 
 	// 初期化
 	memset(m_InputList, 0, sizeof(m_InputList));
-
+	ZeroMemory(&m_jump, sizeof(Jump));
 	// ステートマシン　引数は自分自身のポインタ
 	m_pStateMachine = new StateMachine<BasePlayer>(this);
 	m_pStateMachine->SetGlobalState(BasePlayerState::Global::GetInstance());// グローバル
@@ -85,15 +94,23 @@ void BasePlayer::Update()
 void BasePlayer::Move() 
 {
 	// 移動量更新
-	m_move.y -= m_Gravity;
+	m_move.y -= c_GRAVITY;
 	//if (m_move.y <= -3.0f) { m_move.y = -3.0f; } // 落ちる速度を抑制
-	m_move.y = max(-3.0f, m_move.y);// 落ちる速度を抑制
+	m_move.y = max(-2.75f, m_move.y);// 落ちる速度を抑制
 
+	if (m_bLand)
+	{
+		m_move.x *= 0.92f;	// 減速(A列車:この値はキャラ固有の値)
+	}
+	else
+	{
+		m_move.x *= 0.98f;
+	}
 
 	// 左右のMove値
-	m_move.x = Math::Clamp(m_move.x, -m_maxSpeed, m_maxSpeed);
+	//m_move.x = Math::Clamp(m_move.x, -m_maxSpeed, m_maxSpeed);
 
-	m_move *= 0.9f;	// 減速(A列車:この値はキャラ固有の値)
+
 }
 
 void BasePlayer::Control()
@@ -117,6 +134,8 @@ void BasePlayer::Render()
 	m_pObj->Render();
 	
 	m_pStateMachine->Render();// ステートマシンでの描画
+
+	tdnText::Draw(0, 0, 0xffffffff,"%.1f", m_move.y);
 }
 
 // ステートマシンへの他から来るメッセージ

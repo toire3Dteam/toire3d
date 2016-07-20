@@ -110,8 +110,8 @@ namespace BasePlayerState
 		Walk() {};
 		~Walk() {};
 
-		Walk(const Wait&) {}
-		Walk& operator=(const Wait&) {}
+		Walk(const Walk&) {}
+		Walk& operator=(const Walk&) {}
 	};
 
 	/*******************************************************/
@@ -144,19 +144,19 @@ namespace BasePlayerState
 		Run() {};
 		~Run() {};
 
-		Run(const Wait&) {}
-		Run& operator=(const Wait&) {}
+		Run(const Run&) {}
+		Run& operator=(const Run&) {}
 	};
 
 	/*******************************************************/
-	//					ブレーキ
+	//					フロントブレーキ
 	/*******************************************************/
-	class TrunOverBrake :public State<BasePlayer>
+	class FrontBrake :public State<BasePlayer>
 	{
 	public:
 
 		// this is a シングルトン
-		static TrunOverBrake* GetInstance();
+		static FrontBrake* GetInstance();
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -175,10 +175,79 @@ namespace BasePlayerState
 
 
 	private:
-		TrunOverBrake() {};
-		~TrunOverBrake() {};
+		FrontBrake() {};
+		~FrontBrake() {};
 
-		TrunOverBrake(const Wait&) {}
-		TrunOverBrake& operator=(const Wait&) {}
+		FrontBrake(const FrontBrake&) {}
+		FrontBrake& operator=(const FrontBrake&) {}
+	};
+
+	/*******************************************************/
+	//					Uターンブレーキ
+	/*******************************************************/
+	class TurnOverBrake :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static TurnOverBrake* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		TurnOverBrake() {};
+		~TurnOverBrake() {};
+
+		TurnOverBrake(const TurnOverBrake&) {}
+		TurnOverBrake& operator=(const TurnOverBrake&) {}
+	};
+
+	/*******************************************************/
+	//					ジャンプ
+	/*******************************************************/
+	class Jump :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static Jump* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+
+		Jump() {};
+		~Jump() {};
+
+		Jump(const Jump&) {}
+		Jump& operator=(const Jump&) {}
 	};
 }

@@ -82,7 +82,7 @@ void Collision::RaypicDown(iexMesh *obj, BasePlayer *player)
 				player->SetMove(move);
 				player->SetPos(pos);
 
-				//player->Land();//プレイヤーのポジションをセットした後に変更
+				player->SetLand(true);//プレイヤーのポジションをセットした後に変更
 
 				hit = true;
 			}

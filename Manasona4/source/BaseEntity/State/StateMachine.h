@@ -139,4 +139,9 @@ public:
 		if (typeid(*m_pCurrentState) == typeid(st)) return true;
 		return false;
 	}
+	bool  isPrevState(const State<entity_type>& st)const
+	{
+		if (typeid(*m_pPreviousState) == typeid(st)) return true;
+		return false;
+	}
 };

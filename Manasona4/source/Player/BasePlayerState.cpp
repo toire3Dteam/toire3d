@@ -55,12 +55,22 @@ void BasePlayerState::Wait::Enter(BasePlayer * pPerson)
 
 void BasePlayerState::Wait::Execute(BasePlayer * pPerson)
 {
-	if (pPerson->GetInputList(PLAYER_INPUT::RIGHT) == 3)
+	//////////////////////////////////////////////
+	//	ジャンプボタン
+	//============================================
+	if (pPerson->GetInputList(PLAYER_INPUT::C) == 3)
+	{
+		// ジャンプステートに行く
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
+		return;
+	}
+
+	if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
 	{
 		pPerson->SetDir(DIR::RIGHT);
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
 	}
-	if (pPerson->GetInputList(PLAYER_INPUT::LEFT) == 3)
+	if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
 	{
 		pPerson->SetDir(DIR::LEFT);
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
@@ -121,6 +131,16 @@ void BasePlayerState::Walk::Enter(BasePlayer * pPerson)
 
 void BasePlayerState::Walk::Execute(BasePlayer * pPerson)
 {
+	//////////////////////////////////////////////
+	//	ジャンプボタン
+	//============================================
+	if (pPerson->GetInputList(PLAYER_INPUT::C) == 3)
+	{
+		// ジャンプステートに行く
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
+		return;
+	}
+
 	if (pPerson->GetInputList(PLAYER_INPUT::RIGHT) == 1)
 	{
 		pPerson->AddMove(Vector3(0.1f, 0.0f, 0.0f));
@@ -139,7 +159,7 @@ void BasePlayerState::Walk::Execute(BasePlayer * pPerson)
 		// ほぼ止まってたら、Waitステートに移行(減速自体はBaseのアップデートでやってる)
 		if (
 			//move.Length() < .1f
-			abs(move.x) < .35f
+			abs(move.x) < BasePlayer::c_END_MOVE_LINE
 			)
 		{
 			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
@@ -203,54 +223,84 @@ void BasePlayerState::Run::Enter(BasePlayer * pPerson)
 
 void BasePlayerState::Run::Execute(BasePlayer * pPerson)
 {
-	// 右押した瞬間
-	if (pPerson->GetInputList(PLAYER_INPUT::RIGHT) == 3)
+	//////////////////////////////////////////////
+	//	ジャンプボタン
+	//============================================
+	if (pPerson->GetInputList(PLAYER_INPUT::C) == 3)
 	{
-		// 反対方向
-		if (pPerson->GetDir() == DIR::LEFT)
-		{
-			pPerson->SetDir(DIR::RIGHT);
-			// ブレーキステートへ
-			pPerson->GetFSM()->ChangeState(BasePlayerState::TrunOverBrake::GetInstance());
-		}
-	}
-	else if (pPerson->GetInputList(PLAYER_INPUT::RIGHT) == 1)
-	{
-		pPerson->AddMove(Vector3(0.1f, 0.0f, 0.0f));
-		pPerson->SetDir(DIR::RIGHT);
+		// ジャンプステートに行く
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
+		return;
 	}
 
-	// 左押した瞬間
-	else if (pPerson->GetInputList(PLAYER_INPUT::LEFT) == 3)
+	//////////////////////////////////////////////
+	//	左
+	//============================================
+	// 押した瞬間
+	if (pPerson->GetInputList(PLAYER_INPUT::LEFT) == 3)
 	{
 		// 反対方向
 		if (pPerson->GetDir() == DIR::RIGHT)
 		{
 			pPerson->SetDir(DIR::LEFT);
 			// ブレーキステートへ
-			pPerson->GetFSM()->ChangeState(BasePlayerState::TrunOverBrake::GetInstance());
+			pPerson->GetFSM()->ChangeState(BasePlayerState::TurnOverBrake::GetInstance());
 		}
 	}
+	// 押してる間
 	else if (pPerson->GetInputList(PLAYER_INPUT::LEFT) == 1)
 	{
 		pPerson->AddMove(Vector3(-0.1f, 0.0f, 0.0f));
 		pPerson->SetDir(DIR::LEFT);
 
 	}
+
+	//////////////////////////////////////////////
+	//	右
+	//============================================
+	// 押した瞬間
+	else if (pPerson->GetInputList(PLAYER_INPUT::RIGHT) == 3)
+	{
+		// 反対方向
+		if (pPerson->GetDir() == DIR::LEFT)
+		{
+			pPerson->SetDir(DIR::RIGHT);
+			// ブレーキステートへ
+			pPerson->GetFSM()->ChangeState(BasePlayerState::TurnOverBrake::GetInstance());
+		}
+	}
+	// 押してる間
+	else if (pPerson->GetInputList(PLAYER_INPUT::RIGHT) == 1)
+	{
+		pPerson->AddMove(Vector3(0.1f, 0.0f, 0.0f));
+		pPerson->SetDir(DIR::RIGHT);
+	}
+
+
+
+
 	else // ニュートラル
 	{
 		Vector3 move = pPerson->GetMove();
-
-		// ほぼ止まってたら、Waitステートに移行(減速自体はBaseのアップデートでやってる)
+		// ある程度減速したら、前ブレーキステートに移行(減速自体はBaseのアップデートでやってる)
 		if (
-			//move.Length() < .1f
-			abs(move.x) < .5f
+			abs(move.x) < BasePlayer::c_FRONT_BRAKE_LINE
 			)
 		{
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+			// 前のステートがUターンブレーキだったら、「待機」ステートに戻る(ターンブレーキの後にフロントブレーキが発生してしまうから)
+			if (pPerson->GetFSM()->isPrevState(*BasePlayerState::TurnOverBrake::GetInstance()))
+				pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+			else
+			{
+				pPerson->GetFSM()->ChangeState(BasePlayerState::FrontBrake::GetInstance());
+			}
 		}
 	}
 
+	Vector3 move = pPerson->GetMove();
+	// 左右のMove値の制御
+	move.x = Math::Clamp(move.x, -pPerson->GetMaxSpeed(), pPerson->GetMaxSpeed());
+	pPerson->SetMove(move);
 }
 
 void BasePlayerState::Run::Exit(BasePlayer * pPerson)
@@ -273,48 +323,271 @@ bool BasePlayerState::Run::OnMessage(BasePlayer * pPerson, const Message & msg)
 
 
 /*******************************************************/
-//					Uターンブレーキステート
+//					フロントブレーキステート
 /*******************************************************/
 
-BasePlayerState::TrunOverBrake * BasePlayerState::TrunOverBrake::GetInstance()
+BasePlayerState::FrontBrake * BasePlayerState::FrontBrake::GetInstance()
 {
 	// ここに変数を作る
-	static BasePlayerState::TrunOverBrake instance;
+	static BasePlayerState::FrontBrake instance;
 	return &instance;
 }
 
-void BasePlayerState::TrunOverBrake::Enter(BasePlayer * pPerson)
+void BasePlayerState::FrontBrake::Enter(BasePlayer * pPerson)
+{
+	// ブレーキモーションに変える
+	pPerson->SetMotion(0);
+}
+
+void BasePlayerState::FrontBrake::Execute(BasePlayer * pPerson)
+{
+	//////////////////////////////////////////////
+	//	ジャンプボタン
+	//============================================
+	if (pPerson->GetInputList(PLAYER_INPUT::C) == 3)
+	{
+		// ジャンプステートに行く
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
+		return;
+	}
+
+	Vector3 move = pPerson->GetMove();
+	
+	// A列車: MOVE値をここで直書きしている
+	move *= .95f;
+	pPerson->SetMove(move);
+
+	// ほぼ止まってたら、(減速自体はBaseのアップデートでやってる)
+	if (
+		//move.Length() < .1f
+		abs(move.x) < BasePlayer::c_END_MOVE_LINE
+		)
+	{
+		// 方向キーを入力していたら、再度「走り」ステートへ
+		if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
+		{
+			pPerson->SetDir(DIR::LEFT);
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+		}
+		else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
+		{
+			pPerson->SetDir(DIR::RIGHT);
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+		}
+
+		// 左右方向キーを押してなかったら、待機ステートへ
+		else
+		{
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		}
+
+	}
+}
+
+void BasePlayerState::FrontBrake::Exit(BasePlayer * pPerson)
+{
+
+
+}
+
+void BasePlayerState::FrontBrake::Render(BasePlayer * pPerson)
+{
+	tdnText::Draw(20, 690, 0xffffffff, "TurnOverBrakeState");
+}
+
+bool BasePlayerState::FrontBrake::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	return false;
+}
+
+
+
+/*******************************************************/
+//					Uターンブレーキステート
+/*******************************************************/
+
+BasePlayerState::TurnOverBrake * BasePlayerState::TurnOverBrake::GetInstance()
+{
+	// ここに変数を作る
+	static BasePlayerState::TurnOverBrake instance;
+	return &instance;
+}
+
+void BasePlayerState::TurnOverBrake::Enter(BasePlayer * pPerson)
 {
 	// ブレーキモーションに変える
 	pPerson->SetMotion(18);
 }
 
-void BasePlayerState::TrunOverBrake::Execute(BasePlayer * pPerson)
+void BasePlayerState::TurnOverBrake::Execute(BasePlayer * pPerson)
 {
+	//////////////////////////////////////////////
+	//	ジャンプボタン
+	//============================================
+	if (pPerson->GetInputList(PLAYER_INPUT::C) == 3)
+	{
+		// ジャンプステートに行く
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
+		return;
+	}
+
 	Vector3 move = pPerson->GetMove();
 
 	// ほぼ止まってたら、Waitステートに移行(減速自体はBaseのアップデートでやってる)
 	if (
 		//move.Length() < .1f
-		abs(move.x) < .1f
+		abs(move.x) < BasePlayer::c_END_MOVE_LINE
 		)
 	{
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+		// 方向キーを入力していたら、再度「走り」ステートへ
+		if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
+		{
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+		}
+		else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
+		{
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+		}
+
+		// 左右方向キーを押してなかったら、待機ステートへ
+		else
+		{
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		}
+
 	}
 }
 
-void BasePlayerState::TrunOverBrake::Exit(BasePlayer * pPerson)
+void BasePlayerState::TurnOverBrake::Exit(BasePlayer * pPerson)
 {
 
 
 }
 
-void BasePlayerState::TrunOverBrake::Render(BasePlayer * pPerson)
+void BasePlayerState::TurnOverBrake::Render(BasePlayer * pPerson)
 {
-	tdnText::Draw(20, 690, 0xffffffff, "TrunOverBrakeState");
+	tdnText::Draw(20, 690, 0xffffffff, "TurnOverBrakeState");
 }
 
-bool BasePlayerState::TrunOverBrake::OnMessage(BasePlayer * pPerson, const Message & msg)
+bool BasePlayerState::TurnOverBrake::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
 	return false;
 }
+
+
+
+/*******************************************************/
+//					ジャンプステート
+/*******************************************************/
+
+BasePlayerState::Jump * BasePlayerState::Jump::GetInstance()
+{
+	// ここに変数を作る
+	static BasePlayerState::Jump instance;
+	return &instance;
+}
+
+void BasePlayerState::Jump::Enter(BasePlayer * pPerson)
+{
+	// ブレーキモーションに変える
+	pPerson->SetMotion(8);
+
+	// しゃがみフラグ初期化
+	pPerson->GetJump()->bHold = true;
+	pPerson->GetJump()->HoldTimer = 0;
+	pPerson->GetJump()->PlayerHoldTimer = 0;
+}
+
+void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
+{
+	//////////////////////////////////////////////
+	//	ジャンプ発動前のしゃがみ中
+	//============================================
+	if (pPerson->GetJump()->bHold)
+	{
+		if(pPerson->isPushInput(PLAYER_INPUT::C))
+		{
+			// プレイヤーが押してる時間計測
+			pPerson->GetJump()->PlayerHoldTimer++;
+		}
+
+		if (++pPerson->GetJump()->HoldTimer > 3)
+		{
+			// 初速度の設定
+			Vector3 add(0, 0, 0);
+
+			// しゃがんでる間、ずっと押してたので、最大ジャンプ
+			if (pPerson->GetJump()->HoldTimer == pPerson->GetJump()->PlayerHoldTimer)
+			{
+				add.y = BasePlayer::c_MAX_JUMP;
+			}
+			// そうじゃないので小ジャンプ
+			else
+			{
+				add.y = BasePlayer::c_MAX_JUMP * .65f;
+			}
+
+			// 左右入力
+			if (pPerson->isPushInput(PLAYER_INPUT::LEFT))		add.x = -.25f;
+			else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT)) add.x = .25f;
+
+			// 移動地を足す！
+			pPerson->AddMove(add);
+
+			// 地上フラグオフ！
+			pPerson->SetLand(false);
+
+			// しゃがみフラグ終了
+			pPerson->GetJump()->bHold = false;
+		}
+	}
+
+	//////////////////////////////////////////////
+	//	ジャンプ中
+	//============================================
+	else
+	{
+
+		//////////////////////////////////////////////
+		//	左入力
+		//============================================
+		if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
+		{
+			pPerson->AddMove(Vector3(-0.05f, 0.0f, 0.0f));
+		}
+
+
+		//////////////////////////////////////////////
+		//	右入力
+		//============================================
+		else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
+		{
+			pPerson->AddMove(Vector3(0.05f, 0.0f, 0.0f));
+		}
+
+
+		// 地上フラグtrue(着地したら)
+		if (pPerson->isLand())
+		{
+			// 着地ステートに移行
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		}
+	}
+}
+
+void BasePlayerState::Jump::Exit(BasePlayer * pPerson)
+{
+	//pPerson->GetMove().y = 0;
+}
+
+void BasePlayerState::Jump::Render(BasePlayer * pPerson)
+{
+	//tdnText::Draw(20, 690, 0xffffffff, "JumpState");
+}
+
+bool BasePlayerState::Jump::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	return false;
+}
+
+
