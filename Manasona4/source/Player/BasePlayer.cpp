@@ -8,10 +8,10 @@
 //_/_/_/_/_/_/__/_/__/_/__/_/__
 // 定数
 //_/_/_/_/__/_/__/_/__/_/__/_/_
-const float BasePlayer::c_END_MOVE_LINE = .25f;		// 移動が終わって待機に戻る移動値ライン
+const float BasePlayer::c_END_MOVE_LINE = .35f;		// 移動が終わって待機に戻る移動値ライン
 const float BasePlayer::c_FRONT_BRAKE_LINE = .55f;	// 走り中に操作を離してブレーキに移行するまでの移動値ライン
 const float BasePlayer::c_GRAVITY = .1f;
-const float BasePlayer::c_MAX_JUMP = 2.2f;
+const float BasePlayer::c_MAX_JUMP = 2.5f;
 
 static const float DIR_ANGLE[(int)DIR::MAX] =
 {
