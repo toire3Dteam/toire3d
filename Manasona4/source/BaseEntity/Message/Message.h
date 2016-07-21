@@ -22,7 +22,7 @@ struct HIT_DAMAGE_INFO
 // 攻撃ヒットしたプレイヤー用
 struct HIT_ATTACK_INFO
 {
-	int HitPlayerNo;	// ダメージを与えた相手の番号
+	int HitPlayerDeviceID;	// ダメージを与えた相手の番号
 };
 
 // プレイヤーInfo

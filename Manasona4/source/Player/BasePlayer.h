@@ -94,11 +94,11 @@ protected:
 	struct RushAttack
 	{
 		int step;	// 0,1,2で進める
-		bool bHit;	// これがtrueの時にボタンを押すと次の攻撃に行く
+		bool bNextOK;	// これがtrueの時にボタンを押すと次の攻撃に行く
 		void Clear()
 		{
 			step = 0;
-			bHit = false;
+			bNextOK = false;
 		}
 	};
 	RushAttack m_RushAttack;
@@ -129,6 +129,7 @@ public:
 	bool HandleMessage(const Message& msg); //メッセージを受け取る
 
 	// ゲッター
+	int GetDeviceID() { return m_deviceID; }
 	Vector3 &GetMove() { return m_move; }
 	Vector3 &GetPos() { return m_pos; }
 	Vector3 *GetPosAddress() { return &m_pos; }
@@ -152,6 +153,11 @@ public:
 		return (m_AttackFrameList[m_AttackState][m_CurrentAttackFrame] == ATTACK_FRAME::ATTACK);
 	}
 	int GetInvincibleLV(){ return m_InvincibleLV; }
+	ATTACK_FRAME GetAttackFrame()
+	{
+		if (!isAttackState()) return ATTACK_FRAME::END;
+		return m_AttackFrameList[(int)m_AttackState][m_CurrentAttackFrame]; 
+	}
 
 	// セッター
 	void SetMove(const Vector3 &v) { m_move.Set(v.x, v.y, v.z); }

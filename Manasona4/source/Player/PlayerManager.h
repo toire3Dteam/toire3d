@@ -29,7 +29,7 @@ private:
 	Stage::Base *m_pStage;	// 参照するだけ(Updateの引数でもらってたのだが、BaseGameEntityの継承で引数なしのUpdateを使わないといけなくなったため、メンバ変数に)
 
 	// ★プレイヤーとプレイヤーの攻撃の判定
-	void CollisionPlayerAttack(int my, int you);
+	bool CollisionPlayerAttack(BasePlayer *my, BasePlayer *you);
 
 	// BaseGameEntiryサブクラスはメッセージを使って通信する
 	bool  HandleMessage(const Message& msg);

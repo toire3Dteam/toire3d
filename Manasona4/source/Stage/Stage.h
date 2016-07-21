@@ -30,6 +30,7 @@ namespace Stage
 
 	protected:
 		iexMesh *m_pObj;	// メッシュの実体
+		iexMesh *m_pBack;	// スカイドームとか、背景で使う
 		//std::vector<iexMesh*> gimmick_meshes;
 		//std::vector<GimmickBase*> gimmicks;
 

@@ -4,7 +4,7 @@
 #include "../Collision/Collision.h"
 #include "../Camera/camera.h"
 
-Stage::Base::Base() : m_pObj(nullptr), m_DeadLineY(0)
+Stage::Base::Base() : m_pObj(nullptr), m_pBack(nullptr),m_DeadLineY(0)
 {
 
 }
@@ -12,6 +12,7 @@ Stage::Base::Base() : m_pObj(nullptr), m_DeadLineY(0)
 Stage::Base::~Base()
 {
 	SAFE_DELETE(m_pObj);
+	SAFE_DELETE(m_pBack);
 }
 
 
@@ -23,6 +24,7 @@ void Stage::Base::Update()
 
 void Stage::Base::Render()
 {
+	if (m_pBack) m_pBack->Render();
 	m_pObj->Render();
 }
 
@@ -56,6 +58,9 @@ void Stage::Base::Collision(BasePlayer *player)
 void Stage::Senjo::Initialize(Camera *pCamera)
 {
 	m_pObj = new iexMesh("DATA/Stage/Senjo/pupupu2.IMO");
+	m_pBack = new iexMesh("DATA/Stage/Senjo/Skydome.IMO");
+	m_pBack->SetPos(Vector3(0, -50, 0));
+	m_pBack->Update();
 	m_DeadLineY = -100;
 
 	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する

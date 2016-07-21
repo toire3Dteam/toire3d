@@ -1,6 +1,8 @@
 #include "BasePlayer.h"
 #include "BasePlayerState.h"
 
+// 定数
+static const float HUTTOBI_LINE = 8.0f;
 
 /*******************************************************/
 //					グローバルステート
@@ -39,9 +41,12 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 	case MESSAGE_TYPE::HIT_DAMAGE:
 	{
 		HIT_DAMAGE_INFO *hdi = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
-		
+
+		// 吹っ飛びベクトルを加算
+		pPerson->AddMove(Vector3(hdi->FlyVector.x, hdi->FlyVector.y, 0));
+
 		// 吹っ飛び距離	に　応じて	ダメージステートを変える
-		if (hdi->FlyVector.Length() < 100)
+		if (hdi->FlyVector.Length() <  HUTTOBI_LINE)
 		{
 			// ノックバックに行く
 			pPerson->GetFSM()->ChangeState(BasePlayerState::KnockBack::GetInstance());
@@ -746,6 +751,25 @@ void BasePlayerState::RushAttack::Enter(BasePlayer * pPerson)
 
 	// 攻撃ステートを1段目に設定する
 	pPerson->SetAttackState(BASE_ATTACK_STATE::RUSH1);
+
+	// 初速度の設定
+
+	// もし走っている状態で攻撃をしたら　ダッシュ攻撃っぽく攻撃
+	if (pPerson->GetFSM()->isPrevState(*Run::GetInstance()) == true)
+	{
+		float moveX = pPerson->GetMove().x * .75f;
+		//static const float speedPow = 1;
+		//if (pPerson->GetDir() == DIR::LEFT) 
+		//{
+		//	moveX = -speedPow;
+		//}
+		//else
+		//{
+		//	moveX = speedPow;
+		//}
+		pPerson->AddMove(Vector3(moveX, 0, 0));
+	}
+
 }
 
 void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
@@ -753,11 +777,18 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 	switch (pPerson->GetRushAttack()->step)
 	{
 	case 0:	// 1段目
-		// ヒットしてる状態
-		if (pPerson->GetRushAttack()->bHit)
+			// 攻撃終了してたら
+		if (!pPerson->isAttackState())
 		{
-			// 攻撃ボタン押したら
-			if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
+			// 待機モーションに戻る
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		}
+
+		// ヒットしてる状態かつフォローモーション
+		else if (pPerson->GetRushAttack()->bNextOK && pPerson->GetAttackFrame() == ATTACK_FRAME::FOLLOW)
+		{
+			// 攻撃ボタン押したら(押しっぱなし込み)
+			if (pPerson->isPushInput(PLAYER_INPUT::B))
 			{
 				// 次のモーションセット
 				pPerson->SetMotion(4);
@@ -766,22 +797,24 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 				pPerson->SetAttackState(BASE_ATTACK_STATE::RUSH2);
 
 				pPerson->GetRushAttack()->step++;
-				pPerson->GetRushAttack()->bHit = false;
+				pPerson->GetRushAttack()->bNextOK = false;
 			}
 		}
+
+		break;
+	case 1:	// 2段目
 		// 攻撃終了してたら
 		if (!pPerson->isAttackState())
 		{
 			// 待機モーションに戻る
 			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
 		}
-		break;
-	case 1:	// 2段目
-		// ヒットしてる状態
-		if (pPerson->GetRushAttack()->bHit)
+
+		// ヒットしてる状態かつフォローモーション
+		else if (pPerson->GetRushAttack()->bNextOK && pPerson->GetAttackFrame() == ATTACK_FRAME::FOLLOW)
 		{
-			// 攻撃ボタン押したら
-			if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
+			// 攻撃ボタン押したら(押しっぱなし込み)
+			if (pPerson->isPushInput(PLAYER_INPUT::B))
 			{
 				// 次のモーションセット
 				pPerson->SetMotion(6);
@@ -790,15 +823,10 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 				pPerson->SetAttackState(BASE_ATTACK_STATE::RUSH3);
 
 				pPerson->GetRushAttack()->step++;
-				pPerson->GetRushAttack()->bHit = false;
+				pPerson->GetRushAttack()->bNextOK = false;
 			}
 		}
-		// 攻撃終了してたら
-		if (!pPerson->isAttackState())
-		{
-			// 待機モーションに戻る
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
-		}
+
 		break;
 	case 2:	// 3段目
 		// 攻撃終了してたら
@@ -831,13 +859,7 @@ bool BasePlayerState::RushAttack::OnMessage(BasePlayer * pPerson, const Message 
 	case MESSAGE_TYPE::HIT_ATTACK:
 	{
 										HIT_ATTACK_INFO *hai = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
-										pPerson->GetRushAttack()->bHit = true;
-										break;
-	}
-		// 攻撃くらったよメッセージ
-	case MESSAGE_TYPE::HIT_DAMAGE:
-	{
-										HIT_DAMAGE_INFO *hdi = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+										pPerson->GetRushAttack()->bNextOK = true;
 										break;
 	}
 	default:
