@@ -321,4 +321,75 @@ namespace BasePlayerState
 		RushAttack(const RushAttack&) {}
 		RushAttack& operator=(const RushAttack&) {}
 	};
+
+	/*******************************************************/
+	//					ノックバックステート
+	/*******************************************************/
+	class KnockBack :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static KnockBack* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+
+		KnockBack() {};
+		~KnockBack() {};
+
+		KnockBack(const KnockBack&) {}
+		KnockBack& operator=(const KnockBack&) {}
+	};
+
+
+	/*******************************************************/
+	//					ノックダウンステート
+	/*******************************************************/
+	class KnockDown :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static KnockDown* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+
+		KnockDown() {};
+		~KnockDown() {};
+
+		KnockDown(const KnockDown&) {}
+		KnockDown& operator=(const KnockDown&) {}
+	};
 }

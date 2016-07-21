@@ -31,6 +31,37 @@ void BasePlayerState::Global::Render(BasePlayer * pPerson)
 
 bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
+	// メッセージタイプ
+	switch (msg.Msg)
+	{
+	
+		// 攻撃くらったよメッセージ
+	case MESSAGE_TYPE::HIT_DAMAGE:
+	{
+		HIT_DAMAGE_INFO *hdi = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+		
+		// 吹っ飛び距離	に　応じて	ダメージステートを変える
+		if (hdi->FlyVector.Length() < 100)
+		{
+			// ノックバックに行く
+			pPerson->GetFSM()->ChangeState(BasePlayerState::KnockBack::GetInstance());
+
+		}
+		else
+		{
+			// ノックダウンに行く
+			pPerson->GetFSM()->ChangeState(BasePlayerState::KnockDown::GetInstance());
+
+		}
+
+		return true;
+		break;
+	}
+	// (A列車)死んだぜメッセージ
+
+
+	}
+
 	return false;
 }
 
@@ -363,7 +394,7 @@ BasePlayerState::FrontBrake * BasePlayerState::FrontBrake::GetInstance()
 
 void BasePlayerState::FrontBrake::Enter(BasePlayer * pPerson)
 {
-	// ブレーキモーションに変える
+	// 前ブレーキモーションに変える
 	pPerson->SetMotion(0);
 }
 
@@ -443,7 +474,7 @@ BasePlayerState::TurnOverBrake * BasePlayerState::TurnOverBrake::GetInstance()
 
 void BasePlayerState::TurnOverBrake::Enter(BasePlayer * pPerson)
 {
-	// ブレーキモーションに変える
+	// Uターンブレーキモーションに変える
 	pPerson->SetMotion(18);
 }
 
@@ -517,7 +548,7 @@ BasePlayerState::Jump * BasePlayerState::Jump::GetInstance()
 
 void BasePlayerState::Jump::Enter(BasePlayer * pPerson)
 {
-	// ブレーキモーションに変える
+	// ジャンプモーションに変える
 	pPerson->SetMotion(8);
 
 	// しゃがみフラグ初期化
@@ -633,7 +664,7 @@ BasePlayerState::Land * BasePlayerState::Land::GetInstance()
 
 void BasePlayerState::Land::Enter(BasePlayer * pPerson)
 {
-	// ブレーキモーションに変える
+	// 着地モーションに変える
 	pPerson->SetMotion(12);
 
 	// 着地時間初期化
@@ -814,4 +845,92 @@ bool BasePlayerState::RushAttack::OnMessage(BasePlayer * pPerson, const Message 
 
 	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
 	return false;
+}
+
+
+
+/*******************************************************/
+//					ノックバックステート
+/*******************************************************/
+
+BasePlayerState::KnockBack * BasePlayerState::KnockBack::GetInstance()
+{
+	// ここに変数を作る
+	static BasePlayerState::KnockBack instance;
+	return &instance;
+}
+
+void BasePlayerState::KnockBack::Enter(BasePlayer * pPerson)
+{
+	// ダメージモーションに変える
+	pPerson->SetMotion(2);
+
+}
+
+void BasePlayerState::KnockBack::Execute(BasePlayer * pPerson)
+{
+
+}
+
+void BasePlayerState::KnockBack::Exit(BasePlayer * pPerson)
+{
+
+
+}
+
+void BasePlayerState::KnockBack::Render(BasePlayer * pPerson)
+{
+	//tdnText::Draw(20, 690, 0xffffffff, "RushState");
+}
+
+bool BasePlayerState::KnockBack::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	switch (msg.Msg)
+	{
+
+	}
+}
+
+
+/*******************************************************/
+//					ノックダウンステート
+/*******************************************************/
+
+BasePlayerState::KnockDown * BasePlayerState::KnockDown::GetInstance()
+{
+	// ここに変数を作る
+	static BasePlayerState::KnockDown instance;
+	return &instance;
+}
+
+void BasePlayerState::KnockDown::Enter(BasePlayer * pPerson)
+{
+	// ノックダウンモーションに変える
+	pPerson->SetMotion(2);
+
+}
+
+void BasePlayerState::KnockDown::Execute(BasePlayer * pPerson)
+{
+
+}
+
+void BasePlayerState::KnockDown::Exit(BasePlayer * pPerson)
+{
+
+}
+
+void BasePlayerState::KnockDown::Render(BasePlayer * pPerson)
+{
+	//tdnText::Draw(20, 690, 0xffffffff, "RushState");
+}
+
+bool BasePlayerState::KnockDown::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	switch (msg.Msg)
+	{
+
+	}
 }
