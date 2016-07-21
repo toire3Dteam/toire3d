@@ -549,7 +549,7 @@ BasePlayerState::Jump * BasePlayerState::Jump::GetInstance()
 void BasePlayerState::Jump::Enter(BasePlayer * pPerson)
 {
 	// ジャンプモーションに変える
-	pPerson->SetMotion(8);
+	pPerson->SetMotion(10);
 
 	// しゃがみフラグ初期化
 	pPerson->GetJump()->Clear();
@@ -760,6 +760,7 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 			if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
 			{
 				// 次のモーションセット
+				pPerson->SetMotion(4);
 
 				// 攻撃ステートを2段目に設定する
 				pPerson->SetAttackState(BASE_ATTACK_STATE::RUSH2);
@@ -783,6 +784,7 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 			if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
 			{
 				// 次のモーションセット
+				pPerson->SetMotion(6);
 
 				// 攻撃ステートを3段目に設定する
 				pPerson->SetAttackState(BASE_ATTACK_STATE::RUSH3);
@@ -869,12 +871,15 @@ void BasePlayerState::KnockBack::Enter(BasePlayer * pPerson)
 
 void BasePlayerState::KnockBack::Execute(BasePlayer * pPerson)
 {
-
+	if (true)
+	{
+		// 待機ステートに戻る
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+	}
 }
 
 void BasePlayerState::KnockBack::Exit(BasePlayer * pPerson)
 {
-
 
 }
 
@@ -888,8 +893,12 @@ bool BasePlayerState::KnockBack::OnMessage(BasePlayer * pPerson, const Message &
 	// メッセージタイプ
 	switch (msg.Msg)
 	{
-
+	default:
+		return true;
+		break;
 	}
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
 }
 
 
@@ -913,7 +922,11 @@ void BasePlayerState::KnockDown::Enter(BasePlayer * pPerson)
 
 void BasePlayerState::KnockDown::Execute(BasePlayer * pPerson)
 {
-
+	if (true)
+	{
+		// 待機ステートに戻る
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+	}
 }
 
 void BasePlayerState::KnockDown::Exit(BasePlayer * pPerson)
@@ -931,6 +944,10 @@ bool BasePlayerState::KnockDown::OnMessage(BasePlayer * pPerson, const Message &
 	// メッセージタイプ
 	switch (msg.Msg)
 	{
-
+	default:
+		return true;
+		break;
 	}
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
 }

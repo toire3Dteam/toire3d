@@ -102,7 +102,7 @@ void BasePlayer::Update()
 	if (isAttackState())
 	{
 		// フレーム最後まで再生したら
-		if (m_AttackFrameList[m_AttackState][++m_CurrentAttackFrame] == ATTACK_FRAME::END)
+		if (m_AttackFrameList[m_AttackState][m_CurrentAttackFrame++] == ATTACK_FRAME::END)
 		{
 			// ★攻撃ステート解除
 			m_AttackState = BASE_ATTACK_STATE::END;

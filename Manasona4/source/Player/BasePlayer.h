@@ -109,7 +109,9 @@ protected:
 		int damage;	// 与えるダメージ(スコア？)
 		int pierceLV;		// 貫通レベル
 		bool bBeInvincible;	// 無敵になるかどうか(たとえば、通常の1.2段目ならfalseだし、3段目ならtrue)
-		std::string SE_ID;	// 当たったときに鳴らすSE
+		bool bHit;			// 当たったかどうか(★多段ヒット防止用)多段ヒットしてほしい攻撃だと、また考える必要がある
+		Vector2 FlyVector;	// 当たって吹っ飛ばすベクトル(★基本的にxは+にすること)
+		LPCSTR SE_ID;		// 当たったときに鳴らすSE
 	}m_AttackDatas[(int)BASE_ATTACK_STATE::END];
 
 public:
@@ -142,7 +144,7 @@ public:
 	BASE_ATTACK_STATE GetAttackState(){ return m_AttackState; }
 	AttackData *GetAttackData(){ return &m_AttackDatas[(int)m_AttackState]; }
 	int GetPierceLV(){ return m_AttackDatas[(int)m_AttackState].pierceLV; }
-	LPCSTR GetAttackSE(){ return m_AttackDatas[(int)m_AttackState].SE_ID.c_str(); }
+	LPCSTR GetAttackSE(){ return m_AttackDatas[(int)m_AttackState].SE_ID; }
 	bool isAttackState(){ return (m_AttackState != BASE_ATTACK_STATE::END); }
 	bool isAttackFrame()
 	{
@@ -164,7 +166,8 @@ public:
 		// 攻撃だったら
 		if (isAttackState())
 		{
-			m_CurrentAttackFrame = 0;	// フレーム0にセット
+			m_AttackDatas[(int)state].bHit = false;	// ヒットフラグリセット
+			m_CurrentAttackFrame = 0;				// フレーム0にセット
 		}
 	}
 

@@ -175,6 +175,14 @@ typedef struct Vector2 :public float2
 		if (length != 0.0f){ x /= length, y /= length; }
 	}
 
+	/**
+	*@brief ゼロベクトル化
+	*/
+	void Zero()
+	{
+		x = y = 0;
+	}
+
 	// オペレーター
 	inline Vector2& operator = (CONST Vector2& v){ x = v.x; y = v.y; return *this; }
 	inline Vector2& operator = (CONST float2& v){ x = v.x; y = v.y; return *this; }
@@ -194,6 +202,7 @@ typedef struct Vector2 :public float2
 	BOOL operator == (CONST Vector2& v) const { return (x == v.x) && (y == v.y); }
 	BOOL operator != (CONST Vector2& v) const { return (x != v.x) || (y != v.y); }
 
+	inline void Set(float x, float y){ this->x = x, this->y = y; }
 
 } Vector2, *LPVECTOR2;
 
@@ -247,7 +256,14 @@ public:
 		if (l != .0f){ x /= l; y /= l; z /= l; }
 	}
 
-	
+	/**
+	*@brief ゼロベクトル化
+	*/
+	void Zero()
+	{
+		x = y = z = 0;
+	}
+
 	//	オペレーター
 
 	// this+=vector

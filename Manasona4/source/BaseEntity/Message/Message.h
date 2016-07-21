@@ -6,7 +6,7 @@
 enum MESSAGE_TYPE
 {
 	EFFECT_CAMERA,	// エフェクトカメラ発動メッセージ
-	HIT_ATTACK,		// 攻撃がヒットさせた人に送るメッセージ！
+	HIT_ATTACK,		// 攻撃をヒットさせた人に送るメッセージ！
 	HIT_DAMAGE,		// 攻撃がヒットした相手に送るメッセージ
 	OTHER,			// その他。
 };
@@ -14,9 +14,9 @@ enum MESSAGE_TYPE
 // 攻撃喰らった相手用
 struct HIT_DAMAGE_INFO
 {
-	Vector2 FlyVector;	// 吹っ飛びベクトル(強さもある)
-	int damage;			// 受けるダメ―ジ(スコア)
 	bool BeInvincible;	// 無敵になるかどうか(たとえば、通常の1.2段目ならfalseだし、3段目ならtrue)
+	int damage;			// 受けるダメ―ジ(スコア)
+	Vector2 FlyVector;	// 吹っ飛びベクトル(強さもある)
 };
 
 // 攻撃ヒットしたプレイヤー用

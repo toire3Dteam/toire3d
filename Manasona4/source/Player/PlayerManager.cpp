@@ -72,11 +72,13 @@ void PlayerManager::CollisionPlayerAttack(int my, int you)
 {
 	if (m_pPlayers[my]->isAttackFrame()) // 攻撃フレーム中なら
 	{
-		if (m_pPlayers[you]->GetInvincibleLV() <= m_pPlayers[my]->GetPierceLV()) // 相手が無敵でない
+		if (m_pPlayers[you]->GetInvincibleLV() <= m_pPlayers[my]->GetPierceLV() &&	// 相手が無敵でない
+			!m_pPlayers[my]->GetAttackData()->bHit)									// まだ攻撃を当ててない
 		{
-			if (Math::Length(m_pPlayers[my]->GetPos(), m_pPlayers[you]->GetPos()) < 10)
+			if (Math::Length(m_pPlayers[my]->GetPos(), m_pPlayers[you]->GetPos()) < 20)
 			{
 				// ヒット時の処理
+				m_pPlayers[my]->GetAttackData()->bHit = true;	// 2重ヒット防止用のフラグをONにする
 
 				/* メッセージ送信 */
 
@@ -87,9 +89,9 @@ void PlayerManager::CollisionPlayerAttack(int my, int you)
 
 				// そして、ダメージを受けた人に送信
 				HIT_DAMAGE_INFO hdi;
-				hdi.BeInvincible = m_pPlayers[my]->GetAttackData()->bBeInvincible;
-				hdi.damage = m_pPlayers[my]->GetAttackData()->damage;
-				hdi.FlyVector = Vector2(0, 4);
+				hdi.BeInvincible = m_pPlayers[my]->GetAttackData()->bBeInvincible;	// 無敵になるかどうか
+				hdi.damage = m_pPlayers[my]->GetAttackData()->damage;				// ダメージ(スコア)
+				hdi.FlyVector = m_pPlayers[my]->GetAttackData()->FlyVector;			// 吹っ飛びベクトル
 				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + you), MESSAGE_TYPE::HIT_DAMAGE, &hdi);
 
 				// 音出す

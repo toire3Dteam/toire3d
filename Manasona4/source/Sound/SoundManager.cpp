@@ -178,6 +178,20 @@ int SE_Manager::Play_in(int data_num, const Vector2 &pos, const Vector2 &move, b
 
 int SE_Manager::Play(LPSTR _ID, bool loop)
 {
+	/*
+	std::map<char*, int> map;
+	map["HOGE0"] = 0;
+	map["HOGE1"] = 1;
+
+	const char* str1 = "HOGE1";
+	std::string str2 = "HOGE1";
+
+	int a = map[(char*)str1]			// 1が代入される
+	int b = map[(char*)str2.c_str()];	// 0が代入される
+	*/
+
+	// 何が言いたいかというと連想配列は想像以上に信用できない。
+
 	return Play_in(ID[_ID], loop);
 }
 
