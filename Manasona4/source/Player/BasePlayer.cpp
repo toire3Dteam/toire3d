@@ -25,32 +25,33 @@ void BasePlayer::LoadAttackFrameList(char *filename)
 	std::ifstream ifs(filename);
 	MyAssert(ifs, "アタックフレームのテキスト入ってない");
 
-	FOR((int)BASE_ATTACK_STATE::END)
-	{
-		char skip[64];	// 読み飛ばし用変数
+	char skip[64];	// 読み飛ばし用変数
 
+	FOR((int)BASE_ACTION_STATE::END)
+	{
 		ifs >> skip;
 
 		// 始動、持続、硬直フレームを読み込み
 		int count(0);
 
-		for (int j = 0; j < (int)ATTACK_FRAME::END; j++)
+		for (int j = 0; j < (int)FRAME_STATE::END; j++)
 		{
 			int frame;
 			ifs >> frame;
 			for (int k = 0; k < frame; k++)
 			{
-				m_AttackFrameList[i][count++] = (ATTACK_FRAME)j;
+				m_AttackFrameList[i][count++] = (FRAME_STATE)j;
 			}
 		}
 		// 終端
-		m_AttackFrameList[i][count] = ATTACK_FRAME::END;
+		m_AttackFrameList[i][count] = FRAME_STATE::END;
 	}
 }
 
 BasePlayer::BasePlayer(int deviceID) :BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + deviceID)),
 m_maxSpeed(1.0f), m_dir(DIR::LEFT), m_deviceID(deviceID), m_pHitSquare(new CollisionShape::Square),
-m_pObj(nullptr), m_move(VECTOR_ZERO), m_bLand(false), m_bAerialJump(true), m_AttackState(BASE_ATTACK_STATE::NO_ATTACK), m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentAttackFrame(0),m_RecoveryFlame(0)
+m_pObj(nullptr), m_move(VECTOR_ZERO), m_bLand(false), m_bAerialJump(true), m_ActionState(BASE_ACTION_STATE::NO_ACTION),
+m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentActionFrame(0), m_RecoveryFlame(0), m_bEscape(false)
 {
 	// デフォルト設定
 	m_pHitSquare->height = 4;
@@ -109,14 +110,14 @@ void BasePlayer::Update()
 	// ヒットストップが言わるまで動かない
 	else
 	{
-		// 攻撃フレームの更新
-		if (isAttackState())
+		// アクションフレームの更新
+		if (isFrameAction())
 		{
 			// フレーム最後まで再生したら
-			if (m_AttackFrameList[m_AttackState][m_CurrentAttackFrame++] == ATTACK_FRAME::END)
+			if (m_AttackFrameList[m_ActionState][m_CurrentActionFrame++] == FRAME_STATE::END)
 			{
-				// ★攻撃ステート解除
-				m_AttackState = BASE_ATTACK_STATE::NO_ATTACK;
+				// ★アクションステート解除
+				m_ActionState = BASE_ACTION_STATE::NO_ACTION;
 			}
 		}
 

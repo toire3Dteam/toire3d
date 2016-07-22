@@ -92,6 +92,7 @@ void Collision::RaypicDown(iexMesh *obj, BasePlayer *player)
 		// 空中にいるよ！
 		else
 		{
+			player->SetLand(false);//プレイヤーのポジションをセットした後に変更
 			// 落下メッセージ送信
 			MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + player->GetDeviceID()), MESSAGE_TYPE::FALL, nullptr);
 		}

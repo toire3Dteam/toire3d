@@ -7,6 +7,6 @@ public:
 	Airou(int deviceID);
 
 private:
-	void InitAttackDatas();	// 純粋仮想関数オーバーライド
+	void InitActionDatas();	// 純粋仮想関数オーバーライド
 };
 

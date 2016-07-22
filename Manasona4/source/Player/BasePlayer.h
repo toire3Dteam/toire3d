@@ -16,14 +16,14 @@ namespace Stage
 enum class PLAYER_INPUT
 {
 	A,		// 
-	B,		// 
+	B,		// 攻撃
 	C,		// ジャンプ
 	D,		// 
 	RIGHT,
 	LEFT,
 	UP,
 	DOWN,
-	R1,
+	R1,		// エスケープ
 	R2,
 	R3,
 	L1,
@@ -57,18 +57,19 @@ static const KEYCODE KeyCodeList[(int)PLAYER_INPUT::MAX] = {
 // 向き
 enum class DIR { LEFT, RIGHT, MAX };
 
-enum class ATTACK_FRAME
+enum class FRAME_STATE
 {
 	START,	// 発生
-	ATTACK,	// 持続(この間に攻撃判定)
+	ACTIVE,	// 持続(この間に攻撃判定)
 	FOLLOW,	// 硬直(後隙)
 	END	// 終了(このフレームに来たら攻撃終了)
 };
 
 // 全キャラ固有で持つ攻撃タイプ
-enum BASE_ATTACK_STATE
+enum BASE_ACTION_STATE
 {
-	NO_ATTACK = -1,
+	NO_ACTION = -1,
+	ESCAPE,		// 回避
 	RUSH1,		// 通常1段目
 	RUSH2,		// 通常2段目
 	RUSH3,		// 通常3段目
@@ -84,12 +85,14 @@ protected:
 	struct Jump
 	{
 		bool bHold;	// しゃがんでる状態
+		bool bAttackPush;	// しゃがんでる最中に攻撃ボタンを押したか
 		int HoldTimer;		// しゃがんでる時間
 		int PlayerHoldTimer;	// しゃがんでる間にプレイヤーからジャンプボタンを受け付ける時間
 		int LandTimer;		// 着地の時間
 		void Clear()
 		{
 			bHold = true;
+			bAttackPush = false;
 			HoldTimer = PlayerHoldTimer = LandTimer = 0;
 		}
 	};
@@ -107,19 +110,33 @@ protected:
 	};
 	RushAttack m_RushAttack;
 
-	struct AttackData
+	class ActionData
 	{
-		//Attack_collision shape;		// ★あたり判定の形
-		int damage;	// 与えるダメージ(スコア？)
-		int pierceLV;		// 貫通レベル
-		bool bBeInvincible;	// 無敵になるかどうか(たとえば、通常の1.2段目ならfalseだし、3段目ならtrue)
-		bool bHit;			// 当たったかどうか(★多段ヒット防止用)多段ヒットしてほしい攻撃だと、また考える必要がある
-		Vector2 FlyVector;	// 当たって吹っ飛ばすベクトル(★基本的にxは+にすること)
-		LPCSTR SE_ID;		// 当たったときに鳴らすSE
-		int hitStopFlame;	// ヒットストップの時間
-		int recoveryFlame;	// 硬直の時間
+	public:
+		struct AttackData
+		{
+			bool bBeInvincible;			// 無敵になるかどうか(たとえば、通常の1.2段目ならfalseだし、3段目ならtrue)
+			//Attack_collision shape;		// ★あたり判定の形
+			int damage;	// 与えるダメージ(スコア？)
+			int pierceLV;				// 貫通レベル
+			bool bHit;					// 当たったかどうか(★多段ヒット防止用)多段ヒットしてほしい攻撃だと、また考える必要がある
+			Vector2 LandFlyVector;		// 当たって吹っ飛ばすベクトル(★基本的にxは+にすること)
+			Vector2 AerialFlyVector;	// ※相手が空中にいた時　当たって吹っ飛ばす空中ベクトル(★基本的にxは+にすること)
+			LPCSTR SE_ID;				// 当たったときに鳴らすSE
+			int hitStopFlame;			// ヒットストップの時間
+			int recoveryFlame;			// 硬直の時間
+		}*pAttackData;
 
-	}m_AttackDatas[(int)BASE_ATTACK_STATE::END];
+		ActionData() :pAttackData(nullptr){}
+		~ActionData() { SAFE_DELETE(pAttackData); }
+
+		bool isAttackData() { return (pAttackData != nullptr); }	// アタックデータがあるということは、攻撃系のステートである
+		void InstanceAttackData()
+		{
+			// isAttackDataでtrueが返るようになる
+			if (!pAttackData) pAttackData = new AttackData;
+		}
+	}m_ActionDatas[(int)BASE_ACTION_STATE::END];
 
 public:
 	BasePlayer(int deviceID);
@@ -131,7 +148,7 @@ public:
 	virtual void Render();
 
 	// 継承してるやつに強制的に呼ばせる
-	virtual void InitAttackDatas() = 0;
+	virtual void InitActionDatas() = 0;
 
 	bool HandleMessage(const Message& msg); //メッセージを受け取る
 
@@ -150,27 +167,38 @@ public:
 	Jump *GetJump() { return &m_jump; }
 	RushAttack *GetRushAttack() { return &m_RushAttack; }
 	float GetMaxSpeed() { return m_maxSpeed; }
-	BASE_ATTACK_STATE GetAttackState(){ return m_AttackState; }
-	AttackData *GetAttackData()
+	BASE_ACTION_STATE GetActionState(){ return m_ActionState; }
+	ActionData::AttackData *GetAttackData()
 	{
-		assert(m_AttackState != BASE_ATTACK_STATE::NO_ATTACK);
-		return &m_AttackDatas[(int)m_AttackState]; 
+		assert(isAttackState());	// アタックデータがないステートでアタックデータを参照しようとしている
+		return m_ActionDatas[(int)m_ActionState].pAttackData; 
 	}
-	int GetPierceLV(){ return m_AttackDatas[(int)m_AttackState].pierceLV; }
-	LPCSTR GetAttackSE(){ return m_AttackDatas[(int)m_AttackState].SE_ID; }
-	bool isAttackState(){ return (m_AttackState != BASE_ATTACK_STATE::NO_ATTACK); }
-	bool isAttackFrame()
-	{
-		if (!isAttackState()) return false;
-		return (m_AttackFrameList[m_AttackState][m_CurrentAttackFrame] == ATTACK_FRAME::ATTACK);
+	//int GetPierceLV(){ return m_ActionDatas[(int)m_ActionState].pierceLV; }
+	//LPCSTR GetAttackSE(){ return m_ActionDatas[(int)m_ActionState].SE_ID; }
+	bool isFrameAction() { return (m_ActionState != BASE_ACTION_STATE::NO_ACTION); }
+	bool isAttackState()	// ★ステートが何もないのかそうでないか確認と、これがtrueならAttackDataがnull出ないことが保証される
+	{ 
+		// 何かしらアクションしてたあ
+		if (isFrameAction())
+		{
+			// アクションデータがnullじゃないかどうかを返す
+			return m_ActionDatas[(int)m_ActionState].isAttackData();
+		}
+		else return false;
 	}
 	int GetInvincibleLV(){ return m_InvincibleLV; }
-	ATTACK_FRAME GetAttackFrame()
+	bool isActiveFrame()
 	{
-		if (!isAttackState()) return ATTACK_FRAME::END;
-		return m_AttackFrameList[(int)m_AttackState][m_CurrentAttackFrame]; 
+		if (!isFrameAction()) return false;
+		return (m_AttackFrameList[m_ActionState][m_CurrentActionFrame] == FRAME_STATE::ACTIVE);
+	}
+	FRAME_STATE GetActionFrame()
+	{
+		if (!isFrameAction()) return FRAME_STATE::END;
+		return m_AttackFrameList[(int)m_ActionState][m_CurrentActionFrame]; 
 	}
 	int GetRecoveryFrame() { return m_RecoveryFlame; }
+	bool isEscape() { return m_bEscape; }
 
 
 	// セッター
@@ -182,16 +210,19 @@ public:
 	void SetAerialJump(bool bAerialJump) { m_bAerialJump = bAerialJump; }
 	void SetHitStopFrame(int frame) { m_HitStopFrame = frame; }
 	void SetRecoveryFrame(int frame) { m_RecoveryFlame = frame; }
-	void SetAttackState(BASE_ATTACK_STATE state)
+	void SetEscapeFlag(bool bEscape) { m_bEscape = bEscape; }
+	void SetActionState(BASE_ACTION_STATE state)
 	{
-		m_AttackState = state; 
+		m_ActionState = state; 
 
-		// 攻撃だったら
-		// ★↓でHITフラグを消している
-		if (isAttackState())
+		// NO_ACTIONじゃなかったら
+		if (isFrameAction())
 		{
-			m_AttackDatas[(int)state].bHit = false;	// ヒットフラグリセット
-			m_CurrentAttackFrame = 0;				// フレーム0にセット
+			m_CurrentActionFrame = 0;				// フレーム0にセット
+
+			// 攻撃だったら
+			// ★↓でHITフラグを消している
+			if (isAttackState())m_ActionDatas[(int)state].pAttackData->bHit = false;	// ヒットフラグリセット
 		}
 	}
 
@@ -228,14 +259,14 @@ protected:
 	StateMachine<BasePlayer>* m_pStateMachine; // ★ステートマシン
 	int m_InvincibleLV;			// 無敵かどうか
 	int m_InvincibleTime;		// 無敵時間		無敵時は0以上の値が入り、0になるまでデクリメントされる
-	int m_CurrentAttackFrame;	// 攻撃フレームリストの中を再生しているフレーム
+	int m_CurrentActionFrame;	// 攻撃フレームリストの中を再生しているフレーム
 	int m_HitStopFrame;			// 1以上なら0になるまでストップ
 	int m_RecoveryFlame;		// 1以上なら0になるまで操作を受け付けない
-
+	bool m_bEscape;				// エスケープ判定の時に立つフラグ
 
 	static const int FRAME_MAX = 256; // 攻撃のフレームの最大値(これより超えることはないだろう)
-	ATTACK_FRAME m_AttackFrameList[(int)BASE_ATTACK_STATE::END][FRAME_MAX];
-	BASE_ATTACK_STATE m_AttackState;
+	FRAME_STATE m_AttackFrameList[(int)BASE_ACTION_STATE::END][FRAME_MAX];
+	BASE_ACTION_STATE m_ActionState;
 
 	// 継承してるやつに強制的に呼ばせる
 	void LoadAttackFrameList(char *filename);

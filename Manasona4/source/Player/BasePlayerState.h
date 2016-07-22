@@ -600,4 +600,39 @@ namespace BasePlayerState
 		AerialDropAttack(const AerialDropAttack&) {}
 		AerialDropAttack& operator=(const AerialDropAttack&) {}
 	};
+
+	/*******************************************************/
+	//					回避
+	/*******************************************************/
+	class Escape :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static Escape* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		Escape() {};
+		~Escape() {};
+
+		Escape(const Escape&) {}
+		Escape& operator=(const Escape&) {}
+	};
+
 }

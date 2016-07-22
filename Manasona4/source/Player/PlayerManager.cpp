@@ -25,7 +25,7 @@ void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage)
 	FOR(NumPlayer)
 	{
 		m_pPlayers[i] = new Airou(i);
-		m_pPlayers[i]->InitAttackDatas();		// ★攻撃情報を各キャラに初期化させる
+		m_pPlayers[i]->InitActionDatas();		// ★攻撃情報を各キャラに初期化させる
 	}
 }
 
@@ -81,9 +81,15 @@ void PlayerManager::Render()
 
 bool PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you)
 {
-	if (my->isAttackFrame()) // 攻撃フレーム中なら
+	// 攻撃系のステートじゃないよ！
+	if (!my->isAttackState()) return false;
+
+	// 相手がエスケープ中だよ！
+	if (you->isEscape()) return false;
+
+	if (my->isActiveFrame()) // 攻撃フレーム中なら
 	{
-		if (you->GetInvincibleLV() <= my->GetPierceLV() &&	// 相手が無敵でない
+		if (you->GetInvincibleLV() <= my->GetAttackData()->pierceLV &&	// 相手が無敵でない
 			!my->GetAttackData()->bHit)									// まだ攻撃を当ててない
 		{
 			if (Math::Length(my->GetPos(), you->GetPos()) < 20)
@@ -103,14 +109,14 @@ bool PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you)
 				HIT_DAMAGE_INFO hdi;
 				hdi.BeInvincible = my->GetAttackData()->bBeInvincible;	// 無敵になるかどうか
 				hdi.damage = my->GetAttackData()->damage;				// ダメージ(スコア)
-				hdi.FlyVector = my->GetAttackData()->FlyVector;			// 吹っ飛びベクトル
+				hdi.FlyVector = (you->isLand()) ? my->GetAttackData()->LandFlyVector : my->GetAttackData()->AerialFlyVector;			// 吹っ飛びベクトル
 				hdi.hitStopFlame = my->GetAttackData()->hitStopFlame;		// ヒットストップ
 				hdi.recoveryFlame = my->GetAttackData()->recoveryFlame;		// 硬直時間
 				if (my->GetPos().x > you->GetPos().x) hdi.FlyVector.x *= -1;
 				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + you->GetDeviceID()), MESSAGE_TYPE::HIT_DAMAGE, &hdi);
 
 				// 音出す
-				LPCSTR seID = my->GetAttackSE();
+				LPCSTR seID = my->GetAttackData()->SE_ID;
 				if (strcmp(seID, "") != 0) se->Play((LPSTR)seID);
 
 				return true;	// 当たった

@@ -41,12 +41,12 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 	case MESSAGE_TYPE::HIT_DAMAGE:
 	{
 		// 攻撃ステートオフ
-		pPerson->SetAttackState(BASE_ATTACK_STATE::NO_ATTACK);
+		pPerson->SetActionState(BASE_ACTION_STATE::NO_ACTION);
 
 		HIT_DAMAGE_INFO *hdi = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
 
 		// 吹っ飛びベクトルを加算 (A列車)加算から代入に変更
-		//pPerson->AddMove(Vector3(hdi->FlyVector.x, hdi->FlyVector.y, 0));
+		//pPerson->AddMove(Vector3(hdi->LandFlyVector.x, hdi->LandFlyVector.y, 0));
 		pPerson->SetMove(Vector3(hdi->FlyVector.x, hdi->FlyVector.y, 0));
 
 		// ヒットストップ
@@ -113,6 +113,16 @@ void BasePlayerState::Wait::Execute(BasePlayer * pPerson)
 	{
 		// ジャンプステートに行く
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
+		return;
+	}
+
+	//////////////////////////////////////////////
+	//	エスケープボタン
+	//============================================
+	if (pPerson->GetInputList(PLAYER_INPUT::R1) == 3)
+	{
+		// エスケープステートに行く
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Escape::GetInstance());
 		return;
 	}
 
@@ -197,7 +207,7 @@ BasePlayerState::Walk * BasePlayerState::Walk::GetInstance()
 void BasePlayerState::Walk::Enter(BasePlayer * pPerson)
 {
 	// 歩きモーションに変える
-	pPerson->SetMotion(14);
+	pPerson->SetMotion(1);
 
 	// 初速度の設定
 	Vector3 move = pPerson->GetMove();
@@ -230,6 +240,17 @@ void BasePlayerState::Walk::Execute(BasePlayer * pPerson)
 	}
 
 	//////////////////////////////////////////////
+	//	エスケープボタン
+	//============================================
+	if (pPerson->GetInputList(PLAYER_INPUT::R1) == 3)
+	{
+		// エスケープステートに行く
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Escape::GetInstance());
+		return;
+	}
+
+
+	//////////////////////////////////////////////
 	//	攻撃ボタン
 	//============================================
 	if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
@@ -239,12 +260,31 @@ void BasePlayerState::Walk::Execute(BasePlayer * pPerson)
 		return;
 	}
 
+	if (pPerson->GetInputList(PLAYER_INPUT::RIGHT) == 3)
+	{
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+		pPerson->SetDir(DIR::RIGHT);
+		return;
+	}
+
+	if (pPerson->GetInputList(PLAYER_INPUT::LEFT) == 3)
+	{
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+		pPerson->SetDir(DIR::LEFT);
+		return;
+	}
+
+	// しゃがみ
+	if (pPerson->isPushInput(PLAYER_INPUT::DOWN))
+	{
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Squat::GetInstance());
+		return;
+	}
 	if (pPerson->GetInputList(PLAYER_INPUT::RIGHT) == 1)
 	{
 		pPerson->AddMove(Vector3(0.1f, 0.0f, 0.0f));
 		pPerson->SetDir(DIR::RIGHT);
 	}
-
 	else if (pPerson->GetInputList(PLAYER_INPUT::LEFT) == 1)
 	{
 		pPerson->AddMove(Vector3(-0.1f, 0.0f, 0.0f));
@@ -350,6 +390,16 @@ void BasePlayerState::Run::Execute(BasePlayer * pPerson)
 	}
 
 	//////////////////////////////////////////////
+	//	エスケープボタン
+	//============================================
+	if (pPerson->GetInputList(PLAYER_INPUT::R1) == 3)
+	{
+		// エスケープステートに行く
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Escape::GetInstance());
+		return;
+	}
+
+	//////////////////////////////////////////////
 	//	攻撃ボタン
 	//============================================
 	if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
@@ -414,9 +464,7 @@ void BasePlayerState::Run::Execute(BasePlayer * pPerson)
 	{
 		Vector3 move = pPerson->GetMove();
 		// ある程度減速したら、前ブレーキステートに移行(減速自体はBaseのアップデートでやってる)
-		if (
-			abs(move.x) < BasePlayer::c_FRONT_BRAKE_LINE
-			)
+		//if (abs(move.x) < BasePlayer::c_FRONT_BRAKE_LINE)
 		{
 			// 前のステートがUターンブレーキだったら、「待機」ステートに戻る(ターンブレーキの後にフロントブレーキが発生してしまうから)
 			if (pPerson->GetFSM()->isPrevState(*BasePlayerState::TurnOverBrake::GetInstance()))
@@ -480,7 +528,7 @@ BasePlayerState::FrontBrake * BasePlayerState::FrontBrake::GetInstance()
 void BasePlayerState::FrontBrake::Enter(BasePlayer * pPerson)
 {
 	// 前ブレーキモーションに変える
-	pPerson->SetMotion(0);
+	pPerson->SetMotion(18);
 }
 
 void BasePlayerState::FrontBrake::Execute(BasePlayer * pPerson)
@@ -673,13 +721,16 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 	//============================================
 	if (pPerson->GetJump()->bHold)
 	{
-		if(pPerson->isPushInput(PLAYER_INPUT::C))
+		if (pPerson->isPushInput(PLAYER_INPUT::C))
 		{
 			// プレイヤーが押してる時間計測
 			pPerson->GetJump()->PlayerHoldTimer++;
 		}
 
-		if (++pPerson->GetJump()->HoldTimer > 3)
+		if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
+			pPerson->GetJump()->bAttackPush = true;
+
+		if (++pPerson->GetJump()->HoldTimer > 4)
 		{
 			// 初速度の設定
 			Vector3 add(0, 0, 0);
@@ -707,6 +758,22 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 
 			// しゃがみフラグ終了
 			pPerson->GetJump()->bHold = false;
+
+			// しゃがんでる最中に攻撃ボタンを押してたら
+			if (pPerson->GetJump()->bAttackPush)
+			{
+				if (pPerson->isPushInput(PLAYER_INPUT::DOWN) == true)
+				{
+					// 空中下攻撃ステートに行く
+					pPerson->GetFSM()->ChangeState(BasePlayerState::AerialDropAttack::GetInstance());
+				}
+				else
+				{
+					// 空中攻撃ステートに行く
+					pPerson->GetFSM()->ChangeState(BasePlayerState::AerialAttack::GetInstance());
+				}
+				return;
+			}
 		}
 	}
 
@@ -766,7 +833,7 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 		}
 
 		// 移動地制御
-		pPerson->MoveClampX(pPerson->GetMaxSpeed() * 1.1f);
+		pPerson->MoveClampX(pPerson->GetMaxSpeed() * 1.05f);
 
 
 		// 地上フラグtrue(着地したら)
@@ -1032,8 +1099,23 @@ void BasePlayerState::Land::Enter(BasePlayer * pPerson)
 
 void BasePlayerState::Land::Execute(BasePlayer * pPerson)
 {
+	// 攻撃していて落ちたらスキがでるように
+	if (pPerson->GetFSM()->isPrevState(*BasePlayerState::AerialAttack::GetInstance()) == false &&
+		pPerson->GetFSM()->isPrevState(*BasePlayerState::AerialDropAttack::GetInstance()) == false)
+	{
+		//////////////////////////////////////////////
+		//	ジャンプボタン
+		//============================================
+		if (pPerson->GetInputList(PLAYER_INPUT::C) == 3)
+		{
+			// ジャンプステートに行く
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
+			return;
+		}
+	}
+
 	// 一定時間着地したら
-	if (++pPerson->GetJump()->LandTimer > 5)
+	if (++pPerson->GetJump()->LandTimer > 8)
 	{
 		// 方向キーを入力していたら、「走り」ステートへ
 		if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
@@ -1055,15 +1137,7 @@ void BasePlayerState::Land::Execute(BasePlayer * pPerson)
 
 	}
 
-	//////////////////////////////////////////////
-	//	ジャンプボタン
-	//============================================
-	if (pPerson->GetInputList(PLAYER_INPUT::C) == 3 && pPerson->GetJump()->LandTimer > 3)
-	{
-		// ジャンプステートに行く
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
-		return;
-	}
+
 }
 
 void BasePlayerState::Land::Exit(BasePlayer * pPerson)
@@ -1101,7 +1175,7 @@ void BasePlayerState::RushAttack::Enter(BasePlayer * pPerson)
 	pPerson->GetRushAttack()->Clear();
 
 	// 攻撃ステートを1段目に設定する
-	pPerson->SetAttackState(BASE_ATTACK_STATE::RUSH1);
+	pPerson->SetActionState(BASE_ACTION_STATE::RUSH1);
 
 	// 初速度の設定
 
@@ -1142,7 +1216,7 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 		}
 
 		// ヒットしてる状態かつフォローモーション
-		else if (pPerson->GetRushAttack()->bNextOK && pPerson->GetAttackFrame() == ATTACK_FRAME::FOLLOW)
+		else if (pPerson->GetRushAttack()->bNextOK && pPerson->GetActionFrame() == FRAME_STATE::FOLLOW)
 		{
 			// 攻撃ボタン押したら(押しっぱなし込み)
 			if (pPerson->isPushInput(PLAYER_INPUT::B))
@@ -1151,7 +1225,7 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 				pPerson->SetMotion(4);
 
 				// 攻撃ステートを2段目に設定する
-				pPerson->SetAttackState(BASE_ATTACK_STATE::RUSH2);
+				pPerson->SetActionState(BASE_ACTION_STATE::RUSH2);
 
 				pPerson->GetRushAttack()->step++;
 				pPerson->GetRushAttack()->bNextOK = false;
@@ -1174,7 +1248,7 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 		}
 
 		// ヒットしてる状態かつフォローモーション
-		else if (pPerson->GetRushAttack()->bNextOK && pPerson->GetAttackFrame() == ATTACK_FRAME::FOLLOW)
+		else if (pPerson->GetRushAttack()->bNextOK && pPerson->GetActionFrame() == FRAME_STATE::FOLLOW)
 		{
 			// 攻撃ボタン押したら(押しっぱなし込み)
 			if (pPerson->isPushInput(PLAYER_INPUT::B))
@@ -1183,7 +1257,7 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 				pPerson->SetMotion(6);
 
 				// 攻撃ステートを3段目に設定する
-				pPerson->SetAttackState(BASE_ATTACK_STATE::RUSH3);
+				pPerson->SetActionState(BASE_ACTION_STATE::RUSH3);
 
 				pPerson->GetRushAttack()->step++;
 				pPerson->GetRushAttack()->bNextOK = false;
@@ -1205,7 +1279,7 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 void BasePlayerState::RushAttack::Exit(BasePlayer * pPerson)
 {
 	// 攻撃ステートをやめさせる
-	//pPerson->SetAttackState(BASE_ATTACK_STATE::NO_ATTACK);
+	//pPerson->SetActionState(BASE_ACTION_STATE::NO_ACTION);
 }
 
 void BasePlayerState::RushAttack::Render(BasePlayer * pPerson)
@@ -1410,7 +1484,7 @@ void BasePlayerState::SquatAttack::Enter(BasePlayer * pPerson)
 
 
 	// ★攻撃ステートを2段目に設定する　↓でHITフラグを消している
-	pPerson->SetAttackState(BASE_ATTACK_STATE::SQUAT);
+	pPerson->SetActionState(BASE_ACTION_STATE::SQUAT);
 
 }
 
@@ -1500,12 +1574,20 @@ void BasePlayerState::AerialAttack::Enter(BasePlayer * pPerson)
 
 
 	// ★攻撃ステートを設定する　↓でHITフラグを消している
-	pPerson->SetAttackState(BASE_ATTACK_STATE::AERIAL);
+	pPerson->SetActionState(BASE_ACTION_STATE::AERIAL);
 
 }
 
 void BasePlayerState::AerialAttack::Execute(BasePlayer * pPerson)
 {
+	// 地上フラグtrue(着地したら)
+	if (pPerson->isLand())
+	{
+		// 着地ステートに移行
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Land::GetInstance());
+		return;
+	}
+
 	// 攻撃終了してたら
 	if (!pPerson->isAttackState())
 	{
@@ -1547,6 +1629,7 @@ void BasePlayerState::AerialAttack::Execute(BasePlayer * pPerson)
 		}
 
 	}
+
 
 }
 
@@ -1596,12 +1679,20 @@ void BasePlayerState::AerialDropAttack::Enter(BasePlayer * pPerson)
 
 
 	// ★攻撃ステートを設定する　↓でHITフラグを消している
-	pPerson->SetAttackState(BASE_ATTACK_STATE::AERIALDROP);
+	pPerson->SetActionState(BASE_ACTION_STATE::AERIALDROP);
 
 }
 
 void BasePlayerState::AerialDropAttack::Execute(BasePlayer * pPerson)
 {
+	// 地上フラグtrue(着地したら)
+	if (pPerson->isLand())
+	{
+		// 着地ステートに移行
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Land::GetInstance());
+		return;
+	}
+
 	// 攻撃終了してたら
 	if (!pPerson->isAttackState())
 	{
@@ -1669,5 +1760,117 @@ bool BasePlayerState::AerialDropAttack::OnMessage(BasePlayer * pPerson, const Me
 		break;
 	}
 	}
+	return false;
+}
+
+/*******************************************************/
+//					回避ステート
+/*******************************************************/
+
+BasePlayerState::Escape * BasePlayerState::Escape::GetInstance()
+{
+	// ここに変数を作る
+	static BasePlayerState::Escape instance;
+	return &instance;
+}
+
+void BasePlayerState::Escape::Enter(BasePlayer * pPerson)
+{
+	// 待機モーションに変える
+	pPerson->SetMotion(13);
+
+	// ★エスケープのフレームに設定する
+	pPerson->SetActionState(BASE_ACTION_STATE::ESCAPE);
+}
+
+void BasePlayerState::Escape::Execute(BasePlayer * pPerson)
+{
+	// エスケープの時間更新&エスケープ時間終わったら
+	switch (pPerson->GetActionFrame())
+	{
+	case FRAME_STATE::START:
+		// フラグ設定
+		pPerson->SetEscapeFlag(false);
+		// クイックエスケープ
+		// 向いている方向にスゥーっと移動
+		if (pPerson->GetDir() == DIR::RIGHT)
+		{
+			pPerson->SetMove(Vector3(.25, 0, 0));
+		}
+		else
+		{
+			pPerson->SetMove(Vector3(-.25, 0, 0));
+		}
+		break;
+
+	case FRAME_STATE::ACTIVE:
+		// フラグ設定
+		pPerson->SetEscapeFlag(true);
+		// クイックエスケープ
+		// 向いている方向にスゥーっと移動
+		if (pPerson->GetDir() == DIR::RIGHT)
+		{
+			pPerson->SetMove(Vector3(1.5f, 0, 0));
+		}
+		else
+		{
+			pPerson->SetMove(Vector3(-1.5f, 0, 0));
+		}
+		break;
+
+	case FRAME_STATE::FOLLOW:
+		// フラグ設定
+		pPerson->SetEscapeFlag(false);
+		// クイックエスケープ
+		// 向いている方向にスゥーっと移動
+		if (pPerson->GetDir() == DIR::RIGHT)
+		{
+			pPerson->SetMove(Vector3(.25, 0, 0));
+		}
+		else
+		{
+			pPerson->SetMove(Vector3(-.25, 0, 0));
+		}
+		break;
+
+	case FRAME_STATE::END:
+		pPerson->SetEscapeFlag(false);
+		// 待機モーションに戻る
+		Vector3 move = pPerson->GetMove();
+		move *= .5f;	// 慣性を弱くする
+		pPerson->SetMove(move);
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		return;
+	}
+
+
+
+}
+
+void BasePlayerState::Escape::Exit(BasePlayer * pPerson)
+{
+
+
+}
+
+void BasePlayerState::Escape::Render(BasePlayer * pPerson)
+{
+
+	tdnText::Draw(20, 690, 0xffffffff, "EscapeState");
+}
+
+bool BasePlayerState::Escape::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	//// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+	//	// 攻撃くらったよメッセージ
+	//case MESSAGE_TYPE::HIT_DAMAGE:
+	//{
+	//	// グローバルステートに行かないようにする！
+	//	return true;
+	//}
+	//}
+
 	return false;
 }

@@ -5,5 +5,5 @@ NAME: PAD A|
 ID: NORI_GAMEPAD
 
 NAME: XBOX 360 For Windows (Controller)|
-ID: DEFAULT
+ID: XBOX
 
