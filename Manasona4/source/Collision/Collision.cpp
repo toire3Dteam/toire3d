@@ -82,8 +82,9 @@ void Collision::RaypicDown(iexMesh *obj, BasePlayer *player)
 				player->SetMove(move);
 				player->SetPos(pos);
 
+				// ★★★　地面に付いたら
 				player->SetLand(true);//プレイヤーのポジションをセットした後に変更
-
+				player->SetAerialJump(true);// 空中ジャンプの権利も戻る
 				hit = true;
 			}
 		}

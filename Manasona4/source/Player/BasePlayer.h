@@ -68,10 +68,14 @@ enum class ATTACK_FRAME
 // 全キャラ固有で持つ攻撃タイプ
 enum BASE_ATTACK_STATE
 {
-	RUSH1,	// 通常1段目
-	RUSH2,	// 通常2段目
-	RUSH3,	// 通常3段目
-	END		// 何もなし
+	NO_ATTACK = -1,
+	RUSH1,		// 通常1段目
+	RUSH2,		// 通常2段目
+	RUSH3,		// 通常3段目
+	SQUAT,		// 下段攻撃
+	AERIAL,		// 空中攻撃
+	AERIALDROP,	// 空中下攻撃
+	END		// 何もなし　(A列車)名前
 };
 
 class BasePlayer : public BaseGameEntity
@@ -112,6 +116,9 @@ protected:
 		bool bHit;			// 当たったかどうか(★多段ヒット防止用)多段ヒットしてほしい攻撃だと、また考える必要がある
 		Vector2 FlyVector;	// 当たって吹っ飛ばすベクトル(★基本的にxは+にすること)
 		LPCSTR SE_ID;		// 当たったときに鳴らすSE
+		int hitStopFlame;	// ヒットストップの時間
+		int recoveryFlame;	// 硬直の時間
+
 	}m_AttackDatas[(int)BASE_ATTACK_STATE::END];
 
 public:
@@ -139,14 +146,19 @@ public:
 	DIR GetDir() { return m_dir; }
 	bool isMaxSpeed() { return (abs(m_move.x) >= m_maxSpeed); }
 	bool isLand() { return m_bLand; }
+	bool isAerialJump() { return m_bAerialJump; }
 	Jump *GetJump() { return &m_jump; }
 	RushAttack *GetRushAttack() { return &m_RushAttack; }
 	float GetMaxSpeed() { return m_maxSpeed; }
 	BASE_ATTACK_STATE GetAttackState(){ return m_AttackState; }
-	AttackData *GetAttackData(){ return &m_AttackDatas[(int)m_AttackState]; }
+	AttackData *GetAttackData()
+	{
+		assert(m_AttackState != BASE_ATTACK_STATE::NO_ATTACK);
+		return &m_AttackDatas[(int)m_AttackState]; 
+	}
 	int GetPierceLV(){ return m_AttackDatas[(int)m_AttackState].pierceLV; }
 	LPCSTR GetAttackSE(){ return m_AttackDatas[(int)m_AttackState].SE_ID; }
-	bool isAttackState(){ return (m_AttackState != BASE_ATTACK_STATE::END); }
+	bool isAttackState(){ return (m_AttackState != BASE_ATTACK_STATE::NO_ATTACK); }
 	bool isAttackFrame()
 	{
 		if (!isAttackState()) return false;
@@ -158,6 +170,8 @@ public:
 		if (!isAttackState()) return ATTACK_FRAME::END;
 		return m_AttackFrameList[(int)m_AttackState][m_CurrentAttackFrame]; 
 	}
+	int GetRecoveryFrame() { return m_RecoveryFlame; }
+
 
 	// セッター
 	void SetMove(const Vector3 &v) { m_move.Set(v.x, v.y, v.z); }
@@ -165,11 +179,15 @@ public:
 	void SetDir(DIR dir) { m_dir = dir; }
 	void SetMotion(int MotionNo) { if (m_pObj) { if (m_pObj->GetMotion() != MotionNo)m_pObj->SetMotion(MotionNo); } }
 	void SetLand(bool bLand) { m_bLand = bLand; }
+	void SetAerialJump(bool bAerialJump) { m_bAerialJump = bAerialJump; }
+	void SetHitStopFrame(int frame) { m_HitStopFrame = frame; }
+	void SetRecoveryFrame(int frame) { m_RecoveryFlame = frame; }
 	void SetAttackState(BASE_ATTACK_STATE state)
 	{
 		m_AttackState = state; 
 
 		// 攻撃だったら
+		// ★↓でHITフラグを消している
 		if (isAttackState())
 		{
 			m_AttackDatas[(int)state].bHit = false;	// ヒットフラグリセット
@@ -205,11 +223,15 @@ protected:
 	float m_maxSpeed;		// キャラクターの最大スピード 
 	float m_angleY;
 	bool m_bLand;			// 着地フラグ
+	bool m_bAerialJump;		// 空中ジャンプのフラグ
 	int m_InputList[(int)PLAYER_INPUT::MAX]; 	// 押しているキーを格納
 	StateMachine<BasePlayer>* m_pStateMachine; // ★ステートマシン
 	int m_InvincibleLV;			// 無敵かどうか
 	int m_InvincibleTime;		// 無敵時間		無敵時は0以上の値が入り、0になるまでデクリメントされる
 	int m_CurrentAttackFrame;	// 攻撃フレームリストの中を再生しているフレーム
+	int m_HitStopFrame;			// 1以上なら0になるまでストップ
+	int m_RecoveryFlame;		// 1以上なら0になるまで操作を受け付けない
+
 
 	static const int FRAME_MAX = 256; // 攻撃のフレームの最大値(これより超えることはないだろう)
 	ATTACK_FRAME m_AttackFrameList[(int)BASE_ATTACK_STATE::END][FRAME_MAX];

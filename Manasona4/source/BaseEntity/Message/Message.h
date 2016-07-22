@@ -17,12 +17,15 @@ struct HIT_DAMAGE_INFO
 	bool BeInvincible;	// 無敵になるかどうか(たとえば、通常の1.2段目ならfalseだし、3段目ならtrue)
 	int damage;			// 受けるダメ―ジ(スコア)
 	Vector2 FlyVector;	// 吹っ飛びベクトル(強さもある)
+	int hitStopFlame;		// ヒットストップフレーム
+	int recoveryFlame;		// 硬直フレーム
 };
 
 // 攻撃ヒットしたプレイヤー用
 struct HIT_ATTACK_INFO
 {
 	int HitPlayerDeviceID;	// ダメージを与えた相手の番号
+	int hitStopFlame;		// ヒットストップフレーム
 };
 
 // プレイヤーInfo

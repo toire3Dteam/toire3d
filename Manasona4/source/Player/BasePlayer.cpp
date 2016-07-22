@@ -50,7 +50,7 @@ void BasePlayer::LoadAttackFrameList(char *filename)
 
 BasePlayer::BasePlayer(int deviceID) :BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + deviceID)),
 m_maxSpeed(1.0f), m_dir(DIR::LEFT), m_deviceID(deviceID), m_pHitSquare(new CollisionShape::Square),
-m_pObj(nullptr), m_move(VECTOR_ZERO), m_bLand(false), m_AttackState(BASE_ATTACK_STATE::END), m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentAttackFrame(0)
+m_pObj(nullptr), m_move(VECTOR_ZERO), m_bLand(false), m_bAerialJump(true), m_AttackState(BASE_ATTACK_STATE::NO_ATTACK), m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentAttackFrame(0),m_RecoveryFlame(0)
 {
 	// デフォルト設定
 	m_pHitSquare->height = 4;
@@ -98,38 +98,48 @@ BasePlayer::~BasePlayer()
 
 void BasePlayer::Update()
 {
-	// 攻撃フレームの更新
-	if (isAttackState())
+	// ★硬直時間のデクリメント
+	if (m_RecoveryFlame > 0)m_RecoveryFlame--;
+
+	// ★ヒットストップ中
+	if (m_HitStopFrame > 0)
 	{
-		// フレーム最後まで再生したら
-		if (m_AttackFrameList[m_AttackState][m_CurrentAttackFrame++] == ATTACK_FRAME::END)
-		{
-			// ★攻撃ステート解除
-			m_AttackState = BASE_ATTACK_STATE::END;
-		}
+		m_HitStopFrame--;
 	}
+	// ヒットストップが言わるまで動かない
+	else
+	{
+		// 攻撃フレームの更新
+		if (isAttackState())
+		{
+			// フレーム最後まで再生したら
+			if (m_AttackFrameList[m_AttackState][m_CurrentAttackFrame++] == ATTACK_FRAME::END)
+			{
+				// ★攻撃ステート解除
+				m_AttackState = BASE_ATTACK_STATE::NO_ATTACK;
+			}
+		}
 
-	// 入力受付
-	Control();
+		// 入力受付
+		Control();
 
-	// 入力受付後にステートマシン更新
-	m_pStateMachine->Update();
+		// 入力受付後にステートマシン更新
+		m_pStateMachine->Update();
 
-	//if (m_InputList[(int)PLAYER_INPUT::LEFT] == 1) m_move.x = -2;
-	//else m_move.x = 0;
+		//if (m_InputList[(int)PLAYER_INPUT::LEFT] == 1) m_move.x = -2;
+		//else m_move.x = 0;
 
-	// 動きの制御
-	Move();
+		// 動きの制御
+		Move();
 
+		// メッシュの更新
+		m_pObj->Animation();
+		m_pObj->SetAngle(m_angleY);	// 左右のアングルのセット
+		m_pObj->SetPos(m_pos);
+		m_pObj->Update();
+	}
 	// アングル補間処理
 	m_angleY = m_angleY*.65f + DIR_ANGLE[(int)m_dir] * .35f;
-
-	// メッシュの更新
-	m_pObj->Animation();
-	m_pObj->SetAngle(m_angleY);	// 左右のアングルのセット
-	m_pObj->SetPos(m_pos);
-	m_pObj->Update();
-	
 }
 
 void BasePlayer::Move() 
@@ -171,8 +181,12 @@ void BasePlayer::Control()
 
 void BasePlayer::UpdatePos()
 {
-	// 座標更新
-	m_pos += m_move;
+	// (TODO)ヒットストップしてなかったら
+	if (m_HitStopFrame <= 0)
+	{
+		// 座標更新
+		m_pos += m_move;
+	}
 }
 
 void BasePlayer::Render()

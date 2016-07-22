@@ -95,7 +95,8 @@ bool PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you)
 
 				// まず、攻撃をヒットさせた人に送信
 				HIT_ATTACK_INFO hai;
-				hai.HitPlayerDeviceID = you->GetDeviceID();	// ダメージを与えた相手の番号
+				hai.HitPlayerDeviceID = you->GetDeviceID();					// ダメージを与えた相手の番号
+				hai.hitStopFlame = my->GetAttackData()->hitStopFlame;		// 自分自身にもの自分のヒットストップ
 				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + my->GetDeviceID()), MESSAGE_TYPE::HIT_ATTACK, &hai);
 
 				// そして、ダメージを受けた人に送信
@@ -103,6 +104,8 @@ bool PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you)
 				hdi.BeInvincible = my->GetAttackData()->bBeInvincible;	// 無敵になるかどうか
 				hdi.damage = my->GetAttackData()->damage;				// ダメージ(スコア)
 				hdi.FlyVector = my->GetAttackData()->FlyVector;			// 吹っ飛びベクトル
+				hdi.hitStopFlame = my->GetAttackData()->hitStopFlame;		// ヒットストップ
+				hdi.recoveryFlame = my->GetAttackData()->recoveryFlame;		// 硬直時間
 				if (my->GetPos().x > you->GetPos().x) hdi.FlyVector.x *= -1;
 				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + you->GetDeviceID()), MESSAGE_TYPE::HIT_DAMAGE, &hdi);
 

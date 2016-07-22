@@ -252,6 +252,42 @@ namespace BasePlayerState
 	};
 
 	/*******************************************************/
+	//					空中ジャンプ
+	/*******************************************************/
+	class AerialJump :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static AerialJump* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+
+		AerialJump() {};
+		~AerialJump() {};
+
+		AerialJump(const AerialJump&) {}
+		AerialJump& operator=(const AerialJump&) {}
+	};
+
+
+	/*******************************************************/
 	//					着地ステート
 	/*******************************************************/
 	class Land :public State<BasePlayer>
@@ -391,5 +427,142 @@ namespace BasePlayerState
 
 		KnockDown(const KnockDown&) {}
 		KnockDown& operator=(const KnockDown&) {}
+	};
+
+	
+	/*******************************************************/
+	//					待機
+	/*******************************************************/
+	class Squat :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static Squat* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		Squat() {};
+		~Squat() {};
+
+		Squat(const Squat&) {}
+		Squat& operator=(const Squat&) {}
+	};
+
+	/*******************************************************/
+	//					待機攻撃
+	/*******************************************************/
+	class SquatAttack :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static SquatAttack* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		SquatAttack() {};
+		~SquatAttack() {};
+
+		SquatAttack(const SquatAttack&) {}
+		SquatAttack& operator=(const SquatAttack&) {}
+	};
+
+	/*******************************************************/
+	//					空中攻撃 
+	/*******************************************************/
+	class AerialAttack :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static AerialAttack* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		AerialAttack() {};
+		~AerialAttack() {};
+
+		AerialAttack(const AerialAttack&) {}
+		AerialAttack& operator=(const AerialAttack&) {}
+	};
+
+	/*******************************************************/
+	//					空中下攻撃 
+	/*******************************************************/
+	class AerialDropAttack :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static AerialDropAttack* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		AerialDropAttack() {};
+		~AerialDropAttack() {};
+
+		AerialDropAttack(const AerialDropAttack&) {}
+		AerialDropAttack& operator=(const AerialDropAttack&) {}
 	};
 }
