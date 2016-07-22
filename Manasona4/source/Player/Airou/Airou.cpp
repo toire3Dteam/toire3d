@@ -51,7 +51,7 @@ void Airou::InitAttackDatas()
 	// ãÛíÜçUåÇ
 	m_AttackDatas[(int)BASE_ATTACK_STATE::AERIAL].bBeInvincible = false;
 	m_AttackDatas[(int)BASE_ATTACK_STATE::AERIAL].damage = 360;
-	m_AttackDatas[(int)BASE_ATTACK_STATE::AERIAL].FlyVector.Set(1.0f, 2.5f);
+	m_AttackDatas[(int)BASE_ATTACK_STATE::AERIAL].FlyVector.Set(1.0f, 2.2f);
 	m_AttackDatas[(int)BASE_ATTACK_STATE::AERIAL].hitStopFlame = 4;
 	m_AttackDatas[(int)BASE_ATTACK_STATE::AERIAL].recoveryFlame = 60;
 	m_AttackDatas[(int)BASE_ATTACK_STATE::AERIAL].pierceLV = 0;

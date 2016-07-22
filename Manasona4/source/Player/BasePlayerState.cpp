@@ -45,14 +45,18 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 
 		HIT_DAMAGE_INFO *hdi = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
 
-		// 吹っ飛びベクトルを加算
-		pPerson->AddMove(Vector3(hdi->FlyVector.x, hdi->FlyVector.y, 0));
+		// 吹っ飛びベクトルを加算 (A列車)加算から代入に変更
+		//pPerson->AddMove(Vector3(hdi->FlyVector.x, hdi->FlyVector.y, 0));
+		pPerson->SetMove(Vector3(hdi->FlyVector.x, hdi->FlyVector.y, 0));
 
 		// ヒットストップ
 		pPerson->SetHitStopFrame(hdi->hitStopFlame);
 
 		// 硬直フレーム設定
 		pPerson->SetRecoveryFrame(hdi->recoveryFlame);
+
+		// 空中ジャンプの権利復活
+		pPerson->SetAerialJump(true);
 
 		// 吹っ飛び距離	に　応じて	ダメージステートを変える
 		if (hdi->FlyVector.Length() <  HUTTOBI_LINE)
@@ -135,12 +139,14 @@ void BasePlayerState::Wait::Execute(BasePlayer * pPerson)
 	if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
 	{
 		pPerson->SetDir(DIR::RIGHT);
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+		// 歩きステートにいく
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Walk::GetInstance());
 	}
 	if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
 	{
 		pPerson->SetDir(DIR::LEFT);
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+		// 歩きステートにいく
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Walk::GetInstance());
 	}
 
 
@@ -161,6 +167,19 @@ void BasePlayerState::Wait::Render(BasePlayer * pPerson)
 
 bool BasePlayerState::Wait::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
+	// メッセージタイプ
+	switch (msg.Msg)
+	{
+		// 落下してるよメッセージ
+	case MESSAGE_TYPE::FALL:
+	{
+		// 落下ステートに行く！
+		pPerson->GetFSM()->ChangeState(Fall::GetInstance());
+		break;
+	}
+	}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
 	return false;
 }
 
@@ -177,18 +196,18 @@ BasePlayerState::Walk * BasePlayerState::Walk::GetInstance()
 
 void BasePlayerState::Walk::Enter(BasePlayer * pPerson)
 {
-	// 走るモーションに変える
-	pPerson->SetMotion(1);
+	// 歩きモーションに変える
+	pPerson->SetMotion(14);
 
 	// 初速度の設定
 	Vector3 move = pPerson->GetMove();
 	switch (pPerson->GetDir())
 	{
 	case DIR::LEFT:
-		move.x -= .5f;
+		move.x -= .75f;
 		break;
 	case DIR::RIGHT:
-		move.x += .5f;
+		move.x += .75f;
 		break;
 	default:
 		MyAssert(0, "ふぁっきゅー");
@@ -245,6 +264,8 @@ void BasePlayerState::Walk::Execute(BasePlayer * pPerson)
 		}
 	}
 
+	// 移動地制御
+	pPerson->MoveClampX(pPerson->GetMaxSpeed() * .7f);
 }
 
 void BasePlayerState::Walk::Exit(BasePlayer * pPerson)
@@ -260,6 +281,19 @@ void BasePlayerState::Walk::Render(BasePlayer * pPerson)
 
 bool BasePlayerState::Walk::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
+	// メッセージタイプ
+	switch (msg.Msg)
+	{
+		// 落下してるよメッセージ
+	case MESSAGE_TYPE::FALL:
+	{
+		// 落下ステートに行く！
+		pPerson->GetFSM()->ChangeState(Fall::GetInstance());
+		break;
+	}
+	}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
 	return false;
 }
 
@@ -413,6 +447,19 @@ void BasePlayerState::Run::Render(BasePlayer * pPerson)
 
 bool BasePlayerState::Run::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
+	// メッセージタイプ
+	switch (msg.Msg)
+	{
+		// 落下してるよメッセージ
+	case MESSAGE_TYPE::FALL:
+	{
+		// 落下ステートに行く！
+		pPerson->GetFSM()->ChangeState(Fall::GetInstance());
+		break;
+	}
+	}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
 	return false;
 }
 
@@ -494,6 +541,19 @@ void BasePlayerState::FrontBrake::Render(BasePlayer * pPerson)
 
 bool BasePlayerState::FrontBrake::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
+	// メッセージタイプ
+	switch (msg.Msg)
+	{
+		// 落下してるよメッセージ
+	case MESSAGE_TYPE::FALL:
+	{
+		// 落下ステートに行く！
+		pPerson->GetFSM()->ChangeState(Fall::GetInstance());
+		break;
+	}
+	}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
 	return false;
 }
 
@@ -568,6 +628,19 @@ void BasePlayerState::TurnOverBrake::Render(BasePlayer * pPerson)
 
 bool BasePlayerState::TurnOverBrake::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
+	// メッセージタイプ
+	switch (msg.Msg)
+	{
+		// 落下してるよメッセージ
+	case MESSAGE_TYPE::FALL:
+	{
+		// 落下ステートに行く！
+		pPerson->GetFSM()->ChangeState(Fall::GetInstance());
+		break;
+	}
+	}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
 	return false;
 }
 
@@ -740,9 +813,18 @@ void BasePlayerState::AerialJump::Enter(BasePlayer * pPerson)
 	pPerson->SetAerialJump(false);
 
 	// 移動地を足す！
-	Vector3 add = { 0,2,0 };//c_MAX_AerialJump
-	pPerson->SetMove(VECTOR_ZERO);// 前回のMOVE値を消す
-	pPerson->AddMove(add); 
+	Vector3 add(VECTOR_ZERO);//c_MAX_AerialJump
+	if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
+	{
+		add.x = -.25f;
+	}
+	else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
+	{
+		add.x = .25f;
+	}
+	add.y = 2.25f;
+	pPerson->SetMove(add);// 前回のMOVE値を消す
+	//pPerson->AddMove(add); 
 
 }
 
@@ -814,6 +896,112 @@ void BasePlayerState::AerialJump::Render(BasePlayer * pPerson)
 }
 
 bool BasePlayerState::AerialJump::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	return false;
+}
+
+
+/*******************************************************/
+//					落下
+/*******************************************************/
+
+BasePlayerState::Fall * BasePlayerState::Fall::GetInstance()
+{
+	// ここに変数を作る
+	static BasePlayerState::Fall instance;
+	return &instance;
+}
+
+void BasePlayerState::Fall::Enter(BasePlayer * pPerson)
+{
+	// 落下モーションに変える
+	pPerson->SetMotion(13);
+
+	// 地面にいないよ！ということを設定
+	pPerson->SetLand(false);
+}
+
+void BasePlayerState::Fall::Execute(BasePlayer * pPerson)
+{
+
+	//////////////////////////////////////////////
+	//	落下中
+	//============================================
+
+	//////////////////////////////////////////////
+	//	空中ジャンプボタン
+	//============================================
+	if (pPerson->GetInputList(PLAYER_INPUT::C) == 3)
+	{
+		// 空中ジャンプの権利がなかったら弾く
+		if (pPerson->isAerialJump() == true)
+		{
+			// 空中ジャンプステートに行く
+			pPerson->GetFSM()->ChangeState(BasePlayerState::AerialJump::GetInstance());
+		}
+	}
+
+	//////////////////////////////////////////////
+	//	攻撃ボタン
+	//============================================
+
+	if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
+	{
+		if (pPerson->isPushInput(PLAYER_INPUT::DOWN) == true)
+		{
+			// 空中下攻撃ステートに行く
+			pPerson->GetFSM()->ChangeState(BasePlayerState::AerialDropAttack::GetInstance());
+		}
+		else
+		{
+			// 空中攻撃ステートに行く
+			pPerson->GetFSM()->ChangeState(BasePlayerState::AerialAttack::GetInstance());
+		}
+
+		return;
+	}
+
+	//////////////////////////////////////////////
+	//	左入力
+	//============================================
+	if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
+	{
+		pPerson->AddMove(Vector3(-0.05f, 0.0f, 0.0f));
+	}
+
+
+	//////////////////////////////////////////////
+	//	右入力
+	//============================================
+	else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
+	{
+		pPerson->AddMove(Vector3(0.05f, 0.0f, 0.0f));
+	}
+
+	// 移動地制御
+	pPerson->MoveClampX(pPerson->GetMaxSpeed() * 1.1f);
+
+
+	// 地上フラグtrue(着地したら)
+	if (pPerson->isLand())
+	{
+		// 着地ステートに移行
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Land::GetInstance());
+	}
+
+}
+
+void BasePlayerState::Fall::Exit(BasePlayer * pPerson)
+{
+	//pPerson->GetMove().y = 0;
+}
+
+void BasePlayerState::Fall::Render(BasePlayer * pPerson)
+{
+	//tdnText::Draw(20, 690, 0xffffffff, "FallState");
+}
+
+bool BasePlayerState::Fall::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
 	return false;
 }
@@ -1330,25 +1518,31 @@ void BasePlayerState::AerialAttack::Execute(BasePlayer * pPerson)
 	if (pPerson->GetAttackData()->bHit == true)
 	{
 		//============================================
-		//	ジャンプボタン
+		//	空中ジャンプキャンセルボタン
 		//============================================
 		if (pPerson->GetInputList(PLAYER_INPUT::C) == 3)
 		{
 
-			if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
-			{
-				pPerson->AddMove(Vector3(0.8f, 0.0f, 0.0f));
-			}
-			if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
-			{
-				pPerson->AddMove(Vector3(-0.8f, 0.0f, 0.0f));
-			}
+			//if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
+			//{
+			//	pPerson->AddMove(Vector3(0.8f, 0.0f, 0.0f));
+			//}
+			//if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
+			//{
+			//	pPerson->AddMove(Vector3(-0.8f, 0.0f, 0.0f));
+			//}
 
-			// 高く飛ばす 
-			pPerson->AddMove(Vector3(0.0f, 0.5f, 0.0f));
+			//// 高く飛ばす 
+			//pPerson->AddMove(Vector3(0.0f, 0.5f, 0.0f));
 
-			// ジャンプステートに行く
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
+		
+			// 空中ジャンプの権利がなかったら弾く
+			if (pPerson->isAerialJump() == true)
+			{
+				// 空中ジャンプステートに行く
+				pPerson->GetFSM()->ChangeState(BasePlayerState::AerialJump::GetInstance());
+			}
+			
 			return;
 		}
 
@@ -1425,20 +1619,24 @@ void BasePlayerState::AerialDropAttack::Execute(BasePlayer * pPerson)
 		if (pPerson->GetInputList(PLAYER_INPUT::C) == 3)
 		{
 
-			if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
-			{
-				pPerson->AddMove(Vector3(0.8f, 0.0f, 0.0f));
-			}
-			if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
-			{
-				pPerson->AddMove(Vector3(-0.8f, 0.0f, 0.0f));
-			}
+			//if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
+			//{
+			//	pPerson->AddMove(Vector3(0.8f, 0.0f, 0.0f));
+			//}
+			//if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
+			//{
+			//	pPerson->AddMove(Vector3(-0.8f, 0.0f, 0.0f));
+			//}
 
-			// 高く飛ばす 
-			pPerson->AddMove(Vector3(0.0f, 0.5f, 0.0f));
+			//// 高く飛ばす 
+			//pPerson->AddMove(Vector3(0.0f, 0.5f, 0.0f));
 
-			// ジャンプステートに行く
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
+			// 空中ジャンプの権利がなかったら弾く
+			if (pPerson->isAerialJump() == true)
+			{
+				// 空中ジャンプステートに行く
+				pPerson->GetFSM()->ChangeState(BasePlayerState::AerialJump::GetInstance());
+			}
 			return;
 		}
 

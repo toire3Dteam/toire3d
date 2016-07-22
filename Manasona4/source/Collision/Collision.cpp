@@ -1,6 +1,7 @@
 #include "TDNLIB.h"
 #include "Collision.h"
 #include "../Player/BasePlayer.h"
+#include "../BaseEntity/Message/MessageDispatcher.h"
 
 void Collision::Raypic(iexMesh *obj, BasePlayer *player) // ステージとプレイヤー
 {
@@ -87,6 +88,12 @@ void Collision::RaypicDown(iexMesh *obj, BasePlayer *player)
 				player->SetAerialJump(true);// 空中ジャンプの権利も戻る
 				hit = true;
 			}
+		}
+		// 空中にいるよ！
+		else
+		{
+			// 落下メッセージ送信
+			MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + player->GetDeviceID()), MESSAGE_TYPE::FALL, nullptr);
 		}
 
 		if (!hit)

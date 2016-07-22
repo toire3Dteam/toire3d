@@ -8,7 +8,8 @@ enum MESSAGE_TYPE
 	EFFECT_CAMERA,	// エフェクトカメラ発動メッセージ
 	HIT_ATTACK,		// 攻撃をヒットさせた人に送るメッセージ！
 	HIT_DAMAGE,		// 攻撃がヒットした相手に送るメッセージ
-	OTHER,			// その他。
+	FALL,			// プレイヤーが地面についていないときに送られるメッセージ
+	OTHER			// その他。
 };
 
 // 攻撃喰らった相手用

@@ -286,6 +286,41 @@ namespace BasePlayerState
 		AerialJump& operator=(const AerialJump&) {}
 	};
 
+	/*******************************************************/
+	//					落下
+	/*******************************************************/
+	class Fall :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static Fall* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+
+		Fall() {};
+		~Fall() {};
+
+		Fall(const Fall&) {}
+		Fall& operator=(const Fall&) {}
+	};
+
 
 	/*******************************************************/
 	//					着地ステート
