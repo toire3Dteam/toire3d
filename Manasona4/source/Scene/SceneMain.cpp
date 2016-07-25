@@ -5,12 +5,20 @@
 #include "../Sound/SoundManager.h"
 #include "../PostEffect/PostEffect.h"
 #include "../particle_2d/particle_2d.h"
-#include "../Effect/EffectManager.h"
+
 #include "../Stage/Stage.h"
 #include "../Camera/camera.h"
 #include "../Player/BasePlayer.h"
 #include "../Player/PlayerManager.h"
 #include "../BaseEntity/Message/MessageDispatcher.h"
+
+#include "../Effect/PanelEffect/PanelEffectManager.h"
+#include "../Effect/UVEffect/UVEffectManager.h"
+
+//BaseEffect* g_eff;
+//EffectManager;
+PanelEffectManager* m_panel;
+UVEffectManager* g_uvEffect;
 
 //******************************************************************
 //		初期化・解放
@@ -18,6 +26,12 @@
 
 bool sceneMain::Initialize()
 {
+
+	//g_eff = new HitEffect();
+	m_panel = new PanelEffectManager();
+	g_uvEffect = new UVEffectManager();
+
+
 	// カメラ初期化
 	m_pCamera = new Camera();
 
@@ -50,6 +64,10 @@ sceneMain::~sceneMain()
 	delete m_pStage;
 	delete m_pCamera;
 	PlayerMgr->Release();
+	//EffectMgr.Release();
+	SAFE_DELETE(m_panel);
+	SAFE_DELETE(g_uvEffect);
+
 }
 
 //******************************************************************
@@ -75,6 +93,20 @@ bool sceneMain::Update()
 		MsgMgr->Dispatch(0, ENTITY_ID::CAMERA_MGR, ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::EFFECT_CAMERA, &eci);
 	}
 
+	if (KeyBoardTRG(KB_L))
+	{
+		//g_eff->Action(0,0);
+		//EffectMgr.AddEffect(Vector3(0, 0, -5), EFFECT_TYPE::BURN);
+		//EffectMgr.AddEffect(Vector3(0, 0, -5), EFFECT_TYPE::NOTICE);
+
+		m_panel->AddEffect(Vector3(0, 0, -5), PANEL_EFFECT_TYPE::DAMAGE);
+		g_uvEffect->AddEffect(Vector3(0, 0, -5), UV_EFFECT_TYPE::WAVE);
+	}
+
+	//g_eff->Update();
+	//EffectMgr.Update();
+	m_panel->Update();
+	g_uvEffect->Update();
 	return true;
 }
 
@@ -92,6 +124,15 @@ void sceneMain::Render()
 
 	// プレイヤー
 	PlayerMgr->Render();
+
+	//g_eff->Render3D();
+	//EffectMgr.Render();
+	m_panel->Render();
+
+	//EffectMgr.Render3D();
+	m_panel->Render3D();
+	g_uvEffect->Render();
+
 
 	tdnText::Draw(0, 30, 0xffffffff, "CameraPos    : %.1f %.1f %.1f", m_pCamera->m_pos.x, m_pCamera->m_pos.y, m_pCamera->m_pos.z);
 	tdnText::Draw(0, 60, 0xffffffff, "CameraTarget : %.1f %.1f %.1f", m_pCamera->m_target.x, m_pCamera->m_target.y, m_pCamera->m_target.z);

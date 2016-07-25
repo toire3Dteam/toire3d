@@ -20,6 +20,7 @@ struct HIT_DAMAGE_INFO
 	Vector2 FlyVector;	// 吹っ飛びベクトル(強さもある)
 	int hitStopFlame;		// ヒットストップフレーム
 	int recoveryFlame;		// 硬直フレーム
+	int effectType;			// HITした相手に送るエフェクト (A列車)←をintじゃなくてEFFECT_TYPEにしたい。どうしたものか・・
 };
 
 // 攻撃ヒットしたプレイヤー用

@@ -3,6 +3,11 @@
 #include "../BaseEntity/Entity/BaseGameEntity.h"
 #include "../BaseEntity/State/StateMachine.h"
 
+// エフェクト関連
+#include "../Effect/PanelEffect/PanelEffectManager.h"
+#include "../Effect\UVEffect\UVEffectManager.h"
+
+
 // 前方宣言
 namespace CollisionShape
 {
@@ -79,6 +84,13 @@ enum BASE_ACTION_STATE
 	END		// 何もなし　(A列車)名前
 };
 
+// エフェクトの種類
+enum class EFFECT_TYPE
+{
+	DAMAGE,	// ダメージエフェクト 
+};
+
+
 class BasePlayer : public BaseGameEntity
 {
 protected:
@@ -125,6 +137,7 @@ protected:
 			LPCSTR SE_ID;				// 当たったときに鳴らすSE
 			int hitStopFlame;			// ヒットストップの時間
 			int recoveryFlame;			// 硬直の時間
+			EFFECT_TYPE effectType;		// エフェクトのタイプ
 		}*pAttackData;
 
 		ActionData() :pAttackData(nullptr){}
@@ -144,7 +157,7 @@ public:
 	void Control();			// プレイヤーからの入力を受け付ける
 	virtual void Update();	// 基本的な更新
 	void UpdatePos();		// 座標更新(判定後に呼び出す)
-	void Move(); // 動きの制御
+	void Move();			// 動きの制御
 	virtual void Render();
 
 	// 継承してるやつに強制的に呼ばせる
@@ -231,6 +244,11 @@ public:
 	void AddMove(const Vector3 &v) { m_move += v; }
 	void MoveClampX(float val) { m_move.x = Math::Clamp(m_move.x, -val, val); }
 
+	// エフェクト
+	PanelEffectManager* GetPanelEffectManager() { return m_PanelEffectMGR; }
+	UVEffectManager* GetUVEffectManager() { return m_UVEffectMGR; }
+	void AddEffectAction(Vector3 pos,EFFECT_TYPE effectType);
+
 	// ステージのあたり判定用
 	CollisionShape::Square *GetHitSquare() { return m_pHitSquare; }
 
@@ -267,6 +285,17 @@ protected:
 	static const int FRAME_MAX = 256; // 攻撃のフレームの最大値(これより超えることはないだろう)
 	FRAME_STATE m_AttackFrameList[(int)BASE_ACTION_STATE::END][FRAME_MAX];
 	BASE_ACTION_STATE m_ActionState;
+
+	// (A列車)　//////////////////////////////////////////////////////////
+	// エフェクトマネージャーを一人ずつ持たせた理由は
+	// 一つのマネージャーで追加していく形だと　可変長配列で増やしていくが
+	// ゲーム中にnew Deleteはとても重かった
+	// そもそもダメージエフェクトなどキャラクターに一つあればいいと思った
+	//	4人対戦で5つもヒットエフェクトがでることはないので　
+	// 初期ロードは重くなるがゲーム中おもくなるよりマシ。
+
+	PanelEffectManager* m_PanelEffectMGR;	// パラパラアニメエフェクト 
+	UVEffectManager* m_UVEffectMGR;			// UVエフェクト
 
 	// 継承してるやつに強制的に呼ばせる
 	void LoadAttackFrameList(char *filename);

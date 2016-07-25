@@ -40,7 +40,7 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 		// 攻撃くらったよメッセージ
 	case MESSAGE_TYPE::HIT_DAMAGE:
 	{
-		// 攻撃ステートオフ
+		// アクションステートオフ(つまり現在までやったいた動きが消える)
 		pPerson->SetActionState(BASE_ACTION_STATE::NO_ACTION);
 
 		HIT_DAMAGE_INFO *hdi = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
@@ -54,6 +54,10 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 
 		// 硬直フレーム設定
 		pPerson->SetRecoveryFrame(hdi->recoveryFlame);
+
+		// (追加)ヒットエフェクト発動! 
+		// (A列車)エフェクトを今は自分のポジションにおいてる！！！　後でヒットポジションとかいるかも
+		pPerson->AddEffectAction(pPerson->GetPos()+Vector3(0,4,-3),(EFFECT_TYPE)hdi->effectType);
 
 		// 空中ジャンプの権利復活
 		pPerson->SetAerialJump(true);

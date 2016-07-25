@@ -58,6 +58,10 @@ m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentActionFrame(0), m_RecoveryFlame
 	m_pHitSquare->width = 1;
 	m_pHitSquare->pos.Set(.0f, 4.0f, .0f);
 
+	// エフェクトマネージャー
+	m_PanelEffectMGR = new PanelEffectManager();
+	m_UVEffectMGR	 = new UVEffectManager();
+
 	// 初期化
 	memset(m_InputList, 0, sizeof(m_InputList));
 	ZeroMemory(&m_jump, sizeof(Jump));
@@ -94,11 +98,19 @@ BasePlayer::~BasePlayer()
 {
 	SAFE_DELETE(m_pObj);
 	SAFE_DELETE(m_pStateMachine);
+
+	SAFE_DELETE(m_PanelEffectMGR);
+	SAFE_DELETE(m_UVEffectMGR);
+	
 	delete m_pHitSquare;
 }
 
 void BasePlayer::Update()
 {
+	// エフェクトマネージャー更新 (ヒットストップ無視)
+	m_PanelEffectMGR->Update();
+	m_UVEffectMGR->Update();
+
 	// ★硬直時間のデクリメント
 	if (m_RecoveryFlame > 0)m_RecoveryFlame--;
 
@@ -196,6 +208,10 @@ void BasePlayer::Render()
 	
 	m_pStateMachine->Render();// ステートマシンでの描画
 
+	// エフェクトマネージャー描画
+	m_PanelEffectMGR->Render3D();
+	m_UVEffectMGR->Render();
+	
 	tdnText::Draw(0, 0, 0xffffffff,"%.1f", m_move.y);
 }
 
@@ -203,4 +219,23 @@ void BasePlayer::Render()
 bool BasePlayer::HandleMessage(const Message & msg)
 {
 	return m_pStateMachine->HandleMessage(msg);
+}
+
+// ★エフェクト発動★　（全てのエフェクトの発動場所）
+void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType)
+{
+	// 何のエフェクトを重ねるかはここで俺が決める。
+
+	switch (effectType)
+	{
+	case EFFECT_TYPE::DAMAGE:
+		//m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::BURN);
+		m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::DAMAGE);
+		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::WAVE);
+		break;
+	default:
+		assert(0, "そんなエフェクトは存在しない AddEffectAction()");
+		break;
+	}
+
 }

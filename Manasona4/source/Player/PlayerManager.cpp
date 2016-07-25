@@ -112,6 +112,8 @@ bool PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you)
 				hdi.FlyVector = (you->isLand()) ? my->GetAttackData()->LandFlyVector : my->GetAttackData()->AerialFlyVector;			// 吹っ飛びベクトル
 				hdi.hitStopFlame = my->GetAttackData()->hitStopFlame;		// ヒットストップ
 				hdi.recoveryFlame = my->GetAttackData()->recoveryFlame;		// 硬直時間
+				hdi.effectType = (int)my->GetAttackData()->effectType;			// この攻撃のヒットエフェクトを相手に送る
+
 				if (my->GetPos().x > you->GetPos().x) hdi.FlyVector.x *= -1;
 				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + you->GetDeviceID()), MESSAGE_TYPE::HIT_DAMAGE, &hdi);
 
