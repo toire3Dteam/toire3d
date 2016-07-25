@@ -125,15 +125,22 @@ void BasePlayer::Update()
 		// アクションフレームの更新
 		if (isFrameAction())
 		{
-			// 攻撃なら、空振りSEのディレイの検索
+			// 攻撃フレームなら
 			if (m_ActionDatas[(int)m_ActionState].isAttackData())
 			{
-				LPCSTR SE_ID = m_ActionDatas[(int)m_ActionState].pAttackData->WhiffSE;
-				// 空振りSE入ってたら
-				if (SE_ID)
+				// 今の経過時間とディレイフレームになったら
+				if (m_ActionDatas[(int)m_ActionState].pAttackData->WhiffDelayFrame == m_CurrentActionFrame)
 				{
-					// ディレイフレーム経過したら再生
-					if (m_ActionDatas[(int)m_ActionState].pAttackData->WhiffDelayFrame == m_CurrentActionFrame) se->Play((LPSTR)SE_ID);
+					// (A列車)ここで攻撃判定が発動した瞬間を取ってきてる
+
+
+					LPCSTR SE_ID = m_ActionDatas[(int)m_ActionState].pAttackData->WhiffSE;
+					// 空振りSE入ってたら
+					if (SE_ID)
+					{
+						// ディレイフレーム経過したら再生
+						se->Play((LPSTR)SE_ID);
+					}
 				}
 			}
 

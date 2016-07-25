@@ -33,9 +33,9 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->WhiffSE = "‹óU‚è1";
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->effectType = EFFECT_TYPE::DAMAGE;
 	// ”»’èŒ`ó
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pCollisionShape->height = 2;
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pCollisionShape->width = 9;
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pCollisionShape->pos.Set(9, 2, 0);
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pCollisionShape->width = 11;
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pCollisionShape->height = 6.5f;
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pCollisionShape->pos.Set(9, 4.5f, 0);
 
 	//==============================================================================================================
 	//	’Êí2’i
@@ -51,9 +51,9 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->WhiffSE = "‹óU‚è1";
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->effectType = EFFECT_TYPE::DAMAGE;
 	// ”»’èŒ`ó
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->pCollisionShape->height = 2;
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->pCollisionShape->width = 9;
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->pCollisionShape->pos.Set(9, 2, 0);
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->pCollisionShape->width = 11;
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->pCollisionShape->height = 8;
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->pCollisionShape->pos.Set(9, 5.5, 0);
 
 	//==============================================================================================================
 	//	’Êí3’i
@@ -69,8 +69,8 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH3].pAttackData->WhiffSE = "‹óU‚è2";
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH3].pAttackData->effectType = EFFECT_TYPE::DAMAGE;
 	// ”»’èŒ`ó
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH3].pAttackData->pCollisionShape->height = 4;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH3].pAttackData->pCollisionShape->width = 18;
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH3].pAttackData->pCollisionShape->height = 4;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH3].pAttackData->pCollisionShape->pos.Set(0, 5, 0);
 
 	//==============================================================================================================
@@ -79,7 +79,7 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->damage = 360;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->LandFlyVector.Set(1.0f, 0.0f);
-	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->AerialFlyVector.Set(.5f, 2.2f);
+	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->AerialFlyVector.Set(.5f, 2.1f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->hitStopFlame = 4;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->recoveryFlame = 60;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->pierceLV = 0;
@@ -87,9 +87,9 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->WhiffSE = "‹óU‚è1";
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->effectType = EFFECT_TYPE::DAMAGE;
 	// ”»’èŒ`ó
-	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->pCollisionShape->height = 8;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->pCollisionShape->width = 6;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->pCollisionShape->pos.Set(6, 16, 0);
+	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->pCollisionShape->width = 8;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->pCollisionShape->height = 12;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->pCollisionShape->pos.Set(2.5f, 17, 0);
 
 	//==============================================================================================================
 	//	‹ó’†UŒ‚
@@ -97,7 +97,7 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->damage = 360;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->LandFlyVector.Set(1.0f, 0.0f);
-	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->AerialFlyVector.Set(.75f, 2.2f);
+	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->AerialFlyVector.Set(.7f, 2.1f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->hitStopFlame = 4;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->recoveryFlame = 60;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->pierceLV = 0;
@@ -105,9 +105,9 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->WhiffSE = "‹óU‚è1";
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->effectType = EFFECT_TYPE::DAMAGE;
 	// ”»’èŒ`ó
-	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->pCollisionShape->height = 7;
-	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->pCollisionShape->width = 9;
-	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->pCollisionShape->pos.Set(9, 0, 0);
+	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->pCollisionShape->width = 11;
+	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->pCollisionShape->height = 9;
+	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->pCollisionShape->pos.Set(6.5f, 4, 0);
 
 	//==============================================================================================================
 	//	‹ó’†‰ºUŒ‚
@@ -123,9 +123,9 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->WhiffSE = "‹óU‚è2";
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->effectType = EFFECT_TYPE::DAMAGE;
 	// ”»’èŒ`ó
-	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->pCollisionShape->height = 6;
-	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->pCollisionShape->width = 9;
-	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->pCollisionShape->pos.Set(9, -5, 0);
+	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->pCollisionShape->width = 12;
+	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->pCollisionShape->height = 8;
+	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->pCollisionShape->pos.Set(5, -3.0f, 0);
 
 	//==============================================================================================================
 	//	‘S‹¤’Ê

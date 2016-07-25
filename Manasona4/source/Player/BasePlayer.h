@@ -188,11 +188,19 @@ public:
 	RushAttack *GetRushAttack() { return &m_RushAttack; }
 	float GetMaxSpeed() { return m_maxSpeed; }
 	BASE_ACTION_STATE GetActionState(){ return m_ActionState; }
-	ActionData::AttackData *GetAttackData()
+
+	ActionData::AttackData *GetAttackData(BASE_ACTION_STATE state)
 	{
 		assert(isAttackState());	// アタックデータがないステートでアタックデータを参照しようとしている
-		return m_ActionDatas[(int)m_ActionState].pAttackData; 
+		return m_ActionDatas[(int)state].pAttackData; 
 	}
+
+	ActionData::AttackData *GetAttackData()
+	{
+		// 自分の状態の攻撃データを渡す
+		return GetAttackData(m_ActionState);
+	}
+
 	//int GetPierceLV(){ return m_ActionDatas[(int)m_ActionState].pierceLV; }
 	//LPCSTR GetAttackSE(){ return m_ActionDatas[(int)m_ActionState].SE_ID; }
 	bool isFrameAction() { return (m_ActionState != BASE_ACTION_STATE::NO_ACTION); }

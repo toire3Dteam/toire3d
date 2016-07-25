@@ -299,3 +299,50 @@ technique uvAnime_add
 		PixelShader = compile ps_3_0 PS_UvAnime();
 	}
 }
+
+/*****************************************/
+//
+/*****************************************/
+
+//VS_OUTPUT_UV VS_UvAnime(VS_INPUT_UV In)
+//{
+//	VS_OUTPUT_UV Out = (VS_OUTPUT_UV)0;
+//
+//	Out.Pos = mul(In.Pos, WVPMatrix);
+//	Out.Color = In.Color;// 頂点カラー取得
+//	Out.Tex = In.Tex + float2(tuAnime, tvAnime);//座標
+//
+//	Out.Color.rgb = 1.0f;
+//	Out.Color.a *= alphaUV; //　透明度
+//
+//	return Out;
+//}
+//
+//
+//------------------------------------------------------
+//		ピクセルシェーダー	
+//------------------------------------------------------
+//float4 PS_UvAnime(VS_OUTPUT_UV In) : COLOR
+//{
+//	float4	OUT;
+//	ピクセル色決定
+//OUT = In.Color * tex2D(DecaleSampUV, In.Tex);
+//return OUT;
+//}
+//
+//technique uvAnime
+//{
+//	pass P0
+//	{
+//		AlphaBlendEnable = true;
+//		BlendOp = Add;
+//		SrcBlend = SrcAlpha;
+//		DestBlend = InvSrcAlpha;
+//		CullMode = CCW;
+//		ZEnable = true;			// このオブジェクトはZバッファを考慮する
+//		ZWriteEnable = false;	// このオブジェクトをZバッファに書き込まない
+//
+//		VertexShader = compile vs_3_0 VS_UvAnime();
+//		PixelShader = compile ps_3_0 PS_UvAnime();
+//	}
+//}

@@ -84,13 +84,20 @@ void Stage::Syuten::Initialize(Camera *pCamera)
 
 void Stage::Syuten::Update()
 {
-	//static float v = 0;
-	//v += 0.01f;
-	//if (v > 1.0f)v -= 1.0f;
-	//shader->SetValue("V_move", v);
+	static float v = 0;
+	v += 0.001f;
+	if (v > 1.0f)v -= 1.0f;
+	shader->SetValue("tuAnime", 0.0f);
+	shader->SetValue("tvAnime", v);
+	shader->SetValue("alphaUV", 1.0f);
 
 	static float a = .0f;
 	m_pBack->SetAngle((a += .001f));
 	m_pBack->Update();
 }
 
+void Stage::Syuten::Render()
+{
+	if (m_pBack) m_pBack->Render();
+	m_pObj->Render(shader,"uvAnime");
+}

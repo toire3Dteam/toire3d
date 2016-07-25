@@ -61,7 +61,7 @@ namespace Stage
 		~Syuten(){}
 		void Initialize(Camera *pCamera);
 		void Update() override;
-		//void Render() override;
+		void Render() override;
 		//void Render_ShadowBuf() override;
 
 		STAGE_ID GetStageID(){ return STAGE_ID::SYUTEN; }

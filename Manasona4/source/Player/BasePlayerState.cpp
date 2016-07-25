@@ -63,6 +63,7 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 		// 空中ジャンプの権利復活
 		pPerson->SetAerialJump(true);
 
+
 		// 吹っ飛び距離	に　応じて	ダメージステートを変える
 		if (hdi->FlyVector.Length() <  HUTTOBI_LINE)
 		{
@@ -744,21 +745,21 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 		if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
 			pPerson->GetJump()->bAttackPush = true;
 
-		if (++pPerson->GetJump()->HoldTimer > 4)
+		if (++pPerson->GetJump()->HoldTimer > 2)
 		{
 			// 初速度の設定
 			Vector3 add(0, 0, 0);
 
-			// しゃがんでる間、ずっと押してたので、最大ジャンプ
-			if (pPerson->GetJump()->HoldTimer == pPerson->GetJump()->PlayerHoldTimer)
+			//// しゃがんでる間、ずっと押してたので、最大ジャンプ
+			//if (pPerson->GetJump()->HoldTimer == pPerson->GetJump()->PlayerHoldTimer)
 			{
 				add.y = BasePlayer::c_MAX_JUMP;
 			}
-			// そうじゃないので小ジャンプ
-			else
-			{
-				add.y = BasePlayer::c_MAX_JUMP * .65f;
-			}
+			//// そうじゃないので小ジャンプ
+			//else
+			//{
+			//	add.y = BasePlayer::c_MAX_JUMP * .65f;
+			//}
 
 			// 左右入力
 			//if (pPerson->isPushInput(PLAYER_INPUT::LEFT))		add.x = -.25f;
@@ -850,7 +851,7 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 		}
 
 		// 移動地制御
-		pPerson->MoveClampX(pPerson->GetMaxSpeed() * 1.05f);
+		pPerson->MoveClampX(pPerson->GetMaxSpeed() * 0.8f);
 
 
 		// 地上フラグtrue(着地したら)
@@ -897,17 +898,17 @@ void BasePlayerState::AerialJump::Enter(BasePlayer * pPerson)
 	pPerson->SetAerialJump(false);
 
 	// 移動地を足す！
-	Vector3 add(VECTOR_ZERO);//c_MAX_AerialJump
+	Vector3 set(pPerson->GetMove() * .5f);//c_MAX_AerialJump
 	if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
 	{
-		add.x = -.25f;
+		set.x -= .05f;
 	}
 	else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
 	{
-		add.x = .25f;
+		set.x += .05f;
 	}
-	add.y = 2.25f;
-	pPerson->SetMove(add);// 前回のMOVE値を消す
+	set.y = 2.0f;
+	pPerson->SetMove(set);// 前回のMOVE値を消す
 	//pPerson->AddMove(add); 
 
 	// SE再生
@@ -959,7 +960,7 @@ void BasePlayerState::AerialJump::Execute(BasePlayer * pPerson)
 		}
 
 		// 移動地制御
-		pPerson->MoveClampX(pPerson->GetMaxSpeed() * 1.1f);
+		pPerson->MoveClampX(pPerson->GetMaxSpeed() * 0.8f);
 
 
 		// 地上フラグtrue(着地したら)
@@ -1107,20 +1108,23 @@ BasePlayerState::Land * BasePlayerState::Land::GetInstance()
 void BasePlayerState::Land::Enter(BasePlayer * pPerson)
 {
 	// 着地モーションに変える
-	pPerson->SetMotion(12);
+	pPerson->SetMotion(13);
 
 	// 着地時間初期化
 	pPerson->GetJump()->LandTimer = 0;
 
 	// 移動地制御
 	pPerson->MoveClampX(pPerson->GetMaxSpeed());
+
+	// アクションステートオフ(つまり現在までやったいた動きが消える)
+	pPerson->SetActionState(BASE_ACTION_STATE::NO_ACTION);
 }
 
 void BasePlayerState::Land::Execute(BasePlayer * pPerson)
 {
 	// 攻撃していて落ちたらスキがでるように
-	if (pPerson->GetFSM()->isPrevState(*BasePlayerState::AerialAttack::GetInstance()) == false &&
-		pPerson->GetFSM()->isPrevState(*BasePlayerState::AerialDropAttack::GetInstance()) == false)
+	//if (pPerson->GetFSM()->isPrevState(*BasePlayerState::AerialAttack::GetInstance()) == false &&
+	//	pPerson->GetFSM()->isPrevState(*BasePlayerState::AerialDropAttack::GetInstance()) == false)
 	{
 		//////////////////////////////////////////////
 		//	ジャンプボタン
@@ -1131,6 +1135,23 @@ void BasePlayerState::Land::Execute(BasePlayer * pPerson)
 			pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
 			return;
 		}
+		//////////////////////////////////////////////
+		//	攻撃ボタン
+		//============================================
+		if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
+		{
+			// 攻撃ステートに行く
+			pPerson->GetFSM()->ChangeState(BasePlayerState::RushAttack::GetInstance());
+			return;
+		}
+
+		// しゃがみ
+		if (pPerson->isPushInput(PLAYER_INPUT::DOWN))
+		{
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Squat::GetInstance());
+			return;
+		}
+
 		// 方向キーを入力していたら、「走り」ステートへ
 		if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
 		{
@@ -1259,6 +1280,9 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 
 				pPerson->GetRushAttack()->step++;
 				pPerson->GetRushAttack()->bNextOK = false;
+
+				const float pow = 0.5f;
+				pPerson->AddMove((pPerson->GetDir() == DIR::RIGHT) ? Vector3(pow, 0, 0) : Vector3(-pow, 0, 0));
 			}
 		}
 
@@ -1470,6 +1494,16 @@ void BasePlayerState::Squat::Execute(BasePlayer * pPerson)
 		return;
 	}
 
+	//////////////////////////////////////////////
+	//	ジャンプボタン
+	//============================================
+	if (pPerson->GetInputList(PLAYER_INPUT::C) == 3)
+	{
+		// ジャンプステートに行く
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
+		return;
+	}
+
 	// しゃがみボタンを離したら待機に戻る
 	if (pPerson->isPushInput(PLAYER_INPUT::DOWN) == false)
 	{
@@ -1606,6 +1640,16 @@ void BasePlayerState::AerialAttack::Enter(BasePlayer * pPerson)
 	// ★攻撃ステートを設定する　↓でHITフラグを消している
 	pPerson->SetActionState(BASE_ACTION_STATE::AERIAL);
 
+
+	// 入力方向に向く
+	if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
+	{
+		pPerson->SetDir(DIR::RIGHT);
+	}
+	else if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
+	{
+		pPerson->SetDir(DIR::LEFT);
+	}
 }
 
 void BasePlayerState::AerialAttack::Execute(BasePlayer * pPerson)
@@ -1710,6 +1754,16 @@ void BasePlayerState::AerialDropAttack::Enter(BasePlayer * pPerson)
 
 	// ★攻撃ステートを設定する　↓でHITフラグを消している
 	pPerson->SetActionState(BASE_ACTION_STATE::AERIALDROP);
+
+	// 入力方向に向く
+	if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
+	{
+		pPerson->SetDir(DIR::RIGHT);
+	}
+	else if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
+	{
+		pPerson->SetDir(DIR::LEFT);
+	}
 
 }
 
