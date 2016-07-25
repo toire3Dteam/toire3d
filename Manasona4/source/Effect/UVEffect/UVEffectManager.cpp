@@ -20,7 +20,7 @@ UVEffectManager::UVEffectManager()
 			m_baseUVEffect[i] = new HitImpactEffect();
 			break;
 		default:
-			assert(0, "そんなエフェクトはない");
+			assert(0);	// "そんなエフェクトはない"
 			break;
 		}
 	}

@@ -4,7 +4,7 @@
 class Camera;
 
 // ステージのタイプ
-enum class STAGE_ID{ SENJO, MAX };
+enum class STAGE_ID{ SENJO, SYUTEN, MAX };
 
 class BasePlayer;
 
@@ -50,6 +50,21 @@ namespace Stage
 		//void Render_ShadowBuf() override;
 
 		STAGE_ID GetStageID(){ return STAGE_ID::SENJO; }
+	private:
+	};
+
+	// 終点ステージ
+	class Syuten : public Base
+	{
+	public:
+		Syuten() :Base(){}
+		~Syuten(){}
+		void Initialize(Camera *pCamera);
+		void Update() override;
+		//void Render() override;
+		//void Render_ShadowBuf() override;
+
+		STAGE_ID GetStageID(){ return STAGE_ID::SYUTEN; }
 	private:
 	};
 }

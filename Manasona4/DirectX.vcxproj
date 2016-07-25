@@ -195,14 +195,15 @@
     <ClInclude Include="source\Camera\camera.h" />
     <ClInclude Include="source\Camera\EffectCamera.h" />
     <ClInclude Include="source\Collision\Collision.h" />
-    <ClInclude Include="source\Effect\UVEffect\BaseUVEffect.h" />
     <ClInclude Include="source\Effect\AnimationPanel.h" />
     <ClInclude Include="source\Effect\AnimationRipple.h" />
     <ClInclude Include="source\Effect\AnimationRippleEx.h" />
     <ClInclude Include="source\Effect\AnimationUV.h" />
     <ClInclude Include="source\Effect\PanelEffect\PanelEffect.h" />
-    <ClInclude Include="source\Effect\UVEffect\UVEffectManager.h" />
     <ClInclude Include="source\Effect\PanelEffect\PanelEffectManager.h" />
+    <ClInclude Include="source\Effect\PlusEffect\PlusEffect.h" />
+    <ClInclude Include="source\Effect\UVEffect\BaseUVEffect.h" />
+    <ClInclude Include="source\Effect\UVEffect\UVEffectManager.h" />
     <ClInclude Include="source\Player\Airou\Airou.h" />
     <ClInclude Include="source\Player\BasePlayer.h" />
     <ClInclude Include="source\Number\Number.h" />

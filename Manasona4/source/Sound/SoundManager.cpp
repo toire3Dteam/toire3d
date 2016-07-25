@@ -14,14 +14,26 @@
 //==============================================================================================
 const SE_Manager::DATA all_dataS[] =
 {
-	{ "通常1段",			"DATA/Sound/SE/Battle/attack1.wav",	4, false },
-	{ "通常2段",			"DATA/Sound/SE/Battle/attack2.wav",	4, false },
-	{ "通常3段",			"DATA/Sound/SE/Battle/attack3.wav",	4, false },
+	{ "通常1段ヒット",		"DATA/Sound/SE/Battle/attack1.wav",	4, false },
+	{ "通常2段ヒット",		"DATA/Sound/SE/Battle/attack2.wav",	4, false },
+	{ "通常3段ヒット",		"DATA/Sound/SE/Battle/attack3.wav",	4, false },
+	{ "空中攻撃ヒット",		"DATA/Sound/SE/Battle/hit1.wav", 4, false },
+	{ "空中下攻撃ヒット",	"DATA/Sound/SE/Battle/hit2.wav", 4, false },
 	{ "全ブレイク",			"DATA/Sound/SE/Battle/all_break.wav",	4, false },
+	{ "チャージ",			"DATA/Sound/SE/Battle/charge.wav",4, false },
+	{ "チャージ溜まる",		"DATA/Sound/SE/Battle/fill.wav",4, false },
 	{ "フィニッシュ小",		"DATA/Sound/SE/Battle/finish_base.wav",4, false },
 	{ "フィニッシュ中",		"DATA/Sound/SE/Battle/finish2.wav",	4, false },
 	{ "フィニッシュ大",		"DATA/Sound/SE/Battle/finish3.wav",	4, false },
 	{ "撃ち落とし",			"DATA/Sound/SE/Battle/smack_down.wav",	4, false },
+	{ "ジャンプ",			"DATA/Sound/SE/Battle/jump.wav",	4, false },
+	{ "空振り1",			"DATA/Sound/SE/Battle/whiff1.wav",	4, false },
+	{ "空振り2",			"DATA/Sound/SE/Battle/whiff2.wav",	4, false },
+	{ "エスケープ",			"DATA/Sound/SE/Battle/escape.wav",	4, false },
+	{ "Eカウンター始動",	"DATA/Sound/SE/Battle/counter.wav",	4, false },
+	{ "Eカウンター成功",	"DATA/Sound/SE/Battle/counter_success.wav",	4, false },
+	{ "ブレーキ1",			"DATA/Sound/SE/Battle/brake1.wav",	4, false },
+	{ "ダッシュ",			"DATA/Sound/SE/Battle/dash.wav", 4, false },
 };
 
 //==============================================================================================

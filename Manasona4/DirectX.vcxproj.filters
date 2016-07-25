@@ -236,6 +236,9 @@
     <ClInclude Include="source\pie_graph\pie_graph.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="source\Effect\PlusEffect\PlusEffect.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
     <ClInclude Include="source\PostEffect\PostEffect.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -407,10 +410,10 @@
     <ClInclude Include="source\system\FrameworkEx.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="source\Effect\PanelEffect\PanelEffect.h">
+    <ClInclude Include="source\Effect\PanelEffect\PanelEffectManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="source\Effect\PanelEffect\PanelEffectManager.h">
+    <ClInclude Include="source\Effect\PanelEffect\PanelEffect.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="source\Effect\UVEffect\BaseUVEffect.h">

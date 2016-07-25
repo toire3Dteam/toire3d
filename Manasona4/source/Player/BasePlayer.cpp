@@ -3,7 +3,7 @@
 #include "BasePlayerState.h"
 #include "../Collision/Collision.h"
 #include "../Stage/Stage.h"
-
+#include "../Sound/SoundManager.h"
 
 //_/_/_/_/_/_/__/_/__/_/__/_/__
 // 定数
@@ -40,11 +40,11 @@ void BasePlayer::LoadAttackFrameList(char *filename)
 			ifs >> frame;
 			for (int k = 0; k < frame; k++)
 			{
-				m_AttackFrameList[i][count++] = (FRAME_STATE)j;
+				m_ActionFrameList[i][count++] = (FRAME_STATE)j;
 			}
 		}
 		// 終端
-		m_AttackFrameList[i][count] = FRAME_STATE::END;
+		m_ActionFrameList[i][count] = FRAME_STATE::END;
 	}
 }
 
@@ -125,8 +125,20 @@ void BasePlayer::Update()
 		// アクションフレームの更新
 		if (isFrameAction())
 		{
+			// 攻撃なら、空振りSEのディレイの検索
+			if (m_ActionDatas[(int)m_ActionState].isAttackData())
+			{
+				LPCSTR SE_ID = m_ActionDatas[(int)m_ActionState].pAttackData->WhiffSE;
+				// 空振りSE入ってたら
+				if (SE_ID)
+				{
+					// ディレイフレーム経過したら再生
+					if (m_ActionDatas[(int)m_ActionState].pAttackData->WhiffDelayFrame == m_CurrentActionFrame) se->Play((LPSTR)SE_ID);
+				}
+			}
+
 			// フレーム最後まで再生したら
-			if (m_AttackFrameList[m_ActionState][m_CurrentActionFrame++] == FRAME_STATE::END)
+			if (m_ActionFrameList[m_ActionState][m_CurrentActionFrame++] == FRAME_STATE::END)
 			{
 				// ★アクションステート解除
 				m_ActionState = BASE_ACTION_STATE::NO_ACTION;
@@ -211,8 +223,45 @@ void BasePlayer::Render()
 	// エフェクトマネージャー描画
 	m_PanelEffectMGR->Render3D();
 	m_UVEffectMGR->Render();
-	
-	tdnText::Draw(0, 0, 0xffffffff,"%.1f", m_move.y);
+
+#ifdef _DEBUG
+
+
+	// 判定の描画
+	CollisionShape::Square square;
+
+	memcpy_s(&square, sizeof(CollisionShape::Square), m_pHitSquare, sizeof(CollisionShape::Square));
+	square.pos += m_pos;
+
+	Vector3 wv[3];	// ワールドバーテックス
+	wv[0].Set(square.pos.x - square.width, square.pos.y + square.height, 0);
+	wv[1].Set(square.pos.x + square.width, square.pos.y + square.height, 0);
+	wv[2].Set(square.pos.x + square.width, square.pos.y - square.height, 0);
+
+	Vector2 sv[3];	// スクリーンバーテックス
+	FOR(3)sv[i] = Math::WorldToScreen(wv[i]);
+
+	tdnPolygon::Rect((int)sv[0].x, (int)sv[0].y, (int)(sv[1].x - sv[0].x), (int)(sv[2].y - sv[0].y), RS::COPY, 0x80ffffff);
+
+	/* 攻撃判定の描画 */
+	if (isAttackState())
+	{
+		if (isActiveFrame())
+		{
+			memcpy_s(&square, sizeof(CollisionShape::Square), GetAttackData()->pCollisionShape, sizeof(CollisionShape::Square));
+			if (m_dir == DIR::LEFT) square.pos.x *= -1;	// このposは絶対+(右)なので、左向きなら逆にする
+			square.pos += m_pos;
+
+			wv[0].Set(square.pos.x - square.width, square.pos.y + square.height, 0);
+			wv[1].Set(square.pos.x + square.width, square.pos.y + square.height, 0);
+			wv[2].Set(square.pos.x + square.width, square.pos.y - square.height, 0);
+
+			FOR(3)sv[i] = Math::WorldToScreen(wv[i]);
+
+			tdnPolygon::Rect((int)sv[0].x, (int)sv[0].y, (int)(sv[1].x - sv[0].x), (int)(sv[2].y - sv[0].y), RS::COPY, 0x80ff0000);
+		}
+	}
+#endif
 }
 
 // ステートマシンへの他から来るメッセージ
@@ -234,7 +283,7 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType)
 		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::WAVE);
 		break;
 	default:
-		assert(0, "そんなエフェクトは存在しない AddEffectAction()");
+		assert(0);	// そんなエフェクトは存在しない AddEffectAction()
 		break;
 	}
 
