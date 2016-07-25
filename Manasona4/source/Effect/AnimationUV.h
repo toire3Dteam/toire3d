@@ -30,10 +30,14 @@ public:
 	void StopRoop();	// ループアニメストップ
 
 	void Update(Vector3 pos = Vector3(0.0f, 0.0f, 0.0f),
-		Vector3 angle = Vector3(0.0f, 0.0f, 0.0f), float scale = 1.0f);	// 更新
+		Vector3 angle = Vector3(0.0f, 0.0f, 0.0f));	// 更新
 	void Update(Vector3 pos ,Vector3 angle , Vector3 scale);			// 更新スケールをvector型に変えたもの
 	void Render();			// 描画
 	void Render_ADD();			// 乗算描画
+
+	// スケール・アニメーション　最初から　最後まで　の大きさを書く　変化させたくなければ　どっちも同じ値を入れる
+	void ScaleAnimation(float StartScale, float EndScale);
+
 
 	// ゲッター・セッター
 	iexMesh* GetObj(){ return obj; }
@@ -56,4 +60,10 @@ private:
 	float		alpha;			// 透明度
 
 	bool		isEnd;		// おわり
+
+	float		m_scale;		// 拡大
+	float		m_startScale;	// 初期 拡大率
+	float		m_endScale;		// 最大 拡大率
+
+
 };

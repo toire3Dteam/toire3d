@@ -99,8 +99,9 @@ bool sceneMain::Update()
 		//EffectMgr.AddEffect(Vector3(0, 0, -5), EFFECT_TYPE::BURN);
 		//EffectMgr.AddEffect(Vector3(0, 0, -5), EFFECT_TYPE::NOTICE);
 
-		m_panel->AddEffect(Vector3(0, 0, -5), PANEL_EFFECT_TYPE::DAMAGE);
-		g_uvEffect->AddEffect(Vector3(0, 0, -5), UV_EFFECT_TYPE::WAVE);
+		m_panel->AddEffect(Vector3(0, 5, -5), PANEL_EFFECT_TYPE::DAMAGE);
+		//g_uvEffect->AddEffect(Vector3(0, 0, -5), UV_EFFECT_TYPE::WAVE);
+		g_uvEffect->AddEffect(Vector3(5, 5, -5), UV_EFFECT_TYPE::HIT_IMPACT, 1.0f, 1.5f);
 	}
 
 	//g_eff->Update();

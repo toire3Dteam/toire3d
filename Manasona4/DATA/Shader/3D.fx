@@ -283,4 +283,19 @@ technique uvAnime
 }
 
 
+technique uvAnime_add
+{
+	pass P0
+	{
+		AlphaBlendEnable = true;
+		BlendOp = Add;
+		SrcBlend = SrcAlpha;
+		DestBlend = one;
+		CullMode = CCW;
+		ZEnable = true;			// このオブジェクトはZバッファを考慮する
+		ZWriteEnable = false;	// このオブジェクトをZバッファに書き込まない
 
+		VertexShader = compile vs_3_0 VS_UvAnime();
+		PixelShader = compile ps_3_0 PS_UvAnime();
+	}
+}
