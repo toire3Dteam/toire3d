@@ -1,5 +1,6 @@
 #include "BasePlayer.h"
 #include "BasePlayerState.h"
+#include "../Sound/SoundManager.h"
 
 // 定数
 static const float HUTTOBI_LINE = 8.0f;
@@ -376,6 +377,9 @@ void BasePlayerState::Run::Enter(BasePlayer * pPerson)
 	}
 
 	pPerson->SetMove(move);
+
+	// SE再生
+	se->Play("ダッシュ");
 }
 
 void BasePlayerState::Run::Execute(BasePlayer * pPerson)
@@ -533,6 +537,9 @@ void BasePlayerState::FrontBrake::Enter(BasePlayer * pPerson)
 {
 	// 前ブレーキモーションに変える
 	pPerson->SetMotion(18);
+
+	// SE再生
+	se->Play("ブレーキ1");
 }
 
 void BasePlayerState::FrontBrake::Execute(BasePlayer * pPerson)
@@ -626,6 +633,9 @@ void BasePlayerState::TurnOverBrake::Enter(BasePlayer * pPerson)
 {
 	// Uターンブレーキモーションに変える
 	pPerson->SetMotion(18);
+
+	// SE再生
+	se->Play("ブレーキ1");
 }
 
 void BasePlayerState::TurnOverBrake::Execute(BasePlayer * pPerson)
@@ -778,6 +788,9 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 				}
 				return;
 			}
+
+			// SE再生
+			se->Play("ジャンプ");
 		}
 	}
 
@@ -897,6 +910,8 @@ void BasePlayerState::AerialJump::Enter(BasePlayer * pPerson)
 	pPerson->SetMove(add);// 前回のMOVE値を消す
 	//pPerson->AddMove(add); 
 
+	// SE再生
+	se->Play("ジャンプ");
 }
 
 void BasePlayerState::AerialJump::Execute(BasePlayer * pPerson)
@@ -1116,10 +1131,21 @@ void BasePlayerState::Land::Execute(BasePlayer * pPerson)
 			pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
 			return;
 		}
+		// 方向キーを入力していたら、「走り」ステートへ
+		if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
+		{
+			pPerson->SetDir(DIR::LEFT);
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+		}
+		else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
+		{
+			pPerson->SetDir(DIR::RIGHT);
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+		}
 	}
 
 	// 一定時間着地したら
-	if (++pPerson->GetJump()->LandTimer > 8)
+	if (++pPerson->GetJump()->LandTimer > 16)
 	{
 		// 方向キーを入力していたら、「走り」ステートへ
 		if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
@@ -1785,6 +1811,9 @@ void BasePlayerState::Escape::Enter(BasePlayer * pPerson)
 
 	// ★エスケープのフレームに設定する
 	pPerson->SetActionState(BASE_ACTION_STATE::ESCAPE);
+
+	// SE再生
+	se->Play("エスケープ");
 }
 
 void BasePlayerState::Escape::Execute(BasePlayer * pPerson)

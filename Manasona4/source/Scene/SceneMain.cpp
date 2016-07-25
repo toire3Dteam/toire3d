@@ -38,7 +38,7 @@ bool sceneMain::Initialize()
 	m_fLoadPercentage = .25f;	// ロード割合
 
 	// ステージ初期化
-	Stage::Base::CreateStage(&m_pStage, STAGE_ID::SENJO, m_pCamera);	// 関数の中で作ってもらう
+	Stage::Base::CreateStage(&m_pStage, STAGE_ID::SYUTEN, m_pCamera);	// 関数の中で作ってもらう
 
 	m_fLoadPercentage = .5f;	// ロード割合
 

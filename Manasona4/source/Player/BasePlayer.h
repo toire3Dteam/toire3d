@@ -3,16 +3,14 @@
 #include "../BaseEntity/Entity/BaseGameEntity.h"
 #include "../BaseEntity/State/StateMachine.h"
 
+// 判定のインクルード
+#include "../Collision/Collision.h"
+
 // エフェクト関連
 #include "../Effect/PanelEffect/PanelEffectManager.h"
 #include "../Effect\UVEffect\UVEffectManager.h"
 
-
 // 前方宣言
-namespace CollisionShape
-{
-	class Square;
-}
 namespace Stage
 {
 	class Base;
@@ -125,19 +123,28 @@ protected:
 	class ActionData
 	{
 	public:
-		struct AttackData
+		class AttackData
 		{
-			bool bBeInvincible;			// 無敵になるかどうか(たとえば、通常の1.2段目ならfalseだし、3段目ならtrue)
-			//Attack_collision shape;		// ★あたり判定の形
-			int damage;	// 与えるダメージ(スコア？)
-			int pierceLV;				// 貫通レベル
-			bool bHit;					// 当たったかどうか(★多段ヒット防止用)多段ヒットしてほしい攻撃だと、また考える必要がある
-			Vector2 LandFlyVector;		// 当たって吹っ飛ばすベクトル(★基本的にxは+にすること)
-			Vector2 AerialFlyVector;	// ※相手が空中にいた時　当たって吹っ飛ばす空中ベクトル(★基本的にxは+にすること)
-			LPCSTR SE_ID;				// 当たったときに鳴らすSE
-			int hitStopFlame;			// ヒットストップの時間
-			int recoveryFlame;			// 硬直の時間
-			EFFECT_TYPE effectType;		// エフェクトのタイプ
+		public:
+			//enum class HIT_TYPE{ LAND, AERIAL, MAX };	// 相手がどっちでヒットしたか。地上、空中
+			//struct
+			//{
+				CollisionShape::Square *pCollisionShape;	// ★あたり判定形状(四角にする)
+				bool bBeInvincible;			// 無敵になるかどうか(たとえば、通常の1.2段目ならfalseだし、3段目ならtrue)
+				int damage;					// 与えるダメージ(スコア？)
+				int pierceLV;				// 貫通レベル
+				bool bHit;					// 当たったかどうか(★多段ヒット防止用)多段ヒットしてほしい攻撃だと、また考える必要がある
+				Vector2 LandFlyVector;		// 当たって吹っ飛ばすベクトル(★基本的にxは+にすること)
+				Vector2 AerialFlyVector;	// ※相手が空中にいた時　当たって吹っ飛ばす空中ベクトル(★基本的にxは+にすること)
+				LPCSTR HitSE;				// 当たったときに鳴らすSE
+				LPCSTR WhiffSE;				// 空振りSE
+				int WhiffDelayFrame;		// 何フレーム後に空振りのSEを再生するか(WhiffSEを使わない(nullptr)なら別に設定しなくてもいい)
+				int hitStopFlame;			// ヒットストップの時間
+				int recoveryFlame;			// 硬直の時間
+				EFFECT_TYPE effectType;		// エフェクトのタイプ
+			//};
+				AttackData() :HitSE(nullptr), WhiffSE(nullptr), bHit(false), pCollisionShape(new CollisionShape::Square){}
+				~AttackData(){ SAFE_DELETE(pCollisionShape); }
 		}*pAttackData;
 
 		ActionData() :pAttackData(nullptr){}
@@ -203,12 +210,12 @@ public:
 	bool isActiveFrame()
 	{
 		if (!isFrameAction()) return false;
-		return (m_AttackFrameList[m_ActionState][m_CurrentActionFrame] == FRAME_STATE::ACTIVE);
+		return (m_ActionFrameList[m_ActionState][m_CurrentActionFrame] == FRAME_STATE::ACTIVE);
 	}
 	FRAME_STATE GetActionFrame()
 	{
 		if (!isFrameAction()) return FRAME_STATE::END;
-		return m_AttackFrameList[(int)m_ActionState][m_CurrentActionFrame]; 
+		return m_ActionFrameList[(int)m_ActionState][m_CurrentActionFrame]; 
 	}
 	int GetRecoveryFrame() { return m_RecoveryFlame; }
 	bool isEscape() { return m_bEscape; }
@@ -235,7 +242,10 @@ public:
 
 			// 攻撃だったら
 			// ★↓でHITフラグを消している
-			if (isAttackState())m_ActionDatas[(int)state].pAttackData->bHit = false;	// ヒットフラグリセット
+			if (isAttackState())
+			{
+				m_ActionDatas[(int)state].pAttackData->bHit = false;	// ヒットフラグリセット
+			}
 		}
 	}
 
@@ -283,7 +293,7 @@ protected:
 	bool m_bEscape;				// エスケープ判定の時に立つフラグ
 
 	static const int FRAME_MAX = 256; // 攻撃のフレームの最大値(これより超えることはないだろう)
-	FRAME_STATE m_AttackFrameList[(int)BASE_ACTION_STATE::END][FRAME_MAX];
+	FRAME_STATE m_ActionFrameList[(int)BASE_ACTION_STATE::END][FRAME_MAX];
 	BASE_ACTION_STATE m_ActionState;
 
 	// (A列車)　//////////////////////////////////////////////////////////

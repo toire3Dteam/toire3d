@@ -92,7 +92,14 @@ bool PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you)
 		if (you->GetInvincibleLV() <= my->GetAttackData()->pierceLV &&	// ‘ŠŽè‚ª–³“G‚Å‚È‚¢
 			!my->GetAttackData()->bHit)									// ‚Ü‚¾UŒ‚‚ð“–‚Ä‚Ä‚È‚¢
 		{
-			if (Math::Length(my->GetPos(), you->GetPos()) < 20)
+			// UŒ‚”»’èŒ`ó‚Æ‘ŠŽè‚ÌŽlŠp‚Å”»’è‚ð‚Æ‚é
+			CollisionShape::Square AttackShape, YouShape;
+			memcpy_s(&AttackShape, sizeof(CollisionShape::Square), my->GetAttackData()->pCollisionShape, sizeof(CollisionShape::Square));
+			memcpy_s(&YouShape, sizeof(CollisionShape::Square), you->GetHitSquare(), sizeof(CollisionShape::Square));
+			if (my->GetDir() == DIR::LEFT) AttackShape.pos.x *= -1;	// ‚±‚Ìpos‚Íâ‘Î+(‰E)‚È‚Ì‚ÅA¶Œü‚«‚È‚ç‹t‚É‚·‚é
+			AttackShape.pos += my->GetPos();
+			YouShape.pos += you->GetPos();
+			if (Collision::HitCheck(&AttackShape, &YouShape))
 			{
 				// ƒqƒbƒgŽž‚Ìˆ—
 				//my->GetAttackData()->bHit = true;	// 2dƒqƒbƒg–hŽ~—p‚Ìƒtƒ‰ƒO‚ðON‚É‚·‚é
@@ -118,8 +125,8 @@ bool PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you)
 				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + you->GetDeviceID()), MESSAGE_TYPE::HIT_DAMAGE, &hdi);
 
 				// ‰¹o‚·
-				LPCSTR seID = my->GetAttackData()->SE_ID;
-				if (strcmp(seID, "") != 0) se->Play((LPSTR)seID);
+				LPCSTR seID = my->GetAttackData()->HitSE;
+				if (seID) se->Play((LPSTR)seID);
 
 				return true;	// “–‚½‚Á‚½
 			}

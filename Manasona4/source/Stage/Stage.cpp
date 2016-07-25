@@ -35,6 +35,9 @@ void Stage::Base::CreateStage(Stage::Base**p,STAGE_ID id, Camera *pCamera)
 	case STAGE_ID::SENJO:
 		*p = new Stage::Senjo;
 		break;
+	case STAGE_ID::SYUTEN:
+		*p = new Stage::Syuten;
+		break;
 	}
 
 	// ★ここでInitializeを呼ぶ
@@ -66,3 +69,28 @@ void Stage::Senjo::Initialize(Camera *pCamera)
 	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
 	pCamera->SetStageCameraInfo("DATA/Stage/Senjo/camera.txt");
 }
+
+void Stage::Syuten::Initialize(Camera *pCamera)
+{
+	m_pObj = new iexMesh("DATA/Stage/Syuten/final_point.IMO");
+	m_pBack = new iexMesh("DATA/Stage/Syuten/Skydome.IMO");
+	m_pBack->SetPos(Vector3(0, -50, 0));
+	m_pBack->Update();
+	m_DeadLineY = -100;
+
+	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
+	pCamera->SetStageCameraInfo("DATA/Stage/Syuten/camera.txt");
+}
+
+void Stage::Syuten::Update()
+{
+	//static float v = 0;
+	//v += 0.01f;
+	//if (v > 1.0f)v -= 1.0f;
+	//shader->SetValue("V_move", v);
+
+	static float a = .0f;
+	m_pBack->SetAngle((a += .001f));
+	m_pBack->Update();
+}
+
