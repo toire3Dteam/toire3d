@@ -1,7 +1,7 @@
 #include "../BasePlayer.h"
 #include "Airou.h"
 
-Airou::Airou(int deviceID) :BasePlayer(deviceID)
+Airou::Airou(int deviceID, bool bAI) :BasePlayer(deviceID, bAI)
 {
 	// キャラ固有の情報の設定
 	m_pHitSquare->height = 4;
@@ -23,6 +23,7 @@ void Airou::InitActionDatas()
 	//	通常1段
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].InstanceAttackData();	// アタックデータ作成
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->bBeInvincible = false;
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->HitScore = 120;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->damage = 120;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->LandFlyVector.Set(.25f, .0f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->AerialFlyVector.Set(.25f, 1.0f);
@@ -41,6 +42,7 @@ void Airou::InitActionDatas()
 	//	通常2段
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].InstanceAttackData();	// アタックデータ作成
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->bBeInvincible = false;
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->HitScore = 240;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->damage = 240;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->LandFlyVector.Set(.35f, .0f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->AerialFlyVector.Set(.35f, .75f);
@@ -59,6 +61,7 @@ void Airou::InitActionDatas()
 	//	通常3段
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH3].InstanceAttackData();	// アタックデータ作成
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH3].pAttackData->bBeInvincible = true;
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH3].pAttackData->HitScore = 360;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH3].pAttackData->damage = 360;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH3].pAttackData->LandFlyVector.Set(3.5f, 2.0f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH3].pAttackData->AerialFlyVector.Set(3.5f, 2.0f);
@@ -77,6 +80,7 @@ void Airou::InitActionDatas()
 	//	下段攻撃
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].InstanceAttackData();	// アタックデータ作成
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->bBeInvincible = false;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->HitScore = 360;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->damage = 360;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->LandFlyVector.Set(1.0f, 0.0f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT].pAttackData->AerialFlyVector.Set(.5f, 2.1f);
@@ -95,6 +99,7 @@ void Airou::InitActionDatas()
 	//	空中攻撃
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].InstanceAttackData();	// アタックデータ作成
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->bBeInvincible = false;
+	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->HitScore = 360;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->damage = 360;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->LandFlyVector.Set(1.0f, 0.0f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->AerialFlyVector.Set(.7f, 2.1f);
@@ -113,6 +118,7 @@ void Airou::InitActionDatas()
 	//	空中下攻撃
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].InstanceAttackData();	// アタックデータ作成
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->bBeInvincible = false;
+	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->HitScore = 360;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->damage = 360;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->LandFlyVector.Set(1.0f, 0.0f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->AerialFlyVector.Set(1.5f, -2.5f);

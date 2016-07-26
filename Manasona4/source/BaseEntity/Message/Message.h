@@ -28,6 +28,7 @@ struct HIT_ATTACK_INFO
 {
 	int HitPlayerDeviceID;	// ダメージを与えた相手の番号
 	int hitStopFlame;		// ヒットストップフレーム
+	int HitScore;			// 加算されるスコア
 };
 
 // プレイヤーInfo

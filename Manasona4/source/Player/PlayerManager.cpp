@@ -24,7 +24,7 @@ void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage)
 
 	FOR(NumPlayer)
 	{
-		m_pPlayers[i] = new Airou(i);
+		m_pPlayers[i] = new Airou(i, (i == 3));
 		m_pPlayers[i]->InitActionDatas();		// ★攻撃情報を各キャラに初期化させる
 	}
 }
@@ -110,6 +110,7 @@ bool PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you)
 				HIT_ATTACK_INFO hai;
 				hai.HitPlayerDeviceID = you->GetDeviceID();					// ダメージを与えた相手の番号
 				hai.hitStopFlame = my->GetAttackData()->hitStopFlame;		// 自分自身にもの自分のヒットストップ
+				hai.HitScore = my->GetAttackData()->HitScore;				// ダメージ(スコア)
 				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + my->GetDeviceID()), MESSAGE_TYPE::HIT_ATTACK, &hai);
 
 				// そして、ダメージを受けた人に送信

@@ -48,10 +48,10 @@ void BasePlayer::LoadAttackFrameList(char *filename)
 	}
 }
 
-BasePlayer::BasePlayer(int deviceID) :BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + deviceID)),
+BasePlayer::BasePlayer(int deviceID, bool bAI) :m_bAI(bAI), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + deviceID)),
 m_maxSpeed(1.0f), m_dir(DIR::LEFT), m_deviceID(deviceID), m_pHitSquare(new CollisionShape::Square),
 m_pObj(nullptr), m_move(VECTOR_ZERO), m_bLand(false), m_bAerialJump(true), m_ActionState(BASE_ACTION_STATE::NO_ACTION),
-m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentActionFrame(0), m_RecoveryFlame(0), m_bEscape(false)
+m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentActionFrame(0), m_RecoveryFlame(0), m_bEscape(false), m_score(0), m_CollectScore(0)
 {
 	// デフォルト設定
 	m_pHitSquare->height = 4;
@@ -153,7 +153,8 @@ void BasePlayer::Update()
 		}
 
 		// 入力受付
-		Control();
+		if (m_bAI)	AIControl();
+		else		Control();
 
 		// 入力受付後にステートマシン更新
 		m_pStateMachine->Update();
@@ -211,6 +212,22 @@ void BasePlayer::Control()
 
 }
 
+void BasePlayer::AIControl()
+{
+	for (int i = 0; i < (int)PLAYER_INPUT::MAX; i++)
+	{
+		// 入力リセット
+		m_InputList[i] = 0;
+	}
+
+	static int frame(0);
+	if (++frame > 60)
+	{
+		frame = 0;
+		m_InputList[(int)PLAYER_INPUT::C] = 3;
+	}
+}
+
 void BasePlayer::UpdatePos()
 {
 	// (TODO)ヒットストップしてなかったら
@@ -232,8 +249,6 @@ void BasePlayer::Render()
 	m_UVEffectMGR->Render();
 
 #ifdef _DEBUG
-
-
 	// 判定の描画
 	CollisionShape::Square square;
 
@@ -268,6 +283,10 @@ void BasePlayer::Render()
 			tdnPolygon::Rect((int)sv[0].x, (int)sv[0].y, (int)(sv[1].x - sv[0].x), (int)(sv[2].y - sv[0].y), RS::COPY, 0x80ff0000);
 		}
 	}
+
+	// デバッグ
+	tdnText::Draw(32 + m_deviceID * 250, 560, 0xff00ff80, "CollectScore : %d", m_CollectScore);
+	tdnText::Draw(32 + m_deviceID * 250, 600, 0xffff8000, "Score : %d", m_score);
 #endif
 }
 

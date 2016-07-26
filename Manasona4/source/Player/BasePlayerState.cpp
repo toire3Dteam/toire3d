@@ -81,9 +81,18 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 		return true;
 		break;
 	}
+
+	// 攻撃当たったよメッセージ
+	case MESSAGE_TYPE::HIT_ATTACK:
+	{
+		HIT_ATTACK_INFO *HitAttackInfo = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+		pPerson->SetHitStopFrame(HitAttackInfo->hitStopFlame);// ヒットストップ
+		pPerson->AddCollectScore(HitAttackInfo->HitScore);	// 実体前のスコアを加算
+		break;
+	}
+
+
 	// (A列車)死んだぜメッセージ
-
-
 	}
 
 	return false;
@@ -1261,13 +1270,13 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 		}
 
 		// しゃがみキャンセル
-		else if (pPerson->isPushInput(PLAYER_INPUT::DOWN) && pPerson->GetRushAttack()->bNextOK)
+		else if (pPerson->isPushInput(PLAYER_INPUT::DOWN) && pPerson->GetAttackData()->bHit)
 		{
 			pPerson->GetFSM()->ChangeState(BasePlayerState::Squat::GetInstance());
 		}
 
 		// ヒットしてる状態かつフォローモーション
-		else if (pPerson->GetRushAttack()->bNextOK && pPerson->GetActionFrame() == FRAME_STATE::FOLLOW)
+		else if (pPerson->GetAttackData()->bHit && pPerson->GetActionFrame() == FRAME_STATE::FOLLOW)
 		{
 			// 攻撃ボタン押したら(押しっぱなし込み)
 			if (pPerson->isPushInput(PLAYER_INPUT::B))
@@ -1279,7 +1288,7 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 				pPerson->SetActionState(BASE_ACTION_STATE::RUSH2);
 
 				pPerson->GetRushAttack()->step++;
-				pPerson->GetRushAttack()->bNextOK = false;
+				//pPerson->GetRushAttack()->bNextOK = false;
 
 				const float pow = 0.5f;
 				pPerson->AddMove((pPerson->GetDir() == DIR::RIGHT) ? Vector3(pow, 0, 0) : Vector3(-pow, 0, 0));
@@ -1296,13 +1305,13 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 		}
 
 		// しゃがみキャンセル
-		else if (pPerson->isPushInput(PLAYER_INPUT::DOWN) && pPerson->GetRushAttack()->bNextOK)
+		else if (pPerson->isPushInput(PLAYER_INPUT::DOWN) && pPerson->GetAttackData()->bHit)
 		{
 			pPerson->GetFSM()->ChangeState(BasePlayerState::Squat::GetInstance());
 		}
 
 		// ヒットしてる状態かつフォローモーション
-		else if (pPerson->GetRushAttack()->bNextOK && pPerson->GetActionFrame() == FRAME_STATE::FOLLOW)
+		else if (pPerson->GetAttackData()->bHit && pPerson->GetActionFrame() == FRAME_STATE::FOLLOW)
 		{
 			// 攻撃ボタン押したら(押しっぱなし込み)
 			if (pPerson->isPushInput(PLAYER_INPUT::B))
@@ -1314,7 +1323,7 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 				pPerson->SetActionState(BASE_ACTION_STATE::RUSH3);
 
 				pPerson->GetRushAttack()->step++;
-				pPerson->GetRushAttack()->bNextOK = false;
+				//pPerson->GetRushAttack()->bNextOK = false;
 			}
 		}
 
@@ -1344,17 +1353,17 @@ void BasePlayerState::RushAttack::Render(BasePlayer * pPerson)
 bool BasePlayerState::RushAttack::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
 	// メッセージタイプ
-	switch (msg.Msg)
-	{
-		// 攻撃当たったよメッセージ
-	case MESSAGE_TYPE::HIT_ATTACK:
-	{
-		HIT_ATTACK_INFO *hai = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
-		pPerson->SetHitStopFrame(hai->hitStopFlame);// ヒットストップ
-		pPerson->GetRushAttack()->bNextOK = true;
-		break;
-	}
-	}
+	//switch (msg.Msg)
+	//{
+	//	// 攻撃当たったよメッセージ
+	//case MESSAGE_TYPE::HIT_ATTACK:
+	//{
+	//	HIT_ATTACK_INFO *hai = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+	//	pPerson->SetHitStopFrame(hai->hitStopFlame);// ヒットストップ
+	//	pPerson->GetRushAttack()->bNextOK = true;
+	//	break;
+	//}
+	//}
 
 	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
 	return false;
@@ -1607,16 +1616,16 @@ void BasePlayerState::SquatAttack::Render(BasePlayer * pPerson)
 bool BasePlayerState::SquatAttack::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
 	// メッセージタイプ
-	switch (msg.Msg)
-	{
-		// 攻撃当たったよメッセージ
-	case MESSAGE_TYPE::HIT_ATTACK:
-	{
-		HIT_ATTACK_INFO *hai = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
-		pPerson->SetHitStopFrame(hai->hitStopFlame);// ヒットストップ
-		break;
-	}
-	}
+	//switch (msg.Msg)
+	//{
+	//	// 攻撃当たったよメッセージ
+	//case MESSAGE_TYPE::HIT_ATTACK:
+	//{
+	//	HIT_ATTACK_INFO *hai = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+	//	pPerson->SetHitStopFrame(hai->hitStopFlame);// ヒットストップ
+	//	break;
+	//}
+	//}
 	return false;
 }
 
@@ -1722,16 +1731,16 @@ void BasePlayerState::AerialAttack::Render(BasePlayer * pPerson)
 bool BasePlayerState::AerialAttack::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
 	// メッセージタイプ
-	switch (msg.Msg)
-	{
-		// 攻撃当たったよメッセージ
-	case MESSAGE_TYPE::HIT_ATTACK:
-	{
-		HIT_ATTACK_INFO *hai = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
-		pPerson->SetHitStopFrame(hai->hitStopFlame);// ヒットストップ
-		break;
-	}
-	}
+	//switch (msg.Msg)
+	//{
+	//	// 攻撃当たったよメッセージ
+	//case MESSAGE_TYPE::HIT_ATTACK:
+	//{
+	//	HIT_ATTACK_INFO *hai = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+	//	pPerson->SetHitStopFrame(hai->hitStopFlame);// ヒットストップ
+	//	break;
+	//}
+	//}
 	return false;
 }
 
@@ -1833,17 +1842,17 @@ void BasePlayerState::AerialDropAttack::Render(BasePlayer * pPerson)
 
 bool BasePlayerState::AerialDropAttack::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
-	// メッセージタイプ
-	switch (msg.Msg)
-	{
-		// 攻撃当たったよメッセージ
-	case MESSAGE_TYPE::HIT_ATTACK:
-	{
-		HIT_ATTACK_INFO *hai = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
-		pPerson->SetHitStopFrame(hai->hitStopFlame);// ヒットストップ
-		break;
-	}
-	}
+	//// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+	//	// 攻撃当たったよメッセージ
+	//case MESSAGE_TYPE::HIT_ATTACK:
+	//{
+	//	HIT_ATTACK_INFO *hai = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+	//	pPerson->SetHitStopFrame(hai->hitStopFlame);// ヒットストップ
+	//	break;
+	//}
+	//}
 	return false;
 }
 

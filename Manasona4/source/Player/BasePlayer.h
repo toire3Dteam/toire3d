@@ -79,6 +79,7 @@ enum BASE_ACTION_STATE
 	SQUAT,		// 下段攻撃
 	AERIAL,		// 空中攻撃
 	AERIALDROP,	// 空中下攻撃
+
 	END		// 何もなし　(A列車)名前
 };
 
@@ -111,11 +112,11 @@ protected:
 	struct RushAttack
 	{
 		int step;	// 0,1,2で進める
-		bool bNextOK;	// これがtrueの時にボタンを押すと次の攻撃に行く
+		//bool bNextOK;	// これがtrueの時にボタンを押すと次の攻撃に行く
 		void Clear()
 		{
 			step = 0;
-			bNextOK = false;
+			//bNextOK = false;
 		}
 	};
 	RushAttack m_RushAttack;
@@ -131,7 +132,8 @@ protected:
 			//{
 				CollisionShape::Square *pCollisionShape;	// ★あたり判定形状(四角にする)
 				bool bBeInvincible;			// 無敵になるかどうか(たとえば、通常の1.2段目ならfalseだし、3段目ならtrue)
-				int damage;					// 与えるダメージ(スコア？)
+				int HitScore;				// 加算されるスコア
+				int damage;					// 与えるダメージ
 				int pierceLV;				// 貫通レベル
 				bool bHit;					// 当たったかどうか(★多段ヒット防止用)多段ヒットしてほしい攻撃だと、また考える必要がある
 				Vector2 LandFlyVector;		// 当たって吹っ飛ばすベクトル(★基本的にxは+にすること)
@@ -159,13 +161,30 @@ protected:
 	}m_ActionDatas[(int)BASE_ACTION_STATE::END];
 
 public:
-	BasePlayer(int deviceID);
+	BasePlayer(int deviceID, bool bAI);
 	~BasePlayer();
 	void Control();			// プレイヤーからの入力を受け付ける
+	void AIControl();
 	virtual void Update();	// 基本的な更新
 	void UpdatePos();		// 座標更新(判定後に呼び出す)
 	void Move();			// 動きの制御
 	virtual void Render();
+
+	/*****************/
+	// AIに必要な関数
+
+	//(考え)　AIもステートマシンを作ればいいのかも　考え->行動ってEnterとExecuteみたいな感じなので　
+
+	// [メモ]まずAI用にステートマシンを作る
+	// その中のおもな動きはボタンを押す。ただそれだけ　
+	// enterで状況判断　executeでボタン操作　
+	// ステートの種類　ふつう（敵をねらう）　自分のポイントが溜まってきた(相手にFAを決めにく)　など
+	// 
+
+	void AI_Brain();	// ここで考え->行動の処理を行う
+	void AI_Think();	// 考える関数
+	void AI_Execute();	// 
+
 
 	// 継承してるやつに強制的に呼ばせる
 	virtual void InitActionDatas() = 0;
@@ -260,6 +279,7 @@ public:
 
 	// アクセサー
 	void AddMove(const Vector3 &v) { m_move += v; }
+	void AddCollectScore(int score) { m_CollectScore += score; }
 	void MoveClampX(float val) { m_move.x = Math::Clamp(m_move.x, -val, val); }
 
 	// エフェクト
@@ -299,6 +319,9 @@ protected:
 	int m_HitStopFrame;			// 1以上なら0になるまでストップ
 	int m_RecoveryFlame;		// 1以上なら0になるまで操作を受け付けない
 	bool m_bEscape;				// エスケープ判定の時に立つフラグ
+	bool m_bAI;					// AIかどうか
+	int m_score;				// 実体後の本当のスコア
+	int m_CollectScore;			// 実体前の貯めているスコア
 
 	static const int FRAME_MAX = 256; // 攻撃のフレームの最大値(これより超えることはないだろう)
 	FRAME_STATE m_ActionFrameList[(int)BASE_ACTION_STATE::END][FRAME_MAX];
