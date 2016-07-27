@@ -11,11 +11,16 @@
 #include "../Effect\UVEffect\UVEffectManager.h"
 
 // 前方宣言
+namespace Stand
+{
+	class Base;
+}
 namespace Stage
 {
 	class Base;
 }
 
+// 定数
 enum class PLAYER_INPUT
 {
 	A,		// 
@@ -59,6 +64,11 @@ static const KEYCODE KeyCodeList[(int)PLAYER_INPUT::MAX] = {
 
 // 向き
 enum class DIR { LEFT, RIGHT, MAX };
+static const float DIR_ANGLE[(int)DIR::MAX] =
+{
+	PI * 1.5f,	// 左向き
+	PI * .5,	// 右向き
+};
 
 enum class FRAME_STATE
 {
@@ -67,12 +77,14 @@ enum class FRAME_STATE
 	FOLLOW,	// 硬直(後隙)
 	END	// 終了(このフレームに来たら攻撃終了)
 };
+static const int FRAME_MAX = 256; // 攻撃のフレームの最大値(これより超えることはないだろう)
 
-// 全キャラ固有で持つ攻撃タイプ
+// 全キャラ固有で持つアクション
 enum BASE_ACTION_STATE
 {
 	NO_ACTION = -1,
 	ESCAPE,		// 回避
+	STAND,		// スタンド発動
 	RUSH1,		// 通常1段目
 	RUSH2,		// 通常2段目
 	RUSH3,		// 通常3段目
@@ -89,6 +101,35 @@ enum class EFFECT_TYPE
 	DAMAGE,	// ダメージエフェクト 
 };
 
+class AttackData
+{
+public:
+	enum class HIT_PLACE{ LAND, AERIAL, MAX };	// 相手がどっちでヒットしたか。地上、空中
+
+	// ここにあるエリアは地上ヒットと空中ヒットとか関係なく共通の情報
+	CollisionShape::Square *pCollisionShape;	// ★あたり判定形状(四角にする)
+	int HitScore;				// 加算されるスコア
+	int damage;					// 与えるダメージ
+	bool bHit;					// 当たったかどうか(★多段ヒット防止用)多段ヒットしてほしい攻撃だと、また考える必要がある
+	int WhiffDelayFrame;		// 何フレーム後に空振りのSEを再生するか(WhiffSEを使わない(nullptr)なら別に設定しなくてもいい)
+	EFFECT_TYPE effectType;		// エフェクトのタイプ
+	LPCSTR HitSE;				// 当たったときに鳴らすSE
+	LPCSTR WhiffSE;				// 空振りSE
+	int pierceLV;				// 貫通レベル
+
+	// ★★★地上ヒットと空中ヒットで分けたい情報
+	struct
+	{
+		bool bBeInvincible;			// 無敵になるかどうか(たとえば、通常の1.2段目ならfalseだし、3段目ならtrue)
+		//Vector2 LandFlyVector;		// 当たって吹っ飛ばすベクトル(★基本的にxは+にすること)
+		//Vector2 AerialFlyVector;	// ※相手が空中にいた時　当たって吹っ飛ばす空中ベクトル(★基本的にxは+にすること)
+		Vector2 FlyVector;
+		int hitStopFlame;			// ヒットストップの時間
+		int recoveryFlame;			// 硬直の時間
+	}places[(int)HIT_PLACE::MAX];
+	AttackData() :HitSE(nullptr), WhiffSE(nullptr), bHit(false), pCollisionShape(new CollisionShape::Square){}
+	~AttackData(){ SAFE_DELETE(pCollisionShape); }
+};
 
 class BasePlayer : public BaseGameEntity
 {
@@ -124,30 +165,7 @@ protected:
 	class ActionData
 	{
 	public:
-		class AttackData
-		{
-		public:
-			//enum class HIT_TYPE{ LAND, AERIAL, MAX };	// 相手がどっちでヒットしたか。地上、空中
-			//struct
-			//{
-				CollisionShape::Square *pCollisionShape;	// ★あたり判定形状(四角にする)
-				bool bBeInvincible;			// 無敵になるかどうか(たとえば、通常の1.2段目ならfalseだし、3段目ならtrue)
-				int HitScore;				// 加算されるスコア
-				int damage;					// 与えるダメージ
-				int pierceLV;				// 貫通レベル
-				bool bHit;					// 当たったかどうか(★多段ヒット防止用)多段ヒットしてほしい攻撃だと、また考える必要がある
-				Vector2 LandFlyVector;		// 当たって吹っ飛ばすベクトル(★基本的にxは+にすること)
-				Vector2 AerialFlyVector;	// ※相手が空中にいた時　当たって吹っ飛ばす空中ベクトル(★基本的にxは+にすること)
-				LPCSTR HitSE;				// 当たったときに鳴らすSE
-				LPCSTR WhiffSE;				// 空振りSE
-				int WhiffDelayFrame;		// 何フレーム後に空振りのSEを再生するか(WhiffSEを使わない(nullptr)なら別に設定しなくてもいい)
-				int hitStopFlame;			// ヒットストップの時間
-				int recoveryFlame;			// 硬直の時間
-				EFFECT_TYPE effectType;		// エフェクトのタイプ
-			//};
-				AttackData() :HitSE(nullptr), WhiffSE(nullptr), bHit(false), pCollisionShape(new CollisionShape::Square){}
-				~AttackData(){ SAFE_DELETE(pCollisionShape); }
-		}*pAttackData;
+		AttackData *pAttackData;
 
 		ActionData() :pAttackData(nullptr){}
 		~ActionData() { SAFE_DELETE(pAttackData); }
@@ -194,6 +212,7 @@ public:
 	// ゲッター
 	int GetDeviceID() { return m_deviceID; }
 	Vector3 &GetMove() { return m_move; }
+	//Vector3 &GetStandSaveMove(){ return m_StandSaveMove; }
 	Vector3 &GetPos() { return m_pos; }
 	Vector3 *GetPosAddress() { return &m_pos; }
 	int GetInputList(PLAYER_INPUT input) { return m_InputList[(int)input]; }
@@ -208,13 +227,13 @@ public:
 	float GetMaxSpeed() { return m_maxSpeed; }
 	BASE_ACTION_STATE GetActionState(){ return m_ActionState; }
 
-	ActionData::AttackData *GetAttackData(BASE_ACTION_STATE state)
+	AttackData *GetAttackData(BASE_ACTION_STATE state)
 	{
 		assert(isAttackState());	// アタックデータがないステートでアタックデータを参照しようとしている
 		return m_ActionDatas[(int)state].pAttackData; 
 	}
 
-	ActionData::AttackData *GetAttackData()
+	AttackData *GetAttackData()
 	{
 		// 自分の状態の攻撃データを渡す
 		return GetAttackData(m_ActionState);
@@ -246,6 +265,7 @@ public:
 	}
 	int GetRecoveryFrame() { return m_RecoveryFlame; }
 	bool isEscape() { return m_bEscape; }
+	Stand::Base *GetStand(){ return m_pStand; }
 
 
 	// セッター
@@ -275,6 +295,7 @@ public:
 			}
 		}
 	}
+	//void SetStandSaveMove(const Vector3 &move){ m_StandSaveMove = move; }
 
 
 	// アクセサー
@@ -322,8 +343,10 @@ protected:
 	bool m_bAI;					// AIかどうか
 	int m_score;				// 実体後の本当のスコア
 	int m_CollectScore;			// 実体前の貯めているスコア
+	//Vector3 m_StandSaveMove;	// スタンド発動の保存移動量
 
-	static const int FRAME_MAX = 256; // 攻撃のフレームの最大値(これより超えることはないだろう)
+	Stand::Base *m_pStand;		// スタンドの基底クラスの実体
+
 	FRAME_STATE m_ActionFrameList[(int)BASE_ACTION_STATE::END][FRAME_MAX];
 	BASE_ACTION_STATE m_ActionState;
 

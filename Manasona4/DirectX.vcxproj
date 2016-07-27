@@ -137,6 +137,7 @@
     <ClCompile Include="source\Scene\sceneLoading.cpp" />
     <ClCompile Include="source\Scene\SceneMain.cpp" />
     <ClCompile Include="source\Stage\Stage.cpp" />
+    <ClCompile Include="source\Stand\Stand.cpp" />
     <ClCompile Include="source\system\FrameworkEx.cpp" />
     <ClCompile Include="TDN\DirectShow\baseclasses\amfilter.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -215,6 +216,7 @@
     <ClInclude Include="source\Scene\sceneLoading.h" />
     <ClInclude Include="source\Scene\SceneMain.h" />
     <ClInclude Include="source\Stage\Stage.h" />
+    <ClInclude Include="source\Stand\Stand.h" />
     <ClInclude Include="source\system\FrameworkEx.h" />
     <ClInclude Include="TDN\DirectShow\baseclasses\amextra.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>

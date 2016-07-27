@@ -34,6 +34,7 @@ const SE_Manager::DATA all_dataS[] =
 	{ "Eカウンター成功",	"DATA/Sound/SE/Battle/counter_success.wav",	4, false },
 	{ "ブレーキ1",			"DATA/Sound/SE/Battle/brake1.wav",	4, false },
 	{ "ダッシュ",			"DATA/Sound/SE/Battle/dash.wav", 4, false },
+	{ "ペルソナ召喚",		"DATA/Sound/SE/Battle/kyuin.wav", 4, false },
 };
 
 //==============================================================================================

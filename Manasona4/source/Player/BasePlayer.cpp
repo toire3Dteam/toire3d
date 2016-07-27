@@ -3,6 +3,7 @@
 #include "BasePlayerState.h"
 #include "../Collision/Collision.h"
 #include "../Stage/Stage.h"
+#include "../Stand/Stand.h"
 #include "../Sound/SoundManager.h"
 
 //_/_/_/_/_/_/__/_/__/_/__/_/__
@@ -13,13 +14,8 @@ const float BasePlayer::c_FRONT_BRAKE_LINE = .55f;	// 走り中に操作を離してブレー
 const float BasePlayer::c_GRAVITY = .1f;
 const float BasePlayer::c_MAX_JUMP = 2.2f;
 
-static const float DIR_ANGLE[(int)DIR::MAX] =
-{
-	PI * 1.5f,	// 左向き
-	PI * .5,	// 右向き
-};
 
-// 攻撃フレーム情報読み込み
+// アクションフレーム情報読み込み
 void BasePlayer::LoadAttackFrameList(char *filename)
 {
 	std::ifstream ifs(filename);
@@ -53,6 +49,9 @@ m_maxSpeed(1.0f), m_dir(DIR::LEFT), m_deviceID(deviceID), m_pHitSquare(new Colli
 m_pObj(nullptr), m_move(VECTOR_ZERO), m_bLand(false), m_bAerialJump(true), m_ActionState(BASE_ACTION_STATE::NO_ACTION),
 m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentActionFrame(0), m_RecoveryFlame(0), m_bEscape(false), m_score(0), m_CollectScore(0)
 {
+	// とりあえず、モコイさん
+	m_pStand = new Stand::Mokoi(this);
+
 	// デフォルト設定
 	m_pHitSquare->height = 4;
 	m_pHitSquare->width = 1;
@@ -98,7 +97,7 @@ BasePlayer::~BasePlayer()
 {
 	SAFE_DELETE(m_pObj);
 	SAFE_DELETE(m_pStateMachine);
-
+	SAFE_DELETE(m_pStand);
 	SAFE_DELETE(m_PanelEffectMGR);
 	SAFE_DELETE(m_UVEffectMGR);
 	
@@ -110,6 +109,9 @@ void BasePlayer::Update()
 	// エフェクトマネージャー更新 (ヒットストップ無視)
 	m_PanelEffectMGR->Update();
 	m_UVEffectMGR->Update();
+
+	// スタンド更新
+	m_pStand->Update();
 
 	// ★硬直時間のデクリメント
 	if (m_RecoveryFlame > 0)m_RecoveryFlame--;
@@ -178,27 +180,34 @@ void BasePlayer::Update()
 void BasePlayer::Move() 
 {
 	// 移動量更新
-	m_move.y -= c_GRAVITY;
-	//if (m_move.y <= -3.0f) { m_move.y = -3.0f; } // 落ちる速度を抑制
-	m_move.y = max(-2.75f, m_move.y);// 落ちる速度を抑制
+	if (m_pStateMachine->isInState(*BasePlayerState::StandAction::GetInstance()) == false){	// ペルソナ発動中じゃなかったら移動
+		m_move.y -= c_GRAVITY;
+		//if (m_move.y <= -3.0f) { m_move.y = -3.0f; } // 落ちる速度を抑制
+		m_move.y = max(-2.75f, m_move.y);// 落ちる速度を抑制
 
-	// 空気抵抗(xの値を徐々に減らしていく)
-	if (m_bLand)
-	{
-		//if (m_move.x > 0)		m_move.x = max(m_move.x - .055f, 0);
-		//else if (m_move.x < 0)	m_move.x = min(m_move.x + .055f, 0);
-		m_move.x *= 0.92f;	// 減速(A列車:この値はキャラ固有の値)
+		// 空気抵抗(xの値を徐々に減らしていく)
+		if (m_bLand)
+		{
+			//if (m_move.x > 0)		m_move.x = max(m_move.x - .055f, 0);
+			//else if (m_move.x < 0)	m_move.x = min(m_move.x + .055f, 0);
+			m_move.x *= 0.92f;	// 減速(A列車:この値はキャラ固有の値)
+		}
+		else
+		{
+			//if (m_move.x > 0)		m_move.x = max(m_move.x - .035f, 0);
+			//else if (m_move.x < 0)	m_move.x = min(m_move.x + .035f, 0);
+			m_move.x *= 0.98f;	// 減速(A列車:この値はキャラ固有の値)
+		}
+
+		// 左右のMove値
+		//m_move.x = Math::Clamp(m_move.x, -m_maxSpeed, m_maxSpeed);
 	}
+
+	// ペルソナ発動中移動
 	else
-	{	
-		//if (m_move.x > 0)		m_move.x = max(m_move.x - .035f, 0);
-		//else if (m_move.x < 0)	m_move.x = min(m_move.x + .035f, 0);
-		m_move.x *= 0.98f;	// 減速(A列車:この値はキャラ固有の値)
+	{
+		m_move *= 0.8f;	// 減速(A列車:この値はキャラ固有の値)
 	}
-
-	// 左右のMove値
-	//m_move.x = Math::Clamp(m_move.x, -m_maxSpeed, m_maxSpeed);
-
 
 }
 
@@ -233,13 +242,19 @@ void BasePlayer::UpdatePos()
 	// (TODO)ヒットストップしてなかったら
 	if (m_HitStopFrame <= 0)
 	{
-		// 座標更新
-		m_pos += m_move;
+		//if (m_pStateMachine->isInState(*BasePlayerState::StandAction::GetInstance()) == false)// ペルソナ発動中じゃなかったら移動
+		{
+			// 座標更新
+			m_pos += m_move;
+		}
 	}
 }
 
 void BasePlayer::Render()
 {
+	// スタンド描画
+	m_pStand->Render();
+
 	m_pObj->Render();
 	
 	m_pStateMachine->Render();// ステートマシンでの描画

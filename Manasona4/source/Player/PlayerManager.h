@@ -1,6 +1,12 @@
 #pragma once
 #include "BasePlayer.h"
 
+// 前方宣言
+namespace Stand
+{
+	class Base;
+}
+
 class PlayerManager :public BaseGameEntity
 {
 public:
@@ -30,6 +36,9 @@ private:
 
 	// ★プレイヤーとプレイヤーの攻撃の判定
 	bool CollisionPlayerAttack(BasePlayer *my, BasePlayer *you);
+
+	// ★スタンドの攻撃に対するプレイヤーの判定
+	bool CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou);
 
 	// BaseGameEntiryサブクラスはメッセージを使って通信する
 	bool  HandleMessage(const Message& msg);
