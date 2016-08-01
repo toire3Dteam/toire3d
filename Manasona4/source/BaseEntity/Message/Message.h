@@ -20,7 +20,9 @@ struct HIT_DAMAGE_INFO
 	Vector2 FlyVector;	// 吹っ飛びベクトル(強さもある)
 	int hitStopFlame;		// ヒットストップフレーム
 	int recoveryFlame;		// 硬直フレーム
-	int effectType;			// HITした相手に送るエフェクト (A列車)←をintじゃなくてEFFECT_TYPEにしたい。どうしたものか・・
+	int HitEffectType;		// HITした相手に送るエフェクト (A列車)←をintじゃなくてEFFECT_TYPEにしたい。どうしたものか・・
+	bool bFinishAttack;		// フィニッシュアタック
+	int iAttackType;		// 何の攻撃を当てられたか(おんなじ攻撃だったらその分遅くしたいため)
 };
 
 // 攻撃ヒットしたプレイヤー用
@@ -29,6 +31,7 @@ struct HIT_ATTACK_INFO
 	int HitPlayerDeviceID;	// ダメージを与えた相手の番号
 	int hitStopFlame;		// ヒットストップフレーム
 	int HitScore;			// 加算されるスコア
+	bool bFinishAttack;		// フィニッシュアタック
 };
 
 // プレイヤーInfo

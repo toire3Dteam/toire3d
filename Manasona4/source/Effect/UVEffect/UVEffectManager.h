@@ -25,6 +25,9 @@ public:
 	// ”­“®
 	void AddEffect(Vector3 pos, UV_EFFECT_TYPE type);
 	void AddEffect(Vector3 pos, UV_EFFECT_TYPE type,float startScale, float endScale);
+    void AddEffect(Vector3 pos, UV_EFFECT_TYPE type, float startScale, float endScale,
+        Vector3 startAngle, Vector3 endAngle);
+
 	//void StopEffect(UV_EFFECT_TYPE type);
 
 private:

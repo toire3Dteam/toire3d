@@ -138,7 +138,8 @@ enum class MY_MUSIC_ID
 {
 	SELECT,		// セレクト
 	SENJO,		// 戦場
-	TOILE,		// トイレステージ
+	SYUTEN,		// 終点
+	A,		// Aステージ
 	MAX
 };
 

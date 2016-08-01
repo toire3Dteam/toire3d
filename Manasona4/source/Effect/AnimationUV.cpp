@@ -54,6 +54,9 @@ AnimationUV::AnimationUV(char* name, float moveTU, float moveTV, int EndFlame, b
 	m_startScale = 1.0f;
 	m_endScale = 1.0f;
 
+    m_angle = VECTOR_ZERO;
+    m_startAngle = VECTOR_ZERO;
+    m_endAngle = VECTOR_ZERO;
 }
 
 // α考慮
@@ -121,7 +124,7 @@ void AnimationUV::StopRoop()	// ループアニメストップ
 	nowFlame = alphaFar + 1;	// 透明になる部分へワープ
 }
 
-void AnimationUV::Update(Vector3 pos, Vector3 angle)
+void AnimationUV::Update(Vector3 pos)
 {
 	if (isAction == false)return;//実行されてないなら出てけ！！
 
@@ -191,9 +194,14 @@ void AnimationUV::Update(Vector3 pos, Vector3 angle)
 	float scareRate = (float)(nowFlame) / (float)(endFlame); // 最初にレートを出す
 	float calcScare = (m_startScale * (1.0f - scareRate)) + (m_endScale * scareRate);
 
+    // 回転更新
+    float angleRate = (float)(nowFlame) / (float)(endFlame); // 最初にレートを出す
+    Vector3 calcAngle = (m_startAngle * (1.0f - angleRate)) + (m_endAngle * angleRate);
+
+
 	// メッシュの更新
 	obj->SetScale(calcScare);
-	obj->SetAngle(angle);
+    obj->SetAngle(calcAngle);
 	obj->SetPos(pos);
 	obj->Update();
 
@@ -285,9 +293,16 @@ void AnimationUV::Render_ADD()
 	obj->Render(shader, "uvAnime_add");
 
 }
-// 拡大
+// 拡大アニメ
 void AnimationUV::ScaleAnimation(float StartScale, float EndScale)
 {
 	m_startScale = StartScale;
 	m_endScale = EndScale;
+}
+
+// 回転アニメ
+void AnimationUV::AngleAnimation(Vector3 StartAngle, Vector3 EndAngle)
+{
+    m_startAngle = StartAngle;
+    m_endAngle = EndAngle;
 }

@@ -91,14 +91,19 @@ enum BASE_ACTION_STATE
 	SQUAT,		// 下段攻撃
 	AERIAL,		// 空中攻撃
 	AERIALDROP,	// 空中下攻撃
-
+	FINISH,		// フィニッシュアーツ
 	END		// 何もなし　(A列車)名前
 };
 
 // エフェクトの種類
 enum class EFFECT_TYPE
 {
-	DAMAGE,	// ダメージエフェクト 
+	DAMAGE,	// ダメージエフェクト
+	WHIFF,	//	振り
+	RECOVERY, //リカバリー
+	//AIROU_CIRCLE,// アイルーサークル
+	
+
 };
 
 class AttackData
@@ -112,9 +117,10 @@ public:
 	int damage;					// 与えるダメージ
 	bool bHit;					// 当たったかどうか(★多段ヒット防止用)多段ヒットしてほしい攻撃だと、また考える必要がある
 	int WhiffDelayFrame;		// 何フレーム後に空振りのSEを再生するか(WhiffSEを使わない(nullptr)なら別に設定しなくてもいい)
-	EFFECT_TYPE effectType;		// エフェクトのタイプ
+	EFFECT_TYPE HitEffectType;	// エフェクトのタイプ
 	LPCSTR HitSE;				// 当たったときに鳴らすSE
 	LPCSTR WhiffSE;				// 空振りSE
+	EFFECT_TYPE WhiffEffectType;	// 振りエフェクト
 	int pierceLV;				// 貫通レベル
 
 	// ★★★地上ヒットと空中ヒットで分けたい情報
@@ -239,6 +245,8 @@ public:
 		return GetAttackData(m_ActionState);
 	}
 
+	int GetRecoveryCount(){ return m_recoveryCount; }
+
 	//int GetPierceLV(){ return m_ActionDatas[(int)m_ActionState].pierceLV; }
 	//LPCSTR GetAttackSE(){ return m_ActionDatas[(int)m_ActionState].SE_ID; }
 	bool isFrameAction() { return (m_ActionState != BASE_ACTION_STATE::NO_ACTION); }
@@ -266,7 +274,7 @@ public:
 	int GetRecoveryFrame() { return m_RecoveryFlame; }
 	bool isEscape() { return m_bEscape; }
 	Stand::Base *GetStand(){ return m_pStand; }
-
+	std::list<BASE_ACTION_STATE> *GetRecoveryDamageCount(){ return &m_RecoveryDamageCount; }
 
 	// セッター
 	void SetMove(const Vector3 &v) { m_move.Set(v.x, v.y, v.z); }
@@ -278,6 +286,8 @@ public:
 	void SetHitStopFrame(int frame) { m_HitStopFrame = frame; }
 	void SetRecoveryFrame(int frame) { m_RecoveryFlame = frame; }
 	void SetEscapeFlag(bool bEscape) { m_bEscape = bEscape; }
+	void SetInvincible(int lv = 1){ m_InvincibleLV = lv; }
+	void InvincibleOff(){ m_InvincibleLV = 0; }
 	void SetActionState(BASE_ACTION_STATE state)
 	{
 		m_ActionState = state; 
@@ -296,12 +306,20 @@ public:
 		}
 	}
 	//void SetStandSaveMove(const Vector3 &move){ m_StandSaveMove = move; }
-
+	void SetRecoveryCount(int recoverycount){ m_recoveryCount = recoverycount; }
 
 	// アクセサー
 	void AddMove(const Vector3 &v) { m_move += v; }
 	void AddCollectScore(int score) { m_CollectScore += score; }
+	void ConversionScore()
+	{
+		m_score += m_CollectScore;
+		m_CollectScore = 0;
+	}
+	void AddRecoveryCount(int add){ m_recoveryCount += add; }
+
 	void MoveClampX(float val) { m_move.x = Math::Clamp(m_move.x, -val, val); }
+
 
 	// エフェクト
 	PanelEffectManager* GetPanelEffectManager() { return m_PanelEffectMGR; }
@@ -319,7 +337,7 @@ public:
 	static const float c_FRONT_BRAKE_LINE;	// 走り中に操作を離してブレーキに移行するまでの移動値ライン
 	static const float c_GRAVITY;			// 全員が共通で持つ世界の重力
 	static const float c_MAX_JUMP;			// ジャンプ最大ライン
-
+	static const int   c_RECOVERY_FLAME;	// リカバリ―フレーム
 protected:
 	const int m_deviceID;		// 自分のコントローラーの番号(実質、スマブラのxPに値する)
 	iex3DObj *m_pObj;	// メッシュ実体
@@ -344,6 +362,10 @@ protected:
 	int m_score;				// 実体後の本当のスコア
 	int m_CollectScore;			// 実体前の貯めているスコア
 	//Vector3 m_StandSaveMove;	// スタンド発動の保存移動量
+	int m_recoveryCount;		// リカバリーステートのいる時間をカウント
+
+	// 「喰らい中」に攻撃をくらってるカウント
+	std::list<BASE_ACTION_STATE> m_RecoveryDamageCount;
 
 	Stand::Base *m_pStand;		// スタンドの基底クラスの実体
 

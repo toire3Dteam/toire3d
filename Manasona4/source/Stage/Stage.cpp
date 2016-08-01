@@ -38,6 +38,9 @@ void Stage::Base::CreateStage(Stage::Base**p,STAGE_ID id, Camera *pCamera)
 	case STAGE_ID::SYUTEN:
 		*p = new Stage::Syuten;
 		break;
+	case STAGE_ID::A:
+		*p = new Stage::A;
+		break;
 	}
 
 	// ★ここでInitializeを呼ぶ
@@ -82,6 +85,7 @@ void Stage::Syuten::Initialize(Camera *pCamera)
 	pCamera->SetStageCameraInfo("DATA/Stage/Syuten/camera.txt");
 }
 
+
 void Stage::Syuten::Update()
 {
 	static float v = 0;
@@ -100,4 +104,21 @@ void Stage::Syuten::Render()
 {
 	if (m_pBack) m_pBack->Render();
 	m_pObj->Render(shader,"uvAnime");
+}
+
+void Stage::A::Initialize(Camera *pCamera)
+{
+	m_pObj = new iexMesh("DATA/Stage/A/stage1.IMO");
+	m_pObj->SetAngle(3.14f);
+	m_pObj->SetScale(0.9f);
+	m_pObj->Update();
+
+	m_pBack = new iexMesh("DATA/Stage/A/stage2.IMO");
+	m_pBack->SetAngle(3.14f);
+	m_pBack->SetScale(0.9f);
+	m_pBack->Update();
+	m_DeadLineY = -100;
+
+	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
+	pCamera->SetStageCameraInfo("DATA/Stage/A/camera.txt");
 }

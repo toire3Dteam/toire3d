@@ -78,5 +78,11 @@ void UVEffectManager::AddEffect(Vector3 pos, UV_EFFECT_TYPE type)
 void UVEffectManager::AddEffect(Vector3 pos, UV_EFFECT_TYPE type, float startScale, float endScale)
 {
 	m_baseUVEffect[(int)type]->Action(pos, startScale, endScale);
+}
 
+// アングル込みのエフェクト
+void UVEffectManager::AddEffect(Vector3 pos, UV_EFFECT_TYPE type,
+    float startScale, float endScale, Vector3 startAngle, Vector3 endAngle)
+{
+    m_baseUVEffect[(int)type]->Action(pos, startScale, endScale, startAngle, endAngle);
 }

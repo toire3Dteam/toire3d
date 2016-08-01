@@ -386,16 +386,28 @@ BGM_Manager *bgm;
 
 MyMusicManager::MyMusicManager(MY_MUSIC_ID id) :m_bPlay(false)
 {
-	// IDごとの、情報が入ってるテキストへのパス ※enumずれないようにする
-	static const char *PATHS[(int)MY_MUSIC_ID::MAX]=
+	std::string directory = "DATA/Sound/BGM/MyMusic";
+	switch (id)
 	{
-		"DATA/Sound/BGM/MyMusic/Select/",
-		"DATA/Sound/BGM/MyMusic/Senjo/",
-		"DATA/Sound/BGM/MyMusic/Toile/"
-	};
+	case MY_MUSIC_ID::SELECT:
+		directory += "/Select";
+		break;
+	case MY_MUSIC_ID::SENJO:
+		directory += "/Senjo";
+		break;
+	case MY_MUSIC_ID::SYUTEN:
+		directory += "/Syuten";
+		break;
+	case MY_MUSIC_ID::A:
+		directory += "/A";
+		break;
+	default:
+		assert(0);
+		break;
+	}
 
 	// ファイル読み込み
-	std::ifstream ifs((char*)(std::string(PATHS[(int)id]) + "info.txt").c_str());
+	std::ifstream ifs((char*)(directory + "/info.txt").c_str());
 	MyAssert(ifs, "エラー: オレ曲の読み込みに失敗");
 
 	// 終端まで
@@ -407,7 +419,7 @@ MyMusicManager::MyMusicManager(MY_MUSIC_ID id) :m_bPlay(false)
 		// オレ曲情報読み取り
 		ifs >> MusicName;
 		ifs >> FileName;
-		sprintf_s(path, 256, "%s%s", PATHS[(int)id], FileName);	// パス作成
+		sprintf_s(path, 256, "%s/%s", directory.c_str(), FileName);	// パス作成
 		ifs >> percent;
 
 		// リストに突っ込む

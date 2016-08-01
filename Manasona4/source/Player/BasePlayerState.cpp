@@ -4,7 +4,8 @@
 #include "../Sound/SoundManager.h"
 
 // 定数
-static const float HUTTOBI_LINE = 8.0f;
+static const float HUTTOBI_LINE = 4.0f;
+static const float REPEAT_ATTACK_RATE = 0.85f;		// 同じ攻撃当たるなレート
 
 /*******************************************************/
 //	ファンクション
@@ -68,9 +69,20 @@ bool StandCansel(BasePlayer * pPerson)
 bool RushAttackCansel(BasePlayer *pPerson)
 {
 	// 攻撃キャンセル
-	if (pPerson->isPushInput(PLAYER_INPUT::B))
+	if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
 	{
 		pPerson->GetFSM()->ChangeState(BasePlayerState::RushAttack::GetInstance());
+		return true;
+	}
+	else return false;
+}
+
+bool FinishAttackCansel(BasePlayer *pPerson)
+{
+	// 攻撃キャンセル
+	if (pPerson->isPushInput(PLAYER_INPUT::R2))
+	{
+		pPerson->GetFSM()->ChangeState(BasePlayerState::FinishAttack::GetInstance());
 		return true;
 	}
 	else return false;
@@ -101,6 +113,7 @@ void BasePlayerState::Global::Exit(BasePlayer * pPerson)
 
 void BasePlayerState::Global::Render(BasePlayer * pPerson)
 {
+	tdnText::Draw(20, 610, 0xffffffff, "ぐろーばるすてーと");
 }
 
 bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & msg)
@@ -125,22 +138,43 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 		pPerson->SetHitStopFrame(hdi->hitStopFlame);
 
 		// 硬直フレーム設定
-		pPerson->SetRecoveryFrame(hdi->recoveryFlame);
+		int RecoveryFrame = hdi->recoveryFlame;
+		for (auto it : *pPerson->GetRecoveryDamageCount())
+		{
+			if (it == (BASE_ACTION_STATE)hdi->iAttackType)
+			{
+				RecoveryFrame = (int)(RecoveryFrame * REPEAT_ATTACK_RATE);	// 同技補正
+			}
+		}
+		pPerson->SetRecoveryFrame(RecoveryFrame);
+
+		// くらった攻撃リスト追加
+		pPerson->GetRecoveryDamageCount()->push_back((BASE_ACTION_STATE)hdi->iAttackType);
 
 		// (追加)ヒットエフェクト発動! 
 		// (A列車)エフェクトを今は自分のポジションにおいてる！！！　後でヒットポジションとかいるかも
-		pPerson->AddEffectAction(pPerson->GetPos()+Vector3(0,4,-3),(EFFECT_TYPE)hdi->effectType);
+		pPerson->AddEffectAction(pPerson->GetPos()+Vector3(0,4,-3),(EFFECT_TYPE)hdi->HitEffectType);
 
 		// 空中ジャンプの権利復活
 		pPerson->SetAerialJump(true);
 
 
 		// 吹っ飛び距離	に　応じて	ダメージステートを変える
-		if (hdi->FlyVector.Length() <  HUTTOBI_LINE)
+		const float len = hdi->FlyVector.Length();
+		if (len <  HUTTOBI_LINE)
 		{
-			// ノックバックに行く
-			pPerson->GetFSM()->ChangeState(BasePlayerState::KnockBack::GetInstance());
-
+			// ここで空中でくらってるか地上でくらってるかを分ける
+			if (pPerson->isLand() == true)
+			{
+				// 地上ノックバックに行く
+				pPerson->GetFSM()->ChangeState(BasePlayerState::KnockBack::GetInstance());
+			}
+			else
+			{
+				// 空中ノックバックに行く
+				pPerson->GetFSM()->ChangeState(BasePlayerState::AerialKnockBack::GetInstance());
+			}
+		
 		}
 		else
 		{
@@ -159,6 +193,7 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 		HIT_ATTACK_INFO *HitAttackInfo = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
 		pPerson->SetHitStopFrame(HitAttackInfo->hitStopFlame);// ヒットストップ
 		pPerson->AddCollectScore(HitAttackInfo->HitScore);	// 実体前のスコアを加算
+		if (HitAttackInfo->bFinishAttack) pPerson->ConversionScore();	// フィニッシュアタックならスコア生産
 		break;
 	}
 
@@ -215,6 +250,11 @@ void BasePlayerState::Wait::Execute(BasePlayer * pPerson)
 		pPerson->GetFSM()->ChangeState(BasePlayerState::RushAttack::GetInstance());
 		return;
 	}
+
+	//////////////////////////////////////////////
+	//	フィニッシュ攻撃ボタン
+	//============================================
+	if (FinishAttackCansel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	スタンドキャンセル
@@ -328,6 +368,10 @@ void BasePlayerState::Walk::Execute(BasePlayer * pPerson)
 		return;
 	}
 
+	//////////////////////////////////////////////
+	//	フィニッシュ攻撃ボタン
+	//============================================
+	if (FinishAttackCansel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	攻撃キャンセル
@@ -476,6 +520,11 @@ void BasePlayerState::Run::Execute(BasePlayer * pPerson)
 	//	攻撃キャンセル
 	//============================================
 	if (RushAttackCansel(pPerson)) return;
+
+	//////////////////////////////////////////////
+	//	フィニッシュ攻撃ボタン
+	//============================================
+	if (FinishAttackCansel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	しゃがみキャンセル
@@ -873,6 +922,11 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 		}
 
 		//////////////////////////////////////////////
+		//	フィニッシュ攻撃ボタン
+		//============================================
+		if (FinishAttackCansel(pPerson)) return;
+
+		//////////////////////////////////////////////
 		//	スタンドキャンセル
 		//============================================
 		if (StandCansel(pPerson)) return;
@@ -927,6 +981,7 @@ void BasePlayerState::Jump::Exit(BasePlayer * pPerson)
 
 void BasePlayerState::Jump::Render(BasePlayer * pPerson)
 {
+	tdnText::Draw(20, 650, 0xffffffff, "ジャンプすｙてーと");
 	//tdnText::Draw(20, 690, 0xffffffff, "JumpState");
 }
 
@@ -1005,6 +1060,11 @@ void BasePlayerState::AerialJump::Execute(BasePlayer * pPerson)
 		if (StandCansel(pPerson)) return;
 
 		//////////////////////////////////////////////
+		//	フィニッシュ攻撃ボタン
+		//============================================
+		if (FinishAttackCansel(pPerson)) return;
+
+		//////////////////////////////////////////////
 		//	左入力
 		//============================================
 		if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
@@ -1041,6 +1101,7 @@ void BasePlayerState::AerialJump::Exit(BasePlayer * pPerson)
 
 void BasePlayerState::AerialJump::Render(BasePlayer * pPerson)
 {
+	tdnText::Draw(20, 650, 0xffffffff, "空中ジャンプすｙてーと");
 	//tdnText::Draw(20, 690, 0xffffffff, "AerialJumpState");
 }
 
@@ -1111,6 +1172,11 @@ void BasePlayerState::Fall::Execute(BasePlayer * pPerson)
 	}
 
 	//////////////////////////////////////////////
+	//	フィニッシュ攻撃ボタン
+	//============================================
+	if (FinishAttackCansel(pPerson)) return;
+
+	//////////////////////////////////////////////
 	//	スタンドキャンセル
 	//============================================
 	if (StandCansel(pPerson)) return;
@@ -1152,6 +1218,7 @@ void BasePlayerState::Fall::Exit(BasePlayer * pPerson)
 
 void BasePlayerState::Fall::Render(BasePlayer * pPerson)
 {
+	tdnText::Draw(20, 650, 0xffffffff, "おちたな");
 	//tdnText::Draw(20, 690, 0xffffffff, "FallState");
 }
 
@@ -1204,6 +1271,11 @@ void BasePlayerState::Land::Execute(BasePlayer * pPerson)
 		if (RushAttackCansel(pPerson)) return;
 
 		//////////////////////////////////////////////
+		//	フィニッシュ攻撃ボタン
+		//============================================
+		if (FinishAttackCansel(pPerson)) return;
+
+		//////////////////////////////////////////////
 		//	スタンドキャンセル
 		//============================================
 		if (StandCansel(pPerson)) return;
@@ -1252,6 +1324,7 @@ void BasePlayerState::Land::Exit(BasePlayer * pPerson)
 
 void BasePlayerState::Land::Render(BasePlayer * pPerson)
 {
+	tdnText::Draw(20, 650, 0xffffffff, "着地");
 	//tdnText::Draw(20, 690, 0xffffffff, "LandState");
 }
 
@@ -1412,6 +1485,7 @@ void BasePlayerState::RushAttack::Exit(BasePlayer * pPerson)
 
 void BasePlayerState::RushAttack::Render(BasePlayer * pPerson)
 {
+	tdnText::Draw(20, 650, 0xffffffff, "ラッシュ");
 	//tdnText::Draw(20, 690, 0xffffffff, "RushState");
 }
 
@@ -1461,6 +1535,12 @@ void BasePlayerState::KnockBack::Execute(BasePlayer * pPerson)
 	{
 		// 待機ステートに戻る
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		// 喰らったカウントリセット
+		pPerson->GetRecoveryDamageCount()->clear();
+		
+		// [追記]　無敵はここでつけない！
+		// ★無敵時間設定
+		//pPerson->SetInvincible(8);
 	}
 }
 
@@ -1471,6 +1551,7 @@ void BasePlayerState::KnockBack::Exit(BasePlayer * pPerson)
 
 void BasePlayerState::KnockBack::Render(BasePlayer * pPerson)
 {
+	tdnText::Draw(20, 650, 0xffffffff, "ノックバック！");
 	//tdnText::Draw(20, 690, 0xffffffff, "RushState");
 }
 
@@ -1479,13 +1560,99 @@ bool BasePlayerState::KnockBack::OnMessage(BasePlayer * pPerson, const Message &
 	// メッセージタイプ
 	//switch (msg.Msg)
 	//{
-	//default:
-	//	return true;
-	//	break;
+	//	// 攻撃くらったよメッセージ
+	//case MESSAGE_TYPE::HIT_DAMAGE:
+	//{
+	//								 HIT_DAMAGE_INFO *hdi = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+	//								 // 喰らってる状態でくらった攻撃リスト追加
+	//								 pPerson->GetRecoveryDamageCount()->push_back((BASE_ACTION_STATE)hdi->iAttackType);
+	//								 // trueは返さない。ここでは、ダウン状態でのくらったカウントを取るだけなので。
+	//}
 	//}
 	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
 	return false;
 }
+
+
+/*******************************************************/
+//					エアリアルノックバックステート
+/*******************************************************/
+
+BasePlayerState::AerialKnockBack * BasePlayerState::AerialKnockBack::GetInstance()
+{
+	// ここに変数を作る
+	static BasePlayerState::AerialKnockBack instance;
+	return &instance;
+}
+
+void BasePlayerState::AerialKnockBack::Enter(BasePlayer * pPerson)
+{
+	// 空中ノックバックモーションに変える
+	pPerson->SetMotion(17);
+
+}
+
+void BasePlayerState::AerialKnockBack::Execute(BasePlayer * pPerson)
+{
+	// 硬直が0以下なら硬直終了
+	if (pPerson->GetRecoveryFrame() <= 0)
+	{
+		// 硬直が0になったら　なおかついずれかのボタンを押していたら復帰ステートへ
+		if (pPerson->isPushInput(PLAYER_INPUT::A)||
+			pPerson->isPushInput(PLAYER_INPUT::B)||
+			pPerson->isPushInput(PLAYER_INPUT::C)||
+			pPerson->isPushInput(PLAYER_INPUT::D))
+		{
+
+			// 地上オア空中
+			if (pPerson->isLand() == true)
+			{
+				// 地上リカバリーステートへ！
+				pPerson->GetFSM()->ChangeState(BasePlayerState::LandRecovery::GetInstance());
+				// 喰らったカウントリセット
+				pPerson->GetRecoveryDamageCount()->clear();
+			}
+			else
+			{
+				// 空中リカバリーステートへ！
+				pPerson->GetFSM()->ChangeState(BasePlayerState::AerialRecovery::GetInstance());
+				// 喰らったカウントリセット
+				pPerson->GetRecoveryDamageCount()->clear();
+			}
+
+		}
+	}
+}
+
+void BasePlayerState::AerialKnockBack::Exit(BasePlayer * pPerson)
+{
+
+}
+
+void BasePlayerState::AerialKnockBack::Render(BasePlayer * pPerson)
+{
+	tdnText::Draw(20, 650, 0xffffffff, "選りえるノックバック");
+	//tdnText::Draw(20, 690, 0xffffffff, "RushState");
+}
+
+bool BasePlayerState::AerialKnockBack::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+		//{
+		//	// 攻撃くらったよメッセージ
+		//case MESSAGE_TYPE::HIT_DAMAGE:
+		//{
+		//								 HIT_DAMAGE_INFO *hdi = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+		//								 // 喰らってる状態でくらった攻撃リスト追加
+		//								 pPerson->GetRecoveryDamageCount()->push_back((BASE_ACTION_STATE)hdi->iAttackType);
+		//								 // trueは返さない。ここでは、ダウン状態でのくらったカウントを取るだけなので。
+		//}
+		//}
+		// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+		return false;
+}
+
 
 
 /*******************************************************/
@@ -1502,16 +1669,29 @@ BasePlayerState::KnockDown * BasePlayerState::KnockDown::GetInstance()
 void BasePlayerState::KnockDown::Enter(BasePlayer * pPerson)
 {
 	// ノックダウンモーションに変える
-	pPerson->SetMotion(17);
+	pPerson->SetMotion(18);
 
 }
 
 void BasePlayerState::KnockDown::Execute(BasePlayer * pPerson)
 {
-	if (true)
+	if (pPerson->isLand() == false)return;
+
+	// 硬直が0以下なら硬直終了
+	if (pPerson->GetRecoveryFrame() <= 0)
 	{
-		// 待機ステートに戻る
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		if (pPerson->isPushInput(PLAYER_INPUT::A) ||
+			pPerson->isPushInput(PLAYER_INPUT::B) ||
+			pPerson->isPushInput(PLAYER_INPUT::C) ||
+			pPerson->isPushInput(PLAYER_INPUT::D))
+		{
+			// 待機ステートに戻る
+			pPerson->GetFSM()->ChangeState(BasePlayerState::LandRecovery::GetInstance());
+
+			// 喰らったカウントリセット
+			pPerson->GetRecoveryDamageCount()->clear();
+		}
+
 	}
 }
 
@@ -1522,6 +1702,7 @@ void BasePlayerState::KnockDown::Exit(BasePlayer * pPerson)
 
 void BasePlayerState::KnockDown::Render(BasePlayer * pPerson)
 {
+	tdnText::Draw(20, 650, 0xffffffff, "ノックダウン");
 	//tdnText::Draw(20, 690, 0xffffffff, "RushState");
 }
 
@@ -1530,14 +1711,158 @@ bool BasePlayerState::KnockDown::OnMessage(BasePlayer * pPerson, const Message &
 	// メッセージタイプ
 	//switch (msg.Msg)
 	//{
-	//default:
-	//	return true;
-	//	break;
+	//	// 攻撃くらったよメッセージ
+	//case MESSAGE_TYPE::HIT_DAMAGE:
+	//{
+	//								 HIT_DAMAGE_INFO *hdi = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+	//								 // 喰らってる状態でくらった攻撃リスト追加
+	//								 pPerson->GetRecoveryDamageCount()->push_back((BASE_ACTION_STATE)hdi->iAttackType);
+	//								 // trueは返さない。ここでは、ダウン状態でのくらったカウントを取るだけなので。
+	//}
 	//}
 	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
 	return false;
 }
 
+
+/*******************************************************/
+//					地上リカバリーステート
+/*******************************************************/
+
+BasePlayerState::LandRecovery * BasePlayerState::LandRecovery::GetInstance()
+{
+	// ここに変数を作る
+	static BasePlayerState::LandRecovery instance;
+	return &instance;
+}
+
+void BasePlayerState::LandRecovery::Enter(BasePlayer * pPerson)
+{
+	// リカバリーに変える
+	pPerson->SetMotion(13);
+
+	// りかバリーかうんとを初期化
+	pPerson->SetRecoveryCount(0);
+
+	// リカバー中は無敵！！！
+	pPerson->SetInvincible(1);
+
+	// エフェクト発動」
+	pPerson->AddEffectAction(pPerson->GetPos() + Vector3(0, 5, -3), EFFECT_TYPE::RECOVERY);
+}
+
+void BasePlayerState::LandRecovery::Execute(BasePlayer * pPerson)
+{
+	pPerson->AddRecoveryCount(1);
+
+	// リカバリーフレームを超えたら終わり！
+	if (pPerson->GetRecoveryCount() >= BasePlayer::c_RECOVERY_FLAME)
+	{
+		// 待機ステートへ
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+
+		// 喰らったカウントリセット
+		pPerson->GetRecoveryDamageCount()->clear();
+	}
+}
+
+void BasePlayerState::LandRecovery::Exit(BasePlayer * pPerson)
+{
+	// 無敵解除！！
+	pPerson->InvincibleOff();
+
+	// りかバリーかうんとを初期化
+	pPerson->SetRecoveryCount(0);
+}
+
+void BasePlayerState::LandRecovery::Render(BasePlayer * pPerson)
+{
+	tdnText::Draw(20, 650, 0xffffffff, "りかばり");
+}
+
+bool BasePlayerState::LandRecovery::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	return false;
+}
+
+/*******************************************************/
+//					空中リカバリーステート (空中)
+/*******************************************************/
+
+BasePlayerState::AerialRecovery * BasePlayerState::AerialRecovery::GetInstance()
+{
+	// ここに変数を作る
+	static BasePlayerState::AerialRecovery instance;
+	return &instance;
+}
+
+void BasePlayerState::AerialRecovery::Enter(BasePlayer * pPerson)
+{
+	// リカバリーに変える
+	pPerson->SetMotion(13);
+
+	// りかバリーかうんとを初期化
+	pPerson->SetRecoveryCount(0);
+
+	// リカバー中は無敵！！！
+	pPerson->SetInvincible(1);
+
+	Vector3 move;
+	move = pPerson->GetMove()*0.25f;
+	pPerson->SetMove(move);
+
+	// ＋Ｍｏｖｅ
+	Vector3 addMove = Vector3(0, 2.55f, 0);
+
+	if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
+	{
+		addMove += Vector3(0.7f, 0, 0);
+	}
+	else if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
+	{
+		addMove += Vector3(-0.7f, 0, 0);
+	}
+	
+	pPerson->AddMove(addMove);
+
+	// エフェクト発動」
+	pPerson->AddEffectAction(pPerson->GetPos() + Vector3(0, 5, -3) , EFFECT_TYPE::RECOVERY);
+}
+
+void BasePlayerState::AerialRecovery::Execute(BasePlayer * pPerson)
+{
+	pPerson->AddRecoveryCount(1);
+
+	// リカバリーフレームを超えたら終わり！
+	if (pPerson->GetRecoveryCount() >= BasePlayer::c_RECOVERY_FLAME)
+	{
+		// 空中なので落ちるステートに
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Fall::GetInstance());
+
+		// 喰らったカウントリセット
+		pPerson->GetRecoveryDamageCount()->clear();
+	}
+}
+
+void BasePlayerState::AerialRecovery::Exit(BasePlayer * pPerson)
+{
+	// 無敵解除！！
+	pPerson->InvincibleOff();
+
+	pPerson->SetRecoveryCount(0);
+}
+
+void BasePlayerState::AerialRecovery::Render(BasePlayer * pPerson)
+{
+	tdnText::Draw(20, 650, 0xffffffff, "空中りかばり");
+}
+
+bool BasePlayerState::AerialRecovery::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+		return false;
+}
 
 
 /*******************************************************/
@@ -2134,6 +2459,69 @@ void BasePlayerState::StandAction::Render(BasePlayer * pPerson)
 }
 
 bool BasePlayerState::StandAction::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	//// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+	//	// 攻撃くらったよメッセージ
+	//case MESSAGE_TYPE::HIT_DAMAGE:
+	//{
+	//	// グローバルステートに行かないようにする！
+	//	return true;
+	//}
+	//}
+
+	return false;
+}
+
+
+
+/*******************************************************/
+//					フィニッシュアタックステート
+/*******************************************************/
+
+BasePlayerState::FinishAttack * BasePlayerState::FinishAttack::GetInstance()
+{
+	// ここに変数を作る
+	static BasePlayerState::FinishAttack instance;
+	return &instance;
+}
+
+void BasePlayerState::FinishAttack::Enter(BasePlayer * pPerson)
+{
+	// 召喚モーションに変える
+	pPerson->SetMotion(7);
+
+	// アクションステート変更
+	pPerson->SetActionState(BASE_ACTION_STATE::FINISH);
+
+	// SE再生
+	//se->Play("ペルソナ召喚");
+}
+
+void BasePlayerState::FinishAttack::Execute(BasePlayer * pPerson)
+{
+	// 攻撃ステート終わったら
+	if (!pPerson->isAttackState())
+	{
+		// 待機ステートに(さすがにキャンセルはやめておこう)
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+	}
+}
+
+void BasePlayerState::FinishAttack::Exit(BasePlayer * pPerson)
+{
+
+
+}
+
+void BasePlayerState::FinishAttack::Render(BasePlayer * pPerson)
+{
+
+	tdnText::Draw(20, 690, 0xffffffff, "フィニッシュあたっくState");
+}
+
+bool BasePlayerState::FinishAttack::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
 	//// メッセージタイプ
 	//switch (msg.Msg)

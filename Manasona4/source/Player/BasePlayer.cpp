@@ -14,6 +14,7 @@ const float BasePlayer::c_FRONT_BRAKE_LINE = .55f;	// 走り中に操作を離してブレー
 const float BasePlayer::c_GRAVITY = .1f;
 const float BasePlayer::c_MAX_JUMP = 2.2f;
 
+const int BasePlayer::c_RECOVERY_FLAME = 8;			// リカバリーステートにいる時間
 
 // アクションフレーム情報読み込み
 void BasePlayer::LoadAttackFrameList(char *filename)
@@ -47,7 +48,8 @@ void BasePlayer::LoadAttackFrameList(char *filename)
 BasePlayer::BasePlayer(int deviceID, bool bAI) :m_bAI(bAI), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + deviceID)),
 m_maxSpeed(1.0f), m_dir(DIR::LEFT), m_deviceID(deviceID), m_pHitSquare(new CollisionShape::Square),
 m_pObj(nullptr), m_move(VECTOR_ZERO), m_bLand(false), m_bAerialJump(true), m_ActionState(BASE_ACTION_STATE::NO_ACTION),
-m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentActionFrame(0), m_RecoveryFlame(0), m_bEscape(false), m_score(0), m_CollectScore(0)
+m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentActionFrame(0), m_RecoveryFlame(0), m_bEscape(false), m_score(0), m_CollectScore(0),
+m_recoveryCount(0), m_HitStopFrame(0)// ★★★バグの原因　ひっとすトップ初期化のし忘れ。
 {
 	// とりあえず、モコイさん
 	m_pStand = new Stand::Mokoi(this);
@@ -78,19 +80,22 @@ m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentActionFrame(0), m_RecoveryFlame
 		break;
 
 	case 1:
-		m_pos.Set(-25, 20, 0);
+		m_pos.Set(-25, 30, 0);
 		break;
 
 	case 2:
-		m_pos.Set(25, 20, 0);
+		m_pos.Set(25, 40, 0);
 		break;
 
 	case 3:
-		m_pos.Set(50, 20, 0);
+		m_pos.Set(50, 50, 0);
 		break;
 	}
 
 	m_angleY = DIR_ANGLE[(int)m_dir];
+
+	// 喰らってる中に喰らってるかうんと初期化
+	m_RecoveryDamageCount.clear();
 }
 
 BasePlayer::~BasePlayer()
@@ -113,8 +118,18 @@ void BasePlayer::Update()
 	// スタンド更新
 	m_pStand->Update();
 
+	// 無敵時間の更新
+	//if (m_InvincibleTime > 0)
+	//{
+	//	//m_InvincibleLV = (--m_InvincibleTime <= 0) ? 0 : m_InvincibleLV;
+	//	m_InvincibleTime--;
+	//	if (m_InvincibleTime <= 0)
+	//		m_InvincibleLV = 0;
+	//}
+
 	// ★硬直時間のデクリメント
-	if (m_RecoveryFlame > 0)m_RecoveryFlame--;
+	if (m_RecoveryFlame > 0)
+		m_RecoveryFlame--;
 
 	// ★ヒットストップ中
 	if (m_HitStopFrame > 0)
@@ -134,7 +149,9 @@ void BasePlayer::Update()
 				if (m_ActionDatas[(int)m_ActionState].pAttackData->WhiffDelayFrame == m_CurrentActionFrame)
 				{
 					// (A列車)ここで攻撃判定が発動した瞬間を取ってきてる
-
+					
+					// 振りエフェクト発動
+					AddEffectAction(m_pos + Vector3(0, 5, -3) , m_ActionDatas[(int)m_ActionState].pAttackData->WhiffEffectType);
 
 					LPCSTR SE_ID = m_ActionDatas[(int)m_ActionState].pAttackData->WhiffSE;
 					// 空振りSE入ってたら
@@ -163,6 +180,8 @@ void BasePlayer::Update()
 
 		//if (m_InputList[(int)PLAYER_INPUT::LEFT] == 1) m_move.x = -2;
 		//else m_move.x = 0;
+
+		// ★★★　なぞのバグは　ここをとおってないからおこる
 
 		// 動きの制御
 		Move();
@@ -235,6 +254,13 @@ void BasePlayer::AIControl()
 		frame = 0;
 		m_InputList[(int)PLAYER_INPUT::C] = 3;
 	}
+	//static int frame2(0);
+	//if (++frame2 > 12)
+	//{
+	//	frame2 = 0;
+	//	m_InputList[(int)PLAYER_INPUT::B] = 3;
+	//}
+	m_InputList[(int)PLAYER_INPUT::A] = 1;	// Aおしっぱ
 }
 
 void BasePlayer::UpdatePos()
@@ -256,8 +282,14 @@ void BasePlayer::Render()
 	m_pStand->Render();
 
 	m_pObj->Render();
+	// 無敵なら加算で重ねて描画
+	if (m_InvincibleTime > 0) m_pObj->Render(RS::ADD);
+
+	if (m_deviceID == 0)
+	{
+		m_pStateMachine->Render();// ステートマシンでの描画
+	}
 	
-	m_pStateMachine->Render();// ステートマシンでの描画
 
 	// エフェクトマネージャー描画
 	m_PanelEffectMGR->Render3D();
@@ -316,12 +348,27 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType)
 {
 	// 何のエフェクトを重ねるかはここで俺が決める。
 
+    // キャラクター向きによる向き
+    float diaAngle = (m_dir == DIR::RIGHT) ? 0.0f : 3.14f;
+
 	switch (effectType)
 	{
 	case EFFECT_TYPE::DAMAGE:
 		//m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::BURN);
 		m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::DAMAGE);
 		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::WAVE);
+		break;
+	case EFFECT_TYPE::WHIFF:
+		m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::INEFFECT_MINI);
+		
+        m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::HIT_IMPACT,
+            1, 2, Vector3(0, diaAngle, 0), Vector3(0, diaAngle, 0));
+
+		break;
+	case EFFECT_TYPE::RECOVERY:
+		m_PanelEffectMGR->AddEffect(pos + Vector3(0, 5, 0), PANEL_EFFECT_TYPE::ClEAR);
+
+
 		break;
 	default:
 		assert(0);	// そんなエフェクトは存在しない AddEffectAction()

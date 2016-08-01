@@ -159,6 +159,7 @@
     <ClCompile Include="TDN\TDN_File.cpp">
       <DeploymentContent>false</DeploymentContent>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="TDN\TDN_Font.cpp" />
     <ClCompile Include="TDN\TDN_Input.cpp" />

@@ -16,7 +16,9 @@ public:
 	virtual void Render();
 	virtual void RenderADD();
 
-	virtual void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f,float endScale = 1.0f);
+    virtual void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f,
+        Vector3 startAngle = VECTOR_ZERO, Vector3 endAngle = VECTOR_ZERO);
+
 	virtual void Stop();
 
 	AnimationUV* GetUV() { return m_pic; }

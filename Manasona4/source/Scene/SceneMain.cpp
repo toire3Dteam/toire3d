@@ -52,7 +52,7 @@ bool sceneMain::Initialize()
 	m_fLoadPercentage = 1.0f;	// ƒ[ƒhŠ„‡
 
 	// ƒIƒŒ‹È‰Šú‰»
-	m_pMyMusicMgr = new MyMusicManager(MY_MUSIC_ID::TOILE);
+	m_pMyMusicMgr = new MyMusicManager(MY_MUSIC_ID::SENJO);
 	m_pMyMusicMgr->Play();
 
 	return true;

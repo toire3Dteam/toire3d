@@ -35,10 +35,15 @@ void BaseUVEffect::RenderADD()
 	m_pic->Render_ADD();
 }
 
-void BaseUVEffect::Action(Vector3 pos, float startScale, float endScale)
+void BaseUVEffect::Action(Vector3 pos, 
+    float startScale, float endScale,
+    Vector3 startAngle , Vector3 endAngle)
 {
 	// スケールのアニメ
 	m_pic->ScaleAnimation(startScale, endScale);
+    // アングルのアニメ
+    m_pic->AngleAnimation(startAngle, endAngle);
+
 	// エフェクト発動
 	m_pic->Action();
 	m_pos = pos;

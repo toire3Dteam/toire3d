@@ -7,3 +7,6 @@ ID: NORI_GAMEPAD
 NAME: XBOX 360 For Windows (Controller)|
 ID: XBOX
 
+NAME: Controller (XBOX 360 For Windows)|
+ID: DEFAULT
+

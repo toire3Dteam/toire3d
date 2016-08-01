@@ -40,10 +40,14 @@ PlayerManager::~PlayerManager()
 void PlayerManager::Update()
 {
 	/* プレイヤーたち更新 */
+	int count(0);
 	FOR(m_NumPlayer)
 	{
+		count++;
 		m_pPlayers[i]->Update();			// モーションとか移動値の作成とか、基本的な更新。
 	}
+
+	if (count == m_NumPlayer - 1)throw "XXXXXX";
 
 	/* プレイヤーVSプレイヤーの攻撃判定 */
 	bool *bHit = new bool[m_NumPlayer];					// 複数ヒット用
@@ -77,15 +81,17 @@ void PlayerManager::Update()
 	}
 
 
-	delete[] bHit;	// ポインタ配列の解放
-	delete[] bHitStand;
-
 	/* 位置を確定 */
 	FOR(m_NumPlayer)
 	{
 		m_pStage->Collision(m_pPlayers[i]);	// ステージとの判定で、move値をどうこういじった後に
 		m_pPlayers[i]->UpdatePos();			// 座標にmove値を足す更新
 	}
+
+
+	delete[] bHit;	// ポインタ配列の解放
+	delete[] bHitStand;
+
 }
 
 void PlayerManager::Render()
@@ -124,27 +130,32 @@ bool PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you)
 				// 相手がヒットしたときの地上にいたか空中にいたか
 				int iHitPlace = (you->isLand()) ? (int)AttackData::HIT_PLACE::LAND : (int)AttackData::HIT_PLACE::AERIAL;
 
+				// フィニッシュアーツかどうか
+				bool bFinish = (my->GetActionState() == BASE_ACTION_STATE::FINISH);
+
 				// まず、攻撃をヒットさせた人に送信
-				HIT_ATTACK_INFO hai;
-				hai.HitPlayerDeviceID = you->GetDeviceID();					// ダメージを与えた相手の番号
-				hai.hitStopFlame = my->GetAttackData()->places[iHitPlace].hitStopFlame;		// 自分自身にもの自分のヒットストップ
-				hai.HitScore = my->GetAttackData()->HitScore;				// ダメージ(スコア)
-				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + my->GetDeviceID()), MESSAGE_TYPE::HIT_ATTACK, &hai);
+				HIT_ATTACK_INFO HitAttackInfo;
+				HitAttackInfo.HitPlayerDeviceID = you->GetDeviceID();									// ダメージを与えた相手の番号
+				HitAttackInfo.hitStopFlame = my->GetAttackData()->places[iHitPlace].hitStopFlame;		// 自分自身にもの自分のヒットストップ
+				HitAttackInfo.HitScore = my->GetAttackData()->HitScore;									// ダメージ(スコア)
+				HitAttackInfo.bFinishAttack = bFinish;													// ふぃにしゅアーツかどうか
+				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + my->GetDeviceID()), MESSAGE_TYPE::HIT_ATTACK, &HitAttackInfo);
 
 				// そして、ダメージを受けた人に送信
-				HIT_DAMAGE_INFO hdi;
-				hdi.BeInvincible = my->GetAttackData()->places[iHitPlace].bBeInvincible;	// 無敵になるかどうか
-				hdi.damage = my->GetAttackData()->damage;				// ダメージ(スコア)
-				hdi.FlyVector = my->GetAttackData()->places[iHitPlace].FlyVector;			// 吹っ飛びベクトル
-				hdi.hitStopFlame = my->GetAttackData()->places[iHitPlace].hitStopFlame;		// ヒットストップ
-				hdi.recoveryFlame = my->GetAttackData()->places[iHitPlace].recoveryFlame;		// 硬直時間
-				hdi.effectType = (int)my->GetAttackData()->effectType;			// この攻撃のヒットエフェクトを相手に送る
-
+				HIT_DAMAGE_INFO HitDamageInfo;
+				HitDamageInfo.BeInvincible = my->GetAttackData()->places[iHitPlace].bBeInvincible;	// 無敵になるかどうか
+				HitDamageInfo.damage = my->GetAttackData()->damage;				// ダメージ(スコア)
+				HitDamageInfo.FlyVector = my->GetAttackData()->places[iHitPlace].FlyVector;			// 吹っ飛びベクトル
+				HitDamageInfo.hitStopFlame = my->GetAttackData()->places[iHitPlace].hitStopFlame;		// ヒットストップ
+				HitDamageInfo.recoveryFlame = my->GetAttackData()->places[iHitPlace].recoveryFlame;		// 硬直時間
+				HitDamageInfo.HitEffectType = (int)my->GetAttackData()->HitEffectType;			// この攻撃のヒットエフェクトを相手に送る
+				HitDamageInfo.iAttackType = (int)my->GetActionState();						// 何の攻撃かのタイプ(コンボ中に同じ攻撃を使わせないように)
+				HitDamageInfo.bFinishAttack = bFinish;										// ふぃにしゅアーツかどうか
 				if (
 					//my->GetPos().x > you->GetPos().x// 位置関係によるベクトル
 					my->GetDir() == DIR::LEFT			// 当てた人の向きによるベクトル
-					) hdi.FlyVector.x *= -1;
-				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + you->GetDeviceID()), MESSAGE_TYPE::HIT_DAMAGE, &hdi);
+					) HitDamageInfo.FlyVector.x *= -1;
+				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + you->GetDeviceID()), MESSAGE_TYPE::HIT_DAMAGE, &HitDamageInfo);
 
 				// 音出す
 				LPCSTR seID = my->GetAttackData()->HitSE;
@@ -204,8 +215,8 @@ bool PlayerManager::CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou)
 				hdi.FlyVector = pStand->GetAttackData()->places[iHitPlace].FlyVector;			// 吹っ飛びベクトル
 				hdi.hitStopFlame = pStand->GetAttackData()->places[iHitPlace].hitStopFlame;		// ヒットストップ
 				hdi.recoveryFlame = pStand->GetAttackData()->places[iHitPlace].recoveryFlame;		// 硬直時間
-				hdi.effectType = (int)pStand->GetAttackData()->effectType;			// この攻撃のヒットエフェクトを相手に送る
-	
+				hdi.HitEffectType = (int)pStand->GetAttackData()->HitEffectType;			// この攻撃のヒットエフェクトを相手に送る
+				hdi.iAttackType = (int)BASE_ACTION_STATE::NO_ACTION;	// NO_ACTIONのときは、コンボ継続関連のを無視する
 				if (pStand->GetPos().x > pYou->GetPos().x) hdi.FlyVector.x *= -1;
 				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + pYou->GetDeviceID()), MESSAGE_TYPE::HIT_DAMAGE, &hdi);
 	

@@ -326,7 +326,7 @@ PanelEffectManager::PanelEffectManager()
 			break;
 
 		default:
-			assert(0, "そんなエフェクトはない");
+			assert(0);		// "そんなエフェクトはない"
 			break;
 		}
 	}

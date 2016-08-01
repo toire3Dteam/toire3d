@@ -37,7 +37,7 @@ BOOL InitApp(HINSTANCE hInstance, int nCmdShow)									// ƒQ[ƒ€‹N“®‚ÌÅ‰‚Ì
 	SYSTEM_Initialize();
 
 	//MainFrameEx = new Framework();			 // ƒƒCƒ“ƒtƒŒ[ƒ€ƒ[ƒN¶¬
-	MainFrameEx->ChangeScene(new sceneMain, true); // ‰ŠúƒV[ƒ“
+	MainFrameEx->ChangeScene(new sceneMain); // ‰ŠúƒV[ƒ“
 
 	return TRUE;
 }

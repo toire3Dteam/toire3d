@@ -428,6 +428,41 @@ namespace BasePlayerState
 		KnockBack& operator=(const KnockBack&) {}
 	};
 
+	/*******************************************************/
+	//		エアリアルノックバックステート(空中やられ)　
+	/*******************************************************/
+	class AerialKnockBack :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static AerialKnockBack* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+
+		AerialKnockBack() {};
+		~AerialKnockBack() {};
+
+		AerialKnockBack(const AerialKnockBack&) {}
+		AerialKnockBack& operator=(const AerialKnockBack&) {}
+	};
+
 
 	/*******************************************************/
 	//					ノックダウンステート
@@ -464,7 +499,76 @@ namespace BasePlayerState
 		KnockDown& operator=(const KnockDown&) {}
 	};
 
-	
+	/*******************************************************/
+	//					空中リカバリーステート
+	/*******************************************************/
+	class LandRecovery :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static LandRecovery* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+
+		LandRecovery() {};
+		~LandRecovery() {};
+
+		LandRecovery(const LandRecovery&) {}
+		LandRecovery& operator=(const LandRecovery&) {}
+	};
+
+	/*******************************************************/
+	//					空中リカバリーステート
+	/*******************************************************/
+	class AerialRecovery :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static AerialRecovery* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+
+		AerialRecovery() {};
+		~AerialRecovery() {};
+
+		AerialRecovery(const AerialRecovery&) {}
+		AerialRecovery& operator=(const AerialRecovery&) {}
+	};
+
 	/*******************************************************/
 	//					待機
 	/*******************************************************/
@@ -668,5 +772,39 @@ namespace BasePlayerState
 
 		StandAction(const StandAction&) {}
 		StandAction& operator=(const StandAction&) {}
+	};
+
+	/*******************************************************/
+	//				フィニッシュモーション
+	/*******************************************************/
+	class FinishAttack :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static FinishAttack* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		FinishAttack() {};
+		~FinishAttack() {};
+
+		FinishAttack(const StandAction&) {}
+		FinishAttack& operator=(const StandAction&) {}
 	};
 }

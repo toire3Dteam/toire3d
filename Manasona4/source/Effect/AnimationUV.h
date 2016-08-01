@@ -29,14 +29,16 @@ public:
 	void ActionRoop();  // ループアニメ実行
 	void StopRoop();	// ループアニメストップ
 
-	void Update(Vector3 pos = Vector3(0.0f, 0.0f, 0.0f),
-		Vector3 angle = Vector3(0.0f, 0.0f, 0.0f));	// 更新
+	void Update(Vector3 pos = Vector3(0.0f, 0.0f, 0.0f));	// 更新
 	void Update(Vector3 pos ,Vector3 angle , Vector3 scale);			// 更新スケールをvector型に変えたもの
 	void Render();			// 描画
 	void Render_ADD();			// 乗算描画
 
 	// スケール・アニメーション　最初から　最後まで　の大きさを書く　変化させたくなければ　どっちも同じ値を入れる
 	void ScaleAnimation(float StartScale, float EndScale);
+
+    // アングル・アニメーション　最初から　最後まで　の値を書く　変化させたくなければ　どっちも同じ値を入れる
+    void AngleAnimation(Vector3 StartAngle, Vector3 EndAngle);
 
 
 	// ゲッター・セッター
@@ -65,5 +67,7 @@ private:
 	float		m_startScale;	// 初期 拡大率
 	float		m_endScale;		// 最大 拡大率
 
-
+    Vector3		m_angle;		        // アングル
+    Vector3		m_startAngle;   	// 初期 アングル
+    Vector3		m_endAngle;		// 最大 アングル
 };
