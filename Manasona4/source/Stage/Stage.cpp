@@ -25,7 +25,7 @@ void Stage::Base::Update()
 void Stage::Base::Render()
 {
 	if (m_pBack) m_pBack->Render();
-	m_pObj->Render();
+	m_pObj->Render(shader,"copy");
 }
 
 void Stage::Base::CreateStage(Stage::Base**p,STAGE_ID id, Camera *pCamera)
@@ -63,9 +63,11 @@ void Stage::Base::Collision(BasePlayer *player)
 
 void Stage::Senjo::Initialize(Camera *pCamera)
 {
-	m_pObj = new iexMesh("DATA/Stage/Senjo/pupupu2.IMO");
+	//m_pObj = new iexMesh("DATA/Stage/Senjo/pupupu2.IMO");
+	m_pObj = new iexMesh("DATA/Stage/Stage/sandStage.IMO");
 	m_pBack = new iexMesh("DATA/Stage/Senjo/Skydome.IMO");
-	m_pBack->SetPos(Vector3(0, -50, 0));
+	m_pBack->SetPos(Vector3(0, 0, 300));
+	m_pBack->SetScale(3.5f);
 	m_pBack->Update();
 	m_DeadLineY = -100;
 
@@ -88,12 +90,7 @@ void Stage::Syuten::Initialize(Camera *pCamera)
 
 void Stage::Syuten::Update()
 {
-	static float v = 0;
-	v += 0.001f;
-	if (v > 1.0f)v -= 1.0f;
-	shader->SetValue("tuAnime", 0.0f);
-	shader->SetValue("tvAnime", v);
-	shader->SetValue("alphaUV", 1.0f);
+
 
 	static float a = .0f;
 	m_pBack->SetAngle((a += .001f));
@@ -103,6 +100,14 @@ void Stage::Syuten::Update()
 void Stage::Syuten::Render()
 {
 	if (m_pBack) m_pBack->Render();
+	
+	static float v = 0;
+	v += 0.001f;
+	if (v > 1.0f)v -= 1.0f;
+	shader->SetValue("tuAnime", 0.0f);
+	shader->SetValue("tvAnime", v);
+	shader->SetValue("alphaUV", 1.0f);
+
 	m_pObj->Render(shader,"uvAnime");
 }
 

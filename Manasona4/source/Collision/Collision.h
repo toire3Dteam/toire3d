@@ -52,6 +52,9 @@ namespace Collision
 	void RaypicLeft(iexMesh *obj, BasePlayer *player);
 	void RaypicRight(iexMesh *obj, BasePlayer *player);
 
+	// ÇﬂÇËçûÇ›
+	void Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2);
+
 	// å`èÛÇ≈îªíË
 	bool HitCheck(CollisionShape::Circle* c1, CollisionShape::Circle* c2);
 	bool HitCheck(CollisionShape::Square* s1, CollisionShape::Square* s2);

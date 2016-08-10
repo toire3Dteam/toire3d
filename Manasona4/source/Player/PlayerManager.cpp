@@ -25,8 +25,15 @@ void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage)
 
 	FOR(NumPlayer)
 	{
-		m_pPlayers[i] = new Airou(i, (i == 3));
+		m_pPlayers[i] = new Airou(i, (i == 3 || i == 2));
 		m_pPlayers[i]->InitActionDatas();		// ★攻撃情報を各キャラに初期化させる
+	}
+
+
+	FOR(NumPlayer)
+	{
+		// AI初期化 なぜここで初期化するというと、初期化の中でプレイヤーを参照することがあり、全員の初期化が完了した後に呼び出したいから
+		m_pPlayers[i]->InitAI();
 	}
 }
 
@@ -40,16 +47,13 @@ PlayerManager::~PlayerManager()
 void PlayerManager::Update()
 {
 	/* プレイヤーたち更新 */
-	int count(0);
 	FOR(m_NumPlayer)
 	{
-		count++;
 		m_pPlayers[i]->Update();			// モーションとか移動値の作成とか、基本的な更新。
 	}
 
-	if (count == m_NumPlayer - 1)throw "XXXXXX";
-
 	/* プレイヤーVSプレイヤーの攻撃判定 */
+	//bool bHit[m_NumPlayer];
 	bool *bHit = new bool[m_NumPlayer];					// 複数ヒット用
 	bool *bHitStand = new bool[m_NumPlayer];
 	memset(bHit, false, sizeof(bool) * m_NumPlayer);	// falseで初期化
@@ -58,7 +62,11 @@ void PlayerManager::Update()
 	{
 		for (int you = my + 1; you < m_NumPlayer; you++)
 		{
+			Collision::Sinking(m_pPlayers[my], m_pPlayers[you]);	// めり込み判定
+
 			bool receive;	// 判定結果受取り用変数
+
+			// ( my->you you->my )つまり交互に当たっていないかチェックする
 
 			/* プレイヤーVSプレイヤーの攻撃判定 */
 			receive = CollisionPlayerAttack(m_pPlayers[my], m_pPlayers[you]);
@@ -76,7 +84,7 @@ void PlayerManager::Update()
 	// プレイヤーVSプレイヤー攻撃結果確定
 	FOR(m_NumPlayer)
 	{
-		if (bHit[i]) m_pPlayers[i]->GetAttackData()->bHit = true;	// 2重ヒット防止用のフラグをONにする
+		if (bHit[i]) if(m_pPlayers[i]->isAttackState()) m_pPlayers[i]->GetAttackData()->bHit = true;	// 2重ヒット防止用のフラグをONにする
 		if (bHitStand[i]) m_pPlayers[i]->GetStand()->GetAttackData()->bHit = true;	// 2重ヒット防止用のフラグをONにする
 	}
 
@@ -110,6 +118,24 @@ bool PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you)
 
 	if (my->isActiveFrame()) // 攻撃フレーム中なら
 	{
+		// 渾身の対空の処理
+		/***************************************/
+		// 相手も攻撃中なら
+		if (you->isAttackState() == true)
+		{
+			// その攻撃が　もし始動・持続の間に
+			// 「対空」効果を持っていた場合
+			if ((you->GetActionFrame() == FRAME_STATE::ACTIVE ||
+				you->GetActionFrame() == FRAME_STATE::START)
+				&& you->GetAttackData()->bAntiAir== true)
+			{
+				// 自分が空中で攻撃していた場合
+				if (my->isLand() == false)return false;
+			}
+
+		}
+		/******************************************/
+
 		if (you->GetInvincibleLV() <= my->GetAttackData()->pierceLV &&	// 相手が無敵でない
 			!my->GetAttackData()->bHit)									// まだ攻撃を当ててない
 		{
@@ -217,7 +243,10 @@ bool PlayerManager::CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou)
 				hdi.recoveryFlame = pStand->GetAttackData()->places[iHitPlace].recoveryFlame;		// 硬直時間
 				hdi.HitEffectType = (int)pStand->GetAttackData()->HitEffectType;			// この攻撃のヒットエフェクトを相手に送る
 				hdi.iAttackType = (int)BASE_ACTION_STATE::NO_ACTION;	// NO_ACTIONのときは、コンボ継続関連のを無視する
-				if (pStand->GetPos().x > pYou->GetPos().x) hdi.FlyVector.x *= -1;
+				if (
+					//my->GetPos().x > you->GetPos().x// 位置関係によるベクトル
+					pStand->GetDir() == DIR::LEFT			// 当てた人の向きによるベクトル
+					) hdi.FlyVector.x *= -1;
 				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + pYou->GetDeviceID()), MESSAGE_TYPE::HIT_DAMAGE, &hdi);
 	
 				// 音出す

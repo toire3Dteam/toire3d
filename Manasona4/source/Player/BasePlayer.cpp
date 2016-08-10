@@ -1,10 +1,12 @@
 #include "TDNLIB.h"
 #include "BasePlayer.h"
-#include "BasePlayerState.h"
 #include "../Collision/Collision.h"
 #include "../Stage/Stage.h"
 #include "../Stand/Stand.h"
 #include "../Sound/SoundManager.h"
+#include "AI\AI.h"
+#include "../Effect/Particle.h"
+
 
 //_/_/_/_/_/_/__/_/__/_/__/_/__
 // 定数
@@ -48,7 +50,7 @@ void BasePlayer::LoadAttackFrameList(char *filename)
 BasePlayer::BasePlayer(int deviceID, bool bAI) :m_bAI(bAI), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + deviceID)),
 m_maxSpeed(1.0f), m_dir(DIR::LEFT), m_deviceID(deviceID), m_pHitSquare(new CollisionShape::Square),
 m_pObj(nullptr), m_move(VECTOR_ZERO), m_bLand(false), m_bAerialJump(true), m_ActionState(BASE_ACTION_STATE::NO_ACTION),
-m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentActionFrame(0), m_RecoveryFlame(0), m_bEscape(false), m_score(0), m_CollectScore(0),
+m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentActionFrame(0), m_RecoveryFlame(0), m_bEscape(false), m_score(0), m_CollectScore(0), m_pAI(nullptr),
 m_recoveryCount(0), m_HitStopFrame(0)// ★★★バグの原因　ひっとすトップ初期化のし忘れ。
 {
 	// とりあえず、モコイさん
@@ -71,6 +73,10 @@ m_recoveryCount(0), m_HitStopFrame(0)// ★★★バグの原因　ひっとすトップ初期化の
 	m_pStateMachine = new StateMachine<BasePlayer>(this);
 	m_pStateMachine->SetGlobalState(BasePlayerState::Global::GetInstance());// グローバル
 	m_pStateMachine->SetCurrentState(BasePlayerState::Wait::GetInstance());
+
+	// AIかどうかで　分岐
+	//if(bAI) m_pAI = new AI(m_deviceID, this);
+	m_pAI = nullptr;
 
 	// IDで座標の分岐
 	switch (deviceID)
@@ -98,6 +104,13 @@ m_recoveryCount(0), m_HitStopFrame(0)// ★★★バグの原因　ひっとすトップ初期化の
 	m_RecoveryDamageCount.clear();
 }
 
+void BasePlayer::InitAI()
+{
+	// AIフラグかつ、AIがnewされてなかったら
+	//if (m_pAI) return;
+	if (m_bAI) m_pAI = new AI(m_deviceID, this);
+}
+
 BasePlayer::~BasePlayer()
 {
 	SAFE_DELETE(m_pObj);
@@ -105,15 +118,15 @@ BasePlayer::~BasePlayer()
 	SAFE_DELETE(m_pStand);
 	SAFE_DELETE(m_PanelEffectMGR);
 	SAFE_DELETE(m_UVEffectMGR);
-	
+	SAFE_DELETE(m_pAI);
+
+
 	delete m_pHitSquare;
 }
 
 void BasePlayer::Update()
 {
-	// エフェクトマネージャー更新 (ヒットストップ無視)
-	m_PanelEffectMGR->Update();
-	m_UVEffectMGR->Update();
+
 
 	// スタンド更新
 	m_pStand->Update();
@@ -150,7 +163,7 @@ void BasePlayer::Update()
 				{
 					// (A列車)ここで攻撃判定が発動した瞬間を取ってきてる
 					
-					// 振りエフェクト発動
+					// 振りエフェクト発動（仮）！
 					AddEffectAction(m_pos + Vector3(0, 5, -3) , m_ActionDatas[(int)m_ActionState].pAttackData->WhiffEffectType);
 
 					LPCSTR SE_ID = m_ActionDatas[(int)m_ActionState].pAttackData->WhiffSE;
@@ -161,10 +174,50 @@ void BasePlayer::Update()
 						se->Play((LPSTR)SE_ID);
 					}
 				}
+
+
+				//// もし始動・持続の間にその攻撃が「対空」効果を持っていた場合
+				//// 対空フラグをONにするそれ以外はOFFに
+				//if ((m_ActionFrameList[m_ActionState][m_CurrentActionFrame] == FRAME_STATE::ACTIVE ||
+				//	m_ActionFrameList[m_ActionState][m_CurrentActionFrame] == FRAME_STATE::START)
+				//	&& m_ActionDatas[(int)m_ActionState].pAttackData->bAntiAir == true	)
+				//{
+				//	m_move.y += 0.35f;
+				//}
+				//else
+				//{
+
+				//}
+
 			}
+			//else
+			//{
+			//	// ようわからんのでこっちでも一応対空OFFにしとこ
+
+			//}
+
+			
+			// ActionFlameがフレームや
+			//if (m_ActionFrameList[m_ActionState][m_CurrentActionFrame] == FRAME_STATE::ACTIVE || 
+			//	m_ActionFrameList[m_ActionState][m_CurrentActionFrame] == FRAME_STATE::START)
+			//{
+			//	// 攻撃フレームなら(これがなかったら攻撃のデータがないものも見てしまう)
+			//	if (m_ActionDatas[(int)m_ActionState].isAttackData())
+			//	{
+			//		// 今どの業のステートかわかる
+			//		if (m_ActionDatas[(int)m_ActionState].pAttackData->bAntiAir == true)
+			//		{
+			//			m_move.y += 0.35f;
+			//		}
+			//	}
+			//	
+			//}
+
+			// モーションのフレームを更新！
+			m_CurrentActionFrame++;
 
 			// フレーム最後まで再生したら
-			if (m_ActionFrameList[m_ActionState][m_CurrentActionFrame++] == FRAME_STATE::END)
+			if (m_ActionFrameList[m_ActionState][m_CurrentActionFrame] == FRAME_STATE::END)
 			{
 				// ★アクションステート解除
 				m_ActionState = BASE_ACTION_STATE::NO_ACTION;
@@ -192,8 +245,13 @@ void BasePlayer::Update()
 		m_pObj->SetPos(m_pos);
 		m_pObj->Update();
 	}
+
 	// アングル補間処理
 	m_angleY = m_angleY*.65f + DIR_ANGLE[(int)m_dir] * .35f;
+
+	// エフェクトマネージャー更新 (ヒットストップ無視)
+	m_PanelEffectMGR->Update();
+	m_UVEffectMGR->Update();
 }
 
 void BasePlayer::Move() 
@@ -242,25 +300,27 @@ void BasePlayer::Control()
 
 void BasePlayer::AIControl()
 {
-	for (int i = 0; i < (int)PLAYER_INPUT::MAX; i++)
-	{
-		// 入力リセット
-		m_InputList[i] = 0;
-	}
-
-	static int frame(0);
-	if (++frame > 60)
-	{
-		frame = 0;
-		m_InputList[(int)PLAYER_INPUT::C] = 3;
-	}
-	//static int frame2(0);
-	//if (++frame2 > 12)
+	//static int frame(0);
+	//if (++frame > 90)
 	//{
-	//	frame2 = 0;
-	//	m_InputList[(int)PLAYER_INPUT::B] = 3;
+	//	frame = 0;
+	//	m_InputList[(int)PLAYER_INPUT::C] = 3;
+	//	//m_InputList[(int)PLAYER_INPUT::LEFT] = 3;
 	//}
-	m_InputList[(int)PLAYER_INPUT::A] = 1;	// Aおしっぱ
+
+	////static int frame2(0);
+	////if (++frame2 > 65)
+	////{
+	////	frame2 = 0;
+	////	m_InputList[(int)PLAYER_INPUT::B] = 3;
+	////	m_InputList[(int)PLAYER_INPUT::DOWN] = 3;
+	////}
+	//m_InputList[(int)PLAYER_INPUT::LEFT] = 1;	// Aおしっぱ
+
+
+	// AIのステートマシンを更新
+	m_pAI->Update();
+
 }
 
 void BasePlayer::UpdatePos()
@@ -285,7 +345,7 @@ void BasePlayer::Render()
 	// 無敵なら加算で重ねて描画
 	if (m_InvincibleTime > 0) m_pObj->Render(RS::ADD);
 
-	if (m_deviceID == 0)
+	if (m_deviceID == 3)
 	{
 		m_pStateMachine->Render();// ステートマシンでの描画
 	}
@@ -331,10 +391,15 @@ void BasePlayer::Render()
 		}
 	}
 
+#endif
+
 	// デバッグ
 	tdnText::Draw(32 + m_deviceID * 250, 560, 0xff00ff80, "CollectScore : %d", m_CollectScore);
 	tdnText::Draw(32 + m_deviceID * 250, 600, 0xffff8000, "Score : %d", m_score);
-#endif
+
+	tdnText::Draw(32 + m_deviceID * 250, 630, 0xff00ff80, "スタンドゲージ : %d", m_pStand->GetStandGage());
+	tdnText::Draw(32 + m_deviceID * 250, 660, 0xffff8000, "スタンドストック: %d", m_pStand->GetStandStock());
+
 }
 
 // ステートマシンへの他から来るメッセージ
@@ -368,6 +433,29 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType)
 	case EFFECT_TYPE::RECOVERY:
 		m_PanelEffectMGR->AddEffect(pos + Vector3(0, 5, 0), PANEL_EFFECT_TYPE::ClEAR);
 
+
+		break;
+	case EFFECT_TYPE::PERSONA:
+		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::PERSONA,
+			1, 2.0f, Vector3(0, diaAngle, 0), Vector3(0, diaAngle, 0));
+		ParticleManager::EffectPersonaTrigger(pos);
+		break;
+	case EFFECT_TYPE::DROP_IMPACT:
+		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::IMPACT,
+			1.0f, 1.35f, Vector3(0, 0, 0), Vector3(0, 0, 0));
+
+		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::SHOCK_WAVE,
+			1.0f, 1.55f, Vector3(0, 0, 0), Vector3(0, 0, 0));
+
+		break;
+	case EFFECT_TYPE::UPPER:
+		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::UPPER,
+			1.0f, 1.0f, Vector3(0, diaAngle, 0), Vector3(0, diaAngle, 0));
+
+		break;
+
+	case EFFECT_TYPE::FINISH_HIT:
+		ParticleManager::EffectFinish(pos);
 
 		break;
 	default:

@@ -2,6 +2,7 @@
 // エンティティ関連のインクルード
 #include "../BaseEntity/Entity/BaseGameEntity.h"
 #include "../BaseEntity/State/StateMachine.h"
+#include "BasePlayerState.h"
 
 // 判定のインクルード
 #include "../Collision/Collision.h"
@@ -11,6 +12,7 @@
 #include "../Effect\UVEffect\UVEffectManager.h"
 
 // 前方宣言
+class AI;
 namespace Stand
 {
 	class Base;
@@ -92,6 +94,7 @@ enum BASE_ACTION_STATE
 	AERIAL,		// 空中攻撃
 	AERIALDROP,	// 空中下攻撃
 	FINISH,		// フィニッシュアーツ
+	SKILL,		// 地上キャラクター固有技
 	END		// 何もなし　(A列車)名前
 };
 
@@ -101,11 +104,18 @@ enum class EFFECT_TYPE
 	DAMAGE,	// ダメージエフェクト
 	WHIFF,	//	振り
 	RECOVERY, //リカバリー
-	//AIROU_CIRCLE,// アイルーサークル
+	PERSONA,  //　ペ...ル..ソ..ナ!!
+	DROP_IMPACT,// ドロップインパクト
+	UPPER,		// アッパー
+	FINISH_HIT,		// フィニッシュアーツヒット
+ 	//AIROU_CIRCLE,// アイルーサークル
 	
 
 };
 
+/****************************************/
+//		アタックデータ
+/****************************************/
 class AttackData
 {
 public:
@@ -122,6 +132,7 @@ public:
 	LPCSTR WhiffSE;				// 空振りSE
 	EFFECT_TYPE WhiffEffectType;	// 振りエフェクト
 	int pierceLV;				// 貫通レベル
+	bool bAntiAir;				// 対空攻撃かどうか　(追加)
 
 	// ★★★地上ヒットと空中ヒットで分けたい情報
 	struct
@@ -137,6 +148,11 @@ public:
 	~AttackData(){ SAFE_DELETE(pCollisionShape); }
 };
 
+/***************************************************************/
+//
+//		ベースプレイヤー
+//
+/***************************************************************/
 class BasePlayer : public BaseGameEntity
 {
 protected:
@@ -187,12 +203,18 @@ protected:
 public:
 	BasePlayer(int deviceID, bool bAI);
 	~BasePlayer();
+	void InitAI();
 	void Control();			// プレイヤーからの入力を受け付ける
 	void AIControl();
 	virtual void Update();	// 基本的な更新
 	void UpdatePos();		// 座標更新(判定後に呼び出す)
 	void Move();			// 動きの制御
 	virtual void Render();
+
+	/****************************/
+	//	キャラクター固有スキル
+	/****************************/
+	virtual void SkillUpdate() = 0;//
 
 	/*****************/
 	// AIに必要な関数
@@ -205,9 +227,9 @@ public:
 	// ステートの種類　ふつう（敵をねらう）　自分のポイントが溜まってきた(相手にFAを決めにく)　など
 	// 
 
-	void AI_Brain();	// ここで考え->行動の処理を行う
-	void AI_Think();	// 考える関数
-	void AI_Execute();	// 
+	//void AI_Brain();	// ここで考え->行動の処理を行う
+	//void AI_Think();	// 考える関数
+	//void AI_Execute();	// 
 
 
 	// 継承してるやつに強制的に呼ばせる
@@ -233,9 +255,15 @@ public:
 	float GetMaxSpeed() { return m_maxSpeed; }
 	BASE_ACTION_STATE GetActionState(){ return m_ActionState; }
 
+	void SetInputList(PLAYER_INPUT inputNo, int inputFlag){ m_InputList[(int)inputNo] = inputFlag; }
+
 	AttackData *GetAttackData(BASE_ACTION_STATE state)
 	{
-		assert(isAttackState());	// アタックデータがないステートでアタックデータを参照しようとしている
+		if (!isAttackState())
+		{
+			int i = 0;
+			assert(isAttackState());	// アタックデータがないステートでアタックデータを参照しようとしている
+		}
 		return m_ActionDatas[(int)state].pAttackData; 
 	}
 
@@ -275,9 +303,15 @@ public:
 	bool isEscape() { return m_bEscape; }
 	Stand::Base *GetStand(){ return m_pStand; }
 	std::list<BASE_ACTION_STATE> *GetRecoveryDamageCount(){ return &m_RecoveryDamageCount; }
+	bool isDownState(){ return (m_pStateMachine->isInState(*BasePlayerState::KnockDown::GetInstance())); }
 
 	// セッター
-	void SetMove(const Vector3 &v) { m_move.Set(v.x, v.y, v.z); }
+	void SetMove(const Vector3 &v) 
+	{
+		if (v.y > 0)
+			int i = 0;
+		m_move.Set(v.x, v.y, v.z);
+	}
 	void SetPos(const Vector3 &v) { m_pos.Set(v.x, v.y, v.z); }
 	void SetDir(DIR dir) { m_dir = dir; }
 	void SetMotion(int MotionNo) { if (m_pObj) { if (m_pObj->GetMotion() != MotionNo)m_pObj->SetMotion(MotionNo); } }
@@ -309,7 +343,10 @@ public:
 	void SetRecoveryCount(int recoverycount){ m_recoveryCount = recoverycount; }
 
 	// アクセサー
-	void AddMove(const Vector3 &v) { m_move += v; }
+	void AddMove(const Vector3 &v) 
+	{ 
+		m_move += v;
+	}
 	void AddCollectScore(int score) { m_CollectScore += score; }
 	void ConversionScore()
 	{
@@ -352,6 +389,7 @@ protected:
 	bool m_bAerialJump;		// 空中ジャンプのフラグ
 	int m_InputList[(int)PLAYER_INPUT::MAX]; 	// 押しているキーを格納
 	StateMachine<BasePlayer>* m_pStateMachine; // ★ステートマシン
+	AI*						  m_pAI;			// ★AI
 	int m_InvincibleLV;			// 無敵かどうか
 	int m_InvincibleTime;		// 無敵時間		無敵時は0以上の値が入り、0になるまでデクリメントされる
 	int m_CurrentActionFrame;	// 攻撃フレームリストの中を再生しているフレーム

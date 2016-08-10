@@ -77,7 +77,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// メインループ
 	for (;;)
 	{
-	NOTACTIVE:
+	//NOTACTIVE:
 		// メッセージ処理
 		if (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))	// メッセージがあればTRUE
 		{
@@ -89,7 +89,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			if (tdnSystem::GetWindowActive() == false)
 			{
 				WaitMessage();
-				goto NOTACTIVE;
+				//goto NOTACTIVE;
 			}
 		}
 		else

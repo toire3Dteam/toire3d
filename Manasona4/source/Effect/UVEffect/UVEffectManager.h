@@ -9,7 +9,9 @@ class BaseUVEffect;
 
 enum class UV_EFFECT_TYPE
 {
-	WAVE, HIT_IMPACT, ARRAY_END, 
+	WAVE, HIT_IMPACT, PERSONA, IMPACT, SHOCK_WAVE, UPPER,
+
+	ARRAY_END, // Å¶îzóÒÇÃèIÇÌÇË
 };
 
 class UVEffectManager

@@ -2,9 +2,10 @@
 #include "BasePlayerState.h"
 #include "../Stand/Stand.h"
 #include "../Sound/SoundManager.h"
+#include "../Effect/Particle.h"
 
 // 定数
-static const float HUTTOBI_LINE = 4.0f;
+static const float HUTTOBI_LINE = 3.0f;
 static const float REPEAT_ATTACK_RATE = 0.85f;		// 同じ攻撃当たるなレート
 
 /*******************************************************/
@@ -60,6 +61,8 @@ bool StandCansel(BasePlayer * pPerson)
 	// スタンドキャンセル
 	if (pPerson->isPushInput(PLAYER_INPUT::L1))
 	{
+		// 追記　スタンドストックがないときはキャンセルできない
+		if (pPerson->GetStand()->GetStandStock() <= 0)return false;
 		pPerson->GetFSM()->ChangeState(BasePlayerState::StandAction::GetInstance());
 		return true;
 	}
@@ -83,6 +86,17 @@ bool FinishAttackCansel(BasePlayer *pPerson)
 	if (pPerson->isPushInput(PLAYER_INPUT::R2))
 	{
 		pPerson->GetFSM()->ChangeState(BasePlayerState::FinishAttack::GetInstance());
+		return true;
+	}
+	else return false;
+}
+
+bool SkillCansel(BasePlayer *pPerson)
+{
+	// 攻撃キャンセル
+	if (pPerson->isPushInput(PLAYER_INPUT::D))
+	{
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Skill::GetInstance());
 		return true;
 	}
 	else return false;
@@ -226,6 +240,11 @@ void BasePlayerState::Wait::Enter(BasePlayer * pPerson)
 void BasePlayerState::Wait::Execute(BasePlayer * pPerson)
 {
 	//////////////////////////////////////////////
+	//	スキルキャンセル
+	//============================================
+	if (SkillCansel(pPerson)) return;
+
+	//////////////////////////////////////////////
 	//	ジャンプキャンセル
 	//============================================
 	if (JumpCansel(pPerson)) return;
@@ -353,6 +372,11 @@ void BasePlayerState::Walk::Enter(BasePlayer * pPerson)
 
 void BasePlayerState::Walk::Execute(BasePlayer * pPerson)
 {
+	//////////////////////////////////////////////
+	//	スキルキャンセル
+	//============================================
+	if (SkillCansel(pPerson)) return;
+
 	//////////////////////////////////////////////
 	//	ジャンプキャンセル
 	//============================================
@@ -502,6 +526,11 @@ void BasePlayerState::Run::Enter(BasePlayer * pPerson)
 void BasePlayerState::Run::Execute(BasePlayer * pPerson)
 {
 	//////////////////////////////////////////////
+	//	スキルキャンセル
+	//============================================
+	if (SkillCansel(pPerson)) return;
+
+	//////////////////////////////////////////////
 	//	ジャンプキャンセル
 	//============================================
 	if (JumpCansel(pPerson)) return;
@@ -561,7 +590,7 @@ void BasePlayerState::Run::Execute(BasePlayer * pPerson)
 	//////////////////////////////////////////////
 	//	右
 	//============================================
-	// 押した瞬間
+	// 押した瞬間 理論上　★二回連続押すことはありえない　ニュートラルを挟む
 	else if (pPerson->GetInputList(PLAYER_INPUT::RIGHT) == 3)
 	{
 		// 反対方向
@@ -870,7 +899,7 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 			pPerson->AddMove(add);
 
 			// 地上フラグオフ！
-			pPerson->SetLand(false);
+			//pPerson->SetLand(false);
 
 			// しゃがみフラグ終了
 			pPerson->GetJump()->bHold = false;
@@ -901,6 +930,19 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 	//============================================
 	else
 	{
+		// 地上フラグtrue(着地したら)
+		if (pPerson->isLand())
+		{
+			// 着地ステートに移行
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Land::GetInstance());
+			return;
+		}
+
+		//////////////////////////////////////////////
+		//	スキルキャンセル
+		//============================================
+		if (SkillCansel(pPerson)) return;
+
 		//////////////////////////////////////////////
 		//	攻撃ボタン
 		//============================================
@@ -963,14 +1005,6 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 
 		// 移動地制御
 		pPerson->MoveClampX(pPerson->GetMaxSpeed() * 0.8f);
-
-
-		// 地上フラグtrue(着地したら)
-		if (pPerson->isLand())
-		{
-			// 着地ステートに移行
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Land::GetInstance());
-		}
 	}
 }
 
@@ -1004,7 +1038,7 @@ BasePlayerState::AerialJump * BasePlayerState::AerialJump::GetInstance()
 void BasePlayerState::AerialJump::Enter(BasePlayer * pPerson)
 {
 	// ジャンプモーションに変える
-	pPerson->SetMotion(0);
+	pPerson->SetMotion(13);
 
 	// 空中ジャンプの権利を使用
 	pPerson->SetAerialJump(false);
@@ -1023,6 +1057,9 @@ void BasePlayerState::AerialJump::Enter(BasePlayer * pPerson)
 	pPerson->SetMove(set);// 前回のMOVE値を消す
 	//pPerson->AddMove(add); 
 
+	// 地上フラグオフ！
+	//pPerson->SetLand(false);
+
 	// SE再生
 	se->Play("ジャンプ");
 }
@@ -1033,6 +1070,11 @@ void BasePlayerState::AerialJump::Execute(BasePlayer * pPerson)
 	//////////////////////////////////////////////
 	//	空中ジャンプ中
 	//============================================
+
+	//////////////////////////////////////////////
+	//	スキルキャンセル
+	//============================================
+	if (SkillCansel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	攻撃ボタン
@@ -1097,6 +1139,7 @@ void BasePlayerState::AerialJump::Execute(BasePlayer * pPerson)
 void BasePlayerState::AerialJump::Exit(BasePlayer * pPerson)
 {
 	//pPerson->GetMove().y = 0;
+	int i = 0;
 }
 
 void BasePlayerState::AerialJump::Render(BasePlayer * pPerson)
@@ -1133,6 +1176,13 @@ void BasePlayerState::Fall::Enter(BasePlayer * pPerson)
 
 void BasePlayerState::Fall::Execute(BasePlayer * pPerson)
 {
+	// 地上フラグtrue(着地したら)
+	if (pPerson->isLand())
+	{
+		// 着地ステートに移行
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Land::GetInstance());
+		return;
+	}
 
 	//////////////////////////////////////////////
 	//	落下中
@@ -1201,14 +1251,6 @@ void BasePlayerState::Fall::Execute(BasePlayer * pPerson)
 	// 移動地制御
 	pPerson->MoveClampX(pPerson->GetMaxSpeed() * 1.1f);
 
-
-	// 地上フラグtrue(着地したら)
-	if (pPerson->isLand())
-	{
-		// 着地ステートに移行
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Land::GetInstance());
-	}
-
 }
 
 void BasePlayerState::Fall::Exit(BasePlayer * pPerson)
@@ -1250,6 +1292,10 @@ void BasePlayerState::Land::Enter(BasePlayer * pPerson)
 	// 移動地制御
 	pPerson->MoveClampX(pPerson->GetMaxSpeed());
 
+	// 着地エフェクト！
+	pPerson->AddEffectAction(pPerson->GetPos(), EFFECT_TYPE::DROP_IMPACT);
+
+
 	// アクションステートオフ(つまり現在までやったいた動きが消える)
 	pPerson->SetActionState(BASE_ACTION_STATE::NO_ACTION);
 }
@@ -1261,9 +1307,15 @@ void BasePlayerState::Land::Execute(BasePlayer * pPerson)
 	//	pPerson->GetFSM()->isPrevState(*BasePlayerState::AerialDropAttack::GetInstance()) == false)
 	{
 		//////////////////////////////////////////////
+		//	スキルキャンセル
+		//============================================
+		if (SkillCansel(pPerson)) return;
+
+		//////////////////////////////////////////////
 		//	ジャンプキャンセル
 		//============================================
-		if (JumpCansel(pPerson)) return;
+		if (JumpCansel(pPerson))
+			return;
 
 		//////////////////////////////////////////////
 		//	攻撃キャンセル
@@ -1292,7 +1344,7 @@ void BasePlayerState::Land::Execute(BasePlayer * pPerson)
 	}
 
 	// 一定時間着地したら
-	if (++pPerson->GetJump()->LandTimer > 16)
+	if (++pPerson->GetJump()->LandTimer > 12)
 	{
 		// 方向キーを入力していたら、「走り」ステートへ
 		if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
@@ -1391,6 +1443,11 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 		else if (pPerson->GetAttackData()->bHit)
 		{
 			/* キャンセルルート */
+			
+			//////////////////////////////////////////////
+			//	スキルキャンセル
+			//============================================
+			if (SkillCansel(pPerson)) return;
 
 			//////////////////////////////////////////////
 			//	スタンドキャンセル
@@ -1675,7 +1732,12 @@ void BasePlayerState::KnockDown::Enter(BasePlayer * pPerson)
 
 void BasePlayerState::KnockDown::Execute(BasePlayer * pPerson)
 {
-	if (pPerson->isLand() == false)return;
+	if (pPerson->isLand() == false)
+	{
+		// 吹っ飛びけむりパーティクル
+		ParticleManager::EffectFlySmoke(pPerson->GetPos());
+		return;
+	}
 
 	// 硬直が0以下なら硬直終了
 	if (pPerson->GetRecoveryFrame() <= 0)
@@ -1964,6 +2026,11 @@ void BasePlayerState::SquatAttack::Execute(BasePlayer * pPerson)
 	// HITしていたらキャンセルできる
 	if (pPerson->GetAttackData()->bHit == true)
 	{
+		//////////////////////////////////////////////
+		//	スキルキャンセル
+		//============================================
+		if (SkillCansel(pPerson)) return;
+
 		//////////////////////////////////////////////
 		//	スタンドキャンセル
 		//============================================
@@ -2397,15 +2464,26 @@ void BasePlayerState::StandAction::Enter(BasePlayer * pPerson)
 	// SE再生
 	se->Play("ペルソナ召喚");
 
+	// ペルソナ発動エフェクト！
+	pPerson->AddEffectAction(pPerson->GetPos(),EFFECT_TYPE::PERSONA);
+
 	// 前回移動量保存
 	//pPerson->SetStandSaveMove(pPerson->GetMove());
 }
 
 void BasePlayerState::StandAction::Execute(BasePlayer * pPerson)
 {
+	// オーラのパーティクル
+	ParticleManager::EffectPersonaAura(pPerson->GetPos());
+
 	if (pPerson->GetStand()->isHit())
 	{
 		/* キャンセルルート */
+
+		//////////////////////////////////////////////
+		//	スキルキャンセル
+		//============================================
+		if (SkillCansel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	しゃがみキャンセル
@@ -2415,7 +2493,20 @@ void BasePlayerState::StandAction::Execute(BasePlayer * pPerson)
 		//////////////////////////////////////////////
 		//	ジャンプキャンセル
 		//============================================
-		if (JumpCansel(pPerson)) return;
+		if (JumpCansel(pPerson))
+		{
+
+			if (pPerson->isPushInput(PLAYER_INPUT::LEFT) == true)
+			{
+				pPerson->AddMove(Vector3(-0.35f, 0, 0));
+			}
+			else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT) == true)
+			{
+				pPerson->AddMove(Vector3(0.35f, 0, 0));
+			}
+
+			return;
+		}
 
 		//////////////////////////////////////////////
 		//	左右キーで走りキャンセル
@@ -2522,6 +2613,75 @@ void BasePlayerState::FinishAttack::Render(BasePlayer * pPerson)
 }
 
 bool BasePlayerState::FinishAttack::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	//// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+	//	// 攻撃くらったよメッセージ
+	//case MESSAGE_TYPE::HIT_DAMAGE:
+	//{
+	//	// グローバルステートに行かないようにする！
+	//	return true;
+	//}
+	//}
+
+	return false;
+}
+
+
+
+/*******************************************************/
+//					スキルステート
+/*******************************************************/
+
+BasePlayerState::Skill * BasePlayerState::Skill::GetInstance()
+{
+	// ここに変数を作る
+	static BasePlayerState::Skill instance;
+	return &instance;
+}
+
+void BasePlayerState::Skill::Enter(BasePlayer * pPerson)
+{
+	// 召喚モーションに変える
+	pPerson->SetMotion(6);
+
+	// アクションステートをキャラクター固有に変更
+	pPerson->SetActionState(BASE_ACTION_STATE::SKILL);
+
+	// SE再生
+	se->Play("ペルソナ召喚");
+
+}
+
+void BasePlayerState::Skill::Execute(BasePlayer * pPerson)
+{
+
+	// そのキャラクターのスキルの更新
+	pPerson->SkillUpdate();
+
+
+	// 攻撃ステート終わったら
+	if (pPerson->GetActionFrame()==FRAME_STATE::END)
+	{
+		// 待機ステートに(さすがにキャンセルはやめておこう)
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+	}
+}
+
+void BasePlayerState::Skill::Exit(BasePlayer * pPerson)
+{
+
+
+}
+
+void BasePlayerState::Skill::Render(BasePlayer * pPerson)
+{
+
+	tdnText::Draw(20, 690, 0xffffffff, "スキルState");
+}
+
+bool BasePlayerState::Skill::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
 	//// メッセージタイプ
 	//switch (msg.Msg)

@@ -160,7 +160,7 @@ float4 PS_Basic(VS_OUTPUT In) : COLOR
 	//	ピクセル色決定
 	OUT = In.Color * tex2D(DecaleSamp, In.Tex);		
 
-	OUT.r = 1.0f;
+	//OUT.r = 1.0f;
 	OUT.a = 1.0f;
 
 	return OUT;

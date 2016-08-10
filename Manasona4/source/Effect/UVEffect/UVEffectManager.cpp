@@ -19,6 +19,18 @@ UVEffectManager::UVEffectManager()
 		case UV_EFFECT_TYPE::HIT_IMPACT:
 			m_baseUVEffect[i] = new HitImpactEffect();
 			break;
+		case UV_EFFECT_TYPE::PERSONA:
+			m_baseUVEffect[i] = new PersonaEffect();
+			break;
+		case UV_EFFECT_TYPE::IMPACT:
+			m_baseUVEffect[i] = new ImpactEffect();
+			break;
+		case UV_EFFECT_TYPE::SHOCK_WAVE:
+			m_baseUVEffect[i] = new ShockWaveEffect();
+			break;
+		case UV_EFFECT_TYPE::UPPER:
+			m_baseUVEffect[i] = new UpperEffect();
+			break;
 		default:
 			assert(0);	// "そんなエフェクトはない"
 			break;

@@ -4,7 +4,7 @@
 #include "../Stage/Stage.h"
 #include "../Sound/SoundManager.h"
 #include "../PostEffect/PostEffect.h"
-#include "../particle_2d/particle_2d.h"
+#include "../Effect/Particle.h"
 
 #include "../Stage/Stage.h"
 #include "../Camera/camera.h"
@@ -28,7 +28,7 @@ bool sceneMain::Initialize()
 {
 
 	//g_eff = new HitEffect();
-	m_panel = new PanelEffectManager();
+	m_panel	   = new PanelEffectManager();
 	g_uvEffect = new UVEffectManager();
 
 
@@ -38,7 +38,7 @@ bool sceneMain::Initialize()
 	m_fLoadPercentage = .25f;	// ロード割合
 
 	// ステージ初期化
-	Stage::Base::CreateStage(&m_pStage, STAGE_ID::SYUTEN, m_pCamera);	// 関数の中で作ってもらう
+	Stage::Base::CreateStage(&m_pStage, STAGE_ID::SENJO, m_pCamera);	// 関数の中で作ってもらう
 
 	m_fLoadPercentage = .5f;	// ロード割合
 
@@ -50,6 +50,9 @@ bool sceneMain::Initialize()
 	m_pCamera->SetPlayersPos();
 
 	m_fLoadPercentage = 1.0f;	// ロード割合
+
+	// パーティクル初期化
+	ParticleManager::Initialize("DATA/Effect/particle.png", 2048);
 
 	// オレ曲初期化
 	m_pMyMusicMgr = new MyMusicManager(MY_MUSIC_ID::SENJO);
@@ -67,7 +70,7 @@ sceneMain::~sceneMain()
 	//EffectMgr.Release();
 	SAFE_DELETE(m_panel);
 	SAFE_DELETE(g_uvEffect);
-
+	ParticleManager::Release();
 }
 
 //******************************************************************
@@ -85,13 +88,16 @@ bool sceneMain::Update()
 	// プレイヤー更新
 	PlayerMgr->Update();
 
+	// パーティクル更新
+	ParticleManager::Update();
+
 	// エンターでエフェクトカメラ発動してみる
-	if (KeyBoardTRG(KB_ENTER))
-	{
-		EFFECT_CAMERA_INFO eci;
-		eci.scriptID = 3;
-		MsgMgr->Dispatch(0, ENTITY_ID::CAMERA_MGR, ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::EFFECT_CAMERA, &eci);
-	}
+	//if (KeyBoardTRG(KB_ENTER))
+	//{
+	//	EFFECT_CAMERA_INFO eci;
+	//	eci.scriptID = 3;
+	//	MsgMgr->Dispatch(0, ENTITY_ID::CAMERA_MGR, ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::EFFECT_CAMERA, &eci);
+	//}
 
 	if (KeyBoardTRG(KB_L))
 	{
@@ -125,6 +131,9 @@ void sceneMain::Render()
 
 	// プレイヤー
 	PlayerMgr->Render();
+
+	// パーティクル
+	ParticleManager::Render();
 
 	//g_eff->Render3D();
 	//EffectMgr.Render();

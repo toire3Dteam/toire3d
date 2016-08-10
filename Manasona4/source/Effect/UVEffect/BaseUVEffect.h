@@ -2,6 +2,7 @@
 #include "TDNLIB.h"
 #include "../AnimationUV.h"
 
+
 /************************/
 //	UVエフェクトベース
 /************************/
@@ -70,6 +71,85 @@ public:
 		m_pic = new AnimationUV("Data/UVeffect/hitImpact.imo", -0.01f, 0.0f, 8, false, 2, 4);
 	};
 	~HitImpactEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::Render(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/*****************/
+//	ペルソナエフェクト　
+/*****************/
+class PersonaEffect :public BaseUVEffect
+{
+public:
+	PersonaEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Persona.imo", 0.01f, 0.01f, 18, false, 4, 8);
+	};
+	~PersonaEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::Render(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f)
+	{
+		BaseUVEffect::Action(pos, startScale, endScale); 
+	};
+
+private:
+};
+
+/*****************/
+//	インパクトエフェクト　
+/*****************/
+class ImpactEffect :public BaseUVEffect
+{
+public:
+	ImpactEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/impact.IMO", 0.005f, -0.05f, 8, false, 1, 7);
+	};
+	~ImpactEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::Render(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/*****************/
+//	ショックウェーブエフェクト　
+/*****************/
+class ShockWaveEffect :public BaseUVEffect
+{
+public:
+	ShockWaveEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/shockWave.IMO", 0.01f, -0.0075f, 12, false, 1, 6);
+	};
+	~ShockWaveEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::Render(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/*****************/
+//	アッパーエフェクト
+/*****************/
+class UpperEffect :public BaseUVEffect
+{
+public:
+	UpperEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/UpperEffect.IMO", 0.0f, 0.03f, 16, false, 1, 12);
+	};
+	~UpperEffect() {};
 
 	void Update() { BaseUVEffect::Update(); };
 	void Render() { BaseUVEffect::Render(); };

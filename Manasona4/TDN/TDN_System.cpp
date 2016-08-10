@@ -95,7 +95,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
 				// [メモ]　SetWindowPos　windowのサイズよりも大きく表示できない
 				// WS_POPUPなら全力で引き延ばしてフルスクにできる
-				SetWindowPos(hWnd, HWND_TOPMOST, 0, 0,
+				SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0,
 					tdnSystem::GetDisplaySize().right,	// 現在のディスプレイサイズ分大きく
 					tdnSystem::GetDisplaySize().bottom,	// 現在のディスプレイサイズ分大きく
 					SWP_SHOWWINDOW | SWP_FRAMECHANGED);

@@ -32,7 +32,14 @@ void Stand::Base::LoadActionFrameList(char *filename)
 }
 
 
-Stand::Base::Base(BasePlayer *pPlayer) :m_pPlayer(pPlayer), m_pObj(nullptr), m_bActive(false)
+Stand::Base::Base(BasePlayer *pPlayer) :
+m_pPlayer(pPlayer), 
+m_pObj(nullptr),
+m_bActive(false),
+m_standStockMAX(2),
+m_standStock(0),
+m_standGageMAX(360),
+m_standGage(0)
 {
 	FOR((int)ACTION_TYPE::MAX) m_pAttackData[i] = nullptr;
 }
@@ -45,6 +52,9 @@ Stand::Base::~Base()
 
 void Stand::Base::Update()
 {
+	// スタンドゲージ更新
+	StandGageUpdate();
+
 	// アクティブじゃなかったら出ていけぇ！！
 	if (!m_bActive) return;
 
@@ -57,6 +67,9 @@ void Stand::Base::Update()
 		if (m_pAttackData[(int)m_ActionType]->WhiffDelayFrame == m_CurrentActionFrame)
 		{
 			// (A列車)ここで攻撃判定が発動した瞬間を取ってきてる
+
+			// 振りエフェクト発動（仮）！
+			m_pPlayer->AddEffectAction(m_pos + Vector3(0, 5, -3), m_pAttackData[(int)m_ActionType]->WhiffEffectType);
 
 			LPCSTR SE_ID = m_pAttackData[(int)m_ActionType]->WhiffSE;
 			// 空振りSE入ってたら
@@ -81,9 +94,29 @@ void Stand::Base::Update()
 	m_pObj->SetPos(m_pos);
 	m_pObj->Update();
 }
+ 
+// スタンドゲージ更新
+void Stand::Base::StandGageUpdate()
+{
+	// スタンドストックが最大値まで溜まっていなかったら
+	if (m_standStock < m_standStockMAX)
+	{	
+		m_standGage++;// ゲージ加算
+
+		// スタンドゲージが最大値まで溜まったら
+		if (m_standGage >= m_standGageMAX)
+		{
+			m_standStock++;
+			m_standGage = 0;
+		}
+
+	}
+
+}
 
 void Stand::Base::Render()
 {
+
 	// アクティブじゃなかったら出ていけぇ！！
 	if (!m_bActive) return;
 
@@ -119,14 +152,23 @@ void Stand::Base::Render()
 #endif
 }
 
+/******************************/
+//		モコイ
+/******************************/
 Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 {
 	// モコイの実体
-	m_pObj = new iex3DObj("DATA/CHR/Airou/airou_motion.IEM");
-	m_pObj->SetTexture(tdnTexture::Load("DATA/CHR/Airou/tex_airou4.png"), 0);	// ダークアイルー
+	m_pObj = new iex3DObj("DATA/CHR/mokoi/mokoi.IEM");
+	//m_pObj->SetTexture(tdnTexture::Load("DATA/CHR/Airou/tex_airou4.png"), 0);	// ダークアイルー
 	
 	// アクションフレームロードする
 	LoadActionFrameList("DATA/CHR/Mokoi/FrameList.txt");
+
+	/*****************************/
+	// モコイの基本ステータス
+	m_standStockMAX = 2;
+	m_standGageMAX = 120;
+
 
 	//==============================================================================================================
 	//	地上ニュートラル
@@ -138,6 +180,9 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 	m_pAttackData[(int)ACTION_TYPE::LAND]->HitSE = "通常3段ヒット";
 	m_pAttackData[(int)ACTION_TYPE::LAND]->WhiffSE = "空振り1";
 	m_pAttackData[(int)ACTION_TYPE::LAND]->HitEffectType = EFFECT_TYPE::DAMAGE;
+	m_pAttackData[(int)ACTION_TYPE::LAND]->WhiffEffectType = EFFECT_TYPE::UPPER;
+	m_pAttackData[(int)ACTION_TYPE::LAND]->bAntiAir = true;
+
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_pAttackData[(int)ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = true;
 	m_pAttackData[(int)ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
@@ -162,6 +207,8 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 	m_pAttackData[(int)ACTION_TYPE::SQUAT]->HitSE = "通常3段ヒット";
 	m_pAttackData[(int)ACTION_TYPE::SQUAT]->WhiffSE = "空振り1";
 	m_pAttackData[(int)ACTION_TYPE::SQUAT]->HitEffectType = EFFECT_TYPE::DAMAGE;
+	m_pAttackData[(int)ACTION_TYPE::SQUAT]->bAntiAir = true;
+
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_pAttackData[(int)ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = true;
 	m_pAttackData[(int)ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
@@ -186,6 +233,8 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 	m_pAttackData[(int)ACTION_TYPE::AERIAL]->HitSE = "通常3段ヒット";
 	m_pAttackData[(int)ACTION_TYPE::AERIAL]->WhiffSE = "空振り1";
 	m_pAttackData[(int)ACTION_TYPE::AERIAL]->HitEffectType = EFFECT_TYPE::DAMAGE;
+	m_pAttackData[(int)ACTION_TYPE::AERIAL]->bAntiAir = true;
+
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_pAttackData[(int)ACTION_TYPE::AERIAL]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = true;
 	m_pAttackData[(int)ACTION_TYPE::AERIAL]->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
@@ -210,6 +259,8 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->HitSE = "通常3段ヒット";
 	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->WhiffSE = "空振り1";
 	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->HitEffectType = EFFECT_TYPE::DAMAGE;
+	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->bAntiAir = true;
+
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = true;
 	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
@@ -233,10 +284,16 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 		m_pAttackData[i]->bHit = false;
 		for (int frame = 0;; frame++)if (m_ActionFrameList[i][frame] == FRAME_STATE::ACTIVE){ m_pAttackData[i]->WhiffDelayFrame = frame; break; }
 	}
+
+	// アッパーの空振りフレーム調整
+	m_pAttackData[(int)ACTION_TYPE::LAND]->WhiffDelayFrame -= 8;
 }
 
 void Stand::Mokoi::Action(Stand::ACTION_TYPE type)
 {
+	// ストックを消費
+	m_standStock--;
+
 	m_ActionType = type;		// 技のタイプ設定
 	m_CurrentActionFrame = 0;	// フレームリセット
 
@@ -250,11 +307,14 @@ void Stand::Mokoi::Action(Stand::ACTION_TYPE type)
 
 	// とりあえず、プレイヤーと同じ座標
 	m_pos = m_pPlayer->GetPos();
-	Vector3 v(0.5f, 0.5f, 0);
-	if (m_dir == DIR::LEFT)v.x *= -1;;
-	m_pos += v * 10.0f;
+	Vector3 v(0.5f, 0.0f, 0.5f);
+	if (m_dir == DIR::LEFT)v.x *= -1;
+	//v.z *= 1.;
+	m_pos += v * 5.0f;
+	m_pObj->SetMotion(0);
 	m_pObj->SetPos(m_pos);
 	m_pObj->Update();
 
-
+	// アッパーエフェクト！
+	//if(type == ACTION_TYPE::LAND) m_pPlayer->AddEffectAction(m_pPlayer->GetPos(), EFFECT_TYPE::UPPER);
 }
