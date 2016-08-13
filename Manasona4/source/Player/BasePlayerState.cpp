@@ -2,6 +2,7 @@
 #include "BasePlayerState.h"
 #include "../Stand/Stand.h"
 #include "../Sound/SoundManager.h"
+#include "../Effect/Particle.h"
 
 // 定数
 static const float HUTTOBI_LINE = 3.0f;
@@ -1731,7 +1732,12 @@ void BasePlayerState::KnockDown::Enter(BasePlayer * pPerson)
 
 void BasePlayerState::KnockDown::Execute(BasePlayer * pPerson)
 {
-	if (pPerson->isLand() == false)return;
+	if (pPerson->isLand() == false)
+	{
+		// 吹っ飛びけむりパーティクル
+		ParticleManager::EffectFlySmoke(pPerson->GetPos());
+		return;
+	}
 
 	// 硬直が0以下なら硬直終了
 	if (pPerson->GetRecoveryFrame() <= 0)
@@ -2467,6 +2473,9 @@ void BasePlayerState::StandAction::Enter(BasePlayer * pPerson)
 
 void BasePlayerState::StandAction::Execute(BasePlayer * pPerson)
 {
+	// オーラのパーティクル
+	ParticleManager::EffectPersonaAura(pPerson->GetPos());
+
 	if (pPerson->GetStand()->isHit())
 	{
 		/* キャンセルルート */

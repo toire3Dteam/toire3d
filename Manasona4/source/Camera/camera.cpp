@@ -35,6 +35,7 @@ m_NumPlayer(-1), m_pPlayerPosReferences(nullptr)
 
 	/* ステートマシン初期化 */
 	m_pStateMachine = new StateMachine<Camera>(this);
+	m_pStateMachine->SetGlobalState(GlobalCameraState::GetInstance());	// グローバルステートの設定
 }
 
 void Camera::SetPlayersPos()
@@ -112,8 +113,8 @@ void Camera::Update()
 	//	モードごとの処理
 	m_pStateMachine->Update();
 
-	// 座標と注視点設定
-	tdnView::Set(m_pos, m_target);
+	// 座標と注視点設定(グローバルステートでやる)
+	//tdnView::Set(m_pos, m_target);
 
 	// 投影設定
 	tdnView::SetProjection(m_projection.fovY, m_projection.Near, m_projection.Far);
@@ -153,6 +154,92 @@ void Camera::OffEffectCamera()
 	//m_pStateMachine->SetCurrentState(m_pStateMachine->GetPreviousState());	// 1個前のステートに戻す
 	m_pStateMachine->RevertToPreviousState();
 }
+
+
+//*****************************************************************************************************************************
+//
+//		カメラ振動
+GlobalCameraState::ShakeData::ShakeData() :power(0), MaxPower(0),frame(0), MaxFrame(0), ShakedPos(0, 0, 0), ShakedTarget(0.0f, 0.0f, 0.0f),
+rate(5.0f)	// 振動の強さ基準(rate * 0～1.0f)
+{}
+
+
+
+void GlobalCameraState::ShakeData::Start(float power, unsigned int frame)
+{
+	this->power = MaxPower = (power * rate);
+	this->frame = MaxFrame = frame;
+}
+
+void GlobalCameraState::ShakeData::Update(Camera *camera)
+{
+	ShakedTarget = camera->m_target;
+	ShakedPos = camera->m_pos;
+
+	if (MaxFrame == 0) return;
+
+	if (frame > 0)
+	{
+		power = MaxPower * (frame / (float)MaxFrame);
+		const float x(tdnRandom::Get(-1.0f, 1.0f) * power), y(tdnRandom::Get(-1.0f, 1.0f) * power);
+		ShakedPos.x += x;
+		ShakedPos.y += y;
+		ShakedTarget.x += x;
+		ShakedTarget.y += y;
+
+		if (--frame <= 0)
+		{
+			MaxFrame = 0;
+			power = MaxPower = 0.0f;
+		}
+	}
+}
+//
+//*****************************************************************************************************************************
+
+
+
+//*****************************************************************************************************************************
+//
+//		グローバルステート
+void GlobalCameraState::Enter(Camera *pCamera)
+{
+
+}
+
+void GlobalCameraState::Execute(Camera *pCamera)
+{
+	// カメラ振動更新
+	m_ShakeData.Update(pCamera);
+
+	// 座標と注視点の設定	★グローバルステートでやる
+	tdnView::Set(pCamera->m_pos, m_ShakeData.ShakedTarget);
+}
+
+// 出口
+void GlobalCameraState::Exit(Camera *pCamera)
+{
+
+}
+
+bool GlobalCameraState::OnMessage(Camera *pCamera, const Message &msg)
+{
+
+	// メッセージタイプ
+	switch (msg.Msg)
+	{
+	case MESSAGE_TYPE::SHAKE_CAMERA:	// 振動メッセージ
+		// オリジナル構造体を受け取る
+		SHAKE_CAMERA_INFO *info = (SHAKE_CAMERA_INFO*)msg.ExtraInfo;
+		m_ShakeData.Start(info->ShakePower, info->ShakeFrame);
+		break;
+	}
+
+	return false;
+}
+//
+//*****************************************************************************************************************************
+
 
 
 //*****************************************************************************************************************************
@@ -282,11 +369,9 @@ bool SumaburaCameraState::OnMessage(Camera *pCamera, const Message &msg)
 										EFFECT_CAMERA_INFO *eci = (EFFECT_CAMERA_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
 										pCamera->m_OrgPos = (eci->pOrgPos) ? *eci->pOrgPos : VECTOR_ZERO;	// 原点座標入ってたら代入
 										pCamera->OnEffectCamera(eci->scriptID);								// エフェクトカメラ開始
+										return true;
 										break;
 	}
-	default:
-		return true;
-		break;
 	}
 
 	// Flaseで返すとグローバルステートのOnMessageの処理へ行く

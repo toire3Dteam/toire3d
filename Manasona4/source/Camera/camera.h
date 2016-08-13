@@ -133,6 +133,49 @@ private:
 };
 
 
+//--------------------グローバルステート
+class GlobalCameraState : public State<Camera>
+{
+public:
+	// this is a シングルトン
+	static GlobalCameraState *GetInstance(){ static GlobalCameraState i; return &i; }
+
+	// 入る
+	void Enter(Camera *pCamera);
+
+	// 実行します
+	void Execute(Camera *pCamera);
+
+	// 帰る
+	void Exit(Camera *pCamera);
+
+	// エージェントからのメッセージを受信した場合、これが実行される
+	bool OnMessage(Camera *pCamera, const Message& msg);
+
+private:
+
+	struct ShakeData
+	{
+		float power, MaxPower;
+		int frame, MaxFrame;
+		const float rate;
+		Vector3 ShakedPos, ShakedTarget;
+
+		ShakeData();
+
+		void Start(float power, unsigned int frame);
+
+		void Update(Camera *pCamera);
+	}m_ShakeData;
+
+	~GlobalCameraState() {};
+
+	// シングルトンの作法
+	GlobalCameraState() {};
+	GlobalCameraState(const GlobalCameraState&);
+	GlobalCameraState& operator=(const GlobalCameraState&);
+};
+
 //--------------------スマブラカメラステート
 class SumaburaCameraState :public State<Camera>
 {

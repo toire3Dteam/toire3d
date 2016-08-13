@@ -256,6 +256,35 @@ void Collision::RaypicRight(iexMesh *obj, BasePlayer *player)
 }
 
 
+void Collision::Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2)
+{
+	// プレイヤーの判定■
+	CollisionShape::Square s1, s2;
+	memcpy_s(&s1, sizeof(CollisionShape::Square), pPlayer1->GetHitSquare(), sizeof(CollisionShape::Square));
+	memcpy_s(&s2, sizeof(CollisionShape::Square), pPlayer2->GetHitSquare(), sizeof(CollisionShape::Square));
+	s1.pos += pPlayer1->GetPos(), s2.pos += pPlayer2->GetPos();
+
+	// とりあえず、横だけ判定してみる
+	Vector3 v = s2.pos - s1.pos;
+	if (HitCheck(&s1, &s2))
+	{
+		const float len = v.Length();
+		//v.Normalize();	// 正規化
+		Vector3 sinking(s2.width - sqrtf(v.x*v.x), s2.height - sqrtf(v.y*v.y), 0);	// めり込み量
+		if (v.x < 0)
+		{
+			sinking.x *= -1;
+		}
+
+		sinking.y = 0;
+		static const float rate = .25f;
+		sinking *= rate;	// 完全に戻すと不自然なので
+
+		pPlayer1->AddMove(sinking);
+		pPlayer2->AddMove(-sinking);
+	}
+}
+
 
 bool Collision::HitCheck(CollisionShape::Circle* c1, CollisionShape::Circle* c2)
 {

@@ -44,6 +44,7 @@ void AIState::Global::Exit(AI * pPerson)
 
 void AIState::Global::Render(AI * pPerson)
 {
+	tdnText::Draw(420, 610, 0xffffffff, "AIぐろーばるすてーと");
 }
 
 bool AIState::Global::OnMessage(AI * pPerson, const Message & msg)
@@ -119,7 +120,7 @@ void AIState::Chase::Enter(AI * pPerson)
 	//	誰をおいかかえるか考える
 
 	//近いやつをたーげーとぬい「
-	float length2 = 114514810;
+	float length2 = 114514810.0f;
 	int targetno = 0;
 	for (int i = 0; i < PlayerMgr->GetNumPlayer(); i++)
 	{

@@ -62,6 +62,8 @@ void PlayerManager::Update()
 	{
 		for (int you = my + 1; you < m_NumPlayer; you++)
 		{
+			Collision::Sinking(m_pPlayers[my], m_pPlayers[you]);	// めり込み判定
+
 			bool receive;	// 判定結果受取り用変数
 
 			// ( my->you you->my )つまり交互に当たっていないかチェックする
@@ -188,6 +190,9 @@ bool PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you)
 					) HitDamageInfo.FlyVector.x *= -1;
 				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + you->GetDeviceID()), MESSAGE_TYPE::HIT_DAMAGE, &HitDamageInfo);
 
+				// カメラに振動メッセージを送る
+				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::SHAKE_CAMERA, &my->GetAttackData()->ShakeCameraInfo);
+
 				// 音出す
 				LPCSTR seID = my->GetAttackData()->HitSE;
 				if (seID) se->Play((LPSTR)seID);
@@ -254,6 +259,10 @@ bool PlayerManager::CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou)
 					) hdi.FlyVector.x *= -1;
 				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + pYou->GetDeviceID()), MESSAGE_TYPE::HIT_DAMAGE, &hdi);
 	
+
+				// カメラに振動メッセージを送る
+				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::SHAKE_CAMERA, &pStand->GetAttackData()->ShakeCameraInfo);
+
 				// 音出す
 				LPCSTR seID = pStand->GetAttackData()->HitSE;
 				if (seID) se->Play((LPSTR)seID);

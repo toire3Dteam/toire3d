@@ -4,7 +4,7 @@
 #include "../Stage/Stage.h"
 #include "../Sound/SoundManager.h"
 #include "../PostEffect/PostEffect.h"
-#include "../particle_2d/particle_2d.h"
+#include "../Effect/Particle.h"
 
 #include "../Stage/Stage.h"
 #include "../Camera/camera.h"
@@ -54,6 +54,9 @@ bool sceneMain::Initialize()
 
 	m_fLoadPercentage = 1.0f;	// ロード割合
 
+	// パーティクル初期化
+	ParticleManager::Initialize("DATA/Effect/particle.png", 2048);
+
 	// オレ曲初期化
 	m_pMyMusicMgr = new MyMusicManager(MY_MUSIC_ID::SENJO);
 	m_pMyMusicMgr->Play();
@@ -74,7 +77,7 @@ sceneMain::~sceneMain()
 	//EffectMgr.Release();
 	SAFE_DELETE(m_panel);
 	SAFE_DELETE(g_uvEffect);
-
+	ParticleManager::Release();
 	DeferredManagerEx.Release();
 }
 
@@ -93,7 +96,10 @@ bool sceneMain::Update()
 	// プレイヤー更新
 	PlayerMgr->Update();
 
-	static float lightAngle = 2.14;
+	// パーティクル更新
+	ParticleManager::Update();
+
+	static float lightAngle = 2.14f;
 	// アングル
 	if (KeyBoard(KB_R)) { lightAngle -= 0.05f; }
 	if (KeyBoard(KB_T)) { lightAngle += 0.05f; }
@@ -178,8 +184,8 @@ void sceneMain::Render()
 		DeferredManagerEx.G_End();
 
 
-		DeferredManagerEx.DirLight(m_dirLight, Vector3(0.8, 0.72, 0.72));
-		DeferredManagerEx.HemiLight(Vector3(0.6, 0.5, 0.5), Vector3(0.45, 0.43, 0.43));
+		DeferredManagerEx.DirLight(m_dirLight, Vector3(0.8f, 0.72f, 0.72f));
+		DeferredManagerEx.HemiLight(Vector3(0.6f, 0.5f, 0.5f), Vector3(0.45f, 0.43f, 0.43f));
 
 		// 最後の処理
 		{
@@ -189,6 +195,9 @@ void sceneMain::Render()
 			m_pStage->Render(shaderM, "DefaultLighting");
 			// プレイヤー
 			PlayerMgr->Render(shaderM, "DefaultLighting");
+
+			// パーティクル
+			ParticleManager::Render();
 
 			m_panel->Render();
 			m_panel->Render3D();

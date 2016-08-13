@@ -5,8 +5,8 @@
 #include "../Stand/Stand.h"
 #include "../Sound/SoundManager.h"
 #include "AI\AI.h"
+#include "../Effect/Particle.h"
 #include "../system/System.h"
-
 
 //_/_/_/_/_/_/__/_/__/_/__/_/__
 // ’è”
@@ -447,7 +447,7 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType)
 	case EFFECT_TYPE::PERSONA:
 		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::PERSONA,
 			1, 2.0f, Vector3(0, diaAngle, 0), Vector3(0, diaAngle, 0));
-
+		ParticleManager::EffectPersonaTrigger(pos);
 		break;
 	case EFFECT_TYPE::DROP_IMPACT:
 		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::IMPACT,
@@ -460,6 +460,11 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType)
 	case EFFECT_TYPE::UPPER:
 		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::UPPER,
 			1.0f, 1.0f, Vector3(0, diaAngle, 0), Vector3(0, diaAngle, 0));
+
+		break;
+
+	case EFFECT_TYPE::FINISH_HIT:
+		ParticleManager::EffectFinish(pos);
 
 		break;
 	default:

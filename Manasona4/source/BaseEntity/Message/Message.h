@@ -6,6 +6,7 @@
 enum MESSAGE_TYPE
 {
 	EFFECT_CAMERA,	// エフェクトカメラ発動メッセージ
+	SHAKE_CAMERA,	// カメラ振動メッセージ
 	HIT_ATTACK,		// 攻撃をヒットさせた人に送るメッセージ！
 	HIT_DAMAGE,		// 攻撃がヒットした相手に送るメッセージ
 	FALL,			// プレイヤーが地面についていないときに送られるメッセージ
@@ -47,6 +48,14 @@ struct EFFECT_CAMERA_INFO
 	int scriptID;			// カメラスクリプトのID
 	Vector3 *pOrgPos;		// エフェクトカメラの原点の座標(nullptrならVector3(0,0,0))
 	EFFECT_CAMERA_INFO() :scriptID(0), pOrgPos(nullptr){}
+};
+
+/* カメラ振動時に送る時の構造体 */
+struct SHAKE_CAMERA_INFO
+{
+	float ShakePower;	// 振動の力(0～1)
+	int ShakeFrame;			// 揺れてる時間(前の真夏だと3にしてた)
+	void Set(float power, int frame){ ShakePower = power; ShakeFrame = frame; }
 };
 
 // イントロ発動メッセージ送信のときにいれる構造体

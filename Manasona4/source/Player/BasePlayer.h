@@ -1,5 +1,6 @@
 #pragma once
 // エンティティ関連のインクルード
+#include "../BaseEntity/Message/Message.h"
 #include "../BaseEntity/Entity/BaseGameEntity.h"
 #include "../BaseEntity/State/StateMachine.h"
 #include "BasePlayerState.h"
@@ -107,6 +108,7 @@ enum class EFFECT_TYPE
 	PERSONA,  //　ペ...ル..ソ..ナ!!
 	DROP_IMPACT,// ドロップインパクト
 	UPPER,		// アッパー
+	FINISH_HIT,		// フィニッシュアーツヒット
  	//AIROU_CIRCLE,// アイルーサークル
 	
 
@@ -132,6 +134,7 @@ public:
 	EFFECT_TYPE WhiffEffectType;	// 振りエフェクト
 	int pierceLV;				// 貫通レベル
 	bool bAntiAir;				// 対空攻撃かどうか　(追加)
+	SHAKE_CAMERA_INFO ShakeCameraInfo;	// カメラ振動用構造体
 
 	// ★★★地上ヒットと空中ヒットで分けたい情報
 	struct
