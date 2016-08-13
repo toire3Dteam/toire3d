@@ -114,14 +114,14 @@ void Stand::Base::StandGageUpdate()
 
 }
 
-void Stand::Base::Render()
+void Stand::Base::Render(tdnShader* shader, char* name)
 {
 
 	// アクティブじゃなかったら出ていけぇ！！
 	if (!m_bActive) return;
 
 	// 3Dオブジェクトの描画
-	m_pObj->Render();
+	m_pObj->Render(shader,name);
 
 #ifdef _DEBUG
 	// 判定の描画

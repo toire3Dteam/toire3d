@@ -265,7 +265,7 @@ void iexMesh::Render( tdnShader* shader, char* name )
 			//	テクスチャ指定
 			shader->SetDecaleTexture( lpTexture[i] );
 			shader->SetValue( "NormalMap", lpNormal[i] );
-			shader->SetValue( "LightMap", lpSpecular[i] );
+			shader->SetValue( "RoughnessMap", lpSpecular[i] );
 			shader->SetValue( "MultiMap", lpHeight[i] );
 			shader->CommitChanges();
 			//	材質グループ描画
@@ -683,7 +683,7 @@ BOOL iexMesh::LoadIMO( LPSTR filename )
 		sprintf( temp, "%sN%s", workpath, imo.Texture[i] );
 		lpNormal[i] = tdnTexture::Load( temp );
 
-		sprintf( temp, "%sS%s", workpath, imo.Texture[i] );
+		sprintf( temp, "%sL%s", workpath, imo.Texture[i] );
 		lpSpecular[i] = tdnTexture::Load( temp );
 
 		sprintf( temp, "%sH%s", workpath, imo.Texture[i] );

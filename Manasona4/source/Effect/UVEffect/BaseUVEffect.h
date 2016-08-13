@@ -2,7 +2,6 @@
 #include "TDNLIB.h"
 #include "../AnimationUV.h"
 
-
 /************************/
 //	UVエフェクトベース
 /************************/
@@ -93,10 +92,7 @@ public:
 
 	void Update() { BaseUVEffect::Update(); };
 	void Render() { BaseUVEffect::Render(); };
-	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f)
-	{
-		BaseUVEffect::Action(pos, startScale, endScale); 
-	};
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
 
 private:
 };

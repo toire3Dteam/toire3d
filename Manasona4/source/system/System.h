@@ -13,7 +13,7 @@
 //*****************************************************************************
 extern tdnShader* shader;
 extern tdnShader* shader2D;
-//extern iexShader* shaderD;
+extern tdnShader* shaderM;
 
 //*****************************************************************************
 //		ŠÖ”

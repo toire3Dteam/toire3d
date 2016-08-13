@@ -107,7 +107,6 @@ enum class EFFECT_TYPE
 	PERSONA,  //　ペ...ル..ソ..ナ!!
 	DROP_IMPACT,// ドロップインパクト
 	UPPER,		// アッパー
-	FINISH_HIT,		// フィニッシュアーツヒット
  	//AIROU_CIRCLE,// アイルーサークル
 	
 
@@ -209,7 +208,8 @@ public:
 	virtual void Update();	// 基本的な更新
 	void UpdatePos();		// 座標更新(判定後に呼び出す)
 	void Move();			// 動きの制御
-	virtual void Render();
+	virtual void Render(tdnShader* shader,char* name);
+	virtual void RenderDeferred();
 
 	/****************************/
 	//	キャラクター固有スキル

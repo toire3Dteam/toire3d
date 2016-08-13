@@ -27,7 +27,19 @@ void Stage::Base::Render()
 	if (m_pBack) m_pBack->Render();
 	m_pObj->Render(shader,"copy");
 }
-
+void Stage::Base::Render(tdnShader* shader, char* name)
+{
+	if (m_pBack) m_pBack->Render(shaderM,"sky");
+	m_pObj->Render(shader, name);
+}
+void Stage::Base::RenderDeferred()
+{
+	m_pObj->Render(shaderM, "G_Buffer");
+}
+void Stage::Base::RenderShadow()
+{
+	m_pObj->Render(shaderM, "ShadowBuf");
+}
 void Stage::Base::CreateStage(Stage::Base**p,STAGE_ID id, Camera *pCamera)
 {
 	switch (id)

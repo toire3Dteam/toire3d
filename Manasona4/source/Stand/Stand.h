@@ -18,7 +18,7 @@ namespace Stand
 		Base(BasePlayer *pPlayer);
 		virtual ~Base();
 		virtual void Update();
-		virtual void Render();
+		virtual void Render(tdnShader* shader,char* name);
 
 		// プレイヤーがペルソナボタン押したら呼び出す
 		virtual void Action(ACTION_TYPE type) = 0;

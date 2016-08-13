@@ -5,7 +5,7 @@
 #include "../Stand/Stand.h"
 #include "../Sound/SoundManager.h"
 #include "AI\AI.h"
-#include "../Effect/Particle.h"
+#include "../system/System.h"
 
 
 //_/_/_/_/_/_/__/_/__/_/__/_/__
@@ -336,18 +336,19 @@ void BasePlayer::UpdatePos()
 	}
 }
 
-void BasePlayer::Render()
+void BasePlayer::Render(tdnShader* shader, char* name)
 {
 	// スタンド描画
-	m_pStand->Render();
+	m_pStand->Render(shader, name);
 
-	m_pObj->Render();
+	m_pObj->Render(shader, name);
 	// 無敵なら加算で重ねて描画
 	if (m_InvincibleTime > 0) m_pObj->Render(RS::ADD);
 
 	if (m_deviceID == 3)
 	{
 		m_pStateMachine->Render();// ステートマシンでの描画
+		m_pAI->GetFSM()->Render();// AIステートマシンでの描画
 	}
 	
 
@@ -402,6 +403,14 @@ void BasePlayer::Render()
 
 }
 
+void BasePlayer::RenderDeferred()
+{
+	// スタンド描画
+	m_pStand->Render(shaderM, "G_Buffer");
+
+	m_pObj->Render(shaderM,"G_Buffer");
+}
+
 // ステートマシンへの他から来るメッセージ
 bool BasePlayer::HandleMessage(const Message & msg)
 {
@@ -438,7 +447,7 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType)
 	case EFFECT_TYPE::PERSONA:
 		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::PERSONA,
 			1, 2.0f, Vector3(0, diaAngle, 0), Vector3(0, diaAngle, 0));
-		ParticleManager::EffectPersonaTrigger(pos);
+
 		break;
 	case EFFECT_TYPE::DROP_IMPACT:
 		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::IMPACT,
@@ -451,11 +460,6 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType)
 	case EFFECT_TYPE::UPPER:
 		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::UPPER,
 			1.0f, 1.0f, Vector3(0, diaAngle, 0), Vector3(0, diaAngle, 0));
-
-		break;
-
-	case EFFECT_TYPE::FINISH_HIT:
-		ParticleManager::EffectFinish(pos);
 
 		break;
 	default:

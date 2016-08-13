@@ -247,6 +247,75 @@ namespace AIState
 		AnitiAir(const AnitiAir&){}
 		AnitiAir& operator=(const AnitiAir&){}
 	};
+
+
+	/*******************************************************/
+	//				空中攻撃 準備ステート
+	/*******************************************************/
+	class SetAerialAtack :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static SetAerialAtack* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		SetAerialAtack() {};
+		~SetAerialAtack() {};
+
+		SetAerialAtack(const SetAerialAtack&){}
+		SetAerialAtack& operator=(const SetAerialAtack&){}
+	};
+
+	/*******************************************************/
+	//				空中攻撃 準備ステート
+	/*******************************************************/
+	class AerialAtack :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static AerialAtack* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		AerialAtack() {};
+		~AerialAtack() {};
+
+		AerialAtack(const AerialAtack&){}
+		AerialAtack& operator=(const AerialAtack&){}
+	};
 }
 
 

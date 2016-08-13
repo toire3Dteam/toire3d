@@ -25,7 +25,7 @@ void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage)
 
 	FOR(NumPlayer)
 	{
-		m_pPlayers[i] = new Airou(i, (i == 3 || i == 2));
+		m_pPlayers[i] = new Airou(i, (i == 3));
 		m_pPlayers[i]->InitActionDatas();		// ★攻撃情報を各キャラに初期化させる
 	}
 
@@ -62,8 +62,6 @@ void PlayerManager::Update()
 	{
 		for (int you = my + 1; you < m_NumPlayer; you++)
 		{
-			Collision::Sinking(m_pPlayers[my], m_pPlayers[you]);	// めり込み判定
-
 			bool receive;	// 判定結果受取り用変数
 
 			// ( my->you you->my )つまり交互に当たっていないかチェックする
@@ -102,10 +100,17 @@ void PlayerManager::Update()
 
 }
 
-void PlayerManager::Render()
+void PlayerManager::Render(tdnShader* shader, char* name)
 {
 	// プレイヤーたち描画
-	FOR(m_NumPlayer) m_pPlayers[i]->Render();
+	FOR(m_NumPlayer) m_pPlayers[i]->Render(shader, name);
+}
+
+void PlayerManager::RenderDeferred()
+{
+	// プレイヤーたち描画
+	FOR(m_NumPlayer) m_pPlayers[i]->RenderDeferred();
+
 }
 
 bool PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you)

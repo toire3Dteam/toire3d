@@ -18,9 +18,15 @@ public:
 	bool Update();
 	//描画
 	void Render();
+	void RenderShadow();
+	void SurfaceRender();
+
 private:
 
 	Stage::Base *m_pStage;			// ステージさん
 	Camera *m_pCamera;				// カメラさん
 	MyMusicManager *m_pMyMusicMgr;	// オレ曲管理さん
+	
+	Vector3 m_dirLight;// ライト方向ﾆｷ
+	bool m_bShaderFlag;
 };

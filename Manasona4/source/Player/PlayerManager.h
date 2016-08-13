@@ -21,7 +21,8 @@ public:
 	void Initialize(int NumPlayer, Stage::Base *pStage);
 	void Release(){ SAFE_DELETE(pInstance); }
 	void Update();
-	void Render();
+	void Render(tdnShader* shader, char* name);
+	void RenderDeferred();
 
 	int GetNumPlayer() { return m_NumPlayer; }
 	BasePlayer *GetPlayer(int no) { return m_pPlayers[no]; }

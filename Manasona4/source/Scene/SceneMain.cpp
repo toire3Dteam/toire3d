@@ -4,7 +4,7 @@
 #include "../Stage/Stage.h"
 #include "../Sound/SoundManager.h"
 #include "../PostEffect/PostEffect.h"
-#include "../Effect/Particle.h"
+#include "../particle_2d/particle_2d.h"
 
 #include "../Stage/Stage.h"
 #include "../Camera/camera.h"
@@ -14,6 +14,8 @@
 
 #include "../Effect/PanelEffect/PanelEffectManager.h"
 #include "../Effect/UVEffect/UVEffectManager.h"
+
+#include "../DeferredEx/DeferredEx.h"
 
 //BaseEffect* g_eff;
 //EffectManager;
@@ -26,6 +28,7 @@ UVEffectManager* g_uvEffect;
 
 bool sceneMain::Initialize()
 {
+	m_dirLight = Vector3(1, -1, 1);
 
 	//g_eff = new HitEffect();
 	m_panel	   = new PanelEffectManager();
@@ -51,12 +54,13 @@ bool sceneMain::Initialize()
 
 	m_fLoadPercentage = 1.0f;	// ロード割合
 
-	// パーティクル初期化
-	ParticleManager::Initialize("DATA/Effect/particle.png", 2048);
-
 	// オレ曲初期化
 	m_pMyMusicMgr = new MyMusicManager(MY_MUSIC_ID::SENJO);
 	m_pMyMusicMgr->Play();
+
+	DeferredManagerEx;
+	DeferredManagerEx.InitShadowMap(1024);
+	m_bShaderFlag = true;
 
 	return true;
 }
@@ -70,7 +74,8 @@ sceneMain::~sceneMain()
 	//EffectMgr.Release();
 	SAFE_DELETE(m_panel);
 	SAFE_DELETE(g_uvEffect);
-	ParticleManager::Release();
+
+	DeferredManagerEx.Release();
 }
 
 //******************************************************************
@@ -88,8 +93,17 @@ bool sceneMain::Update()
 	// プレイヤー更新
 	PlayerMgr->Update();
 
-	// パーティクル更新
-	ParticleManager::Update();
+	static float lightAngle = 2.14;
+	// アングル
+	if (KeyBoard(KB_R)) { lightAngle -= 0.05f; }
+	if (KeyBoard(KB_T)) { lightAngle += 0.05f; }
+
+	m_dirLight.x = sinf(lightAngle);
+	m_dirLight.z = cosf(lightAngle);
+	m_dirLight.y = -0.8f;
+
+	// ブラー更新
+	DeferredManagerEx.RadialBlurUpdate();
 
 	// エンターでエフェクトカメラ発動してみる
 	//if (KeyBoardTRG(KB_ENTER))
@@ -107,8 +121,21 @@ bool sceneMain::Update()
 
 		m_panel->AddEffect(Vector3(0, 5, -5), PANEL_EFFECT_TYPE::DAMAGE);
 		//g_uvEffect->AddEffect(Vector3(0, 0, -5), UV_EFFECT_TYPE::WAVE);
-		g_uvEffect->AddEffect(Vector3(5, 5, -5), UV_EFFECT_TYPE::HIT_IMPACT, 1.0f, 1.5f);
+		g_uvEffect->AddEffect(Vector3(5, 5, -5), UV_EFFECT_TYPE::UPPER, 1.0f, 1.5f);
 	}
+
+	if (KeyBoardTRG(KB_K))
+	{
+		if (m_bShaderFlag)
+		{
+			m_bShaderFlag = false;
+		}
+		else
+		{
+			m_bShaderFlag = true;
+		}
+	}
+
 
 	//g_eff->Update();
 	//EffectMgr.Update();
@@ -126,24 +153,142 @@ void sceneMain::Render()
 	// カメラ
 	m_pCamera->Activate();
 
-	// ステージ描画
-	m_pStage->Render();
+	if (m_bShaderFlag)
+	{
+		// G_Bufferクリア
+		DeferredManagerEx.ClearLightSurface();
+		DeferredManagerEx.ClearBloom();
+		DeferredManagerEx.ClearGpuPointLight();
+		DeferredManagerEx.ClearPLSdata();
 
-	// プレイヤー
-	PlayerMgr->Render();
+		// シェーダ更新
+		DeferredManagerEx.G_Update(m_pCamera->m_pos);
 
-	// パーティクル
-	ParticleManager::Render();
+		// 影
+		RenderShadow();
 
-	//g_eff->Render3D();
-	//EffectMgr.Render();
-	m_panel->Render();
+		// シェーダ
+		DeferredManagerEx.G_Begin();
+		// ステージ描画
+		m_pStage->RenderDeferred();
+		// プレイヤー
+		PlayerMgr->RenderDeferred();
 
-	//EffectMgr.Render3D();
-	m_panel->Render3D();
-	g_uvEffect->Render();
+		// シェーダ終わり
+		DeferredManagerEx.G_End();
 
 
+		DeferredManagerEx.DirLight(m_dirLight, Vector3(0.8, 0.72, 0.72));
+		DeferredManagerEx.HemiLight(Vector3(0.6, 0.5, 0.5), Vector3(0.45, 0.43, 0.43));
+
+		// 最後の処理
+		{
+			DeferredManagerEx.FinalBegin();
+
+			// ステージ描画
+			m_pStage->Render(shaderM, "DefaultLighting");
+			// プレイヤー
+			PlayerMgr->Render(shaderM, "DefaultLighting");
+
+			m_panel->Render();
+			m_panel->Render3D();
+			g_uvEffect->Render();
+
+			DeferredManagerEx.FinalEnd();
+		}
+
+		// ブルーム
+		DeferredManagerEx.BloomRender();
+
+
+		if (KeyBoard(KB_J))
+		{
+			SurfaceRender();
+		}
+	}
+	else
+	{
+
+		// ステージ描画
+		m_pStage->Render(shader, "copy");
+		// プレイヤー
+		PlayerMgr->Render(shader, "copy");
+
+		m_panel->Render();
+		m_panel->Render3D();
+		g_uvEffect->Render();
+
+	}
 	tdnText::Draw(0, 30, 0xffffffff, "CameraPos    : %.1f %.1f %.1f", m_pCamera->m_pos.x, m_pCamera->m_pos.y, m_pCamera->m_pos.z);
 	tdnText::Draw(0, 60, 0xffffffff, "CameraTarget : %.1f %.1f %.1f", m_pCamera->m_target.x, m_pCamera->m_target.y, m_pCamera->m_target.z);
+}
+
+void sceneMain::RenderShadow()
+{
+	if (DeferredManagerEx.GetShadowFlag() == false)return;
+
+	DeferredManagerEx.CreateShadowMatrix
+		(m_dirLight, Vector3(0,0,0), Vector3(0, 0, 1), 400);
+
+	{
+		DeferredManagerEx.ShadowBegin();
+
+		m_pStage->RenderShadow();
+
+		DeferredManagerEx.ShadowEnd();
+	}
+}
+
+void sceneMain::SurfaceRender()
+{
+	enum {
+		X = 320/2, Y = 180/2 
+	};
+
+	int texX = 0;
+	int texY = 0;
+
+	DeferredManagerEx.GetTex(SURFACE_NAME_EX::NORMAL_DEPTH)->Render(X*texX, Y*texY, X, Y, 0, 0, 1280, 720);
+
+	texX++;
+	DeferredManagerEx.GetTex(SURFACE_NAME_EX::ROUGHNESS)->Render(X*texX, Y*texY, X, Y, 0, 0, 1280, 720);
+
+	texX++;
+	DeferredManagerEx.GetTex(SURFACE_NAME_EX::LIGHT)->Render(X*texX, Y*texY, X, Y, 0, 0, 1280, 720);
+
+	texX++;
+	DeferredManagerEx.GetTex(SURFACE_NAME_EX::SPEC)->Render(X*texX, Y*texY, X, Y, 0, 0, 1280, 720);
+
+	texX++;
+	DeferredManagerEx.GetTex(SURFACE_NAME_EX::FORWARD)->Render(X*texX, Y*texY, X, Y, 0, 0, 1280, 720);
+
+	texX++;
+	DeferredManagerEx.GetTex(SURFACE_NAME_EX::BLOOM)->Render(X*texX, Y*texY, X, Y, 0, 0, 1280, 720);
+
+	texX++;
+	DeferredManagerEx.GetTex(SURFACE_NAME_EX::BLOOM_SEED)->Render(X*texX, Y*texY, X, Y, 0, 0, 1280, 720);
+
+	texX++;
+	DeferredManagerEx.GetTex(SURFACE_NAME_EX::SCREEN)->Render(X*texX, Y*texY, X, Y, 0, 0, 1280, 720);
+
+	texX = 0;
+	texY++;
+	DeferredManagerEx.GetTex(SURFACE_NAME_EX::POINT_LIGHT)->Render(X*texX, Y*texY, X, Y, 0, 0, 1280, 720);
+
+	if (DeferredManagerEx.GetShadowFlag() == false)return;
+	texX++;
+	DeferredManagerEx.GetTex(SURFACE_NAME_EX::SHADOW_MAP)->Render(X*texX, Y*texY, X, Y, 0, 0, 1280, 720);
+
+	texX = 0;
+	//texY ++;
+	//DeferredManager.GetTex(SURFACE_NAME::MRT_NORMAL)->Render(X*texX, Y*texY, X, Y, 0, 0, 1280, 720);
+
+	//texX++;
+	//DeferredManager.GetTex(SURFACE_NAME::MRT_ROUGHNESS)->Render(X*texX, Y*texY, X, Y, 0, 0, 1280, 720);
+
+	//texX++;
+	//DeferredManager.GetTex(SURFACE_NAME::LIGHT)->Render(X*texX, Y*texY, X, Y, 0, 0, 1280, 720);
+
+	//texX++;
+	//DeferredManager.GetTex(SURFACE_NAME::SPECULAR)->Render(X*texX, Y*texY, X, Y, 0, 0, 1280, 720);
 }

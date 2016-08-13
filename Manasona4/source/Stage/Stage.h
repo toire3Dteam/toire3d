@@ -19,7 +19,11 @@ namespace Stage
 
 		virtual void Initialize(Camera *pCamera) = 0;
 		virtual void Update();
-		virtual void Render();
+		virtual void Render(); 
+		virtual void Render(tdnShader* shader,char* name);
+		virtual void RenderDeferred();
+		virtual void RenderShadow();
+
 		//virtual void Render_ShadowBuf() = 0;
 
 		static void CreateStage(Base**p, STAGE_ID id, Camera *pCamera);
