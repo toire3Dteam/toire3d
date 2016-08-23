@@ -10,6 +10,3 @@ ID: XBOX
 NAME: Controller (XBOX 360 For Windows)|
 ID: DEFAULT
 
-NAME: PLAYSTATION(R)3 Controller|
-ID: DEFAULT
-

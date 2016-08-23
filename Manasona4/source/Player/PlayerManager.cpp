@@ -73,7 +73,7 @@ void PlayerManager::Update()
 	{
 		for (int you = my + 1; you < m_NumPlayer; you++)
 		{
-			Collision::Sinking(m_pPlayers[my], m_pPlayers[you]);	// めり込み判定
+			m_pStage->Sinking(m_pPlayers[my], m_pPlayers[you]);	// めり込み判定
 
 			bool receive;	// 判定結果受取り用変数
 
@@ -103,7 +103,7 @@ void PlayerManager::Update()
 	/* 位置を確定 */
 	FOR(m_NumPlayer)
 	{
-		m_pStage->Collision(m_pPlayers[i]);	// ステージとの判定で、move値をどうこういじった後に
+		m_pStage->Collision(m_pPlayers[i], m_pPlayers[i]->GetMoveAddress());	// ステージとの判定で、move値をどうこういじった後に
 		m_pPlayers[i]->UpdatePos();			// 座標にmove値を足す更新
 	}
 

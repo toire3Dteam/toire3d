@@ -59,7 +59,7 @@ void Stage::Base::CreateStage(Stage::Base**p,STAGE_ID id, Camera *pCamera)
 	(*p)->Initialize(pCamera);
 }
 
-void Stage::Base::Collision(BasePlayer *player)
+void Stage::Base::Collision(BasePlayer *player, Vector3 *move)
 {
 	// 落下死判定
 	if (player->GetPos().y < m_DeadLineY)
@@ -70,8 +70,14 @@ void Stage::Base::Collision(BasePlayer *player)
 	}
 
 	// ステージとのあたり判定
-	Collision::Raypic(m_pObj, player);
+	Collision::Raypic(m_pObj, player, move);
 }
+
+void Stage::Base::Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2)
+{
+	Collision::Sinking(m_pObj, pPlayer1, pPlayer2);
+}
+
 
 void Stage::Senjo::Initialize(Camera *pCamera)
 {

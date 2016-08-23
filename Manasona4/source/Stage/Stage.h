@@ -30,7 +30,8 @@ namespace Stage
 
 		virtual STAGE_ID GetStageID() = 0;	// ステージのID取得
 
-		void Collision(BasePlayer *player);
+		void Collision(BasePlayer *player, Vector3 *move);
+		void Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2);
 
 	protected:
 		iexMesh *m_pObj;	// メッシュの実体

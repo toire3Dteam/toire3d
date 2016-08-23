@@ -564,7 +564,6 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType)
 		m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::DAMAGE);
 		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::WAVE);
 		PointLightMgr->AddPointLight(pos + Vector3(0, 5, 0), Vector3(1.0f, 0.4f, 0.0f), 20, 4, 20, 4, 15);// ポイントライトエフェクト！
-		ParticleManager::EffectHit(pos);
 
 		break;
 	case EFFECT_TYPE::WHIFF:

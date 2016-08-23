@@ -260,6 +260,7 @@ public:
 	// ÉQÉbÉ^Å[
 	int GetDeviceID() { return m_deviceID; }
 	Vector3 &GetMove() { return m_move; }
+	Vector3 *GetMoveAddress(){ return &m_move; }
 	//Vector3 &GetStandSaveMove(){ return m_StandSaveMove; }
 	Vector3 &GetPos() { return m_pos; }
 	Vector3 *GetPosAddress() { return &m_pos; }

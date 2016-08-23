@@ -114,17 +114,6 @@ sampler MultiSamp = sampler_state
 	AddressV = Wrap;
 };
 
-texture ToonShadowMap;	//	トゥーンの影用テクスチャ
-sampler ToonShadowSamp = sampler_state
-{
-	Texture = <ToonShadowMap>;
-	MinFilter = POINT;
-	MagFilter = POINT;
-	MipFilter = NONE;
-
-	AddressU = Wrap;
-	AddressV = Wrap;
-};
 
 /***************************/
 //	G_Buffer用の頂点データ
@@ -1233,88 +1222,15 @@ technique DefaultLighting
 	}
 }
 
-/*************************************/
-// アウトラインに必要な変数
-/*************************************/
-
-float    g_OutlineSize = 0.005f;
-
-//------------------------------------------------------
-//		頂点フォーマット
-//------------------------------------------------------
-struct VS_OUTPUT_OUTLINE
-{
-	float4 Pos		: POSITION;
-	float2 Tex		: TEXCOORD0;
-};
-
-/*************************************/
-// アウトライン用の頂点シェーダー
-/*************************************/
-
-VS_OUTPUT_OUTLINE VS_OutLine(VS_INPUT In) //:POSITION テクスコードの情報がなくなるので書かない
-{
-
-	VS_OUTPUT_OUTLINE OUT = (VS_OUTPUT_OUTLINE)0;
-
-	OUT.Pos = mul(In.Pos, WVPMatrix);
-	OUT.Pos.xy += normalize(mul(mul(float4(In.Normal, 0), WMatrix), VPMatrix).xy) * OUT.Pos.z * g_OutlineSize;
-	OUT.Pos.z += 0.001f;
-
-	OUT.Tex = In.Tex;
-
-	return OUT;
-}
-
-/*************************************/
-// アウトライン用のピクセルシェーダー
-/*************************************/
-
-PS_TONEMAP PS_OutLine(VS_OUTPUT_OUTLINE In)
-{
-	PS_TONEMAP	OUT = (PS_TONEMAP)0;
-
-	float4 col = tex2D(DecaleSamp, In.Tex); //そのキャラクターのエッジ付近の色に
-
-	OUT.color.rgb = col.rgb - float3(0.25,0.5,0.5);// ふちは少し暗く
-	OUT.color.a = 1.0f;
-
-	OUT.high = col - 1;
-	//OUT.high.rgb = float3(0, 1, 1.5);
-	OUT.high.a = 1;
-
-	return OUT;
-}
-
-
-technique OutLine
-{
-	pass P0
-	{
-		ZEnable = true;				// 奥行考慮
-		ZWriteEnable = false;		// 奥行を書き込むか
-
-		AlphaBlendEnable = true;	// アルファブレンド考慮
-		BlendOp = Add;				// ブレンド仕様
-		SrcBlend = SrcAlpha;		// 現在描いてる方
-		DestBlend = InvSrcAlpha;	// 描かれている方
-		CullMode = CW;				// カリングの仕様
-
-
-		VertexShader = compile vs_3_0 VS_OutLine();
-		PixelShader = compile ps_3_0 PS_OutLine();
-	}
-}
-
 //------------------------------------------------------
 //		プレイヤー用のグローバルエリア
 //------------------------------------------------------
-float g_InvincibleColRate = 0.0f;//Flash そのキャラクターダウン後の点滅のレート　ちか
+float g_InvincibleColRate = 1.0f;//Flash そのキャラクターダウン後の点滅のレート　ちか
 
 
 
 //------------------------------------------------------
-//		プレイヤー用のピクセルシェーダー	
+//		ピクセルシェーダー	
 //------------------------------------------------------
 PS_TONEMAP PS_Player(VS_OUTPUT_FINAL In) : COLOR
 {
@@ -1331,7 +1247,6 @@ PS_TONEMAP PS_Player(VS_OUTPUT_FINAL In) : COLOR
 	//OUT.color.rgb *= lightCol;
 	//OUT.color.rgb += tex2D(SpecSamp, ScreenTex);
 	//OUT.color.rgb += tex2D(PLSSamp, ScreenTex);
-
 
 	//OUT.color.g += 0.5;
 
@@ -1350,7 +1265,7 @@ PS_TONEMAP PS_Player(VS_OUTPUT_FINAL In) : COLOR
 }
 
 //------------------------------------------------------
-//		プレイヤー用のテクニック
+//		通常描画テクニック
 //------------------------------------------------------
 technique Player
 {
@@ -1370,192 +1285,6 @@ technique Player
 	}
 }
 
-
-//------------------------------------------------------
-//		プレイヤー用のピクセルシェーダー	
-//------------------------------------------------------
-PS_TONEMAP PS_ToonPlayer(VS_OUTPUT_FINAL In) : COLOR
-{
-	PS_TONEMAP	OUT = (PS_TONEMAP)0;
-
-	//スクリーン空間をテクスチャ座標に  NDC->UV y反転
-	const float2 ScreenTex = In.wvpPos.xy / In.wvpPos.w * float2(0.5, -0.5) + float2(0.5, 0.5);
-	// 必要な情報を取得
-	const float4 NormalDepth = tex2D(NormalDepthSamp, ScreenTex);
-	const float3 Normal = CalcNormal(NormalDepth.xy*2.0f - 1.0f);
-	const float3 Pos = CalcViewPosition(ScreenTex, NormalDepth.zw);
-
-	//	ピクセル色決定
-	OUT.color = In.Color * tex2D(DecaleSamp, In.Tex);
-
-	float4 lightCol = tex2D(LightSamp, ScreenTex);
-		lightCol += tex2D(PLSSamp, ScreenTex);
-	//OUT.color.rgb *= lightCol;
-	//OUT.color.rgb += tex2D(SpecSamp, ScreenTex);
-	//OUT.color.rgb += tex2D(PLSSamp, ScreenTex);
-
-	// ライト率(ハーフランバート)
-	float rate = (dot(Normal, -ViewLightVec));
-	float HalfLambert = pow((rate + 1.0f)*0.5f, 2);	// HalfLambert
-	float3 toonShadowCol = tex2D(ToonShadowSamp, float2(HalfLambert, 0.0f));
-		OUT.color.rgb *= toonShadowCol;
-
-	//OUT.color.g += 0.5;
-	float3 E = Pos.xyz;// ビューの目線
-		E = normalize(E);
-	float RimPower = pow(1.0f - max(0.0f, dot(-E, Normal)), 4.0f);
-	float RimLightPower = max(.0f, dot(-E, ViewLightVec));
-
-	//トーンマッピング
-	OUT.color.rgb *= exp2(exposure);
-
-	OUT.high.rgb = max(float3(0.0f, 0.0f, 0.0f), (OUT.color.rgb - g_bloomColor));
-	OUT.high.a = 1.0f;
-
-	// キャサリンの白いリム
-	OUT.color.rgb += (RimPower)* float3(1, 1, 1);
-
-	//高輝度抽出後にしないとHDRで光ってしまうので最後に
-	OUT.color.rgb += g_InvincibleColRate;
-
-	return OUT;
-}
-
-//------------------------------------------------------
-//		プレイヤー用のテクニック
-//------------------------------------------------------
-technique PlayerToon
-{
-	pass OutLine
-	{
-		ZEnable = true;				// 奥行考慮
-		ZWriteEnable = false;		// 奥行を書き込むか
-
-		AlphaBlendEnable = true;	// アルファブレンド考慮
-		BlendOp = Add;				// ブレンド仕様
-		SrcBlend = SrcAlpha;		// 現在描いてる方
-		DestBlend = InvSrcAlpha;	// 描かれている方
-		CullMode = CW;				// カリングの仕様
-
-		VertexShader = compile vs_3_0 VS_OutLine();
-		PixelShader = compile ps_3_0 PS_OutLine();
-	}
-
-	pass P0
-	{
-		ZEnable = true;				// 奥行考慮
-		ZWriteEnable = true;		// 奥行を書き込むか
-
-		AlphaBlendEnable = true;	// アルファブレンド考慮
-		BlendOp = Add;				// ブレンド仕様
-		SrcBlend = SrcAlpha;		// 現在描いてる方
-		DestBlend = InvSrcAlpha;	// 描かれている方
-		CullMode = CCW;				// カリングの仕様
-
-		VertexShader = compile vs_3_0 VS_DefaultLighting();
-		PixelShader = compile ps_3_0 PS_ToonPlayer();
-	}
-}
-
-
-//------------------------------------------------------
-//		ペルソナ用のピクセルシェーダー	
-//------------------------------------------------------
-PS_TONEMAP PS_Persona(VS_OUTPUT_FINAL In) : COLOR
-{
-	PS_TONEMAP	OUT = (PS_TONEMAP)0;
-
-	//スクリーン空間をテクスチャ座標に  NDC->UV y反転
-	const float2 ScreenTex = In.wvpPos.xy / In.wvpPos.w * float2(0.5, -0.5) + float2(0.5, 0.5);
-	// 必要な情報を取得
-	const float4 NormalDepth = tex2D(NormalDepthSamp, ScreenTex);
-	const float3 Normal = CalcNormal(NormalDepth.xy*2.0f - 1.0f);
-	const float3 Pos = CalcViewPosition(ScreenTex, NormalDepth.zw);
-
-	//	ピクセル色決定
-	OUT.color = In.Color * tex2D(DecaleSamp, In.Tex);
-
-	float4 lightCol = tex2D(LightSamp, ScreenTex);
-		lightCol += tex2D(PLSSamp, ScreenTex);
-	OUT.color.rgb *= lightCol;
-	OUT.color.rgb += tex2D(SpecSamp, ScreenTex);
-
-	// ライト率(ハーフランバート)
-	//float rate = (dot(Normal, -ViewLightVec));
-	//float HalfLambert = pow((rate + 1.0f)*0.5f, 2);	// HalfLambert
-	//float3 toonShadowCol = tex2D(ToonShadowSamp, float2(HalfLambert, 0.0f));
-	//	OUT.color.rgb *= toonShadowCol;
-
-		// ピクセルの色
-		//OUT.color.rgb = (HalfLambert * LightColor);
-	
-
-	// 青いリムライティング
-	float3 E = Pos.xyz;// ビューの目線
-	E = normalize(E);
-
-	float RimPower = pow(1.0f - max(0.0f, dot(-E, Normal)),2.0f);
-
-	// ペルソナの青い光
-	OUT.color.rgb += RimPower * float3(0, 0.4, 2.5);
-
-	//トーンマッピング
-	OUT.color.rgb *= exp2(exposure);
-
-	OUT.high.rgb = max(float3(0.0f, 0.0f, 0.0f), (OUT.color.rgb - g_bloomColor));
-
-	// ペルソナの青い光
-	//OUT.high.rgb += RimPower * float3(0,1.3, 1.5);
-
-	OUT.high.a = 1.0f;
-
-	//高輝度抽出後にしないとHDRで光ってしまうので最後に
-	//OUT.color.rgb += g_InvincibleColRate;
-
-
-
-	return OUT;
-}
-
-//------------------------------------------------------
-//		ペルソナテクニック
-//------------------------------------------------------
-technique Persona
-{
-	//pass OutLine
-	//{
-	//	ZEnable = true;				// 奥行考慮
-	//	ZWriteEnable = false;		// 奥行を書き込むか
-
-	//	AlphaBlendEnable = true;	// アルファブレンド考慮
-	//	BlendOp = Add;				// ブレンド仕様
-	//	SrcBlend = SrcAlpha;		// 現在描いてる方
-	//	DestBlend = InvSrcAlpha;	// 描かれている方
-	//	CullMode = CW;				// カリングの仕様
-
-	//	VertexShader = compile vs_3_0 VS_OutLine();
-	//	PixelShader = compile ps_3_0 PS_OutLine();
-
-	//}
-
-	pass P0
-	{
-		ZEnable = true;				// 奥行考慮
-		ZWriteEnable = true;		// 奥行を書き込むか
-
-		AlphaBlendEnable = true;	// アルファブレンド考慮
-		BlendOp = Add;				// ブレンド仕様
-		SrcBlend = SrcAlpha;		// 現在描いてる方
-		DestBlend = InvSrcAlpha;	// 描かれている方
-		CullMode = CCW;				// カリングの仕様
-
-		VertexShader = compile vs_3_0 VS_DefaultLighting();
-		PixelShader = compile ps_3_0 PS_Persona();
-	}
-
-
-
-}
 
 //********************************************************************
 //

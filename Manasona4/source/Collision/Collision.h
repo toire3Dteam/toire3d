@@ -46,14 +46,14 @@ namespace CollisionShape
 namespace Collision
 {
 	// レイピック
-	void Raypic(iexMesh *obj, BasePlayer *player); // Squareで判定
-	void RaypicUp(iexMesh *obj, BasePlayer *player);
-	void RaypicDown(iexMesh *obj, BasePlayer *player);
-	void RaypicLeft(iexMesh *obj, BasePlayer *player);
-	void RaypicRight(iexMesh *obj, BasePlayer *player);
+	void Raypic(iexMesh *obj, BasePlayer *player, Vector3 *move); // Squareで判定
+	void RaypicUp(iexMesh *obj, BasePlayer *player, Vector3 *move);
+	void RaypicDown(iexMesh *obj, BasePlayer *player, Vector3 *move);
+	void RaypicLeft(iexMesh *obj, BasePlayer *player, Vector3 *move);
+	void RaypicRight(iexMesh *obj, BasePlayer *player, Vector3 *move);
 
 	// めり込み
-	void Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2);
+	void Sinking(iexMesh *obj, BasePlayer *pPlayer1, BasePlayer *pPlayer2);
 
 	// 形状で判定
 	bool HitCheck(CollisionShape::Circle* c1, CollisionShape::Circle* c2);

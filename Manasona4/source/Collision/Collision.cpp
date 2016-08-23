@@ -3,66 +3,63 @@
 #include "../Player/BasePlayer.h"
 #include "../BaseEntity/Message/MessageDispatcher.h"
 
-void Collision::Raypic(iexMesh *obj, BasePlayer *player) // ステージとプレイヤー
+void Collision::Raypic(iexMesh *obj, BasePlayer *player, Vector3 *move) // ステージとプレイヤー
 {
-	Vector3 move(player->GetMove());
-
-	if (move.y > 0) // 上
+	if (move->y > 0) // 上
 	{
-		RaypicUp(obj, player);
+		RaypicUp(obj, player, move);
 
 		// ★★★　move値が0以上だった場合、isLand判定をしているレイピックが呼ばれないため、通常3段目殻の派生が滞空にならない。
 		// move値Yが0以上なら、間違いなく地上ではない場所にいるだろうと仮定、強制的に地上フラグをオフにする
 		player->SetLand(false);//プレイヤーのポジションをセットした後に変更
 	}
-	else if (move.y <= 0) // 下
+	else if (move->y <= 0) // 下
 	{
-		RaypicDown(obj, player);
+		RaypicDown(obj, player, move);
 	}
 
-	if (move.x > 0) // 右
+	if (move->x > 0) // 右
 	{
-		RaypicRight(obj, player);
+		RaypicRight(obj, player, move);
 	}
-	else if (move.x < 0) // 左
+	else if (move->x < 0) // 左
 	{
-		RaypicLeft(obj, player);
+		RaypicLeft(obj, player, move);
 	}
 }
 
-void Collision::RaypicUp(iexMesh *obj, BasePlayer *player)
+void Collision::RaypicUp(iexMesh *obj, BasePlayer *player, Vector3 *move)
 {
-	Vector3 pos(player->GetPos()), move(player->GetMove());
+	Vector3 pos(player->GetPos());
 	const CollisionShape::Square *square(player->GetHitSquare());
 
 	Vector3 hit_pos, ray_pos, ray_vec; float dist;
 
-	if (move.y > 0) // 上
+	if (move->y > 0) // 上
 	{
 		ray_pos = pos;
 		ray_pos += square->pos;
 		ray_vec.Set(0, 1, 0);
-		dist = square->height + move.y + 1;
+		dist = square->height + move->y + 1;
 
 		if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // 当たった
 		{
 			dist = abs(hit_pos.y - ray_pos.y);
-			if (dist <= square->height + move.y)
+			if (dist <= square->height + move->y)
 			{
 				pos.y = hit_pos.y - square->height - square->pos.y;
-				move.y = -0.1e-10f;
+				move->y = -0.1e-10f;
 
-				player->SetMove(move);
+				// プレイヤーにセットするのではなく、move値のアドレスを引数でもらって直接書き換える形にした。(めり込み判定で、めり込み判定用のmove値を使うことになったので)
+				//player->SetMove(move);
 				player->SetPos(pos);
 			}
 		}
 	}
 }
-void Collision::RaypicDown(iexMesh *obj, BasePlayer *player)
+void Collision::RaypicDown(iexMesh *obj, BasePlayer *player, Vector3 *move)
 {
-	Vector3 move(player->GetMove());
-
-	if (move.y <= 0) // 下
+	if (move->y <= 0) // 下
 	{
 		bool hit(false);
 
@@ -74,17 +71,18 @@ void Collision::RaypicDown(iexMesh *obj, BasePlayer *player)
 		ray_pos += square->pos;
 		ray_pos.x += square->width; // 右から
 		ray_vec.Set(0, -1, 0);
-		dist = square->height - move.y + 1;
+		dist = square->height - move->y + 1;
 
 		if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // 当たった
 		{
 			dist = abs(hit_pos.y - ray_pos.y);
-			if (dist <= square->height - move.y)
+			if (dist <= square->height - move->y)
 			{
 				pos.y = hit_pos.y + square->height - square->pos.y;
-				move.y = 0;
+				move->y = 0;
 
-				player->SetMove(move);
+				// プレイヤーにセットするのではなく、move値のアドレスを引数でもらって直接書き換える形にした。(めり込み判定で、めり込み判定用のmove値を使うことになったので)
+				//player->SetMove(move);
 				player->SetPos(pos);
 
 				// ★★★　地面に付いたら
@@ -107,17 +105,18 @@ void Collision::RaypicDown(iexMesh *obj, BasePlayer *player)
 			ray_pos += square->pos;
 			ray_pos.x -= square->width; // 左から
 			ray_vec.Set(0, -1, 0);
-			dist = square->height - move.y + 1;
+			dist = square->height - move->y + 1;
 
 			if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // 当たった
 			{
 				dist = abs(hit_pos.y - ray_pos.y);
-				if (dist <= square->height - move.y)
+				if (dist <= square->height - move->y)
 				{
 					pos.y = hit_pos.y + square->height - square->pos.y;
-					move.y = 0;
+					move->y = 0;
 
-					player->SetMove(move);
+					// プレイヤーにセットするのではなく、move値のアドレスを引数でもらって直接書き換える形にした。(めり込み判定で、めり込み判定用のmove値を使うことになったので)
+					//player->SetMove(move);
 					player->SetPos(pos);
 
 					//player->Land();//プレイヤーのポジションをセットした後に変更
@@ -126,31 +125,31 @@ void Collision::RaypicDown(iexMesh *obj, BasePlayer *player)
 		}
 	}
 }
-void Collision::RaypicLeft(iexMesh *obj, BasePlayer *player)
+void Collision::RaypicLeft(iexMesh *obj, BasePlayer *player, Vector3 *move)
 {
-	Vector3 pos(player->GetPos()), move(player->GetMove());
+	Vector3 pos(player->GetPos());
 	const CollisionShape::Square *square(player->GetHitSquare());
 
 	Vector3 hit_pos, ray_pos, ray_vec; float dist;
 
-	if (move.x < 0) // 左
+	if (move->x < 0) // 左
 	{
 		bool hit = false;
 
 		ray_pos = pos;
 		ray_pos += square->pos;
 		ray_vec.Set(-1, 0, 0);
-		dist = square->width - move.x + 1;
+		dist = square->width - move->x + 1;
 
 		if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // 当たった
 		{
 			dist = abs(hit_pos.x - ray_pos.x);
-			if (dist <= square->width - move.x)
+			if (dist <= square->width - move->x)
 			{
 				pos.x = hit_pos.x + square->width - square->pos.x;
-				move.x = 0;
+				move->x = 0;
 
-				player->SetMove(move);
+				//player->SetMove(move);
 				player->SetPos(pos);
 				hit = true;
 			}
@@ -159,7 +158,7 @@ void Collision::RaypicLeft(iexMesh *obj, BasePlayer *player)
 		if(!hit) // 当たらなかったから上下からray出す 
 		{
 			float h(0);
-			if (move.y > 0) // 上
+			if (move->y > 0) // 上
 			{
 				h = square->height * 0.85f;
 			}
@@ -171,33 +170,34 @@ void Collision::RaypicLeft(iexMesh *obj, BasePlayer *player)
 			ray_pos += square->pos;
 			ray_pos.y += h;
 			ray_vec.Set(-1, 0, 0);
-			dist = square->width - move.x + 1;
+			dist = square->width - move->x + 1;
 
 
 
 			if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // 当たった
 			{
 				dist = abs(hit_pos.x - ray_pos.x);
-				if (dist <= square->width - move.x)
+				if (dist <= square->width - move->x)
 				{
 					pos.x = hit_pos.x + square->width - square->pos.x;
-					move.x = 0;
+					move->x = 0;
 
-					player->SetMove(move);
+					// プレイヤーにセットするのではなく、move値のアドレスを引数でもらって直接書き換える形にした。(めり込み判定で、めり込み判定用のmove値を使うことになったので)
+					//player->SetMove(move);
 					player->SetPos(pos);
 				}
 			}
 		}
 	}
 }
-void Collision::RaypicRight(iexMesh *obj, BasePlayer *player)
+void Collision::RaypicRight(iexMesh *obj, BasePlayer *player, Vector3 *move)
 {
-	Vector3 pos(player->GetPos()), move(player->GetMove());
+	Vector3 pos(player->GetPos());
 	const CollisionShape::Square *square(player->GetHitSquare());
 
 	Vector3 hit_pos, ray_pos, ray_vec; float dist;
 
-	if (move.x > 0) // 右
+	if (move->x > 0) // 右
 	{
 		bool hit = false;
 
@@ -205,17 +205,18 @@ void Collision::RaypicRight(iexMesh *obj, BasePlayer *player)
 		ray_pos += square->pos;
 		ray_pos.y += square->height * 0.1f;
 		ray_vec.Set(1, 0, 0);
-		dist = square->width + move.x + 1;
+		dist = square->width + move->x + 1;
 
 		if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // 当たった
 		{
 			dist = abs(hit_pos.x - ray_pos.x);
-			if (dist <= square->width + move.x)
+			if (dist <= square->width + move->x)
 			{
 				pos.x = hit_pos.x - square->width - square->pos.x;
-				move.x = 0;
+				move->x = 0;
 
-				player->SetMove(move);
+				// プレイヤーにセットするのではなく、move値のアドレスを引数でもらって直接書き換える形にした。(めり込み判定で、めり込み判定用のmove値を使うことになったので)
+				//player->SetMove(move);
 				player->SetPos(pos);
 				hit = true;
 			}
@@ -224,7 +225,7 @@ void Collision::RaypicRight(iexMesh *obj, BasePlayer *player)
 		if (!hit) // 当たらなかったから上下からray出す 
 		{
 			float h(0);
-			if (move.y > 0) // 上
+			if (move->y > 0) // 上
 			{
 				h = square->height * 0.85f;
 			}
@@ -236,17 +237,17 @@ void Collision::RaypicRight(iexMesh *obj, BasePlayer *player)
 			ray_pos += square->pos;
 			ray_pos.y += h;
 			ray_vec.Set(1, 0, 0);
-			dist = square->width + move.x + 1;
+			dist = square->width + move->x + 1;
 
 			if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // 当たった
 			{
 				dist = abs(hit_pos.x - ray_pos.x);
-				if (dist <= square->width + move.x)
+				if (dist <= square->width + move->x)
 				{
 					pos.x = hit_pos.x - square->width - square->pos.x;
-					move.x = 0;
+					move->x = 0;
 
-					player->SetMove(move);
+					//player->SetMove(move);
 					player->SetPos(pos);
 				}
 			}
@@ -256,7 +257,7 @@ void Collision::RaypicRight(iexMesh *obj, BasePlayer *player)
 }
 
 
-void Collision::Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2)
+void Collision::Sinking(iexMesh *obj, BasePlayer *pPlayer1, BasePlayer *pPlayer2)
 {
 	// プレイヤーの判定■
 	CollisionShape::Square s1, s2;
@@ -270,18 +271,26 @@ void Collision::Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2)
 	{
 		const float len = v.Length();
 		//v.Normalize();	// 正規化
-		Vector3 sinking(s2.width - sqrtf(v.x*v.x), s2.height - sqrtf(v.y*v.y), 0);	// めり込み量
+		Vector3 sinking1(s2.width - sqrtf(v.x*v.x), s2.height - sqrtf(v.y*v.y), 0);	// めり込み量
+		Vector3 sinking2(-sinking1);
 		if (v.x < 0)
 		{
-			sinking.x *= -1;
+			sinking1.x *= -1;
+			sinking2.x *= -1;
 		}
 
-		sinking.y = 0;
-		static const float rate = .25f;
-		sinking *= rate;	// 完全に戻すと不自然なので
+		sinking1.y = 0;
+		sinking2.y = 0;
+		static const float rate = .75f;
+		sinking1 *= rate;	// 完全に戻すと不自然なので
+		sinking2 *= rate;
 
-		pPlayer1->AddMove(sinking);
-		pPlayer2->AddMove(-sinking);
+		// むーぶちに足すと挙動がおかしいので、座標に足す。でもそのまま足すと壁抜けするのでレイピック
+		Raypic(obj, pPlayer1, &sinking1);
+		Raypic(obj, pPlayer2, &sinking2);
+
+		pPlayer1->SetPos(pPlayer1->GetPos() + sinking1);
+		pPlayer2->SetPos(pPlayer2->GetPos() + sinking2);
 	}
 }
 
