@@ -74,6 +74,7 @@ public:
 	static void EffectPersonaAura(const Vector3 &pos);		// ペルソナ持続オーラ
 	static void EffectFinish(const Vector3 &pos);		// フィニッシュアーツヒット
 	static void EffectFlySmoke(const Vector3 &pos);		// 吹っ飛び煙
+	static void EffectHit(const Vector3 &pos);
 	//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
 
 private:

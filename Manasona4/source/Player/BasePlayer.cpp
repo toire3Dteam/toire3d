@@ -7,6 +7,7 @@
 #include "AI\AI.h"
 #include "../Effect/Particle.h"
 #include "../system/System.h"
+#include "../PointLight/PointLight.h"
 
 //_/_/_/_/_/_/__/_/__/_/__/_/__
 // 定数
@@ -47,14 +48,16 @@ void BasePlayer::LoadAttackFrameList(char *filename)
 	}
 }
 
-BasePlayer::BasePlayer(int deviceID, bool bAI) :m_bAI(bAI), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + deviceID)),
+BasePlayer::BasePlayer(int deviceID,TEAM team, bool bAI) :m_bAI(bAI),m_team(team), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + deviceID)),
 m_maxSpeed(1.0f), m_dir(DIR::LEFT), m_deviceID(deviceID), m_pHitSquare(new CollisionShape::Square),
 m_pObj(nullptr), m_move(VECTOR_ZERO), m_bLand(false), m_bAerialJump(true), m_ActionState(BASE_ACTION_STATE::NO_ACTION),
 m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentActionFrame(0), m_RecoveryFlame(0), m_bEscape(false), m_score(0), m_CollectScore(0), m_pAI(nullptr),
-m_recoveryCount(0), m_HitStopFrame(0)// ★★★バグの原因　ひっとすトップ初期化のし忘れ。
+m_recoveryCount(0), m_HitStopFrame(0),// ★★★バグの原因　ひっとすトップ初期化のし忘れ。
+m_InvincibleColRate(0), m_InvincibleColRateFlame(0), m_bInvincibleColRateUpFlag(false)
 {
 	// とりあえず、モコイさん
 	m_pStand = new Stand::Mokoi(this);
+
 
 	// デフォルト設定
 	m_pHitSquare->height = 4;
@@ -132,13 +135,12 @@ void BasePlayer::Update()
 	m_pStand->Update();
 
 	// 無敵時間の更新
-	//if (m_InvincibleTime > 0)
-	//{
-	//	//m_InvincibleLV = (--m_InvincibleTime <= 0) ? 0 : m_InvincibleLV;
-	//	m_InvincibleTime--;
-	//	if (m_InvincibleTime <= 0)
-	//		m_InvincibleLV = 0;
-	//}
+	if (KeyBoardTRG(KB_H))
+	{
+		SetInvincible(240, 1);
+	}
+	InvincibleUpdate();
+
 
 	// ★硬直時間のデクリメント
 	if (m_RecoveryFlame > 0)
@@ -288,6 +290,61 @@ void BasePlayer::Move()
 
 }
 
+// 無敵の制御
+void BasePlayer::InvincibleUpdate()
+{
+	// ここだけのお名前
+	enum 
+	{
+		FLASH_SPEED = 15
+	};
+
+	// 無敵時間の更新
+	if (m_InvincibleTime > 0)
+	{
+		//m_InvincibleLV = (--m_InvincibleTime <= 0) ? 0 : m_InvincibleLV;
+		m_InvincibleTime--;
+
+		
+		m_InvincibleColRateFlame++;
+		m_InvincibleColRateFlame = m_InvincibleColRateFlame % FLASH_SPEED;
+		
+		// 上げ下げのフラグ切り替え
+		if (m_InvincibleColRateFlame == 0)
+		{
+			m_bInvincibleColRateUpFlag = (m_bInvincibleColRateUpFlag == false) ? true : false;
+		}
+
+		// 上げフラグがONならだんだん白く
+		if (m_bInvincibleColRateUpFlag == false)
+		{
+			m_InvincibleColRate = ((float)(m_InvincibleColRateFlame) / FLASH_SPEED);
+		}
+		else
+		{
+			m_InvincibleColRate = 1.0f - ((float)(m_InvincibleColRateFlame) / FLASH_SPEED);
+		}
+	
+
+		// ★　色の調整 (ここはセンスの問題)
+		m_InvincibleColRate *= 0.25f;	// ちょっと薄く
+		m_InvincibleColRate += 0.1f;    // けど点滅がない状態でも白っぽい
+
+	}
+	else
+	{
+		// タイムが0以下に達したらおしまい　初期化
+		m_InvincibleLV = 0;
+		m_InvincibleTime = 0;
+
+		m_InvincibleColRate = 0.0f;
+		m_InvincibleColRateFlame = 0;
+		m_bInvincibleColRateUpFlag = false;
+		
+	}
+
+}
+
 void BasePlayer::Control()
 {
 	// 押したキー判定
@@ -336,10 +393,85 @@ void BasePlayer::UpdatePos()
 	}
 }
 
+void BasePlayer::Render()
+{
+	// スタンド描画
+	m_pStand->Render(shaderM, "Persona");
+
+	// 無敵の白色チカチカレートを送る
+	shaderM->SetValue("g_InvincibleColRate", m_InvincibleColRate);
+	m_pObj->Render(shaderM, "PlayerToon");
+
+	// 無敵なら加算で重ねて描画
+	if (m_InvincibleTime > 0) m_pObj->Render(RS::ADD);
+
+	if (m_deviceID == 3)
+	{
+		m_pStateMachine->Render();// ステートマシンでの描画
+		m_pAI->GetFSM()->Render();// AIステートマシンでの描画
+	}
+
+
+	// エフェクトマネージャー描画
+	m_PanelEffectMGR->Render3D();
+	m_UVEffectMGR->Render();
+
+#ifdef _DEBUG
+	// 判定の描画
+	CollisionShape::Square square;
+
+	memcpy_s(&square, sizeof(CollisionShape::Square), m_pHitSquare, sizeof(CollisionShape::Square));
+	square.pos += m_pos;
+
+	Vector3 wv[3];	// ワールドバーテックス
+	wv[0].Set(square.pos.x - square.width, square.pos.y + square.height, 0);
+	wv[1].Set(square.pos.x + square.width, square.pos.y + square.height, 0);
+	wv[2].Set(square.pos.x + square.width, square.pos.y - square.height, 0);
+
+	Vector2 sv[3];	// スクリーンバーテックス
+	FOR(3)sv[i] = Math::WorldToScreen(wv[i]);
+
+	tdnPolygon::Rect((int)sv[0].x, (int)sv[0].y, (int)(sv[1].x - sv[0].x), (int)(sv[2].y - sv[0].y), RS::COPY, 0x80ffffff);
+
+	/* 攻撃判定の描画 */
+	if (isAttackState())
+	{
+		if (isActiveFrame())
+		{
+			memcpy_s(&square, sizeof(CollisionShape::Square), GetAttackData()->pCollisionShape, sizeof(CollisionShape::Square));
+			if (m_dir == DIR::LEFT) square.pos.x *= -1;	// このposは絶対+(右)なので、左向きなら逆にする
+			square.pos += m_pos;
+
+			wv[0].Set(square.pos.x - square.width, square.pos.y + square.height, 0);
+			wv[1].Set(square.pos.x + square.width, square.pos.y + square.height, 0);
+			wv[2].Set(square.pos.x + square.width, square.pos.y - square.height, 0);
+
+			FOR(3)sv[i] = Math::WorldToScreen(wv[i]);
+
+			tdnPolygon::Rect((int)sv[0].x, (int)sv[0].y, (int)(sv[1].x - sv[0].x), (int)(sv[2].y - sv[0].y), RS::COPY, 0x80ff0000);
+		}
+	}
+
+#endif
+
+	// デバッグ
+	tdnText::Draw(32 + m_deviceID * 250, 560, 0xff00ff80, "CollectScore : %d", m_CollectScore);
+	tdnText::Draw(32 + m_deviceID * 250, 600, 0xffff8000, "Score : %d", m_score);
+
+	tdnText::Draw(32 + m_deviceID * 250, 630, 0xff00ff80, "スタンドゲージ : %d", m_pStand->GetStandGage());
+	tdnText::Draw(32 + m_deviceID * 250, 660, 0xffff8000, "スタンドストック: %d", m_pStand->GetStandStock());
+
+}
+
 void BasePlayer::Render(tdnShader* shader, char* name)
 {
 	// スタンド描画
 	m_pStand->Render(shader, name);
+
+	// 無敵の白色を送る
+	shader->SetValue("g_InvincibleColRate", m_InvincibleColRate);
+	// デバッグ
+	tdnText::Draw(332 + m_deviceID * 350, 260, 0xff00ff80, "m_InvColRate : %.2f", m_InvincibleColRate);
 
 	m_pObj->Render(shader, name);
 	// 無敵なら加算で重ねて描画
@@ -431,6 +563,9 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType)
 		//m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::BURN);
 		m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::DAMAGE);
 		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::WAVE);
+		PointLightMgr->AddPointLight(pos + Vector3(0, 5, 0), Vector3(1.0f, 0.4f, 0.0f), 20, 4, 20, 4, 15);// ポイントライトエフェクト！
+		ParticleManager::EffectHit(pos);
+
 		break;
 	case EFFECT_TYPE::WHIFF:
 		m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::INEFFECT_MINI);
@@ -448,6 +583,8 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType)
 		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::PERSONA,
 			1, 2.0f, Vector3(0, diaAngle, 0), Vector3(0, diaAngle, 0));
 		ParticleManager::EffectPersonaTrigger(pos);
+		PointLightMgr->AddPointLight(pos + Vector3(0, 3, 0) , Vector3(0, .4f, 2.0f), 50, 4, 40, 10, 30);// ポイントライトエフェクト！
+
 		break;
 	case EFFECT_TYPE::DROP_IMPACT:
 		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::IMPACT,

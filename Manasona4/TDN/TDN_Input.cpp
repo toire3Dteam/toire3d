@@ -234,8 +234,42 @@ LPDIRECTINPUTDEVICE8 tdnInputManager::GetDevice(int no)
 //*****************************************************************************************************************************
 //				入力デバイス
 //*****************************************************************************************************************************
-const int tdnInputDevice::default_key_map[20] = { 'W', 'S', 'A', 'D', 'Z', 'X', 'C', 'V', 'F', 'G', 'R', 'T', '4', '5', VK_RETURN, VK_SPACE };
-const int tdnInputDevice::default_joy_map[20] = { AXIS_X, AXIS_Y, AXIS_Z, AXIS_RZ, 2, 3, 1, 4, 7, 5, 11, 8, 6, 12, 9, 10 };
+const int tdnInputDevice::default_key_map[20] = 
+{
+	'W',		// ↑
+	'S',		// ↓
+	'A',		// ←
+	'D',		// →
+	'Z',		// KEY_A
+	'X',		// KEY_B
+	'C',		// KEY_C
+	'V',		// KEY_D
+	'F',		// KEY_L1
+	'G',		// KEY_R1
+	'R',		// KEY_L2
+	'T',		// KEY_R2
+	'4',		// KEY_L3
+	'5',		// KEY_R3
+	VK_RETURN,	// KEY_START
+	VK_SPACE	// KEY_SELECT
+};
+
+/* キーボードとジョイスティックのコンフィグが若干違う？キーボード:L1,R1,L2,R2,L3,R3 ジョイ:L1,L2,L3,R1,R2,R3 */
+const int tdnInputDevice::default_joy_map[20] = 
+{ AXIS_X, AXIS_Y, AXIS_Z, AXIS_RZ,
+	2,	// KEY_A
+	3,	// KEY_B
+	1,	// KEY_C
+	4,	// KEY_D
+	5,	// KEY_L1
+	7,	// KEY_L2
+	11,	// KEY_L3
+	6,	// KEY_R1
+	8,	// KEY_R2
+	12,	// KEY_R3
+	9,	// KEY_START
+	10	// KEY_SELECT
+};
 
 //------------------------------------------------------
 //	初期化
@@ -459,6 +493,12 @@ void tdnInput::PadAsign(LPSTR ID, int no)
 {
 	std::ifstream infs("DATA/Input/key_config.txt");
 	MyAssert(infs, "エラー: TDN_Input\n原因、データフォルダにInput/key_config.txtが入ってない！");
+
+	// 最初のコメント文読み飛ばし
+	{
+		char skip[128];
+		infs >> skip;
+	}
 
 	char str[64];
 

@@ -5,8 +5,13 @@
 //		AIクラス
 /**********************************/
 
-AI::AI(int DeviceID,BasePlayer* myBasePlayer) :BaseGameEntity((ENTITY_ID(ENTITY_ID::ID_AI_FIRST + DeviceID)))
+AI::AI(int DeviceID,BasePlayer* myBasePlayer) 
+:BaseGameEntity((ENTITY_ID(ENTITY_ID::ID_AI_FIRST + DeviceID)))
 {
+	// AIに必要なパラメーター
+	m_iChaseFrame = 0;		// 一途に追いかけてる時間
+	m_iWaitFrame = 0;		// もじもじしてる時間
+
 	m_pTargetPlayer = nullptr;
 
 	// このAIを所有しているプレイヤーのポインター

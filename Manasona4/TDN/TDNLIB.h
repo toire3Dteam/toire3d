@@ -471,6 +471,15 @@ namespace Math
 	*@param[in]		Up	カメラの上向きベクトル
 	*/
 	void	LookAtLH(Matrix& mat, Vector& Eye, Vector& At, Vector& Up);
+
+	/**
+	*@brief						左手座標系ビュー変換行列の生成(Roll回転)
+	*@param[out]		mat	変換行列の受け取り先
+	*@param[in]		Eye	視点の位置
+	*@param[in]		At		ターゲットの位置
+	*@param[in]		roll	カメラのRoll値(AngleZ)
+	*/
+	void	LookAtLHRoll(Matrix& mat, Vector& Eye, Vector& At, float roll);
 	
 	// 投影変換表列
 	/**
@@ -723,7 +732,7 @@ public:
 
 /**
 *@brief		カメラの空間を制御するクラス
-*@author		Nishida
+*@author		Nishida・Yamagoe
 */
 class tdnView
 {
@@ -736,7 +745,7 @@ public:
 	static void ClearZ();
 
 	//	視点設定
-	static void Set(const Vector& pos, const Vector& target);
+	static void Set(const Vector& pos, const Vector& target, float roll = .0f);
 	static void Set(float x, float y, float z, float ax, float ay, float az);
 
 	//	投影平面設定
@@ -757,7 +766,7 @@ protected:
 	static float FovY;					// 視野角
 	static float Near, Far;				// 投影の手前の位置と一番奥の位置 
 	static float Aspect;				// 
-
+	static float m_roll;				// カメラのroll値(Z軸回転)
 
 };
 

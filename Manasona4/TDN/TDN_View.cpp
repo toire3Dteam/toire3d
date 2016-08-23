@@ -13,6 +13,7 @@ float tdnView::FovY;				// 視野角
 float tdnView::Near;				// ビューポートの手前
 float tdnView::Far;				// 一番奥の位置 (狭いほどZファイティングが無くなる)
 float tdnView::Aspect;				// 
+float tdnView::m_roll(.0f);		// カメラのZ軸回転(Angle.Z)
 
 /*************/
 //	クリア
@@ -55,10 +56,11 @@ void tdnView::ClearZ()
 //	視点設定
 /*************/
 //	視点・注視点設定
-void tdnView::Set(const Vector& pos, const Vector& target)
+void tdnView::Set(const Vector& pos, const Vector& target, float roll)
 {
 	Pos = pos;
 	Target = target;
+	m_roll = roll;
 }
 
 //	位置・角度設定
@@ -140,7 +142,8 @@ void tdnView::Activate()
 	p = Pos;
 	t = Target;
 	
-	Math::LookAtLH(matV, p, t, Vector3(.0f, 1.0f, .0f));
+	//Math::LookAtLH(matV, p, t, Vector3(.0f, 1.0f, .0f));	// 座標・注視点(Z)、仮の上ベクトル(Y)から3軸を作成
+	Math::LookAtLHRoll(matV, p, t, m_roll);					// ★座標・注視点(Z)、Roll値(Zアングル)から3軸を作成
 
 	//	ビューポート設定
 	if (Viewport.Width != 0) tdnSystem::GetDevice()->SetViewport(&Viewport);

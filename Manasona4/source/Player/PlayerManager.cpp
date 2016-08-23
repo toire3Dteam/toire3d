@@ -25,7 +25,18 @@ void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage)
 
 	FOR(NumPlayer)
 	{
-		m_pPlayers[i] = new Airou(i, (i == 3));
+		// チームを今は仮で振り分け!!
+		TEAM team;
+		if (i % 2 == 0)
+		{
+			team = TEAM::B;
+		}
+		else
+		{
+			team = TEAM::A;
+		}
+
+		m_pPlayers[i] = new Airou(i, team, (i == 3 /*|| i == 2*/));
 		m_pPlayers[i]->InitActionDatas();		// ★攻撃情報を各キャラに初期化させる
 	}
 
@@ -102,6 +113,12 @@ void PlayerManager::Update()
 
 }
 
+void PlayerManager::Render()
+{
+	// プレイヤーたち描画
+	FOR(m_NumPlayer) m_pPlayers[i]->Render();
+}
+
 void PlayerManager::Render(tdnShader* shader, char* name)
 {
 	// プレイヤーたち描画
@@ -117,6 +134,9 @@ void PlayerManager::RenderDeferred()
 
 bool PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you)
 {
+	// チーム同じだよ！
+	if (my->GetTeam() == you->GetTeam()) return false;
+
 	// 攻撃系のステートじゃないよ！
 	if (!my->isAttackState()) return false;
 
@@ -206,6 +226,9 @@ bool PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you)
 
 bool PlayerManager::CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou)
 {
+	// チーム同じだよ！
+	if (pStand->GetPlayer()->GetTeam() == pYou->GetTeam()) return false;
+
 	// スタンドがアクティブじゃないよ！
 	if (!pStand->isActive()) return false;
 	

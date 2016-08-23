@@ -40,7 +40,7 @@ namespace Stand
 		DIR GetDir(){ return m_dir; }
 		Vector3 &GetPos(){ return m_pos; }
 		int GetDeviceID(){ return m_pPlayer->GetDeviceID(); }
-
+		BasePlayer *GetPlayer(){ return m_pPlayer; }
 
 		int GetStandGageMAX(){ return m_standGageMAX; };
 		int GetStandGage(){ return m_standGage; };

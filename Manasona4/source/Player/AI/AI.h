@@ -31,11 +31,27 @@ public:
 	BasePlayer* GetTargetPlayer(){ return m_pTargetPlayer; };		// 攻撃相手
 	void SetTargetPlayer(BasePlayer* targetplayer){ m_pTargetPlayer = targetplayer; }
 
+	// パラメータ関連 アクセサー
+	int GetChaseFrame(){ return m_iChaseFrame; }
+	int GetWaitFrame(){ return m_iWaitFrame; }
+
+	void SetChaseFrame(int rate){ m_iChaseFrame = rate; }
+	void SetWaitFrame(int rate){ m_iWaitFrame = rate; }
+
+	void AddChaseFrame(int add){ m_iChaseFrame += add; }
+	void AddWaitFrame(int add){ m_iWaitFrame += add; }
+
+
 private:
 	StateMachine<AI>* m_pStateMachine; // ★AIステートマシン
 	BasePlayer* m_pMyBasePlayer;
 	BasePlayer* m_pTargetPlayer;		// 攻撃相手
 
 	bool m_bPushFlag[(int)PLAYER_INPUT::MAX];	// ボタンが押されたフレーム
+
+	// AIに必要なパラメーター
+	int m_iChaseFrame;		// 一途に追いかけてる時間
+
+	int m_iWaitFrame;		// もじもじしてる時間
 
 };

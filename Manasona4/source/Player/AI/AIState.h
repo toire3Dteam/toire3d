@@ -76,6 +76,141 @@ namespace AIState
 		PracticeJump& operator=(const PracticeJump&){}
 	};
 
+	/*******************************************************/
+	//				待機ステート
+	/*******************************************************/
+	class Wait :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static Wait* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		Wait() {};
+		~Wait() {};
+
+		Wait(const Wait&){}
+		Wait& operator=(const Wait&){}
+	};
+
+	/*******************************************************/
+	//		感覚を空けるステート　(無敵からの逃げ)
+	/*******************************************************/
+	class Space :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static Space* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		Space() {};
+		~Space() {};
+
+		Space(const Space&){}
+		Space& operator=(const Space&){}
+	};
+
+	/*******************************************************/
+	//		飛ぶステート　特に意味はないけど作ってみた
+	/*******************************************************/
+	class SimpleJump :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static SimpleJump* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		SimpleJump() {};
+		~SimpleJump() {};
+
+		SimpleJump(const SimpleJump&){}
+		SimpleJump& operator=(const SimpleJump&){}
+	};
+
+	/*******************************************************/
+	//		回避ステート　
+	/*******************************************************/
+	class Escape :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static Escape* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		Escape() {};
+		~Escape() {};
+
+		Escape(const Escape&){}
+		Escape& operator=(const Escape&){}
+	};
 
 	/*******************************************************/
 	//				敵を追いかけるステート
@@ -109,6 +244,40 @@ namespace AIState
 
 		Chase(const Chase&){}
 		Chase& operator=(const Chase&){}
+	};
+
+	/*******************************************************/
+	//			ジャンプして空中で敵を追いかけるステート
+	/*******************************************************/
+	class ChaseAir :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static ChaseAir* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		ChaseAir() {};
+		~ChaseAir() {};
+
+		ChaseAir(const ChaseAir&){}
+		ChaseAir& operator=(const ChaseAir&){}
 	};
 
 	/*******************************************************/
@@ -284,7 +453,7 @@ namespace AIState
 	};
 
 	/*******************************************************/
-	//				空中攻撃 準備ステート
+	//				空中攻撃 ステート
 	/*******************************************************/
 	class AerialAtack :public State<AI>
 	{
@@ -315,6 +484,110 @@ namespace AIState
 
 		AerialAtack(const AerialAtack&){}
 		AerialAtack& operator=(const AerialAtack&){}
+	};
+
+	
+	/*******************************************************/
+	//				空中下攻撃 ステート
+	/*******************************************************/
+	class AerialDropAtack :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static AerialDropAtack* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		AerialDropAtack() {};
+		~AerialDropAtack() {};
+
+		AerialDropAtack(const AerialDropAtack&){}
+		AerialDropAtack& operator=(const AerialDropAtack&){}
+	};
+
+	/*******************************************************/
+	//				フィニッシュ攻撃ステート
+	/*******************************************************/
+	class FinishAtack :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static FinishAtack* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		FinishAtack() {};
+		~FinishAtack() {};
+
+		FinishAtack(const FinishAtack&){}
+		FinishAtack& operator=(const FinishAtack&){}
+	};
+
+
+	/*******************************************************/
+	//			キャラクター固有の攻撃系スキル発動ステート
+	/*******************************************************/
+	class SkillAtack :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static SkillAtack* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		SkillAtack() {};
+		~SkillAtack() {};
+
+		SkillAtack(const SkillAtack&){}
+		SkillAtack& operator=(const SkillAtack&){}
 	};
 }
 

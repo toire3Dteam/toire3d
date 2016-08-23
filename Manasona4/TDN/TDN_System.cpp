@@ -1,5 +1,5 @@
 #include	"TDNLIB.h"
-//#include	"../source/FileLoader/DragAndDrop.h"
+#include	"../source/resource.h"
 
 /********************************************/
 //	tdnSystem
@@ -221,7 +221,7 @@ BOOL tdnSystem::InitWindow(HINSTANCE hInstance, int nCmdShow, char* AppTitle, DW
 	wcex.cbClsExtra = 0;										// この構造体に割り当てる余分なメモリを設定し、0で初期化します
 	wcex.cbWndExtra = 0;										// ウィンドウインスタンス(実際のウィンドウ)に割り当てられる 余分なメモリを設定し、0で初期化されます
 	wcex.hInstance = hInstance;									// このクラスのウィンドウプロシージャを含むアプリケーション インスタンスハンドルを設定します。
-	wcex.hIcon = LoadIcon(hInstance, IDI_APPLICATION);			// アイコンのハンドルを設定します。
+	wcex.hIcon = LoadIcon(hInstance, (LPSTR)IDI_ICON1);			// アイコンのハンドルを設定します。
 	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);					// カーソルのハンドルを設定します。 
 	wcex.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);	// 背景のハンドルを設定します。 
 	wcex.lpszMenuName = NULL;									// メニューリソースの名前を設定します

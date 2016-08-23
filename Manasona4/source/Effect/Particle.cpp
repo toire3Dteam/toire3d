@@ -34,13 +34,13 @@ void ParticleManager::EffectPersonaAura(const Vector3 &pos)
 {
 	Vector3 Pos, Move, Power;
 
-	Pos.x = pos.x + rand() % 26 - 12.0f;
+	Pos.x = pos.x + rand() % 21 - 10.0f;
 	Pos.y = pos.y + (float)(rand() % 10);
-	Pos.z = pos.z + rand() % 26 - 12.0f;
+	Pos.z = pos.z + rand() % 21 - 10.0f;
 	const int M = 2;
-	Move.x = (rand() % M - (M / 2))*0.01f;
-	Move.y = (rand() % 2 + 3) * 0.1f;
-	Move.z = (rand() % M - (M / 2))*0.01f;
+	Move.x = (rand() % M - (M / 2))*0.091f;
+	Move.y = (rand() % 2 + 2) * 0.05f;
+	Move.z = (rand() % M - (M / 2))*0.091f;
 	Power.x = 0;
 	Power.y = 0.0f;
 	Power.z = 0;
@@ -48,7 +48,7 @@ void ParticleManager::EffectPersonaAura(const Vector3 &pos)
 	const int type = (rand() % 2) ? 5 : 6;
 
 	// ÉpÅ[ÉeÉBÉNÉãÉZÉbÉg
-	Set2(type, 0, .1f, 40, .0f, 10, .75f, Pos, Move, Power, .75f, .75f, .75f, 0, rand() % 314 * 0.01f, 1.0f, 1.0f, RS::ADD);
+	Set2(type, 0, .1f, 20, .0f, 10, .4f, Pos, Move, Power, .75f, .75f, .75f, (rand() % 3  - 1) * 0.025f, rand() % 314 * 0.01f, 1.0f, rand ()% 3 + 5.0f, RS::ADD);
 }
 
 //*****************************************************************************
@@ -96,14 +96,59 @@ void ParticleManager::EffectFinish(const Vector3 &pos)
 //*****************************************************************************
 void ParticleManager::EffectFlySmoke(const Vector3 &pos)
 {
+	static int set(0);
+
+	if (++set < 3)
+	{
+		return;
+	}
+
+	set = 0;
+
 	Vector3 Pos, Move, Power;
 
-	Pos.x = pos.x + rand() % 6 - 2.0f;
+	Pos.x = pos.x + rand() % 8 - 3.0f;
 	Pos.y = pos.y + (float)(rand() % 3);
-	Pos.z = pos.z + rand() % 6 - 2.0f;
-	Move.Zero();
+	Pos.z = pos.z + rand() % 8 - 3.0f;
+	Move.x = (rand() % 5 - 2) * 0.005f;
+	Move.y = (rand() % 3 + 2) * 0.01f;
+	Move.z = (rand() % 5 - 2) * 0.005f;
 	Power.Zero();
-	Set2(4, 0, .75f, 50, .0f, 10, 1.0f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, rand() % 314 * .01f, 1.0f, rand() % 2 + 2.0f, RS::COPY);
+	Set2(4, 0, 1.0f, 50, .0f, 30, 1.0f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, rand() % 628 * .01f, 1.0f, rand() % 2 + 6.0f, RS::COPY);
+}
+
+//*****************************************************************************
+//	çUåÇÉqÉbÉg
+//*****************************************************************************
+void ParticleManager::EffectHit(const Vector3 &pos)
+{
+	Vector3 Pos, Move, Power;
+
+	FOR(20)
+	{
+		Pos.x = pos.x + rand() % 5 - 2.0f;
+		Pos.y = pos.y + (float)(rand() % 3);
+		Pos.z = pos.z + rand() % 5 - 2.0f;
+		Pos = pos;
+		const int M = 16;
+		Move.x = (rand() % M - (M / 2))*0.25f;
+		Move.y = (rand() % 3 + 7) * 0.1f;
+		Move.z = (rand() % M - (M / 2))*0.25f;
+		Power.x = 0;
+		Power.y = 0;
+		Power.z = 0;
+		// ê¬Åú
+		//Set(6, 0, 1.0f, 20, .0f, 10, .9f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, rand() % 2 + 1.5f, RS::COPY);
+
+		// ó±
+		for (int j = 0; j < 5; j++)
+		{
+			Move.x = (rand() % 30 - 16.0f) * 0.25f;
+			Move.y = rand() % 9 - 4.0f;
+			Move.z = (rand() % 30 -16.0f) * 0.001f;
+			Set(7, 0, 1.0f, 16, .0f, 6, .75f, pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, rand() % 1 + 1, RS::ADD);
+		}
+	}
 }
 
 //**************************************************************************************************
@@ -455,8 +500,23 @@ void ParticleData::Render()
 
 	if (SetVertex(v) == false) return;
 	//	çáê¨ê›íË
+	//tdnRenderState::Set(pdata.flag, NULL, NULL);
+	// å∏éZ
 	if (pdata.flag == RS::SUB) tdnSystem::GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_REVSUBTRACT);
-	else                      tdnSystem::GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+	// â¡éZ
+	else if (pdata.flag == RS::ADD)
+	{
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);			// å„Ç…ï`Ç¢ÇƒÇ¢ÇÈï®ëÃÇ‡ëSóÕï`âÊ
+	}
+	// COPY
+	else
+	{
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);			// åãâ  = ì]ëóå≥ + ì]ëóêÊ
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);		// ç°èëÇ¢ÇƒÇ¢ÇÈÇ‡ÇÃÇÇ«ÇÍÇ≠ÇÁÇ¢èÊÇ¡ÇØÇÈÇ©
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);	// å„Ç…ï`Ç¢ÇƒÇ¢ÇΩï®ëÃÇÅ™ÇÃîΩëŒï™îñÇﬂÇƒï`âÊ
+	}
 	//	ÉåÉìÉ_ÉäÉìÉO
 	tdnSystem::GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, v, sizeof(TLVERTEX));
 }

@@ -130,6 +130,9 @@ private:
 	float m_blurValue;
 	float m_blurPower;
 
+	// ToonTexture
+	tdn2DObj* m_pToonShadoTex;
+
 	/*************************/
 	//	PointLight—p
 	/*************************/

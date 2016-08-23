@@ -150,6 +150,13 @@ public:
 	~AttackData(){ SAFE_DELETE(pCollisionShape); }
 };
 
+// チーム
+enum class TEAM
+{
+	A,
+	B
+};
+
 /***************************************************************/
 //
 //		ベースプレイヤー
@@ -203,7 +210,7 @@ protected:
 	}m_ActionDatas[(int)BASE_ACTION_STATE::END];
 
 public:
-	BasePlayer(int deviceID, bool bAI);
+	BasePlayer(int deviceID,TEAM team, bool bAI);
 	~BasePlayer();
 	void InitAI();
 	void Control();			// プレイヤーからの入力を受け付ける
@@ -211,7 +218,10 @@ public:
 	virtual void Update();	// 基本的な更新
 	void UpdatePos();		// 座標更新(判定後に呼び出す)
 	void Move();			// 動きの制御
-	virtual void Render(tdnShader* shader,char* name);
+	void InvincibleUpdate(); // 無敵の制御
+
+	virtual void Render();
+	virtual void Render(tdnShader* shader,char* name);	
 	virtual void RenderDeferred();
 
 	/****************************/
@@ -221,7 +231,7 @@ public:
 
 	/*****************/
 	// AIに必要な関数
-
+	/*****************/
 	//(考え)　AIもステートマシンを作ればいいのかも　考え->行動ってEnterとExecuteみたいな感じなので　
 
 	// [メモ]まずAI用にステートマシンを作る
@@ -229,6 +239,13 @@ public:
 	// enterで状況判断　executeでボタン操作　
 	// ステートの種類　ふつう（敵をねらう）　自分のポイントが溜まってきた(相手にFAを決めにく)　など
 	// 
+
+	// それぞれのキャラクター毎のAIによる技のボタンを設定！
+	virtual void AIHighAtackButton() = 0;	// このキャラクターの〆技(強い技)
+	virtual void AIAtackSkillButton() = 0;	// このキャラクターのスキル攻撃(攻撃系スキル発動)
+
+	virtual float AIAtackRange() = 0;		// 攻撃範囲
+	virtual float AIRunAtackRange() = 0;	// 走ってるときの攻撃範囲
 
 	//void AI_Brain();	// ここで考え->行動の処理を行う
 	//void AI_Think();	// 考える関数
@@ -257,6 +274,7 @@ public:
 	RushAttack *GetRushAttack() { return &m_RushAttack; }
 	float GetMaxSpeed() { return m_maxSpeed; }
 	BASE_ACTION_STATE GetActionState(){ return m_ActionState; }
+	TEAM GetTeam(){ return m_team; }
 
 	void SetInputList(PLAYER_INPUT inputNo, int inputFlag){ m_InputList[(int)inputNo] = inputFlag; }
 
@@ -292,6 +310,9 @@ public:
 		else return false;
 	}
 	int GetInvincibleLV(){ return m_InvincibleLV; }
+	int GetInvincibleTime(){ return m_InvincibleTime; }
+	bool isInvincible(){ return  (m_InvincibleLV >= 1) ? true : false; }
+
 	bool isActiveFrame()
 	{
 		if (!isFrameAction()) return false;
@@ -323,8 +344,10 @@ public:
 	void SetHitStopFrame(int frame) { m_HitStopFrame = frame; }
 	void SetRecoveryFrame(int frame) { m_RecoveryFlame = frame; }
 	void SetEscapeFlag(bool bEscape) { m_bEscape = bEscape; }
-	void SetInvincible(int lv = 1){ m_InvincibleLV = lv; }
-	void InvincibleOff(){ m_InvincibleLV = 0; }
+	void SetInvincible(int time, int lv){ m_InvincibleTime = time; m_InvincibleLV = lv; }
+	void SetInvincibleLV(int lv = 1){ m_InvincibleLV = lv; }
+	void SetInvincibleTime(int time){ m_InvincibleTime = time; }	
+	void InvincibleOff(){ m_InvincibleLV = 0; m_InvincibleTime = 0; }
 	void SetActionState(BASE_ACTION_STATE state)
 	{
 		m_ActionState = state; 
@@ -350,6 +373,7 @@ public:
 	{ 
 		m_move += v;
 	}
+	int GetCollectScore(){ return m_CollectScore; }
 	void AddCollectScore(int score) { m_CollectScore += score; }
 	void ConversionScore()
 	{
@@ -380,6 +404,8 @@ public:
 	static const int   c_RECOVERY_FLAME;	// リカバリ―フレーム
 protected:
 	const int m_deviceID;		// 自分のコントローラーの番号(実質、スマブラのxPに値する)
+	const TEAM m_team;			// このキャラクターの所属してるチーム
+
 	iex3DObj *m_pObj;	// メッシュ実体
 	Vector3 m_pos;	// 座標
 	Vector3 m_move;	// 移動値
@@ -395,6 +421,9 @@ protected:
 	AI*						  m_pAI;			// ★AI
 	int m_InvincibleLV;			// 無敵かどうか
 	int m_InvincibleTime;		// 無敵時間		無敵時は0以上の値が入り、0になるまでデクリメントされる
+	float m_InvincibleColRate;	// 無敵時間の点滅のレート
+	int m_InvincibleColRateFlame;		// 無敵点滅のフレーム(速さ）
+	bool m_bInvincibleColRateUpFlag;		// 無敵点滅の上げ下げフラグ
 	int m_CurrentActionFrame;	// 攻撃フレームリストの中を再生しているフレーム
 	int m_HitStopFrame;			// 1以上なら0になるまでストップ
 	int m_RecoveryFlame;		// 1以上なら0になるまで操作を受け付けない
@@ -404,6 +433,7 @@ protected:
 	int m_CollectScore;			// 実体前の貯めているスコア
 	//Vector3 m_StandSaveMove;	// スタンド発動の保存移動量
 	int m_recoveryCount;		// リカバリーステートのいる時間をカウント
+	
 
 	// 「喰らい中」に攻撃をくらってるカウント
 	std::list<BASE_ACTION_STATE> m_RecoveryDamageCount;
@@ -426,6 +456,7 @@ protected:
 
 	// 継承してるやつに強制的に呼ばせる
 	void LoadAttackFrameList(char *filename);
+
 };
 
 

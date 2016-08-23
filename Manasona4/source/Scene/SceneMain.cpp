@@ -17,6 +17,9 @@
 
 #include "../DeferredEx/DeferredEx.h"
 
+#include "../PointLight/PointLight.h"
+
+
 //BaseEffect* g_eff;
 //EffectManager;
 PanelEffectManager* m_panel;
@@ -65,6 +68,8 @@ bool sceneMain::Initialize()
 	DeferredManagerEx.InitShadowMap(1024);
 	m_bShaderFlag = true;
 
+	PointLightMgr;
+
 	return true;
 }
 
@@ -79,6 +84,8 @@ sceneMain::~sceneMain()
 	SAFE_DELETE(g_uvEffect);
 	ParticleManager::Release();
 	DeferredManagerEx.Release();
+
+	PointLightMgr->Release();
 }
 
 //******************************************************************
@@ -111,6 +118,9 @@ bool sceneMain::Update()
 	// ブラー更新
 	DeferredManagerEx.RadialBlurUpdate();
 
+	// ポイントライト更新
+	PointLightMgr->Update();
+
 	// エンターでエフェクトカメラ発動してみる
 	//if (KeyBoardTRG(KB_ENTER))
 	//{
@@ -121,6 +131,8 @@ bool sceneMain::Update()
 
 	if (KeyBoardTRG(KB_L))
 	{
+		PointLightManager::GetInstance()->AddPointLight(Vector3(10, 3, 0), Vector3(0, 1, 1), 100, 4, 60, 20, 40);
+
 		//g_eff->Action(0,0);
 		//EffectMgr.AddEffect(Vector3(0, 0, -5), EFFECT_TYPE::BURN);
 		//EffectMgr.AddEffect(Vector3(0, 0, -5), EFFECT_TYPE::NOTICE);
@@ -165,7 +177,7 @@ void sceneMain::Render()
 		DeferredManagerEx.ClearLightSurface();
 		DeferredManagerEx.ClearBloom();
 		DeferredManagerEx.ClearGpuPointLight();
-		DeferredManagerEx.ClearPLSdata();
+
 
 		// シェーダ更新
 		DeferredManagerEx.G_Update(m_pCamera->m_pos);
@@ -187,6 +199,9 @@ void sceneMain::Render()
 		DeferredManagerEx.DirLight(m_dirLight, Vector3(0.8f, 0.72f, 0.72f));
 		DeferredManagerEx.HemiLight(Vector3(0.6f, 0.5f, 0.5f), Vector3(0.45f, 0.43f, 0.43f));
 
+		// ポイントライト描画
+		DeferredManagerEx.GpuPointLightRender();
+
 		// 最後の処理
 		{
 			DeferredManagerEx.FinalBegin();
@@ -194,7 +209,7 @@ void sceneMain::Render()
 			// ステージ描画
 			m_pStage->Render(shaderM, "DefaultLighting");
 			// プレイヤー
-			PlayerMgr->Render(shaderM, "DefaultLighting");
+			PlayerMgr->Render();
 
 			// パーティクル
 			ParticleManager::Render();

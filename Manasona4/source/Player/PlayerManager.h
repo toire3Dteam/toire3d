@@ -7,6 +7,7 @@ namespace Stand
 	class Base;
 }
 
+
 class PlayerManager :public BaseGameEntity
 {
 public:
@@ -21,6 +22,7 @@ public:
 	void Initialize(int NumPlayer, Stage::Base *pStage);
 	void Release(){ SAFE_DELETE(pInstance); }
 	void Update();
+	void Render();
 	void Render(tdnShader* shader, char* name);
 	void RenderDeferred();
 

@@ -731,7 +731,7 @@ void BasePlayerState::FrontBrake::Exit(BasePlayer * pPerson)
 
 void BasePlayerState::FrontBrake::Render(BasePlayer * pPerson)
 {
-	tdnText::Draw(20, 690, 0xffffffff, "TurnOverBrakeState");
+	tdnText::Draw(20, 690, 0xffffffff, "フロントBrakeState");
 }
 
 bool BasePlayerState::FrontBrake::OnMessage(BasePlayer * pPerson, const Message & msg)
@@ -1474,7 +1474,7 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 					pPerson->GetRushAttack()->step++;
 					//pPerson->GetRushAttack()->bNextOK = false;
 
-					const float pow = 0.5f;
+					const float pow = 0.6f;
 					pPerson->AddMove((pPerson->GetDir() == DIR::RIGHT) ? Vector3(pow, 0, 0) : Vector3(-pow, 0, 0));
 				}
 			}
@@ -1518,6 +1518,10 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 
 					pPerson->GetRushAttack()->step++;
 					//pPerson->GetRushAttack()->bNextOK = false;
+
+					const float pow = 0.2f;
+					pPerson->AddMove((pPerson->GetDir() == DIR::RIGHT) ? Vector3(pow, 0, 0) : Vector3(-pow, 0, 0));
+
 				}
 			}
 		}
@@ -1595,9 +1599,7 @@ void BasePlayerState::KnockBack::Execute(BasePlayer * pPerson)
 		// 喰らったカウントリセット
 		pPerson->GetRecoveryDamageCount()->clear();
 		
-		// [追記]　無敵はここでつけない！
-		// ★無敵時間設定
-		//pPerson->SetInvincible(8);
+
 	}
 }
 
@@ -1728,6 +1730,9 @@ void BasePlayerState::KnockDown::Enter(BasePlayer * pPerson)
 	// ノックダウンモーションに変える
 	pPerson->SetMotion(18);
 
+	//むてきつくった
+	// ★やっぱりここで無敵時間設定
+	pPerson->SetInvincible(90,1);
 }
 
 void BasePlayerState::KnockDown::Execute(BasePlayer * pPerson)
@@ -1807,7 +1812,7 @@ void BasePlayerState::LandRecovery::Enter(BasePlayer * pPerson)
 	pPerson->SetRecoveryCount(0);
 
 	// リカバー中は無敵！！！
-	pPerson->SetInvincible(1);
+	//pPerson->SetInvincibleLV(1);
 
 	// エフェクト発動」
 	pPerson->AddEffectAction(pPerson->GetPos() + Vector3(0, 5, -3), EFFECT_TYPE::RECOVERY);
@@ -1831,7 +1836,7 @@ void BasePlayerState::LandRecovery::Execute(BasePlayer * pPerson)
 void BasePlayerState::LandRecovery::Exit(BasePlayer * pPerson)
 {
 	// 無敵解除！！
-	pPerson->InvincibleOff();
+	//pPerson->InvincibleOff();
 
 	// りかバリーかうんとを初期化
 	pPerson->SetRecoveryCount(0);
@@ -1868,7 +1873,8 @@ void BasePlayerState::AerialRecovery::Enter(BasePlayer * pPerson)
 	pPerson->SetRecoveryCount(0);
 
 	// リカバー中は無敵！！！
-	pPerson->SetInvincible(1);
+	//pPerson->SetInvincibleLV(1);
+	pPerson->SetInvincible(90, 1);
 
 	Vector3 move;
 	move = pPerson->GetMove()*0.25f;
@@ -1910,7 +1916,7 @@ void BasePlayerState::AerialRecovery::Execute(BasePlayer * pPerson)
 void BasePlayerState::AerialRecovery::Exit(BasePlayer * pPerson)
 {
 	// 無敵解除！！
-	pPerson->InvincibleOff();
+	//pPerson->InvincibleOff();
 
 	pPerson->SetRecoveryCount(0);
 }
@@ -2474,7 +2480,7 @@ void BasePlayerState::StandAction::Enter(BasePlayer * pPerson)
 void BasePlayerState::StandAction::Execute(BasePlayer * pPerson)
 {
 	// オーラのパーティクル
-	ParticleManager::EffectPersonaAura(pPerson->GetPos());
+	ParticleManager::EffectPersonaAura(Vector3(pPerson->GetPos().x, pPerson->GetPos().y, -0.5f));	// 若干手前
 
 	if (pPerson->GetStand()->isHit())
 	{
@@ -2498,11 +2504,11 @@ void BasePlayerState::StandAction::Execute(BasePlayer * pPerson)
 
 			if (pPerson->isPushInput(PLAYER_INPUT::LEFT) == true)
 			{
-				pPerson->AddMove(Vector3(-0.35f, 0, 0));
+				pPerson->AddMove(Vector3(-0.45f, 0, 0));
 			}
 			else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT) == true)
 			{
-				pPerson->AddMove(Vector3(0.35f, 0, 0));
+				pPerson->AddMove(Vector3(0.45f, 0, 0));
 			}
 
 			return;

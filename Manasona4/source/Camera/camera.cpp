@@ -131,8 +131,8 @@ void Camera::Activate()
 	//Text::Draw(32, 64, 0xffffff00, "CameraFar : %.1f", projection.Far);
 	//Text::Draw(32, 128, 0xffffff00, "CameraFov : %.2f", projection.fovY);
 
-	//if (KeyBoard(KB_1)) projection.Far -= 5.0f;
-	//if (KeyBoard(KB_2)) projection.Far += 5.0f;
+	if (KeyBoard(KB_NUMPAD4)) m_angle.z += .05f;
+	if (KeyBoard(KB_NUMPAD6)) m_angle.z -= .05f;
 	//if (KeyBoard(KB_3)) projection.fovY -= .01f;
 	//if (KeyBoard(KB_4)) projection.fovY += .01f;
 }
@@ -213,7 +213,7 @@ void GlobalCameraState::Execute(Camera *pCamera)
 	m_ShakeData.Update(pCamera);
 
 	// 座標と注視点の設定	★グローバルステートでやる
-	tdnView::Set(pCamera->m_pos, m_ShakeData.ShakedTarget);
+	tdnView::Set(pCamera->m_pos, m_ShakeData.ShakedTarget, pCamera->m_angle.z);
 }
 
 // 出口

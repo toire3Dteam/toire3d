@@ -114,6 +114,40 @@ void Math::LookAtLH(Matrix& mat, Vector& Eye, Vector& At, Vector& Up)
 	mat._43 = -(zaxis.x*Eye.x + zaxis.y*Eye.y + zaxis.z*Eye.z);
 	mat._44 = 1;
 }
+void Math::LookAtLHRoll(Matrix& mat, Vector& Eye, Vector& At, float roll)
+{
+	Vector3 zaxis(At.x - Eye.x, At.y - Eye.y, At.z - Eye.z);	// カメラZ軸(座標と注視点で出せる)
+	zaxis.Normalize();
+
+	const Vector3 up(sinf(roll) * zaxis.z, cosf(roll), sinf(roll) * zaxis.x);	// 仮の上ベクトル。iexは010ベクトル(シェーダーでもやってるかな)で出しているが、この関数ではroll値(Radian)と正面ベクトルで上ベクトル出す
+	Vector3 xaxis = Vector3(up.y*zaxis.z - up.z*zaxis.y, up.z*zaxis.x - up.x*zaxis.z, up.x*zaxis.y - up.y*zaxis.x);						// カメラX軸(仮の上ベクトルと正面ベクトルの外積で出す)
+	Vector3 yaxis = Vector3(zaxis.y*xaxis.z - zaxis.z*xaxis.y, zaxis.z*xaxis.x - zaxis.x*xaxis.z, zaxis.x*xaxis.y - zaxis.y*xaxis.x);	// カメラY軸(上記のZとXの外積で出す)
+
+	xaxis.Normalize();
+	yaxis.Normalize();
+
+
+	mat._11 = xaxis.x;
+	mat._21 = xaxis.y;
+	mat._31 = xaxis.z;
+
+	mat._12 = yaxis.x;
+	mat._22 = yaxis.y;
+	mat._32 = yaxis.z;
+
+	mat._13 = zaxis.x;
+	mat._23 = zaxis.y;
+	mat._33 = zaxis.z;
+
+	mat._14 = 0;
+	mat._24 = 0;
+	mat._34 = 0;
+
+	mat._41 = -(xaxis.x*Eye.x + xaxis.y*Eye.y + xaxis.z*Eye.z);
+	mat._42 = -(yaxis.x*Eye.x + yaxis.y*Eye.y + yaxis.z*Eye.z);
+	mat._43 = -(zaxis.x*Eye.x + zaxis.y*Eye.y + zaxis.z*Eye.z);
+	mat._44 = 1;
+}
 
 //*****************************************************************************
 //		投影変換表列

@@ -182,7 +182,7 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 	m_pAttackData[(int)ACTION_TYPE::LAND]->HitEffectType = EFFECT_TYPE::DAMAGE;
 	m_pAttackData[(int)ACTION_TYPE::LAND]->WhiffEffectType = EFFECT_TYPE::UPPER;
 	m_pAttackData[(int)ACTION_TYPE::LAND]->bAntiAir = true;
-	m_pAttackData[(int)ACTION_TYPE::LAND]->ShakeCameraInfo.Set(.75f, 4);
+	m_pAttackData[(int)ACTION_TYPE::LAND]->ShakeCameraInfo.Set(.2f, 2);
 
 	// ’nãƒqƒbƒg‚Æ‹ó’†ƒqƒbƒg‚Å‹““®‚ª•Ï‚í‚é‚à‚Ì
 	m_pAttackData[(int)ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = true;
@@ -196,7 +196,7 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 	// ”»’èŒ`ó
 	m_pAttackData[(int)ACTION_TYPE::LAND]->pCollisionShape->width = 14;
 	m_pAttackData[(int)ACTION_TYPE::LAND]->pCollisionShape->height = 18;
-	m_pAttackData[(int)ACTION_TYPE::LAND]->pCollisionShape->pos.Set(2.5f, 17, 0);
+	m_pAttackData[(int)ACTION_TYPE::LAND]->pCollisionShape->pos.Set(7.5f, 17, 0);
 
 	//==============================================================================================================
 	//	‚µ‚á‚ª‚Ý
@@ -209,7 +209,7 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 	m_pAttackData[(int)ACTION_TYPE::SQUAT]->WhiffSE = "‹óU‚è1";
 	m_pAttackData[(int)ACTION_TYPE::SQUAT]->HitEffectType = EFFECT_TYPE::DAMAGE;
 	m_pAttackData[(int)ACTION_TYPE::SQUAT]->bAntiAir = true;
-	m_pAttackData[(int)ACTION_TYPE::SQUAT]->ShakeCameraInfo.Set(.75f, 4);
+	m_pAttackData[(int)ACTION_TYPE::SQUAT]->ShakeCameraInfo.Set(.1f, 3);
 
 	// ’nãƒqƒbƒg‚Æ‹ó’†ƒqƒbƒg‚Å‹““®‚ª•Ï‚í‚é‚à‚Ì
 	m_pAttackData[(int)ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = true;
@@ -236,7 +236,7 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 	m_pAttackData[(int)ACTION_TYPE::AERIAL]->WhiffSE = "‹óU‚è1";
 	m_pAttackData[(int)ACTION_TYPE::AERIAL]->HitEffectType = EFFECT_TYPE::DAMAGE;
 	m_pAttackData[(int)ACTION_TYPE::AERIAL]->bAntiAir = true;
-	m_pAttackData[(int)ACTION_TYPE::AERIAL]->ShakeCameraInfo.Set(.75f, 4);
+	m_pAttackData[(int)ACTION_TYPE::AERIAL]->ShakeCameraInfo.Set(.1f, 3);
 
 	// ’nãƒqƒbƒg‚Æ‹ó’†ƒqƒbƒg‚Å‹““®‚ª•Ï‚í‚é‚à‚Ì
 	m_pAttackData[(int)ACTION_TYPE::AERIAL]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = true;
@@ -263,7 +263,7 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->WhiffSE = "‹óU‚è1";
 	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->HitEffectType = EFFECT_TYPE::DAMAGE;
 	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->bAntiAir = true;
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->ShakeCameraInfo.Set(.75f, 4);
+	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->ShakeCameraInfo.Set(.1f, 3);
 
 	// ’nãƒqƒbƒg‚Æ‹ó’†ƒqƒbƒg‚Å‹““®‚ª•Ï‚í‚é‚à‚Ì
 	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = true;

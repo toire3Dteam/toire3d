@@ -117,8 +117,9 @@ DeferredEx::DeferredEx()
 	m_PLSdata.reserve(PLS_MAX);// 前もって容量を確保 (reserve) しておけば、データの追加時に発生する再割り当て (reallocation) を防ぐことができ、効率的です。 
 	m_pPLS = new iexMesh("DATA/Shader/PLS_CCW.imo");
 
-
-
+	// ToonTex
+	m_pToonShadoTex = new tdn2DObj("Data/Shader/toonShadow.png");
+	shaderM->SetValue("ToonShadowMap", m_pToonShadoTex);
 
 }
 
@@ -132,6 +133,7 @@ DeferredEx::~DeferredEx()
 
 	SAFE_DELETE(m_pPLS);
 
+	SAFE_DELETE(m_pToonShadoTex);
 
 	//Surfaceの解放	
 	SAFE_RELEASE(m_pBackBuffer);
@@ -196,6 +198,9 @@ void DeferredEx::G_Update(const Vector3 ViewPos)
 	shaderM->SetValue("VMatrix", matView);
 	// Projection変換行列 
 	shaderM->SetValue("PMatrix", matProjection);
+
+	// View*Proj変換行列
+	shaderM->SetValue("VPMatrix", matView*matProjection);
 
 
 }
