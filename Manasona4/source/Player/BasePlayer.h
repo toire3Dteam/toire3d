@@ -88,6 +88,8 @@ enum BASE_ACTION_STATE
 	NO_ACTION = -1,
 	ESCAPE,		// 回避
 	STAND,		// スタンド発動
+	OVERDRIVE_ONEMORE,	// ワンモア覚醒
+	OVERDRIVE_BURST,	// バースト覚醒
 	RUSH1,		// 通常1段目
 	RUSH2,		// 通常2段目
 	RUSH3,		// 通常3段目
@@ -109,6 +111,8 @@ enum class EFFECT_TYPE
 	DROP_IMPACT,// ドロップインパクト
 	UPPER,		// アッパー
 	FINISH_HIT,		// フィニッシュアーツヒット
+	BURST,		// バースト
+	ONEMORE_BURST,// ワンモアバースト
  	//AIROU_CIRCLE,// アイルーサークル
 	
 
@@ -155,6 +159,14 @@ enum class TEAM
 {
 	A,
 	B
+};
+
+// 覚醒の種類
+enum class OVERDRIVE_TYPE
+{
+	//HEAVE_HO,	// どっこい通常の覚醒
+	ONEMORE,	// コンボ中にさらなる追撃をするために発動
+	BURST		// 相手の攻撃を受けているときにバーストとして発動
 };
 
 /***************************************************************/
@@ -219,6 +231,8 @@ public:
 	void UpdatePos();		// 座標更新(判定後に呼び出す)
 	void Move();			// 動きの制御
 	void InvincibleUpdate(); // 無敵の制御
+	void OverDriveUpdate(); // 覚醒の制御
+	void ActionOverDrive(); // 覚醒発動
 
 	virtual void Render();
 	virtual void Render(tdnShader* shader,char* name);	
@@ -381,6 +395,10 @@ public:
 		m_score += m_CollectScore;
 		m_CollectScore = 0;
 	}
+
+	int GetScore(){ return m_score; }
+	//void SetScore(){ return m_score; }
+
 	void AddRecoveryCount(int add){ m_recoveryCount += add; }
 
 	void MoveClampX(float val) { m_move.x = Math::Clamp(m_move.x, -val, val); }
@@ -394,6 +412,12 @@ public:
 	// ステージのあたり判定用
 	CollisionShape::Square *GetHitSquare() { return m_pHitSquare; }
 
+	// 覚醒
+	int GetOverDrive(){ return m_OverDriveGage; } // 覚醒ゲージ
+	bool isOverDrive(){ return m_bOverDrive; } // 覚醒してるか
+	int GetOverDriveFlame(){ return m_OverDriveFlame; } // 覚醒時間
+	OVERDRIVE_TYPE GetOverDriveType(){ return m_OverDriveType; }	// 覚醒の種類
+
 
 	//_/_/_/_/_/_/__/_/__/_/__/_/__
 	// 定数
@@ -403,6 +427,8 @@ public:
 	static const float c_GRAVITY;			// 全員が共通で持つ世界の重力
 	static const float c_MAX_JUMP;			// ジャンプ最大ライン
 	static const int   c_RECOVERY_FLAME;	// リカバリ―フレーム
+	static const int   c_OVERDRIVE_MAX_GAGE;// 覚醒ゲージの最大値
+	static const int   c_OVERDRIVE_MAX_TIME;// 覚醒が切れるまでの時間
 protected:
 	const int m_deviceID;		// 自分のコントローラーの番号(実質、スマブラのxPに値する)
 	const TEAM m_team;			// このキャラクターの所属してるチーム
@@ -435,6 +461,11 @@ protected:
 	//Vector3 m_StandSaveMove;	// スタンド発動の保存移動量
 	int m_recoveryCount;		// リカバリーステートのいる時間をカウント
 	
+	// 覚醒
+	int m_OverDriveGage;			// 覚醒ゲージ
+	bool m_bOverDrive;				// 覚醒してるか
+	int m_OverDriveFlame;			// 覚醒時間
+	OVERDRIVE_TYPE m_OverDriveType;	// 覚醒の種類
 
 	// 「喰らい中」に攻撃をくらってるカウント
 	std::list<BASE_ACTION_STATE> m_RecoveryDamageCount;

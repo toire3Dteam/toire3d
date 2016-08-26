@@ -17,6 +17,7 @@ namespace GAME_ID
 		PLAYER_MGR,					// マネージャーのID 
 		JUDGE_MNG,					// ジャッジマネージャーID
 		CAMERA_MGR,					// カメラマネージャーID
+		UI_MGR,						// UIマネージャー
 
 		ID_PLAYER_FIRST,			//人のIDの初め
 		ID_PLAYER_MAX = ID_PLAYER_FIRST + GAME_PLAYER_MAX,	//人の最大ID+1

@@ -130,23 +130,36 @@ void ParticleManager::EffectHit(const Vector3 &pos)
 		Pos.y = pos.y + (float)(rand() % 3);
 		Pos.z = pos.z + rand() % 5 - 2.0f;
 		Pos = pos;
-		const int M = 16;
-		Move.x = (rand() % M - (M / 2))*0.25f;
-		Move.y = (rand() % 3 + 7) * 0.1f;
-		Move.z = (rand() % M - (M / 2))*0.25f;
+		const int M = 64;
+		Move.x = (rand() % M - (M / 2))*0.05f;
+		Move.y = (rand() % 5 + 6) * 0.1f;
+		Move.z = (rand() % M - (M / 2))*0.05f;
 		Power.x = 0;
-		Power.y = 0;
+		Power.y = -0.015f;
 		Power.z = 0;
-		// ê¬Åú
-		//Set(6, 0, 1.0f, 20, .0f, 10, .9f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, rand() % 2 + 1.5f, RS::COPY);
+		Set(7, 0, 1.0f, 90, .0f, 30, .9f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, rand() % 1 + 1.0f, RS::COPY);
+
+		Power.x = 0;
+		Power.y = -0.01f;
+		Power.z = 0;
 
 		// ó±
-		for (int j = 0; j < 5; j++)
+		for (int j = 0; j < 1; j++)
 		{
-			Move.x = (rand() % 30 - 16.0f) * 0.25f;
-			Move.y = rand() % 9 - 4.0f;
-			Move.z = (rand() % 30 -16.0f) * 0.001f;
-			Set(7, 0, 1.0f, 16, .0f, 6, .75f, pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, rand() % 1 + 1, RS::ADD);
+			Pos.x = pos.x + rand() % 5 - 2.0f;
+			Pos.y = pos.y + (float)(rand() % 3);
+			Pos.z = pos.z + rand() % 5 - 2.0f;
+			Pos = pos;
+			const int M2 = 16;
+			Move.x = (rand() % M2 - (M2 / 2))*0.05f;
+			Move.y = (rand() % 3 + 7) * 0.1f;
+			Move.z = (rand() % M2 - (M2 / 2))*0.05f;
+			Set(7, 0, 1.0f, 40, .0f, 20, .9f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, rand() % 1 + .5f, RS::COPY);
+
+			//Move.x = (rand() % 30 - 16.0f) * 0.25f;
+			//Move.y = rand() % 9 - 4.0f;
+			//Move.z = (rand() % 30 -16.0f) * 0.001f;
+			//Set(7, 0, 1.0f, 16, .0f, 6, .75f, pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, rand() % 1 + 1.0f, RS::ADD);
 		}
 	}
 }

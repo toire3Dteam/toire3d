@@ -19,6 +19,10 @@ const float BasePlayer::c_MAX_JUMP = 2.2f;
 
 const int BasePlayer::c_RECOVERY_FLAME = 8;			// リカバリーステートにいる時間
 
+const int BasePlayer::c_OVERDRIVE_MAX_GAGE = 10;	// 覚醒ゲージの最大値
+const int BasePlayer::c_OVERDRIVE_MAX_TIME = 30;	// 覚醒が切れるまでの時間
+
+
 // アクションフレーム情報読み込み
 void BasePlayer::LoadAttackFrameList(char *filename)
 {
@@ -53,7 +57,8 @@ m_maxSpeed(1.0f), m_dir(DIR::LEFT), m_deviceID(deviceID), m_pHitSquare(new Colli
 m_pObj(nullptr), m_move(VECTOR_ZERO), m_bLand(false), m_bAerialJump(true), m_ActionState(BASE_ACTION_STATE::NO_ACTION),
 m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentActionFrame(0), m_RecoveryFlame(0), m_bEscape(false), m_score(0), m_CollectScore(0), m_pAI(nullptr),
 m_recoveryCount(0), m_HitStopFrame(0),// ★★★バグの原因　ひっとすトップ初期化のし忘れ。
-m_InvincibleColRate(0), m_InvincibleColRateFlame(0), m_bInvincibleColRateUpFlag(false)
+m_InvincibleColRate(0), m_InvincibleColRateFlame(0), m_bInvincibleColRateUpFlag(false),
+m_OverDriveGage(0), m_bOverDrive(false), m_OverDriveFlame(0), m_OverDriveType(OVERDRIVE_TYPE::BURST)
 {
 	// とりあえず、モコイさん
 	m_pStand = new Stand::Mokoi(this);
@@ -129,10 +134,15 @@ BasePlayer::~BasePlayer()
 
 void BasePlayer::Update()
 {
+	// 覚醒の更新
+	OverDriveUpdate();
 
-
-	// スタンド更新
-	m_pStand->Update();
+	// 1more覚醒していたらスタンドの動きを止める
+	if (GetFSM()->isInState(*BasePlayerState::OverDrive_OneMore::GetInstance()) == false)
+	{
+		// スタンド更新
+		m_pStand->Update();
+	}
 
 	// 無敵時間の更新
 	if (KeyBoardTRG(KB_H))
@@ -345,6 +355,55 @@ void BasePlayer::InvincibleUpdate()
 
 }
 
+// 覚醒の制御
+void BasePlayer::OverDriveUpdate()
+{
+	// 覚醒しているか
+	if (m_bOverDrive == false)
+	{
+		m_OverDriveGage++;
+		// ゲージが最大まで溜まったら
+		if (m_OverDriveGage >= c_OVERDRIVE_MAX_GAGE)
+		{
+			m_OverDriveGage = c_OVERDRIVE_MAX_GAGE;
+		}
+
+	}
+	else // 覚醒中
+	{
+		// 覚醒の種類に応じて
+		switch (m_OverDriveType)
+		{
+		case OVERDRIVE_TYPE::ONEMORE:
+			break;
+		case OVERDRIVE_TYPE::BURST:
+			break;
+		default:
+			break;
+		}
+
+		m_OverDriveFlame--;
+		if (m_OverDriveFlame <= 0) // 覚醒時間が0になったら覚醒終わり
+		{
+			m_OverDriveFlame = 0;
+			m_bOverDrive = false;
+		}
+	}
+
+}
+
+void BasePlayer::ActionOverDrive()
+{
+	// アクション
+	m_bOverDrive = true;
+	
+	m_OverDriveGage = 0; //空に
+	m_OverDriveFlame = c_OVERDRIVE_MAX_TIME;
+
+	// ジャンプの権利も復活
+	m_bAerialJump = true;
+}
+
 void BasePlayer::Control()
 {
 	// 押したキー判定
@@ -460,6 +519,20 @@ void BasePlayer::Render()
 
 	tdnText::Draw(32 + m_deviceID * 250, 630, 0xff00ff80, "スタンドゲージ : %d", m_pStand->GetStandGage());
 	tdnText::Draw(32 + m_deviceID * 250, 660, 0xffff8000, "スタンドストック: %d", m_pStand->GetStandStock());
+	
+	tdnText::Draw(32 + m_deviceID * 250, 430, 0xff00ff80, "OD ゲージ: %d", m_OverDriveGage);
+	tdnText::Draw(32 + m_deviceID * 250, 460, 0xffff8000, "OD残り時間: %d", m_OverDriveFlame);
+
+
+	Vector2 pos2d = Math::WorldToScreen(m_pos);
+	
+	//if (m_deviceID == 1 || m_deviceID == 2)
+	{
+		tdnText::Draw(pos2d.x, pos2d.y - 150, 0xff00ff80, "C_Score : %d", m_CollectScore);
+		tdnText::Draw(pos2d.x, pos2d.y-100, 0xffff8000, "%dP!!", m_deviceID);
+
+	}
+
 
 }
 
@@ -564,6 +637,7 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType)
 		m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::DAMAGE);
 		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::WAVE);
 		PointLightMgr->AddPointLight(pos + Vector3(0, 5, 0), Vector3(1.0f, 0.4f, 0.0f), 20, 4, 20, 4, 15);// ポイントライトエフェクト！
+		ParticleManager::EffectHit(pos);
 
 		break;
 	case EFFECT_TYPE::WHIFF:
@@ -601,6 +675,14 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType)
 
 	case EFFECT_TYPE::FINISH_HIT:
 		ParticleManager::EffectFinish(pos);
+
+		break;
+	case EFFECT_TYPE::BURST:
+		m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::BURST);
+
+		break;
+	case EFFECT_TYPE::ONEMORE_BURST:
+		m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::ONEMORE_BURST);
 
 		break;
 	default:

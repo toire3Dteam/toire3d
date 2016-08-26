@@ -29,6 +29,14 @@ public:
 	int GetNumPlayer() { return m_NumPlayer; }
 	BasePlayer *GetPlayer(int no) { return m_pPlayers[no]; }
 
+	void CalcTeamPoint();
+	
+	// アクセサ
+	int GetPointA(){ return m_PointAteam; }
+	int GetPointB(){ return m_PointBteam; }
+
+	int GetOverDriveDim(){ return m_OverDriveDim; }
+
 private:
 	// 1つしかない実体
 	static PlayerManager *pInstance;
@@ -36,6 +44,13 @@ private:
 	int m_NumPlayer;
 	BasePlayer **m_pPlayers;
 	Stage::Base *m_pStage;	// 参照するだけ(Updateの引数でもらってたのだが、BaseGameEntityの継承で引数なしのUpdateを使わないといけなくなったため、メンバ変数に)
+
+	// チームポイント
+	int m_PointAteam;
+	int m_PointBteam;
+
+	// 覚醒暗転
+	int m_OverDriveDim;
 
 	// ★プレイヤーとプレイヤーの攻撃の判定
 	bool CollisionPlayerAttack(BasePlayer *my, BasePlayer *you);

@@ -4,6 +4,7 @@
 #include "../Sound/SoundManager.h"
 #include "../BaseEntity/Message/MessageDispatcher.h"
 #include "../Stand/Stand.h"
+#include "../Number/Number.h"
 
 // 実体の宣言
 PlayerManager *PlayerManager::pInstance = nullptr;
@@ -11,7 +12,10 @@ PlayerManager *PlayerManager::pInstance = nullptr;
 PlayerManager::PlayerManager() :BaseGameEntity(ENTITY_ID::PLAYER_MGR),	// エンティティID登録
 m_pStage(nullptr), m_NumPlayer(1), m_pPlayers(nullptr)
 {
+	m_PointAteam = 0;
+	m_PointBteam = 0;
 
+	m_OverDriveDim = 255;
 }
 PlayerManager::PlayerManager(const PlayerManager&) :BaseGameEntity(ENTITY_ID::PLAYER_MGR){}
 
@@ -29,14 +33,14 @@ void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage)
 		TEAM team;
 		if (i % 2 == 0)
 		{
-			team = TEAM::B;
+			team = TEAM::A;
 		}
 		else
 		{
-			team = TEAM::A;
+			team = TEAM::B;
 		}
 
-		m_pPlayers[i] = new Airou(i, team, (i == 3 /*|| i == 2*/));
+		m_pPlayers[i] = new Airou(i, team, (/*i == 3|| i == 2 || i == 0 ||*/ i == 1));
 		m_pPlayers[i]->InitActionDatas();		// ★攻撃情報を各キャラに初期化させる
 	}
 
@@ -56,7 +60,31 @@ PlayerManager::~PlayerManager()
 }
 
 void PlayerManager::Update()
-{
+{	
+	// 誰かが1More覚醒していたら全員の動きを止める
+	FOR(m_NumPlayer)
+	{
+		if (m_pPlayers[i]->GetFSM()->isInState(*BasePlayerState::OverDrive_OneMore::GetInstance()) == true)
+		{
+			m_pPlayers[i]->Update();			// モーションとか移動値の作成とか、基本的な更新。
+			
+			m_pStage->Collision(m_pPlayers[i], m_pPlayers[i]->GetMoveAddress());	// ステージとの判定で、move値をどうこういじった後に
+			m_pPlayers[i]->UpdatePos();			// 座標にmove値を足す更新
+
+			// ●暗転処理
+			 m_OverDriveDim = max(m_OverDriveDim-40, 64);	
+
+			return; // ほかのキャラクターの所へは断じて通さない
+		}
+		
+	}
+	// 誰も覚醒していなかったので通常通り更新
+	
+	// ●暗転処理
+	m_OverDriveDim=min(m_OverDriveDim+40, 255);
+	
+	
+
 	/* プレイヤーたち更新 */
 	FOR(m_NumPlayer)
 	{
@@ -110,6 +138,10 @@ void PlayerManager::Update()
 
 	delete[] bHit;	// ポインタ配列の解放
 	delete[] bHitStand;
+
+
+	// チームポイント計算
+	CalcTeamPoint();
 
 }
 
@@ -193,6 +225,10 @@ bool PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you)
 				HitAttackInfo.HitScore = my->GetAttackData()->HitScore;									// ダメージ(スコア)
 				HitAttackInfo.bFinishAttack = bFinish;													// ふぃにしゅアーツかどうか
 				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + my->GetDeviceID()), MESSAGE_TYPE::HIT_ATTACK, &HitAttackInfo);
+				// 数字エフェクト追加
+				Vector2 screenPos= Math::WorldToScreen(my->GetPos());
+				NumberEffect.AddNumber(screenPos.x, screenPos.y - 200, my->GetAttackData()->HitScore, Number_Effect::COLOR_TYPE::WHITE, Number::NUM_KIND::NORMAL);
+
 
 				// そして、ダメージを受けた人に送信
 				HIT_DAMAGE_INFO HitDamageInfo;
@@ -266,6 +302,9 @@ bool PlayerManager::CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou)
 				hai.hitStopFlame = pStand->GetAttackData()->places[iHitPlace].hitStopFlame;		// 自分自身にもの自分のヒットストップ
 				hai.HitScore = pStand->GetAttackData()->HitScore;				// ダメージ(スコア)
 				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + pStand->GetDeviceID()), MESSAGE_TYPE::HIT_ATTACK, &hai);
+				// 数字エフェクト追加
+				Vector2 screenPos = Math::WorldToScreen(pStand->GetPos());
+				NumberEffect.AddNumber(screenPos.x, screenPos.y - 200, pStand->GetAttackData()->HitScore, Number_Effect::COLOR_TYPE::WHITE, Number::NUM_KIND::NORMAL);
 
 				// そして、ダメージを受けた人に送信
 				HIT_DAMAGE_INFO hdi;
@@ -301,4 +340,26 @@ bool PlayerManager::HandleMessage(const Message &msg)
 {
 	// 今のところ送られることはないのかな
 	return false;
+}
+
+// チームポイント計算
+void PlayerManager::CalcTeamPoint()
+{
+	m_PointAteam = 0;
+	m_PointBteam = 0;
+	
+	// プレイヤーたち描画
+	FOR(m_NumPlayer)
+	{
+		if (m_pPlayers[i]->GetTeam()==TEAM::A)
+		{
+			m_PointAteam += m_pPlayers[i]->GetScore();
+		}
+		else
+		{
+			m_PointBteam += m_pPlayers[i]->GetScore();
+		}	
+	}
+
+
 }

@@ -83,6 +83,9 @@ void Stage::Senjo::Initialize(Camera *pCamera)
 {
 	//m_pObj = new iexMesh("DATA/Stage/Senjo/pupupu2.IMO");
 	m_pObj = new iexMesh("DATA/Stage/Stage/sandStage.IMO");
+	//m_pObj->SetScale(2);
+	//m_pObj->Update();
+
 	m_pBack = new iexMesh("DATA/Stage/Senjo/Skydome.IMO");
 	m_pBack->SetPos(Vector3(0, 0, 300));
 	m_pBack->SetScale(3.5f);

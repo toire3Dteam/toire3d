@@ -393,9 +393,9 @@ Vector3 Math::ScreenToWorldPlate(const Vector2 &ScreenPos, Vector3 &PlateNormal,
 //********************************************************************
 //						ベジエ曲線
 //********************************************************************
-void Math::Bezier(Vector3 *out, Vector3 pos_array[], int num_elements_array, float percentage)
+void Math::Bezier(Vector3 *out, Vector3 PosArray[], int NumArray, float percentage)
 {
-	assert(num_elements_array > 0);
+	assert(NumArray > 0);
 
 	float b = percentage;
 	float a = 1 - b;
@@ -408,28 +408,67 @@ void Math::Bezier(Vector3 *out, Vector3 pos_array[], int num_elements_array, flo
 	*/
 
 	// 2点間の直線の場合、ベジエ計算をするとおかしくなるので、割合による直線の計算にする
-	if (num_elements_array == 2)
+	if (NumArray == 2)
 	{
-		*out = pos_array[0] * a + pos_array[1] * b;
+		*out = PosArray[0] * a + PosArray[1] * b;
 		return;
 	}
 
 	// 始点
-	*out = pos_array[0] * (float)pow(a, num_elements_array);
+	*out = PosArray[0] * (float)pow(a, NumArray);
 
 	// 中間
-	for (int i = 1; i < num_elements_array - 1; i++)	// -1なのは終点を省くから
+	for (int i = 1; i < NumArray - 1; i++)	// -1なのは終点を省くから
 	{
 		float mult = b;
-		for (int j = 1; j < num_elements_array - 1; j++)
+		for (int j = 1; j < NumArray - 1; j++)
 		{
 			mult *= (j >= i) ? a : b;
 		}
-		*out += pos_array[i] * (num_elements_array * mult);
+		*out += PosArray[i] * (NumArray * mult);
 	}
 
 	// 終点
-	*out += pos_array[num_elements_array - 1] * (float)pow(b, num_elements_array);
+	*out += PosArray[NumArray - 1] * (float)pow(b, NumArray);
+}
+
+void Math::Bezier(float *out, float FloatArray[], int NumArray, float percentage)
+{
+	assert(NumArray > 0);
+
+	float b = percentage;
+	float a = 1 - b;
+
+	/*				//		参考資料		//
+	//ベジェ曲線↓　まず　　最初と中間　　　　次に　　　　中間と最後
+	pos->x = a*a*a* p1.x + 3 * a*a*b*p2.x + 3 * a*b*b*p2.x + b*b*b*p3.x;
+	pos->y = a*a*a* p1.y + 3 * a*a*b*p2.y + 3 * a*b*b*p2.y + b*b*b*p3.y;
+	pos->z = a*a*a* p1.z + 3 * a*a*b*p2.z + 3 * a*b*b*p2.z + b*b*b*p3.z;
+	*/
+
+	// 2点間の直線の場合、ベジエ計算をするとおかしくなるので、割合による直線の計算にする
+	if (NumArray == 2)
+	{
+		*out = FloatArray[0] * a + FloatArray[1] * b;
+		return;
+	}
+
+	// 始点
+	*out = FloatArray[0] * (float)pow(a, NumArray);
+
+	// 中間
+	for (int i = 1; i < NumArray - 1; i++)	// -1なのは終点を省くから
+	{
+		float mult = b;
+		for (int j = 1; j < NumArray - 1; j++)
+		{
+			mult *= (j >= i) ? a : b;
+		}
+		*out += FloatArray[i] * (NumArray * mult);
+	}
+
+	// 終点
+	*out += FloatArray[NumArray - 1] * (float)pow(b, NumArray);
 }
 
 // 補間

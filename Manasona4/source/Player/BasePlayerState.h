@@ -842,5 +842,72 @@ namespace BasePlayerState
 		Skill& operator=(const Skill&) {}
 	};
 
+	/*******************************************************/
+	//				1more覚醒モーション
+	/*******************************************************/
+	class OverDrive_OneMore :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static OverDrive_OneMore* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		OverDrive_OneMore() {};
+		~OverDrive_OneMore() {};
+
+		OverDrive_OneMore(const OverDrive_OneMore&) {}
+		OverDrive_OneMore& operator=(const OverDrive_OneMore&) {}
+	};
+
+	/*******************************************************/
+	//				Burst覚醒モーション
+	/*******************************************************/
+	class OverDrive_Burst :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static OverDrive_Burst* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		OverDrive_Burst() {};
+		~OverDrive_Burst() {};
+
+		OverDrive_Burst(const OverDrive_Burst&) {}
+		OverDrive_Burst& operator=(const OverDrive_Burst&) {}
+	};
 
 }

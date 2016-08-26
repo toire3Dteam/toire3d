@@ -175,6 +175,47 @@ bool AIState::Global::OnMessage(AI * pPerson, const Message & msg)
 }
 
 
+
+/*******************************************************/
+//					プラクティスグローバルステート
+/*******************************************************/
+
+AIState::PracticeGlobal* AIState::PracticeGlobal::GetInstance()
+{
+	// ここに変数を作る
+	static AIState::PracticeGlobal instance;
+	return &instance;
+}
+
+void AIState::PracticeGlobal::Enter(AI * pPerson)
+{
+}
+
+void AIState::PracticeGlobal::Execute(AI * pPerson)
+{
+
+}
+
+void AIState::PracticeGlobal::Exit(AI * pPerson)
+{
+}
+
+void AIState::PracticeGlobal::Render(AI * pPerson)
+{
+	//tdnText::Draw(420, 610, 0xffffffff, "AIぐろーばるすてーと");
+}
+
+bool AIState::PracticeGlobal::OnMessage(AI * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+	//}
+
+	return false;
+}
+
+
 /*******************************************************/
 //				練習用ジャンプステート
 /*******************************************************/
@@ -288,8 +329,8 @@ void AIState::Space::Execute(AI * pPerson)
 
 	enum 
 	{
-		SPACE_LENGTH = 40,// 逃げる距離
-		SPACE_LENGTH_FAR = 65// 逃げすぎてたら近づける距離
+		SPACE_LENGTH = 50,// 逃げる距離
+		SPACE_LENGTH_FAR = 75// 逃げすぎてたら近づける距離
 	};
 
 	if (Math::Length(TargetPos, MyPos) > SPACE_LENGTH_FAR)

@@ -324,6 +324,12 @@ PanelEffectManager::PanelEffectManager()
 		case PANEL_EFFECT_TYPE::SMOKE:
 			m_basePanelEffect[i] = new SmokeEffect();
 			break;
+		case PANEL_EFFECT_TYPE::BURST:
+			m_basePanelEffect[i] = new BurstEffect();
+			break;
+		case PANEL_EFFECT_TYPE::ONEMORE_BURST:
+			m_basePanelEffect[i] = new OneMoreBurstEffect();
+			break;
 
 		default:
 			assert(0);		// "そんなエフェクトはない"

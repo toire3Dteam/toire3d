@@ -40,6 +40,40 @@ namespace AIState
 		Global& operator=(const Global&){}
 	};
 
+	/*******************************************************/
+	//					プラクティスグローバルステート
+	/*******************************************************/
+	class PracticeGlobal :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static PracticeGlobal* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		PracticeGlobal() {};
+		~PracticeGlobal() {};
+
+		PracticeGlobal(const PracticeGlobal&){}
+		PracticeGlobal& operator=(const PracticeGlobal&){}
+	};
+
 
 
 	/*******************************************************/

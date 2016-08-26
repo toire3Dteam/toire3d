@@ -26,6 +26,7 @@ protected:
 	AnimationPanel* m_pic;
 	Vector3 m_pos;
 	int m_picSize;
+	float m_pic3DScale;
 	RS state;
 
 };
@@ -405,4 +406,40 @@ public:
 private:
 };
 
+class BurstEffect :public BasePanelEffect
+{
+public:
+	BurstEffect()
+	{
+		m_picSize = 256;
+		m_pic = new AnimationPanel("Data/Effect/BurstEffect.png", 256, 256, 15, 1, 4, false);
+		//state = RS::COPY;
+		m_pic3DScale = 100;//3Dのスケール
+	};
+	~BurstEffect() {};
 
+	void Update() { BasePanelEffect::Update(); };
+	void Render() { BasePanelEffect::Render(); };
+	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+
+private:
+};
+
+class OneMoreBurstEffect :public BasePanelEffect
+{
+public:
+	OneMoreBurstEffect()
+	{
+		m_picSize = 256;
+		m_pic = new AnimationPanel("Data/Effect/OneMoreBurstEffect.png", 256, 256, 15, 1, 4, false);
+		//state = RS::COPY;
+		m_pic3DScale = 100;//3Dのスケール
+	};
+	~OneMoreBurstEffect() {};
+
+	void Update() { BasePanelEffect::Update(); };
+	void Render() { BasePanelEffect::Render(); };
+	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+
+private:
+};

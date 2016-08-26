@@ -39,12 +39,17 @@ EffectCamera::EffectCamera(Camera *me) :m_pCamera(me), m_CurrentScriptID(0), m_C
 			ifs >> skip;
 			ifs >> set->pPatterns[i].EndFrame;
 
+			// フレーム速度取得
+			ifs >> skip;
+			ifs >> set->pPatterns[i].FrameSpeed;
+
 			// 座標と注視点のベジエ点の個数
 			ifs >> skip;
 			ifs >> set->pPatterns[i].NumPoints;
 			assert(set->pPatterns[i].NumPoints > 0);
-			set->pPatterns[i].pPosArray = new Vector3[set->pPatterns[i].NumPoints];
-			set->pPatterns[i].pTargetArray = new Vector3[set->pPatterns[i].NumPoints];
+			//set->pPatterns[i].pPosArray = new Vector3[set->pPatterns[i].NumPoints];
+			//set->pPatterns[i].pTargetArray = new Vector3[set->pPatterns[i].NumPoints];
+			set->pPatterns[i].InstanceArrays();	// ★ここでNuMPoints分の配列ポインタの確保を行っている
 
 			for (int j = 0; j < set->pPatterns[i].NumPoints; j++)
 			{
@@ -57,6 +62,9 @@ EffectCamera::EffectCamera(Camera *me) :m_pCamera(me), m_CurrentScriptID(0), m_C
 				ifs >> set->pPatterns[i].pTargetArray[j].x;
 				ifs >> set->pPatterns[i].pTargetArray[j].y;
 				ifs >> set->pPatterns[i].pTargetArray[j].z;
+
+				// roll値
+				ifs >> set->pPatterns[i].pRollArray[j];
 			}
 
 			// 固定かどうか
@@ -106,7 +114,7 @@ void Rot2D(float rad, float *x, float *y)
 void EffectCamera::Update()
 {
 	// カメラフレーム更新+パターン内での終了フレーム到達したら
-	if (++m_CurrentFrame > m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].EndFrame)
+	if ((m_CurrentFrame += m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].FrameSpeed) > m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].EndFrame)
 	{
 		m_CurrentFrame = 0;
 
@@ -120,7 +128,8 @@ void EffectCamera::Update()
 
 	// カメラ座標更新
 	Vector3 pos, target;
-	GetTimeLineCameraPos(&pos, &target);
+	float roll;
+	GetTimeLineCameraPos(&pos, &target, &roll);
 
 	// プレイヤー座標系にする
 	Rot2D(m_pCamera->m_angle.y, &pos.z, &pos.x);
@@ -130,6 +139,7 @@ void EffectCamera::Update()
 	// カメラにセット
 	m_pCamera->m_pos = pos;
 	m_pCamera->m_target = target;
+	m_pCamera->m_angle.z = roll;
 	//m_pCamera->Set(pos, target);
 }
 //
@@ -149,28 +159,38 @@ void EffectCamera::Start(int ID)
 
 
 
-void EffectCamera::GetTimeLineCameraPos(Vector3 *out_pos, Vector3 *out_target)
+void EffectCamera::GetTimeLineCameraPos(Vector3 *OutPos, Vector3 *OutTarget, float *OutRoll)
 {
 	if (m_PatternCursor == -1) return;
 	if (m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].fix)
 	{
-		*out_pos = m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].pPosArray[0];
-		*out_target = m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].pTargetArray[0];
+		*OutPos = m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].pPosArray[0];
+		*OutTarget = m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].pTargetArray[0];
+		*OutRoll = m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].pRollArray[0];
 		return;
 	}
 
+	const float percentage = m_CurrentFrame / m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].EndFrame;	// 現在フレームのpercentage
+
 	// ベジエ計算関数に丸投げ
 	Math::Bezier(
-		out_pos,																	// 受け皿
+		OutPos,																	// 受け皿
 		m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].pPosArray,					// 始点、中間、終点が入ってる座標配列
 		m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].NumPoints,					// の要素数
-		m_CurrentFrame / m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].EndFrame	// 終了フレーム
+		percentage
 		);
 
 	Math::Bezier(
-		out_target,																	// 受け皿
+		OutTarget,																	// 受け皿
 		m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].pTargetArray,				// 始点、中間、終点が入ってる座標配列
 		m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].NumPoints,					// の要素数
-		m_CurrentFrame / m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].EndFrame	// 終了フレーム
+		percentage
+		);
+
+	Math::Bezier(
+		OutRoll,																// 受け皿
+		m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].pRollArray,				// 始点、中間、終点が入ってる座標配列
+		m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].NumPoints,					// の要素数
+		percentage
 		);
 }

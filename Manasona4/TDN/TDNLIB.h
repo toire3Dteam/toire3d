@@ -554,13 +554,23 @@ namespace Math
 
 	/**
 	*@brief									ベジエ計算
-	*@param[in]		out						計算結果吐き出し
-	*@param[in]		pos_array				座標の配列(複数の点)
-	*@param[in]		num_elements_array		配列の個数
+	*@param[out]		out					計算結果吐き出し
+	*@param[in]		PosArray				座標の配列(複数の点)
+	*@param[in]		NumArray		配列の個数
 	*@param[in]		percentage				どれぐらいの割合の位置か(0.0～1.0)
 	*@return		ベジエ計算を行い、outに吐き出す関数
 	*/
-	void Bezier(Vector3 *out, Vector3 pos_array[], int num_elements_array, float percentage);
+	void Bezier(Vector3 *out, Vector3 PosArray[], int NumArray, float percentage);
+
+	/**
+	*@brief									ベジエ計算
+	*@param[out]		out					計算結果吐き出し
+	*@param[in]		FloatArray				floatの配列(複数の点)
+	*@param[in]		NumArray		配列の個数
+	*@param[in]		percentage				どれぐらいの割合の位置か(0.0～1.0)
+	*@return		上記ベジエ関数のfloat版
+	*/
+	void Bezier(float *out, float FloatArray[], int NumArray, float percentage);
 
 	/**
 	*@brief									最小値と最大値を範囲内に値を収める

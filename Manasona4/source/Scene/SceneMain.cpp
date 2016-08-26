@@ -19,6 +19,9 @@
 
 #include "../PointLight/PointLight.h"
 
+#include "../Number/Number.h"
+#include "../UI/GameUI.h"
+
 
 //BaseEffect* g_eff;
 //EffectManager;
@@ -50,7 +53,7 @@ bool sceneMain::Initialize()
 
 	// プレイヤー初期化
 	//m_pPlayerMgr = new PlayerManager(4, m_pStage);
-	PlayerMgr->Initialize(4, m_pStage);
+	PlayerMgr->Initialize(2, m_pStage);
 
 	// プレイヤーの座標のアドレスをカメラに渡してあげる(いじることは絶対に無く、ただ参照するだけ)
 	m_pCamera->SetPlayersPos();
@@ -70,6 +73,12 @@ bool sceneMain::Initialize()
 
 	PointLightMgr;
 
+	NumberEffect;
+	
+	GameUIMgr;
+
+	m_stageScreen = new tdn2DObj(tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom, TDN2D::HDR);
+
 	return true;
 }
 
@@ -84,8 +93,14 @@ sceneMain::~sceneMain()
 	SAFE_DELETE(g_uvEffect);
 	ParticleManager::Release();
 	DeferredManagerEx.Release();
+	SAFE_DELETE(m_stageScreen);
 
 	PointLightMgr->Release();
+
+	NumberEffect.Release();
+
+	GameUIMgr->Rerease();
+
 }
 
 //******************************************************************
@@ -121,16 +136,21 @@ bool sceneMain::Update()
 	// ポイントライト更新
 	PointLightMgr->Update();
 
+	// 
+	NumberEffect.Update();
+
 	// エンターでエフェクトカメラ発動してみる
-	//if (KeyBoardTRG(KB_ENTER))
-	//{
-	//	EFFECT_CAMERA_INFO eci;
-	//	eci.scriptID = 3;
-	//	MsgMgr->Dispatch(0, ENTITY_ID::CAMERA_MGR, ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::EFFECT_CAMERA, &eci);
-	//}
+	if (KeyBoardTRG(KB_ENTER))
+	{
+		EFFECT_CAMERA_INFO eci;
+		eci.scriptID = 0;
+		MsgMgr->Dispatch(0, ENTITY_ID::CAMERA_MGR, ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::EFFECT_CAMERA, &eci);
+	}
 
 	if (KeyBoardTRG(KB_L))
 	{
+
+
 		PointLightManager::GetInstance()->AddPointLight(Vector3(10, 3, 0), Vector3(0, 1, 1), 100, 4, 60, 20, 40);
 
 		//g_eff->Action(0,0);
@@ -202,12 +222,16 @@ void sceneMain::Render()
 		// ポイントライト描画
 		DeferredManagerEx.GpuPointLightRender();
 
+		RenderStage();// ここでステージだけをまとめて描画
+
 		// 最後の処理
 		{
 			DeferredManagerEx.FinalBegin();
 
-			// ステージ描画
-			m_pStage->Render(shaderM, "DefaultLighting");
+			int dim= PlayerMgr->GetOverDriveDim();
+			m_stageScreen->SetARGB(255, dim, dim, dim);
+			m_stageScreen->Render(0, 0, RS::COPY_NOZ);// ※Z値考慮させてない理由は↓の絵を描画するため
+
 			// プレイヤー
 			PlayerMgr->Render();
 
@@ -224,6 +248,10 @@ void sceneMain::Render()
 		// ブルーム
 		DeferredManagerEx.BloomRender();
 
+
+		NumberEffect.Render();
+	
+		GameUIMgr->Render();
 
 		if (KeyBoard(KB_J))
 		{
@@ -245,6 +273,22 @@ void sceneMain::Render()
 	}
 	tdnText::Draw(0, 30, 0xffffffff, "CameraPos    : %.1f %.1f %.1f", m_pCamera->m_pos.x, m_pCamera->m_pos.y, m_pCamera->m_pos.z);
 	tdnText::Draw(0, 60, 0xffffffff, "CameraTarget : %.1f %.1f %.1f", m_pCamera->m_target.x, m_pCamera->m_target.y, m_pCamera->m_target.z);
+}
+
+void sceneMain::RenderStage()
+{
+	Surface* save;
+	// まずは今のサーフェイスを保存
+	tdnSystem::GetDevice()->GetRenderTarget(0, &save);
+
+	m_stageScreen->RenderTarget(); //切り替え
+
+	// ステージ描画
+	m_pStage->Render(shaderM, "DefaultLighting");
+
+
+	tdnSystem::GetDevice()->SetRenderTarget(0, save);//レンダーターゲットの復元
+
 }
 
 void sceneMain::RenderShadow()

@@ -153,6 +153,7 @@ void Camera::OffEffectCamera()
 {
 	//m_pStateMachine->SetCurrentState(m_pStateMachine->GetPreviousState());	// 1個前のステートに戻す
 	m_pStateMachine->RevertToPreviousState();
+	m_angle.z = 0;
 }
 
 

@@ -14,6 +14,8 @@ BasePanelEffect::BasePanelEffect()
 	m_pic = nullptr;
 	m_pos.x = m_pos.y = m_pos.z = 0.0f;
 
+	m_pic3DScale = 50.0f;// 初期値　３Dで描画するときの大きさ
+
 	state = RS::ADD;
 }
 
@@ -37,7 +39,7 @@ void BasePanelEffect::Render()
 void BasePanelEffect::Render3D()
 {
 	//tdnRenderState::Filter(FALSE);
-	m_pic->GetPic()->SetScale(50.0f);
+	m_pic->GetPic()->SetScale(m_pic3DScale);// 各自所有しているスケールに設定
 	m_pic->Render3D(m_pos, state);
 	m_pic->GetPic()->SetScale(1);
 	//tdnRenderState::Filter(TRUE);

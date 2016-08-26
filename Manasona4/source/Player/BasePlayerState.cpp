@@ -18,9 +18,21 @@ bool JumpCansel(BasePlayer * pPerson)
 	//============================================
 	if (pPerson->GetInputList(PLAYER_INPUT::C) == 3)
 	{
-		// ジャンプステートに行く
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
-		return true;
+		// 地面についていたら
+		if (pPerson->isLand() == true)
+		{
+			// ジャンプステートに行く
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
+			return true;
+		}
+		else if (pPerson->isAerialJump() == true)	// 空中で空中ジャンプの権利があれば
+		{
+			// 空中ジャンプステートに行く
+			pPerson->GetFSM()->ChangeState(BasePlayerState::AerialJump::GetInstance());
+			return true;
+		}
+		else return false;
+	
 	}
 	else return false;
 }
@@ -102,6 +114,45 @@ bool SkillCansel(BasePlayer *pPerson)
 	else return false;
 }
 
+bool OverDriveCansel(BasePlayer *pPerson)
+{
+	// 覚醒（バースト）キャンセル
+	if (pPerson->isPushInput(PLAYER_INPUT::R3))
+	{
+		// ゲージが溜まってたら
+		if (pPerson->GetOverDrive() == BasePlayer::c_OVERDRIVE_MAX_GAGE)
+		{
+			// 攻めの1Moreか守りのバーストかを判断
+			if (pPerson->GetRecoveryFrame() <= 0)
+			{
+				// 攻めの覚醒
+				pPerson->GetFSM()->ChangeState(BasePlayerState::OverDrive_OneMore::GetInstance());
+				return true;
+			}
+			else
+			{
+				// 守りのバースト
+				pPerson->GetFSM()->ChangeState(BasePlayerState::OverDrive_Burst::GetInstance());
+				return true;
+			}
+
+		}
+		else return false;
+	}
+	else return false;
+}
+
+bool EscapeCansel(BasePlayer *pPerson)
+{
+	if (pPerson->GetInputList(PLAYER_INPUT::R1) == 3)
+	{
+		// エスケープステートに行く
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Escape::GetInstance());
+		return true;
+	}
+	else return false;
+}
+
 /*******************************************************/
 //					グローバルステート
 /*******************************************************/
@@ -119,6 +170,11 @@ void BasePlayerState::Global::Enter(BasePlayer * pPerson)
 
 void BasePlayerState::Global::Execute(BasePlayer * pPerson)
 {
+	////////////////////////////////////////////////////////////////
+	//	オーバードライブ　どこからでも出せる最強のキャンセルルート
+	//==============================================================
+	if (OverDriveCansel(pPerson)) return;
+
 }
 
 void BasePlayerState::Global::Exit(BasePlayer * pPerson)
@@ -139,6 +195,16 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 		// 攻撃くらったよメッセージ
 	case MESSAGE_TYPE::HIT_DAMAGE:
 	{
+		//// もしバースト中ならはじく
+		//if (pPerson->GetFSM()->isInState(*BasePlayerState::OverDrive::GetInstance()) == true)
+		//{
+		//	 // アクションフレームが続いてたら
+		//	 if (pPerson->isFrameAction())
+		//	 {			 
+		//		 return true;
+		//	 }
+		//}
+
 		// アクションステートオフ(つまり現在までやったいた動きが消える)
 		pPerson->SetActionState(BASE_ACTION_STATE::NO_ACTION);
 
@@ -252,23 +318,12 @@ void BasePlayerState::Wait::Execute(BasePlayer * pPerson)
 	//////////////////////////////////////////////
 	//	エスケープボタン
 	//============================================
-	if (pPerson->GetInputList(PLAYER_INPUT::R1) == 3)
-	{
-		// エスケープステートに行く
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Escape::GetInstance());
-		return;
-	}
-
+	if (EscapeCansel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	攻撃ボタン
 	//============================================
-	if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
-	{
-		// 攻撃ステートに行く
-		pPerson->GetFSM()->ChangeState(BasePlayerState::RushAttack::GetInstance());
-		return;
-	}
+	if (RushAttackCansel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	フィニッシュ攻撃ボタン
@@ -385,12 +440,8 @@ void BasePlayerState::Walk::Execute(BasePlayer * pPerson)
 	//////////////////////////////////////////////
 	//	エスケープボタン
 	//============================================
-	if (pPerson->GetInputList(PLAYER_INPUT::R1) == 3)
-	{
-		// エスケープステートに行く
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Escape::GetInstance());
-		return;
-	}
+	if (EscapeCansel(pPerson)) return;
+
 
 	//////////////////////////////////////////////
 	//	フィニッシュ攻撃ボタン
@@ -538,12 +589,8 @@ void BasePlayerState::Run::Execute(BasePlayer * pPerson)
 	//////////////////////////////////////////////
 	//	エスケープボタン
 	//============================================
-	if (pPerson->GetInputList(PLAYER_INPUT::R1) == 3)
-	{
-		// エスケープステートに行く
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Escape::GetInstance());
-		return;
-	}
+	if (EscapeCansel(pPerson)) return;
+
 
 	//////////////////////////////////////////////
 	//	攻撃キャンセル
@@ -1189,17 +1236,14 @@ void BasePlayerState::Fall::Execute(BasePlayer * pPerson)
 	//============================================
 
 	//////////////////////////////////////////////
-	//	空中ジャンプボタン
+	//	スキルキャンセル
 	//============================================
-	if (pPerson->GetInputList(PLAYER_INPUT::C) == 3)
-	{
-		// 空中ジャンプの権利がなかったら弾く
-		if (pPerson->isAerialJump() == true)
-		{
-			// 空中ジャンプステートに行く
-			pPerson->GetFSM()->ChangeState(BasePlayerState::AerialJump::GetInstance());
-		}
-	}
+	if (SkillCansel(pPerson)) return;
+
+	//////////////////////////////////////////////
+	//	ジャンプキャンセル
+	//============================================
+	if (JumpCansel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	攻撃ボタン
@@ -1733,6 +1777,10 @@ void BasePlayerState::KnockDown::Enter(BasePlayer * pPerson)
 	//むてきつくった
 	// ★やっぱりここで無敵時間設定
 	pPerson->SetInvincible(90,1);
+
+	// 仮
+	//pPerson->SetRecoveryFrame(120);
+
 }
 
 void BasePlayerState::KnockDown::Execute(BasePlayer * pPerson)
@@ -1747,6 +1795,8 @@ void BasePlayerState::KnockDown::Execute(BasePlayer * pPerson)
 	// 硬直が0以下なら硬直終了
 	if (pPerson->GetRecoveryFrame() <= 0)
 	{
+		//pPerson->SetInvincible(60, 1);
+
 		if (pPerson->isPushInput(PLAYER_INPUT::A) ||
 			pPerson->isPushInput(PLAYER_INPUT::B) ||
 			pPerson->isPushInput(PLAYER_INPUT::C) ||
@@ -2546,7 +2596,7 @@ void BasePlayerState::StandAction::Execute(BasePlayer * pPerson)
 void BasePlayerState::StandAction::Exit(BasePlayer * pPerson)
 {
 
-
+	
 }
 
 void BasePlayerState::StandAction::Render(BasePlayer * pPerson)
@@ -2649,10 +2699,10 @@ BasePlayerState::Skill * BasePlayerState::Skill::GetInstance()
 
 void BasePlayerState::Skill::Enter(BasePlayer * pPerson)
 {
-	// 召喚モーションに変える
+	// モーションに変える
 	pPerson->SetMotion(6);
 
-	// アクションステートをキャラクター固有に変更
+	// アクションステート変更
 	pPerson->SetActionState(BASE_ACTION_STATE::SKILL);
 
 	// SE再生
@@ -2699,6 +2749,229 @@ bool BasePlayerState::Skill::OnMessage(BasePlayer * pPerson, const Message & msg
 	//	return true;
 	//}
 	//}
+
+	return false;
+}
+
+
+/*******************************************************/
+//					1more覚醒ステート
+/*******************************************************/
+
+BasePlayerState::OverDrive_OneMore * BasePlayerState::OverDrive_OneMore::GetInstance()
+{
+	// ここに変数を作る
+	static BasePlayerState::OverDrive_OneMore instance;
+	return &instance;
+}
+
+void BasePlayerState::OverDrive_OneMore::Enter(BasePlayer * pPerson)
+{
+	// モーションに変える
+	pPerson->SetMotion(15);
+
+	// アクションステート変更
+	pPerson->SetActionState(BASE_ACTION_STATE::OVERDRIVE_ONEMORE);
+
+	// オーバードライブ
+	pPerson->ActionOverDrive();
+
+	// SE再生
+	se->Play("ペルソナ召喚");
+
+	// 上に浮く
+	pPerson->SetMove(Vector3(0, 1, 0));
+
+}
+
+void BasePlayerState::OverDrive_OneMore::Execute(BasePlayer * pPerson)
+{
+
+	if (pPerson->GetActionFrame() == FRAME_STATE::START)
+	{
+		// ↑
+		pPerson->SetMove(Vector3(0, .21f, 0));
+	}
+	if (pPerson->GetActionFrame() == FRAME_STATE::ACTIVE)
+	{
+		// バーストエフェクト発動！
+		pPerson->AddEffectAction(pPerson->GetPos() + Vector3(0, 5, 0), EFFECT_TYPE::ONEMORE_BURST);
+
+		// 動きを止める
+		pPerson->SetMove(Vector3(0, 0, 0));
+	}
+	if (pPerson->GetActionFrame() == FRAME_STATE::FOLLOW)
+	{
+		//////////////////////////////////////////////
+		//	スキルキャンセル
+		//============================================
+		if (SkillCansel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	ジャンプキャンセル
+		//============================================
+		if (JumpCansel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	攻撃ボタン
+		//============================================
+		if (RushAttackCansel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	フィニッシュ攻撃ボタン
+		//============================================
+		if (FinishAttackCansel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	スタンドキャンセル
+		//============================================
+		if (StandCansel(pPerson)) return;
+
+		// 動きを止める
+		pPerson->SetMove(Vector3(0, 0, 0));
+	}
+
+	// アクションフレーム終了してたら、戻る
+	if (!pPerson->isFrameAction())
+	{
+		if (pPerson->isLand()==true)
+		{
+			// 待機ステートに
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+			return;
+		}
+		else
+		{
+			// 落下ステートに
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Fall::GetInstance());
+			return;
+		}
+
+
+	}
+	
+}
+
+void BasePlayerState::OverDrive_OneMore::Exit(BasePlayer * pPerson)
+{
+
+
+}
+
+void BasePlayerState::OverDrive_OneMore::Render(BasePlayer * pPerson)
+{
+
+	tdnText::Draw(20, 690, 0xffffffff, "OverDrive_OneMoreState");
+}
+
+bool BasePlayerState::OverDrive_OneMore::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	switch (msg.Msg)
+	{
+		// 覚醒してるときは無敵
+	case MESSAGE_TYPE::HIT_DAMAGE:
+	{
+
+									 // アクションフレームが続いてたら
+									 if (pPerson->isFrameAction())
+									 {
+										 // グローバルステートに行かないようにする！
+										 return true;
+									 }
+
+
+	}
+
+	}
+	return false;
+
+}
+
+
+
+/*******************************************************/
+//					Burst覚醒ステート
+/*******************************************************/
+
+BasePlayerState::OverDrive_Burst * BasePlayerState::OverDrive_Burst::GetInstance()
+{
+	// ここに変数を作る
+	static BasePlayerState::OverDrive_Burst instance;
+	return &instance;
+}
+
+void BasePlayerState::OverDrive_Burst::Enter(BasePlayer * pPerson)
+{
+	// モーションに変える
+	pPerson->SetMotion(15);
+
+	// アクションステート変更
+	pPerson->SetActionState(BASE_ACTION_STATE::OVERDRIVE_BURST);
+
+	// オーバードライブ
+	pPerson->ActionOverDrive();
+
+	// SE再生
+	se->Play("ペルソナ召喚");
+
+
+}
+
+void BasePlayerState::OverDrive_Burst::Execute(BasePlayer * pPerson)
+{
+
+	// 動きを止める
+	pPerson->SetMove(Vector3(0, 0, 0));
+
+	if (pPerson->GetActionFrame() == FRAME_STATE::ACTIVE)
+	{
+		// バーストエフェクト発動！
+		pPerson->AddEffectAction(pPerson->GetPos() + Vector3(0, 5, 0), EFFECT_TYPE::BURST);
+	}
+
+	// アクションフレーム終了してたら、戻る
+	if (!pPerson->isFrameAction())
+	{
+		// 待機ステートに
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+
+	}
+
+}
+
+void BasePlayerState::OverDrive_Burst::Exit(BasePlayer * pPerson)
+{
+
+
+}
+
+void BasePlayerState::OverDrive_Burst::Render(BasePlayer * pPerson)
+{
+
+	tdnText::Draw(20, 690, 0xffffffff, "OverDrive_BurstState");
+}
+
+bool BasePlayerState::OverDrive_Burst::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	switch (msg.Msg)
+	{
+		// 覚醒してるときは無敵
+	case MESSAGE_TYPE::HIT_DAMAGE:
+	{
+
+									 // アクションフレームが続いてたら
+									 if (pPerson->isFrameAction())
+									 {
+										 // グローバルステートに行かないようにする！
+										 return true;
+									 }
+
+
+	}
+
+	}
 
 	return false;
 }
