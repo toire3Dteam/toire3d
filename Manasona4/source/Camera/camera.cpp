@@ -40,8 +40,7 @@ m_NumPlayer(-1), m_pPlayerPosReferences(nullptr)
 
 void Camera::InitializeResult()
 {
-	if (!m_pStateMachine->GetCurrentState()) m_pStateMachine->SetCurrentState(FixCameraState::GetInstance());
-	m_pStateMachine->ChangeState(EffectCameraState::GetInstance());
+	if (!m_pStateMachine->GetCurrentState()) m_pStateMachine->SetCurrentState(EffectCameraState::GetInstance());
 	m_pEffectCamera->Start(0);
 }
 

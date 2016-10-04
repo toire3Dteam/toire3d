@@ -240,13 +240,13 @@ bool PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you)
 					hitScore = (int)(hitScore * 0.25f);// スコア半減
 
 					// 懇親の
-					if (my->GetDir()==DIR::RIGHT)
+					if (my->GetDir() == DIR::RIGHT)
 					{
-						my->SetMove(Vector3(-1,0,0));
+						my->SetMove(Vector3(-0.5f,0,0));
 					}
 					else
 					{
-						my->SetMove(Vector3(1, 0, 0));
+						my->SetMove(Vector3(0.5f, 0, 0));
 					}
 				}
 

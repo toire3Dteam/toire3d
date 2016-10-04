@@ -87,8 +87,16 @@ bool RushAttackCansel(BasePlayer *pPerson)
 	// 攻撃キャンセル
 	if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
 	{
-		pPerson->GetFSM()->ChangeState(BasePlayerState::RushAttack::GetInstance());
-		return true;
+		if (pPerson->isLand() == true)
+		{
+			pPerson->GetFSM()->ChangeState(BasePlayerState::RushAttack::GetInstance());
+			return true;
+		}
+		else
+		{
+			pPerson->GetFSM()->ChangeState(BasePlayerState::AerialAttack::GetInstance());
+			return true;
+		}
 	}
 	else return false;
 }
@@ -769,7 +777,9 @@ void BasePlayerState::Run::Execute(BasePlayer * pPerson)
 				pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
 			else
 			{
-				pPerson->GetFSM()->ChangeState(BasePlayerState::FrontBrake::GetInstance());
+				// ★　フロントブレーキ封印して待機にした
+				//pPerson->GetFSM()->ChangeState(BasePlayerState::FrontBrake::GetInstance());
+				pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
 			}
 		}
 	}
@@ -1621,8 +1631,19 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 					pPerson->GetRushAttack()->step++;
 					//pPerson->GetRushAttack()->bNextOK = false;
 
-					const float pow = 0.6f;
-					pPerson->AddMove((pPerson->GetDir() == DIR::RIGHT) ? Vector3(pow, 0, 0) : Vector3(-pow, 0, 0));
+					// 向いてる方向にキーを入力すると移動
+					const float pow = 0.6f;	
+					if(pPerson->GetDir() == DIR::RIGHT)
+					{
+						if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))// 方向キーを入力してたら
+						pPerson->AddMove(Vector3(pow, 0, 0));
+					}
+					else
+					{
+						if (pPerson->isPushInput(PLAYER_INPUT::LEFT)) // 方向キーを入力してたら
+						pPerson->AddMove(Vector3(-pow, 0, 0));
+					}
+						
 				}
 			}
 		}
@@ -1671,9 +1692,21 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 					pPerson->GetRushAttack()->step++;
 					//pPerson->GetRushAttack()->bNextOK = false;
 
-					const float pow = 0.2f;
-					pPerson->AddMove((pPerson->GetDir() == DIR::RIGHT) ? Vector3(pow, 0, 0) : Vector3(-pow, 0, 0));
+					//const float pow = 0.2f;
+					//pPerson->AddMove((pPerson->GetDir() == DIR::RIGHT) ? Vector3(pow, 0, 0) : Vector3(-pow, 0, 0));
 
+					// 向いてる方向にキーを入力すると移動
+					const float pow = 0.2f;
+					if (pPerson->GetDir() == DIR::RIGHT)
+					{
+						if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))// 方向キーを入力してたら
+							pPerson->AddMove(Vector3(pow, 0, 0));
+					}
+					else
+					{
+						if (pPerson->isPushInput(PLAYER_INPUT::LEFT)) // 方向キーを入力してたら
+							pPerson->AddMove(Vector3(-pow, 0, 0));
+					}
 				}
 			}
 		}
@@ -1973,6 +2006,7 @@ void BasePlayerState::LandRecovery::Enter(BasePlayer * pPerson)
 
 	// リカバー中は無敵！！！
 	//pPerson->SetInvincibleLV(1);
+	pPerson->SetInvincible(12, 1);
 
 	// エフェクト発動」
 	pPerson->AddEffectAction(pPerson->GetPos() + Vector3(0, 5, -3), EFFECT_TYPE::RECOVERY);
@@ -2961,7 +2995,7 @@ void BasePlayerState::OverDrive_OneMore::Execute(BasePlayer * pPerson)
 		//	攻撃ボタン
 		//============================================
 		if (RushAttackCansel(pPerson)) return;
-
+		
 		//////////////////////////////////////////////
 		//	フィニッシュ攻撃ボタン
 		//============================================
@@ -3247,12 +3281,12 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 										 if (hdi->FlyVector.x > 0.0f)
 										 {
 											 pPerson->SetDir(DIR::LEFT);
-											 pPerson->SetMove(Vector3(1.25f, 0, 0));
+											 pPerson->SetMove(Vector3(1.0f, 0, 0));
 										 }
 										 else
 										 {
 											 pPerson->SetDir(DIR::RIGHT);
-											 pPerson->SetMove(Vector3(-1.25f, 0, 0));
+											 pPerson->SetMove(Vector3(-1.0f, 0, 0));
 										 }
 										
 
@@ -3265,12 +3299,12 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 										 if (hdi->FlyVector.x > 0.0f)
 										 {
 											 pPerson->SetDir(DIR::LEFT);
-											 pPerson->SetMove(Vector3(2, 0, 0));
+											 pPerson->SetMove(Vector3(1.5f, 0, 0));
 										 }
 										 else
 										 {
 											 pPerson->SetDir(DIR::RIGHT);
-											 pPerson->SetMove(Vector3(-2, 0, 0));
+											 pPerson->SetMove(Vector3(-1.5f, 0, 0));
 										 }
 									 }
 

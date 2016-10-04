@@ -1116,6 +1116,14 @@ void AIState::RushAtack::Execute(AI * pPerson)
 	//if (Flame > 5)
 	{
 		Flame = 0;
+		if (MyPlayer->GetDir()== DIR::RIGHT)
+		{
+			pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+		}
+		else
+		{
+			pPerson->PushInputList(PLAYER_INPUT::LEFT);
+		}
 		pPerson->PushInputList(PLAYER_INPUT::B);
 
 	}

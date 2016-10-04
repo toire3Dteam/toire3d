@@ -126,10 +126,25 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
 		}
 		return 0;
-		case VK_F3:
+		case VK_F3:		// スクリーンショット
 		{
+			Surface* pBackBuffer;
 
+			// BackBufferに保存
+			tdnSystem::GetDevice()->GetRenderTarget(0, &pBackBuffer);
+			
+			
+			time_t now = time(NULL);
+			struct tm *pnow = localtime(&now);
 
+			char buff[128] = "";
+			sprintf(buff, "Data/ScreenShot/%d年%d月%d日%d時%d分%d秒.png", pnow->tm_year + 1900, pnow->tm_mon + 1, pnow->tm_mday, pnow->tm_hour, pnow->tm_min, pnow->tm_sec);
+
+			
+			D3DXSaveSurfaceToFile(buff, D3DXIFF_PNG, pBackBuffer, NULL, NULL);
+
+			//Surfaceの解放	
+			SAFE_RELEASE(pBackBuffer);
 			
 		}
 		return 0;

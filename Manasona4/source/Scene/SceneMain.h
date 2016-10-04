@@ -10,7 +10,6 @@
 // ‘O•ûéŒ¾
 class MyMusicManager;
 class Camera;
-class sceneMain;
 //class Stage::Base;	// ~
 namespace Stage{		// ›
 	class Base;

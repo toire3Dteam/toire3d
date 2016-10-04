@@ -10,7 +10,7 @@ GameUIManager *GameUIManager::pInstance = nullptr;
 /***************/
 GameUIManager::GameUIManager() :BaseGameEntity(ENTITY_ID::UI_MGR)	// エンティティID登録
 {
-	m_teamPic = new tdn2DObj("Data/UI/Game/team.png");
+	m_teamPic = new tdn2DObj("Data/UI/Game/GameUI2.png");
 
 	//m_combo
 }

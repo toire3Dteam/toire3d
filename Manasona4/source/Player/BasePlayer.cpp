@@ -499,7 +499,7 @@ void BasePlayer::Render()
 	if (m_InvincibleTime > 0) m_pObj->Render(RS::ADD);
 
 	// ここで現在のステートマシンの状態を確認
-	if (m_deviceID == 1)
+	if (m_deviceID == 0)
 	{
 		m_pStateMachine->Render();// ステートマシンでの描画
 		
