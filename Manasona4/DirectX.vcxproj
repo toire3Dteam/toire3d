@@ -120,8 +120,6 @@
     <ClCompile Include="source\Collision\Collision.cpp" />
     <ClCompile Include="source\Data\PlayerData.cpp" />
     <ClCompile Include="source\DeferredEx\DeferredEx.cpp" />
-    <ClCompile Include="source\EffectTool\Effect2D.cpp" />
-    <ClCompile Include="source\EffectTool\Effect2DManager.cpp" />
     <ClCompile Include="source\Effect\AnimationPanel.cpp" />
     <ClCompile Include="source\Effect\AnimationRipple.cpp" />
     <ClCompile Include="source\Effect\AnimationRippleEx.cpp" />
@@ -145,7 +143,6 @@
     <ClCompile Include="source\PostEffect\PostEffect.cpp" />
     <ClCompile Include="source\ResultPerformance\BaseResultPerformance.cpp" />
     <ClCompile Include="source\SceneSwitch\SceneSwitch.cpp" />
-    <ClCompile Include="source\Scene\SceneEffectTool.cpp" />
     <ClCompile Include="source\Scene\sceneLoading.cpp" />
     <ClCompile Include="source\Scene\SceneMain.cpp" />
     <ClCompile Include="source\Scene\SceneMainState.cpp" />
@@ -215,8 +212,6 @@
     <ClInclude Include="source\Collision\Collision.h" />
     <ClInclude Include="source\Data\PlayerData.h" />
     <ClInclude Include="source\DeferredEx\DeferredEx.h" />
-    <ClInclude Include="source\EffectTool\Effect2D.h" />
-    <ClInclude Include="source\EffectTool\Effect2DManager.h" />
     <ClInclude Include="source\Effect\AnimationPanel.h" />
     <ClInclude Include="source\Effect\AnimationRipple.h" />
     <ClInclude Include="source\Effect\AnimationRippleEx.h" />
@@ -242,7 +237,6 @@
     <ClInclude Include="source\resource.h" />
     <ClInclude Include="source\ResultPerformance\BaseResultPerformance.h" />
     <ClInclude Include="source\SceneSwitch\SceneSwitch.h" />
-    <ClInclude Include="source\Scene\SceneEffectTool.h" />
     <ClInclude Include="source\Scene\sceneLoading.h" />
     <ClInclude Include="source\Scene\SceneMain.h" />
     <ClInclude Include="source\Scene\SceneMainState.h" />

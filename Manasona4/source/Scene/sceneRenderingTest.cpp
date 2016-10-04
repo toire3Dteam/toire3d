@@ -17,9 +17,6 @@
 
 #include "../PointLight/PointLight.h"
 
-#include "EffectTool\Effect2D.h"
-#include "EffectTool\Effect2DManager.h"
-
 //******************************************************************
 //		‰Šú‰»E‰ğ•ú
 //******************************************************************

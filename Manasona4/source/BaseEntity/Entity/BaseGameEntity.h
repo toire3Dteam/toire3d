@@ -31,7 +31,7 @@ public:
 	virtual ~BaseGameEntity();
 
 	// 全てのエンティティにUpdateを引き継ぐよう純粋仮想関数に
-	virtual void Update() = 0;
+	virtual void Update(){};
 
 	/*
 		メッセージを作成と配信をする

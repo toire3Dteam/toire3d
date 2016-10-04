@@ -13,7 +13,7 @@ namespace GAME_ID
 	enum _ENUM_ENTITY_ID
 	{
 		ID_ERROR,					//エラーID
-
+		SCENE_MAIN,					// シーンメイン
 		PLAYER_MGR,					// マネージャーのID 
 		JUDGE_MNG,					// ジャッジマネージャーID
 		CAMERA_MGR,					// カメラマネージャーID

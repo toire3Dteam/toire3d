@@ -3,7 +3,6 @@
 #include	"../Scene/sceneMain.h"
 #include	"../Scene/sceneRenderingTest.h"
 #include	"../Scene/sceneResult.h"
-#include	"../Scene/SceneEffectTool.h"
 #include	"System.h"
 #include	"../Sound/SoundManager.h"
 //*****************************/
