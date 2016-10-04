@@ -11,6 +11,10 @@ AI::AI(int DeviceID,BasePlayer* myBasePlayer)
 	// AIに必要なパラメーター
 	m_iChaseFrame = 0;		// 一途に追いかけてる時間
 	m_iWaitFrame = 0;		// もじもじしてる時間
+	m_iGuardFrame = 0;		// ガードしてる時間
+
+	m_iPracticeGuardFrame = 120;
+	m_bPracticeGuardFlag = true;
 
 	m_pTargetPlayer = nullptr;
 
@@ -20,8 +24,8 @@ AI::AI(int DeviceID,BasePlayer* myBasePlayer)
 
 	// ステートマシン　引数は自分自身のポインタ
 	m_pStateMachine = new StateMachine<AI>(this);
-	m_pStateMachine->SetGlobalState(AIState::Global::GetInstance());// グローバル
-	m_pStateMachine->SetCurrentState(AIState::Chase::GetInstance());
+	m_pStateMachine->SetGlobalState(AIState::PracticeGlobal::GetInstance());// グローバル
+	m_pStateMachine->SetCurrentState(AIState::PracticeLand::GetInstance());
 
 	// インプットフラグ初期化
 	memset(m_bPushFlag, false, sizeof(bool) * (int)PLAYER_INPUT::MAX);

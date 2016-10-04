@@ -1,53 +1,63 @@
 #include "TDNLIB.h"
-#include "../system/Framework.h"
 #include "SceneMain.h"
 #include "../Stage/Stage.h"
 #include "../Sound/SoundManager.h"
 #include "../PostEffect/PostEffect.h"
 #include "../Effect/Particle.h"
-
+#include "../Effect/PanelEffect/PanelEffectManager.h"
+#include "../Effect/UVEffect/UVEffectManager.h"
+#include "../Timer/Timer.h"
 #include "../Stage/Stage.h"
 #include "../Camera/camera.h"
 #include "../Player/BasePlayer.h"
 #include "../Player/PlayerManager.h"
 #include "../BaseEntity/Message/MessageDispatcher.h"
-
-#include "../Effect/PanelEffect/PanelEffectManager.h"
-#include "../Effect/UVEffect/UVEffectManager.h"
-
+#include "SceneMainState.h"
+#include "../Fade/Fade.h"
 #include "../DeferredEx/DeferredEx.h"
 
 #include "../PointLight/PointLight.h"
 
 #include "../Number/Number.h"
 #include "../UI/GameUI.h"
+//#include "../UI/Combo.h"
 
+///Combo* com;
 
 //BaseEffect* g_eff;
 //EffectManager;
 PanelEffectManager* m_panel;
 UVEffectManager* g_uvEffect;
 
+int stopTimer = 0;
+
+
 //******************************************************************
 //		初期化・解放
 //******************************************************************
+sceneMain::sceneMain() :BaseGameEntity(ENTITY_ID::SCENE_MAIN)
+{
 
+}
 bool sceneMain::Initialize()
 {
+	//com = new Combo();
+
 	m_dirLight = Vector3(1, -1, 1);
 
 	//g_eff = new HitEffect();
 	m_panel	   = new PanelEffectManager();
+	m_fLoadPercentage = .05f;	// ロード割合
 	g_uvEffect = new UVEffectManager();
 
-
+	m_fLoadPercentage = .1f;	// ロード割合
 	// カメラ初期化
-	m_pCamera = new Camera();
+	//CameraMgr = new Camera();
 
 	m_fLoadPercentage = .25f;	// ロード割合
 
 	// ステージ初期化
-	Stage::Base::CreateStage(&m_pStage, STAGE_ID::SENJO, m_pCamera);	// 関数の中で作ってもらう
+	Stage::Base::CreateStage(&m_pStage, STAGE_ID::SENJO, CameraMgr);	// 関数の中で作ってもらう
 
 	m_fLoadPercentage = .5f;	// ロード割合
 
@@ -55,8 +65,10 @@ bool sceneMain::Initialize()
 	//m_pPlayerMgr = new PlayerManager(4, m_pStage);
 	PlayerMgr->Initialize(2, m_pStage);
 
+	m_fLoadPercentage = .75f;	// ロード割合
+
 	// プレイヤーの座標のアドレスをカメラに渡してあげる(いじることは絶対に無く、ただ参照するだけ)
-	m_pCamera->SetPlayersPos();
+	CameraMgr->SetPlayersPos();
 
 	m_fLoadPercentage = 1.0f;	// ロード割合
 
@@ -77,7 +89,14 @@ bool sceneMain::Initialize()
 	
 	GameUIMgr;
 
+	// タイム初期化
+	TimeMgr->Reset(60);
+
 	m_stageScreen = new tdn2DObj(tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom, TDN2D::HDR);
+
+	/* ステートマシン初期化 */
+	m_pStateMachine = new StateMachine<sceneMain>(this);
+	m_pStateMachine->SetCurrentState(SceneMainState::Intro::GetInstance());	// ステートの設定
 
 	return true;
 }
@@ -86,7 +105,7 @@ sceneMain::~sceneMain()
 {
 	delete m_pMyMusicMgr;
 	delete m_pStage;
-	delete m_pCamera;
+	//delete CameraMgr;
 	PlayerMgr->Release();
 	//EffectMgr.Release();
 	SAFE_DELETE(m_panel);
@@ -94,29 +113,42 @@ sceneMain::~sceneMain()
 	ParticleManager::Release();
 	DeferredManagerEx.Release();
 	SAFE_DELETE(m_stageScreen);
-
+	delete m_pStateMachine;
 	PointLightMgr->Release();
 
 	NumberEffect.Release();
 
 	GameUIMgr->Rerease();
 
+	//SAFE_DELETE(com);
 }
 
 //******************************************************************
 //		処理
 //******************************************************************
 
-bool sceneMain::Update()
+void sceneMain::Update()
 {
+
+//	com->Update();
+
+	stopTimer++;
+	//if (stopTimer > 60 * 60)
+	//{
+	//	return true;
+	//}
+
+	// フェード更新
+	Fade::Update();
+
 	// カメラ更新
-	m_pCamera->Update();
+	CameraMgr->Update();
 
 	// ステージ更新
 	m_pStage->Update();
 
 	// プレイヤー更新
-	PlayerMgr->Update();
+	//PlayerMgr->Update();
 
 	// パーティクル更新
 	ParticleManager::Update();
@@ -149,17 +181,65 @@ bool sceneMain::Update()
 
 	if (KeyBoardTRG(KB_L))
 	{
-
-
-		PointLightManager::GetInstance()->AddPointLight(Vector3(10, 3, 0), Vector3(0, 1, 1), 100, 4, 60, 20, 40);
+	//	PointLightManager::GetInstance()->AddPointLight(Vector3(10, 3, 0), Vector3(0, 1, 1), 100, 4, 60, 20, 40);
 
 		//g_eff->Action(0,0);
 		//EffectMgr.AddEffect(Vector3(0, 0, -5), EFFECT_TYPE::BURN);
 		//EffectMgr.AddEffect(Vector3(0, 0, -5), EFFECT_TYPE::NOTICE);
 
-		m_panel->AddEffect(Vector3(0, 5, -5), PANEL_EFFECT_TYPE::DAMAGE);
-		//g_uvEffect->AddEffect(Vector3(0, 0, -5), UV_EFFECT_TYPE::WAVE);
-		g_uvEffect->AddEffect(Vector3(5, 5, -5), UV_EFFECT_TYPE::UPPER, 1.0f, 1.5f);
+		m_panel->AddEffect(Vector3(0, 5, -5), PANEL_EFFECT_TYPE::GLASS);
+
+		//g_uvEffect->AddEffectRoop(Vector3(5, 5, 0), UV_EFFECT_TYPE::GUARD, 1.0f, 1.0f);
+
+		//g_uvEffect->AddEffect(Vector3(-4, 0, -5), UV_EFFECT_TYPE::CONV,2,2
+		//	, Vector3(0, 0, 0), Vector3(0, 0, 0));
+
+		//g_uvEffect->AddEffect(Vector3(4, 0, -5), UV_EFFECT_TYPE::CONV2, 2, 2
+		//	, Vector3(0, 0, 0), Vector3(0, 0, 0));
+
+		//g_uvEffect->AddEffect(Vector3(10, 0, -5), UV_EFFECT_TYPE::CONV3, 1, 1
+		//	, Vector3(0, 0, 0), Vector3(0, 0, 0));
+	}
+	if (KeyBoardTRG(KB_NUMPAD1))
+	{
+		g_uvEffect->AddEffect(Vector3(-2, -5,0 ), UV_EFFECT_TYPE::CONV, 2, 2
+			, Vector3(0, 0, 0), Vector3(0, 0, 0));
+
+	}
+	if (KeyBoardTRG(KB_NUMPAD2))
+	{
+		g_uvEffect->AddEffect(Vector3(2, -5, 0), UV_EFFECT_TYPE::CONV2, 2, 2
+			, Vector3(0, 0, 0), Vector3(0, 0, 0));
+
+	}
+	if (KeyBoardTRG(KB_NUMPAD3))
+	{
+		g_uvEffect->AddEffect(Vector3(0, -5, 0), UV_EFFECT_TYPE::CONV3, 2, 2
+			, Vector3(0, 0, 0), Vector3(0, 0, 0));
+
+	}
+	if (KeyBoardTRG(KB_NUMPAD7))
+	{
+		g_uvEffect->AddEffect(Vector3(0, -5, 0), UV_EFFECT_TYPE::CONV4, 2, 2
+			, Vector3(0, 0, 0), Vector3(0, 0, 0));
+
+	}
+	if (KeyBoardTRG(KB_NUMPAD8))
+	{
+		g_uvEffect->AddEffect(Vector3(0, 0, 0), UV_EFFECT_TYPE::BURST_BALL, 1, 2
+			, Vector3(0, 0, 0), Vector3(0, 0, 0));
+
+	}
+
+	if (KeyBoardTRG(KB_I))
+	{		
+		g_uvEffect->AddEffect(Vector3(10, 5, -5), UV_EFFECT_TYPE::CONV, 2, 2
+			, Vector3(1.14f, 0, 0), Vector3(1.14f, 0, 0));
+	}
+
+	if (KeyBoardTRG(KB_M))
+	{
+		//g_uvEffect->StopEffectRoop(UV_EFFECT_TYPE::GUARD);
 	}
 
 	if (KeyBoardTRG(KB_K))
@@ -174,12 +254,14 @@ bool sceneMain::Update()
 		}
 	}
 
-
 	//g_eff->Update();
 	//EffectMgr.Update();
 	m_panel->Update();
 	g_uvEffect->Update();
-	return true;
+
+
+	// ★ステートマシン更新(何故ここに書くかというと、中でシーンチェンジの処理を行っているため)
+	m_pStateMachine->Update();
 }
 
 //******************************************************************
@@ -189,7 +271,7 @@ bool sceneMain::Update()
 void sceneMain::Render()
 {
 	// カメラ
-	m_pCamera->Activate();
+	CameraMgr->Activate();
 
 	if (m_bShaderFlag)
 	{
@@ -200,7 +282,7 @@ void sceneMain::Render()
 
 
 		// シェーダ更新
-		DeferredManagerEx.G_Update(m_pCamera->m_pos);
+		DeferredManagerEx.G_Update(CameraMgr->m_pos);
 
 		// 影
 		RenderShadow();
@@ -228,8 +310,8 @@ void sceneMain::Render()
 		{
 			DeferredManagerEx.FinalBegin();
 
-			int dim= PlayerMgr->GetOverDriveDim();
-			m_stageScreen->SetARGB(255, dim, dim, dim);
+			//int dim= PlayerMgr->GetOverDriveDim();
+			//m_stageScreen->SetARGB(255, dim, dim, dim);
 			m_stageScreen->Render(0, 0, RS::COPY_NOZ);// ※Z値考慮させてない理由は↓の絵を描画するため
 
 			// プレイヤー
@@ -249,14 +331,21 @@ void sceneMain::Render()
 		DeferredManagerEx.BloomRender();
 
 
-		NumberEffect.Render();
-	
+		// UI
+		NumberEffect.Render();	
+		PlayerMgr->RenderUI();
 		GameUIMgr->Render();
+
+		// ★ここにステートマシン描画(多分2D関係が多いんじゃないかと)
+		//m_pStateMachine->Render();
 
 		if (KeyBoard(KB_J))
 		{
 			SurfaceRender();
 		}
+
+		// フェード描画
+		Fade::Render();
 	}
 	else
 	{
@@ -269,10 +358,14 @@ void sceneMain::Render()
 		m_panel->Render();
 		m_panel->Render3D();
 		g_uvEffect->Render();
-
 	}
-	tdnText::Draw(0, 30, 0xffffffff, "CameraPos    : %.1f %.1f %.1f", m_pCamera->m_pos.x, m_pCamera->m_pos.y, m_pCamera->m_pos.z);
-	tdnText::Draw(0, 60, 0xffffffff, "CameraTarget : %.1f %.1f %.1f", m_pCamera->m_target.x, m_pCamera->m_target.y, m_pCamera->m_target.z);
+
+	//com->Render(400, 400);
+
+	tdnText::Draw(0, 30, 0xffffffff, "CameraPos    : %.1f %.1f %.1f", CameraMgr->m_pos.x, CameraMgr->m_pos.y, CameraMgr->m_pos.z);
+	tdnText::Draw(0, 60, 0xffffffff, "CameraTarget : %.1f %.1f %.1f", CameraMgr->m_target.x, CameraMgr->m_target.y, CameraMgr->m_target.z);
+
+
 }
 
 void sceneMain::RenderStage()
@@ -281,14 +374,18 @@ void sceneMain::RenderStage()
 	// まずは今のサーフェイスを保存
 	tdnSystem::GetDevice()->GetRenderTarget(0, &save);
 
-	m_stageScreen->RenderTarget(); //切り替え
+	m_stageScreen->RenderTarget(0); //切り替え
+	DeferredManagerEx.GetTex(SURFACE_NAME_EX::BLOOM_SEED)->RenderTarget(1); //切り替え
+
+	// ステージ用のパラメータ
+	shaderM->SetValue("g_OverDriveDim", PlayerMgr->GetOverDriveDim());
 
 	// ステージ描画
-	m_pStage->Render(shaderM, "DefaultLighting");
+	m_pStage->Render(shaderM, "Stage");
 
 
 	tdnSystem::GetDevice()->SetRenderTarget(0, save);//レンダーターゲットの復元
-
+	tdnSystem::GetDevice()->SetRenderTarget(1, nullptr);
 }
 
 void sceneMain::RenderShadow()

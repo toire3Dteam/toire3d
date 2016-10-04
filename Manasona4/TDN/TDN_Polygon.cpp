@@ -187,6 +187,23 @@ void	tdnPolygon::Rect(int DstX, int DstY, int DstW, int DstH, tdnShader* shader,
 	Render2D(v, 2, NULL, shader, name);
 }
 
+void	tdnPolygon::Rect(int x, int y, int size, u32 dwFlags , COLOR color)
+{
+	TLVERTEX	v[4];
+
+	v[0].sx = v[2].sx = (FLOAT)x;
+	v[1].sx = v[3].sx = (FLOAT)(x + size);
+
+	v[0].sy = v[1].sy = (FLOAT)y;
+	v[2].sy = v[3].sy = (FLOAT)(y + size);
+
+	v[0].sz = v[1].sz = v[2].sz = v[3].sz = 0.0f;
+	v[0].color = v[1].color = v[2].color = v[3].color = color;
+	v[0].rhw = v[1].rhw = v[2].rhw = v[3].rhw = 1.0f;
+
+	Render2D(v, 2, NULL, dwFlags);
+}
+
 
 //*****************************************************************************
 //	ê¸ï`âÊ

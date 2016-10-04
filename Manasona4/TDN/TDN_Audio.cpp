@@ -952,16 +952,24 @@ DWORD WINAPI ThreadIIDX(LPDWORD lpdwParam)
 
 		case WAIT_TIMEOUT:		switch (lpStream->GetMode()){
 		case STR_NORMAL:		break;
-		case STR_FADEIN:	lpStream->SetVolume(lpStream->GetVolume() + lpStream->GetParam());
+		case STR_FADEIN:
+		{
+			float rate((lpStream->GetVolume() + lpStream->GetParam()) / 255.0f);
+			lpStream->SetVolume(rate);
 			if (lpStream->GetVolume() >= 255) lpStream->SetMode(STR_NORMAL, 0);
+		}
 			break;
-		case STR_FADEOUT:	lpStream->SetVolume(lpStream->GetVolume() - lpStream->GetParam());
+		case STR_FADEOUT:
+		{
+			float rate((lpStream->GetVolume() - lpStream->GetParam()) / 255.0f);
+			lpStream->SetVolume(rate);
 			if (lpStream->GetVolume() <= 0){
 				lpStream->Stop();
 				delete lpStream;
 				ExitThread(TRUE);
 				return 0;
 			}
+		}
 			break;
 		}
 								break;
@@ -1239,16 +1247,16 @@ void tdnStreamSound::Stop()
 	lpStream->Stop();
 }
 
-void tdnStreamSound::SetVolume(int volume)
+void tdnStreamSound::SetVolume(float volume)
 {
 	int		vol;
 	if (lpStream == nullptr) return;
 	/*	音量セット	*/
-	if (volume > 255) volume = 255;
-	if (volume < 0) volume = 0;
-	this->volume = volume;
-	volume -= 255;
-	vol = (volume*volume * 100 / (255 * 255));
+	volume = Math::Clamp(volume, 0, 1);
+	vol = (int)(255 * volume);
+	this->volume = vol;
+	vol -= 255;
+	vol = (vol*vol * 100 / (255 * 255));
 	lpStream->SetVolume(-vol*vol);
 }
 
@@ -2135,7 +2143,7 @@ tdnStreamSound* tdnSoundBGM::PlayStream(char* filename, BYTE mode, int param)
 	if (lpDS == nullptr) return nullptr;
 
 	lpStream = new tdnStreamSound(lpDS, filename, mode, param);
-	lpStream->SetVolume((int)(m_fBaseVolume * 255));				// ★基本ボリューム設定
+	lpStream->SetVolume(m_fBaseVolume);				// ★基本ボリューム設定
 	return lpStream;
 }
 

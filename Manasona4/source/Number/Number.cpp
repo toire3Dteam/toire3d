@@ -129,6 +129,8 @@ void Number::Render(int x, int y, int num, NUM_KIND kind)
 	switch (kind)
 	{
 	case Number::NUM_KIND::NORMAL:
+		m_pic->SetAngle(0.0f);
+
 		for (int count = 0;; ++count)
 		{
 			int digitNum = number % 10;	// 一番小さい桁を入手
@@ -196,6 +198,32 @@ void Number::Render(int x, int y, int num, NUM_KIND kind)
 
 		break;
 	}
+	case Number::NUM_KIND::COMBO:
+		for (int count = 0;; ++count)
+		{
+			int digitNum = number % 10;	// 一番小さい桁を入手
+			number = (int)(number / 10);// 数値の一番小さい桁を消す
+
+			m_pic->SetAngle(0.3f);
+			m_pic->Render(x - ((count * (m_picSize / 2))*m_picScale), y + count*20, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize);// 数字描画
+
+			if (number <= 0)break;// 数値が０以下になったらさよなら
+		}
+
+		break;
+	case Number::NUM_KIND::DAMAGE_SCORE:
+		m_pic->SetAngle(0.0f);
+
+		for (int count = 0;; ++count)
+		{
+			int digitNum = number % 10;	// 一番小さい桁を入手
+			number = (int)(number / 10);// 数値の一番小さい桁を消す
+
+			m_pic->Render(x - ((count * (int)(m_picSize / 1.5f))*m_picScale), y, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize);// 数字描画
+
+			if (number <= 0)break;// 数値が０以下になったらさよなら
+		}
+		break;
 	default:
 		//for (int count = 0;; ++count)
 		//{

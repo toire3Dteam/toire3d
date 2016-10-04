@@ -5,6 +5,7 @@
 #include "../BaseEntity/Entity/BaseGameEntity.h"
 #include "../BaseEntity/State/StateMachine.h"
 
+//#include "Combo.h"
 
 
 class GameUIManager :public BaseGameEntity
@@ -40,6 +41,7 @@ private:
 
 	tdn2DObj* m_teamPic;
 
+	//Combo* m_combo;
 
 };
 

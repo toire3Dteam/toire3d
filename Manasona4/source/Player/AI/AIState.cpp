@@ -189,6 +189,7 @@ AIState::PracticeGlobal* AIState::PracticeGlobal::GetInstance()
 
 void AIState::PracticeGlobal::Enter(AI * pPerson)
 {
+
 }
 
 void AIState::PracticeGlobal::Execute(AI * pPerson)
@@ -233,11 +234,11 @@ void AIState::PracticeJump::Enter(AI * pPerson)
 
 void AIState::PracticeJump::Execute(AI * pPerson)
 {
+	// 
 	if (MyPlayer->isLand())
 	{
-		// ジャンプボタン押してる
+		// ジャンプ
 		pPerson->PushInputList(PLAYER_INPUT::C);
-
 	}
 
 }
@@ -258,6 +259,83 @@ bool AIState::PracticeJump::OnMessage(AI * pPerson, const Message & msg)
 	//{
 	//}
 
+	return false;
+}
+
+/*******************************************************/
+//				練習用地面ステート
+/*******************************************************/
+
+AIState::PracticeLand * AIState::PracticeLand::GetInstance()
+{
+	// ここに変数を作る
+	static AIState::PracticeLand instance;
+	return &instance;
+}
+
+void AIState::PracticeLand::Enter(AI * pPerson)
+{
+	pPerson->SetPracticeGuardFrame(120);
+	pPerson->SetPracticeGuardFlag(true);
+}
+
+void AIState::PracticeLand::Execute(AI * pPerson)
+{
+	
+	// ★何か攻撃を受けている最中ならば
+	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::KnockBack::GetInstance()) == true ||
+		MyPlayer->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) == true ||
+		MyPlayer->GetFSM()->isInState(*BasePlayerState::AerialKnockBack::GetInstance()) == true
+		)
+	{
+		// 復帰ボタン
+		pPerson->PushInputList(PLAYER_INPUT::A);
+		pPerson->SetPracticeGuardFrame(0);
+		pPerson->SetPracticeGuardFlag(false);
+	}
+
+
+	//  まだガードフラグがたっていなくリカバリー？できていたら
+	if (pPerson->GetPracticeGuardFlag() == false)
+	{
+		// ノックバック・空中リカバリー・地上リカバリーが前のステートになっていたらガードする
+		if (MyPlayer->GetFSM()->isInState(*BasePlayerState::Wait::GetInstance()) == true ||
+			MyPlayer->GetFSM()->isPrevState(*BasePlayerState::AerialRecovery::GetInstance()) == true ||
+			MyPlayer->GetFSM()->isPrevState(*BasePlayerState::LandRecovery::GetInstance()) == true)
+		{
+			pPerson->PushInputList(PLAYER_INPUT::R1);// ガードする
+			pPerson->SetPracticeGuardFlag(true);
+		}
+	}
+	else
+	{
+		pPerson->AddPracticeGuardFrame(1);
+		if (pPerson->GetPracticeGuardFrame() < 60)
+		{
+			pPerson->PushInputList(PLAYER_INPUT::R1);// ガードする
+			//pPerson->SetPracticeGuardFrame(0);
+			//pPerson->SetPracticeGuardFlag(false);
+		}
+
+	}
+
+}
+
+void AIState::PracticeLand::Exit(AI * pPerson)
+{
+}
+
+void AIState::PracticeLand::Render(AI * pPerson)
+{
+	tdnText::Draw(420, 610, 0xffffffff, "AI地面");
+}
+
+bool AIState::PracticeLand::OnMessage(AI * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+	//}
 	return false;
 }
 
@@ -362,8 +440,12 @@ void AIState::Space::Execute(AI * pPerson)
 			else
 			{
 
-				// 回避してみる
-				pPerson->GetFSM()->ChangeState(AIState::Escape::GetInstance());
+				// 回避してみる 
+				//pPerson->GetFSM()->ChangeState(AIState::Escape::GetInstance());	
+				// 改めガードして見る
+				//pPerson->GetFSM()->ChangeState(AIState::Guard::GetInstance());
+				// 適当に何かさせる
+
 				return;
 
 			}
@@ -443,8 +525,8 @@ void AIState::SimpleJump::Execute(AI * pPerson)
 	// ジャンプの踏み込みはカウントしない
 	if (MyPlayer->GetJump()->bHold == false)
 	{
-		// 地上に着地したら
-		if (MyPlayer->isLand())
+		// 地上に着地したら かつ　待機ステートにいれば
+		if (MyPlayer->isLand() && MyPlayer->GetFSM()->isInState(*BasePlayerState::Wait::GetInstance()) == true)
 		{
 			// 追いかけに戻る
 			pPerson->GetFSM()->ChangeState(AIState::Chase::GetInstance());
@@ -471,8 +553,6 @@ bool AIState::SimpleJump::OnMessage(AI * pPerson, const Message & msg)
 /*******************************************************/
 //				回避ステート
 /*******************************************************/
-//かいひすてーとつくるぞー
-//かいひのじょうほうどっからとおってくる？
 
 AIState::Escape * AIState::Escape::GetInstance()
 {
@@ -483,8 +563,16 @@ AIState::Escape * AIState::Escape::GetInstance()
 
 void AIState::Escape::Enter(AI * pPerson)
 {
-	// 回避ボタン押す
+	Vector3 TargetPos = pPerson->GetTargetPlayer()->GetPos();
+	Vector3 MyPos = MyPlayer->GetPos();
+
+	// ガード＋移動で　回避発動させる
 	pPerson->PushInputList(PLAYER_INPUT::R1);
+	// 相手の場所に応じて
+	if (TargetPos.x < MyPos.x) pPerson->PushInputList(PLAYER_INPUT::LEFT);
+	else pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+
+
 }
 
 void AIState::Escape::Execute(AI * pPerson)
@@ -509,6 +597,101 @@ void AIState::Escape::Render(AI * pPerson)
 }
 
 bool AIState::Escape::OnMessage(AI * pPerson, const Message & msg)
+{
+	return false;
+}
+
+/*******************************************************/
+//				ガードステート
+/*******************************************************/
+
+AIState::Guard * AIState::Guard::GetInstance()
+{
+	// ここに変数を作る
+	static AIState::Guard instance;
+	return &instance;
+}
+
+void AIState::Guard::Enter(AI * pPerson)
+{
+	// ガードボタン押す
+	pPerson->PushInputList(PLAYER_INPUT::R1);
+}
+
+void AIState::Guard::Execute(AI * pPerson)
+{
+	//　ガードボタンを押し続ける
+	pPerson->PushInputList(PLAYER_INPUT::R1);
+	
+	// ガード後または待機になっていたら
+	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::Wait::GetInstance()) == true ||
+		MyPlayer->GetFSM()->isPrevState(*BasePlayerState::Guard::GetInstance()) == true)
+	{
+		pPerson->GetFSM()->ChangeState(AIState::Chase::GetInstance());
+		return;
+	}
+	
+	// 一度のガード時間　最高でも8フレームは硬直
+
+	// 8フレーム毎に回避か防御継続かを判断
+	if (pPerson->GetGuardFrame() % 8 == 0)
+	{
+		Vector3 TargetPos = pPerson->GetTargetPlayer()->GetPos();
+		Vector3 MyPos = MyPlayer->GetPos();
+		float len = MyPlayer->AIAtackRange();
+
+		/***********************/
+		// 回避or防御
+		/***********************/
+		// 相手が攻撃ステートなら
+		if (pPerson->GetTargetPlayer()->isAttackState())
+		{
+			if (tdnRandom::Get(0, 1) == 0)
+			{
+				// 一定まで相手が近くにいて
+				if (Math::Length(TargetPos, MyPos) < len)
+				{
+					// 回避してよける
+					pPerson->GetFSM()->ChangeState(AIState::Escape::GetInstance());
+					return;
+				}
+			}
+
+		}
+	}
+
+
+	// 40フレームまできたら今度は相手が攻撃していなかったらガードを解除
+	if (pPerson->GetGuardFrame() > 40)
+	{
+		pPerson->SetGuardFrame(0);// リセット
+
+		// 相手が攻撃していなかったら
+		if (pPerson->GetTargetPlayer()->isAttackState()==false)
+		{
+			// ガード解除
+			pPerson->GetFSM()->ChangeState(AIState::SimpleJump::GetInstance());
+			return;
+
+		}
+
+	}
+
+	pPerson->AddGuardFrame(1);//++
+
+
+}
+
+void AIState::Guard::Exit(AI * pPerson)
+{
+}
+
+void AIState::Guard::Render(AI * pPerson)
+{
+	tdnText::Draw(420, 610, 0xffffffff, "AIGuard");
+}
+
+bool AIState::Guard::OnMessage(AI * pPerson, const Message & msg)
 {
 	return false;
 }
@@ -568,6 +751,12 @@ void AIState::Chase::Execute(AI * pPerson)
 		pPerson->GetFSM()->ChangeState(AIState::ChaseAir::GetInstance());
 		return;
 	}
+
+	/***********************************************************/
+	//pPerson->GetFSM()->ChangeState(AIState::Guard::GetInstance());
+	//return;
+	/***********************************************************/
+
 	//ふぃにっしゅあーつAIでｔくろうかなあああ
 	// 走ってるか歩いているかで ★（TODO）キャラクター毎にレンジを変える
 	float len = 0;
@@ -578,7 +767,7 @@ void AIState::Chase::Execute(AI * pPerson)
 	// 一定まで近づいたら
 	if (Math::Length(TargetPos, MyPos) < len)
 	{
-		if (tdnRandom::Get(0, 2) == (1||2))// なぞの式やけどええ感じやからこのままで
+		if (tdnRandom::Get(0, 2) == 0)// なぞの式やけどええ感じやからこのままで
 		{
 			// 前回空中攻撃をかましていなかったら
 			if (pPerson->GetFSM()->isPrevState(*AIState::AerialDropAtack::GetInstance()) != true)
@@ -594,13 +783,13 @@ void AIState::Chase::Execute(AI * pPerson)
 			MyPlayer->GetFSM()->isInState
 			(*BasePlayerState::Walk::GetInstance()) == true)
 		{
-			// 連続回避防止
-			if (pPerson->GetFSM()->isPrevState(*AIState::Escape::GetInstance()) != true)
+			// 連続で防御するの防止
+			if (pPerson->GetFSM()->isPrevState(*AIState::Guard::GetInstance()) != true)
 			{
 				//4分の１
 				if (tdnRandom::Get(0, 3) == 3)
 				{
-					pPerson->GetFSM()->ChangeState(AIState::Escape::GetInstance());
+					pPerson->GetFSM()->ChangeState(AIState::Guard::GetInstance());
 					return;
 				}
 			}
@@ -663,9 +852,14 @@ void AIState::Chase::Execute(AI * pPerson)
 			// ★（難易度に属する物）製作者の慈悲により絶対対空当てるマンを確立に
 			
 			// 2分の1の確立で対空攻撃
-			if (tdnRandom::Get(0, 1) == 0)
+			if (tdnRandom::Get(0, 2) == 0)
 			{
 				pPerson->GetFSM()->ChangeState(AIState::SetAnitiAir::GetInstance());
+				return;
+			}
+			else if (tdnRandom::Get(0, 2) == 0)
+			{
+				pPerson->GetFSM()->ChangeState(AIState::Guard::GetInstance());
 				return;
 			}
 			else
@@ -673,7 +867,6 @@ void AIState::Chase::Execute(AI * pPerson)
 				pPerson->GetFSM()->ChangeState(AIState::RushAtack::GetInstance());
 				return;
 			}
-			
 		}
 	}
 	
@@ -847,7 +1040,7 @@ void AIState::ChaseAir::Execute(AI * pPerson)
 			}
 		}
 	}
-	else
+	else// 落下ステートとか？
 	{			// 着地したら
 		if (MyPlayer->isLand() == true)
 		{
@@ -978,8 +1171,9 @@ void AIState::Recovery::Execute(AI * pPerson)
 		MyPlayer->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) == false &&
 		MyPlayer->GetFSM()->isInState(*BasePlayerState::AerialKnockBack::GetInstance()) == false)
 	{
-		// 追跡モードに戻る
-		pPerson->GetFSM()->ChangeState(AIState::Chase::GetInstance());
+			// 追跡モードに戻る
+			pPerson->GetFSM()->ChangeState(AIState::Chase::GetInstance());
+		
 	}
 
 }

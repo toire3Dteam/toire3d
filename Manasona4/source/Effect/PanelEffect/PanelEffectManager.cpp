@@ -330,7 +330,15 @@ PanelEffectManager::PanelEffectManager()
 		case PANEL_EFFECT_TYPE::ONEMORE_BURST:
 			m_basePanelEffect[i] = new OneMoreBurstEffect();
 			break;
-
+		case PANEL_EFFECT_TYPE::GUARD:
+			m_basePanelEffect[i] = new GuardActionEffect();
+			break;
+		case PANEL_EFFECT_TYPE::BURST_PREV:
+			m_basePanelEffect[i] = new BurstPrevEffect();
+			break;
+		case PANEL_EFFECT_TYPE::GLASS:
+			m_basePanelEffect[i] = new GlassEffect();
+			break;
 		default:
 			assert(0);		// "そんなエフェクトはない"
 			break;

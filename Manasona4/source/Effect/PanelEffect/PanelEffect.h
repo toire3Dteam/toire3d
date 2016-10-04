@@ -443,3 +443,60 @@ public:
 
 private:
 };
+
+class GuardActionEffect :public BasePanelEffect
+{
+public:
+	GuardActionEffect()
+	{
+		m_picSize = 256;
+		m_pic = new AnimationPanel("Data/Effect/guardAction3.png", 256, 256, 15, 1, 4, false);
+		//state = RS::COPY;
+		m_pic3DScale = 50;//3Dのスケール
+	};
+	~GuardActionEffect() {};
+
+	void Update() { BasePanelEffect::Update(); };
+	void Render() { BasePanelEffect::Render(); };
+	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+
+private:
+};
+
+class BurstPrevEffect :public BasePanelEffect
+{
+public:
+	BurstPrevEffect()
+	{
+		m_picSize = 256;
+		m_pic = new AnimationPanel("Data/Effect/burstPrev.png", 256, 256, 15, 1, 4, false);
+		//state = RS::COPY;
+		m_pic3DScale = 100;//3Dのスケール
+	};
+	~BurstPrevEffect() {};
+
+	void Update() { BasePanelEffect::Update(); };
+	void Render() { BasePanelEffect::Render(); };
+	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+
+private:
+};
+
+class GlassEffect :public BasePanelEffect
+{
+public:
+	GlassEffect()
+	{
+		m_picSize = 256;
+		m_pic = new AnimationPanel("Data/Effect/Glass.png", 256, 256, 15, 2, 4, false);
+		//state = RS::COPY;
+		m_pic3DScale = 80;//3Dのスケール
+	};
+	~GlassEffect() {};
+
+	void Update() { BasePanelEffect::Update(); };
+	void Render() { BasePanelEffect::Render(); };
+	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+
+private:
+};

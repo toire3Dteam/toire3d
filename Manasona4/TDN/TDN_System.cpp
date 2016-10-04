@@ -382,6 +382,80 @@ BOOL tdnSystem::InitD3D()
 	return TRUE;
 }
 
+BOOL tdnSystem::InitD3D(HWND hWnd)
+{
+	lpD3D = Direct3DCreate9(D3D_SDK_VERSION);
+	
+	// スクリーンサイズを取得
+	DWORD ScreenMode = SCREEN1280x720;
+	ScreenSize = GetScreenRect(ScreenMode); // モードに合わせサイズを取得
+											// アダプタの「現在」のディスプレイのサイズを取得する(FullScreen用)
+
+	D3DDISPLAYMODE d3ddm;
+	lpD3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm);// アダプタの現在のディスプレイ モードを取得する。今は使っていない
+
+
+		// D3Dデバイス(ウィンドウ)パラメータの設定
+		ZeroMemory(&d3dpp, sizeof(d3dpp));
+		d3dpp.Flags = 0;											// 
+		d3dpp.BackBufferHeight = ScreenSize.bottom;					// バックバッファの幅
+		d3dpp.BackBufferWidth = ScreenSize.right;					// バックバッファの高さ
+		d3dpp.BackBufferCount = 1;									// バックバッファの数　厳密に1つでなければいけない
+		d3dpp.hDeviceWindow = hWnd	;								// ウィンドウ　フルスクリーンの場合はカバーウィンドウに
+		d3dpp.EnableAutoDepthStencil = TRUE;						// TRUEなら深度ステンシルバッファを作成する
+		d3dpp.AutoDepthStencilFormat = D3DFMT_D24S8;				// デバイスが作成する自動深度ステンシルサーフェイスのフォーマット
+		d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;	// アダプタのリフレッシュレート　D3DPRESENT　
+		d3dpp.MultiSampleType = D3DMULTISAMPLE_NONE;				// _NONE->いずれのレベルのフルシーンマルチサンプリングも利用できない
+		d3dpp.MultiSampleQuality = 0;								// サンプル品質レベル
+
+		d3dpp.Windowed = TRUE;										// TRUEでウィンドウ　FALSEでフルスクリーン
+		d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;					// スワップチェーンの定義 D3DSWAPEFFECT_DISCARD
+		d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;					// D3DFMT_UNKNOWN->現在のディスプレイモードフォーマットを使う
+
+	//	デバイス作成
+	D3DCAPS9 Caps;
+	ZeroMemory(&Caps, sizeof(Caps));
+	//	HALチェック
+	//D3DDEVTYPE_HAL->ハードウェアによるラスター化。シェーディングは、ソフトウェア、ハードウェア、またはトランスフォームとライティングの組み合わせによって実行されます。
+	if (SUCCEEDED(lpD3D->GetDeviceCaps(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &Caps)))
+	{
+		// ここでOKだったら◎
+		// ハードウェアによる頂点処理を指定します。 と マルチスレッドを安全に行う(パフォーマンスは低い)
+		if (FAILED(lpD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED, &d3dpp, &Device)))
+		{
+			// ↑に失敗したら
+			// ソフトウェアおよびハードウェアによるミックスの頂点処理を指定します。 と　マルチスレッドを安全に行う(パフォーマンスは低い)
+			if (FAILED(lpD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_MIXED_VERTEXPROCESSING | D3DCREATE_MULTITHREADED, &d3dpp, &Device)))
+			{
+				// ↑に失敗したら
+				// ソフトウェアによる頂点処理を指定しますと　マルチスレッドを安全に行う(パフォーマンスは低い)
+				if (FAILED(lpD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED, &d3dpp, &Device)))
+				{
+					return FALSE;	// 無理ゲー
+				}
+			}
+		}
+	}
+	else 
+	{
+		ZeroMemory(&Caps, sizeof(Caps));
+		// Direct3D 機能が「ソフトウェア」に実装されます。ただし、リファレンスラスタライザーは、可能な場合、特殊なCPU 命令を利用します。
+		lpD3D->GetDeviceCaps(D3DADAPTER_DEFAULT, D3DDEVTYPE_REF, &Caps);
+		if (FAILED(lpD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_REF, hWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED, &d3dpp, &Device)))
+			return FALSE;
+	}
+	
+	// 画面バックバッファフォーマットを保存
+	ScreenFormat = d3dpp.BackBufferFormat;	// FMT2D::RENDERTARGET
+
+	// その他
+	// ID3DXLineインターフェイスの生成
+	D3DXCreateLine(tdnSystem::Device, &pLine);
+
+
+	return TRUE;
+}
+
 // 解放
 void tdnSystem::Release()
 {

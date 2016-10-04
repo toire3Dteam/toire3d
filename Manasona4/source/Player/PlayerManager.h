@@ -21,10 +21,11 @@ public:
 	~PlayerManager();
 	void Initialize(int NumPlayer, Stage::Base *pStage);
 	void Release(){ SAFE_DELETE(pInstance); }
-	void Update();
+	void Update(bool bControl);
 	void Render();
 	void Render(tdnShader* shader, char* name);
 	void RenderDeferred();
+	void RenderUI();
 
 	int GetNumPlayer() { return m_NumPlayer; }
 	BasePlayer *GetPlayer(int no) { return m_pPlayers[no]; }
@@ -35,7 +36,7 @@ public:
 	int GetPointA(){ return m_PointAteam; }
 	int GetPointB(){ return m_PointBteam; }
 
-	int GetOverDriveDim(){ return m_OverDriveDim; }
+	float GetOverDriveDim(){ return m_OverDriveDim; }
 
 private:
 	// 1つしかない実体
@@ -50,13 +51,17 @@ private:
 	int m_PointBteam;
 
 	// 覚醒暗転
-	int m_OverDriveDim;
+	float m_OverDriveDim;
 
 	// ★プレイヤーとプレイヤーの攻撃の判定
 	bool CollisionPlayerAttack(BasePlayer *my, BasePlayer *you);
 
 	// ★スタンドの攻撃に対するプレイヤーの判定
 	bool CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou);
+
+	// ★投げの攻撃に対するプレイヤーの判定
+	bool CollisionThrowAttack(BasePlayer *my, BasePlayer *you);
+
 
 	// BaseGameEntiryサブクラスはメッセージを使って通信する
 	bool  HandleMessage(const Message& msg);

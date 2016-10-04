@@ -5,10 +5,7 @@
 //	数字を描画する
 /***********************************/
 
-struct RGB
-{
-	BYTE r, g, b;
-};
+
 
 class Number
 {
@@ -16,10 +13,15 @@ private:
 
 
 public:
+	struct RGB
+	{
+		BYTE r, g, b;
+	};
+
 	// 数字の色のタイプ
 	enum class NUM_KIND
 	{
-		NORMAL, HEAL, COMBO, TIMER, BIG
+		NORMAL, HEAL, COMBO, TIMER, BIG, DAMAGE_SCORE
 	};
 
 	// 実体

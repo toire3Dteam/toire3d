@@ -35,6 +35,12 @@ void BaseUVEffect::RenderADD()
 	m_pic->Render_ADD();
 }
 
+void BaseUVEffect::RenderGuard()
+{
+	// ガード用描画
+	m_pic->Render_Guard();
+}
+
 void BaseUVEffect::Action(Vector3 pos, 
     float startScale, float endScale,
     Vector3 startAngle , Vector3 endAngle)
@@ -56,4 +62,57 @@ void BaseUVEffect::Stop()
 {
 	// エフェクト止める
 	m_pic->Stop();
+	
+	//m_pic->StopRoop();
 }
+
+
+void BaseUVEffect::ActionRoop(Vector3 pos,
+	float startScale, float endScale,
+	Vector3 startAngle, Vector3 endAngle)
+{
+	// スケールのアニメ
+	m_pic->ScaleAnimation(startScale, endScale);
+	// アングルのアニメ
+	m_pic->AngleAnimation(startAngle, endAngle);
+
+	// エフェクト発動
+	m_pic->ActionRoop();
+	m_pos = pos;
+
+	//m_startScale = startScale;
+	//m_endScale = endScale;
+}
+
+void BaseUVEffect::StopRoop()
+{
+	// エフェクト止める
+	m_pic->StopRoop();
+}
+
+// ビルドが邪魔くさいのでこちらへ移動
+ConvEffect::ConvEffect()
+{
+	m_pic = new AnimationUV("Data/UVeffect/convEffect/convEffect2.IMO", 0.00f, 0.03f, 10, false, 2, 6);
+};
+ConvEffect2::ConvEffect2()
+{
+	m_pic = new AnimationUV("Data/UVeffect/convEffect/convEffect3.IMO", 0.00f, 0.03f, 10, false, 2, 6);
+};
+ConvEffect3::ConvEffect3()
+{
+
+	m_pic = new AnimationUV("Data/UVeffect/convEffect/convEffect4.IMO", 0.00f, 0.04f, 20, false, 2, 16);
+
+}
+ConvEffect4::ConvEffect4()
+{
+
+	m_pic = new AnimationUV("Data/UVeffect/convEffect/convEffect5.IMO", 0.00f, 0.04f, 20, false, 0, 16);
+
+}
+
+BurstBallEffect::BurstBallEffect()
+{
+	m_pic = new AnimationUV("Data/UVeffect/Burst/burstBallEffect.IMO", 0.05f, 0.01f, 40, false, 1, 24);
+};

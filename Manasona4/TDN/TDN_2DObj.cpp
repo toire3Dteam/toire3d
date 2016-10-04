@@ -179,6 +179,22 @@ tdn2DObj::tdn2DObj(UINT width, UINT height, FMT2D fmtFlag):m_bLoadTexture(true)
 
 }
 
+// テクスチャ参照型
+tdn2DObj::tdn2DObj(Texture2D *texture) : lpTexture(texture), m_bLoadTexture(false), scale(1), angle(0), color(0xffffffff), centerX(0), centerY(0), isTurnOver(false), isShiftCenter(false)
+{
+	MyAssert(texture, "エラー: tdn2DObjのコンストラクタ、テクスチャが空。");
+
+	/***************************************/
+	// 読み込んだテクスチャからサイズを保存
+	D3DSURFACE_DESC sd;						// サーフェイスを記述する。
+	lpTexture->GetLevelDesc(0, &sd);		// テクスチャの情報取得
+	m_width = sd.Width;						// メンバ変数にサイズ保存 
+	m_height = sd.Height;
+
+	// メインサーフェイスの取得(保存)
+	lpTexture->GetSurfaceLevel(0, &lpSurface);
+}
+
 //	文字テクスチャをロード
 bool tdn2DObj::LoadFontTexture(LPCSTR character, UINT charaSize, LPCSTR fontName)
 {

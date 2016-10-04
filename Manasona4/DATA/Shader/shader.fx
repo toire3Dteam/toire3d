@@ -126,6 +126,147 @@ sampler ToonShadowSamp = sampler_state
 	AddressV = Wrap;
 };
 
+//********************************************************************
+//
+//		基本３Ｄシェーダー		
+//
+//********************************************************************
+//------------------------------------------------------
+//		頂点フォーマット
+//------------------------------------------------------
+struct VS_OUTPUT
+{
+	float4 Pos		: POSITION;
+	float4 Color	: COLOR0;
+	float2 Tex		: TEXCOORD0;
+
+	float4 wPos			: TEXCOORD1;//　ピクセルに送る情報にワールドからのポジション追加
+	float4 ProjectionPos: TEXCOORD2;//　ピクセルに送る情報にゲーム画面ラストのポジション追加
+};
+//------------------------------------------------------
+//		頂点シェーダー	
+//------------------------------------------------------
+VS_OUTPUT VS_Basic(VS_INPUT In)
+{
+	VS_OUTPUT Out = (VS_OUTPUT)0;
+	//TransMatrixとPosを合成してwPosの情報生成
+	Out.wPos = mul(In.Pos, WMatrix);
+
+	Out.Pos = mul(In.Pos, WVPMatrix);
+	Out.Tex = In.Tex;
+	Out.Color = 1.0f;
+
+	Out.ProjectionPos = Out.Pos;
+
+	return Out;
+}
+//------------------------------------------------------
+//		ピクセルシェーダー	
+//------------------------------------------------------
+float4 PS_Basic(VS_OUTPUT In) : COLOR
+{
+	float4	OUT;
+
+	//	ピクセル色決定
+	OUT = In.Color * tex2D(DecaleSamp, In.Tex);
+
+	//OUT.r = 1.0f;
+	OUT.a = 1.0f;
+
+	return OUT;
+}
+
+//------------------------------------------------------
+//		通常描画テクニック
+//------------------------------------------------------
+technique copy
+{
+	pass P0
+	{
+		ZEnable = true;				// 奥行考慮
+		ZWriteEnable = true;		// 奥行を書き込むか
+
+		AlphaBlendEnable = true;	// アルファブレンド考慮
+		BlendOp = Add;				// ブレンド仕様
+		SrcBlend = SrcAlpha;		// 現在描いてる方
+		DestBlend = InvSrcAlpha;	// 描かれている方
+		CullMode = CCW;				// カリングの仕様
+
+		VertexShader = compile vs_3_0 VS_Basic();
+		PixelShader = compile ps_3_0 PS_Basic();
+	}
+}
+
+//------------------------------------------------------
+//		黒色ピクセルシェーダー	
+//------------------------------------------------------
+float4 PS_Black(VS_OUTPUT In) : COLOR
+{
+	float4	OUT;
+
+	//	ピクセル色決定
+	OUT.rgb = 0.0f;
+
+	OUT.a = 1.0f;
+
+	return OUT;
+}
+//------------------------------------------------------
+//		黒塗りつぶし描画テクニック
+//------------------------------------------------------
+technique black
+{
+	pass P0
+	{
+		ZEnable = true;				// 奥行考慮
+		ZWriteEnable = true;		// 奥行を書き込むか
+
+		AlphaBlendEnable = true;	// アルファブレンド考慮
+		BlendOp = Add;				// ブレンド仕様
+		SrcBlend = SrcAlpha;		// 現在描いてる方
+		DestBlend = InvSrcAlpha;	// 描かれている方
+		CullMode = CCW;				// カリングの仕様
+
+		VertexShader = compile vs_3_0 VS_Basic();
+		PixelShader = compile ps_3_0 PS_Black();
+	}
+}
+
+//------------------------------------------------------
+//		カメラピクセルシェーダー	
+//------------------------------------------------------
+float4 PS_CameraAlpha(VS_OUTPUT In) : COLOR
+{
+	float4	OUT;
+
+	//	ピクセル色決定
+	OUT = In.Color * tex2D(DecaleSamp, In.Tex);
+	OUT.a = 0.5f;
+
+	return OUT;
+}
+//------------------------------------------------------
+//		半透明描画テクニック
+//------------------------------------------------------
+technique cameraAlpha
+{
+	pass P0
+	{
+		ZEnable = true;				// 奥行考慮
+		ZWriteEnable = true;		// 奥行を書き込むか
+
+		AlphaBlendEnable = true;	// アルファブレンド考慮
+		BlendOp = Add;				// ブレンド仕様
+		SrcBlend = SrcAlpha;		// 現在描いてる方
+		DestBlend = InvSrcAlpha;	// 描かれている方
+		CullMode = CCW;				// カリングの仕様
+
+		VertexShader = compile vs_3_0 VS_Basic();
+		PixelShader = compile ps_3_0 PS_CameraAlpha();
+	}
+}
+
+
 /***************************/
 //	G_Buffer用の頂点データ
 /***************************/
@@ -1046,14 +1187,21 @@ float4 PS_RadialBlur(float2 Tex:TEXCOORD0) : COLOR
 {
 	float4	OUT;
 
+	/*******************************************/
+	// ( NDC空間 ) -> ( UV空間 ) に持ってくる
+	// 
+	// 
+	// 
+	/*******************************************/
+	
 	//　放射中心
 	float2 ss_center = float2((CenterX + 1.0f) * 0.5f, (-CenterY + 1.0f) * 0.5f);
 
-		//　オフセット
-		float2 uvOffset = (ss_center - Tex) * (BlurPower / IMAGE_SIZE);
+	//　オフセット
+	float2 uvOffset = (ss_center - Tex) * (BlurPower / IMAGE_SIZE);
 
-		//　サンプリング数の逆数 　for文で回す回数文色を減らし　完成したときに元の色にする。
-		float InvSampling = 1.0f / 8.0f;
+	//　サンプリング数の逆数 　for文で回す回数文色を減らし　完成したときに元の色にする。
+	float InvSampling = 1.0f / 8.0f;
 
 	//　テクスチャ座標　動かすために今のテクスチャーの場所を渡す。
 	float2 uv = Tex;
@@ -1086,6 +1234,61 @@ technique RadialBlur
 	}
 }
 
+
+//********************************************************************
+//		移動ブラ―
+//********************************************************************
+
+float DirectionalX = 1.0f;
+float DirectionalY = 0.0f;
+float DirectionalBlurPower = 0.015f;
+//------------------------------------------------------
+//		ピクセルシェーダー	
+//------------------------------------------------------
+float4 PS_DirectionalBlur(float2 Tex:TEXCOORD0) : COLOR
+{
+	float4	OUT;
+
+	/*******************************************/
+	// ( NDC空間 ) -> ( UV空間 ) に持ってくる
+	// 
+	/*******************************************/
+
+	//　オフセット
+	float2 uvOffset = float2(DirectionalX, DirectionalY) *(DirectionalBlurPower);
+
+	//　サンプリング数の逆数 　for文で回す回数文色を減らし　完成したときに元の色にする。
+	float InvSampling = 1.0f / 16.0f;
+
+	//　テクスチャ座標　動かすために今のテクスチャーの場所を渡す。
+	float2 uv = Tex;
+
+	//　サンプリングの回数だけ実行
+	for (int i = 0; i<16; i++)
+	{
+		OUT += tex2D(GaussianSamp, uv) * InvSampling;
+		uv += uvOffset;
+	}
+
+	return OUT;
+}
+//------------------------------------------------------
+// テクニック
+//------------------------------------------------------
+technique DirectionalBlur
+{
+	pass P0
+	{
+		AlphaBlendEnable = true;
+		BlendOp = Add;
+		SrcBlend = SrcAlpha;
+		DestBlend = InvSrcAlpha;
+		CullMode = None;
+		ZEnable = false;
+
+		PixelShader = compile ps_3_0 PS_DirectionalBlur();
+	}
+}
 
 /*-------------------*/
 //  HDRブルーム効果
@@ -1232,6 +1435,63 @@ technique DefaultLighting
 		PixelShader = compile ps_3_0 PS_DefaultLighting();
 	}
 }
+
+/*************************************/
+// ステージに必要な変数
+/*************************************/
+
+float    g_OverDriveDim = 1.0f;
+
+//------------------------------------------------------
+//		ピクセルシェーダー	
+//------------------------------------------------------
+PS_TONEMAP PS_Stage(VS_OUTPUT_FINAL In) : COLOR
+{
+	PS_TONEMAP	OUT = (PS_TONEMAP)0;
+
+	//スクリーン空間をテクスチャ座標に  NDC->UV y反転
+	const float2 ScreenTex = In.wvpPos.xy / In.wvpPos.w * float2(0.5, -0.5) + float2(0.5, 0.5);
+
+	//	ピクセル色決定
+	OUT.color = In.Color * tex2D(DecaleSamp, In.Tex);
+
+	float4 lightCol = tex2D(LightSamp, ScreenTex);
+		lightCol += tex2D(PLSSamp, ScreenTex);
+	OUT.color.rgb *= lightCol;
+	OUT.color.rgb += tex2D(SpecSamp, ScreenTex);
+	
+	// 必殺暗転の値
+	OUT.color.rgb *= g_OverDriveDim;
+
+	//トーンマッピング
+	OUT.color.rgb *= exp2(exposure);
+
+	OUT.high.rgb = max(float3(0.0f, 0.0f, 0.0f), (OUT.color.rgb - g_bloomColor));
+	OUT.high.a = 1.0f;
+
+	return OUT;
+}
+//------------------------------------------------------
+//		ステージ用描画テクニック
+//------------------------------------------------------
+technique Stage
+{
+	pass P0
+	{
+		ZEnable = true;				// 奥行考慮
+		ZWriteEnable = true;		// 奥行を書き込むか
+
+		AlphaBlendEnable = true;	// アルファブレンド考慮
+		BlendOp = Add;				// ブレンド仕様
+		SrcBlend = SrcAlpha;		// 現在描いてる方
+		DestBlend = InvSrcAlpha;	// 描かれている方
+		CullMode = CCW;				// カリングの仕様
+
+		VertexShader = compile vs_3_0 VS_DefaultLighting();
+		PixelShader = compile ps_3_0 PS_Stage();
+	}
+}
+
 
 /*************************************/
 // アウトラインに必要な変数
@@ -1601,10 +1861,14 @@ PS_TONEMAP PS_Sky(VS_OUTPUT_FINAL In) : COLOR
 
 	//OUT.color.g += 0.5;
 
+
+	// 必殺暗転の値
+	OUT.color.rgb *= g_OverDriveDim;
+
 	//トーンマッピング
 	OUT.color.rgb *= exp2(exposure);
 	//OUT.color.rgb -= float3(0.05f, 0.1f, 0.3f);
-	OUT.high.rgb = float3(0.05f, 0.1f, 0.3f);
+	OUT.high.rgb = float3(0.05f, 0.1f, 0.3f)*g_OverDriveDim;// 必殺暗転の値
 	OUT.high.a = 1.0f;
 
 	return OUT;
@@ -1628,5 +1892,180 @@ technique sky
 
 		VertexShader = compile vs_3_0 VS_Sky();
 		PixelShader = compile ps_3_0 PS_Sky();
+	}
+}
+
+
+
+//**************************************
+//
+///		ＵＶアニメーション
+//
+//**************************************
+
+// UV用
+sampler DecaleSampUV = sampler_state
+{
+	Texture = <Texture>;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+	MipFilter = NONE;
+
+	//BorderColor = 0x00FFFFFF;
+	AddressU = WRAP;
+	AddressV = WRAP;
+};
+
+
+struct VS_INPUT_UV
+{
+	float4 Pos    : POSITION;
+	float3 Normal : NORMAL;
+	float2 Tex	  : TEXCOORD0;
+	float4 Color	: COLOR0;
+};
+struct VS_OUTPUT_UV
+{
+	float4 Pos		: POSITION;
+	float4 Color	: COLOR0;
+	float2 Tex		: TEXCOORD0;
+	float4 wvpPos	: TEXCOORD1;
+	float3 Normal	: NORMAL;
+};
+
+// UV
+float tuAnime = 0.0f;
+float tvAnime = 0.0f;
+float alphaUV = 1.0f;
+
+VS_OUTPUT_UV VS_UvAnime(VS_INPUT_UV In)
+{
+	VS_OUTPUT_UV Out = (VS_OUTPUT_UV)0;
+
+	Out.Pos = mul(In.Pos, WVPMatrix);
+	Out.wvpPos = Out.Pos;
+	Out.Normal = In.Normal;
+	Out.Color = In.Color;// 頂点カラー取得
+	Out.Tex = In.Tex + float2(tuAnime, tvAnime);//座標
+
+	Out.Color.rgb = 1.0f;
+	Out.Color.a *= alphaUV; //　透明度
+
+	return Out;
+}
+
+
+//------------------------------------------------------
+///		ピクセルシェーダー	
+//------------------------------------------------------
+PS_TONEMAP PS_UvAnime(VS_OUTPUT_UV In) : COLOR
+{
+	PS_TONEMAP	OUT = (PS_TONEMAP)0;
+
+	//	ピクセル色決定
+	OUT.color = In.Color * tex2D(DecaleSampUV, In.Tex);
+	
+	//トーンマッピング
+	//OUT.color.rgb *= exp2(exposure); 今は考慮はなしで
+	
+	// 高輝度抽出
+	OUT.high.rgb = max(OUT.color.rgb - 0.5f,0.0f);
+	//OUT.high.rgb = float3(0, 0.5, 0);
+	OUT.high.a = OUT.color.a;
+
+	return OUT;
+}
+
+technique uvAnime
+{
+	pass P0
+	{
+		AlphaBlendEnable = true;
+		BlendOp = Add;
+		SrcBlend = SrcAlpha;
+		DestBlend = InvSrcAlpha;
+		CullMode = CCW;
+		ZEnable = true;			// このオブジェクトはZバッファを考慮する
+		ZWriteEnable = false;	// このオブジェクトをZバッファに書き込まない
+
+		VertexShader = compile vs_3_0 VS_UvAnime();
+		PixelShader = compile ps_3_0 PS_UvAnime();
+	}
+}
+
+
+technique uvAnime_add
+{
+	pass P0
+	{
+		AlphaBlendEnable = true;
+		BlendOp = Add;
+		SrcBlend = SrcAlpha;
+		DestBlend = one;
+		CullMode = CCW;
+		ZEnable = true;			// このオブジェクトはZバッファを考慮する
+		ZWriteEnable = false;	// このオブジェクトをZバッファに書き込まない
+
+		VertexShader = compile vs_3_0 VS_UvAnime();
+		PixelShader = compile ps_3_0 PS_UvAnime();
+	}
+}
+
+
+//------------------------------------------------------
+///		ガード用ピクセルシェーダー	
+//------------------------------------------------------
+PS_TONEMAP PS_UvAnime_Guard(VS_OUTPUT_UV In) : COLOR
+{
+	PS_TONEMAP	OUT = (PS_TONEMAP)0;
+
+	//スクリーン空間をテクスチャ座標に  NDC->UV y反転
+	//const float2 ScreenTex = In.wvpPos.xy / In.wvpPos.w * float2(0.5, -0.5) + float2(0.5, 0.5);
+	// 必要な情報を取得
+	//const float4 NormalDepth = tex2D(NormalDepthSamp, ScreenTex);
+	//const float3 Normal = CalcNormal(NormalDepth.xy*2.0f - 1.0f);
+	//const float3 Pos = CalcViewPosition(ScreenTex, NormalDepth.zw);
+
+	//	ピクセル色決定
+	OUT.color = In.Color * tex2D(DecaleSampUV, In.Tex);
+
+	// 目線
+	//float3 E = Pos.xyz;
+	//	E.normalize();
+
+	In.wvpPos.xyz /= In.wvpPos.w;// NDC
+	float RimPower = pow(1.0f - max(0.0f, dot(-In.wvpPos.xyz, In.Normal)), 2.0f);
+	RimPower *= 3.0f;
+	OUT.color.a *= RimPower;
+	OUT.color.rgb += float3(0.3, 0.3, 1.0);
+
+	//トーンマッピング
+	//OUT.color.rgb *= exp2(exposure); 今は考慮はなしで
+
+	// 高輝度抽出
+	OUT.high.rgb = max(OUT.color.rgb - 0.5f, 0.0f);
+	//OUT.high.rgb = float3(0, 0.5, 0);
+	OUT.high.a = OUT.color.a;
+
+	return OUT;
+}
+
+//------------------------------------------------------
+///		ガード用テクニック
+//------------------------------------------------------
+technique uvAnime_guard
+{
+	pass P0
+	{
+		AlphaBlendEnable = true;
+		BlendOp = Add;
+		SrcBlend = SrcAlpha;
+		DestBlend = InvSrcAlpha;
+		CullMode = CCW;
+		ZEnable = true;			// このオブジェクトはZバッファを考慮する
+		ZWriteEnable = false;	// このオブジェクトをZバッファに書き込まない
+
+		VertexShader = compile vs_3_0 VS_UvAnime();
+		PixelShader = compile ps_3_0 PS_UvAnime_Guard();
 	}
 }

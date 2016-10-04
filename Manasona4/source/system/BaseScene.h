@@ -13,7 +13,7 @@ public:
 	virtual bool Initialize(){ return true; }
 	virtual bool Initialize(BaseScene *newScene){ return true; }	// ★sceneLoading専用
 	//	更新・描画
-	virtual bool Update(){ return false; }
+	virtual void Update(){}
 	virtual void Render(){}
 
 	bool m_bLoad;				// sceneLoadingで2重に読み込むので、1回読み終わったらこれをtrueにして2回読み込まないようにする

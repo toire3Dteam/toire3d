@@ -270,12 +270,13 @@ void AnimationUV::Render()
 
 	// 描画の前に情報を送る
 	//　シェーダーに描画毎UV座標を送る
-	shader->SetValue("tuAnime", tu);
-	shader->SetValue("tvAnime", tv);
-	shader->SetValue("alphaUV", alpha);// 透明度
+	shaderM->SetValue("tuAnime", tu);
+	shaderM->SetValue("tvAnime", tv);
+	shaderM->SetValue("alphaUV", alpha);// 透明度
 
 	// 描画
-	obj->Render(shader, "uvAnime");
+	obj->Render(shaderM, "uvAnime");
+
 
 }
 
@@ -285,14 +286,32 @@ void AnimationUV::Render_ADD()
 
 	// 描画の前に情報を送る
 	//　シェーダーに描画毎UV座標を送る
-	shader->SetValue("tuAnime", tu);
-	shader->SetValue("tvAnime", tv);
-	shader->SetValue("alphaUV", alpha);// 透明度
+	shaderM->SetValue("tuAnime", tu);
+	shaderM->SetValue("tvAnime", tv);
+	shaderM->SetValue("alphaUV", alpha);// 透明度
 
 	// 描画
-	obj->Render(shader, "uvAnime_add");
+	obj->Render(shaderM, "uvAnime_add");
 
 }
+
+// ガード用描画
+void AnimationUV::Render_Guard()			
+{
+	if (isAction == false)return;//実行されてないなら出てけ！！
+
+	// 描画の前に情報を送る
+	//　シェーダーに描画毎UV座標を送る
+	shaderM->SetValue("tuAnime", tu);
+	shaderM->SetValue("tvAnime", tv);
+	shaderM->SetValue("alphaUV", alpha);// 透明度
+
+	// 描画
+	obj->Render(shaderM, "uvAnime_guard");
+
+}
+
+
 // 拡大アニメ
 void AnimationUV::ScaleAnimation(float StartScale, float EndScale)
 {

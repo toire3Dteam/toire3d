@@ -34,21 +34,54 @@ void ParticleManager::EffectPersonaAura(const Vector3 &pos)
 {
 	Vector3 Pos, Move, Power;
 
-	Pos.x = pos.x + rand() % 21 - 10.0f;
-	Pos.y = pos.y + (float)(rand() % 10);
-	Pos.z = pos.z + rand() % 21 - 10.0f;
-	const int M = 2;
-	Move.x = (rand() % M - (M / 2))*0.091f;
-	Move.y = (rand() % 2 + 2) * 0.05f;
-	Move.z = (rand() % M - (M / 2))*0.091f;
-	Power.x = 0;
-	Power.y = 0.0f;
-	Power.z = 0;
+	for (int i = 0; i < 2; i++)
+	{
 
-	const int type = (rand() % 2) ? 5 : 6;
+		Pos.x = pos.x + rand() % 21 - 10.0f;
+		Pos.y = pos.y + (float)(rand() % 10);
+		Pos.z = pos.z + rand() % 21 - 10.0f;
+		const int M = 2;
+		Move.x = (rand() % M - (M / 2))*0.091f;
+		Move.y = (rand() % 2 + 2) * 0.05f;
+		Move.z = (rand() % M - (M / 2))*0.091f;
+		Power.x = 0;
+		Power.y = 0.0f;
+		Power.z = 0;
 
-	// パーティクルセット
-	Set2(type, 0, .1f, 20, .0f, 10, .4f, Pos, Move, Power, .75f, .75f, .75f, (rand() % 3  - 1) * 0.025f, rand() % 314 * 0.01f, 1.0f, rand ()% 3 + 5.0f, RS::ADD);
+		const int type = (rand() % 2) ? 5 : 6;
+
+		// パーティクルセット
+		Set2(type, 0, .1f, 20, .0f, 10, .4f, Pos, Move, Power, .75f, .75f, .75f, (rand() % 3 - 1) * 0.025f, rand() % 314 * 0.01f, 1.0f, rand() % 3 + 5.0f, RS::ADD);
+
+	}
+}
+
+//*****************************************************************************
+//	オーバードライブ持続オーラ
+//*****************************************************************************
+void ParticleManager::EffectOverDrive(const Vector3 &pos)
+{
+	Vector3 Pos, Move, Power;
+
+	for (int i = 0; i < 3; i++)
+	{
+		Pos.x = pos.x + rand() % 9 - 4.0f;
+		Pos.y = pos.y + (float)(rand() % 7+2);
+		Pos.z = pos.z + rand() % 9 - 4.0f;
+		const int M = 2;
+		Move.x = (rand() % M - (M / 2))*0.091f;
+		Move.y = (rand() % 2 + 2) * 0.05f;
+		Move.z = (rand() % M - (M / 2))*0.091f;
+		Power.x = 0;
+		Power.y = 0.0f;
+		Power.z = 0;
+
+		const int type = (rand() % 2) ? 13 : 13;
+
+		// パーティクルセット
+		Set2(type, 0, .1f, 20, .0f, 10, .4f, Pos, Move, Power, .75f, .75f, .75f, (rand() % 3 - 1) * 0.025f, rand() % 314 * 0.01f, 1.0f, rand() % 3 + 2.0f, RS::ADD);
+
+	}
 }
 
 //*****************************************************************************
@@ -98,7 +131,7 @@ void ParticleManager::EffectFlySmoke(const Vector3 &pos)
 {
 	static int set(0);
 
-	if (++set < 3)
+	if (++set < 4)
 	{
 		return;
 	}
@@ -114,13 +147,51 @@ void ParticleManager::EffectFlySmoke(const Vector3 &pos)
 	Move.y = (rand() % 3 + 2) * 0.01f;
 	Move.z = (rand() % 5 - 2) * 0.005f;
 	Power.Zero();
-	Set2(4, 0, 1.0f, 50, .0f, 30, 1.0f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, rand() % 628 * .01f, 1.0f, rand() % 2 + 6.0f, RS::COPY);
+	Set2(4, 0, 0.8f, 40, .0f, 10, 1.0f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, rand() % 628 * .01f, 1.005f, rand() % 2 + 6.0f, RS::COPY);
+}
+
+//*****************************************************************************
+//	走りはじめの煙
+//*****************************************************************************
+void ParticleManager::EffectRunSmoke(const Vector3 &pos, bool bLeft)
+{
+	Vector3 Pos, Move, Power(0, 0, 0);
+
+	FOR(10)
+	{
+		Pos.x = pos.x + rand() % 8 - 3.0f;
+		Pos.y = pos.y + (float)(rand() % 3);
+		Pos.z = pos.z + rand() % 8 - 3.0f;
+		Move.x = (rand() % 30 + 20) * 0.005f;
+		Move.x = (bLeft) ? -abs(Move.x) : abs(Move.x);
+		Move.y = (rand() % 3 + 2) * 0.01f;
+		Move.z = (rand() % 11 - 5) * 0.005f;
+		Set2(4, 0, 0.8f, 25, .0f, 10, .65f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, (rand() % 3 - 1) * 0.025f, rand() % 628 * .01f, 1.005f, rand() % 2 + 2.0f, RS::COPY);
+	}
+}
+
+//*****************************************************************************
+//	着地の煙
+//*****************************************************************************
+void ParticleManager::EffectLandSmoke(const Vector3 &pos)
+{
+	Vector3 Pos, Move, Power;
+	FOR(10)
+	{
+		Pos.x = pos.x + rand() % 8 - 3.0f;
+		Pos.y = pos.y + (float)(rand() % 3);
+		Pos.z = pos.z + rand() % 8 - 3.0f;
+		Move.x = (rand() % 41 - 20) * 0.005f;
+		Move.y = (rand() % 3 + 2) * 0.01f;
+		Move.z = (rand() % 11 - 5) * 0.005f;
+		Set2(4, 0, 0.8f, 25, .0f, 10, .65f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, (rand() % 3 - 1) * 0.025f, rand() % 628 * .01f, 1.005f, rand() % 2 + 2.0f, RS::COPY);
+	}
 }
 
 //*****************************************************************************
 //	攻撃ヒット
 //*****************************************************************************
-void ParticleManager::EffectHit(const Vector3 &pos)
+void ParticleManager::EffectHit(const Vector3 &pos, const Vector3 &v)
 {
 	Vector3 Pos, Move, Power;
 
@@ -132,10 +203,12 @@ void ParticleManager::EffectHit(const Vector3 &pos)
 		Pos = pos;
 		const int M = 64;
 		Move.x = (rand() % M - (M / 2))*0.05f;
+		if(v.x != 0)Move.x = (v.x < 0) ? -abs(Move.x) : abs(Move.x);
 		Move.y = (rand() % 5 + 6) * 0.1f;
+		Move.y = (v.y < 0) ? -Move.y : Move.y;
 		Move.z = (rand() % M - (M / 2))*0.05f;
 		Power.x = 0;
-		Power.y = -0.015f;
+		Power.y = (v.y < 0) ? -.0001f : -0.015f;
 		Power.z = 0;
 		Set(7, 0, 1.0f, 90, .0f, 30, .9f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, rand() % 1 + 1.0f, RS::COPY);
 
@@ -144,7 +217,7 @@ void ParticleManager::EffectHit(const Vector3 &pos)
 		Power.z = 0;
 
 		// 粒
-		for (int j = 0; j < 1; j++)
+		//for (int j = 0; j < 1; j++)
 		{
 			Pos.x = pos.x + rand() % 5 - 2.0f;
 			Pos.y = pos.y + (float)(rand() % 3);
@@ -161,6 +234,30 @@ void ParticleManager::EffectHit(const Vector3 &pos)
 			//Move.z = (rand() % 30 -16.0f) * 0.001f;
 			//Set(7, 0, 1.0f, 16, .0f, 6, .75f, pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, rand() % 1 + 1.0f, RS::ADD);
 		}
+	}
+}
+
+//*****************************************************************************
+//	リザルトの血しぶき
+//*****************************************************************************
+void ParticleManager::EffectResultSplash(const Vector3 &pos)
+{
+	Vector3 Pos, Move, Power;
+
+	FOR(1)
+	{
+		Pos.x = pos.x;
+		Pos.y = pos.y + (float)(rand() % 3);
+		Pos.z = pos.z;
+		Move.x = (rand() % 101 - 50)*0.003f;
+		Move.y = (rand() % 100)*0.003f;
+		Move.z = (rand() % 101 - 50)*0.003f;
+		Power.x = .0f;
+		Power.y = -0.01f;
+		Power.z = .0f;
+		Set2(14, 0, 1.0f, 50, 1.0f, 5, 1.0f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, (rand() % 3 - 1) * 0.025f, rand() % 628 * .01f, 
+			.955f,	// 拡大率
+			rand() % 2 + 4.0f, RS::ADD);
 	}
 }
 
@@ -333,7 +430,7 @@ void ParticleManager::Render(tdnShader* shader, char* name)
 	//	//	パーティクルレンダリング
 	//	if (ParticleData[i].isActive()) ParticleData[i].Render(shader, name);
 	//}
-	//
+
 	//iexSystem::Device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 	//iexSystem::Device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 }

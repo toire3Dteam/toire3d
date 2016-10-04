@@ -341,7 +341,7 @@ HRESULT TextureRenderer::SetMediaType(const CMediaType *pmt)
 	if (m_bUseDynamicTextures)
 	{
 		hr = m_pd3dDevice->CreateTexture(uintWidth, uintHeight, 1, 0,
-			D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT,
+			D3DFMT_X8R8G8B8/*D3DFMT_A8R8G8B8*/, D3DPOOL_DEFAULT,
 			&m_pTexture, NULL);
 		g_pachRenderMethod = g_achDynTextr;
 		if (FAILED(hr))
@@ -352,7 +352,7 @@ HRESULT TextureRenderer::SetMediaType(const CMediaType *pmt)
 	if (FALSE == m_bUseDynamicTextures)
 	{
 		hr = m_pd3dDevice->CreateTexture(uintWidth, uintHeight, 1, 0,
-			D3DFMT_X8R8G8B8, D3DPOOL_MANAGED,
+			D3DFMT_X8R8G8B8/*D3DFMT_A8R8G8B8*/, D3DPOOL_MANAGED,
 			&m_pTexture, NULL);
 		g_pachRenderMethod = g_achCopy;
 	}
@@ -380,7 +380,7 @@ HRESULT TextureRenderer::SetMediaType(const CMediaType *pmt)
 	// Save format info
 	m_TextureFormat = ddsd.Format;
 
-	if (m_TextureFormat != D3DFMT_X8R8G8B8 &&
+	if (m_TextureFormat != D3DFMT_X8R8G8B8/*D3DFMT_A8R8G8B8*/ &&
 		m_TextureFormat != D3DFMT_A1R5G5B5) {
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
@@ -428,7 +428,7 @@ HRESULT TextureRenderer::DoRenderSample(IMediaSample * pSample)
 	// Copy the bits
 	pTxtBuffer += lTxtPitch*(m_lVidHeight - 1);
 
-	if (m_TextureFormat == D3DFMT_X8R8G8B8)
+	if (m_TextureFormat == D3DFMT_X8R8G8B8/*D3DFMT_A8R8G8B8*/)
 	{
 		// Instead of copying data bytewise, we use DWORD alignment here.
 		// We also unroll loop by copying 4 pixels at once.

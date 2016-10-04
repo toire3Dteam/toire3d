@@ -34,13 +34,20 @@ public:
 	// パラメータ関連 アクセサー
 	int GetChaseFrame(){ return m_iChaseFrame; }
 	int GetWaitFrame(){ return m_iWaitFrame; }
+	int GetGuardFrame(){ return m_iGuardFrame; }	
+	int GetPracticeGuardFrame(){ return m_iPracticeGuardFrame; }
+	bool GetPracticeGuardFlag(){ return m_bPracticeGuardFlag; }
 
 	void SetChaseFrame(int rate){ m_iChaseFrame = rate; }
 	void SetWaitFrame(int rate){ m_iWaitFrame = rate; }
+	void SetGuardFrame(int rate){ m_iGuardFrame = rate; }
+	void SetPracticeGuardFrame(int rate){ m_iPracticeGuardFrame = rate; }
+	void SetPracticeGuardFlag(bool flag){ m_bPracticeGuardFlag = flag; }
 
 	void AddChaseFrame(int add){ m_iChaseFrame += add; }
 	void AddWaitFrame(int add){ m_iWaitFrame += add; }
-
+	void AddGuardFrame(int add){ m_iGuardFrame += add; }
+	void AddPracticeGuardFrame(int add){ m_iPracticeGuardFrame += add; }
 
 private:
 	StateMachine<AI>* m_pStateMachine; // ★AIステートマシン
@@ -51,7 +58,11 @@ private:
 
 	// AIに必要なパラメーター
 	int m_iChaseFrame;		// 一途に追いかけてる時間
-
 	int m_iWaitFrame;		// もじもじしてる時間
+	int m_iGuardFrame;		// 一度のガードしている時間
+
+	// 練習モードでガードしてる時間
+	int m_iPracticeGuardFrame;
+	bool m_bPracticeGuardFlag;
 
 };

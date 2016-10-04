@@ -12,6 +12,7 @@ GameUIManager::GameUIManager() :BaseGameEntity(ENTITY_ID::UI_MGR)	// ƒGƒ“ƒeƒBƒeƒ
 {
 	m_teamPic = new tdn2DObj("Data/UI/Game/team.png");
 
+	//m_combo
 }
 
 GameUIManager::~GameUIManager()

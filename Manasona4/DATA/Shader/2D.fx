@@ -253,7 +253,7 @@ technique add_hdr
 //------------------------------------------------------
 //		スクリーンフィルタ
 //------------------------------------------------------
-float	contrast = 0.9;
+float	contrast = 1.0;
 float	chroma = 1.0f;
 float3	ScreenColor = { 1.0f, 1.0f, 1.0f };
 
@@ -310,6 +310,64 @@ technique Mastering
 	}
 }
 
+texture WaveTexture;
+sampler WaveSamp = sampler_state
+{
+	Texture = <WaveTexture>;
+	MinFilter = POINT;//LINEAR;
+	MagFilter = POINT;//LINEAR;
+	MipFilter = NONE;
+
+	AddressU = CLAMP;
+	AddressV = CLAMP;
+};
+
+
+//------------------------------------------------------
+//		ピクセルシェーダー	
+//------------------------------------------------------
+float4 PS_Master_Wave(VS_M In) : COLOR
+{
+	float4	OUT;
+
+	// ウェーブ用に
+	float	waveRate = tex2D(WaveSamp, In.Tex);
+	waveRate *= 2;
+	waveRate -= 1.0f;
+
+	waveRate *= 0.0065f;// ウェーブの威力を弱める
+
+	float3	col = tex2D(DecaleSamp, float2(In.Tex.x, In.Tex.y+waveRate));
+
+		col = ((col - 0.5f)*contrast) + 0.5f;
+
+	float	avr = (col.r + col.g + col.b) / 3;
+	col = (col - avr) * chroma + avr;
+
+	//	ピクセル色決定
+	OUT.rgb = col * ScreenColor;
+	OUT.w = 1;
+
+	return OUT;
+}
+
+
+//------------------------------------------------------
+//
+//------------------------------------------------------
+technique Mastering_Wave
+{
+	pass P0
+	{
+		AlphaBlendEnable = false;
+		BlendOp = Add;
+		SrcBlend = one;
+		DestBlend = zero;
+
+		VertexShader = compile vs_2_0 VS_Master();
+		PixelShader = compile ps_2_0 PS_Master_Wave();
+	}
+}
 
 //------------------------------------------------------
 //		パーティクル
@@ -1290,5 +1348,33 @@ technique mask
 //		PixelShader = compile ps_3_0 PS_Multi();//PS_gaussX
 //	}
 //}
+
+
+// -------------------------------------------------------------
+// ピクセルシェーダプログラム
+// -------------------------------------------------------------
+float4 PS_passhero(VS_OUTPUT_G In) : COLOR
+{
+	float4 col = tex2D(DecaleSamp2, In.Tex);
+	
+	if (col.r < 0.3)discard;
+
+	return col;
+
+}
+
+technique hero
+{
+	pass P0
+	{
+		AlphaBlendEnable = true;
+		BlendOp = Add;
+		SrcBlend = SrcAlpha;
+		DestBlend = InvSrcAlpha;
+		// シェーダ
+		VertexShader = compile vs_3_0 VS_pass1();
+		PixelShader = compile ps_3_0 PS_passhero();
+	}
+}
 
 

@@ -102,6 +102,7 @@ public:
 	//　アクセサー
 	tdn2DObj* GetTex(const SURFACE_NAME_EX name); //テクスチャを取ってくる
 	bool  GetShadowFlag(){ return m_bShadowFlag; }
+	Surface* GetBackBuffer() { return m_pBackBuffer; }
 
 private:
 

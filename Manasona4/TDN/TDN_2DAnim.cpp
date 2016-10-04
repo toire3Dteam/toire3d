@@ -1,5 +1,5 @@
 #include	"TDNLIB.h"
-
+#include    "../source/system/System.h"
 
 /****************************************************/
 //	2DObjをラップして様々な特殊機能をつけた演出
@@ -14,9 +14,8 @@ bool AnimAction::Base::ActionCheck()
 	
 	// ?
 	// ディレイタイマーが0になるまで通さない
-	if (m_iDelayFlame > 0)
+	if (--m_iDelayFlame > 0)
 	{
-		m_iDelayFlame--;
 		return false;
 	}
 	
@@ -86,7 +85,14 @@ void AnimAction::Base::Render3D(tdn2DObj* pic, Vector3 pos, int w, int h, int tx
 	pic->Render3D(pos, w, h, tx, ty, tw, th, dwFlags);
 }
 
+// 一部の特殊演出用
+void AnimAction::Base::RenderSpecial(tdn2DObj* pic, int x, int y)
+{
+	if (m_bActionFlag == false)return;
+	if (m_iDelayFlame > 0)return;
 
+	pic->Render(x, y);
+}
 
 /**********************/
 // 波紋
@@ -246,6 +252,41 @@ void AnimAction::MoveAppeared::Render(tdn2DObj* pic, int x, int y, int w, int h,
 		(int)(Math::Blend(m_rate, (float)m_startY, (float)y)),
 		(int)(Math::Blend(m_rate, (float)m_startY, (float)y)),
 		w, h, tx, ty, tw, th, shader, name);
+}
+
+// MoveAppendの特殊演出用
+void AnimAction::MoveAppeared::RenderSpecial(tdn2DObj* pic, int x, int y)
+{
+	if (m_bActionFlag == false)return;
+	if (m_iDelayFlame > 0)return;
+
+	// 移動ブラー
+	if (m_rate < 1.0f)
+	{
+		Vector2 vec;
+		vec.x = (float)x - (float)m_startX;
+		vec.y = (float)y - (float)m_startY;
+
+		vec.Normalize();
+
+		// シェーダ側に転送
+		shaderM->SetValue("DirectionalX", vec.x);
+		shaderM->SetValue("DirectionalY", vec.y);
+
+		pic->Render(
+			(int)(Math::Blend(m_rate, (float)m_startX, (float)x)),
+			(int)(Math::Blend(m_rate, (float)m_startY, (float)y))
+			,shaderM, "DirectionalBlur");
+	}
+	else
+	{
+		pic->Render(
+			(int)(Math::Blend(m_rate, (float)m_startX, (float)x)),
+			(int)(Math::Blend(m_rate, (float)m_startY, (float)y))
+			);
+	}
+
+
 }
 
 /**********************/
@@ -611,6 +652,31 @@ void AnimAction::Grow::Action(tdn2DObj * pic, int delay)
 
 }
 
+/**********************/
+// なし
+/**********************/
+
+AnimAction::None::None()
+{
+}
+
+AnimAction::None::~None()
+{
+
+}
+
+void AnimAction::None::Update(tdn2DObj * pic)
+{
+	// なんもしない　しいてあるとすればディレイのみ
+	if (ActionCheck() == false)return;
+
+}
+
+void AnimAction::None::Action(tdn2DObj * pic, int delay)
+{
+	AnimAction::Base::Action(pic, delay);
+}
+
 
 /******************************************/
 // 描画をアニメ用に加工
@@ -651,5 +717,10 @@ void tdn2DAnim::OrderGrow(int endFlame, float startScale, float moveScale)
 {
 	if (m_pAction != nullptr) delete m_pAction;
 	m_pAction = new AnimAction::Grow(endFlame, startScale, moveScale);
+}
 
+void tdn2DAnim::OrderNone()
+{
+	if (m_pAction != nullptr) delete m_pAction;
+	m_pAction = new AnimAction::None();
 }

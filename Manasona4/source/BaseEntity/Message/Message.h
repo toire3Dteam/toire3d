@@ -5,12 +5,16 @@
 // メッセージタイプ
 enum MESSAGE_TYPE
 {
-	EFFECT_CAMERA,	// エフェクトカメラ発動メッセージ
-	SHAKE_CAMERA,	// カメラ振動メッセージ
-	HIT_ATTACK,		// 攻撃をヒットさせた人に送るメッセージ！
-	HIT_DAMAGE,		// 攻撃がヒットした相手に送るメッセージ
-	FALL,			// プレイヤーが地面についていないときに送られるメッセージ
-	OTHER			// その他。
+	EFFECT_CAMERA,		// エフェクトカメラ発動メッセージ
+	SHAKE_CAMERA,		// カメラ振動メッセージ
+	HIT_ATTACK,			// 攻撃をヒットさせた人に送るメッセージ！
+	HIT_DAMAGE,			// 攻撃がヒットした相手に送るメッセージ
+	FALL,				// プレイヤーが地面についていないときに送られるメッセージ
+	THROW_SUCCESS,		// 掴んだ人に送るメッセージ
+	BE_THROWN,			// 掴まれた相手に送るメッセージ(★掴んだ相手のIDを送ってあげる)
+	CAN_THROW_RELEASE,	// 掴まれた人が投げぬけコマンドを入力したときに掴んだやつに対して送るメッセージ
+	THROW_RELEASE,		// 投げぬけしていいよと送るメッセージ
+	OTHER				// その他。
 };
 
 // 攻撃喰らった相手用
@@ -58,10 +62,11 @@ struct SHAKE_CAMERA_INFO
 	void Set(float power, int frame){ ShakePower = power; ShakeFrame = frame; }
 };
 
-// イントロ発動メッセージ送信のときにいれる構造体
-struct INTRO_CAMERA_INFO
+/* 掴まれた相手に送る情報構造体 */
+struct BE_THROWN_INFO
 {
-	Vector3 start_person_pos;	// うわさを流す人間の座標
+	ENTITY_ID ThrowPlayerID;	// つかんだやつのID
+	int iThrowPlayerDir;		// つかんだやつの向き(受けた側はこれの反対を向く)
 };
 
 /*

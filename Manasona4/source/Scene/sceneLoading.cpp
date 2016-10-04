@@ -54,7 +54,7 @@ void sceneLoading::Thread_funk(void *arg)
 
 //=============================================================================================
 //		更			新
-bool sceneLoading::Update()
+void sceneLoading::Update()
 {
 	// 画像アニメーション処理
 	static const int AnimeSpeed = 10;
@@ -72,8 +72,6 @@ bool sceneLoading::Update()
 	{
 		MainFrameEx->ChangeScene(m_newScene);
 	}
-
-	return true;
 }
 //
 //=============================================================================================

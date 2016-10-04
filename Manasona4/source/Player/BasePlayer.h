@@ -2,6 +2,7 @@
 // エンティティ関連のインクルード
 #include "../BaseEntity/Message/Message.h"
 #include "../BaseEntity/Entity/BaseGameEntity.h"
+#include "../BaseEntity/Entity/EntityEnum.h"
 #include "../BaseEntity/State/StateMachine.h"
 #include "BasePlayerState.h"
 
@@ -11,6 +12,10 @@
 // エフェクト関連
 #include "../Effect/PanelEffect/PanelEffectManager.h"
 #include "../Effect\UVEffect\UVEffectManager.h"
+
+// UI
+#include "../UI/ComboUI.h"
+
 
 // 前方宣言
 class AI;
@@ -83,7 +88,7 @@ enum class FRAME_STATE
 static const int FRAME_MAX = 256; // 攻撃のフレームの最大値(これより超えることはないだろう)
 
 // 全キャラ固有で持つアクション
-enum BASE_ACTION_STATE
+enum class BASE_ACTION_STATE
 {
 	NO_ACTION = -1,
 	ESCAPE,		// 回避
@@ -98,7 +103,42 @@ enum BASE_ACTION_STATE
 	AERIALDROP,	// 空中下攻撃
 	FINISH,		// フィニッシュアーツ
 	SKILL,		// 地上キャラクター固有技
+	THROW,		// 投げ
+	FRAMECOUNT,	// ★とりあえず一定フレーム計りたいというときに、今使っているのは(投げ失敗の間だったり、投げ抜けの間だったり。)
 	END		// 何もなし　(A列車)名前
+};
+
+enum class MOTION_TYPE
+{
+	WAIT,
+	WALK,
+	RUN,
+	JUMP,
+	FALL,
+	RAND,
+	BRAKE,
+	U_TURN,
+	SQUAT,
+	RUSH_ATTACK1,
+	RUSH_ATTACK2,
+	RUSH_ATTACK3,
+	SQUAT_ATTACK,
+	AERIAL_ATTACK,
+	AERIALDROP_ATTACK,
+	FINISH_ATTACK,
+	CHARA_ATTACK_LAND,
+	CHARA_ATTACK_SQUAT,
+	CHARA_ATTACK_AERIAL,
+	CHARA_ATTACK_AERIALDROP,
+	BURST,
+	ESCAPE,
+	PERSONA,
+	KNOCKBACK,
+	KNOCKDOWN_RAND,
+	KNOCKDOWN_AERIAL,
+	DIE,
+	WIN,
+	MAX
 };
 
 // エフェクトの種類
@@ -113,6 +153,9 @@ enum class EFFECT_TYPE
 	FINISH_HIT,		// フィニッシュアーツヒット
 	BURST,		// バースト
 	ONEMORE_BURST,// ワンモアバースト
+	ONEMORE_BURST_START,// ワンモアバーストの前
+	RUN,			// 走る瞬間
+	GUARD_BREAK,		// ガードブレイク
  	//AIROU_CIRCLE,// アイルーサークル
 	
 
@@ -222,25 +265,34 @@ protected:
 	}m_ActionDatas[(int)BASE_ACTION_STATE::END];
 
 public:
-	BasePlayer(int deviceID,TEAM team, bool bAI);
+	BasePlayer(int deviceID, TEAM team, bool bAI);
 	~BasePlayer();
 	void InitAI();
 	void Control();			// プレイヤーからの入力を受け付ける
 	void AIControl();
-	virtual void Update();	// 基本的な更新
+	void Update(bool bControl);	// 基本的な更新
 	void UpdatePos();		// 座標更新(判定後に呼び出す)
 	void Move();			// 動きの制御
 	void InvincibleUpdate(); // 無敵の制御
 	void OverDriveUpdate(); // 覚醒の制御
-	void ActionOverDrive(); // 覚醒発動
+	void ActionOverDrive(OVERDRIVE_TYPE type); // 覚醒発動
 
 	virtual void Render();
-	virtual void Render(tdnShader* shader,char* name);	
+	virtual void Render(tdnShader* shader, char* name);
 	virtual void RenderDeferred();
+	virtual void RenderUI();
+	
+	/****************************/
+	//	キャラクター固有の様々なポジション
+	/****************************/
+	virtual Vector3 GetCenterPos() = 0;	// プレイヤーの真ん中の場所
+	virtual Vector3 GetHoldPos() = 0;   // つかみの相手の場所
 
 	/****************************/
 	//	キャラクター固有スキル
 	/****************************/
+	virtual void SkillInit() = 0;		// スキル発動時に呼び出す
+	virtual void SkillExit() = 0;
 	virtual void SkillUpdate() = 0;//
 
 	/*****************/
@@ -268,6 +320,7 @@ public:
 
 	// 継承してるやつに強制的に呼ばせる
 	virtual void InitActionDatas() = 0;
+	virtual void InitMotionDatas() = 0;
 
 	bool HandleMessage(const Message& msg); //メッセージを受け取る
 
@@ -300,7 +353,7 @@ public:
 			int i = 0;
 			assert(isAttackState());	// アタックデータがないステートでアタックデータを参照しようとしている
 		}
-		return m_ActionDatas[(int)state].pAttackData; 
+		return m_ActionDatas[(int)state].pAttackData;
 	}
 
 	AttackData *GetAttackData()
@@ -315,7 +368,7 @@ public:
 	//LPCSTR GetAttackSE(){ return m_ActionDatas[(int)m_ActionState].SE_ID; }
 	bool isFrameAction() { return (m_ActionState != BASE_ACTION_STATE::NO_ACTION); }
 	bool isAttackState()	// ★ステートが何もないのかそうでないか確認と、これがtrueならAttackDataがnull出ないことが保証される
-	{ 
+	{
 		// 何かしらアクションしてたあ
 		if (isFrameAction())
 		{
@@ -331,12 +384,12 @@ public:
 	bool isActiveFrame()
 	{
 		if (!isFrameAction()) return false;
-		return (m_ActionFrameList[m_ActionState][m_CurrentActionFrame] == FRAME_STATE::ACTIVE);
+		return (m_ActionFrameList[(int)m_ActionState][m_CurrentActionFrame] == FRAME_STATE::ACTIVE);
 	}
 	FRAME_STATE GetActionFrame()
 	{
 		if (!isFrameAction()) return FRAME_STATE::END;
-		return m_ActionFrameList[(int)m_ActionState][m_CurrentActionFrame]; 
+		return m_ActionFrameList[(int)m_ActionState][m_CurrentActionFrame];
 	}
 	int GetRecoveryFrame() { return m_RecoveryFlame; }
 	bool isEscape() { return m_bEscape; }
@@ -345,7 +398,7 @@ public:
 	bool isDownState(){ return (m_pStateMachine->isInState(*BasePlayerState::KnockDown::GetInstance())); }
 
 	// セッター
-	void SetMove(const Vector3 &v) 
+	void SetMove(const Vector3 &v)
 	{
 		if (v.y > 0)
 			int i = 0;
@@ -353,6 +406,12 @@ public:
 	}
 	void SetPos(const Vector3 &v) { m_pos.Set(v.x, v.y, v.z); }
 	void SetDir(DIR dir) { m_dir = dir; }
+	void SetMotion(MOTION_TYPE type)
+	{
+		if (!m_pObj) return;
+		m_pObj->SetMotion(m_MotionNumbers[(int)type]);
+		//SetMotion(m_MotionNumbers[(int)type]); 
+	}
 	void SetMotion(int MotionNo) { if (m_pObj) { if (m_pObj->GetMotion() != MotionNo)m_pObj->SetMotion(MotionNo); } }
 	void SetLand(bool bLand) { m_bLand = bLand; }
 	void SetAerialJump(bool bAerialJump) { m_bAerialJump = bAerialJump; }
@@ -361,11 +420,11 @@ public:
 	void SetEscapeFlag(bool bEscape) { m_bEscape = bEscape; }
 	void SetInvincible(int time, int lv){ m_InvincibleTime = time; m_InvincibleLV = lv; }
 	void SetInvincibleLV(int lv = 1){ m_InvincibleLV = lv; }
-	void SetInvincibleTime(int time){ m_InvincibleTime = time; }	
+	void SetInvincibleTime(int time){ m_InvincibleTime = time; }
 	void InvincibleOff(){ m_InvincibleLV = 0; m_InvincibleTime = 0; }
 	void SetActionState(BASE_ACTION_STATE state)
 	{
-		m_ActionState = state; 
+		m_ActionState = state;
 
 		// NO_ACTIONじゃなかったら
 		if (isFrameAction())
@@ -380,12 +439,15 @@ public:
 			}
 		}
 	}
+	int GetCurrentFrame(){ return m_CurrentActionFrame; }
 	//void SetStandSaveMove(const Vector3 &move){ m_StandSaveMove = move; }
 	void SetRecoveryCount(int recoverycount){ m_recoveryCount = recoverycount; }
+	void SetMoveUpdate(bool bMove){ m_bMoveUpdate = bMove; }
+	void TurnOverDir(){ m_dir = (m_dir == DIR::LEFT) ? DIR::RIGHT : DIR::LEFT; }
 
 	// アクセサー
-	void AddMove(const Vector3 &v) 
-	{ 
+	void AddMove(const Vector3 &v)
+	{
 		m_move += v;
 	}
 	int GetCollectScore(){ return m_CollectScore; }
@@ -403,11 +465,22 @@ public:
 
 	void MoveClampX(float val) { m_move.x = Math::Clamp(m_move.x, -val, val); }
 
+	// ガードしているか？ 
+	bool isGuard(){ return m_bGuard; }
+	int GetGuardFollowFrame(){ return m_GuardFollowFrame; }
+
+	void SetGuard(bool isguard){ m_bGuard = isguard; }
+	void SetGuardFollowFrame(int followFrame){ m_GuardFollowFrame = followFrame; }
+
+	void AddGuardFollowFrame(){ m_GuardFollowFrame++; }
 
 	// エフェクト
 	PanelEffectManager* GetPanelEffectManager() { return m_PanelEffectMGR; }
 	UVEffectManager* GetUVEffectManager() { return m_UVEffectMGR; }
 	void AddEffectAction(Vector3 pos,EFFECT_TYPE effectType);
+	void GuardEffectAction();
+	void GuardEffectStop();
+	void GuardEffectUpdate();
 
 	// ステージのあたり判定用
 	CollisionShape::Square *GetHitSquare() { return m_pHitSquare; }
@@ -415,20 +488,32 @@ public:
 	// 覚醒
 	int GetOverDrive(){ return m_OverDriveGage; } // 覚醒ゲージ
 	bool isOverDrive(){ return m_bOverDrive; } // 覚醒してるか
-	int GetOverDriveFlame(){ return m_OverDriveFlame; } // 覚醒時間
+	int GetOverDriveFlame(){ return m_OverDriveFrame; } // 覚醒時間
 	OVERDRIVE_TYPE GetOverDriveType(){ return m_OverDriveType; }	// 覚醒の種類
 
+	//  投げてる人のID
+	ENTITY_ID  GetThrowPlayerID() { return m_ThrowPlayerID; }
+	void SetThrowPlayerID(ENTITY_ID id){ m_ThrowPlayerID = id; }
+	bool isThrowSuccess(){ return m_bThrowSuccess; }
+	void SetThrowSuccess(bool bSuccess){ m_bThrowSuccess = bSuccess; }
+
+	// UI
+	ComboUI* GetComboUI(){ return m_pComboUI; }
 
 	//_/_/_/_/_/_/__/_/__/_/__/_/__
 	// 定数
 	//_/_/_/_/__/_/__/_/__/_/__/_/_
-	static const float c_END_MOVE_LINE;		// 移動が終わって大気に戻る移動値ライン
-	static const float c_FRONT_BRAKE_LINE;	// 走り中に操作を離してブレーキに移行するまでの移動値ライン
-	static const float c_GRAVITY;			// 全員が共通で持つ世界の重力
-	static const float c_MAX_JUMP;			// ジャンプ最大ライン
-	static const int   c_RECOVERY_FLAME;	// リカバリ―フレーム
-	static const int   c_OVERDRIVE_MAX_GAGE;// 覚醒ゲージの最大値
-	static const int   c_OVERDRIVE_MAX_TIME;// 覚醒が切れるまでの時間
+	static const float	c_END_MOVE_LINE;		// 移動が終わって大気に戻る移動値ライン
+	static const float	c_FRONT_BRAKE_LINE;		// 走り中に操作を離してブレーキに移行するまでの移動値ライン
+	static const float	c_GRAVITY;				// 全員が共通で持つ世界の重力
+	static const float	c_MAX_JUMP;				// ジャンプ最大ライン
+	static const int	c_RECOVERY_FLAME;		// リカバリ―フレーム
+	static const int	c_OVERDRIVE_MAX_GAGE;	// 覚醒ゲージの最大値
+	static const int	c_OVERDRIVE_MAX_TIME;	// 覚醒が切れるまでの時間
+	static const int	c_THROW_ESCAPE_FRAME;	// 投げぬけの猶予フレーム
+	static const int	c_THROW_MISS_FRAME;		// 投げ失敗のフレーム(全キャラ共通だろうという考え)
+	static const int	c_THROW_RELEASE_FRAME;	// 投げ抜けで、パシンてなってる間のフレーム(これも全キャラ共通だろう)
+
 protected:
 	const int m_deviceID;		// 自分のコントローラーの番号(実質、スマブラのxPに値する)
 	const TEAM m_team;			// このキャラクターの所属してるチーム
@@ -460,11 +545,18 @@ protected:
 	int m_CollectScore;			// 実体前の貯めているスコア
 	//Vector3 m_StandSaveMove;	// スタンド発動の保存移動量
 	int m_recoveryCount;		// リカバリーステートのいる時間をカウント
-	
+	bool m_bMoveUpdate;			// これがtrueなら、重力とか空気抵抗とかを受ける(アイルードリルとかペルソナとかでfalseにする)
+	// ガードに必要なやつ
+	bool m_bGuard;				// ガードしてるか
+	int m_GuardFollowFrame;		// ガード解除の隙
+
+	// モーション
+	int m_MotionNumbers[(int)MOTION_TYPE::MAX];
+
 	// 覚醒
 	int m_OverDriveGage;			// 覚醒ゲージ
 	bool m_bOverDrive;				// 覚醒してるか
-	int m_OverDriveFlame;			// 覚醒時間
+	int m_OverDriveFrame;			// 覚醒時間
 	OVERDRIVE_TYPE m_OverDriveType;	// 覚醒の種類
 
 	// 「喰らい中」に攻撃をくらってるカウント
@@ -488,6 +580,15 @@ protected:
 
 	// 継承してるやつに強制的に呼ばせる
 	void LoadAttackFrameList(char *filename);
+
+	// 投げてきた相手のIDを保存
+	ENTITY_ID m_ThrowPlayerID;
+
+	// 投げ成功フラグ(投げ抜け猶予終了時にこのフラグがたってなかったら投げ失敗ステートへ)
+	bool m_bThrowSuccess;
+
+	// UI
+	ComboUI* m_pComboUI;
 
 };
 

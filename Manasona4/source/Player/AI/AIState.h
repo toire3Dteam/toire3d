@@ -111,6 +111,40 @@ namespace AIState
 	};
 
 	/*******************************************************/
+	//					練習用地面ステート
+	/*******************************************************/
+	class PracticeLand :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static PracticeLand* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		PracticeLand() {};
+		~PracticeLand() {};
+
+		PracticeLand(const PracticeLand&){}
+		PracticeLand& operator=(const PracticeLand&){}
+	};
+
+	/*******************************************************/
 	//				待機ステート
 	/*******************************************************/
 	class Wait :public State<AI>
@@ -244,6 +278,40 @@ namespace AIState
 
 		Escape(const Escape&){}
 		Escape& operator=(const Escape&){}
+	};
+
+	/*******************************************************/
+	//		ガードステート　
+	/*******************************************************/
+	class Guard :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static Guard* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		Guard() {};
+		~Guard() {};
+
+		Guard(const Guard&){}
+		Guard& operator=(const Guard&){}
 	};
 
 	/*******************************************************/

@@ -93,9 +93,9 @@ bool FrameworkEx::Update()
 	}
 
 	// 一回の更新に2FPS以上かかってしまった場合 描画を止めて更新だけする
-	if (intervalTime > FPS_1 * 2) m_bRenderFlag = false;
-	else m_bRenderFlag = true;
-
+	//if (intervalTime > FPS_1 * 2) m_bRenderFlag = false;
+	//else m_bRenderFlag = true;
+	m_bRenderFlag = true;
 
 	// 新たに1FPSを加算
 	// この数値を触ることにより1フレームの長さを変えれる
@@ -127,10 +127,10 @@ bool FrameworkEx::Update()
 	if (m_scene != NULL)
 	{
 		// シーンの更新
-		m_bMoviePlay = m_scene->Update();	
+		m_scene->Update();	
 		
 		// 動画が再生していたら描画させない
-		return m_bMoviePlay;
+		return true;
 	}
 
 	return true;
@@ -181,8 +181,7 @@ bool FrameworkEx::FPSCtrl()
 		if (m_bSlowFlag == false)
 		{
 			m_bSlowFlag = true;
-		}
-		else
+		} else
 		{
 			m_bSlowFlag = false;
 		}

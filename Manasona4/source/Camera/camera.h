@@ -14,16 +14,22 @@
 class PlayerManager;
 class EffectCamera;
 
-
+// カメラクラス<Singleton>
 class Camera :public BaseGameEntity
 {
 public:
 	enum class MODE{ SUMABURA, EFFECT, MAX };
 
 	//------------------------------------------------------
+	//	実体取得
+	//------------------------------------------------------
+	static Camera *GetInstance(){ static Camera instance; return &instance; }
+
+	//------------------------------------------------------
 	//	初期化・解放
 	//------------------------------------------------------
-	Camera();
+	//Camera();
+	void InitializeResult();
 	~Camera();
 
 	//------------------------------------------------------
@@ -75,6 +81,9 @@ public:
 	StateMachine<Camera>* GetFSM()const { return m_pStateMachine; }
 
 private:
+	Camera();
+	//Camera(const Camera&){}
+	//Camera &operator=(const Camera&){}
 
 	// ★ステートマシン
 	StateMachine<Camera> *m_pStateMachine;
@@ -132,6 +141,8 @@ private:
 	bool  HandleMessage(const Message& msg);	// メッセージ更新
 };
 
+#define CameraMgr (Camera::GetInstance())
+
 
 //--------------------グローバルステート
 class GlobalCameraState : public State<Camera>
@@ -174,6 +185,34 @@ private:
 	GlobalCameraState() {};
 	GlobalCameraState(const GlobalCameraState&);
 	GlobalCameraState& operator=(const GlobalCameraState&);
+};
+
+//--------------------固定カメラステート
+class FixCameraState :public State<Camera>
+{
+public:
+	// this is a シングルトン
+	static FixCameraState *GetInstance(){ static FixCameraState i; return &i; }
+
+	// 入る
+	void Enter(Camera *pCamera){}
+
+	// 実行します
+	void Execute(Camera *pCamera){}
+
+	// 帰る
+	void Exit(Camera *pCamera){}
+
+	// エージェントからのメッセージを受信した場合、これが実行される
+	bool OnMessage(Camera *pCamera, const Message& msg){ return false; }
+
+private:
+	~FixCameraState() {};
+
+	// シングルトンの作法
+	FixCameraState() {};
+	FixCameraState(const FixCameraState&){}
+	FixCameraState& operator=(const FixCameraState&){}
 };
 
 //--------------------スマブラカメラステート

@@ -72,9 +72,13 @@ public:
 	//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
 	static void EffectPersonaTrigger(const Vector3 &pos);	// ペルソナ発動した瞬間
 	static void EffectPersonaAura(const Vector3 &pos);		// ペルソナ持続オーラ
+	static void EffectOverDrive(const Vector3 &pos);		// オーバードライブ持続オーラ
 	static void EffectFinish(const Vector3 &pos);		// フィニッシュアーツヒット
 	static void EffectFlySmoke(const Vector3 &pos);		// 吹っ飛び煙
-	static void EffectHit(const Vector3 &pos);
+	static void EffectRunSmoke(const Vector3 &pos, bool bLeft);		// 走りはじめの煙
+	static void EffectLandSmoke(const Vector3 &pos);		// 着地の煙
+	static void EffectHit(const Vector3 &pos, const Vector3 &v);
+	static void EffectResultSplash(const Vector3 &pos);		// リザルトの血しぶき
 	//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
 
 private:

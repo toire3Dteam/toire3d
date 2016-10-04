@@ -22,7 +22,9 @@ const int BasePlayer::c_RECOVERY_FLAME = 8;			// リカバリーステートにいる時間
 const int BasePlayer::c_OVERDRIVE_MAX_GAGE = 10;	// 覚醒ゲージの最大値
 const int BasePlayer::c_OVERDRIVE_MAX_TIME = 30;	// 覚醒が切れるまでの時間
 
-
+const int BasePlayer::c_THROW_ESCAPE_FRAME = 8;	// 投げぬけの猶予フレーム
+const int BasePlayer::c_THROW_MISS_FRAME = 30;	// 投げ外しロスのフレーム(全キャラ共通だろうという考え)
+const int BasePlayer::c_THROW_RELEASE_FRAME = 15;	// 投げ抜けで、パシンてなってる間のフレーム(これも全キャラ共通だろう)
 // アクションフレーム情報読み込み
 void BasePlayer::LoadAttackFrameList(char *filename)
 {
@@ -45,6 +47,7 @@ void BasePlayer::LoadAttackFrameList(char *filename)
 			for (int k = 0; k < frame; k++)
 			{
 				m_ActionFrameList[i][count++] = (FRAME_STATE)j;
+				MyAssert(count < 256, "アクションフレームの合計は255以下にしてください");
 			}
 		}
 		// 終端
@@ -52,13 +55,16 @@ void BasePlayer::LoadAttackFrameList(char *filename)
 	}
 }
 
-BasePlayer::BasePlayer(int deviceID,TEAM team, bool bAI) :m_bAI(bAI),m_team(team), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + deviceID)),
+BasePlayer::BasePlayer(int deviceID, TEAM team, bool bAI) :m_bAI(bAI), m_team(team), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + deviceID)),
 m_maxSpeed(1.0f), m_dir(DIR::LEFT), m_deviceID(deviceID), m_pHitSquare(new CollisionShape::Square),
 m_pObj(nullptr), m_move(VECTOR_ZERO), m_bLand(false), m_bAerialJump(true), m_ActionState(BASE_ACTION_STATE::NO_ACTION),
 m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentActionFrame(0), m_RecoveryFlame(0), m_bEscape(false), m_score(0), m_CollectScore(0), m_pAI(nullptr),
 m_recoveryCount(0), m_HitStopFrame(0),// ★★★バグの原因　ひっとすトップ初期化のし忘れ。
 m_InvincibleColRate(0), m_InvincibleColRateFlame(0), m_bInvincibleColRateUpFlag(false),
-m_OverDriveGage(0), m_bOverDrive(false), m_OverDriveFlame(0), m_OverDriveType(OVERDRIVE_TYPE::BURST)
+m_OverDriveGage(0), m_bOverDrive(false), m_OverDriveFrame(0), m_OverDriveType(OVERDRIVE_TYPE::BURST),
+m_bMoveUpdate(true), m_bThrowSuccess(false),
+m_bGuard(false), m_GuardFollowFrame(0),
+m_ThrowPlayerID(ENTITY_ID::ID_ERROR)
 {
 	// とりあえず、モコイさん
 	m_pStand = new Stand::Mokoi(this);
@@ -81,6 +87,7 @@ m_OverDriveGage(0), m_bOverDrive(false), m_OverDriveFlame(0), m_OverDriveType(OV
 	m_pStateMachine = new StateMachine<BasePlayer>(this);
 	m_pStateMachine->SetGlobalState(BasePlayerState::Global::GetInstance());// グローバル
 	m_pStateMachine->SetCurrentState(BasePlayerState::Wait::GetInstance());
+	m_pStateMachine->SetPreviousState(BasePlayerState::Wait::GetInstance());
 
 	// AIかどうかで　分岐
 	//if(bAI) m_pAI = new AI(m_deviceID, this);
@@ -110,6 +117,10 @@ m_OverDriveGage(0), m_bOverDrive(false), m_OverDriveFlame(0), m_OverDriveType(OV
 
 	// 喰らってる中に喰らってるかうんと初期化
 	m_RecoveryDamageCount.clear();
+
+
+	m_pComboUI = new ComboUI(&m_RecoveryFlame);
+
 }
 
 void BasePlayer::InitAI()
@@ -127,15 +138,18 @@ BasePlayer::~BasePlayer()
 	SAFE_DELETE(m_PanelEffectMGR);
 	SAFE_DELETE(m_UVEffectMGR);
 	SAFE_DELETE(m_pAI);
-
+	SAFE_DELETE(m_pComboUI);
 
 	delete m_pHitSquare;
 }
 
-void BasePlayer::Update()
+void BasePlayer::Update(bool bControl)
 {
 	// 覚醒の更新
 	OverDriveUpdate();
+
+	// ガードエフェクト更新
+	GuardEffectUpdate();
 
 	// 1more覚醒していたらスタンドの動きを止める
 	if (GetFSM()->isInState(*BasePlayerState::OverDrive_OneMore::GetInstance()) == false)
@@ -229,7 +243,7 @@ void BasePlayer::Update()
 			m_CurrentActionFrame++;
 
 			// フレーム最後まで再生したら
-			if (m_ActionFrameList[m_ActionState][m_CurrentActionFrame] == FRAME_STATE::END)
+			if (m_ActionFrameList[(int)m_ActionState][m_CurrentActionFrame] == FRAME_STATE::END)
 			{
 				// ★アクションステート解除
 				m_ActionState = BASE_ACTION_STATE::NO_ACTION;
@@ -237,8 +251,11 @@ void BasePlayer::Update()
 		}
 
 		// 入力受付
-		if (m_bAI)	AIControl();
-		else		Control();
+		if (bControl)
+		{
+			if (m_bAI)	AIControl();
+			else		Control();
+		}
 
 		// 入力受付後にステートマシン更新
 		m_pStateMachine->Update();
@@ -259,17 +276,26 @@ void BasePlayer::Update()
 	}
 
 	// アングル補間処理
-	m_angleY = m_angleY*.65f + DIR_ANGLE[(int)m_dir] * .35f;
+	const float AnglePercentage = (m_pStateMachine->isInState(*BasePlayerState::Escape::GetInstance())) ? .9f : .65f;
+	m_angleY = m_angleY * AnglePercentage + DIR_ANGLE[(int)m_dir] * (1 - AnglePercentage);
 
 	// エフェクトマネージャー更新 (ヒットストップ無視)
 	m_PanelEffectMGR->Update();
 	m_UVEffectMGR->Update();
+	
+	// コンボUI
+	m_pComboUI->Update();
+
 }
 
 void BasePlayer::Move() 
 {
 	// 移動量更新
-	if (m_pStateMachine->isInState(*BasePlayerState::StandAction::GetInstance()) == false){	// ペルソナ発動中じゃなかったら移動
+	if (
+		//m_pStateMachine->isInState(*BasePlayerState::StandAction::GetInstance()) == false
+		m_bMoveUpdate
+		)
+	{	// ペルソナ発動中じゃなかったら移動
 		m_move.y -= c_GRAVITY;
 		//if (m_move.y <= -3.0f) { m_move.y = -3.0f; } // 落ちる速度を抑制
 		m_move.y = max(-2.75f, m_move.y);// 落ちる速度を抑制
@@ -375,30 +401,38 @@ void BasePlayer::OverDriveUpdate()
 		switch (m_OverDriveType)
 		{
 		case OVERDRIVE_TYPE::ONEMORE:
+
+			// オーラのパーティクル
+			ParticleManager::EffectOverDrive(Vector3(GetPos().x, GetPos().y, -0.5f));	// 若干手前
+
 			break;
 		case OVERDRIVE_TYPE::BURST:
+
 			break;
 		default:
 			break;
 		}
 
-		m_OverDriveFlame--;
-		if (m_OverDriveFlame <= 0) // 覚醒時間が0になったら覚醒終わり
+		m_OverDriveFrame--;
+		if (m_OverDriveFrame <= 0) // 覚醒時間が0になったら覚醒終わり
 		{
-			m_OverDriveFlame = 0;
+			m_OverDriveFrame = 0;
 			m_bOverDrive = false;
 		}
 	}
 
 }
 
-void BasePlayer::ActionOverDrive()
+void BasePlayer::ActionOverDrive(OVERDRIVE_TYPE type)
 {
+	// 覚醒の種類
+	m_OverDriveType = type;
+
 	// アクション
 	m_bOverDrive = true;
 	
 	m_OverDriveGage = 0; //空に
-	m_OverDriveFlame = c_OVERDRIVE_MAX_TIME;
+	m_OverDriveFrame = c_OVERDRIVE_MAX_TIME;
 
 	// ジャンプの権利も復活
 	m_bAerialJump = true;
@@ -464,10 +498,15 @@ void BasePlayer::Render()
 	// 無敵なら加算で重ねて描画
 	if (m_InvincibleTime > 0) m_pObj->Render(RS::ADD);
 
-	if (m_deviceID == 3)
+	// ここで現在のステートマシンの状態を確認
+	if (m_deviceID == 1)
 	{
 		m_pStateMachine->Render();// ステートマシンでの描画
-		m_pAI->GetFSM()->Render();// AIステートマシンでの描画
+		
+		if (m_pAI != nullptr)
+		{
+			 m_pAI->GetFSM()->Render();// AIステートマシンでの描画
+		}
 	}
 
 
@@ -521,15 +560,15 @@ void BasePlayer::Render()
 	tdnText::Draw(32 + m_deviceID * 250, 660, 0xffff8000, "スタンドストック: %d", m_pStand->GetStandStock());
 	
 	tdnText::Draw(32 + m_deviceID * 250, 430, 0xff00ff80, "OD ゲージ: %d", m_OverDriveGage);
-	tdnText::Draw(32 + m_deviceID * 250, 460, 0xffff8000, "OD残り時間: %d", m_OverDriveFlame);
+	tdnText::Draw(32 + m_deviceID * 250, 460, 0xffff8000, "OD残り時間: %d", m_OverDriveFrame);
 
 
 	Vector2 pos2d = Math::WorldToScreen(m_pos);
 	
 	//if (m_deviceID == 1 || m_deviceID == 2)
 	{
-		tdnText::Draw(pos2d.x, pos2d.y - 150, 0xff00ff80, "C_Score : %d", m_CollectScore);
-		tdnText::Draw(pos2d.x, pos2d.y-100, 0xffff8000, "%dP!!", m_deviceID);
+		tdnText::Draw((int)pos2d.x, (int)pos2d.y - 150, 0xff00ff80, "C_Score : %d", m_CollectScore);
+		tdnText::Draw((int)pos2d.x, (int)pos2d.y-100, 0xffff8000, "%dP!!", m_deviceID);
 
 	}
 
@@ -616,6 +655,12 @@ void BasePlayer::RenderDeferred()
 	m_pObj->Render(shaderM,"G_Buffer");
 }
 
+void BasePlayer::RenderUI()
+{
+	// コンボUI
+	m_pComboUI->Render(100 + (m_deviceID * 950), 200);
+}
+
 // ステートマシンへの他から来るメッセージ
 bool BasePlayer::HandleMessage(const Message & msg)
 {
@@ -630,15 +675,21 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType)
     // キャラクター向きによる向き
     float diaAngle = (m_dir == DIR::RIGHT) ? 0.0f : 3.14f;
 
+	// 集まるエフェクトの場所補正
+	Vector3 convAddPos = Vector3(0, -10, 0);
+
 	switch (effectType)
 	{
 	case EFFECT_TYPE::DAMAGE:
+	{
 		//m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::BURN);
 		m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::DAMAGE);
 		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::WAVE);
 		PointLightMgr->AddPointLight(pos + Vector3(0, 5, 0), Vector3(1.0f, 0.4f, 0.0f), 20, 4, 20, 4, 15);// ポイントライトエフェクト！
-		ParticleManager::EffectHit(pos);
-
+		Vector3 FlyVector(m_move);
+		FlyVector.Normalize();
+		ParticleManager::EffectHit(pos, FlyVector);
+	}
 		break;
 	case EFFECT_TYPE::WHIFF:
 		m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::INEFFECT_MINI);
@@ -646,6 +697,7 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType)
         m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::HIT_IMPACT,
             1, 2, Vector3(0, diaAngle, 0), Vector3(0, diaAngle, 0));
 
+	
 		break;
 	case EFFECT_TYPE::RECOVERY:
 		m_PanelEffectMGR->AddEffect(pos + Vector3(0, 5, 0), PANEL_EFFECT_TYPE::ClEAR);
@@ -685,9 +737,58 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType)
 		m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::ONEMORE_BURST);
 
 		break;
+	case EFFECT_TYPE::ONEMORE_BURST_START:
+	
+		m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::BURST_PREV);
+
+	//m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::BURST_BALL, 0.9, 0.75
+	//		, Vector3(0, 0, 0), Vector3(0, 0, 0));
+
+	 m_UVEffectMGR->AddEffect(pos+convAddPos, UV_EFFECT_TYPE::CONV, 1.5f, 1.5f
+		 , Vector3(0, 0, 0), Vector3(0, 0, 0));
+	 m_UVEffectMGR->AddEffect(pos + convAddPos+Vector3(0,-5,0), UV_EFFECT_TYPE::CONV2, 1.5f, 1.5f
+		 , Vector3(0, 0, 0), Vector3(0, 0, 0),4);
+	 m_UVEffectMGR->AddEffect(pos + convAddPos + Vector3(-0.5, -7, 0), UV_EFFECT_TYPE::CONV3, 1.5f, 1.5f
+		 , Vector3(0, 0, 0), Vector3(0, 0, 0),8);
+	 m_UVEffectMGR->AddEffect(pos + convAddPos, UV_EFFECT_TYPE::CONV4, 1.5f, 1.5f
+		 , Vector3(0, 0, 0), Vector3(0, 0, 0),12);
+		break;
+	case EFFECT_TYPE::RUN:
+		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::RUN,
+			0.8f, 1.0f, Vector3(0, diaAngle, 0), Vector3(0, diaAngle, 0));
+		ParticleManager::EffectRunSmoke(m_pos, (m_dir != DIR::LEFT));
+
+		break;
+	case EFFECT_TYPE::GUARD_BREAK:
+		m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::GLASS);
+
+		break;
 	default:
 		assert(0);	// そんなエフェクトは存在しない AddEffectAction()
 		break;
 	}
 
+}
+
+// ガードEffect
+void BasePlayer::GuardEffectAction()
+{
+	// ガードエフェクト発動
+	m_UVEffectMGR->AddEffectRoop(GetCenterPos(), UV_EFFECT_TYPE::GUARD);
+
+	m_PanelEffectMGR->AddEffect(GetCenterPos()+Vector3(0,0,-5), PANEL_EFFECT_TYPE::GUARD);
+
+}
+
+void BasePlayer::GuardEffectStop()
+{
+	// ガードエフェクト終了
+	m_UVEffectMGR->StopEffectRoop(UV_EFFECT_TYPE::GUARD);
+}
+
+void BasePlayer::GuardEffectUpdate()
+{
+	// キャラクターに追従
+	// ガードエフェクト更新
+	m_UVEffectMGR->GetBaseUVEffect(UV_EFFECT_TYPE::GUARD)->SetPos(GetCenterPos());
 }

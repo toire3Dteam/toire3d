@@ -2,6 +2,8 @@
 #include	"FrameworkEx.h"
 #include	"../Scene/sceneMain.h"
 #include	"../Scene/sceneRenderingTest.h"
+#include	"../Scene/sceneResult.h"
+#include	"../Scene/SceneEffectTool.h"
 #include	"System.h"
 #include	"../Sound/SoundManager.h"
 //*****************************/
@@ -38,8 +40,10 @@ BOOL InitApp(HINSTANCE hInstance, int nCmdShow)									// ƒQ[ƒ€‹N“®‚ÌÅ‰‚Ì
 	SYSTEM_Initialize();
 
 	//MainFrameEx = new Framework();			 // ƒƒCƒ“ƒtƒŒ[ƒ€ƒ[ƒN¶¬
-	MainFrameEx->ChangeScene(new sceneMain); // ‰ŠúƒV[ƒ“
+	MainFrameEx->ChangeScene(new sceneMain, true); // ‰ŠúƒV[ƒ“
 	//MainFrameEx->ChangeScene(new sceneRenderingTest); // •`‰æƒeƒXƒgƒV[ƒ“
+	//MainFrameEx->ChangeScene(new sceneResurt); // ƒŠƒUƒ‹ƒgƒV[ƒ“
+	//MainFrameEx->ChangeScene(new sceneEffectTool); // 
 
 	return TRUE;
 }
@@ -67,6 +71,8 @@ BOOL EndApp()																	// ‚±‚Ì’†‚ÅƒVƒXƒeƒ€‚àŠÜ‚ß‚½‘S‚Ä‚ÌŒãˆ—‚ğ‚·‚é‚Ì‚Åƒ
 //*****************************************************************************************************************************
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	
+
 	// ƒƒ‚ƒŠƒŠ[ƒNŒŸ’mŠí
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	// ƒƒ‚ƒŠŠm•Û‚µ‚½uŠÔŒŸ’mŠí
@@ -97,8 +103,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		else
 		{
 			// ƒQ[ƒ€‚ÌXVE•`‰æ
-			if (MainFrameEx->Update()) MainFrameEx->Render();
+			if (MainFrameEx->Update())
+			{
+				MainFrameEx->Render();
+			}			
+
 		}
+
 
 	}
 

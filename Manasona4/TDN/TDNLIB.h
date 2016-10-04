@@ -31,7 +31,7 @@
 #include	<memory>
 #include	<random>		// メルセンヌ・ツイスターなどを扱うためのヘッダー
 #include	<list>			// 双方向リストを扱うへっだー
-//#include	<string>		// std::string型を扱うために必要なヘッダー
+#include	<string>		// std::string型を扱うために必要なヘッダー
 #include	<tchar.h>		// 
 #include	<mbstring.h>
 
@@ -666,6 +666,7 @@ private:
 	static BOOL WindowActive;			// ウィンドウの状態
 private:
 	static BOOL InitD3D();				// D3D初期化。Privateへ移行
+	static BOOL InitD3D(HWND hWnd);		// D3D初期化。tool用
 	static LPDIRECT3D9	lpD3D;			// DirectX9にアクセスするためのポインタ			
 	static LPDEVICE	Device;				// ビデオカードにアクセスするための3Dデバイス		
 	static D3DPRESENT_PARAMETERS d3dpp;	// ディスプレイパラメーター
@@ -1159,6 +1160,9 @@ namespace AnimAction
 		virtual void Render3D(tdn2DObj* pic, float x, float y, float z, int w, int h, int tx, int ty, int tw, int th, u32 dwFlags = RS::COPY);
 		virtual void Render3D(tdn2DObj* pic, Vector3 pos, int w, int h, int tx, int ty, int tw, int th, u32 dwFlags = RS::COPY);
 
+		// それぞれの特殊演出描画用　(例)　MoveAppearedならブラーをかける
+		virtual void RenderSpecial(tdn2DObj* pic, int x, int y);
+
 		// アクションチェック
 		bool ActionCheck();
 
@@ -1216,6 +1220,10 @@ namespace AnimAction
 		void Render(tdn2DObj* pic, int x, int y, tdnShader* shader, char* name);// shader適用
 		void Render(tdn2DObj* pic, int x, int y, int w, int h, int tx, int ty, int tw, int th, u32 dwFlags = RS::COPY);
 		void Render(tdn2DObj* pic, int x, int y, int w, int h, int tx, int ty, int tw, int th, tdnShader* shader, char* name);
+
+		// それぞれの特殊演出描画用　(例)　MoveAppearedならブラーをかける
+		void RenderSpecial(tdn2DObj* pic, int x, int y);
+
 
 	private:
 		int m_nowFlame;
@@ -1349,6 +1357,23 @@ namespace AnimAction
 
 	};
 
+	/**
+	*@brief		なし
+	*@author		Nishida
+	*/
+	class None :public Base
+	{
+	public:
+		// 引数で設定
+		None();
+		~None();
+
+		void Update(tdn2DObj* pic);// tdn2DObjの実態を中へ
+		void Action(tdn2DObj* pic, int delay);// 基本的にアニメの始動
+
+	private:
+
+	};
 }
 
 /**
@@ -1376,6 +1401,8 @@ public:
 	void OrderJump(int endFlame, float startScale, float addScale);
 	void OrderShrink(int endFlame, float startScale, float maxScale);
 	void OrderGrow(int endFlame, float startScale, float addScale);
+
+	void OrderNone();
 
 	// 実行・始動
 	void Update()
@@ -1466,6 +1493,12 @@ public:
 	{
 		MyAssert((m_pAction != nullptr), "特殊エフェクトがセットされていない!\n[Order関数を呼びましょう]");
 		m_pAction->Render3D(m_obj, pos, w, h, tx, ty, tw, th, dwFlags);
+	}
+
+	void RenderSpecial(int x, int y)
+	{
+		MyAssert((m_pAction != nullptr), "特殊エフェクトがセットされていない!\n[Order関数を呼びましょう]");
+		m_pAction->RenderSpecial(m_obj, x, y);
 	}
 
 private:
@@ -1561,6 +1594,7 @@ public:
 	// 矩形
 	static void Rect(int DstX, int DstY, int DstW, int DstH, u32 dwFlags, COLOR color, float z = .0f);
 	static void Rect(int DstX, int DstY, int DstW, int DstH, tdnShader* shader, char* name, COLOR color, float z = .0f);
+	static void Rect(int x, int y, int size, u32 dwFlags=RS::COPY, COLOR color = 0xffffffff);
 	// 線
 	static void DrawLine(float x1, float y1, float x2, float y2, DWORD color = 0xFFFFFFFF, float size = 1.0f);
 	static void DrawLine3D(Vector3 pos1, Vector3 pos2, DWORD color = 0xFFFFFFFF, float size = 1.0f, u32 dwFlag = RS::COPY);
@@ -2229,7 +2263,7 @@ public:
 	BOOL	SetOGG(LPDIRECTSOUND lpDS, char* filename);
 
 	void	Stop();
-	void	SetVolume(int volume);
+	void	SetVolume(float volume);
 	int		GetVolume(){ return volume; }
 
 	void SetMode(BYTE mode, int param);

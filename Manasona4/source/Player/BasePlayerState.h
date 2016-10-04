@@ -910,4 +910,173 @@ namespace BasePlayerState
 		OverDrive_Burst& operator=(const OverDrive_Burst&) {}
 	};
 
+	/*******************************************************/
+	//				ガードモーション
+	/*******************************************************/
+	class Guard :public State<BasePlayer>
+	{
+	public:
+		// this is a シングルトン
+		static Guard* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		Guard() {};
+		~Guard() {};
+
+		Guard(const Guard&) {}
+		Guard& operator=(const Guard&) {}
+	};
+
+
+	/*******************************************************/
+	//				投げモーション
+	/*******************************************************/
+	class Throw :public State<BasePlayer>
+	{
+	public:
+		// this is a シングルトン
+		static Throw* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		Throw() {};
+		~Throw() {};
+
+		Throw(const Throw&) {}
+		Throw& operator=(const Throw&) {}
+	};
+
+	/*******************************************************/
+	//				投げ失敗モーション
+	/*******************************************************/
+	class ThrowMiss :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static ThrowMiss* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		ThrowMiss() {};
+		~ThrowMiss() {};
+
+		ThrowMiss(const ThrowMiss&) {}
+		ThrowMiss& operator=(const ThrowMiss&) {}
+	};
+
+	/*******************************************************/
+	//				掴まれたモーション
+	/*******************************************************/
+	class ThrowBind :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static ThrowBind* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		ThrowBind() {};
+		~ThrowBind() {};
+
+		ThrowBind(const ThrowBind&) {}
+		ThrowBind& operator=(const ThrowBind&) {}
+	};
+
+	/*******************************************************/
+	//				掴み解除成功してはじくステート
+	/*******************************************************/
+	class SuccessThrowRelease :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static SuccessThrowRelease* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		SuccessThrowRelease() {};
+		~SuccessThrowRelease() {};
+
+		SuccessThrowRelease(const ThrowBind&) {}
+		SuccessThrowRelease& operator=(const ThrowBind&) {}
+	};
+
 }

@@ -38,12 +38,20 @@ m_NumPlayer(-1), m_pPlayerPosReferences(nullptr)
 	m_pStateMachine->SetGlobalState(GlobalCameraState::GetInstance());	// グローバルステートの設定
 }
 
+void Camera::InitializeResult()
+{
+	if (!m_pStateMachine->GetCurrentState()) m_pStateMachine->SetCurrentState(FixCameraState::GetInstance());
+	m_pStateMachine->ChangeState(EffectCameraState::GetInstance());
+	m_pEffectCamera->Start(0);
+}
+
 void Camera::SetPlayersPos()
 {
 	// プレイヤー数取得
 	m_NumPlayer = PlayerMgr->GetNumPlayer();
 
 	// スマブラカメラ用にプレイヤー達の座標のアドレスを取得する
+	if (m_pPlayerPosReferences) delete[] m_pPlayerPosReferences;	// 既存のバッファの解放
 	m_pPlayerPosReferences = new Vector3*[m_NumPlayer];
 	FOR(m_NumPlayer)
 	{
@@ -97,7 +105,7 @@ void Camera::SetStageCameraInfo(char *path)
 //------------------------------------------------------
 Camera::~Camera()
 {
-	delete[] m_pPlayerPosReferences;
+	if(m_pPlayerPosReferences) delete[] m_pPlayerPosReferences;
 	delete m_pStateMachine;
 	delete m_pEffectCamera;
 }
@@ -131,8 +139,8 @@ void Camera::Activate()
 	//Text::Draw(32, 64, 0xffffff00, "CameraFar : %.1f", projection.Far);
 	//Text::Draw(32, 128, 0xffffff00, "CameraFov : %.2f", projection.fovY);
 
-	if (KeyBoard(KB_NUMPAD4)) m_angle.z += .05f;
-	if (KeyBoard(KB_NUMPAD6)) m_angle.z -= .05f;
+	//if (KeyBoard(KB_NUMPAD4)) m_angle.z += .05f;
+	//if (KeyBoard(KB_NUMPAD6)) m_angle.z -= .05f;
 	//if (KeyBoard(KB_3)) projection.fovY -= .01f;
 	//if (KeyBoard(KB_4)) projection.fovY += .01f;
 }
