@@ -93,7 +93,7 @@ void SceneMainState::End::Execute(sceneMain *pMain)
 	// フェード終わったらリザルトに行く
 	if (Fade::isFadeStop())
 	{
-		MainFrameEx->ChangeScene(new sceneResurt);
+		MainFrameEx->ChangeScene(new sceneResult);
 	}
 }
 void SceneMainState::End::Exit(sceneMain *pMain){}

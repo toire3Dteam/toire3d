@@ -685,93 +685,92 @@ void tdn2DObj::Render(int x, int y, int w, int h, int tx, int ty, int tw, int th
 }
 
 // 反転
-void tdn2DObj::RenderReversal(int x, int y, int w, int h, int tx, int ty, int tw, int th, u32 dwFlags)
-{
-	// 頂点情報
-	TLVERTEX	v[4];
-
-	// 順番　拡大(S)->回転(R)->移動(T)
-
-	// 原点から拡大
-	v[1].sx = v[3].sx = (float)(w * -0.5f - centerX) * scale;
-	v[0].sx = v[2].sx = (float)(w * 0.5f - centerX) * scale;
-	v[0].sy = v[1].sy = (float)(h * -0.5f - centerY) * scale;
-	v[2].sy = v[3].sy = (float)(h * 0.5f - centerY) * scale;
-
-	// 原点から回転
-	for (DWORD i = 0; i < 4; i++) {
-		const float xrot = v[i].sx;
-		const float yrot = v[i].sy;
-		v[i].sx = xrot * cos(angle) + yrot * sin(angle);
-		v[i].sy = -xrot * sin(angle) + yrot * cos(angle);
-	}
-
-	// 移動
-	float transX = 0.0f;
-	float transY = 0.0f;
-	if (isShiftCenter)
-	{
-		// そのまま移動
-		transX = (float)(x);
-		transY = (float)(y);
-	}
-	else
-	{
-		// 元の位置に戻して移動
-		transX = (float)(x + centerX + (w * 0.5f));
-		transY = (float)(y + centerY + (h * 0.5f));
-	}
-
-	v[1].sx += transX;
-	v[3].sx += transX;
-	v[0].sx += transX - abjustSize; //0.5fずらす
-	v[2].sx += transX - abjustSize; //0.5fずらす	
-	v[0].sy += transY;
-	v[1].sy += transY;
-	v[2].sy += transY - abjustSize;
-	v[3].sy += transY - abjustSize;
-
-	// テクスチャ内の座標(UV)
-	if (isTurnOver == false)
-	{
-		v[1].tu = v[3].tu = (float)(tx + (float)abjustSize) / ((float)this->m_width);// ほんの少しUV座標をずらす
-
-																					 // 回転を適用したなら　補間のずれを修正するため少しずらす
-		if (angle == 0.0f)
-			v[0].tu = v[2].tu = (float)(tx + tw) / (float)this->m_width;
-		else
-			v[0].tu = v[2].tu = (float)((tx + tw) - abjustSize) / (float)this->m_width;
-
-	}
-	else //反転するなら
-	{
-		if (angle == 0.0f)
-			v[0].tu = v[2].tu = (float)(tx) / ((float)this->m_width);//
-		else
-			v[0].tu = v[2].tu = (float)(tx + (float)abjustSize) / ((float)this->m_width);//
-
-		v[1].tu = v[4].tu = (float)((tx + tw) - (float)abjustSize) / ((float)this->m_width);
-	}
-
-	// 縦のuv座標は変わらず
-	v[0].tv = v[1].tv = (float)(ty + abjustSize) / (float)this->m_height;// 
-																		 /// 回転を適用したなら　補間のずれを修正するため少しずらす
-	if (angle == 0.0f)
-		v[2].tv = v[3].tv = (float)((ty + th)) / (float)this->m_height;
-	else
-		v[2].tv = v[3].tv = (float)((ty + th) - abjustSize) / (float)this->m_height;
-
-
-	// ポリゴンの色
-	v[0].color = v[1].color = v[2].color = v[3].color = color;
-	v[0].rhw = v[1].rhw = v[2].rhw = v[3].rhw = 1.0f;//除算数?	
-	v[0].sz = v[1].sz = v[2].sz = v[3].sz = 0.0f;// Zは0
-
-												 // ↑の情報でポリゴン作成!!
-	tdnPolygon::Render2D(v, 2, this, dwFlags);
-
-
-}
+//void tdn2DObj::RenderReversal(int x, int y, int w, int h, int tx, int ty, int tw, int th, u32 dwFlags)
+//{
+//	// 頂点情報
+//	TLVERTEX	v[4];
+//
+//	// 順番　拡大(S)->回転(R)->移動(T)
+//
+//	// 原点から拡大
+//	v[0].sx = v[2].sx = (float)(w * -0.5f - centerX) * scale;
+//	v[1].sx = v[3].sx = (float)(w * 0.5f - centerX) * scale;
+//	v[0].sy = v[1].sy = (float)(h * -0.5f - centerY) * scale;
+//	v[2].sy = v[3].sy = (float)(h * 0.5f - centerY) * scale;
+//
+//	// 原点から回転
+//	for (DWORD i = 0; i < 4; i++) {
+//		const float xrot = v[i].sx;
+//		const float yrot = v[i].sy;
+//		v[i].sx = xrot * cos(angle) + yrot * sin(angle);
+//		v[i].sy = -xrot * sin(angle) + yrot * cos(angle);
+//	}
+//
+//	// 移動
+//	float transX = 0.0f;
+//	float transY = 0.0f;
+//	if (isShiftCenter)
+//	{
+//		// そのまま移動
+//		transX = (float)(x);
+//		transY = (float)(y);
+//	}
+//	else
+//	{
+//		// 元の位置に戻して移動
+//		transX = (float)(x + centerX + (w * 0.5f));
+//		transY = (float)(y + centerY + (h * 0.5f));
+//	}
+//
+//	v[0].sx += transX;
+//	v[2].sx += transX;
+//	v[1].sx += transX - abjustSize; //0.5fずらす
+//	v[3].sx += transX - abjustSize; //0.5fずらす	
+//	v[0].sy += transY;
+//	v[1].sy += transY;
+//	v[2].sy += transY - abjustSize;
+//	v[3].sy += transY - abjustSize;
+//
+//	// テクスチャ内の座標(UV)
+//	if (isTurnOver == false)
+//	{
+//		v[0].tu = v[2].tu = (float)(tx + (float)abjustSize) / ((float)this->m_width);// ほんの少しUV座標をずらす
+//
+//		// 回転を適用したなら　補間のずれを修正するため少しずらす
+//		if (angle == 0.0f)
+//			v[1].tu = v[3].tu = (float)(tx + tw) / (float)this->m_width;
+//		else
+//			v[1].tu = v[3].tu = (float)((tx + tw) - abjustSize) / (float)this->m_width;
+//
+//	}
+//	else //反転するなら
+//	{
+//		if (angle == 0.0f)
+//			v[1].tu = v[3].tu = (float)(tx) / ((float)this->m_width);//
+//		else
+//			v[1].tu = v[3].tu = (float)(tx + (float)abjustSize) / ((float)this->m_width);//
+//
+//		v[0].tu = v[2].tu = (float)((tx + tw) - (float)abjustSize) / ((float)this->m_width);
+//	}
+//
+//	// 縦のuv座標は変わらず
+//	v[0].tv = v[1].tv = (float)(ty + abjustSize) / (float)this->m_height;// 
+//																		 /// 回転を適用したなら　補間のずれを修正するため少しずらす
+//	if (angle == 0.0f)
+//		v[2].tv = v[3].tv = (float)((ty + th)) / (float)this->m_height;
+//	else
+//		v[2].tv = v[3].tv = (float)((ty + th) - abjustSize) / (float)this->m_height;
+//	
+//	// ポリゴンの色
+//	v[0].color = v[1].color = v[2].color = v[3].color = color;
+//	v[0].rhw = v[1].rhw = v[2].rhw = v[3].rhw = 1.0f;//除算数?	
+//	v[0].sz = v[1].sz = v[2].sz = v[3].sz = 0.0f;// Zは0
+//
+//												 // ↑の情報でポリゴン作成!!
+//	tdnPolygon::Render2D(v, 2, this, dwFlags);
+//
+//
+//}
 
 
 // 3D描画

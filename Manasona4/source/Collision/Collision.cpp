@@ -271,9 +271,9 @@ void Collision::Sinking(iexMesh *obj, BasePlayer *pPlayer1, BasePlayer *pPlayer2
 	{
 		const float len = v.Length();
 		//v.Normalize();	// ê≥ãKâª
-		Vector3 sinking1(s2.width - sqrtf(v.x*v.x), s2.height - sqrtf(v.y*v.y), 0);	// ÇﬂÇËçûÇ›ó 
+		Vector3 sinking1((s1.width + s2.width) - sqrtf(v.x*v.x), (s1.height + s2.height) - sqrtf(v.y*v.y), 0);	// ÇﬂÇËçûÇ›ó 
 		Vector3 sinking2(-sinking1);
-		if (v.x < 0)
+		if (v.x > 0)
 		{
 			sinking1.x *= -1;
 			sinking2.x *= -1;
@@ -281,7 +281,7 @@ void Collision::Sinking(iexMesh *obj, BasePlayer *pPlayer1, BasePlayer *pPlayer2
 
 		sinking1.y = 0;
 		sinking2.y = 0;
-		static const float rate = .75f;
+		static const float rate = .5f;
 		sinking1 *= rate;	// äÆëSÇ…ñﬂÇ∑Ç∆ïsé©ëRÇ»ÇÃÇ≈
 		sinking2 *= rate;
 

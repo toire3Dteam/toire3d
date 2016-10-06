@@ -4,7 +4,7 @@
 class Camera;
 
 // ステージのタイプ
-enum class STAGE_ID{ SENJO, SYUTEN,A, MAX };
+enum class STAGE_ID{ SENJO, SYUTEN,A, HEAVE_HO, MAX };
 
 class BasePlayer;
 
@@ -17,7 +17,7 @@ namespace Stage
 		Base();
 		virtual ~Base();
 
-		virtual void Initialize(Camera *pCamera) = 0;
+		virtual void Initialize(Camera *pCamera){}
 		virtual void Update();
 		virtual void Render(); 
 		virtual void Render(tdnShader* shader,char* name);
@@ -32,6 +32,14 @@ namespace Stage
 
 		void Collision(BasePlayer *player, Vector3 *move);
 		void Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2);
+
+		void ChangeObj(char *ObjFileName, char *BackFileName)
+		{
+			if (m_pObj) delete m_pObj;
+			if (m_pBack) delete m_pBack;
+			m_pObj = (ObjFileName) ? new iexMesh(ObjFileName) : nullptr;
+			m_pBack = (BackFileName) ? new iexMesh(BackFileName) : nullptr;
+		}
 
 	protected:
 		iexMesh *m_pObj;	// メッシュの実体
@@ -87,5 +95,6 @@ namespace Stage
 		STAGE_ID GetStageID(){ return STAGE_ID::SYUTEN; }
 	private:
 	};
+
 }
 

@@ -30,7 +30,7 @@ const SE_Manager::DATA all_dataS[] =
 	{ "空振り1",			"DATA/Sound/SE/Battle/whiff1.wav",	2, false },
 	{ "空振り2",			"DATA/Sound/SE/Battle/whiff2.wav",	2, false },
 	{ "エスケープ",			"DATA/Sound/SE/Battle/escape.wav",	2, false },
-	//{ "Eカウンター始動",	"DATA/Sound/SE/Battle/counter.wav",	2, false },
+	{ "ガード",				"DATA/Sound/SE/Battle/guard.wav",	8, false },
 	//{ "Eカウンター成功",	"DATA/Sound/SE/Battle/counter_success.wav",	2, false },
 	{ "ブレーキ1",			"DATA/Sound/SE/Battle/brake1.wav",	2, false },
 	{ "ダッシュ",			"DATA/Sound/SE/Battle/dash.wav", 2, false },

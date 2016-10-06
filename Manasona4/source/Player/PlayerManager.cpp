@@ -29,7 +29,7 @@ void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage)
 
 	FOR(NumPlayer)
 	{
-		// チームを今は仮で振り分け!!
+		// チームを今は仮で振り分け!! 2016/10.04日　左か右をTeamで変えてる
 		TEAM team;
 		if (i % 2 == 0)
 		{
@@ -40,7 +40,7 @@ void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage)
 			team = TEAM::B;
 		}
 
-		m_pPlayers[i] = new Airou(i, team, (i == 1 )/*(i == 1 || i == 2 || i == 3)*/);//*i == 1*/0));
+		m_pPlayers[i] = new Airou(i, team, (i == 2 )/*(i == 1 || i == 2 || i == 3)*/);//*i == 1*/0));
 		m_pPlayers[i]->InitActionDatas();		// ★攻撃情報を各キャラに初期化させる
 		m_pPlayers[i]->InitMotionDatas();		// 各キャラごとの必殺技
 	}
@@ -65,7 +65,7 @@ void PlayerManager::Update(bool bControl)
 	// 誰かが1More覚醒していたら全員の動きを止める
 	FOR(m_NumPlayer)
 	{
-		if (m_pPlayers[i]->GetFSM()->isInState(*BasePlayerState::OverDrive_OneMore::GetInstance()) == true)
+		if (m_pPlayers[i]->isGameTimerStopFlag() == true)
 		{
 			m_pPlayers[i]->Update(bControl);			// モーションとか移動値の作成とか、基本的な更新。
 			
@@ -81,7 +81,7 @@ void PlayerManager::Update(bool bControl)
 	}
 	// 誰も覚醒していなかったので通常通り更新
 	
-	// ●暗転処理
+	// ●暗転解放処理
 	m_OverDriveDim = min(m_OverDriveDim + 0.1f, 1.0f);
 	
 	
@@ -93,11 +93,16 @@ void PlayerManager::Update(bool bControl)
 	}
 
 	/* プレイヤーVSプレイヤーの攻撃判定 */
-	//bool bHit[m_NumPlayer];
-	bool *bHit = new bool[m_NumPlayer];					// 複数ヒット用
+	HIT_ATTACK_INFO **pHitAttackInfo=new HIT_ATTACK_INFO*[m_NumPlayer];
+	HIT_DAMAGE_INFO **pHitDamageInfo=new HIT_DAMAGE_INFO*[m_NumPlayer];
+	FOR(m_NumPlayer)
+	{
+		pHitAttackInfo[i] = nullptr;
+		pHitDamageInfo[i] = nullptr;
+	}
 	bool *bHitStand = new bool[m_NumPlayer];
-	memset(bHit, false, sizeof(bool) * m_NumPlayer);	// falseで初期化
 	memset(bHitStand, false, sizeof(bool)* m_NumPlayer);	// falseで初期化
+
 	for (int my = 0; my < m_NumPlayer; my++)
 	{
 		for (int you = my + 1; you < m_NumPlayer; you++)
@@ -109,10 +114,12 @@ void PlayerManager::Update(bool bControl)
 			// ( my->you you->my )つまり交互に当たっていないかチェックする
 
 			/* プレイヤーVSプレイヤーの攻撃判定 */
-			receive = CollisionPlayerAttack(m_pPlayers[my], m_pPlayers[you]);
-			bHit[my] = (bHit[my]) ? true : receive;		// 当たってたら、その後の判定結果とか気にしなくていい
-			receive = CollisionPlayerAttack(m_pPlayers[you], m_pPlayers[my]);
-			bHit[you] = (bHit[you]) ? true : receive;	// 当たってたら、その後の判定結果とか気にしなくていい
+			//receive = CollisionPlayerAttack(m_pPlayers[my], m_pPlayers[you]);
+			//bHit[my] = (bHit[my]) ? true : receive;		// 当たってたら、その後の判定結果とか気にしなくていい
+			//receive = CollisionPlayerAttack(m_pPlayers[you], m_pPlayers[my]);
+			//bHit[you] = (bHit[you]) ? true : receive;	// 当たってたら、その後の判定結果とか気にしなくていい
+			CollisionPlayerAttack(m_pPlayers[my], m_pPlayers[you], &pHitAttackInfo[my], &pHitDamageInfo[you]);
+			CollisionPlayerAttack(m_pPlayers[you], m_pPlayers[my], &pHitAttackInfo[you], &pHitDamageInfo[my]);
 
 			/* プレイヤーVSプレイヤーの投げ掴み判定 */
 			if (m_pPlayers[my]->GetFSM()->isInState(*BasePlayerState::Throw::GetInstance()))	// 自分が投げモードに入ってたら
@@ -130,7 +137,22 @@ void PlayerManager::Update(bool bControl)
 	// プレイヤーVSプレイヤー攻撃結果確定
 	FOR(m_NumPlayer)
 	{
-		if (bHit[i]) if(m_pPlayers[i]->isAttackState()) m_pPlayers[i]->GetAttackData()->bHit = true;	// 2重ヒット防止用のフラグをONにする
+		// 当たってたら
+		if (pHitAttackInfo[i])
+		{
+			int DamagePlayerNo(0);
+			for (int j = 0; j < m_NumPlayer; j++)
+			{
+				if (j == i) continue;
+				if (m_pPlayers[j]->GetDeviceID() == pHitAttackInfo[i]->HitPlayerDeviceID)
+				{
+					DamagePlayerNo = j;
+					break;
+				}
+			}
+			SendHitMessage(m_pPlayers[i], m_pPlayers[DamagePlayerNo], pHitAttackInfo[i], pHitDamageInfo[DamagePlayerNo]);
+			if (m_pPlayers[i]->isAttackState()) m_pPlayers[i]->GetAttackData()->bHit = true;	// 2重ヒット防止用のフラグをONにする
+		}
 		if (bHitStand[i]) m_pPlayers[i]->GetStand()->GetAttackData()->bHit = true;	// 2重ヒット防止用のフラグをONにする
 	}
 
@@ -142,10 +164,15 @@ void PlayerManager::Update(bool bControl)
 		m_pPlayers[i]->UpdatePos();			// 座標にmove値を足す更新
 	}
 
-
-	delete[] bHit;	// ポインタ配列の解放
+	// 解放
 	delete[] bHitStand;
-
+	FOR(m_NumPlayer)
+	{
+		if (pHitAttackInfo[i]) delete pHitAttackInfo[i];
+		if (pHitDamageInfo[i]) delete pHitDamageInfo[i];
+	}
+	delete[] pHitAttackInfo;
+	delete[] pHitDamageInfo;
 
 	// チームポイント計算
 	CalcTeamPoint();
@@ -177,16 +204,16 @@ void PlayerManager::RenderUI()
 	FOR(m_NumPlayer) m_pPlayers[i]->RenderUI();
 }
 
-bool PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you)
+void PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_ATTACK_INFO **OutAttackInfo, HIT_DAMAGE_INFO **OutDamageInfo)
 {
 	// チーム同じだよ！
-	if (my->GetTeam() == you->GetTeam()) return false;
+	if (my->GetTeam() == you->GetTeam()) return;
 
 	// 攻撃系のステートじゃないよ！
-	if (!my->isAttackState()) return false;
+	if (!my->isAttackState()) return;
 
 	// 相手がエスケープ中だよ！
-	if (you->isEscape()) return false;
+	if (you->isEscape()) return;
 
 	if (my->isActiveFrame()) // 攻撃フレーム中なら
 	{
@@ -202,7 +229,7 @@ bool PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you)
 				&& you->GetAttackData()->bAntiAir== true)
 			{
 				// 自分が空中で攻撃していた場合
-				if (my->isLand() == false)return false;
+				if (my->isLand() == false)return;
 			}
 
 		}
@@ -226,15 +253,13 @@ bool PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you)
 				/* メッセージ送信 */
 
 				// 相手がヒットしたときの地上にいたか空中にいたか
-				int iHitPlace = (you->isLand()) ? (int)AttackData::HIT_PLACE::LAND : (int)AttackData::HIT_PLACE::AERIAL;
+				int iHitPlace((you->isLand()) ? (int)AttackData::HIT_PLACE::LAND : (int)AttackData::HIT_PLACE::AERIAL);
 
 				// (A列車)(TODO) ★★★これだとフィニッシュアーツがひとつしか存在しなくなるのでどうにかしよう
 				// フィニッシュアーツかどうか
-				bool bFinish = (my->GetActionState() == BASE_ACTION_STATE::FINISH);
-
-				// ★(TODO)(A列車)　ガードならSEをキンッ！でおなシャス
+				bool bFinish(my->GetActionState() == BASE_ACTION_STATE::FINISH);
 				
-				int hitScore = my->GetAttackData()->HitScore;
+				int hitScore(my->GetAttackData()->HitScore);
 				if (you->isGuard()) // 相手がガード中なら
 				{
 					hitScore = (int)(hitScore * 0.25f);// スコア半減
@@ -251,50 +276,52 @@ bool PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you)
 				}
 
 				// まず、攻撃をヒットさせた人に送信
-				HIT_ATTACK_INFO HitAttackInfo;
-				HitAttackInfo.HitPlayerDeviceID = you->GetDeviceID();									// ダメージを与えた相手の番号
-				HitAttackInfo.hitStopFlame = my->GetAttackData()->places[iHitPlace].hitStopFlame;		// 自分自身にもの自分のヒットストップ
-				HitAttackInfo.HitScore = hitScore;									// ダメージ(スコア)
-				HitAttackInfo.bFinishAttack = bFinish;													// ふぃにしゅアーツかどうか
-				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, my->GetID(), MESSAGE_TYPE::HIT_ATTACK, &HitAttackInfo);
+				*OutAttackInfo = new HIT_ATTACK_INFO;
+				(*OutAttackInfo)->HitPlayerDeviceID = you->GetDeviceID();									// ダメージを与えた相手の番号
+				(*OutAttackInfo)->hitStopFlame = my->GetAttackData()->places[iHitPlace].hitStopFlame;		// 自分自身にもの自分のヒットストップ
+				(*OutAttackInfo)->HitScore = hitScore;									// ダメージ(スコア)
+				(*OutAttackInfo)->bFinishAttack = bFinish;													// ふぃにしゅアーツかどうか
+				//MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, my->GetID(), MESSAGE_TYPE::HIT_ATTACK, &HitAttackInfo);
 				// 数字エフェクト追加
 				Vector2 screenPos= Math::WorldToScreen(my->GetPos());
 				NumberEffect.AddNumber((int)screenPos.x, (int)screenPos.y - 200, hitScore, Number_Effect::COLOR_TYPE::WHITE, Number::NUM_KIND::NORMAL);
 
 
 				// そして、ダメージを受けた人に送信
-				HIT_DAMAGE_INFO HitDamageInfo;
-				HitDamageInfo.BeInvincible = my->GetAttackData()->places[iHitPlace].bBeInvincible;	// 無敵になるかどうか
-				HitDamageInfo.damage = my->GetAttackData()->damage;				// ダメージ(スコア)
-				HitDamageInfo.FlyVector = my->GetAttackData()->places[iHitPlace].FlyVector;			// 吹っ飛びベクトル
-				HitDamageInfo.hitStopFlame = my->GetAttackData()->places[iHitPlace].hitStopFlame;		// ヒットストップ
-				HitDamageInfo.recoveryFlame = my->GetAttackData()->places[iHitPlace].recoveryFlame;		// 硬直時間
-				HitDamageInfo.HitEffectType = (int)my->GetAttackData()->HitEffectType;			// この攻撃のヒットエフェクトを相手に送る
-				HitDamageInfo.iAttackType = (int)my->GetActionState();						// 何の攻撃かのタイプ(コンボ中に同じ攻撃を使わせないように)
-				HitDamageInfo.bFinishAttack = bFinish;										// ふぃにしゅアーツかどうか
+				*OutDamageInfo = new HIT_DAMAGE_INFO;
+				(*OutDamageInfo)->BeInvincible = my->GetAttackData()->places[iHitPlace].bBeInvincible;	// 無敵になるかどうか
+				(*OutDamageInfo)->damage = my->GetAttackData()->damage;				// ダメージ(スコア)
+				(*OutDamageInfo)->FlyVector = my->GetAttackData()->places[iHitPlace].FlyVector;			// 吹っ飛びベクトル
+				(*OutDamageInfo)->hitStopFlame = my->GetAttackData()->places[iHitPlace].hitStopFlame;		// ヒットストップ
+				(*OutDamageInfo)->recoveryFlame = my->GetAttackData()->places[iHitPlace].recoveryFlame;		// 硬直時間
+				(*OutDamageInfo)->HitEffectType = (int)my->GetAttackData()->HitEffectType;			// この攻撃のヒットエフェクトを相手に送る
+				(*OutDamageInfo)->iAttackType = (int)my->GetActionState();						// 何の攻撃かのタイプ(コンボ中に同じ攻撃を使わせないように)
+				(*OutDamageInfo)->bFinishAttack = bFinish;										// ふぃにしゅアーツかどうか
 				
 				// ★コンボUI エフェクト(カウント)発動
-				if (you->isGuard() == false) you->GetComboUI()->Count(hitScore, HitDamageInfo.recoveryFlame); // 相手がガード中でなければ
+				if (you->isGuard() == false) you->GetComboUI()->Count(hitScore, (*OutDamageInfo)->recoveryFlame); // 相手がガード中でなければ
 				else you->GetComboUI()->Guard();// ガードされた
+
+				// ★★★超絶仮
+				my->SetHP(my->GetMaxHP() - my->GetCollectScore());
+				you->SetHP(my->GetMaxHP() - my->GetCollectScore());
 
 				if (
 					//my->GetPos().x > you->GetPos().x// 位置関係によるベクトル
 					my->GetDir() == DIR::LEFT			// 当てた人の向きによるベクトル
-					) HitDamageInfo.FlyVector.x *= -1;
-				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, you->GetID(), MESSAGE_TYPE::HIT_DAMAGE, &HitDamageInfo);
+					) (*OutDamageInfo)->FlyVector.x *= -1;
+				//MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, you->GetID(), MESSAGE_TYPE::HIT_DAMAGE, &HitDamageInfo);
 
 				// カメラに振動メッセージを送る
 				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::SHAKE_CAMERA, &my->GetAttackData()->ShakeCameraInfo);
 
 				// 音出す
-				LPCSTR seID = my->GetAttackData()->HitSE;
+				// ガードならSEをキンッ！でおなシャス
+				LPCSTR seID = (you->isGuard() && !bFinish) ? "ガード" : my->GetAttackData()->HitSE;
 				if (seID) se->Play((LPSTR)seID);
-
-				return true;	// 当たった
 			}
 		}
 	}
-	return false;	// 当たらなかった
 }
 
 bool PlayerManager::CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou)
@@ -396,7 +423,9 @@ bool PlayerManager::CollisionThrowAttack(BasePlayer *my, BasePlayer *you)
 	if (my->GetCurrentFrame() >= BasePlayer::c_THROW_ESCAPE_FRAME) return false;
 
 	// 球距離判定
-	if (Math::Length(my->GetPos(), you->GetPos()) < 8)
+	Vector3 v(you->GetPos() - my->GetPos());
+	if (v.x * v.x + v.y * v.y < 10 * 10 &&
+		((v.x > 0 && my->GetDir() == DIR::RIGHT) || (v.x < 0 && my->GetDir() == DIR::LEFT)))
 	{
 		// ★ここでつかまれた相手の座標をつかんだ相手の掴み座標に移動(普通に代入すると壁抜けするので、壁判定もろもろここでやってしまおうという事)
 		const Vector3 p(my->GetPos());
@@ -424,6 +453,15 @@ bool PlayerManager::CollisionThrowAttack(BasePlayer *my, BasePlayer *you)
 	return false;
 }
 
+void PlayerManager::SendHitMessage(BasePlayer *pAttackPlayer, BasePlayer *pDamagePlayer, HIT_ATTACK_INFO *pHitAttackInfo, HIT_DAMAGE_INFO *pHitDamageInfo)
+{
+	/* メッセージ送信 */
+	// 相手にダメージ与えたよメッセージ
+	MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, pAttackPlayer->GetID(), MESSAGE_TYPE::HIT_ATTACK, pHitAttackInfo);
+
+	// ダメージ受けたよメッセージ
+	MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, pDamagePlayer->GetID(), MESSAGE_TYPE::HIT_DAMAGE, pHitDamageInfo);
+}
 
 bool PlayerManager::HandleMessage(const Message &msg)
 {

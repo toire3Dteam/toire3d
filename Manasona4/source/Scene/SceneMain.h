@@ -1,7 +1,7 @@
 #pragma once
 
 // 他からインクルードするとBaseSceneがどうこう言われるので
-#include "../system/Framework.h"
+#include "../system/FrameworkEx.h"
 
 // エンティティ関連のインクルード
 #include "../BaseEntity/Entity/BaseGameEntity.h"
@@ -10,11 +10,11 @@
 // 前方宣言
 class MyMusicManager;
 class Camera;
+
 //class Stage::Base;	// ×
 namespace Stage{		// ○
 	class Base;
 }
-
 
 class sceneMain : public BaseScene, BaseGameEntity
 {
@@ -37,12 +37,12 @@ public:
 	// メッセージ受信(BaseEntityによるオーバーライド)
 	bool  HandleMessage(const Message& msg){ return m_pStateMachine->HandleMessage(msg); }
 
-
 private:
+
 	Stage::Base *m_pStage;			// ステージさん
 	//Camera *m_pCamera;				// カメラさん
 	MyMusicManager *m_pMyMusicMgr;	// オレ曲管理さん
-
+	
 	tdn2DObj* m_stageScreen;		// ステージオンリーのレンダーターゲット
 
 	Vector3 m_dirLight;// ライト方向ﾆｷ

@@ -14,6 +14,9 @@ enum MESSAGE_TYPE
 	BE_THROWN,			// 掴まれた相手に送るメッセージ(★掴んだ相手のIDを送ってあげる)
 	CAN_THROW_RELEASE,	// 掴まれた人が投げぬけコマンドを入力したときに掴んだやつに対して送るメッセージ
 	THROW_RELEASE,		// 投げぬけしていいよと送るメッセージ
+	HEAVE_HO_OVER_DRIVE_HIT,	// ヒーホーフィニッシュヒット
+	PERSONA_CARD_COUNT_UP,// ペルソナカードが増えた
+	PERSONA_CARD_COUNT_DOWN,// ペルソナカードが減った
 	OTHER				// その他。
 };
 
@@ -67,6 +70,13 @@ struct BE_THROWN_INFO
 {
 	ENTITY_ID ThrowPlayerID;	// つかんだやつのID
 	int iThrowPlayerDir;		// つかんだやつの向き(受けた側はこれの反対を向く)
+};
+
+// チーム
+enum class TEAM
+{
+	A,
+	B
 };
 
 /*

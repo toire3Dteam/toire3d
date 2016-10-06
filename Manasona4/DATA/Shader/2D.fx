@@ -1121,95 +1121,72 @@ technique blind
 //	マスク
 /***********************************/
 
-// -------------------------------------------------------------
-// 頂点シェーダからピクセルシェーダに渡すデータ
-// -------------------------------------------------------------
-struct VS_OUTPUT_M
-{
-	float4 Pos			: POSITION;
-	float2 Tex			: TEXCOORD0;
-	float4 Color		: COLOR0;
-	float4 wvpPos			: TEXCOORD1;
-};
 
-texture MaskTex;
-sampler MaskSamp = sampler_state
-{
-	Texture = <MaskTex>;
-	MinFilter = LINEAR;
-	MagFilter = LINEAR;
-	MipFilter = NONE;
-
-	AddressU = Wrap;// 繰り返す
-	AddressV = Wrap;
-};
-
-
-// -------------------------------------------------------------
-// 頂点シェーダプログラム
-// -------------------------------------------------------------
-VS_OUTPUT_M VS_mask(
-	float4 Pos    : POSITION,          // モデルの頂点
-	float4 Tex : TEXCOORD0,	     // テクスチャ座標
-	float4 Color : COLOR0
-	) {
-	VS_OUTPUT_M Out;        // 出力データ
-
-							// 位置座標
-	Out.Pos = Pos;
-	Out.Tex = Tex;
-	Out.Color = Color;
-
-	Out.wvpPos = Pos;
-	return Out;
-}
-
-float maskRate = 0.9f;
-
-float4 PS_mask(VS_OUTPUT_M In) : COLOR
-{
-	float4 OUT;
-// ブラインドマップ取得
-float rate = tex2D(MaskSamp, In.Tex).r;
-
-rate += maskRate;
-
-float colRate = 0.0f;
-if (rate >= 1.0f)
-{
-	colRate = 1.0f;
-}
-//else if (rate >= 0.9f) {
-//	colRate = 0.5f;
+//// -------------------------------------------------------------
+//// 頂点シェーダプログラム
+//// -------------------------------------------------------------
+//VS_OUTPUT_M VS_mask(
+//	float4 Pos    : POSITION,          // モデルの頂点
+//	float4 Tex : TEXCOORD0,	     // テクスチャ座標
+//	float4 Color : COLOR0
+//	) {
+//	VS_OUTPUT_M Out;        // 出力データ
+//
+//							// 位置座標
+//	Out.Pos = Pos;
+//	Out.Tex = Tex;
+//	Out.Color = Color;
+//
+//	Out.wvpPos = Pos;
+//	return Out;
 //}
-
-//******************************************************
-/// G_Bufferを合わせ取得する
-//******************************************************
-//float2 G_Fetch = (In.wvpPos.xy )*0.5f + 0.5f;
-//G_Fetch.y = -G_Fetch.y;
-//OUT.rgb = In.Color * tex2D(BlindSamp, G_Fetch);
-
-OUT.rgba = colRate * tex2D(DecaleSamp2, In.Tex);
-//OUT.a = 1.0f;
-//OUT.rgba = In.Color * tex2D(BlindSamp, In.Tex);
-return OUT;
-}
-
-technique mask
-{
-	pass P0
-	{
-		AlphaBlendEnable = true;
-		BlendOp = Add;
-		SrcBlend = SrcAlpha;
-		DestBlend = InvSrcAlpha;
-		// シェーダ
-		VertexShader = compile vs_3_0 VS_mask();
-		PixelShader = compile ps_3_0 PS_mask();
-	}
-}
-
+//
+//float maskRate = 0.9f;
+//
+//float4 PS_mask(VS_OUTPUT_M In) : COLOR
+//{
+//	float4 OUT;
+//// ブラインドマップ取得
+//float rate = tex2D(MaskSamp, In.Tex).r;
+//
+//rate += maskRate;
+//
+//float colRate = 0.0f;
+//if (rate >= 1.0f)
+//{
+//	colRate = 1.0f;
+//}
+////else if (rate >= 0.9f) {
+////	colRate = 0.5f;
+////}
+//
+////******************************************************
+///// G_Bufferを合わせ取得する
+////******************************************************
+////float2 G_Fetch = (In.wvpPos.xy )*0.5f + 0.5f;
+////G_Fetch.y = -G_Fetch.y;
+////OUT.rgb = In.Color * tex2D(BlindSamp, G_Fetch);
+//
+//OUT.rgba = colRate * tex2D(DecaleSamp2, In.Tex);
+////OUT.a = 1.0f;
+////OUT.rgba = In.Color * tex2D(BlindSamp, In.Tex);
+//return OUT;
+//}
+//
+//technique mask
+//{
+//	pass P0
+//	{
+//		AlphaBlendEnable = true;
+//		BlendOp = Add;
+//		SrcBlend = SrcAlpha;
+//		DestBlend = InvSrcAlpha;
+//		// シェーダ
+//		VertexShader = compile vs_3_0 VS_mask();
+//		PixelShader = compile ps_3_0 PS_mask();
+//	}
+//}
+//
 
 //********************************************************************
 //		放射ブラ―(ゴッドレイ用)
@@ -1378,3 +1355,108 @@ technique hero
 }
 
 
+
+
+/***********************************/
+//	マスク
+
+// -------------------------------------------------------------
+// 頂点シェーダからピクセルシェーダに渡すデータ
+// -------------------------------------------------------------
+struct VS_OUTPUT_M
+{
+	float4 Pos			: POSITION;
+	float2 Tex			: TEXCOORD0;
+	float4 Color		: COLOR0;
+	float4 wvpPos			: TEXCOORD1;
+};
+
+texture MaskTex;
+sampler MaskSamp = sampler_state
+{
+	Texture = <MaskTex>;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+	MipFilter = NONE;
+
+	AddressU = Wrap;// 繰り返す
+	AddressV = Wrap;
+};
+
+// -------------------------------------------------------------
+// 頂点シェーダプログラム
+// -------------------------------------------------------------
+VS_OUTPUT_M VS_Mask(
+	float4 Pos    : POSITION,          // モデルの頂点
+	float4 Tex : TEXCOORD0,	     // テクスチャ座標
+	float4 Color : COLOR0
+	) {
+	VS_OUTPUT_M Out;        // 出力データ
+
+							// 位置座標
+	Out.Pos = Pos;
+	Out.Tex = Tex;
+	Out.Color = Color;
+
+	Out.wvpPos = Pos;
+	return Out;
+}
+
+float g_fMaskEdgeRate = 0.0f;
+
+float4 PS_MaskEdge(VS_OUTPUT_M In) : COLOR
+{
+	float4 OUT;
+	// ブラインドマップ取得
+	float rate = tex2D(MaskSamp, In.Tex).r;
+
+	rate += g_fMaskEdgeRate;
+
+	float colRate = 0.0f;
+	if (rate >= 1.0f)
+	{
+		colRate = 1.0f;
+	}
+
+	OUT.rgba = colRate * tex2D(DecaleSamp2, In.Tex);
+	return OUT;
+}
+
+technique MaskEdge
+{
+	pass P0
+	{
+		AlphaBlendEnable = true;
+		BlendOp = Add;
+		SrcBlend = SrcAlpha;
+		DestBlend = InvSrcAlpha;
+		// シェーダ
+		VertexShader = compile vs_3_0 VS_Mask();
+		PixelShader = compile ps_3_0 PS_MaskEdge();
+	}
+}
+
+
+float4 PS_Mask(VS_OUTPUT_M In) : COLOR
+{
+	float4 OUT;
+	// ブラインドマップ取得
+	float rate = tex2D(MaskSamp, In.Tex).r;
+
+	OUT.rgba = rate  * tex2D(DecaleSamp2, In.Tex);
+	return OUT;
+}
+
+technique Mask
+{
+	pass P0
+	{
+		AlphaBlendEnable = true;
+		BlendOp = Add;
+		SrcBlend = SrcAlpha;
+		DestBlend = InvSrcAlpha;
+		// シェーダ
+		VertexShader = compile vs_3_0 VS_Mask();
+		PixelShader = compile ps_3_0 PS_Mask();
+	}
+}

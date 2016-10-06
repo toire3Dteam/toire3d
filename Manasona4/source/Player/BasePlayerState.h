@@ -1075,8 +1075,110 @@ namespace BasePlayerState
 		SuccessThrowRelease() {};
 		~SuccessThrowRelease() {};
 
-		SuccessThrowRelease(const ThrowBind&) {}
-		SuccessThrowRelease& operator=(const ThrowBind&) {}
+		SuccessThrowRelease(const SuccessThrowRelease&) {}
+		SuccessThrowRelease& operator=(const SuccessThrowRelease&) {}
 	};
 
+	/*******************************************************/
+	//				必殺技ステート
+	/*******************************************************/
+	class HeavehoDrive :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static HeavehoDrive* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		HeavehoDrive() {};
+		~HeavehoDrive() {};
+
+		HeavehoDrive(const HeavehoDrive&) {}
+		HeavehoDrive& operator=(const HeavehoDrive&) {}
+	};
+
+	/*******************************************************/
+	//				超必殺技ステート
+	/*******************************************************/
+	class HeavehoDriveOverFlow :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static HeavehoDriveOverFlow* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		HeavehoDriveOverFlow() {};
+		~HeavehoDriveOverFlow() {};
+
+		HeavehoDriveOverFlow(const HeavehoDriveOverFlow&) {}
+		HeavehoDriveOverFlow& operator=(const HeavehoDriveOverFlow&) {}
+	};
+
+	
+	/*******************************************************/
+	//				超必殺技_成功ステート
+	/*******************************************************/
+	class HeavehoDriveOverFlow_Success :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static HeavehoDriveOverFlow_Success* GetInstance();
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		HeavehoDriveOverFlow_Success() {};
+		~HeavehoDriveOverFlow_Success() {};
+
+		HeavehoDriveOverFlow_Success(const HeavehoDriveOverFlow_Success&) {}
+		HeavehoDriveOverFlow_Success& operator=(const HeavehoDriveOverFlow_Success&) {}
+	};
 }

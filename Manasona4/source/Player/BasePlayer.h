@@ -31,10 +31,10 @@ namespace Stage
 // 定数
 enum class PLAYER_INPUT
 {
-	A,		// 
+	A,		// ヒーホードライブキャンセル
 	B,		// 攻撃
 	C,		// ジャンプ
-	D,		// 
+	D,		// キャラ固有
 	RIGHT,
 	LEFT,
 	UP,
@@ -104,6 +104,8 @@ enum class BASE_ACTION_STATE
 	FINISH,		// フィニッシュアーツ
 	SKILL,		// 地上キャラクター固有技
 	THROW,		// 投げ
+	HEAVEHO_DRIVE,// ヒーホードライブ
+	HEAVEHO_DRIVE_OVERFLOW,// ヒーホードライブ_オーバーフロー
 	FRAMECOUNT,	// ★とりあえず一定フレーム計りたいというときに、今使っているのは(投げ失敗の間だったり、投げ抜けの間だったり。)
 	END		// 何もなし　(A列車)名前
 };
@@ -136,6 +138,8 @@ enum class MOTION_TYPE
 	KNOCKBACK,
 	KNOCKDOWN_RAND,
 	KNOCKDOWN_AERIAL,
+	HEAVEHO_DRIVE,
+	HEAVEHO_DRIVE_OVERFLOW,
 	DIE,
 	WIN,
 	MAX
@@ -197,12 +201,7 @@ public:
 	~AttackData(){ SAFE_DELETE(pCollisionShape); }
 };
 
-// チーム
-enum class TEAM
-{
-	A,
-	B
-};
+
 
 // 覚醒の種類
 enum class OVERDRIVE_TYPE
@@ -270,7 +269,7 @@ public:
 	void InitAI();
 	void Control();			// プレイヤーからの入力を受け付ける
 	void AIControl();
-	void Update(bool bControl);	// 基本的な更新
+	virtual void Update(bool bControl);	// 基本的な更新
 	void UpdatePos();		// 座標更新(判定後に呼び出す)
 	void Move();			// 動きの制御
 	void InvincibleUpdate(); // 無敵の制御
@@ -295,6 +294,22 @@ public:
 	virtual void SkillExit() = 0;
 	virtual void SkillUpdate() = 0;//
 
+	/****************************/
+	//	ヒーホードライブ
+	/****************************/
+	virtual void HeavehoDriveInit() = 0;		// スキル発動時に呼び出す
+	virtual void HeavehoDriveExit() = 0;
+	virtual void HeavehoDriveUpdate() = 0;
+
+	/****************************/
+	//	ヒーホードライブ_オーバーフロー
+	/****************************/
+	virtual void HeavehoDriveOverFlowInit() = 0;		// スキル発動時に呼び出す
+	virtual void HeavehoDriveOverFlowExit() = 0;
+	virtual void HeavehoDriveOverFlowUpdate() = 0;
+	virtual void HeavehoDriveOverFlowSuccess() = 0;		// 必殺当てて演出中の更新
+
+		
 	/*****************/
 	// AIに必要な関数
 	/*****************/
@@ -343,6 +358,12 @@ public:
 	float GetMaxSpeed() { return m_maxSpeed; }
 	BASE_ACTION_STATE GetActionState(){ return m_ActionState; }
 	TEAM GetTeam(){ return m_team; }
+
+	int GetMaxHP() {return m_MaxHP;	}
+	
+	int GetHP() {	return m_HP; }
+	void SetHP(int hp) { m_HP = hp; }
+
 
 	void SetInputList(PLAYER_INPUT inputNo, int inputFlag){ m_InputList[(int)inputNo] = inputFlag; }
 
@@ -486,9 +507,9 @@ public:
 	CollisionShape::Square *GetHitSquare() { return m_pHitSquare; }
 
 	// 覚醒
-	int GetOverDrive(){ return m_OverDriveGage; } // 覚醒ゲージ
+	int GetOverDriveGage(){ return m_OverDriveGage; } // 覚醒ゲージ
 	bool isOverDrive(){ return m_bOverDrive; } // 覚醒してるか
-	int GetOverDriveFlame(){ return m_OverDriveFrame; } // 覚醒時間
+	int GetOverDriveFrame(){ return m_OverDriveFrame; } // 覚醒時間
 	OVERDRIVE_TYPE GetOverDriveType(){ return m_OverDriveType; }	// 覚醒の種類
 
 	//  投げてる人のID
@@ -499,6 +520,10 @@ public:
 
 	// UI
 	ComboUI* GetComboUI(){ return m_pComboUI; }
+
+	// 
+	bool isGameTimerStopFlag() { return m_bGameTimerStopFlag; }
+	void SetGameTimerStopFlag(bool flag) { m_bGameTimerStopFlag = flag; }
 
 	//_/_/_/_/_/_/__/_/__/_/__/_/__
 	// 定数
@@ -549,6 +574,14 @@ protected:
 	// ガードに必要なやつ
 	bool m_bGuard;				// ガードしてるか
 	int m_GuardFollowFrame;		// ガード解除の隙
+	// HP
+	int m_MaxHP;
+	int m_HP;
+	// ヒーホー用の変数
+	int m_HeavehoStopTimer;			// ヒーホードライブ発動のザワールドの時間
+
+	// ストップフラグ
+	bool m_bGameTimerStopFlag;
 
 	// モーション
 	int m_MotionNumbers[(int)MOTION_TYPE::MAX];

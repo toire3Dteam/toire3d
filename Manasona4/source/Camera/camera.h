@@ -187,6 +187,34 @@ private:
 	GlobalCameraState& operator=(const GlobalCameraState&);
 };
 
+//--------------------固定カメラステート
+class FixCameraState :public State<Camera>
+{
+public:
+	// this is a シングルトン
+	static FixCameraState *GetInstance(){ static FixCameraState i; return &i; }
+
+	// 入る
+	void Enter(Camera *pCamera){}
+
+	// 実行します
+	void Execute(Camera *pCamera){}
+
+	// 帰る
+	void Exit(Camera *pCamera){}
+
+	// エージェントからのメッセージを受信した場合、これが実行される
+	bool OnMessage(Camera *pCamera, const Message& msg){ return false; }
+
+private:
+	~FixCameraState() {};
+
+	// シングルトンの作法
+	FixCameraState() {};
+	FixCameraState(const FixCameraState&){}
+	FixCameraState& operator=(const FixCameraState&){}
+};
+
 //--------------------スマブラカメラステート
 class SumaburaCameraState :public State<Camera>
 {

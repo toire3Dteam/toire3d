@@ -87,8 +87,10 @@ void tdnShader::SetValue(char* name, float f){ pShader->SetFloat(name, f); }
 void tdnShader::SetValue(char* name, int d){ pShader->SetInt(name, d); }
 void tdnShader::SetValue(char* name, DWORD d){ pShader->SetValue(name, &d, 4); }
 
-
-
-
+void tdnShader::SetMaskScreen(tdn2DObj* maskScreen)
+{
+	tdnShader::SetValue("MaskTex", maskScreen);
+	//pShader->SetValue("MaskTex", maskScreen->get);
+}
 
 

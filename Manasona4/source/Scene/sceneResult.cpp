@@ -32,7 +32,7 @@
 iexMesh* g_grand;
 
  
-bool sceneResurt::Initialize()
+bool sceneResult::Initialize()
 {
 	g_grand = new iexMesh("Data/Result/persona5_grand.IMO");
 	g_grand->SetScale(Vector3(2, 1, 0.5f));
@@ -95,11 +95,11 @@ bool sceneResurt::Initialize()
 	winPlayer = WINNER_PLAYER::ARAMITAMA;
 	switch (winPlayer)
 	{
-	case sceneResurt::WINNER_PLAYER::ARAMITAMA:
+	case sceneResult::WINNER_PLAYER::ARAMITAMA:
 		m_ResultPerformance = new AramitamaResultPerformance();
 
 		break;
-	case sceneResurt::WINNER_PLAYER::AIROU:
+	case sceneResult::WINNER_PLAYER::AIROU:
 		m_ResultPerformance = new AramitamaResultPerformance();
 		break;
 	default:
@@ -143,7 +143,7 @@ bool sceneResurt::Initialize()
 }
 
 
-sceneResurt::~sceneResurt()
+sceneResult::~sceneResult()
 {
 	m_pStream->Stop();
 	ParticleManager::Release();
@@ -175,7 +175,7 @@ sceneResurt::~sceneResurt()
 //		ˆ—
 //******************************************************************
 
-void sceneResurt::Update()
+void sceneResult::Update()
 {
 
 	static float angle = 0;
@@ -286,7 +286,7 @@ void sceneResurt::Update()
 //		•`‰æ
 //******************************************************************
 
-void sceneResurt::Render()
+void sceneResult::Render()
 {
 #ifdef USE_EFFECT_CAMERA
 	CameraMgr->Activate();
@@ -318,7 +318,7 @@ void sceneResurt::Render()
 }
 
 // Œã‚ë‚Ì‚QD
-void sceneResurt::BackRender()
+void sceneResult::BackRender()
 {
 	// BackBuffer‚Ì•Û‘¶
 	tdnSystem::GetDevice()->GetRenderTarget(0, &m_pBackBuffer);
@@ -340,7 +340,7 @@ void sceneResurt::BackRender()
 }
 
 // 3DƒQ[ƒ€‰æ–Ê
-void sceneResurt::CameraRender()
+void sceneResult::CameraRender()
 {
 	// BackBuffer‚Ì•Û‘¶
 	tdnSystem::GetDevice()->GetRenderTarget(0, &m_pBackBuffer);
@@ -370,7 +370,7 @@ void sceneResurt::CameraRender()
 
 
 // š‚±‚±‚Í‚QDê—p‚ÌêŠ‚É‚µ‚æ‚¤@ALPHA‚Ì–â‘è‚Å
-void sceneResurt::FrontRender()
+void sceneResult::FrontRender()
 {
 	// BackBuffer‚Ì•Û‘¶
 	tdnSystem::GetDevice()->GetRenderTarget(0, &m_pBackBuffer);
@@ -393,7 +393,7 @@ void sceneResurt::FrontRender()
 
 }
 
-void sceneResurt::AllRender()
+void sceneResult::AllRender()
 {
 	/****************************/
 	// ‚±‚±‚©‚çƒQ[ƒ€‰æ–Ê
@@ -418,7 +418,7 @@ void sceneResurt::AllRender()
 }
 
 
-void sceneResurt::WaveRender()
+void sceneResult::WaveRender()
 {
 	m_waveScreen->RenderTarget();
 

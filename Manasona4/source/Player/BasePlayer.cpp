@@ -19,8 +19,8 @@ const float BasePlayer::c_MAX_JUMP = 2.2f;
 
 const int BasePlayer::c_RECOVERY_FLAME = 8;			// リカバリーステートにいる時間
 
-const int BasePlayer::c_OVERDRIVE_MAX_GAGE = 10;	// 覚醒ゲージの最大値
-const int BasePlayer::c_OVERDRIVE_MAX_TIME = 30;	// 覚醒が切れるまでの時間
+const int BasePlayer::c_OVERDRIVE_MAX_GAGE = 100;	// 覚醒ゲージの最大値
+const int BasePlayer::c_OVERDRIVE_MAX_TIME = 360;	// 覚醒が切れるまでの時間
 
 const int BasePlayer::c_THROW_ESCAPE_FRAME = 8;	// 投げぬけの猶予フレーム
 const int BasePlayer::c_THROW_MISS_FRAME = 30;	// 投げ外しロスのフレーム(全キャラ共通だろうという考え)
@@ -64,7 +64,9 @@ m_InvincibleColRate(0), m_InvincibleColRateFlame(0), m_bInvincibleColRateUpFlag(
 m_OverDriveGage(0), m_bOverDrive(false), m_OverDriveFrame(0), m_OverDriveType(OVERDRIVE_TYPE::BURST),
 m_bMoveUpdate(true), m_bThrowSuccess(false),
 m_bGuard(false), m_GuardFollowFrame(0),
-m_ThrowPlayerID(ENTITY_ID::ID_ERROR)
+m_ThrowPlayerID(ENTITY_ID::ID_ERROR),
+m_MaxHP(0), m_HP(0),
+m_bGameTimerStopFlag(false), m_HeavehoStopTimer(0)
 {
 	// とりあえず、モコイさん
 	m_pStand = new Stand::Mokoi(this);
@@ -659,6 +661,7 @@ void BasePlayer::RenderUI()
 {
 	// コンボUI
 	m_pComboUI->Render(100 + (m_deviceID * 950), 200);
+
 }
 
 // ステートマシンへの他から来るメッセージ

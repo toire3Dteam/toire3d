@@ -35,10 +35,7 @@ int stopTimer = 0;
 //******************************************************************
 //		初期化・解放
 //******************************************************************
-sceneMain::sceneMain() :BaseGameEntity(ENTITY_ID::SCENE_MAIN)
-{
-
-}
+sceneMain::sceneMain() :BaseGameEntity(ENTITY_ID::SCENE_MAIN){}
 bool sceneMain::Initialize()
 {
 	//com = new Combo();
@@ -87,12 +84,17 @@ bool sceneMain::Initialize()
 
 	NumberEffect;
 	
-	GameUIMgr;
 
-	// タイム初期化
-	TimeMgr->Reset(60);
+	BasePlayer* p1 = PlayerMgr->GetPlayer_TeamInSearch(TEAM::A);
+	BasePlayer* p2 = PlayerMgr->GetPlayer_TeamInSearch(TEAM::B);
+	GameUIMgr;
+	GameUIMgr->ReferencesPlayer(p1, p2);
+	GameUIMgr->Action();
 
 	m_stageScreen = new tdn2DObj(tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom, TDN2D::HDR);
+
+	TimeMgr->Init();
+	TimeMgr->Reset(60);
 
 	/* ステートマシン初期化 */
 	m_pStateMachine = new StateMachine<sceneMain>(this);
@@ -103,6 +105,7 @@ bool sceneMain::Initialize()
 
 sceneMain::~sceneMain()
 {
+	delete m_pStateMachine;
 	delete m_pMyMusicMgr;
 	delete m_pStage;
 	//delete CameraMgr;
@@ -113,12 +116,14 @@ sceneMain::~sceneMain()
 	ParticleManager::Release();
 	DeferredManagerEx.Release();
 	SAFE_DELETE(m_stageScreen);
-	delete m_pStateMachine;
+
 	PointLightMgr->Release();
 
 	NumberEffect.Release();
 
 	GameUIMgr->Rerease();
+
+	TimeMgr->Release();
 
 	//SAFE_DELETE(com);
 }
@@ -254,11 +259,18 @@ void sceneMain::Update()
 		}
 	}
 
+	if (KeyBoardTRG(KB_U))
+	{
+		GameUIMgr->Action();
+	}
+	GameUIMgr->Update();
+
 	//g_eff->Update();
 	//EffectMgr.Update();
 	m_panel->Update();
 	g_uvEffect->Update();
 
+	TimeMgr->Update();
 
 	// ★ステートマシン更新(何故ここに書くかというと、中でシーンチェンジの処理を行っているため)
 	m_pStateMachine->Update();
@@ -337,8 +349,8 @@ void sceneMain::Render()
 		GameUIMgr->Render();
 
 		// ★ここにステートマシン描画(多分2D関係が多いんじゃないかと)
-		//m_pStateMachine->Render();
-
+		m_pStateMachine->Render();
+		
 		if (KeyBoard(KB_J))
 		{
 			SurfaceRender();
@@ -358,14 +370,15 @@ void sceneMain::Render()
 		m_panel->Render();
 		m_panel->Render3D();
 		g_uvEffect->Render();
+
 	}
+
+	TimeMgr->Render();
 
 	//com->Render(400, 400);
 
 	tdnText::Draw(0, 30, 0xffffffff, "CameraPos    : %.1f %.1f %.1f", CameraMgr->m_pos.x, CameraMgr->m_pos.y, CameraMgr->m_pos.z);
 	tdnText::Draw(0, 60, 0xffffffff, "CameraTarget : %.1f %.1f %.1f", CameraMgr->m_target.x, CameraMgr->m_target.y, CameraMgr->m_target.z);
-
-
 }
 
 void sceneMain::RenderStage()

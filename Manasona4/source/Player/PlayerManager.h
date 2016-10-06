@@ -38,6 +38,22 @@ public:
 
 	float GetOverDriveDim(){ return m_OverDriveDim; }
 
+	// 引数のチームのやつを探し出す
+	BasePlayer* GetPlayer_TeamInSearch(TEAM team)
+	{	
+	
+		FOR(m_NumPlayer)
+		{
+			if (m_pPlayers[i]->GetTeam() == team)
+			{
+				return m_pPlayers[i];
+			}
+		}
+
+		MyAssert(0, "PLAYERMGR：見つからなかった！");
+		return m_pPlayers[0];
+	}
+
 private:
 	// 1つしかない実体
 	static PlayerManager *pInstance;
@@ -54,7 +70,7 @@ private:
 	float m_OverDriveDim;
 
 	// ★プレイヤーとプレイヤーの攻撃の判定
-	bool CollisionPlayerAttack(BasePlayer *my, BasePlayer *you);
+	void CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_ATTACK_INFO **OutAttackInfo, HIT_DAMAGE_INFO **OutDamageInfo);
 
 	// ★スタンドの攻撃に対するプレイヤーの判定
 	bool CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou);
@@ -62,6 +78,7 @@ private:
 	// ★投げの攻撃に対するプレイヤーの判定
 	bool CollisionThrowAttack(BasePlayer *my, BasePlayer *you);
 
+	void SendHitMessage(BasePlayer *pAttackPlayer, BasePlayer *pDamagePlayer, HIT_ATTACK_INFO *pHitAttackInfo, HIT_DAMAGE_INFO *pHitDamageInfo);
 
 	// BaseGameEntiryサブクラスはメッセージを使って通信する
 	bool  HandleMessage(const Message& msg);

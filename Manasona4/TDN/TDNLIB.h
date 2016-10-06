@@ -1010,6 +1010,8 @@ public:
 	void SetValue(char* name, LPDIRECT3DCUBETEXTURE9* obj);
 	void SetValue(char* name, LPDIRECT3DCUBETEXTURE9& obj);
 
+	void SetMaskScreen(tdn2DObj* maskScreen);
+
 private:
 	LPD3DXEFFECT pShader;	// エフェクトファイルへのアクセスポインタ
 	D3DXHANDLE	hmWVP;		// 射影変換行列　パラメーターを参照するための効率的な手段を提供します。
@@ -1065,7 +1067,7 @@ public:
 	virtual void Render(int x, int y, int w, int h, int tx, int ty, int tw, int th, tdnShader* shader, char* name);
 
 	// 右端から始める
-	virtual void RenderReversal(int x, int y, int w, int h, int tx, int ty, int tw, int th, u32 dwFlags = RS::COPY);
+	//virtual void RenderReversal(int x, int y, int w, int h, int tx, int ty, int tw, int th, u32 dwFlags = RS::COPY);	
 
 	// 3D描画
 	virtual void Render3D(float x, float y, float z, u32 dwFlags = RS::COPY);

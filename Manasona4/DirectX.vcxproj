@@ -118,8 +118,9 @@
     <ClCompile Include="source\Camera\camera.cpp" />
     <ClCompile Include="source\Camera\EffectCamera.cpp" />
     <ClCompile Include="source\Collision\Collision.cpp" />
-    <ClCompile Include="source\Data\PlayerData.cpp" />
     <ClCompile Include="source\DeferredEx\DeferredEx.cpp" />
+    <ClCompile Include="source\EffectTool\Effect2D.cpp" />
+    <ClCompile Include="source\EffectTool\Effect2DManager.cpp" />
     <ClCompile Include="source\Effect\AnimationPanel.cpp" />
     <ClCompile Include="source\Effect\AnimationRipple.cpp" />
     <ClCompile Include="source\Effect\AnimationRippleEx.cpp" />
@@ -143,6 +144,7 @@
     <ClCompile Include="source\PostEffect\PostEffect.cpp" />
     <ClCompile Include="source\ResultPerformance\BaseResultPerformance.cpp" />
     <ClCompile Include="source\SceneSwitch\SceneSwitch.cpp" />
+    <ClCompile Include="source\Scene\SceneEffectTool.cpp" />
     <ClCompile Include="source\Scene\sceneLoading.cpp" />
     <ClCompile Include="source\Scene\SceneMain.cpp" />
     <ClCompile Include="source\Scene\SceneMainState.cpp" />
@@ -151,8 +153,12 @@
     <ClCompile Include="source\Stage\Stage.cpp" />
     <ClCompile Include="source\Stand\Stand.cpp" />
     <ClCompile Include="source\system\FrameworkEx.cpp" />
+    <ClCompile Include="source\Timer\Timer.cpp" />
     <ClCompile Include="source\UI\ComboUI.cpp" />
     <ClCompile Include="source\UI\GameUI.cpp" />
+    <ClCompile Include="source\UI\HpGage.cpp" />
+    <ClCompile Include="source\UI\PersonaUI.cpp" />
+    <ClCompile Include="source\UI\SPGage.cpp" />
     <ClCompile Include="TDN\DirectShow\baseclasses\amfilter.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClCompile>
@@ -210,8 +216,9 @@
     <ClInclude Include="source\Camera\camera.h" />
     <ClInclude Include="source\Camera\EffectCamera.h" />
     <ClInclude Include="source\Collision\Collision.h" />
-    <ClInclude Include="source\Data\PlayerData.h" />
     <ClInclude Include="source\DeferredEx\DeferredEx.h" />
+    <ClInclude Include="source\EffectTool\Effect2D.h" />
+    <ClInclude Include="source\EffectTool\Effect2DManager.h" />
     <ClInclude Include="source\Effect\AnimationPanel.h" />
     <ClInclude Include="source\Effect\AnimationRipple.h" />
     <ClInclude Include="source\Effect\AnimationRippleEx.h" />
@@ -237,6 +244,7 @@
     <ClInclude Include="source\resource.h" />
     <ClInclude Include="source\ResultPerformance\BaseResultPerformance.h" />
     <ClInclude Include="source\SceneSwitch\SceneSwitch.h" />
+    <ClInclude Include="source\Scene\SceneEffectTool.h" />
     <ClInclude Include="source\Scene\sceneLoading.h" />
     <ClInclude Include="source\Scene\SceneMain.h" />
     <ClInclude Include="source\Scene\SceneMainState.h" />
@@ -248,6 +256,9 @@
     <ClInclude Include="source\Timer\Timer.h" />
     <ClInclude Include="source\UI\ComboUI.h" />
     <ClInclude Include="source\UI\GameUI.h" />
+    <ClInclude Include="source\UI\HpGage.h" />
+    <ClInclude Include="source\UI\PersonaUI.h" />
+    <ClInclude Include="source\UI\SpGage.h" />
     <ClInclude Include="TDN\DirectShow\baseclasses\amextra.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClInclude>

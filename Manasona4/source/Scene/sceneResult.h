@@ -14,12 +14,12 @@ namespace Stage{		// ›
 	class Base;
 }
 
-class sceneResurt: public BaseScene
+class sceneResult: public BaseScene
 {
 public:
 	//‰Šú‰»E‰ğ•ú
 	bool Initialize();
-	~sceneResurt();
+	~sceneResult();
 	//ˆ—
 	void Update();
 	//•`‰æ

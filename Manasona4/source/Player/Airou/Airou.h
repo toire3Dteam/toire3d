@@ -22,6 +22,21 @@ public:
 	void SkillUpdate();//
 
 	/****************************/
+	//	ヒーホードライブ
+	/****************************/
+	void HeavehoDriveInit();
+	void HeavehoDriveExit();
+	void HeavehoDriveUpdate();
+
+	/****************************/
+	//	ヒーホードライブ_オーバーフロー
+	/****************************/
+	void HeavehoDriveOverFlowInit();
+	void HeavehoDriveOverFlowExit();
+	void HeavehoDriveOverFlowUpdate();//
+	void HeavehoDriveOverFlowSuccess();
+
+	/****************************/
 	//	AI
 	/****************************/
 	// それぞれのキャラクター毎のAIによる技のボタンを設定！
