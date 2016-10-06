@@ -30,17 +30,17 @@ void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage)
 	FOR(NumPlayer)
 	{
 		// チームを今は仮で振り分け!! 2016/10.04日　左か右をTeamで変えてる
-		TEAM team;
+		SIDE side;
 		if (i % 2 == 0)
 		{
-			team = TEAM::A;
+			side = SIDE::LEFT;
 		}
 		else
 		{
-			team = TEAM::B;
+			side = SIDE::RIGHT;
 		}
 
-		m_pPlayers[i] = new Airou(i, team, (i == 2 )/*(i == 1 || i == 2 || i == 3)*/);//*i == 1*/0));
+		m_pPlayers[i] = new Airou(i, side, (i == 2 )/*(i == 1 || i == 2 || i == 3)*/);//*i == 1*/0));
 		m_pPlayers[i]->InitActionDatas();		// ★攻撃情報を各キャラに初期化させる
 		m_pPlayers[i]->InitMotionDatas();		// 各キャラごとの必殺技
 	}
@@ -207,7 +207,7 @@ void PlayerManager::RenderUI()
 void PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_ATTACK_INFO **OutAttackInfo, HIT_DAMAGE_INFO **OutDamageInfo)
 {
 	// チーム同じだよ！
-	if (my->GetTeam() == you->GetTeam()) return;
+	if (my->GetSide() == you->GetSide()) return;
 
 	// 攻撃系のステートじゃないよ！
 	if (!my->isAttackState()) return;
@@ -327,7 +327,7 @@ void PlayerManager::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_A
 bool PlayerManager::CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou)
 {
 	// チーム同じだよ！
-	if (pStand->GetPlayer()->GetTeam() == pYou->GetTeam()) return false;
+	if (pStand->GetPlayer()->GetSide() == pYou->GetSide()) return false;
 
 	// スタンドがアクティブじゃないよ！
 	if (!pStand->isActive()) return false;
@@ -411,7 +411,7 @@ bool PlayerManager::CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou)
 bool PlayerManager::CollisionThrowAttack(BasePlayer *my, BasePlayer *you)
 {
 	// チーム同じだよ！
-	if (my->GetTeam() == you->GetTeam()) return false;
+	if (my->GetSide() == you->GetSide()) return false;
 
 	// 相手が空中だったらつかめない
 	if (!you->isLand()) return false;
@@ -478,7 +478,7 @@ void PlayerManager::CalcTeamPoint()
 	// プレイヤーたち描画
 	FOR(m_NumPlayer)
 	{
-		if (m_pPlayers[i]->GetTeam()==TEAM::A)
+		if (m_pPlayers[i]->GetSide()==SIDE::LEFT)
 		{
 			m_PointAteam += m_pPlayers[i]->GetScore();
 		}

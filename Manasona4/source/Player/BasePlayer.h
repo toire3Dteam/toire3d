@@ -264,7 +264,7 @@ protected:
 	}m_ActionDatas[(int)BASE_ACTION_STATE::END];
 
 public:
-	BasePlayer(int deviceID, TEAM team, bool bAI);
+	BasePlayer(int deviceID, SIDE side, bool bAI);
 	~BasePlayer();
 	void InitAI();
 	void Control();			// プレイヤーからの入力を受け付ける
@@ -357,7 +357,7 @@ public:
 	RushAttack *GetRushAttack() { return &m_RushAttack; }
 	float GetMaxSpeed() { return m_maxSpeed; }
 	BASE_ACTION_STATE GetActionState(){ return m_ActionState; }
-	TEAM GetTeam(){ return m_team; }
+	SIDE GetSide(){ return m_side; }
 
 	int GetMaxHP() {return m_MaxHP;	}
 	
@@ -541,7 +541,7 @@ public:
 
 protected:
 	const int m_deviceID;		// 自分のコントローラーの番号(実質、スマブラのxPに値する)
-	const TEAM m_team;			// このキャラクターの所属してるチーム
+	const SIDE m_side;			// このキャラクターの所属してるチーム
 
 	iex3DObj *m_pObj;	// メッシュ実体
 	Vector3 m_pos;	// 座標

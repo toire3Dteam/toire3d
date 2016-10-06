@@ -1,7 +1,7 @@
 #include "../BasePlayer.h"
 #include "Airou.h"
 
-Airou::Airou(int deviceID, TEAM team, bool bAI) :BasePlayer(deviceID, team, bAI)
+Airou::Airou(int deviceID, SIDE side, bool bAI) :BasePlayer(deviceID, side, bAI)
 , m_DrillFrame(0), m_DrillHitCount(0)
 {
 	
@@ -31,7 +31,7 @@ Airou::Airou(int deviceID, TEAM team, bool bAI) :BasePlayer(deviceID, team, bAI)
 	//	break;
 	//}
 
-	if (TEAM::B == m_team)
+	if (SIDE::LEFT == m_side)
 	{
 		m_pObj->SetTexture(tdnTexture::Load("DATA/CHR/Airou/tex_airou2.png"), 0);
 	}

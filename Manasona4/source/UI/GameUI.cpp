@@ -44,11 +44,11 @@ GameUIManager::~GameUIManager()
 
 void GameUIManager::ReferencesPlayer(BasePlayer* pLeftPlayer, BasePlayer* pRightPlayer)
 {
-	m_pHpGage1P = new HpGage(pLeftPlayer, UI_SIDE::LEFT);
-	m_pHpGage2P = new HpGage(pRightPlayer, UI_SIDE::RIGHT);
+	m_pHpGage1P = new HpGage(pLeftPlayer, pLeftPlayer->GetSide());
+	m_pHpGage2P = new HpGage(pRightPlayer, pRightPlayer->GetSide());
 
-	m_pSpGage1P = new SpGage(pLeftPlayer, UI_SIDE::LEFT);
-	m_pSpGage2P = new SpGage(pRightPlayer, UI_SIDE::RIGHT);
+	m_pSpGage1P = new SpGage(pLeftPlayer, pLeftPlayer->GetSide());
+	m_pSpGage2P = new SpGage(pRightPlayer, pRightPlayer->GetSide());
 
 	m_pPersona1P = new PersonaUI(pLeftPlayer, true);
 	m_pPersona2P = new PersonaUI(pRightPlayer, false);
@@ -119,11 +119,36 @@ bool GameUIManager::HandleMessage(const Message& msg)
 	switch (msg.Msg)
 	{
 	case PERSONA_CARD_COUNT_UP:
+	{
+		SIDE *data = (SIDE*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+		SIDE side = *data;
 
+		if (side == SIDE::LEFT)
+		{
+			m_pPersona1P->UpEffectAction();
+		}
+		else
+		{
+			m_pPersona2P->UpEffectAction();
+		}
 
+	}
 		break;
 	case PERSONA_CARD_COUNT_DOWN:
+	{
+		SIDE *data = (SIDE*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+		SIDE side = *data;
 
+		if (side == SIDE::LEFT)
+		{
+			m_pPersona1P->DownEffectAction();
+		}
+		else
+		{
+			m_pPersona2P->DownEffectAction();
+		}
+
+	}
 		break;
 	case OTHER:
 		break;

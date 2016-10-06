@@ -1,6 +1,9 @@
 #include "TDNLIB.h"
 #include "Stand.h"
 #include "../Sound/SoundManager.h"
+#include "BaseEntity\Entity\BaseGameEntity.h"
+#include "BaseEntity\Message\MessageDispatcher.h"
+
 
 // 攻撃フレーム情報読み込み
 void Stand::Base::LoadActionFrameList(char *filename)
@@ -108,6 +111,13 @@ void Stand::Base::StandGageUpdate()
 		{
 			m_standStock++;
 			m_standGage = 0;
+
+			// UIにメッセージを送る
+			SIDE side = m_pPlayer->GetSide();
+			MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
+				MESSAGE_TYPE::PERSONA_CARD_COUNT_UP, &side);
+
+
 		}
 
 	}
@@ -166,8 +176,8 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 
 	/*****************************/
 	// モコイの基本ステータス
-	m_standStockMAX = 2;
-	m_standGageMAX = 120;
+	m_standStockMAX = 4;
+	m_standGageMAX = 240;
 
 
 	//==============================================================================================================
@@ -295,6 +305,11 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 
 void Stand::Mokoi::Action(Stand::ACTION_TYPE type)
 {
+	// UIにメッセージを送る
+	SIDE side = m_pPlayer->GetSide();
+	MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
+		MESSAGE_TYPE::PERSONA_CARD_COUNT_DOWN, &side);
+
 	// ストックを消費
 	m_standStock--;
 
@@ -318,6 +333,10 @@ void Stand::Mokoi::Action(Stand::ACTION_TYPE type)
 	m_pObj->SetMotion(0);
 	m_pObj->SetPos(m_pos);
 	m_pObj->Update();
+
+
+
+
 
 	// アッパーエフェクト！
 	//if(type == ACTION_TYPE::LAND) m_pPlayer->AddEffectAction(m_pPlayer->GetPos(), EFFECT_TYPE::UPPER);

@@ -85,8 +85,8 @@ bool sceneMain::Initialize()
 	NumberEffect;
 	
 
-	BasePlayer* p1 = PlayerMgr->GetPlayer_TeamInSearch(TEAM::A);
-	BasePlayer* p2 = PlayerMgr->GetPlayer_TeamInSearch(TEAM::B);
+	BasePlayer* p1 = PlayerMgr->GetPlayer_TeamInSearch(SIDE::LEFT);
+	BasePlayer* p2 = PlayerMgr->GetPlayer_TeamInSearch(SIDE::RIGHT);
 	GameUIMgr;
 	GameUIMgr->ReferencesPlayer(p1, p2);
 	GameUIMgr->Action();

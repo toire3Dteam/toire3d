@@ -39,12 +39,12 @@ public:
 	float GetOverDriveDim(){ return m_OverDriveDim; }
 
 	// ˆø”‚Ìƒ`[ƒ€‚Ì‚â‚Â‚ğ’T‚µo‚·
-	BasePlayer* GetPlayer_TeamInSearch(TEAM team)
+	BasePlayer* GetPlayer_TeamInSearch(SIDE side)
 	{	
 	
 		FOR(m_NumPlayer)
 		{
-			if (m_pPlayers[i]->GetTeam() == team)
+			if (m_pPlayers[i]->GetSide() == side)
 			{
 				return m_pPlayers[i];
 			}

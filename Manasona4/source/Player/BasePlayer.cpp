@@ -55,7 +55,7 @@ void BasePlayer::LoadAttackFrameList(char *filename)
 	}
 }
 
-BasePlayer::BasePlayer(int deviceID, TEAM team, bool bAI) :m_bAI(bAI), m_team(team), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + deviceID)),
+BasePlayer::BasePlayer(int deviceID, SIDE side, bool bAI) :m_bAI(bAI), m_side(side), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + deviceID)),
 m_maxSpeed(1.0f), m_dir(DIR::LEFT), m_deviceID(deviceID), m_pHitSquare(new CollisionShape::Square),
 m_pObj(nullptr), m_move(VECTOR_ZERO), m_bLand(false), m_bAerialJump(true), m_ActionState(BASE_ACTION_STATE::NO_ACTION),
 m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentActionFrame(0), m_RecoveryFlame(0), m_bEscape(false), m_score(0), m_CollectScore(0), m_pAI(nullptr),

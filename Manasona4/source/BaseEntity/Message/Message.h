@@ -72,11 +72,11 @@ struct BE_THROWN_INFO
 	int iThrowPlayerDir;		// つかんだやつの向き(受けた側はこれの反対を向く)
 };
 
-// チーム
-enum class TEAM
+// キャラクターサイド
+enum class SIDE
 {
-	A,
-	B
+	LEFT,
+	RIGHT
 };
 
 /*

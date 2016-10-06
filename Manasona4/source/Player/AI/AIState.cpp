@@ -31,7 +31,7 @@ bool SearchNearPlayer(AI * pPerson)
 			continue;
 		}
 		// 同じチームをはじく
-		if (MyPlayer->GetTeam() == PlayerMgr->GetPlayer(i)->GetTeam())
+		if (MyPlayer->GetSide() == PlayerMgr->GetPlayer(i)->GetSide())
 		{
 			continue;
 		}
@@ -86,7 +86,7 @@ bool SearchNearInvinciblePlayer(AI * pPerson)
 		}
 
 		// 同じチームをはじく
-		if (MyPlayer->GetTeam() == PlayerMgr->GetPlayer(i)->GetTeam())
+		if (MyPlayer->GetSide() == PlayerMgr->GetPlayer(i)->GetSide())
 		{
 			continue;
 		}

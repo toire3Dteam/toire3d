@@ -5,7 +5,7 @@ class AI;
 class Airou : public BasePlayer
 {
 public:
-	Airou(int deviceID,TEAM team, bool bAI);
+	Airou(int deviceID, SIDE side, bool bAI);
 
 	/****************************/
 	//	キャラクター固有の様々なポジション
