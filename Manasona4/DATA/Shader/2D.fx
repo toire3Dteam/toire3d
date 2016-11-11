@@ -1383,6 +1383,18 @@ sampler MaskSamp = sampler_state
 	AddressV = Wrap;
 };
 
+//texture MaskEdgeTex;
+//sampler MaskEdgeSamp = sampler_state
+//{
+//	Texture = <MaskEdgeTex>;
+//	MinFilter = LINEAR;
+//	MagFilter = LINEAR;
+//	MipFilter = NONE;
+//
+//	AddressU = Wrap;// 繰り返す
+//	AddressV = Wrap;
+//};
+
 // -------------------------------------------------------------
 // 頂点シェーダプログラム
 // -------------------------------------------------------------
@@ -1402,7 +1414,8 @@ VS_OUTPUT_M VS_Mask(
 	return Out;
 }
 
-float g_fMaskEdgeRate = 0.0f;
+// 描画ラインを決めるレート　0で何も見えなくなり　1で全て描画する
+float g_fMaskEdgeRate = 0.5f;
 
 float4 PS_MaskEdge(VS_OUTPUT_M In) : COLOR
 {
@@ -1430,6 +1443,8 @@ technique MaskEdge
 		BlendOp = Add;
 		SrcBlend = SrcAlpha;
 		DestBlend = InvSrcAlpha;
+		ZEnable = false;
+		ZWriteEnable = false;
 		// シェーダ
 		VertexShader = compile vs_3_0 VS_Mask();
 		PixelShader = compile ps_3_0 PS_MaskEdge();
@@ -1455,6 +1470,20 @@ technique Mask
 		BlendOp = Add;
 		SrcBlend = SrcAlpha;
 		DestBlend = InvSrcAlpha;
+		// シェーダ
+		VertexShader = compile vs_3_0 VS_Mask();
+		PixelShader = compile ps_3_0 PS_Mask();
+	}
+}
+
+technique Mask_Add
+{
+	pass P0
+	{
+		AlphaBlendEnable = true;
+		BlendOp = Add;
+		SrcBlend = SrcAlpha;
+		DestBlend = One;
 		// シェーダ
 		VertexShader = compile vs_3_0 VS_Mask();
 		PixelShader = compile ps_3_0 PS_Mask();

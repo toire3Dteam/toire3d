@@ -46,8 +46,6 @@ struct VS_INPUT
 	float2 Tex	  : TEXCOORD0;
 };
 
-
-
 //------------------------------------------------------
 //		テクスチャサンプラー	
 //------------------------------------------------------
@@ -131,6 +129,67 @@ sampler ToonShadowSamp = sampler_state
 //		基本３Ｄシェーダー		
 //
 //********************************************************************
+
+/***************************/
+//	★TDNMeshで使用
+/***************************/
+struct VSINPUT
+{
+	float4 Pos : POSITION;
+	float4 Normal : NORMAL;
+	float4 Color : COLOR;
+	float2 UV : TEXCOORD0;
+	// インスタンシング
+	float4 worldPos : TEXCOORD1;
+};
+
+VSINPUT VS(VSINPUT In)
+{
+	VSINPUT Out = (VSINPUT)0;
+
+	Out.Pos = mul(In.Pos, WMatrix);
+	Out.Pos += In.worldPos;
+
+	//float4x4 VPMatrix;
+	//VPMatrix = mul(VMatrix, PMatrix);
+
+	Out.Pos = mul(Out.Pos, VPMatrix);
+
+	Out.UV = In.UV;
+	Out.Normal = In.Normal;
+	Out.Color = In.Color;
+	return Out;
+}
+
+float4 PS(VSINPUT In) : COLOR
+{
+	float4 Out = 1;
+	In.Color = min(1, In.Color);
+	Out.rgb *= tex2D(DecaleSamp, In.UV);
+	Out.rgb *= In.Color;
+	//Out.a = alpha;
+	Out.a = 1;
+	return Out;
+}
+
+technique linecopy
+{
+	pass P0
+	{
+		AlphaBlendEnable = true;
+		BlendOp = Add;
+		SrcBlend = SrcAlpha;
+		DestBlend = InvSrcAlpha;
+		CullMode = CCW;
+		Zenable = true;
+		ZWriteEnable = true;
+
+		// シェーダ
+		VertexShader = compile vs_3_0 VS();
+		PixelShader = compile ps_3_0 PS();
+	}
+}
+
 //------------------------------------------------------
 //		頂点フォーマット
 //------------------------------------------------------
@@ -1456,7 +1515,7 @@ PS_TONEMAP PS_Stage(VS_OUTPUT_FINAL In) : COLOR
 	OUT.color = In.Color * tex2D(DecaleSamp, In.Tex);
 
 	float4 lightCol = tex2D(LightSamp, ScreenTex);
-		lightCol += tex2D(PLSSamp, ScreenTex);
+	lightCol += tex2D(PLSSamp, ScreenTex);
 	OUT.color.rgb *= lightCol;
 	OUT.color.rgb += tex2D(SpecSamp, ScreenTex);
 	
@@ -1506,6 +1565,7 @@ struct VS_OUTPUT_OUTLINE
 {
 	float4 Pos		: POSITION;
 	float2 Tex		: TEXCOORD0;
+	float4 Color	: COLOR;
 };
 
 /*************************************/
@@ -1570,7 +1630,9 @@ technique OutLine
 //		プレイヤー用のグローバルエリア
 //------------------------------------------------------
 float g_InvincibleColRate = 0.0f;//Flash そのキャラクターダウン後の点滅のレート　ちか
-
+float g_OrangeColRate = 0.0f;//　オレンジの光
+float g_MagentaColRate = 0.0f;//　マゼンタの光
+float g_OverDriveColRate = 0.0f;//
 
 
 //------------------------------------------------------
@@ -1675,6 +1737,11 @@ PS_TONEMAP PS_ToonPlayer(VS_OUTPUT_FINAL In) : COLOR
 	// キャサリンの白いリム
 	OUT.color.rgb += (RimPower)* float3(1, 1, 1);
 
+	// オーバードライブ用
+	//float RimPower2 = pow(1.0f - max(0.0f, dot(-E, Normal)), 1.0f);
+	OUT.high.rgb += float3(0.0, 0.2, 0.4)*g_OverDriveColRate;
+	OUT.high.rgb += float3(0.8, 0.5, 0.0)*g_OrangeColRate;
+	OUT.high.rgb += float3(0.7, 0.0, 0.4)*g_MagentaColRate;
 	//高輝度抽出後にしないとHDRで光ってしまうので最後に
 	OUT.color.rgb += g_InvincibleColRate;
 
@@ -1969,7 +2036,7 @@ PS_TONEMAP PS_UvAnime(VS_OUTPUT_UV In) : COLOR
 	//OUT.color.rgb *= exp2(exposure); 今は考慮はなしで
 	
 	// 高輝度抽出
-	OUT.high.rgb = max(OUT.color.rgb - 0.5f,0.0f);
+	OUT.high.rgb = max(OUT.color.rgb - 0.45f,0.0f);
 	//OUT.high.rgb = float3(0, 0.5, 0);
 	OUT.high.a = OUT.color.a;
 
