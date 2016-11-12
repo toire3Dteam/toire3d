@@ -13,3 +13,6 @@ ID: DEFAULT
 NAME: PLAYSTATION(R)3 Controller|
 ID: DEFAULT
 
+NAME: Wireless Controller|
+ID: DEFAULT
+
