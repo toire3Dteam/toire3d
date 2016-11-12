@@ -1000,7 +1000,7 @@ tdnStreamSound::tdnStreamSound(LPDIRECTSOUND lpDS, LPSTR filename, BYTE mode, in
 	if (lstrcmpi(work, ".ogg") == 0) bInit = SetOGG(lpDS, filename);
 
 	lpStream->SetCurrentPosition(0);
-	if (mode != STR_FADEIN) SetVolume(255);
+	if (mode != STR_FADEIN) SetVolume(1);
 	else SetVolume(0);
 	/*	管理スレッドの作成	*/
 	hStrThread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)ThreadIIDX, this, 0, &dwThreadId);
@@ -2143,7 +2143,7 @@ tdnStreamSound* tdnSoundBGM::PlayStream(char* filename, BYTE mode, int param)
 	if (lpDS == nullptr) return nullptr;
 
 	lpStream = new tdnStreamSound(lpDS, filename, mode, param);
-	lpStream->SetVolume(m_fBaseVolume);				// ★基本ボリューム設定
+	if(mode == STR_NORMAL)lpStream->SetVolume(m_fBaseVolume);				// ★基本ボリューム設定
 	return lpStream;
 }
 

@@ -75,7 +75,7 @@ void sceneEffectTool::Update()
 	}
 	if (KeyBoard(KB_G) == 1)
 	{
-		bool a = GetMiddleFlag();
+		bool a = (GetMiddleFlag()) ? true : false;
 		a = a;
 	}
 	if (KeyBoard(KB_5) == 1)

@@ -76,8 +76,8 @@ bool Framework::Update()
 
 	/*“®‰æ‚ğÄ¶‚µ‚Ä‚¢‚½‚ç•`‰æ‚³‚¹‚È‚¢*/
 	if (scene != NULL){
-		movie_play = scene->Update();
-		return movie_play;
+		//movie_play = scene->Update();
+		//return movie_play;
 	}
 
 	return true;

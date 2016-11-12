@@ -7,9 +7,10 @@ class TimeManager
 private:
 	int m_frame;		// 自分のフレーム
 	tdn2DAnim* m_pic;	// 画像
+	Vector2 m_vPos;
 
 	// シングルトンの作法
-	TimeManager():m_frame(0){}
+	TimeManager();
 	TimeManager(const TimeManager&){}
 	TimeManager &operator=(const TimeManager&){}
 
@@ -17,12 +18,7 @@ public:
 	static TimeManager *GetInstance(){ static TimeManager i; return &i; }
 
 	// 初期化
-	void  Init() 
-	{
-		m_pic = new tdn2DAnim("Data/UI/Game/timer.png");
-		m_pic->OrderNone();
-		m_pic->Action();
-	};
+	void  Init();
 
 	// 解放
 	void  Release() { SAFE_DELETE(m_pic); };

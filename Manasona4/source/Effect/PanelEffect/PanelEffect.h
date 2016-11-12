@@ -15,8 +15,8 @@ public:
 	virtual void Update();
 	virtual void Render();
 	virtual void Render3D();
-	virtual void Action(int x = 0, int y = 0);
-	virtual void Action(Vector3 pos = VECTOR_ZERO);
+	virtual void Action(int x = 0, int y = 0, int delayFrame = 0);
+	virtual void Action(Vector3 pos = VECTOR_ZERO, int delayFrame = 0);
 
 	virtual void Stop();
 
@@ -28,6 +28,8 @@ protected:
 	int m_picSize;
 	float m_pic3DScale;
 	RS state;
+
+	int m_iDelayFrame;
 
 };
 
@@ -49,7 +51,7 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -62,12 +64,13 @@ public:
 		m_picSize = 256;
 		m_pic = new AnimationPanel("Data/Effect/eraseEffect.png", 256, 256, 15, 1, 4, false);
 		state = RS::ADD;
+		m_pic3DScale = 80.0f;
 	};
 	~HitEffect() {};
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -85,7 +88,7 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -105,7 +108,7 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -127,7 +130,7 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -139,13 +142,15 @@ public:
 	{
 		m_picSize = 256;
 		m_pic = new AnimationPanel("Data/Effect/in2.png", 256, 256, 15, 1, 4, false);
+		
+		m_pic3DScale = 100.0f;
 		//state = RS::COPY;
 	};
 	~InEffectMini() {};
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -163,7 +168,7 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -181,7 +186,7 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -194,13 +199,13 @@ public:
 		m_picSize = 256;
 		m_pic = new AnimationPanel("Data/Effect/clear.png", 256, 256, 15, 2, 4, false);
 		//state = RS::COPY;
-		m_pic->GetPic()->SetScale(3.0f);
+		//m_pic->GetPic()->SetScale(3.0f);// [10/23]スケールもとに戻した
 	};
 	~ClearEffect() {};
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -220,7 +225,7 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -239,7 +244,7 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -258,7 +263,7 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -278,7 +283,7 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -299,7 +304,7 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -321,7 +326,7 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -341,7 +346,7 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -362,7 +367,7 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -381,7 +386,7 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -401,7 +406,7 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -420,7 +425,7 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -439,7 +444,7 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -458,7 +463,7 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -477,7 +482,7 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };
@@ -496,7 +501,124 @@ public:
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };
-	void Action(int x = 0, int y = 0) { BasePanelEffect::Action(x, y); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
+
+private:
+};
+
+class AirouWindEffect :public BasePanelEffect
+{
+public:
+	AirouWindEffect()
+	{
+		m_picSize = 256;
+		m_pic = new AnimationPanel("Data/Effect/AirouWind.png", 256, 256, 15, 1, 4, false);
+		m_pic3DScale = 500;//3Dのスケール
+	};
+	~AirouWindEffect() {};
+
+	void Update() { BasePanelEffect::Update(); };
+	void Render() { BasePanelEffect::Render(); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
+
+private:
+};
+
+// 
+class WeakEffect :public BasePanelEffect
+{
+public:
+	WeakEffect()
+	{
+		m_picSize = 256;
+		m_pic = new AnimationPanel("Data/Effect/Weak.png", 256, 256, 59, 1, 8, false);
+		state = RS::COPY_NOZ;
+		m_pic3DScale = 75;//3Dのスケール
+	};
+	~WeakEffect() {};
+
+	void Update() { BasePanelEffect::Update(); };
+	void Render() { BasePanelEffect::Render(); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
+
+private:
+};
+
+// 
+class OverDriveEffect :public BasePanelEffect
+{
+public:
+	OverDriveEffect()
+	{
+		m_picSize = 256;
+		m_pic = new AnimationPanel("Data/Effect/OverDrive.png", 256, 256, 15, 2, 4, false);
+		state = RS::ADD;
+		m_pic3DScale = 150;//3Dのスケール
+	};
+	~OverDriveEffect() {};
+
+	void Update() { BasePanelEffect::Update(); };
+	void Render() { BasePanelEffect::Render(); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
+
+private:
+};
+
+// 
+class OverDriveStartEffect :public BasePanelEffect
+{
+public:
+	OverDriveStartEffect()
+	{
+		m_picSize = 256;
+		m_pic = new AnimationPanel("Data/Effect/overDriveStart.png", 256, 256, 15, 1, 4, false);
+		state = RS::ADD;
+		m_pic3DScale = 100;//3Dのスケール
+	};
+	~OverDriveStartEffect() {};
+
+	void Update() { BasePanelEffect::Update(); };
+	void Render() { BasePanelEffect::Render(); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
+
+private:
+};
+
+class OrangeLightEffect :public BasePanelEffect
+{
+public:
+	OrangeLightEffect()
+	{
+		m_picSize = 256;
+		m_pic = new AnimationPanel("Data/Effect/OrangeLight.png", 256, 256, 15, 1, 4, false);
+		state = RS::ADD;
+		m_pic3DScale = 50;//3Dのスケール
+	};
+	~OrangeLightEffect() {};
+
+	void Update() { BasePanelEffect::Update(); };
+	void Render() { BasePanelEffect::Render(); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
+
+private:
+};
+
+
+class DokkoiEffect :public BasePanelEffect
+{
+public:
+	DokkoiEffect()
+	{
+		m_picSize = 256;
+		m_pic = new AnimationPanel("Data/Effect/dokkoi.png", 256, 256, 15, 1, 4, false);
+		state = RS::ADD;
+		m_pic3DScale = 50;//3Dのスケール
+	};
+	~DokkoiEffect() {};
+
+	void Update() { BasePanelEffect::Update(); };
+	void Render() { BasePanelEffect::Render(); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
 };

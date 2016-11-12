@@ -6,11 +6,14 @@
 
 
 
-HpGage::HpGage(BasePlayer* pPlayer, SIDE bSide)
+HpGage::HpGage(BasePlayer* pPlayer)
 {
 	m_pGage = new tdn2DObj("Data/UI/Game/HPGage.png");
 	m_iGageWidth = 422;
 	m_iGageHeight = 25;
+
+	m_pGageUsually = new tdn2DObj("Data/UI/Game/HPGageUsually.png");
+	m_pGagePinch = new tdn2DObj("Data/UI/Game/HPGagePinch.png");
 
 	m_pWave = new tdn2DObj("Data/UI/Game/HPGage_Wave.png");
 	m_fWaveUV = 0.0f;
@@ -27,7 +30,7 @@ HpGage::HpGage(BasePlayer* pPlayer, SIDE bSide)
 	m_fRate = 0.0f;
 
 	// 右か左
-	m_sSideFlag = bSide;
+	m_sSideFlag = pPlayer->GetSide();
 	if (m_sSideFlag == SIDE::LEFT)
 	{
 		m_vPos.x = 125;
@@ -75,6 +78,8 @@ HpGage::HpGage(BasePlayer* pPlayer, SIDE bSide)
 HpGage::~HpGage()
 {
 	SAFE_DELETE(m_pGage);
+	SAFE_DELETE(m_pGageUsually);
+	SAFE_DELETE(m_pGagePinch);
 	SAFE_DELETE(m_pWave);
 	SAFE_DELETE(m_pDamageGage);
 
@@ -165,7 +170,9 @@ void HpGage::Render()
 	//
 	//m_pMaskScreen->Render(0, 0, 1280/4, 720/4, 0, 0, 1280, 720);
 
+
 	m_pUseMaskScreen->Render(0, 0, shader2D, "Mask");
+
 
 	//if (m_sSideFlag == UI_SIDE::LEFT)
 	//{
@@ -200,11 +207,29 @@ void HpGage::UseMaskScreen()
 				m_iGageWidth - (int)(m_iGageWidth  * m_fDamageRate), 0,
 				(int)(m_iGageWidth*m_fDamageRate), m_iGageHeight);
 
+			// HPによって色を変える
+			if (m_fRate >= 1.0f)
+			{
+				m_pGage->Render((int)m_vPos.x + (m_iGageWidth - (int)(m_iGageWidth * m_fRate)), (int)m_vPos.y,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight,
+					m_iGageWidth - (int)(m_iGageWidth  * m_fRate), 0,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight);
+			}
+			else if (m_fRate >= 0.35f)// 普通位
+			{
+				m_pGageUsually->Render((int)m_vPos.x + (m_iGageWidth - (int)(m_iGageWidth * m_fRate)), (int)m_vPos.y,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight,
+					m_iGageWidth - (int)(m_iGageWidth  * m_fRate), 0,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight);
 
-			m_pGage->Render((int)m_vPos.x + (m_iGageWidth - (int)(m_iGageWidth * m_fRate)), (int)m_vPos.y,
-				(int)(m_iGageWidth*m_fRate) , m_iGageHeight,
-				m_iGageWidth - (int)(m_iGageWidth  * m_fRate),0,
-				(int)(m_iGageWidth*m_fRate), m_iGageHeight);
+			}
+			else // ピンチ
+			{
+				m_pGagePinch->Render((int)m_vPos.x + (m_iGageWidth - (int)(m_iGageWidth * m_fRate)), (int)m_vPos.y,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight,
+					m_iGageWidth - (int)(m_iGageWidth  * m_fRate), 0,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight);
+			}
 
 			
 			m_pWave->Render((int)m_vPos.x + (m_iGageWidth - (int)(m_iGageWidth * m_fRate)), (int)m_vPos.y,
@@ -246,11 +271,31 @@ void HpGage::UseMaskScreen()
 				0, 0,
 				(int)(m_iGageWidth*m_fDamageRate), m_iGageHeight);
 
+			if (m_fRate >= 1.0f)
+			{
+				m_pGage->Render((int)m_vPos.x, (int)m_vPos.y,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight,
+					0, 0,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight);
 
-			m_pGage->Render((int)m_vPos.x, (int)m_vPos.y,
-				(int)(m_iGageWidth*m_fRate), m_iGageHeight,
-				0, 0,
-				(int)(m_iGageWidth*m_fRate), m_iGageHeight);
+			}
+			else if (m_fRate >= 0.35f)// 普通位
+			{
+				m_pGageUsually->Render((int)m_vPos.x, (int)m_vPos.y,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight,
+					0, 0,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight);
+
+			}
+			else // ピンチ
+			{
+				m_pGagePinch->Render((int)m_vPos.x, (int)m_vPos.y,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight,
+					0, 0,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight);
+
+			}
+
 
 			// TODO
 			m_pWave->Render((int)m_vPos.x, (int)m_vPos.y,

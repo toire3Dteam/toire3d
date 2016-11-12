@@ -15,14 +15,21 @@
 #include "SceneMainState.h"
 #include "../Fade/Fade.h"
 #include "../DeferredEx/DeferredEx.h"
-
+#include "../SceneSwitch/SceneSwitch.h"
 #include "../PointLight/PointLight.h"
-
+#include "Data\SelectData.h"
 #include "../Number/Number.h"
 #include "../UI/GameUI.h"
-//#include "../UI/Combo.h"
+#include	"../Cutin/CutIn.h"
+#include "../Sound/BattleMusic.h"
+#include "UI/HeaveHoFinish/HeaveHoFinish.h"
 
-///Combo* com;
+#include "RoundCall\RoundCallManager.h"
+#include "Stage\OverDriveStage\OverDriveStage.h"
+
+
+#include "MenuUI\TutorialManager.h"
+
 
 //BaseEffect* g_eff;
 //EffectManager;
@@ -31,19 +38,27 @@ UVEffectManager* g_uvEffect;
 
 int stopTimer = 0;
 
-
 //******************************************************************
 //		初期化・解放
 //******************************************************************
 sceneMain::sceneMain() :BaseGameEntity(ENTITY_ID::SCENE_MAIN){}
 bool sceneMain::Initialize()
 {
+	// ラウンド数
+	// (TODO)[11/4]ラウンド数が0の時はラウンドコールを抜く処理がしたい
+	// トレーニングやチュートリアルのため
+	m_iRoundNum = SelectDataMgr->Get()->iWinRound;
+
 	//com = new Combo();
 
 	m_dirLight = Vector3(1, -1, 1);
 
+#ifdef _DEBUG
+	sprintf_s(m_LoadComment, 256, "UVエフェクトとか初期化");
+#endif
+
 	//g_eff = new HitEffect();
-	m_panel	   = new PanelEffectManager();
+	m_panel = new PanelEffectManager();
 	m_fLoadPercentage = .05f;	// ロード割合
 	g_uvEffect = new UVEffectManager();
 
@@ -53,70 +68,137 @@ bool sceneMain::Initialize()
 
 	m_fLoadPercentage = .25f;	// ロード割合
 
-	// ステージ初期化
-	Stage::Base::CreateStage(&m_pStage, STAGE_ID::SENJO, CameraMgr);	// 関数の中で作ってもらう
+#ifdef _DEBUG
+	sprintf_s(m_LoadComment, 256, "ステージ初期化");
+#endif
 
-	m_fLoadPercentage = .5f;	// ロード割合
+	// ステージ初期化(★セレクトしたステージのタイプを引数に渡す)
+	Stage::Base::CreateStage(&m_pStage, SelectDataMgr->Get()->stage, CameraMgr);	// 関数の中で作ってもらう
+
+	m_fLoadPercentage = .3f;	// ロード割合
+
+#ifdef _DEBUG
+	sprintf_s(m_LoadComment, 256, "プレイヤー初期化");
+#endif
 
 	// プレイヤー初期化
 	//m_pPlayerMgr = new PlayerManager(4, m_pStage);
-	PlayerMgr->Initialize(2, m_pStage);
+	PlayerMgr->Initialize(2, m_pStage, SelectDataMgr->Get()->tagSideDatas);
 
-	m_fLoadPercentage = .75f;	// ロード割合
+	m_fLoadPercentage = .5f;	// ロード割合
 
 	// プレイヤーの座標のアドレスをカメラに渡してあげる(いじることは絶対に無く、ただ参照するだけ)
 	CameraMgr->SetPlayersPos();
 
-	m_fLoadPercentage = 1.0f;	// ロード割合
-
 	// パーティクル初期化
-	ParticleManager::Initialize("DATA/Effect/particle.png", 2048);
+	//ParticleManager::Initialize("DATA/Effect/particle.png", 2048);
 
-	// オレ曲初期化
-	m_pMyMusicMgr = new MyMusicManager(MY_MUSIC_ID::SENJO);
-	m_pMyMusicMgr->Play();
+	m_fLoadPercentage = .55f;	// ロード割合
+
+#ifdef _DEBUG
+	sprintf_s(m_LoadComment, 256, "ディファード初期化");
+#endif
 
 	DeferredManagerEx;
 	DeferredManagerEx.InitShadowMap(1024);
 	m_bShaderFlag = true;
 
+	m_fLoadPercentage = .6f;	// ロード割合
+
+#ifdef _DEBUG
+	sprintf_s(m_LoadComment, 256, "ポイントライト初期化");
+#endif
+
 	PointLightMgr;
 
 	NumberEffect;
-	
+
+	m_fLoadPercentage = .65f;	// ロード割合
+
+#ifdef _DEBUG
+	sprintf_s(m_LoadComment, 256, "ゲームUI初期化");
+#endif
 
 	BasePlayer* p1 = PlayerMgr->GetPlayer_TeamInSearch(SIDE::LEFT);
 	BasePlayer* p2 = PlayerMgr->GetPlayer_TeamInSearch(SIDE::RIGHT);
 	GameUIMgr;
-	GameUIMgr->ReferencesPlayer(p1, p2);
-	GameUIMgr->Action();
+	GameUIMgr->InitData(p1, p2, m_iRoundNum);
+	//GameUIMgr->Action();
+
+	m_fLoadPercentage = .7f;	// ロード割合
 
 	m_stageScreen = new tdn2DObj(tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom, TDN2D::HDR);
+
+#ifdef _DEBUG
+	sprintf_s(m_LoadComment, 256, "その他初期化");
+#endif
 
 	TimeMgr->Init();
 	TimeMgr->Reset(60);
 
+	m_fLoadPercentage = .8f;	// ロード割合
+
+	HeaveHoFinishUI;
+	CutInMgr;
+
+	m_fLoadPercentage = .85f;	// ロード割合
+
+	m_fLoadPercentage = 1.0f;	// ロード割合
+
+	// シーンスイッチ
+	prevEF = new SceneSwitchPrev();
+
+	// ラウンドコールマネージャー
+	m_pRoundCallMgr = new RoundCallManager();
+
 	/* ステートマシン初期化 */
 	m_pStateMachine = new StateMachine<sceneMain>(this);
-	m_pStateMachine->SetCurrentState(SceneMainState::Intro::GetInstance());	// ステートの設定
+
+	//（TODO）チュートリアル・トレーニングだったら分岐
+	m_bTutorialFlag = SelectDataMgr->Get()->bTutorial;
+	if (m_bTutorialFlag == true)
+	{
+		// チュートリアル用の対戦
+		m_pStateMachine->SetCurrentState(SceneMainState::TutorialIntro::GetInstance());
+
+	}
+	else
+	{
+		// 通常の対戦
+		m_pStateMachine->SetCurrentState(SceneMainState::StageIntro::GetInstance());	// ステートの設定
+	}
+
+	m_pMaskScreen = new tdn2DObj("Data/UI/Game/stageScreenMask.png");
+	m_fMaskRate = 0.0f;
+	m_fMaskPower = 0.0f;
+	m_bOverDriveStageFlag = false;
+
+	m_pOverDriveStage = new OverDriveStage();
+
+	// オレ曲初期化
+	//m_pMyMusicMgr = new MyMusicManager(MY_MUSIC_ID::SENJO);
+	//m_pMyMusicMgr->Play();
+	bgm->PlayStreamIn((LPSTR)BattleMusicMgr->GetMusicFilePath(SelectDataMgr->Get()->iBattleMusicID).c_str());
 
 	return true;
 }
 
 sceneMain::~sceneMain()
 {
+	delete prevEF;
 	delete m_pStateMachine;
-	delete m_pMyMusicMgr;
+	//delete m_pMyMusicMgr;
+	bgm->StopStreamIn();
 	delete m_pStage;
 	//delete CameraMgr;
 	PlayerMgr->Release();
 	//EffectMgr.Release();
 	SAFE_DELETE(m_panel);
 	SAFE_DELETE(g_uvEffect);
-	ParticleManager::Release();
+	//ParticleManager::Release();
 	DeferredManagerEx.Release();
 	SAFE_DELETE(m_stageScreen);
-
+	HeaveHoFinishUI->Rerease();
 	PointLightMgr->Release();
 
 	NumberEffect.Release();
@@ -125,6 +207,13 @@ sceneMain::~sceneMain()
 
 	TimeMgr->Release();
 
+	CutInMgr->Rerease();
+
+	SAFE_DELETE(m_pRoundCallMgr);
+
+	SAFE_DELETE(m_pMaskScreen);
+
+	SAFE_DELETE(m_pOverDriveStage);
 	//SAFE_DELETE(com);
 }
 
@@ -134,8 +223,10 @@ sceneMain::~sceneMain()
 
 void sceneMain::Update()
 {
-
-//	com->Update();
+	HeaveHoFinishUI->Update();
+	if (HeaveHoFinishUI->IsAction() == true)return ;
+	
+	//	com->Update();
 
 	stopTimer++;
 	//if (stopTimer > 60 * 60)
@@ -146,8 +237,8 @@ void sceneMain::Update()
 	// フェード更新
 	Fade::Update();
 
-	// カメラ更新
-	CameraMgr->Update();
+	// カメラ更新(ステートマシンに書いた)
+	//CameraMgr->Update();
 
 	// ステージ更新
 	m_pStage->Update();
@@ -165,7 +256,7 @@ void sceneMain::Update()
 
 	m_dirLight.x = sinf(lightAngle);
 	m_dirLight.z = cosf(lightAngle);
-	m_dirLight.y = -0.8f;
+	m_dirLight.y = -0.99f;
 
 	// ブラー更新
 	DeferredManagerEx.RadialBlurUpdate();
@@ -179,73 +270,47 @@ void sceneMain::Update()
 	// エンターでエフェクトカメラ発動してみる
 	if (KeyBoardTRG(KB_ENTER))
 	{
-		EFFECT_CAMERA_INFO eci;
-		eci.scriptID = 0;
-		MsgMgr->Dispatch(0, ENTITY_ID::CAMERA_MGR, ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::EFFECT_CAMERA, &eci);
+		//m_pMyMusicMgr->PlayHeaveHo();
+		//EFFECT_CAMERA_INFO eci;
+		//eci.scriptID = 0;
+		//MsgMgr->Dispatch(0, ENTITY_ID::CAMERA_MGR, ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::EFFECT_CAMERA, &eci);
 	}
 
-	if (KeyBoardTRG(KB_L))
+
+	if (KeyBoardTRG(KB_N))
 	{
-	//	PointLightManager::GetInstance()->AddPointLight(Vector3(10, 3, 0), Vector3(0, 1, 1), 100, 4, 60, 20, 40);
-
-		//g_eff->Action(0,0);
-		//EffectMgr.AddEffect(Vector3(0, 0, -5), EFFECT_TYPE::BURN);
-		//EffectMgr.AddEffect(Vector3(0, 0, -5), EFFECT_TYPE::NOTICE);
-
-		m_panel->AddEffect(Vector3(0, 5, -5), PANEL_EFFECT_TYPE::GLASS);
-
-		//g_uvEffect->AddEffectRoop(Vector3(5, 5, 0), UV_EFFECT_TYPE::GUARD, 1.0f, 1.0f);
-
-		//g_uvEffect->AddEffect(Vector3(-4, 0, -5), UV_EFFECT_TYPE::CONV,2,2
-		//	, Vector3(0, 0, 0), Vector3(0, 0, 0));
-
-		//g_uvEffect->AddEffect(Vector3(4, 0, -5), UV_EFFECT_TYPE::CONV2, 2, 2
-		//	, Vector3(0, 0, 0), Vector3(0, 0, 0));
-
-		//g_uvEffect->AddEffect(Vector3(10, 0, -5), UV_EFFECT_TYPE::CONV3, 1, 1
-		//	, Vector3(0, 0, 0), Vector3(0, 0, 0));
+		// UIにメッセージを送る
+		SIDE side = SIDE::LEFT;
+		MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
+			MESSAGE_TYPE::APP_WIN_ICON, &side);
 	}
-	if (KeyBoardTRG(KB_NUMPAD1))
-	{
-		g_uvEffect->AddEffect(Vector3(-2, -5,0 ), UV_EFFECT_TYPE::CONV, 2, 2
-			, Vector3(0, 0, 0), Vector3(0, 0, 0));
-
-	}
-	if (KeyBoardTRG(KB_NUMPAD2))
-	{
-		g_uvEffect->AddEffect(Vector3(2, -5, 0), UV_EFFECT_TYPE::CONV2, 2, 2
-			, Vector3(0, 0, 0), Vector3(0, 0, 0));
-
-	}
-	if (KeyBoardTRG(KB_NUMPAD3))
-	{
-		g_uvEffect->AddEffect(Vector3(0, -5, 0), UV_EFFECT_TYPE::CONV3, 2, 2
-			, Vector3(0, 0, 0), Vector3(0, 0, 0));
-
-	}
-	if (KeyBoardTRG(KB_NUMPAD7))
-	{
-		g_uvEffect->AddEffect(Vector3(0, -5, 0), UV_EFFECT_TYPE::CONV4, 2, 2
-			, Vector3(0, 0, 0), Vector3(0, 0, 0));
-
-	}
-	if (KeyBoardTRG(KB_NUMPAD8))
-	{
-		g_uvEffect->AddEffect(Vector3(0, 0, 0), UV_EFFECT_TYPE::BURST_BALL, 1, 2
-			, Vector3(0, 0, 0), Vector3(0, 0, 0));
-
-	}
-
-	if (KeyBoardTRG(KB_I))
-	{		
-		g_uvEffect->AddEffect(Vector3(10, 5, -5), UV_EFFECT_TYPE::CONV, 2, 2
-			, Vector3(1.14f, 0, 0), Vector3(1.14f, 0, 0));
-	}
-
 	if (KeyBoardTRG(KB_M))
 	{
-		//g_uvEffect->StopEffectRoop(UV_EFFECT_TYPE::GUARD);
+		// UIにメッセージを送る
+		CUTIN_TYPE_NAME data = CUTIN_TYPE_NAME::AIROU;
+		MsgMgr->Dispatch(0, ENTITY_ID::CUTIN_MGR, ENTITY_ID::CUTIN_MGR,
+			MESSAGE_TYPE::CUTIN_ACTION, &data);
+
 	}
+
+	// 
+	if (KeyBoardTRG(KB_H))
+	{
+		SIDE data = SIDE::LEFT;	
+		// 
+		MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
+			MESSAGE_TYPE::OVER_DRIVE_CUTIN, &data);
+
+	}
+	if (KeyBoardTRG(KB_J))
+	{
+
+		SIDE data = SIDE::RIGHT;
+		//
+		MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
+			MESSAGE_TYPE::OVER_DRIVE_CUTIN, &data);
+	}
+
 
 	if (KeyBoardTRG(KB_K))
 	{
@@ -261,8 +326,27 @@ void sceneMain::Update()
 
 	if (KeyBoardTRG(KB_U))
 	{
+		//TimeMgr->a
 		GameUIMgr->Action();
 	}
+	if (KeyBoardTRG(KB_I))
+	{
+		// UIにメッセージを送る
+		SIDE side = SIDE::LEFT;
+		MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
+			MESSAGE_TYPE::APP_WIN_ICON, &side);
+	}
+
+	if (KeyBoardTRG(KB_N))
+	{
+		OverDriveAction();
+	}
+
+	if (KeyBoardTRG(KB_B))
+	{
+		OverDriveEnd();
+	}
+
 	GameUIMgr->Update();
 
 	//g_eff->Update();
@@ -270,7 +354,14 @@ void sceneMain::Update()
 	m_panel->Update();
 	g_uvEffect->Update();
 
-	TimeMgr->Update();
+	//TimeMgr->Update();
+	CutInMgr->Update();
+
+	m_pRoundCallMgr->Update();// ラウンドコール
+
+	m_pOverDriveStage->Update();// 必殺背景
+
+	OverDriveUpdate();// オーバードライブ
 
 	// ★ステートマシン更新(何故ここに書くかというと、中でシーンチェンジの処理を行っているため)
 	m_pStateMachine->Update();
@@ -294,7 +385,7 @@ void sceneMain::Render()
 
 
 		// シェーダ更新
-		DeferredManagerEx.G_Update(CameraMgr->m_pos);
+		DeferredManagerEx.G_Update(CameraMgr->m_ViewData.pos);
 
 		// 影
 		RenderShadow();
@@ -315,8 +406,17 @@ void sceneMain::Render()
 
 		// ポイントライト描画
 		DeferredManagerEx.GpuPointLightRender();
+		
+		// ★必殺用のステージが描画されるなら描画しない
+		if (m_bOverDriveStageFlag == false)
+		{
+			RenderStage();// ここでステージだけをまとめて描画
+		}
+		else
+		{
+			m_pOverDriveStage->Render();// 必殺背景
+		}
 
-		RenderStage();// ここでステージだけをまとめて描画
 
 		// 最後の処理
 		{
@@ -324,7 +424,14 @@ void sceneMain::Render()
 
 			//int dim= PlayerMgr->GetOverDriveDim();
 			//m_stageScreen->SetARGB(255, dim, dim, dim);
-			m_stageScreen->Render(0, 0, RS::COPY_NOZ);// ※Z値考慮させてない理由は↓の絵を描画するため
+			shader2D->SetValue("MaskTex", m_pMaskScreen);
+			shader2D->SetValue("g_fMaskEdgeRate", m_fMaskRate);
+			m_pOverDriveStage->GetScreen()->Render(0, 0,RS::COPY_NOZ);
+			m_stageScreen->Render(0, 0, shader2D,"MaskEdge");// ※Z値考慮させてない理由は↓の絵を描画するため
+		
+			// キャラクターより下に描画するUI
+			GameUIMgr->RenderBack();
+
 
 			// プレイヤー
 			PlayerMgr->Render();
@@ -341,23 +448,37 @@ void sceneMain::Render()
 
 		// ブルーム
 		DeferredManagerEx.BloomRender();
+		
 
 
 		// UI
-		NumberEffect.Render();	
+		NumberEffect.Render();
 		PlayerMgr->RenderUI();
-		GameUIMgr->Render();
+		if (m_pStateMachine->isInState(*SceneMainState::HeaveHoDriveOverFlowSuccess::GetInstance()) == false)
+		{
+			GameUIMgr->Render();
+			TimeMgr->Render();
+		}
+		
+		HeaveHoFinishUI->Render();
+		
 
 		// ★ここにステートマシン描画(多分2D関係が多いんじゃないかと)
 		m_pStateMachine->Render();
-		
+
 		if (KeyBoard(KB_J))
 		{
 			SurfaceRender();
 		}
 
+		// ラウンドコール
+		m_pRoundCallMgr->Render();
+
 		// フェード描画
 		Fade::Render();
+
+		// シーンスイッチ
+		prevEF->Render();
 	}
 	else
 	{
@@ -373,12 +494,15 @@ void sceneMain::Render()
 
 	}
 
-	TimeMgr->Render();
+	//DeferredManagerEx.GetTex(SURFACE_NAME_EX::BLOOM_SEED)->Render(0, 0, 1280 / 4, 720 / 4, 0, 0, 1280, 720);
+
+	CutInMgr->Render();
 
 	//com->Render(400, 400);
 
-	tdnText::Draw(0, 30, 0xffffffff, "CameraPos    : %.1f %.1f %.1f", CameraMgr->m_pos.x, CameraMgr->m_pos.y, CameraMgr->m_pos.z);
-	tdnText::Draw(0, 60, 0xffffffff, "CameraTarget : %.1f %.1f %.1f", CameraMgr->m_target.x, CameraMgr->m_target.y, CameraMgr->m_target.z);
+	//tdnText::Draw(0, 30, 0xffffffff, "CameraPos    : %.1f %.1f %.1f", CameraMgr->m_pos.x, CameraMgr->m_pos.y, CameraMgr->m_pos.z);
+	//tdnText::Draw(0, 60, 0xffffffff, "CameraTarget : %.1f %.1f %.1f", CameraMgr->m_target.x, CameraMgr->m_target.y, CameraMgr->m_target.z);
+	//tdnText::Draw(0, 90, 0xffffffff, "CameraEvent  : %d", CameraMgr->GetEventFrame());
 }
 
 void sceneMain::RenderStage()
@@ -406,12 +530,15 @@ void sceneMain::RenderShadow()
 	if (DeferredManagerEx.GetShadowFlag() == false)return;
 
 	DeferredManagerEx.CreateShadowMatrix
-		(m_dirLight, Vector3(0,0,0), Vector3(0, 0, 1), 400);
+		(m_dirLight, Vector3(0, 0, 0), Vector3(0, 0, 1), 400);
 
 	{
 		DeferredManagerEx.ShadowBegin();
 
 		m_pStage->RenderShadow();
+
+		// プレイヤー
+		PlayerMgr->RenderShadow();
 
 		DeferredManagerEx.ShadowEnd();
 	}
@@ -420,7 +547,7 @@ void sceneMain::RenderShadow()
 void sceneMain::SurfaceRender()
 {
 	enum {
-		X = 320/2, Y = 180/2 
+		X = 320 / 2, Y = 180 / 2
 	};
 
 	int texX = 0;
@@ -469,4 +596,25 @@ void sceneMain::SurfaceRender()
 
 	//texX++;
 	//DeferredManager.GetTex(SURFACE_NAME::SPECULAR)->Render(X*texX, Y*texY, X, Y, 0, 0, 1280, 720);
+}
+
+void sceneMain::OverDriveUpdate()
+{
+	if (m_bOverDriveStageFlag == true)m_fMaskPower = -0.2f;
+	else m_fMaskPower = 0.2f;
+
+	// マスク
+	m_fMaskRate += m_fMaskPower;
+	m_fMaskRate = Math::Clamp(m_fMaskRate, 0.0f, 1.0f);
+
+}
+
+void sceneMain::OverDriveAction()
+{
+	m_bOverDriveStageFlag = true;
+}
+
+void sceneMain::OverDriveEnd()
+{
+	m_bOverDriveStageFlag = false;
 }

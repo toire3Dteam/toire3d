@@ -1585,12 +1585,12 @@ void AIState::AerialDropAtack::Execute(AI * pPerson)
 		return;
 	}
 
-	// エリアルアタックステートへ移行していなかったら待つ
-	if (MyPlayer->GetFSM()->isPrevState(*BasePlayerState::AerialDropAttack::GetInstance()) == false)
-	{
-		if (MyPlayer->GetFSM()->isInState(*BasePlayerState::AerialDropAttack::GetInstance()) == false)
-			return;
-	}
+	// エリアルアタックステートへ移行していなかったら待つ(空下封印したのでコメントアウトしました！)
+	//if (MyPlayer->GetFSM()->isPrevState(*BasePlayerState::AerialDropAttack::GetInstance()) == false)
+	//{
+	//	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::AerialDropAttack::GetInstance()) == false)
+	//		return;
+	//}
 
 
 	// HITすれば戻る

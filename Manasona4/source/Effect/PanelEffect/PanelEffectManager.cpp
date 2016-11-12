@@ -339,6 +339,24 @@ PanelEffectManager::PanelEffectManager()
 		case PANEL_EFFECT_TYPE::GLASS:
 			m_basePanelEffect[i] = new GlassEffect();
 			break;
+		case PANEL_EFFECT_TYPE::AIROU_WINND:
+			m_basePanelEffect[i] = new AirouWindEffect();
+			break;
+		case PANEL_EFFECT_TYPE::WEAK:
+			m_basePanelEffect[i] = new WeakEffect();
+			break;
+		case PANEL_EFFECT_TYPE::OVER_DRIVE:
+			m_basePanelEffect[i] = new OverDriveEffect();
+			break;
+		case PANEL_EFFECT_TYPE::OVER_DRIVE_START:
+			m_basePanelEffect[i] = new OverDriveStartEffect();
+			break;
+		case PANEL_EFFECT_TYPE::ORANGE_LOGHT:
+			m_basePanelEffect[i] = new OrangeLightEffect();
+			break;
+		case PANEL_EFFECT_TYPE::DOKKOI:
+			m_basePanelEffect[i] = new DokkoiEffect();
+			break;
 		default:
 			assert(0);		// "そんなエフェクトはない"
 			break;
@@ -402,12 +420,12 @@ void PanelEffectManager::Render3D()
 /************************************************/
 //	エフェクト追加
 /************************************************/
-void PanelEffectManager::AddEffect(int x, int y, PANEL_EFFECT_TYPE type)
+void PanelEffectManager::AddEffect(int x, int y, PANEL_EFFECT_TYPE type, int delayFrame )
 {
-	m_basePanelEffect[(int)type]->Action(x, y);
+	m_basePanelEffect[(int)type]->Action(x, y, delayFrame);
 }
 
-void PanelEffectManager::AddEffect(Vector3 pos, PANEL_EFFECT_TYPE type)
+void PanelEffectManager::AddEffect(Vector3 pos, PANEL_EFFECT_TYPE type, int delayFrame)
 {
-	m_basePanelEffect[(int)type]->Action(pos);
+	m_basePanelEffect[(int)type]->Action(pos, delayFrame);
 }

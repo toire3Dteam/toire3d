@@ -11,6 +11,9 @@
 bool tdnFont::m_IsInitialized = false;
 tdnFont::CacheDesc		tdnFont::m_CacheDesc = { 0 }; //キャッシュの色々
 
+// 絵文字
+tdn2DObj* tdnFont::m_pPictograph = nullptr;
+
 /***********************/
 
 
@@ -38,6 +41,9 @@ void	tdnFont::Initialize()
 		m_CacheDesc.nextUseCacheNum = 0;//	次に使用するキャッシュの番号
 	}
 
+	// 絵文字用
+	m_pPictograph = new tdn2DObj("Data/System/Pictograph.png");
+
 	//	初期化フラグを立てる
 	m_IsInitialized = true;
 
@@ -52,6 +58,9 @@ void	tdnFont::Release()
 		m_CacheDesc.nextUseCacheNum = 0;
 	}
 
+	// 絵文字
+	SAFE_DELETE(m_pPictograph);
+	
 	//	初期化フラグをリセット
 	m_IsInitialized = false;
 }
@@ -73,6 +82,16 @@ void	tdnFont::RenderString(LPCSTR string, LPCSTR fontName, int fontSize, int dra
 		//	文字のバイト数を調べる	
 		myByte = _mbclen((BYTE*)&string[i]);
 
+		// 改行コードがあれば改行して次の文字へ
+		if (string[i] == '\n')
+		{
+			x = drawX;
+			y += (int)fontSize + 8;// 初期の文字サイズ分+幅で下げている
+			continue;
+		}
+
+
+
 		//	文字を描画
 		int	drawCoordX = x;
 		int	drawCoordY = y;
@@ -80,6 +99,8 @@ void	tdnFont::RenderString(LPCSTR string, LPCSTR fontName, int fontSize, int dra
 
 		//	描画座標をずらす
 		x += (int)drawedSize.x;
+
+
 	}
 }
 
@@ -105,25 +126,30 @@ Vector2	tdnFont::RenderCharacter(LPCSTR character, LPCSTR fontName, int fontSize
 	pImage = &m_CacheDesc.textureCacheList[SearchCache(character, createSize, fontName)];
 
 	//	空白チェック
-	bool	draw(true);
+	bool	bDraw = true;
 	
 	switch (byteSize) 
 	{
 	case	1:
-		if (character[0] == ' ') {	draw = false;	}
+		if (character[0] == ' ') { bDraw = false;	}
 		break;
-	case	2:
+	case	2:// マルチバイト
 	{
 		char	buffer[3] = { character[0], character[1], '\0' };
-		if (strcmp(buffer, "　") == 0) {
-			draw = false;
+		if (strcmp(buffer, "　") == 0) 
+		{
+			bDraw = false;
 		}
+
+		// ★絵文字検索
+		bDraw = SearchPictograph(buffer, drawX, drawY, pImage->GetWidth(), color, RenderFlag);
+
 	}
 	break;
 	}
 
 	//	描画
-	if (draw)
+	if (bDraw)
 	{
 		pImage->SetARGB(color);
 		pImage->Render(drawX, drawY, pImage->GetWidth(), pImage->GetHeight(),
@@ -138,11 +164,61 @@ Vector2	tdnFont::RenderCharacter(LPCSTR character, LPCSTR fontName, int fontSize
 //  簡易
 void tdnFont::RenderFont2D(LPCSTR _String, int _FontSize, int _DrawX, int _DrawY, DWORD col)
 {
-	LPSTR	c_FontName = "HGS創英角ﾎﾟｯﾌﾟ体";
+	LPSTR	c_FontName = "HGP創英角ﾎﾟｯﾌﾟ体";
 
 	RenderString(_String, c_FontName, _FontSize,
 		_DrawX, _DrawY, col, RS::COPY);
 }
+
+// 中央揃へ
+void tdnFont::RenderStringCentering(LPCSTR string, LPCSTR fontName, int fontSize, int drawX, int  drawY, DWORD color, DWORD RenderFlag)
+{
+	//	変数の用意
+	int	x = drawX;
+	int	y = drawY;
+	UINT	myByte = 0;
+	UINT	addByte = 0;
+	UINT	prevByte = 0;
+	std::string str;
+	str = string;
+
+	//	終端文字又は改行までループ
+	for (UINT i = 0; string[i] != '\0'; )
+	{
+		// 更新
+		i += myByte;
+
+		//	文字のバイト数を調べる	
+		myByte = _mbclen((BYTE*)&string[i]);
+		addByte += _mbclen((BYTE*)&string[i]);
+
+
+		// 改行まできたら一度描画してリセット
+		if (string[i] == '\n'|| string[i] == '\0')
+		{	
+			
+			// 中央揃への処理
+			x = drawX - (int)(((addByte - prevByte)*(fontSize * 0.5f)) * 0.5f);
+
+			// ここで描画	
+			std::string subString = str.substr(prevByte, (addByte - prevByte));
+			prevByte = addByte;// 前回のByte数を変更
+
+			// 文字列描画
+			RenderString(subString.c_str(), fontName, fontSize, x, y, color, RenderFlag);
+
+			// 改行　初期の文字サイズ分+幅で下げている
+			y += (int)fontSize + 8;
+
+		}
+		
+	}
+	
+
+	
+
+}
+
 
 /****************************************/
 //	 2DObjから文字を作るサポート関数
@@ -198,4 +274,65 @@ UINT	tdnFont::SearchCache(LPCSTR chara, UINT size, LPCSTR fontName)
 
 	//	新しくテクスチャを作成した番号を返す
 	return	useNum;
+}
+
+bool tdnFont::SearchPictograph(char buffer[3], int x, int y, UINT size, DWORD color, DWORD RenderFlag)
+{
+	// ★絵文字検索
+	enum TYPE
+	{
+		A = 0, B = 32*1, C = 32 * 2, D = 32 * 3,
+		LEFT = 32 * 4,RIGHT = 32 * 5,UP = 32 * 6,DOWN = 32 * 7
+
+	};
+
+	// 文字の色　(TODO) 今はアルファだけ変えています
+	DWORD col = color & 0xff000000;
+	col = col | 0x00ffffff;
+
+	m_pPictograph->SetARGB(col);
+
+	if (strcmp(buffer, "○") == 0) 
+	{
+		m_pPictograph->Render(x, y, size, size, A, 0, 32, 32, RenderFlag);
+		return false; 	
+	}
+	if (strcmp(buffer, "×") == 0)
+	{
+		m_pPictograph->Render(x, y, size, size, B, 0, 32, 32, RenderFlag);
+		return false;
+	}
+	if (strcmp(buffer, "△") == 0)
+	{
+		m_pPictograph->Render(x, y, size, size, C, 0, 32, 32, RenderFlag);
+		return false;
+	}
+	if (strcmp(buffer, "□") == 0)
+	{
+		m_pPictograph->Render(x, y, size, size, D, 0, 32, 32, RenderFlag);
+		return false;
+	}
+	if (strcmp(buffer, "←") == 0)
+	{
+		m_pPictograph->Render(x, y, size, size, LEFT, 0, 32, 32, RenderFlag);
+		return false;
+	}
+	if (strcmp(buffer, "→") == 0)
+	{
+		m_pPictograph->Render(x, y, size, size, RIGHT, 0, 32, 32, RenderFlag);
+		return false;
+	}
+	if (strcmp(buffer, "↑") == 0)
+	{
+		m_pPictograph->Render(x, y, size, size, UP, 0, 32, 32, RenderFlag);
+		return false;
+	}
+	if (strcmp(buffer, "↓") == 0)
+	{
+		m_pPictograph->Render(x, y, size, size, DOWN, 0, 32, 32, RenderFlag);
+		return false;
+	}
+
+	// 絵文字が見つからなかったので描画してよし
+	return true;
 }

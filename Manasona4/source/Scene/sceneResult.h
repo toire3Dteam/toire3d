@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../BaseEntity/Message/Message.h"
 
 // 前方宣言
 class MyMusicManager;
@@ -8,6 +8,7 @@ class Camera;
 class BaseResultPerformance;
 class SceneSwitch;
 class UVEffectManager;
+class EffectCamera;
 
 //class Stage::Base;	// ×
 namespace Stage{		// ○
@@ -18,6 +19,7 @@ class sceneResult: public BaseScene
 {
 public:
 	//初期化・解放
+	sceneResult(SIDE WinnerSide);
 	bool Initialize();
 	~sceneResult();
 	//処理
@@ -33,14 +35,19 @@ public:
 
 
 private:
+	// ステージ
+	iexMesh* m_grand;
+
 
 	// 勝者
+	SIDE m_WinnerSide;
 	iex3DObj* m_WinPlayer;
 	Vector3 m_winPos;
 
 	// 敗者
 	iex3DObj* m_LosePlayer;
 	Vector3 m_losePos;
+	int m_iLoseMotion;
 
 	/****************************/
 	// ★３のレンダーターゲット
@@ -94,4 +101,11 @@ private:
 
 	// ストリーミング用
 	tdnStreamSound *m_pStream;
+
+	// カメラ用
+	ViewData m_ViewData;
+	EffectCamera *m_pEffectCamera;
+
+	// ★★★シームレスに読み込むので、イニシャライズで初期化すると都合が悪い(例えばストリーミングBGMとか)やつをUpdateで1回だけ呼び出したいときに使う
+	bool m_bFirstUpdate;
 };

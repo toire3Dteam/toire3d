@@ -10,7 +10,7 @@ enum class PANEL_EFFECT_TYPE
 {
 	PLUS, HIT, PUT, DAMAGE, INEFFECT, INEFFECT_MINI, DOG_EFFECT,
 	BURN, ClEAR, DON, PUSH, DELICIOUS, EAT, PERFECT, GREAT, BAD, HAPPY, DARK_NOTICE, SMOKE,
-	BURST,ONEMORE_BURST,GUARD,BURST_PREV,GLASS,
+	BURST,ONEMORE_BURST,GUARD,BURST_PREV,GLASS,AIROU_WINND,WEAK,OVER_DRIVE, OVER_DRIVE_START,ORANGE_LOGHT,DOKKOI,
 	ARRAY_END
 };
 
@@ -70,8 +70,8 @@ public:
 	void Render3D();// ビルボードで描画
 
 	// 追加
-	void AddEffect(int x, int y, PANEL_EFFECT_TYPE type);
-	void AddEffect(Vector3 pos, PANEL_EFFECT_TYPE type);
+	void AddEffect(int x, int y, PANEL_EFFECT_TYPE type, int delayFrame = 0);
+	void AddEffect(Vector3 pos, PANEL_EFFECT_TYPE type, int delayFrame = 0);
 
 private:
 

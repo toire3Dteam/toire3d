@@ -42,13 +42,14 @@ bool PlayerDataManager::LoadPlayerData()
 	if (fopen_s(&fp, "DATA/Save/data.bin", "rb") != 0) return false;
 
 	// プレイヤー基本データ読み込み
-	fread_s((char*)&m_PlayerInfo, sizeof(m_PlayerInfo), sizeof(PlayerData::Infomation), 1, fp);
-
+	fread_s((LPSTR)&m_PlayerInfo, sizeof(m_PlayerInfo), sizeof(PlayerData::Infomation), 1, fp);
+	m_PlayerInfo.PlayCount++;
+	
 	// トロフィー読み込み
-	fread_s((char*)&m_TrophyData, sizeof(PlayerData::Trophy), sizeof(PlayerData::Trophy), 1, fp);
+	fread_s((LPSTR)&m_TrophyData, sizeof(PlayerData::Trophy), sizeof(PlayerData::Trophy), 1, fp);
 
 	// 隠し情報読み込み
-	fread_s((char*)&m_SecretData, sizeof(PlayerData::Secret), sizeof(PlayerData::Secret), 1, fp);
+	fread_s((LPSTR)&m_SecretData, sizeof(PlayerData::Secret), sizeof(PlayerData::Secret), 1, fp);
 
 	// ファイル閉じる
 	fclose(fp);
@@ -72,13 +73,13 @@ void PlayerDataManager::SavePlayerData()
 	MyAssert(fopen_s(&fp, "DATA/Save/data.bin", "wb") == 0, "デデドン(絶望)\nセーブデータ書き出しに失敗した！");	// まず止まることはないと思うが…
 
 	// プレイヤー基本データ書き出し
-	fwrite((char*)&m_PlayerInfo, 1, sizeof(PlayerData::Infomation), fp);
+	fwrite((LPSTR)&m_PlayerInfo, 1, sizeof(PlayerData::Infomation), fp);
 
 	// トロフィー情報書き出し
-	fwrite((char*)&m_TrophyData, 1, sizeof(PlayerData::Trophy), fp);
+	fwrite((LPSTR)&m_TrophyData, 1, sizeof(PlayerData::Trophy), fp);
 
 	// 隠し要素書き出し
-	fwrite((char*)&m_SecretData, 1, sizeof(PlayerData::Secret), fp);
+	fwrite((LPSTR)&m_SecretData, 1, sizeof(PlayerData::Secret), fp);
 
 	// ファイル閉じる
 	fclose(fp);

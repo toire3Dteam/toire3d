@@ -17,13 +17,19 @@
 
 #include "../PointLight/PointLight.h"
 
+#include "Effect\LocusEffect.h"
+
+#include "UI\HeaveHoFinish\HeaveHoFinish.h"
+
+
+//さっそくためしてみるか！
 //******************************************************************
 //		初期化・解放
 //******************************************************************
 
 iexMesh* g_stage;
 iexMesh* g_sky;
-iex3DObj* g_persona;
+tdn3DObj* g_airou;
 
 tdn2DObj* g_ScrennShot;
 
@@ -35,8 +41,50 @@ int size = 1024;
 
 tdn2DObj* g_DamageEF;
 
+BaseUVEffect* m_pAIROU_EF;
+
+LocusEffect* m_pLocus;
+
+BaseUVEffect* m_pAIROU_EF_IMP;
+
+BaseUVEffect* m_pSpeedLine;
+
+BaseUVEffect* m_pWave;
+
+BaseUVEffect* m_pWind;
+
+BasePanelEffect* m_pPanel;
+
+// デリートしたいとき
+#define NO_MEMORY_LEAK
+
+
 bool sceneRenderingTest::Initialize()
 {
+	m_pPanel = new AirouWindEffect();
+
+
+
+	m_pSpeedLine = new SpeedLineGreenEffect();
+	m_pSpeedLine->ActionRoop(Vector3(0, 0, 0), 0.5f, 0.5f);
+
+
+	m_pLocus = new LocusEffect("DATA/UVeffect/Airou/Locus.png", 6,2);
+
+
+	m_pAIROU_EF = new AirouBoostEffect();
+	m_pAIROU_EF->ActionRoop();
+
+
+	m_pAIROU_EF_IMP = new BreakImpactEffect();
+	m_pAIROU_EF_IMP->Action();
+
+	m_pWave = new FireRingEffect();
+	m_pWave->Action();
+
+	m_pWind = new WaveEffect();
+	m_pWind->Action();
+
 	g_fram = 0;
 
 	//g_ScrennShot = new tdn2DObj(size, size, TDN2D::USEALPHA);
@@ -54,7 +102,12 @@ bool sceneRenderingTest::Initialize()
 	
 	g_stage = new iexMesh("Data/Stage/Stage/sandstage.IMO");
 	g_sky = new iexMesh("Data/Stage/senjo/Skydome.IMO");
-	g_persona = new iex3DObj("Data/CHR/mokoi/mokoi.IEM");
+	g_sky->SetScale(2.5f);
+	g_sky->SetPos(Vector3(0, -30, 0));
+	g_sky->Update();
+	g_airou = new tdn3DObj("DATA/CHR/Airou/airou.TDNSM", "DATA/CHR/Airou/airou.TDNMo");
+	//g_airou->GetSkinMesh()->OutPutTDNSM("DATA/CHR/airou.TDNSM");
+	g_airou->SetMotion(0);
 
 	m_dirLight = Vector3(1, -1, 1);
 
@@ -63,7 +116,7 @@ bool sceneRenderingTest::Initialize()
 	m_fLoadPercentage = 1.0f;	// ロード割合
 
 	// パーティクル初期化
-	ParticleManager::Initialize("DATA/Effect/particle.png", 2048);
+	//ParticleManager::Initialize("DATA/Effect/particle.png", 2048);
 
 
 	DeferredManagerEx;
@@ -77,6 +130,8 @@ bool sceneRenderingTest::Initialize()
 
 	g_DamageEF = new tdn2DObj("DATA/Effect/DamageEffect.png");
 
+	HeaveHoFinishUI;
+
 	return true;
 }
 
@@ -87,14 +142,27 @@ sceneRenderingTest::~sceneRenderingTest()
 	//SAFE_DELETE(g_ScrennShot);
 	SAFE_DELETE(g_stage);
 	SAFE_DELETE(g_sky);
-	SAFE_DELETE(g_persona);
+	delete g_airou;	// SAFE_DELETEだとなぜかメモリリークが発生(deleteされなかった)
 
 	SAFE_DELETE(g_DamageEF);
 
-	ParticleManager::Release();
+	//ParticleManager::Release();
 	DeferredManagerEx.Release();
 
 	PointLightMgr->Release();
+
+	HeaveHoFinishUI->Rerease();
+
+#ifdef NO_MEMORY_LEAK
+	delete m_pPanel;
+	delete m_pSpeedLine;
+	delete m_pAIROU_EF;
+	delete m_pAIROU_EF_IMP;
+	delete m_pLocus;
+	delete m_pWave;
+	delete m_pWind;
+	delete g_DamageEF;
+#endif
 }
 
 //******************************************************************
@@ -159,24 +227,91 @@ void sceneRenderingTest::Update()
 	//
 	g_stage->Update();
 
-	g_persona->Update();
-	g_persona->Animation();
+	g_airou->Update();
+	g_airou->Animation(1.0f);
 
 
-	//if (KeyBoardTRG(KB_9))
-	//{
-	//	g_effect->LoadTexture("DATA/Effect/DamageEffect.png"); g_fram = 0;
-	//}
-	//if (KeyBoardTRG(KB_0))
-	//{
-	//	g_effect->LoadTexture("DATA/Effect/burstPrev.png"); g_fram = 0;
-	//}
 
 
-	//if (KeyBoard(KB_7)==1)
-	//{
-	//	Effect2DMgr.AddNode();		
-	//}
+	static Vector3 locusPos = VECTOR_ZERO;
+	static Vector3 locusPos2 = VECTOR_ZERO;
+	locusPos.y = 10;
+	locusPos2.y = 5;
+
+	m_pAIROU_EF->Update();
+	m_pAIROU_EF->SetPos(locusPos-Vector3(0,5,0));
+
+	m_pAIROU_EF_IMP->Update();
+
+	m_pWave->Update();
+
+	m_pWind->Update();
+
+	m_pSpeedLine->Update();
+
+	m_pPanel->Update();
+
+	if (KeyBoardTRG(KB_C))
+	{
+		HeaveHoFinishUI->Action();
+	}
+
+	HeaveHoFinishUI->Update();
+
+	//m_pLocus->Update(locusPos + Vector3(0, 3, 0), locusPos + Vector3(0, -3, 0));
+	m_pLocus->Update();
+
+	if (KeyBoard(KB_V))
+	{
+		locusPos.x -= 5;
+		locusPos2.x -= 5;
+
+		m_pAIROU_EF->SetAngleAnimation(Vector3(0, 0, 1.57f) , Vector3(0, 0, 1.57f));
+
+	}
+	if (KeyBoard(KB_B))
+	{
+		locusPos.x += 5;
+		locusPos2.x += 5;
+
+		m_pAIROU_EF->SetAngleAnimation(Vector3(0, 0, -1.57f), Vector3(0, 0, -1.57f));
+
+	}
+	if (KeyBoardTRG(KB_N))
+	{
+		m_pLocus->Action(&(locusPos), &(locusPos2));
+	}
+	if (KeyBoardTRG(KB_M))
+	{
+		m_pLocus->Stop();
+	}
+
+	if (KeyBoardTRG(KB_H)==1)
+	{
+		// かんぺき！　つぎ風戦
+		m_pAIROU_EF_IMP->Action(Vector3(10, 0, 0), .5, 1.0f);
+		PointLightManager::GetInstance()->AddPointLight(Vector3(10, 10, 0), Vector3(1, 0.5, 0), 125, 2, 10, 2, 6);
+		m_pWave->Action(Vector3(10, 5, 0), 0.5, 1);
+
+		m_pWind->Action(Vector3(10, 10, 0), 2.5, 3.5, Vector3(0, 0, 0), Vector3(0, 0, 0));
+
+		DeferredManagerEx.SetRadialBlur(Vector2(0, 0), 5);
+
+
+		for (int i = 0; i < 8; i++)
+		{
+			PointLightManager::GetInstance()->AddPointLight(Vector3(i * 30.0f ,5, 0), Vector3(1, 0.5f, 0), 65, 2, 180, 2, 170);
+			PointLightManager::GetInstance()->AddPointLight(Vector3(i * 30.0f, 5, 40), Vector3(0, 1.0f, .7f), 65, 3, 180, 2, 170);
+
+		}
+	}
+
+	if (KeyBoardTRG(KB_J) == 1)
+	{
+		m_pPanel->Action(Vector3(0, 10, 0));
+	}
+
+
 	//
 	//if (KeyBoard(KB_8) == 1)
 	//{
@@ -217,6 +352,8 @@ void sceneRenderingTest::Update()
 	//{
 	//	g_fram = 0;
 	//}
+
+
 }
 
 //******************************************************************
@@ -264,7 +401,23 @@ void sceneRenderingTest::Render()
 			// ステージ描画
 			g_stage->Render(shaderM, "DefaultLighting");
 			g_sky->Render();
-			g_persona->Render();
+			g_airou->Render(shaderM,"linecopy");
+
+			//m_pAIROU_EF->Render();
+
+			m_pAIROU_EF_IMP->Render();
+
+			m_pWave->Render();
+
+			m_pWind->Render();
+
+			m_pLocus->Render();
+
+			m_pSpeedLine->Render();
+
+			m_pPanel->Render3D();
+
+			HeaveHoFinishUI->Render();
 
 			// パーティクル
 			ParticleManager::Render();
@@ -274,6 +427,10 @@ void sceneRenderingTest::Render()
 
 		// ブルーム
 		DeferredManagerEx.BloomRender();
+
+		DeferredManagerEx.GetTex(SURFACE_NAME_EX::POINT_LIGHT)->Render(0,0,1280/4, 720/4, 0, 0, 1280, 720);
+		//DeferredManagerEx.GetTex(SURFACE_NAME_EX::ROUGHNESS)->Render(1280 / 4, 0, 1280 / 4, 720 / 4, 0, 0, 1280, 720);
+
 
 		///*******************************/
 		//// まずは今のサーフェイスを保存

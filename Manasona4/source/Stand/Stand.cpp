@@ -13,7 +13,7 @@ void Stand::Base::LoadActionFrameList(char *filename)
 
 	char skip[64];	// 読み飛ばし用変数
 
-	FOR((int)ACTION_TYPE::MAX)
+	FOR((int)SKILL_ACTION_TYPE::MAX)
 	{
 		ifs >> skip;
 
@@ -42,21 +42,27 @@ m_bActive(false),
 m_standStockMAX(2),
 m_standStock(0),
 m_standGageMAX(360),
-m_standGage(0)
+m_standGage(0),
+m_pIcon(nullptr),
+m_pIconRip(nullptr)
 {
-	FOR((int)ACTION_TYPE::MAX) m_pAttackData[i] = nullptr;
+	FOR((int)SKILL_ACTION_TYPE::MAX) m_pAttackData[i] = nullptr;
 }
 
 Stand::Base::~Base()
 {
-	FOR((int)ACTION_TYPE::MAX)SAFE_DELETE(m_pAttackData[i]);
+	FOR((int)SKILL_ACTION_TYPE::MAX)SAFE_DELETE(m_pAttackData[i]);
 	SAFE_DELETE(m_pObj);
+
+	SAFE_DELETE(m_pIcon);
+	SAFE_DELETE(m_pIconRip);
+
 }
 
-void Stand::Base::Update()
+void Stand::Base::Update(bool bControl)
 {
 	// スタンドゲージ更新
-	StandGageUpdate();
+	if(bControl)StandGageUpdate();
 
 	// アクティブじゃなかったら出ていけぇ！！
 	if (!m_bActive) return;
@@ -114,10 +120,8 @@ void Stand::Base::StandGageUpdate()
 
 			// UIにメッセージを送る
 			SIDE side = m_pPlayer->GetSide();
-			MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
+			MsgMgr->Dispatch(0, m_pPlayer->GetID(), ENTITY_ID::UI_MGR,
 				MESSAGE_TYPE::PERSONA_CARD_COUNT_UP, &side);
-
-
 		}
 
 	}
@@ -176,121 +180,133 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 
 	/*****************************/
 	// モコイの基本ステータス
-	m_standStockMAX = 4;
+	m_standStockMAX = 1;
 	m_standGageMAX = 240;
 
+	/*****************************/
+	// そのキャラクターのアイコン
+	m_pIcon= new tdn2DAnim("Data/UI/Game/PersonaIcon/Mokoi.png");
+	m_pIconRip = new tdn2DAnim("Data/UI/Game/PersonaIcon/Mokoi.png");
 
 	//==============================================================================================================
 	//	地上ニュートラル
 	// 地上ヒットも空中ヒットも共通の情報
-	m_pAttackData[(int)ACTION_TYPE::LAND] = new AttackData;
-	m_pAttackData[(int)ACTION_TYPE::LAND]->HitScore = 360;
-	m_pAttackData[(int)ACTION_TYPE::LAND]->damage = 360;
-	m_pAttackData[(int)ACTION_TYPE::LAND]->pierceLV = 0;
-	m_pAttackData[(int)ACTION_TYPE::LAND]->HitSE = "通常3段ヒット";
-	m_pAttackData[(int)ACTION_TYPE::LAND]->WhiffSE = "空振り1";
-	m_pAttackData[(int)ACTION_TYPE::LAND]->HitEffectType = EFFECT_TYPE::DAMAGE;
-	m_pAttackData[(int)ACTION_TYPE::LAND]->WhiffEffectType = EFFECT_TYPE::UPPER;
-	m_pAttackData[(int)ACTION_TYPE::LAND]->bAntiAir = true;
-	m_pAttackData[(int)ACTION_TYPE::LAND]->ShakeCameraInfo.Set(.2f, 2);
-
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND] = new AttackData;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->HitScore = 360;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->damage = 360;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pierceLV = 0;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->HitSE = "ヒット6";
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->WhiffSE = "空振り1";
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->HitEffectType = EFFECT_TYPE::DAMAGE;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->WhiffEffectType = EFFECT_TYPE::UPPER;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->bAntiAir = true;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->bFinish = true;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->AntiGuard = ANTIGUARD_ATTACK::NONE;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->ShakeCameraInfo.Set(.2f, 2);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->GuardRecoveryFrame = 20;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
-	m_pAttackData[(int)ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
-	m_pAttackData[(int)ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
-	m_pAttackData[(int)ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(.75f, 2.3f);
-	m_pAttackData[(int)ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.5f, 2.1f);
-	m_pAttackData[(int)ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame = 8;
-	m_pAttackData[(int)ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].hitStopFlame = 8;
-	m_pAttackData[(int)ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].recoveryFlame = 60;
-	m_pAttackData[(int)ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].recoveryFlame = 60;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(.375f, 2.3f);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.25f, 2.1f);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame = 8;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].hitStopFlame = 8;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 60;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 60;
 	// 判定形状
-	m_pAttackData[(int)ACTION_TYPE::LAND]->pCollisionShape->width = 14;
-	m_pAttackData[(int)ACTION_TYPE::LAND]->pCollisionShape->height = 18;
-	m_pAttackData[(int)ACTION_TYPE::LAND]->pCollisionShape->pos.Set(7.5f, 17, 0);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pCollisionShape->width = 14;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pCollisionShape->height = 18;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pCollisionShape->pos.Set(7.5f, 17, 0);
 
 	//==============================================================================================================
 	//	しゃがみ
 	// 地上ヒットも空中ヒットも共通の情報
-	m_pAttackData[(int)ACTION_TYPE::SQUAT] = new AttackData;
-	m_pAttackData[(int)ACTION_TYPE::SQUAT]->HitScore = 360;
-	m_pAttackData[(int)ACTION_TYPE::SQUAT]->damage = 360;
-	m_pAttackData[(int)ACTION_TYPE::SQUAT]->pierceLV = 0;
-	m_pAttackData[(int)ACTION_TYPE::SQUAT]->HitSE = "通常3段ヒット";
-	m_pAttackData[(int)ACTION_TYPE::SQUAT]->WhiffSE = "空振り1";
-	m_pAttackData[(int)ACTION_TYPE::SQUAT]->HitEffectType = EFFECT_TYPE::DAMAGE;
-	m_pAttackData[(int)ACTION_TYPE::SQUAT]->bAntiAir = true;
-	m_pAttackData[(int)ACTION_TYPE::SQUAT]->ShakeCameraInfo.Set(.1f, 3);
-
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT] = new AttackData;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->HitScore = 360;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->damage = 360;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->pierceLV = 0;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->HitSE = "ヒット6";
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->WhiffSE = "空振り1";
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->HitEffectType = EFFECT_TYPE::DAMAGE;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->bAntiAir = true;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->bFinish = true;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->AntiGuard = ANTIGUARD_ATTACK::NONE;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->ShakeCameraInfo.Set(.1f, 3);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->GuardRecoveryFrame = 20;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
-	m_pAttackData[(int)ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
-	m_pAttackData[(int)ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
-	m_pAttackData[(int)ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(1.0f, .0f);
-	m_pAttackData[(int)ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.5f, 2.1f);
-	m_pAttackData[(int)ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame = 4;
-	m_pAttackData[(int)ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::AERIAL].hitStopFlame = 4;
-	m_pAttackData[(int)ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::LAND].recoveryFlame = 20;
-	m_pAttackData[(int)ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::AERIAL].recoveryFlame = 60;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(1.0f, .0f);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.5f, 2.1f);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame = 4;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::AERIAL].hitStopFlame = 4;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 20;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 60;
 	// 判定形状
-	m_pAttackData[(int)ACTION_TYPE::SQUAT]->pCollisionShape->width = 8;
-	m_pAttackData[(int)ACTION_TYPE::SQUAT]->pCollisionShape->height = 12;
-	m_pAttackData[(int)ACTION_TYPE::SQUAT]->pCollisionShape->pos.Set(2.5f, 17, 0);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->pCollisionShape->width = 8;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->pCollisionShape->height = 12;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->pCollisionShape->pos.Set(2.5f, 17, 0);
 
 	//==============================================================================================================
 	//	空中ニュートラル
 	// 地上ヒットも空中ヒットも共通の情報
-	m_pAttackData[(int)ACTION_TYPE::AERIAL] = new AttackData;
-	m_pAttackData[(int)ACTION_TYPE::AERIAL]->HitScore = 360;
-	m_pAttackData[(int)ACTION_TYPE::AERIAL]->damage = 360;
-	m_pAttackData[(int)ACTION_TYPE::AERIAL]->pierceLV = 0;
-	m_pAttackData[(int)ACTION_TYPE::AERIAL]->HitSE = "通常3段ヒット";
-	m_pAttackData[(int)ACTION_TYPE::AERIAL]->WhiffSE = "空振り1";
-	m_pAttackData[(int)ACTION_TYPE::AERIAL]->HitEffectType = EFFECT_TYPE::DAMAGE;
-	m_pAttackData[(int)ACTION_TYPE::AERIAL]->bAntiAir = true;
-	m_pAttackData[(int)ACTION_TYPE::AERIAL]->ShakeCameraInfo.Set(.1f, 3);
-
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL] = new AttackData;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->HitScore = 360;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->damage = 360;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->pierceLV = 0;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->HitSE = "ヒット6";
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->WhiffSE = "空振り1";
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->HitEffectType = EFFECT_TYPE::DAMAGE;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->bAntiAir = true;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->bFinish = true;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->AntiGuard = ANTIGUARD_ATTACK::NONE;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->ShakeCameraInfo.Set(.1f, 3);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->GuardRecoveryFrame = 20;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
-	m_pAttackData[(int)ACTION_TYPE::AERIAL]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
-	m_pAttackData[(int)ACTION_TYPE::AERIAL]->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
-	m_pAttackData[(int)ACTION_TYPE::AERIAL]->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(1.0f, .0f);
-	m_pAttackData[(int)ACTION_TYPE::AERIAL]->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.5f, 2.1f);
-	m_pAttackData[(int)ACTION_TYPE::AERIAL]->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame = 20;
-	m_pAttackData[(int)ACTION_TYPE::AERIAL]->places[(int)AttackData::HIT_PLACE::AERIAL].hitStopFlame = 20;
-	m_pAttackData[(int)ACTION_TYPE::AERIAL]->places[(int)AttackData::HIT_PLACE::LAND].recoveryFlame = 20;
-	m_pAttackData[(int)ACTION_TYPE::AERIAL]->places[(int)AttackData::HIT_PLACE::AERIAL].recoveryFlame = 60;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(1.0f, .0f);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.5f, 2.1f);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame = 20;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->places[(int)AttackData::HIT_PLACE::AERIAL].hitStopFlame = 20;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 20;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 60;
 	// 判定形状
-	m_pAttackData[(int)ACTION_TYPE::AERIAL]->pCollisionShape->width = 8;
-	m_pAttackData[(int)ACTION_TYPE::AERIAL]->pCollisionShape->height = 12;
-	m_pAttackData[(int)ACTION_TYPE::AERIAL]->pCollisionShape->pos.Set(2.5f, 17, 0);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->pCollisionShape->width = 8;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->pCollisionShape->height = 12;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->pCollisionShape->pos.Set(2.5f, 17, 0);
 
 	//==============================================================================================================
 	//	空中下
 	// 地上ヒットも空中ヒットも共通の情報
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP] = new AttackData;
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->HitScore = 360;
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->damage = 360;
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->pierceLV = 0;
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->HitSE = "通常3段ヒット";
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->WhiffSE = "空振り1";
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->HitEffectType = EFFECT_TYPE::DAMAGE;
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->bAntiAir = true;
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->ShakeCameraInfo.Set(.1f, 3);
-
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP] = new AttackData;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->HitScore = 360;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->damage = 360;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->pierceLV = 0;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->HitSE = "ヒット6";
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->WhiffSE = "空振り1";
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->HitEffectType = EFFECT_TYPE::DAMAGE;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->bAntiAir = true;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->bFinish = true;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->AntiGuard = ANTIGUARD_ATTACK::NONE;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->ShakeCameraInfo.Set(.1f, 3);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->GuardRecoveryFrame = 20;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(1.0f, .0f);
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.5f, 2.1f);
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame = 4;
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::AERIAL].hitStopFlame = 4;
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::LAND].recoveryFlame = 20;
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::AERIAL].recoveryFlame = 60;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(1.0f, .0f);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.5f, 2.1f);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame = 4;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::AERIAL].hitStopFlame = 4;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 20;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 60;
 	// 判定形状
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->pCollisionShape->width = 8;
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->pCollisionShape->height = 12;
-	m_pAttackData[(int)ACTION_TYPE::AERIALDROP]->pCollisionShape->pos.Set(2.5f, 17, 0);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->pCollisionShape->width = 8;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->pCollisionShape->height = 12;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->pCollisionShape->pos.Set(2.5f, 17, 0);
 
 	// 判定発動した瞬間に空振りSEを再生してみる
-	FOR((int)ACTION_TYPE::MAX)
+	FOR((int)SKILL_ACTION_TYPE::MAX)
 	{
 		if (!m_pAttackData[i]) continue;	// newされてなかったらスルー
 		for (int place = 0; place < (int)AttackData::HIT_PLACE::MAX; place++) MyAssert((m_pAttackData[i]->places[place].FlyVector.x >= 0), "Xの値が-になることは絶対ない");
@@ -300,14 +316,14 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 	}
 
 	// アッパーの空振りフレーム調整
-	m_pAttackData[(int)ACTION_TYPE::LAND]->WhiffDelayFrame -= 8;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->WhiffDelayFrame -= 8;
 }
 
-void Stand::Mokoi::Action(Stand::ACTION_TYPE type)
+void Stand::Mokoi::Action(SKILL_ACTION_TYPE type)
 {
 	// UIにメッセージを送る
 	SIDE side = m_pPlayer->GetSide();
-	MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
+	MsgMgr->Dispatch(0, m_pPlayer->GetID(), ENTITY_ID::UI_MGR,
 		MESSAGE_TYPE::PERSONA_CARD_COUNT_DOWN, &side);
 
 	// ストックを消費
@@ -339,5 +355,5 @@ void Stand::Mokoi::Action(Stand::ACTION_TYPE type)
 
 
 	// アッパーエフェクト！
-	//if(type == ACTION_TYPE::LAND) m_pPlayer->AddEffectAction(m_pPlayer->GetPos(), EFFECT_TYPE::UPPER);
+	//if(type == SKILL_ACTION_TYPE::LAND) m_pPlayer->AddEffectAction(m_pPlayer->GetPos(), EFFECT_TYPE::UPPER);
 }

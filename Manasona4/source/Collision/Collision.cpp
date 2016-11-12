@@ -2,12 +2,13 @@
 #include "Collision.h"
 #include "../Player/BasePlayer.h"
 #include "../BaseEntity/Message/MessageDispatcher.h"
+#include "../Stage/Stage.h"
 
-void Collision::Raypic(iexMesh *obj, BasePlayer *player, Vector3 *move) // ÉXÉeÅ[ÉWÇ∆ÉvÉåÉCÉÑÅ[
+void Collision::Raypic(Stage::Base *obj, BasePlayer *player, Vector3 *move) // ÉXÉeÅ[ÉWÇ∆ÉvÉåÉCÉÑÅ[
 {
 	if (move->y > 0) // è„
 	{
-		RaypicUp(obj, player, move);
+		//RaypicUp(obj, player, move);
 
 		// ÅöÅöÅöÅ@moveílÇ™0à»è„ÇæÇ¡ÇΩèÍçáÅAisLandîªíËÇÇµÇƒÇ¢ÇÈÉåÉCÉsÉbÉNÇ™åƒÇŒÇÍÇ»Ç¢ÇΩÇﬂÅAí èÌ3íiñ⁄äkÇÃîhê∂Ç™ëÿãÛÇ…Ç»ÇÁÇ»Ç¢ÅB
 		// moveílYÇ™0à»è„Ç»ÇÁÅAä‘à·Ç¢Ç»Ç≠ínè„Ç≈ÇÕÇ»Ç¢èÍèäÇ…Ç¢ÇÈÇæÇÎÇ§Ç∆âºíËÅAã≠êßìIÇ…ínè„ÉtÉâÉOÇÉIÉtÇ…Ç∑ÇÈ
@@ -28,36 +29,37 @@ void Collision::Raypic(iexMesh *obj, BasePlayer *player, Vector3 *move) // ÉXÉeÅ
 	}
 }
 
-void Collision::RaypicUp(iexMesh *obj, BasePlayer *player, Vector3 *move)
-{
-	Vector3 pos(player->GetPos());
-	const CollisionShape::Square *square(player->GetHitSquare());
+//void Collision::RaypicUp(Stage::Base *obj, BasePlayer *player, Vector3 *move)
+//{
+//	Vector3 pos(player->GetPos());
+//	const CollisionShape::Square *square(player->GetHitSquare());
+//
+//	Vector3 hit_pos, ray_pos, ray_vec; float dist;
+//
+//	if (move->y > 0) // è„
+//	{
+//		ray_pos = pos;
+//		ray_pos += square->pos;
+//		ray_vec.Set(0, 1, 0);
+//		dist = square->height + move->y + 1;
+//
+//		if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // ìñÇΩÇ¡ÇΩ
+//		{
+//			dist = abs(hit_pos.y - ray_pos.y);
+//			if (dist <= square->height + move->y)
+//			{
+//				pos.y = hit_pos.y - square->height - square->pos.y;
+//				move->y = -0.1e-10f;
+//
+//				// ÉvÉåÉCÉÑÅ[Ç…ÉZÉbÉgÇ∑ÇÈÇÃÇ≈ÇÕÇ»Ç≠ÅAmoveílÇÃÉAÉhÉåÉXÇà¯êîÇ≈Ç‡ÇÁÇ¡Çƒíºê⁄èëÇ´ä∑Ç¶ÇÈå`Ç…ÇµÇΩÅB(ÇﬂÇËçûÇ›îªíËÇ≈ÅAÇﬂÇËçûÇ›îªíËópÇÃmoveílÇégÇ§Ç±Ç∆Ç…Ç»Ç¡ÇΩÇÃÇ≈)
+//				//player->SetMove(move);
+//				player->SetPos(pos);
+//			}
+//		}
+//	}
+//}
 
-	Vector3 hit_pos, ray_pos, ray_vec; float dist;
-
-	if (move->y > 0) // è„
-	{
-		ray_pos = pos;
-		ray_pos += square->pos;
-		ray_vec.Set(0, 1, 0);
-		dist = square->height + move->y + 1;
-
-		if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // ìñÇΩÇ¡ÇΩ
-		{
-			dist = abs(hit_pos.y - ray_pos.y);
-			if (dist <= square->height + move->y)
-			{
-				pos.y = hit_pos.y - square->height - square->pos.y;
-				move->y = -0.1e-10f;
-
-				// ÉvÉåÉCÉÑÅ[Ç…ÉZÉbÉgÇ∑ÇÈÇÃÇ≈ÇÕÇ»Ç≠ÅAmoveílÇÃÉAÉhÉåÉXÇà¯êîÇ≈Ç‡ÇÁÇ¡Çƒíºê⁄èëÇ´ä∑Ç¶ÇÈå`Ç…ÇµÇΩÅB(ÇﬂÇËçûÇ›îªíËÇ≈ÅAÇﬂÇËçûÇ›îªíËópÇÃmoveílÇégÇ§Ç±Ç∆Ç…Ç»Ç¡ÇΩÇÃÇ≈)
-				//player->SetMove(move);
-				player->SetPos(pos);
-			}
-		}
-	}
-}
-void Collision::RaypicDown(iexMesh *obj, BasePlayer *player, Vector3 *move)
+void Collision::RaypicDown(Stage::Base *obj, BasePlayer *player, Vector3 *move)
 {
 	if (move->y <= 0) // â∫
 	{
@@ -65,20 +67,19 @@ void Collision::RaypicDown(iexMesh *obj, BasePlayer *player, Vector3 *move)
 
 		Vector3 pos(player->GetPos());
 		const CollisionShape::Square *square(player->GetHitSquare());
-		Vector3 hit_pos, ray_pos, ray_vec; float dist;
+		Vector3 ray_pos;
 
 		ray_pos = pos;
 		ray_pos += square->pos;
-		ray_pos.x += square->width; // âEÇ©ÇÁ
-		ray_vec.Set(0, -1, 0);
-		dist = square->height - move->y + 1;
+		//ray_pos.x += square->width; // âEÇ©ÇÁ
 
-		if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // ìñÇΩÇ¡ÇΩ
+		const float bottom(obj->GetBottom());
+
+		//if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // ìñÇΩÇ¡ÇΩ
 		{
-			dist = abs(hit_pos.y - ray_pos.y);
-			if (dist <= square->height - move->y)
+			if (pos.y + move->y <= bottom)
 			{
-				pos.y = hit_pos.y + square->height - square->pos.y;
+				pos.y = bottom + square->height - square->pos.y;
 				move->y = 0;
 
 				// ÉvÉåÉCÉÑÅ[Ç…ÉZÉbÉgÇ∑ÇÈÇÃÇ≈ÇÕÇ»Ç≠ÅAmoveílÇÃÉAÉhÉåÉXÇà¯êîÇ≈Ç‡ÇÁÇ¡Çƒíºê⁄èëÇ´ä∑Ç¶ÇÈå`Ç…ÇµÇΩÅB(ÇﬂÇËçûÇ›îªíËÇ≈ÅAÇﬂÇËçûÇ›îªíËópÇÃmoveílÇégÇ§Ç±Ç∆Ç…Ç»Ç¡ÇΩÇÃÇ≈)
@@ -90,47 +91,50 @@ void Collision::RaypicDown(iexMesh *obj, BasePlayer *player, Vector3 *move)
 				player->SetAerialJump(true);// ãÛíÜÉWÉÉÉìÉvÇÃå†óòÇ‡ñﬂÇÈ
 				hit = true;
 			}
-		}
-		// ãÛíÜÇ…Ç¢ÇÈÇÊÅI
-		else
-		{
-			//player->SetLand(false);//ÉvÉåÉCÉÑÅ[ÇÃÉ|ÉWÉVÉáÉìÇÉZÉbÉgÇµÇΩå„Ç…ïœçX
-			// óéâ∫ÉÅÉbÉZÅ[ÉWëóêM
-			MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + player->GetDeviceID()), MESSAGE_TYPE::FALL, nullptr);
-		}
-
-		if (!hit)
-		{
-			ray_pos = pos;
-			ray_pos += square->pos;
-			ray_pos.x -= square->width; // ç∂Ç©ÇÁ
-			ray_vec.Set(0, -1, 0);
-			dist = square->height - move->y + 1;
-
-			if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // ìñÇΩÇ¡ÇΩ
+			// ãÛíÜÇ…Ç¢ÇÈÇÊÅI
+			else
 			{
-				dist = abs(hit_pos.y - ray_pos.y);
-				if (dist <= square->height - move->y)
-				{
-					pos.y = hit_pos.y + square->height - square->pos.y;
-					move->y = 0;
-
-					// ÉvÉåÉCÉÑÅ[Ç…ÉZÉbÉgÇ∑ÇÈÇÃÇ≈ÇÕÇ»Ç≠ÅAmoveílÇÃÉAÉhÉåÉXÇà¯êîÇ≈Ç‡ÇÁÇ¡Çƒíºê⁄èëÇ´ä∑Ç¶ÇÈå`Ç…ÇµÇΩÅB(ÇﬂÇËçûÇ›îªíËÇ≈ÅAÇﬂÇËçûÇ›îªíËópÇÃmoveílÇégÇ§Ç±Ç∆Ç…Ç»Ç¡ÇΩÇÃÇ≈)
-					//player->SetMove(move);
-					player->SetPos(pos);
-
-					//player->Land();//ÉvÉåÉCÉÑÅ[ÇÃÉ|ÉWÉVÉáÉìÇÉZÉbÉgÇµÇΩå„Ç…ïœçX
-				}
+				//player->SetLand(false);//ÉvÉåÉCÉÑÅ[ÇÃÉ|ÉWÉVÉáÉìÇÉZÉbÉgÇµÇΩå„Ç…ïœçX
+				// óéâ∫ÉÅÉbÉZÅ[ÉWëóêM
+				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + player->GetDeviceID()), MESSAGE_TYPE::FALL, nullptr);
 			}
 		}
+
+
+		//if (!hit)
+		//{
+		//	ray_pos = pos;
+		//	ray_pos += square->pos;
+		//	ray_pos.x -= square->width; // ç∂Ç©ÇÁ
+		//	ray_vec.Set(0, -1, 0);
+		//	dist = square->height - move->y + 1;
+		//
+		//	if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // ìñÇΩÇ¡ÇΩ
+		//	{
+		//		dist = abs(hit_pos.y - ray_pos.y);
+		//		if (dist <= square->height - move->y)
+		//		{
+		//			pos.y = hit_pos.y + square->height - square->pos.y;
+		//			move->y = 0;
+		//
+		//			// ÉvÉåÉCÉÑÅ[Ç…ÉZÉbÉgÇ∑ÇÈÇÃÇ≈ÇÕÇ»Ç≠ÅAmoveílÇÃÉAÉhÉåÉXÇà¯êîÇ≈Ç‡ÇÁÇ¡Çƒíºê⁄èëÇ´ä∑Ç¶ÇÈå`Ç…ÇµÇΩÅB(ÇﬂÇËçûÇ›îªíËÇ≈ÅAÇﬂÇËçûÇ›îªíËópÇÃmoveílÇégÇ§Ç±Ç∆Ç…Ç»Ç¡ÇΩÇÃÇ≈)
+		//			//player->SetMove(move);
+		//			player->SetPos(pos);
+		//
+		//			//player->Land();//ÉvÉåÉCÉÑÅ[ÇÃÉ|ÉWÉVÉáÉìÇÉZÉbÉgÇµÇΩå„Ç…ïœçX
+		//		}
+		//	}
+		//}
 	}
 }
-void Collision::RaypicLeft(iexMesh *obj, BasePlayer *player, Vector3 *move)
+void Collision::RaypicLeft(Stage::Base *obj, BasePlayer *player, Vector3 *move)
 {
 	Vector3 pos(player->GetPos());
 	const CollisionShape::Square *square(player->GetHitSquare());
 
-	Vector3 hit_pos, ray_pos, ray_vec; float dist;
+	Vector3 ray_pos;
+
+	const float width(obj->GetWidth()/2);
 
 	if (move->x < 0) // ç∂
 	{
@@ -138,15 +142,12 @@ void Collision::RaypicLeft(iexMesh *obj, BasePlayer *player, Vector3 *move)
 
 		ray_pos = pos;
 		ray_pos += square->pos;
-		ray_vec.Set(-1, 0, 0);
-		dist = square->width - move->x + 1;
 
-		if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // ìñÇΩÇ¡ÇΩ
+		//if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // ìñÇΩÇ¡ÇΩ
 		{
-			dist = abs(hit_pos.x - ray_pos.x);
-			if (dist <= square->width - move->x)
+			if (pos.x - square->width + move->x <= -width)
 			{
-				pos.x = hit_pos.x + square->width - square->pos.x;
+				pos.x = -width + square->width - square->pos.x;
 				move->x = 0;
 
 				//player->SetMove(move);
@@ -155,47 +156,47 @@ void Collision::RaypicLeft(iexMesh *obj, BasePlayer *player, Vector3 *move)
 			}
 		}
 		
-		if(!hit) // ìñÇΩÇÁÇ»Ç©Ç¡ÇΩÇ©ÇÁè„â∫Ç©ÇÁrayèoÇ∑ 
-		{
-			float h(0);
-			if (move->y > 0) // è„
-			{
-				h = square->height * 0.85f;
-			}
-			else // â∫
-			{
-				h = -square->height * 0.85f;
-			}
-			ray_pos = pos;
-			ray_pos += square->pos;
-			ray_pos.y += h;
-			ray_vec.Set(-1, 0, 0);
-			dist = square->width - move->x + 1;
-
-
-
-			if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // ìñÇΩÇ¡ÇΩ
-			{
-				dist = abs(hit_pos.x - ray_pos.x);
-				if (dist <= square->width - move->x)
-				{
-					pos.x = hit_pos.x + square->width - square->pos.x;
-					move->x = 0;
-
-					// ÉvÉåÉCÉÑÅ[Ç…ÉZÉbÉgÇ∑ÇÈÇÃÇ≈ÇÕÇ»Ç≠ÅAmoveílÇÃÉAÉhÉåÉXÇà¯êîÇ≈Ç‡ÇÁÇ¡Çƒíºê⁄èëÇ´ä∑Ç¶ÇÈå`Ç…ÇµÇΩÅB(ÇﬂÇËçûÇ›îªíËÇ≈ÅAÇﬂÇËçûÇ›îªíËópÇÃmoveílÇégÇ§Ç±Ç∆Ç…Ç»Ç¡ÇΩÇÃÇ≈)
-					//player->SetMove(move);
-					player->SetPos(pos);
-				}
-			}
-		}
+		//if(!hit) // ìñÇΩÇÁÇ»Ç©Ç¡ÇΩÇ©ÇÁè„â∫Ç©ÇÁrayèoÇ∑ 
+		//{
+		//	float h(0);
+		//	if (move->y > 0) // è„
+		//	{
+		//		h = square->height * 0.85f;
+		//	}
+		//	else // â∫
+		//	{
+		//		h = -square->height * 0.85f;
+		//	}
+		//	ray_pos = pos;
+		//	ray_pos += square->pos;
+		//	ray_pos.y += h;
+		//	ray_vec.Set(-1, 0, 0);
+		//	dist = square->width - move->x + 1;
+		//
+		//
+		//
+		//	if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // ìñÇΩÇ¡ÇΩ
+		//	{
+		//		dist = abs(hit_pos.x - ray_pos.x);
+		//		if (dist <= square->width - move->x)
+		//		{
+		//			pos.x = hit_pos.x + square->width - square->pos.x;
+		//			move->x = 0;
+		//
+		//			// ÉvÉåÉCÉÑÅ[Ç…ÉZÉbÉgÇ∑ÇÈÇÃÇ≈ÇÕÇ»Ç≠ÅAmoveílÇÃÉAÉhÉåÉXÇà¯êîÇ≈Ç‡ÇÁÇ¡Çƒíºê⁄èëÇ´ä∑Ç¶ÇÈå`Ç…ÇµÇΩÅB(ÇﬂÇËçûÇ›îªíËÇ≈ÅAÇﬂÇËçûÇ›îªíËópÇÃmoveílÇégÇ§Ç±Ç∆Ç…Ç»Ç¡ÇΩÇÃÇ≈)
+		//			//player->SetMove(move);
+		//			player->SetPos(pos);
+		//		}
+		//	}
+		//}
 	}
 }
-void Collision::RaypicRight(iexMesh *obj, BasePlayer *player, Vector3 *move)
+void Collision::RaypicRight(Stage::Base *obj, BasePlayer *player, Vector3 *move)
 {
 	Vector3 pos(player->GetPos());
 	const CollisionShape::Square *square(player->GetHitSquare());
 
-	Vector3 hit_pos, ray_pos, ray_vec; float dist;
+	Vector3 ray_pos;
 
 	if (move->x > 0) // âE
 	{
@@ -204,15 +205,14 @@ void Collision::RaypicRight(iexMesh *obj, BasePlayer *player, Vector3 *move)
 		ray_pos = pos;
 		ray_pos += square->pos;
 		ray_pos.y += square->height * 0.1f;
-		ray_vec.Set(1, 0, 0);
-		dist = square->width + move->x + 1;
 
-		if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // ìñÇΩÇ¡ÇΩ
+		const float width(obj->GetWidth() / 2);
+
+		//if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // ìñÇΩÇ¡ÇΩ
 		{
-			dist = abs(hit_pos.x - ray_pos.x);
-			if (dist <= square->width + move->x)
+			if (pos.x + square->width + move->x >= width)
 			{
-				pos.x = hit_pos.x - square->width - square->pos.x;
+				pos.x = width - square->width + square->pos.x;
 				move->x = 0;
 
 				// ÉvÉåÉCÉÑÅ[Ç…ÉZÉbÉgÇ∑ÇÈÇÃÇ≈ÇÕÇ»Ç≠ÅAmoveílÇÃÉAÉhÉåÉXÇà¯êîÇ≈Ç‡ÇÁÇ¡Çƒíºê⁄èëÇ´ä∑Ç¶ÇÈå`Ç…ÇµÇΩÅB(ÇﬂÇËçûÇ›îªíËÇ≈ÅAÇﬂÇËçûÇ›îªíËópÇÃmoveílÇégÇ§Ç±Ç∆Ç…Ç»Ç¡ÇΩÇÃÇ≈)
@@ -222,42 +222,42 @@ void Collision::RaypicRight(iexMesh *obj, BasePlayer *player, Vector3 *move)
 			}
 		}
 
-		if (!hit) // ìñÇΩÇÁÇ»Ç©Ç¡ÇΩÇ©ÇÁè„â∫Ç©ÇÁrayèoÇ∑ 
-		{
-			float h(0);
-			if (move->y > 0) // è„
-			{
-				h = square->height * 0.85f;
-			}
-			else // â∫
-			{
-				h = -square->height * 0.85f;
-			}
-			ray_pos = pos;
-			ray_pos += square->pos;
-			ray_pos.y += h;
-			ray_vec.Set(1, 0, 0);
-			dist = square->width + move->x + 1;
-
-			if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // ìñÇΩÇ¡ÇΩ
-			{
-				dist = abs(hit_pos.x - ray_pos.x);
-				if (dist <= square->width + move->x)
-				{
-					pos.x = hit_pos.x - square->width - square->pos.x;
-					move->x = 0;
-
-					//player->SetMove(move);
-					player->SetPos(pos);
-				}
-			}
-		}
+		//if (!hit) // ìñÇΩÇÁÇ»Ç©Ç¡ÇΩÇ©ÇÁè„â∫Ç©ÇÁrayèoÇ∑ 
+		//{
+		//	float h(0);
+		//	if (move->y > 0) // è„
+		//	{
+		//		h = square->height * 0.85f;
+		//	}
+		//	else // â∫
+		//	{
+		//		h = -square->height * 0.85f;
+		//	}
+		//	ray_pos = pos;
+		//	ray_pos += square->pos;
+		//	ray_pos.y += h;
+		//	ray_vec.Set(1, 0, 0);
+		//	dist = square->width + move->x + 1;
+		//
+		//	if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // ìñÇΩÇ¡ÇΩ
+		//	{
+		//		dist = abs(hit_pos.x - ray_pos.x);
+		//		if (dist <= square->width + move->x)
+		//		{
+		//			pos.x = hit_pos.x - square->width - square->pos.x;
+		//			move->x = 0;
+		//
+		//			//player->SetMove(move);
+		//			player->SetPos(pos);
+		//		}
+		//	}
+		//}
 
 	}
 }
 
 
-void Collision::Sinking(iexMesh *obj, BasePlayer *pPlayer1, BasePlayer *pPlayer2)
+void Collision::Sinking(Stage::Base *obj, BasePlayer *pPlayer1, BasePlayer *pPlayer2)
 {
 	// ÉvÉåÉCÉÑÅ[ÇÃîªíËÅ°
 	CollisionShape::Square s1, s2;

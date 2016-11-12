@@ -9,9 +9,6 @@
 
 */
 
-
-
-
 class BaseGameEntity;
 
 class EntityManager
@@ -45,9 +42,6 @@ private:
 	// ctorをコピーし割り当てはPrivateに
 	EntityManager(const EntityManager&);
 	EntityManager& operator=(const EntityManager&);
-
-
-
 };
 
 // インスタンス化

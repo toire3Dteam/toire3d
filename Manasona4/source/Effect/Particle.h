@@ -62,6 +62,7 @@ public:
 	static Matrix CurViewProjection;
 
 	static void Initialize(char* filename, int NumParticles);
+	static void Reset();
 	static void Release();
 	static void Update();
 	static void Render();
@@ -79,6 +80,7 @@ public:
 	static void EffectLandSmoke(const Vector3 &pos);		// ’…’n‚Ì‰Œ
 	static void EffectHit(const Vector3 &pos, const Vector3 &v);
 	static void EffectResultSplash(const Vector3 &pos);		// ƒŠƒUƒ‹ƒg‚ÌŒŒ‚µ‚Ô‚«
+	static void EffectExplosion(const Vector3 &pos);		// ”š”­‚Ì‰Š
 	//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
 
 private:
@@ -92,8 +94,6 @@ private:
 	static void	Set(int type, int aFrame, COLOR aColor, int eFrame, COLOR eColor, int mFrame, COLOR mColor, const Vector3 &Pos, const Vector3 &Move, const Vector3 &Power, float rotate, float angle, float stretch, float scale, u8 flag);
 	static void	Set(int type, int aFrame, float aAlpha, int eFrame, float eAlpha, int mFrame, float mAlpha, const Vector3 &Pos, const Vector3 &Move, const Vector3 &Power, float r, float g, float b, float rotete, float stretch, float scale, u8 flag);
 	static void	Set2(int type, int aFrame, float aAlpha, int eFrame, float eAlpha, int mFrame, float mAlpha, const Vector3 &Pos, const Vector3 &Move, const Vector3 &Power, float r, float g, float b, float rotete, float angle, float stretch, float scale, u8 flag);
-
-	static void Reset();
 };
 
 

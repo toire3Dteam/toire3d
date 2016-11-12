@@ -17,6 +17,8 @@ BasePanelEffect::BasePanelEffect()
 	m_pic3DScale = 50.0f;// 初期値　３Dで描画するときの大きさ
 
 	state = RS::ADD;
+
+	m_iDelayFrame = 0;
 }
 
 BasePanelEffect::~BasePanelEffect()
@@ -26,18 +28,29 @@ BasePanelEffect::~BasePanelEffect()
 
 void BasePanelEffect::Update()
 {
+	m_iDelayFrame--;// ディレイフレームを減らす
+	if (m_iDelayFrame > 0)
+	{
+			return;
+	}
+	m_iDelayFrame = 0;
+
 	// エフェクト
 	m_pic->Update();
 }
 
 void BasePanelEffect::Render()
 {
+	if (m_iDelayFrame > 0)	return;
+	
 	m_pic->Render((int)m_pos.x - (m_picSize / 2), (int)m_pos.y - (m_picSize / 2), state);
 
 }
 
 void BasePanelEffect::Render3D()
 {
+	if (m_iDelayFrame > 0)	return;
+
 	//tdnRenderState::Filter(FALSE);
 	m_pic->GetPic()->SetScale(m_pic3DScale);// 各自所有しているスケールに設定
 	m_pic->Render3D(m_pos, state);
@@ -45,7 +58,7 @@ void BasePanelEffect::Render3D()
 	//tdnRenderState::Filter(TRUE);
 }
 
-void BasePanelEffect::Action(int x , int y)
+void BasePanelEffect::Action(int x , int y, int delayFrame)
 {
 	// エフェクト発動
 	m_pic->Action();
@@ -53,15 +66,17 @@ void BasePanelEffect::Action(int x , int y)
 	m_pos.x = (float)x;
 	m_pos.y = (float)y;
 
+	m_iDelayFrame = delayFrame;
 }
 
-void BasePanelEffect::Action(Vector3 pos)
+void BasePanelEffect::Action(Vector3 pos, int delayFrame)
 {
 	// エフェクト発動
 	m_pic->Action();
 
 	m_pos = pos;
 
+	m_iDelayFrame = delayFrame;
 }
 
 void BasePanelEffect::Stop()

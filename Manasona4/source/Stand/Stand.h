@@ -2,26 +2,30 @@
 
 #include "../Player/BasePlayer.h"
 
+
 namespace Stand
 {
-	enum class ACTION_TYPE
-	{
-		LAND,
-		SQUAT,
-		AERIAL,
-		AERIALDROP,
-		MAX
-	};
 	class Base
 	{
 	public:
 		Base(BasePlayer *pPlayer);
 		virtual ~Base();
-		virtual void Update();
+		virtual void Update(bool bControl);
 		virtual void Render(tdnShader* shader,char* name);
 
 		// プレイヤーがペルソナボタン押したら呼び出す
-		virtual void Action(ACTION_TYPE type) = 0;
+		virtual void Action(SKILL_ACTION_TYPE type) = 0;
+
+		// ペルソナブレイク
+		void Break()
+		{
+			if (m_bActive)
+			{
+				// ここにブレイクの音とかエフェクトとか
+
+				m_bActive = false;
+			}
+		}
 
 		// ゲッター
 		bool isAttackFrame()
@@ -49,6 +53,10 @@ namespace Stand
 		int GetStandStock(){ return m_standStock; };
 		void SetStandStock(int stock){ m_standStock= stock; }
 
+		// アイコンのアクセサ
+		tdn2DAnim* GetIcon() { return m_pIcon; }
+		tdn2DAnim* GetIconRip() { return m_pIconRip; }
+
 	protected:
 		BasePlayer *m_pPlayer;	// 自分の実体を持っているプレイヤーへのポインタ
 		iex3DObj *m_pObj;		// 3D実体
@@ -57,6 +65,10 @@ namespace Stand
 		DIR m_dir;				// 向き
 		bool m_bActive;			// 出てるかどうか
 
+		// アイコン
+		tdn2DAnim* m_pIcon;
+		tdn2DAnim* m_pIconRip;
+
 		// 出せるペルソナ
 		int m_standStockMAX;	// スタンドストック最大数
 		int m_standStock;		// スタンドストック数
@@ -64,13 +76,13 @@ namespace Stand
 		int m_standGage;		// スタンドゲージ
 
 
-		FRAME_STATE m_ActionFrameList[(int)ACTION_TYPE::MAX][FRAME_MAX];
-		ACTION_TYPE m_ActionType;	// アクションの種類(↑の左の添え字の中身)
+		FRAME_STATE m_ActionFrameList[(int)SKILL_ACTION_TYPE::MAX][FRAME_MAX];
+		SKILL_ACTION_TYPE m_ActionType;	// アクションの種類(↑の左の添え字の中身)
 		int m_CurrentActionFrame;	// アクションフレームリストの中を再生しているフレーム(↑↑の右の添え字の中身)
 
 		void LoadActionFrameList(char *filename);
 
-		AttackData *m_pAttackData[(int)ACTION_TYPE::MAX];	// 攻撃データ
+		AttackData *m_pAttackData[(int)SKILL_ACTION_TYPE::MAX];	// 攻撃データ
 
 	private:
 		void StandGageUpdate();
@@ -87,6 +99,6 @@ namespace Stand
 		//~Mokoi();
 
 		// 純粋仮想オーバーライド
-		void Action(ACTION_TYPE type);
+		void Action(SKILL_ACTION_TYPE type);
 	};
 }

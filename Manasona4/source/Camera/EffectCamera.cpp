@@ -1,6 +1,7 @@
 #include "TDNLIB.h"
 #include "camera.h"
 #include "EffectCamera.h"
+#include "../BaseEntity/Message/MessageDispatcher.h"
 
 
 //*****************************************************************************************************************************
@@ -11,9 +12,9 @@
 
 //=============================================================================================
 //		初	期	化
-EffectCamera::EffectCamera(Camera *me) :m_pCamera(me), m_CurrentScriptID(0), m_CurrentFrame(0), m_PatternCursor(0)
+EffectCamera::EffectCamera(ViewData *pViewData, LPCSTR filename, const Vector3 &OrgPos) :m_pViewData(pViewData), m_CurrentScriptID(0), m_CurrentFrame(0), m_PatternCursor(0), m_EventFrame(0), m_EventCursor(0), m_bAction(false), m_vOrgPos(OrgPos)
 {
-	std::ifstream ifs("DATA/Camera/script.txt");
+	std::ifstream ifs(filename);
 	MyAssert(ifs, "カメラスクリプト入ってないよ！");
 
 	while (!ifs.eof())
@@ -54,22 +55,39 @@ EffectCamera::EffectCamera(Camera *me) :m_pCamera(me), m_CurrentScriptID(0), m_C
 			for (int j = 0; j < set->pPatterns[i].NumPoints; j++)
 			{
 				// 座標
-				ifs >> set->pPatterns[i].pPosArray[j].x;
-				ifs >> set->pPatterns[i].pPosArray[j].y;
-				ifs >> set->pPatterns[i].pPosArray[j].z;
+				ifs >> set->pPatterns[i].pViewDataArray[j].pos.x;
+				ifs >> set->pPatterns[i].pViewDataArray[j].pos.y;
+				ifs >> set->pPatterns[i].pViewDataArray[j].pos.z;
 
 				// 注視点
-				ifs >> set->pPatterns[i].pTargetArray[j].x;
-				ifs >> set->pPatterns[i].pTargetArray[j].y;
-				ifs >> set->pPatterns[i].pTargetArray[j].z;
+				ifs >> set->pPatterns[i].pViewDataArray[j].target.x;
+				ifs >> set->pPatterns[i].pViewDataArray[j].target.y;
+				ifs >> set->pPatterns[i].pViewDataArray[j].target.z;
 
 				// roll値
-				ifs >> set->pPatterns[i].pRollArray[j];
+				ifs >> set->pPatterns[i].pViewDataArray[j].roll;
 			}
 
 			// 固定かどうか
 			set->pPatterns[i].fix = (set->pPatterns[i].NumPoints == 1);
 		}
+
+	// カメラ振動イベント
+	int NumShakeEvent(0);
+	ifs >> skip;
+	ifs >> NumShakeEvent;
+
+	set->PartitioningShakeEvent(NumShakeEvent);
+
+	FOR(NumShakeEvent)
+	{
+		// 発動フレーム
+		ifs >> set->pShakeEventArray[i].TriggerFrame;
+		// 振動の力
+		ifs >> set->pShakeEventArray[i].ShakeInfo.ShakePower;
+		// 振動時間
+		ifs >> set->pShakeEventArray[i].ShakeInfo.ShakeFrame;
+	}
 
 		ifs >> skip;	// END読み飛ばし
 
@@ -113,6 +131,21 @@ void Rot2D(float rad, float *x, float *y)
 
 void EffectCamera::Update()
 {
+	// はじく
+	if (!m_bAction) return;
+
+	// イベント時間更新
+	m_EventFrame++;
+	if (m_EventCursor < m_list[m_CurrentScriptID]->NumShakeEvent)
+	{
+		if (m_EventFrame == m_list[m_CurrentScriptID]->pShakeEventArray[m_EventCursor].TriggerFrame)
+		{
+			// 振動メッセージ送信
+			MsgMgr->Dispatch(0, ENTITY_ID::CAMERA_MGR, ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::SHAKE_CAMERA, &m_list[m_CurrentScriptID]->pShakeEventArray[m_EventCursor].ShakeInfo);
+			m_EventCursor++;
+		}
+	}
+
 	// カメラフレーム更新+パターン内での終了フレーム到達したら
 	if ((m_CurrentFrame += m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].FrameSpeed) > m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].EndFrame)
 	{
@@ -121,25 +154,23 @@ void EffectCamera::Update()
 		// 次のパターンへ移行、もうパターンが無かったら終了
 		if (++m_PatternCursor >= m_list[m_CurrentScriptID]->NumPattern)
 		{
-			m_pCamera->OffEffectCamera();	// スクリプト解除
+			//m_pCamera->OffEffectCamera();	// スクリプト解除
+			m_bAction = false;
 			return;
 		}
 	}
 
 	// カメラ座標更新
-	Vector3 pos, target;
-	float roll;
-	GetTimeLineCameraPos(&pos, &target, &roll);
+	ViewData data;
+	GetTimeLineViewData(&data);
 
 	// プレイヤー座標系にする
-	Rot2D(m_pCamera->m_angle.y, &pos.z, &pos.x);
-	pos += m_pCamera->m_OrgPos;
-	target += m_pCamera->m_OrgPos;
+	//Rot2D(m_pCamera->m_angle.y, &data.pos.z, &data.pos.x);
+	data.pos += m_vOrgPos;
+	data.target += m_vOrgPos;
 
 	// カメラにセット
-	m_pCamera->m_pos = pos;
-	m_pCamera->m_target = target;
-	m_pCamera->m_angle.z = roll;
+	*m_pViewData = data;
 	//m_pCamera->Set(pos, target);
 }
 //
@@ -153,20 +184,21 @@ void EffectCamera::Start(int ID)
 	m_CurrentScriptID = ID;
 	m_PatternCursor = 0;
 	m_CurrentFrame = 0;
+	m_EventFrame = 0;
+	m_EventCursor = 0;
+	m_bAction = true;
 }
 //
 //=============================================================================================
 
 
 
-void EffectCamera::GetTimeLineCameraPos(Vector3 *OutPos, Vector3 *OutTarget, float *OutRoll)
+void EffectCamera::GetTimeLineViewData(ViewData *out)
 {
 	if (m_PatternCursor == -1) return;
 	if (m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].fix)
 	{
-		*OutPos = m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].pPosArray[0];
-		*OutTarget = m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].pTargetArray[0];
-		*OutRoll = m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].pRollArray[0];
+		*out = m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].pViewDataArray[0];
 		return;
 	}
 
@@ -174,22 +206,8 @@ void EffectCamera::GetTimeLineCameraPos(Vector3 *OutPos, Vector3 *OutTarget, flo
 
 	// ベジエ計算関数に丸投げ
 	Math::Bezier(
-		OutPos,																	// 受け皿
-		m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].pPosArray,					// 始点、中間、終点が入ってる座標配列
-		m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].NumPoints,					// の要素数
-		percentage
-		);
-
-	Math::Bezier(
-		OutTarget,																	// 受け皿
-		m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].pTargetArray,				// 始点、中間、終点が入ってる座標配列
-		m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].NumPoints,					// の要素数
-		percentage
-		);
-
-	Math::Bezier(
-		OutRoll,																// 受け皿
-		m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].pRollArray,				// 始点、中間、終点が入ってる座標配列
+		out,																	// 受け皿
+		m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].pViewDataArray,					// 始点、中間、終点が入ってる座標配列
 		m_list[m_CurrentScriptID]->pPatterns[m_PatternCursor].NumPoints,					// の要素数
 		percentage
 		);

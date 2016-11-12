@@ -23,6 +23,9 @@ public:
 	static BYTE m_alpha;		/*	α値(0～255)								*/
 	static COLOR m_dwColor;		/*	カラー(0x00000000 ～ 0x00ffffff)			*/
 
+	static bool m_bFadeInCompletion;	/*	フェードイン完了	*/
+	static bool m_bFadeOutCompletion;	/*	フェードアウト完了	*/
+
 	//void None();
 	//void In();
 	//void Out();
@@ -51,6 +54,9 @@ public:
 	//	Get_Set
 	//------------------------------------------------------
 	static bool isFadeStop(){ return (m_mode == FADE_NONE); }
+	static FLAG GetMode() { return m_mode; }
+	static bool isFadeInCompletion() { return m_bFadeInCompletion; }
+	static bool isFadeOutCompletion() { return m_bFadeOutCompletion; }
 };
 
 #endif

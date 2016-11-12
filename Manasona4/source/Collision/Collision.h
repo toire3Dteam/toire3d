@@ -2,7 +2,10 @@
 
 // 前方宣言
 class BasePlayer;
-
+namespace Stage
+{
+	class Base;
+}
 
 // 形状
 namespace CollisionShape
@@ -46,14 +49,14 @@ namespace CollisionShape
 namespace Collision
 {
 	// レイピック
-	void Raypic(iexMesh *obj, BasePlayer *player, Vector3 *move); // Squareで判定
-	void RaypicUp(iexMesh *obj, BasePlayer *player, Vector3 *move);
-	void RaypicDown(iexMesh *obj, BasePlayer *player, Vector3 *move);
-	void RaypicLeft(iexMesh *obj, BasePlayer *player, Vector3 *move);
-	void RaypicRight(iexMesh *obj, BasePlayer *player, Vector3 *move);
+	void Raypic(Stage::Base *obj, BasePlayer *player, Vector3 *move); // Squareで判定
+	//void RaypicUp(Stage::Base *obj, BasePlayer *player, Vector3 *move);
+	void RaypicDown(Stage::Base *obj, BasePlayer *player, Vector3 *move);
+	void RaypicLeft(Stage::Base *obj, BasePlayer *player, Vector3 *move);
+	void RaypicRight(Stage::Base *obj, BasePlayer *player, Vector3 *move);
 
 	// めり込み
-	void Sinking(iexMesh *obj, BasePlayer *pPlayer1, BasePlayer *pPlayer2);
+	void Sinking(Stage::Base *obj, BasePlayer *pPlayer1, BasePlayer *pPlayer2);
 
 	// 形状で判定
 	bool HitCheck(CollisionShape::Circle* c1, CollisionShape::Circle* c2);

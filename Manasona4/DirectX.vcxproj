@@ -118,6 +118,9 @@
     <ClCompile Include="source\Camera\camera.cpp" />
     <ClCompile Include="source\Camera\EffectCamera.cpp" />
     <ClCompile Include="source\Collision\Collision.cpp" />
+    <ClCompile Include="source\Cutin\CutIn.cpp" />
+    <ClCompile Include="source\Data\PlayerData.cpp" />
+    <ClCompile Include="source\Data\SelectData.cpp" />
     <ClCompile Include="source\DeferredEx\DeferredEx.cpp" />
     <ClCompile Include="source\EffectTool\Effect2D.cpp" />
     <ClCompile Include="source\EffectTool\Effect2DManager.cpp" />
@@ -125,12 +128,19 @@
     <ClCompile Include="source\Effect\AnimationRipple.cpp" />
     <ClCompile Include="source\Effect\AnimationRippleEx.cpp" />
     <ClCompile Include="source\Effect\AnimationUV.cpp" />
+    <ClCompile Include="source\Effect\LocusEffect.cpp" />
     <ClCompile Include="source\Effect\PanelEffect\PanelEffect.cpp" />
     <ClCompile Include="source\Effect\PanelEffect\PanelEffectManager.cpp" />
     <ClCompile Include="source\Effect\Particle.cpp" />
     <ClCompile Include="source\Effect\UVEffect\BaseUVEffect.cpp" />
     <ClCompile Include="source\Effect\UVEffect\UVEffectManager.cpp" />
     <ClCompile Include="source\Fade\Fade.cpp" />
+    <ClCompile Include="source\MenuUI\ControllerSelectUI.cpp" />
+    <ClCompile Include="source\MenuUI\MenuIcon.cpp" />
+    <ClCompile Include="source\MenuUI\MenuUIManager.cpp" />
+    <ClCompile Include="source\MenuUI\TipsCard.cpp" />
+    <ClCompile Include="source\MenuUI\Tutorial.cpp" />
+    <ClCompile Include="source\MenuUI\TutorialManager.cpp" />
     <ClCompile Include="source\Player\Airou\Airou.cpp" />
     <ClCompile Include="source\Player\AI\AI.cpp" />
     <ClCompile Include="source\Player\AI\AIState.cpp" />
@@ -143,21 +153,34 @@
     <ClCompile Include="source\PointLight\PointLight.cpp" />
     <ClCompile Include="source\PostEffect\PostEffect.cpp" />
     <ClCompile Include="source\ResultPerformance\BaseResultPerformance.cpp" />
+    <ClCompile Include="source\RoundCall\RoundCall.cpp" />
+    <ClCompile Include="source\RoundCall\RoundCallManager.cpp" />
     <ClCompile Include="source\SceneSwitch\SceneSwitch.cpp" />
+    <ClCompile Include="source\Scene\SceneCollect.cpp" />
     <ClCompile Include="source\Scene\SceneEffectTool.cpp" />
     <ClCompile Include="source\Scene\sceneLoading.cpp" />
+    <ClCompile Include="source\Scene\LoadSceneThread.cpp" />
     <ClCompile Include="source\Scene\SceneMain.cpp" />
     <ClCompile Include="source\Scene\SceneMainState.cpp" />
+    <ClCompile Include="source\Scene\SceneMenu.cpp" />
+    <ClCompile Include="source\Scene\SceneMenuState.cpp" />
     <ClCompile Include="source\Scene\sceneRenderingTest.cpp" />
     <ClCompile Include="source\Scene\sceneResult.cpp" />
+    <ClCompile Include="source\Scene\sceneTitle.cpp" />
+    <ClCompile Include="source\Scene\sceneTutorial.cpp" />
+    <ClCompile Include="source\Stage\OverDriveStage\OverDriveStage.cpp" />
     <ClCompile Include="source\Stage\Stage.cpp" />
     <ClCompile Include="source\Stand\Stand.cpp" />
     <ClCompile Include="source\system\FrameworkEx.cpp" />
     <ClCompile Include="source\Timer\Timer.cpp" />
     <ClCompile Include="source\UI\ComboUI.cpp" />
+    <ClCompile Include="source\UI\FacePic.cpp" />
     <ClCompile Include="source\UI\GameUI.cpp" />
+    <ClCompile Include="source\UI\HeaveHoFinish\HeaveHoFinish.cpp" />
     <ClCompile Include="source\UI\HpGage.cpp" />
+    <ClCompile Include="source\UI\OverDriveCutin\OverDriveCutin.cpp" />
     <ClCompile Include="source\UI\PersonaUI.cpp" />
+    <ClCompile Include="source\UI\RoundIcon.cpp" />
     <ClCompile Include="source\UI\SPGage.cpp" />
     <ClCompile Include="TDN\DirectShow\baseclasses\amfilter.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -178,7 +201,7 @@
     <ClCompile Include="TDN\TDN_Collision.cpp" />
     <ClCompile Include="TDN\TDN_File.cpp">
       <DeploymentContent>false</DeploymentContent>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="TDN\TDN_Font.cpp" />
@@ -194,6 +217,7 @@
     <ClCompile Include="TDN\TDN_Random.cpp" />
     <ClCompile Include="TDN\TDN_RenderState.cpp" />
     <ClCompile Include="TDN\TDN_Shader.cpp" />
+    <ClCompile Include="TDN\TDN_SkinMesh.cpp" />
     <ClCompile Include="TDN\TDN_System.cpp" />
     <ClCompile Include="TDN\TDN_Text.cpp" />
     <ClCompile Include="TDN\TDN_Texture.cpp" />
@@ -216,6 +240,9 @@
     <ClInclude Include="source\Camera\camera.h" />
     <ClInclude Include="source\Camera\EffectCamera.h" />
     <ClInclude Include="source\Collision\Collision.h" />
+    <ClInclude Include="source\Cutin\CutIn.h" />
+    <ClInclude Include="source\Data\PlayerData.h" />
+    <ClInclude Include="source\Data\SelectData.h" />
     <ClInclude Include="source\DeferredEx\DeferredEx.h" />
     <ClInclude Include="source\EffectTool\Effect2D.h" />
     <ClInclude Include="source\EffectTool\Effect2DManager.h" />
@@ -223,6 +250,7 @@
     <ClInclude Include="source\Effect\AnimationRipple.h" />
     <ClInclude Include="source\Effect\AnimationRippleEx.h" />
     <ClInclude Include="source\Effect\AnimationUV.h" />
+    <ClInclude Include="source\Effect\LocusEffect.h" />
     <ClInclude Include="source\Effect\PanelEffect\PanelEffect.h" />
     <ClInclude Include="source\Effect\PanelEffect\PanelEffectManager.h" />
     <ClInclude Include="source\Effect\Particle.h" />
@@ -230,7 +258,14 @@
     <ClInclude Include="source\Effect\UVEffect\BaseUVEffect.h" />
     <ClInclude Include="source\Effect\UVEffect\UVEffectManager.h" />
     <ClInclude Include="source\Fade\Fade.h" />
+    <ClInclude Include="source\MenuUI\ControllerSelectUI.h" />
+    <ClInclude Include="source\MenuUI\MenuIcon.h" />
+    <ClInclude Include="source\MenuUI\MenuUIManager.h" />
+    <ClInclude Include="source\MenuUI\TipsCard.h" />
+    <ClInclude Include="source\MenuUI\Tutorial.h" />
+    <ClInclude Include="source\MenuUI\TutorialManager.h" />
     <ClInclude Include="source\Player\Airou\Airou.h" />
+    <ClInclude Include="source\Player\Airou\Oshioki.h" />
     <ClInclude Include="source\Player\AI\AI.h" />
     <ClInclude Include="source\Player\AI\AIState.h" />
     <ClInclude Include="source\Player\BasePlayer.h" />
@@ -243,21 +278,35 @@
     <ClInclude Include="source\PostEffect\PostEffect.h" />
     <ClInclude Include="source\resource.h" />
     <ClInclude Include="source\ResultPerformance\BaseResultPerformance.h" />
+    <ClInclude Include="source\RoundCall\RoundCall.h" />
+    <ClInclude Include="source\RoundCall\RoundCallManager.h" />
     <ClInclude Include="source\SceneSwitch\SceneSwitch.h" />
+    <ClInclude Include="source\Scene\SceneCollect.h" />
     <ClInclude Include="source\Scene\SceneEffectTool.h" />
     <ClInclude Include="source\Scene\sceneLoading.h" />
+    <ClInclude Include="source\Scene\LoadSceneThread.h" />
     <ClInclude Include="source\Scene\SceneMain.h" />
     <ClInclude Include="source\Scene\SceneMainState.h" />
+    <ClInclude Include="source\Scene\SceneMenu.h" />
+    <ClInclude Include="source\Scene\SceneMenuState.h" />
     <ClInclude Include="source\Scene\sceneRenderingTest.h" />
     <ClInclude Include="source\Scene\sceneResult.h" />
+    <ClInclude Include="source\Scene\sceneTitle.h" />
+    <ClInclude Include="source\Scene\sceneTutorial.h" />
+    <ClInclude Include="source\Sound\BattleMusic.h" />
+    <ClInclude Include="source\Stage\OverDriveStage\OverDriveStage.h" />
     <ClInclude Include="source\Stage\Stage.h" />
     <ClInclude Include="source\Stand\Stand.h" />
     <ClInclude Include="source\system\FrameworkEx.h" />
     <ClInclude Include="source\Timer\Timer.h" />
     <ClInclude Include="source\UI\ComboUI.h" />
+    <ClInclude Include="source\UI\FacePic.h" />
     <ClInclude Include="source\UI\GameUI.h" />
+    <ClInclude Include="source\UI\HeaveHoFinish\HeaveHoFinish.h" />
     <ClInclude Include="source\UI\HpGage.h" />
+    <ClInclude Include="source\UI\OverDriveCutin\OverDriveCutin.h" />
     <ClInclude Include="source\UI\PersonaUI.h" />
+    <ClInclude Include="source\UI\RoundIcon.h" />
     <ClInclude Include="source\UI\SpGage.h" />
     <ClInclude Include="TDN\DirectShow\baseclasses\amextra.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>

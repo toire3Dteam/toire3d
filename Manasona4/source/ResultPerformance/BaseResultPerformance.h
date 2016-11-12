@@ -60,7 +60,9 @@ public:
 };
 
 
-
+//+-------------------------------
+//	アラミタマの演出
+//+-------------------------------
 class AramitamaResultPerformance : public BaseResultPerformance
 {
 public:
@@ -91,5 +93,54 @@ private:
 	tdn2DObj* m_movieTex;
 
 };
+
+
+//+-------------------------------
+//	アイルーの演出
+//+-------------------------------
+class AirouResultPerformance : public BaseResultPerformance
+{
+public:
+	AirouResultPerformance();
+	~AirouResultPerformance();
+
+	void Update();
+	void BackRender();
+	void FrontRender();
+	void Action();
+
+private:
+	// 必要なやつ
+	Pic m_winner;
+	Pic m_winnerDon;
+
+	Pic m_edge;
+
+	Pic m_back;
+	
+	Pic m_font;
+	int m_iFontAnimFrame;
+	Pic m_fontKill;
+
+	Pic m_danger1;
+	Pic m_danger2;
+
+	Pic m_blackInk;
+	Pic m_susi;
+	Pic m_whiteSoul;
+	
+	// ECC
+	Pic m_eccmanBody;
+	Pic m_eccmanHead;
+
+	// 地球
+	Pic m_earth;
+
+	// バックムービー
+	tdnMovie*  m_movieMgr;
+	tdn2DObj* m_movieTex;
+
+};
+
 //tdn2DobjwoAnimnisuru 
 //SpaeadとかいみわからんｍにゃちうのなんまえをScareとかにもこのさいｓかえる

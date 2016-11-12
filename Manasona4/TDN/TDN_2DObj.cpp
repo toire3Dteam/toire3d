@@ -195,7 +195,7 @@ tdn2DObj::tdn2DObj(Texture2D *texture) : lpTexture(texture), m_bLoadTexture(fals
 	lpTexture->GetSurfaceLevel(0, &lpSurface);
 }
 
-//	文字テクスチャをロード
+//	文字テクスチャをロード 一文字のみを作ります。
 bool tdn2DObj::LoadFontTexture(LPCSTR character, UINT charaSize, LPCSTR fontName)
 {
 	//	現在保持しているテクスチャを破棄

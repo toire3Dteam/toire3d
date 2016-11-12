@@ -6,6 +6,7 @@
 enum MESSAGE_TYPE
 {
 	EFFECT_CAMERA,		// エフェクトカメラ発動メッセージ
+	WINNER_CAMERA,
 	SHAKE_CAMERA,		// カメラ振動メッセージ
 	HIT_ATTACK,			// 攻撃をヒットさせた人に送るメッセージ！
 	HIT_DAMAGE,			// 攻撃がヒットした相手に送るメッセージ
@@ -17,7 +18,51 @@ enum MESSAGE_TYPE
 	HEAVE_HO_OVER_DRIVE_HIT,	// ヒーホーフィニッシュヒット
 	PERSONA_CARD_COUNT_UP,// ペルソナカードが増えた
 	PERSONA_CARD_COUNT_DOWN,// ペルソナカードが減った
+	APP_WIN_ICON,// 勝利数アイコン点灯
+	CUTIN_ACTION,// カットイン発動！
+	HEAVE_HO_OVERFLOW_START,	// ヒーホーオーバーフロー開始！
+	END_ROUNDCALL,
+	END_FINISHCALL,
+	END_WINNER,			// 勝者の演出終了
+	OVER_DRIVE_STAGE,	// オーバードライブのステージ
+	KO,					// HPがゼロになったときに送信
+	OVER_DRIVE_CUTIN,   // 必殺技のカットイン
+	KAKEAI_END,			// 掛け合い終了
+	COMBO_COUNT,		// コンボカウント
+	COMBO_GUARD,		// コンボガードされたぜ
 	OTHER				// その他。
+};
+
+
+// キャラクターサイド
+enum class SIDE
+{
+	LEFT,
+	RIGHT,
+	ARRAY_MAX
+};
+
+// コンボ用
+struct COMBO_DESK
+{
+	SIDE side;
+	int damage;
+	int recoveryFrame;
+};
+
+// KOのタイプ
+enum class FINISH_TYPE
+{
+	NORMAL,
+	OVER_DRIVE
+};
+
+// KOしたときに送るメッセージの構造体
+struct KO_INFO
+{
+	FINISH_TYPE FinishType;		// KOのタイプ
+	int iNumWinnerRound;		// KOしたやつの勝った数(ラウンド設定した分を取ったらリザルトに行く)
+	SIDE WinnerSide;			// KOしたやつのサイド
 };
 
 // 攻撃喰らった相手用
@@ -27,19 +72,25 @@ struct HIT_DAMAGE_INFO
 	int damage;			// 受けるダメ―ジ(スコア)
 	Vector2 FlyVector;	// 吹っ飛びベクトル(強さもある)
 	int hitStopFlame;		// ヒットストップフレーム
-	int recoveryFlame;		// 硬直フレーム
+	int HitRecoveryFrame;	// ヒット硬直フレーム
+	int GuardRecoveryFrame;	// ガード硬直フレーム
 	int HitEffectType;		// HITした相手に送るエフェクト (A列車)←をintじゃなくてEFFECT_TYPEにしたい。どうしたものか・・
-	bool bFinishAttack;		// フィニッシュアタック
+	bool bOverDrive;		// フィニッシュアタック
 	int iAttackType;		// 何の攻撃を当てられたか(おんなじ攻撃だったらその分遅くしたいため)
+	int iAntiGuard;			// ガード突き破る攻撃の種類
+	LPCSTR HitSE;			// ヒットするSEのID
+	bool bFinishOK;			// フィニッシュする攻撃か
+
+	HIT_DAMAGE_INFO():BeInvincible(false), damage(0), FlyVector(0,0), hitStopFlame(0), HitRecoveryFrame(0), GuardRecoveryFrame(0), HitEffectType(0), bOverDrive(false), iAttackType(0), iAntiGuard(0), HitSE(nullptr), bFinishOK(true){}
 };
 
 // 攻撃ヒットしたプレイヤー用
 struct HIT_ATTACK_INFO
 {
-	int HitPlayerDeviceID;	// ダメージを与えた相手の番号
+	//int HitPlayerDeviceID;	// ダメージを与えた相手の番号
 	int hitStopFlame;		// ヒットストップフレーム
 	int HitScore;			// 加算されるスコア
-	bool bFinishAttack;		// フィニッシュアタック
+	bool bOverDrive;		// フィニッシュアタック
 };
 
 // プレイヤーInfo
@@ -65,19 +116,6 @@ struct SHAKE_CAMERA_INFO
 	void Set(float power, int frame){ ShakePower = power; ShakeFrame = frame; }
 };
 
-/* 掴まれた相手に送る情報構造体 */
-struct BE_THROWN_INFO
-{
-	ENTITY_ID ThrowPlayerID;	// つかんだやつのID
-	int iThrowPlayerDir;		// つかんだやつの向き(受けた側はこれの反対を向く)
-};
-
-// キャラクターサイド
-enum class SIDE
-{
-	LEFT,
-	RIGHT
-};
 
 /*
 	メッセージはシンプルな列挙型。

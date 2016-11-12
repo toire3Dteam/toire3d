@@ -89,6 +89,7 @@ public:
 	//****************************
 	//		RADIAL_BLUR
 	//****************************
+	void SetRadialBlur(Vector3 pos, float power);
 	void SetRadialBlur(Vector2 pos, float power);
 	void RadialBlurUpdate();
 	//void RadialBlurRender();

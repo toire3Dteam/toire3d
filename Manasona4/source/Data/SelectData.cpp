@@ -1,0 +1,9 @@
+﻿#include "TDNLIB.h"
+#include "SelectData.h"
+#include "../Sound/BattleMusic.h"
+
+SelectData::SelectData():stage(STAGE::SENJO), bTutorial(false), iWinRound(2), iBattleMusicID(BattleMusicManager::RANDOM)
+{
+	tagSideDatas[(int)SIDE::LEFT].iDeviceID = 0;
+	tagSideDatas[(int)SIDE::RIGHT].iDeviceID = 1;
+}

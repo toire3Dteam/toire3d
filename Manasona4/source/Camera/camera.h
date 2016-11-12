@@ -14,6 +14,13 @@
 class PlayerManager;
 class EffectCamera;
 
+enum class EFFECT_CAMERA_ID
+{
+	SAND_STAGE_INTRO,
+	AIROU_OVERFLOW,
+	OVERFLOW_TEST,
+};
+
 // カメラクラス<Singleton>
 class Camera :public BaseGameEntity
 {
@@ -41,6 +48,7 @@ public:
 	//------------------------------------------------------
 	//	セッター&ゲッター
 	//------------------------------------------------------
+	int GetEventFrame();
 	void Set(const Vector3 &pos, const Vector3 &target){ tdnView::Set(pos, target); }
 	void SetStageCameraInfo(char *path);	// ステージごとのスマブラカメラの設定
 	void SetPlayersPos();
@@ -48,12 +56,13 @@ public:
 	//------------------------------------------------------
 	//	基本パラメータ(ステートマシンからいじりまくるので、publicにおいとく)
 	//------------------------------------------------------
-	Vector3	m_pos;		//	位置
+	ViewData m_ViewData;
+	//Vector3	m_pos;		//	位置
 	Vector3 m_ipos;		//	理想の位置
-	Vector3	m_target;	//	注視点
+	//Vector3	m_target;	//	注視点
 	Vector3 m_itarget;	//	理想の注視点
 	Vector3 m_angle;	//	カメラアングル
-	Vector3 m_OrgPos;	// エフェクトカメラ発動時の原点座標
+	//Vector3 m_OrgPos;	// エフェクトカメラ発動時の原点座標
 
 	//===============================================
 	//	スマブラカメラの情報
@@ -66,7 +75,7 @@ public:
 		float FullZ;// 最大距離のZ値
 		float FullY;// 最大距離のY値
 		Vector2 MoveMax, MoveMin;// 最大・最少
-	}m_CameraData;
+	}m_GameCameraData;
 
 	int m_NumPlayer;					// 暇があったらどうにかしよ
 	Vector3 **m_pPlayerPosReferences;	// プレイヤーの座標参照用

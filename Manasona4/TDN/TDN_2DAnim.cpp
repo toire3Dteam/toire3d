@@ -6,20 +6,34 @@
 /****************************************************/
 
 // アクションチェック
-bool AnimAction::Base::ActionCheck() 
+bool AnimAction::Base::ActionCheckUpdate()
 {
 
 	// アクションフラグがたっていないと返す
 	if (m_bActionFlag == false) return false;
 	
+	m_bFirstUpdateCheak = true; // 更新が一回以上入った
+
 	// ?
 	// ディレイタイマーが0になるまで通さない
-	if (--m_iDelayFlame > 0)
+	m_iDelayFrame--;
+	if (m_iDelayFrame > 0)
 	{
 		return false;
 	}
-	
+	m_iDelayFrame = 0;
+
 	return true; //成功
+}
+
+bool AnimAction::Base::ActionCheakRender()
+{
+	if (m_bActionFlag == false)return false;
+	if (m_bFirstUpdateCheak == false)return false;
+	if (m_iDelayFrame > 0)return false;
+
+	return true;
+
 }
 
 /******************************************/
@@ -28,68 +42,59 @@ bool AnimAction::Base::ActionCheck()
 // 2D
 void AnimAction::Base::Render(tdn2DObj* pic, int x, int y, u32 dwFlags)
 {
-	if (m_bActionFlag == false)return;
-	if (m_iDelayFlame > 0)return;
+	if (ActionCheakRender() == false)return;
 	
 	pic->Render(x, y, dwFlags);
 }
 
 void AnimAction::Base::Render(tdn2DObj* pic, int x, int y, tdnShader * shader, char * name)
 {
-	if (m_bActionFlag == false)return;
-	if (m_iDelayFlame > 0)return;
+	if (ActionCheakRender() == false)return;
 	pic->Render(x, y, shader, name);
 }
 
 void AnimAction::Base::Render(tdn2DObj* pic, int x, int y, int w, int h, int tx, int ty, int tw, int th, u32 dwFlags)
 {
-	if (m_bActionFlag == false)return;
-	if (m_iDelayFlame > 0)return;
+	if (ActionCheakRender() == false)return;
 	pic->Render(x, y, w, h, tx, ty, tw, th, dwFlags);
 
 }
 
 void AnimAction::Base::Render(tdn2DObj* pic, int x, int y, int w, int h, int tx, int ty, int tw, int th, tdnShader * shader, char * name)
 {
-	if (m_bActionFlag == false)return;
-	if (m_iDelayFlame > 0)return;
+	if (ActionCheakRender() == false)return;
 	pic->Render(x, y, w, h, tx, ty, tw, th, shader, name);
 }
 
 // 3D
 void AnimAction::Base::Render3D(tdn2DObj* pic, float x, float y, float z, u32 dwFlags)
 {
-	if (m_bActionFlag == false)return;
-	if (m_iDelayFlame > 0)return;
+	if (ActionCheakRender() == false)return;
 	pic->Render3D(x, y, z, dwFlags);
 }
 
 void AnimAction::Base::Render3D(tdn2DObj* pic, Vector3 pos, u32 dwFlags)
 {
-	if (m_bActionFlag == false)return;
-	if (m_iDelayFlame > 0)return;
+	if (ActionCheakRender() == false)return;
 	pic->Render3D(pos, dwFlags);
 }
 
 void AnimAction::Base::Render3D(tdn2DObj* pic, float x, float y, float z, int w, int h, int tx, int ty, int tw, int th, u32 dwFlags)
 {
-	if (m_bActionFlag == false)return;
-	if (m_iDelayFlame > 0)return;
+	if (ActionCheakRender() == false)return;
 	pic->Render3D(x, y, z, w, h, tx, ty, tw, th, dwFlags);
 }
 
 void AnimAction::Base::Render3D(tdn2DObj* pic, Vector3 pos, int w, int h, int tx, int ty, int tw, int th, u32 dwFlags)
 {
-	if (m_bActionFlag == false)return;
-	if (m_iDelayFlame > 0)return;
+	if (ActionCheakRender() == false)return;
 	pic->Render3D(pos, w, h, tx, ty, tw, th, dwFlags);
 }
 
 // 一部の特殊演出用
 void AnimAction::Base::RenderSpecial(tdn2DObj* pic, int x, int y)
 {
-	if (m_bActionFlag == false)return;
-	if (m_iDelayFlame > 0)return;
+	if (ActionCheakRender() == false)return;
 
 	pic->Render(x, y);
 }
@@ -116,7 +121,7 @@ void AnimAction::Ripple::Update(tdn2DObj * pic)
 {
 	// アクションフラグがたっていないと返す
 	//if (m_bActionFlag == false)return;
-	if (ActionCheck() == false)return;
+	if (ActionCheckUpdate() == false)return;
 
 	// フレーム更新
 	m_nowFlame++;
@@ -175,7 +180,7 @@ AnimAction::MoveAppeared::~MoveAppeared()
 void AnimAction::MoveAppeared::Update(tdn2DObj * pic)
 {
 	// アクションフラグがたっていないと返す
-	if (ActionCheck() == false)return;
+	if (ActionCheckUpdate() == false)return;
 
 	// フレーム更新
 	m_nowFlame++;
@@ -214,8 +219,7 @@ void AnimAction::MoveAppeared::Action(tdn2DObj * pic, int delay)
 // 2D
 void AnimAction::MoveAppeared::Render(tdn2DObj* pic, int x, int y, u32 dwFlags)
 {
-	if (m_bActionFlag == false)return;
-	if (m_iDelayFlame > 0)return;
+	if (ActionCheakRender() == false)return;
 	pic->Render(
 		(int)(Math::Blend(m_rate,(float)m_startX, (float)x)),
 		(int)(Math::Blend(m_rate, (float)m_startY, (float)y)),
@@ -224,8 +228,7 @@ void AnimAction::MoveAppeared::Render(tdn2DObj* pic, int x, int y, u32 dwFlags)
 
 void AnimAction::MoveAppeared::Render(tdn2DObj* pic, int x, int y, tdnShader * shader, char * name)
 {
-	if (m_bActionFlag == false)return;
-	if (m_iDelayFlame > 0)return;
+	if (ActionCheakRender() == false)return;
 	pic->Render(
 		(int)(Math::Blend(m_rate, (float)m_startX, (float)x)),
 		(int)(Math::Blend(m_rate, (float)m_startY, (float)y)),
@@ -235,8 +238,7 @@ void AnimAction::MoveAppeared::Render(tdn2DObj* pic, int x, int y, tdnShader * s
 
 void AnimAction::MoveAppeared::Render(tdn2DObj* pic, int x, int y, int w, int h, int tx, int ty, int tw, int th, u32 dwFlags)
 {
-	if (m_bActionFlag == false)return;
-	if (m_iDelayFlame > 0)return;
+	if (ActionCheakRender() == false)return;
 	pic->Render(
 		(int)(Math::Blend(m_rate, (float)m_startX, (float)x)),
 		(int)(Math::Blend(m_rate, (float)m_startY, (float)y)),
@@ -246,8 +248,7 @@ void AnimAction::MoveAppeared::Render(tdn2DObj* pic, int x, int y, int w, int h,
 
 void AnimAction::MoveAppeared::Render(tdn2DObj* pic, int x, int y, int w, int h, int tx, int ty, int tw, int th, tdnShader * shader, char * name)
 {
-	if (m_bActionFlag == false)return;
-	if (m_iDelayFlame > 0)return;
+	if (ActionCheakRender() == false)return;
 	pic->Render(
 		(int)(Math::Blend(m_rate, (float)m_startY, (float)y)),
 		(int)(Math::Blend(m_rate, (float)m_startY, (float)y)),
@@ -257,8 +258,7 @@ void AnimAction::MoveAppeared::Render(tdn2DObj* pic, int x, int y, int w, int h,
 // MoveAppendの特殊演出用
 void AnimAction::MoveAppeared::RenderSpecial(tdn2DObj* pic, int x, int y)
 {
-	if (m_bActionFlag == false)return;
-	if (m_iDelayFlame > 0)return;
+	if (ActionCheakRender() == false)return;
 
 	// 移動ブラー
 	if (m_rate < 1.0f)
@@ -318,7 +318,7 @@ void AnimAction::Shake::Update(tdn2DObj * pic)
 {
 	// アクションフラグがたっていないと返す
 	//if (m_bActionFlag == false)return;
-	if (ActionCheck() == false)return;
+	if (ActionCheckUpdate() == false)return;
 
 	// フレーム更新
 	m_nowFlame++;
@@ -431,7 +431,7 @@ AnimAction::Jump::~Jump()
 void AnimAction::Jump::Update(tdn2DObj * pic)
 {
 	// アクションフラグがたっていないと返す
-	if (ActionCheck() == false)return;
+	if (ActionCheckUpdate() == false)return;
 
 	// フレーム更新
 	m_nowFlame++;
@@ -535,6 +535,8 @@ AnimAction::Shrink::Shrink(int endFlame, float startScale, float maxScale)
 	float scaleRata = maxScale - startScale;
 
 	m_addScale = scaleRata / endFlame;
+
+	m_alpha = 0;
 }
 
 AnimAction::Shrink::~Shrink()
@@ -546,7 +548,7 @@ void AnimAction::Shrink::Update(tdn2DObj * pic)
 {
 	// アクションフラグがたっていないと返す
 	//if (m_bActionFlag == false)return;
-	if (ActionCheck() == false)return;
+	if (ActionCheckUpdate() == false)return;
 
 	// フレーム更新
 	m_nowFlame++;
@@ -561,11 +563,11 @@ void AnimAction::Shrink::Update(tdn2DObj * pic)
 	}
 
 	// アルファ処理
-	float alpha = (float)m_nowFlame / (float)m_endFlame;//   0/30=0   60/30=2   1-(0~1)
-	Math::Clamp(alpha, 0.0f, 1.0f);
+	m_alpha = (float)m_nowFlame / (float)m_endFlame;//   0/30=0   60/30=2   1-(0~1)
+	Math::Clamp(m_alpha, 0.0f, 1.0f);
 
 	//alpha = 1.0f - alpha;
-	pic->SetARGB((int)(alpha * 255), 255, 255, 255);
+	pic->SetARGB((int)(m_alpha * 255), 255, 255, 255);
 
 	// スケールを引いていく
 	m_nowScale -= m_addScale;
@@ -592,6 +594,13 @@ void AnimAction::Shrink::Action(tdn2DObj * pic, int delay)
 
 }
 
+// 2D
+void AnimAction::Shrink::Render(tdn2DObj* pic, int x, int y, u32 dwFlags)
+{
+	if (ActionCheakRender() == false)return;
+
+	pic->Render(x, y, dwFlags);
+}
 
 /**********************/
 // 大きくなる
@@ -615,7 +624,7 @@ void AnimAction::Grow::Update(tdn2DObj * pic)
 {
 	// アクションフラグがたっていないと返す
 	//if (m_bActionFlag == false)return;
-	if (ActionCheck() == false)return;
+	if (ActionCheckUpdate() == false)return;
 
 	// フレーム更新
 	m_nowFlame++;
@@ -668,13 +677,140 @@ AnimAction::None::~None()
 void AnimAction::None::Update(tdn2DObj * pic)
 {
 	// なんもしない　しいてあるとすればディレイのみ
-	if (ActionCheck() == false)return;
+	if (ActionCheckUpdate() == false)return;
 
 }
 
 void AnimAction::None::Action(tdn2DObj * pic, int delay)
 {
 	AnimAction::Base::Action(pic, delay);
+}
+
+/**********************/
+// アルファ変更
+/**********************/
+
+AnimAction::AlphaMove::AlphaMove(int endFlame, int arrivalFrame, int vanishFrame)
+{
+	m_iNowFrame = 0;
+	m_iEndFrame = endFlame;
+	m_iArrivalFrame = arrivalFrame;
+	m_iVanishFrame = vanishFrame;
+}
+
+AnimAction::AlphaMove::~AlphaMove()
+{
+
+}
+
+void AnimAction::AlphaMove::Update(tdn2DObj * pic)
+{
+	// アクションフラグがたっていないと返す
+	if (ActionCheckUpdate() == false)return;
+
+	// フレーム更新
+	m_iNowFrame++;
+	// エンドフレームまで来たら終わる
+	if (m_iNowFrame >= m_iEndFrame)
+	{
+		// アニメーション終り
+		m_bEndFlag = true;
+	}
+
+	// アルファ更新
+	if (m_iNowFrame <= m_iArrivalFrame)
+	{
+		// アルファ処理
+		float alpha = (float)m_iNowFrame / (float)m_iArrivalFrame;
+		pic->SetARGB((int)(alpha * 255), 255, 255, 255);
+	}
+	else if (m_iNowFrame >= m_iVanishFrame)
+	{
+		float l_fParam = (float)(m_iEndFrame - m_iNowFrame);
+		float l_fMax = (float)(m_iEndFrame - m_iVanishFrame);
+		float l_fAlpha = l_fParam / l_fMax;
+		pic->SetARGB((int)(l_fAlpha * 255), 255, 255, 255);
+	}
+	else
+	{
+		// 真ん中は何もしない
+		pic->SetARGB((int)(255), 255, 255, 255);
+	}
+
+
+
+}
+
+void AnimAction::AlphaMove::Action(tdn2DObj * pic, int delay)
+{
+	AnimAction::Base::Action(pic, delay);
+
+	// 初期化
+	m_iNowFrame = 0;
+}
+
+
+/**********************/
+// 引き伸ばし
+/**********************/
+void AnimAction::Stretch::Update(tdn2DObj * pic)
+{
+	// アクションフラグがたっていないと返す
+	if (ActionCheckUpdate() == false)return;
+
+	// エンドフレームまで来たら終わる
+	if (++m_nowFrame >= m_endFrame)
+	{
+		m_bEndFlag = true; // 終りフラグON
+		return; // 終り
+	}
+
+	const float rate((float)m_nowFrame / m_endFrame);
+	m_CurrentScale.x = Math::Blend(rate, m_StartScale.x, 1);
+	m_CurrentScale.y = Math::Blend(rate, m_StartScale.y, 1);
+}
+
+void AnimAction::Stretch::Action(tdn2DObj * pic, int delay)
+{
+	AnimAction::Base::Action(pic, delay);
+	//m_bActionFlag = true; // 実行フラグOn
+
+	// 初期化
+	m_nowFrame = 0;
+	m_CurrentScale = m_StartScale;
+}
+
+// 2D
+void AnimAction::Stretch::Render(tdn2DObj* pic, int x, int y, u32 dwFlags)
+{
+	int X(m_width / 2 + x), Y(m_height / 2 + y);
+	X -= (int)(m_width / 2 * m_CurrentScale.x);
+	Y -= (int)(m_height / 2 * m_CurrentScale.y);
+	pic->Render(X, Y, (int)(m_width * m_CurrentScale.x), (int)(m_height * m_CurrentScale.y), 0, 0, m_width, m_height, dwFlags);
+}
+
+void AnimAction::Stretch::Render(tdn2DObj* pic, int x, int y, tdnShader * shader, char * name)
+{
+	int X(m_width / 2 + x), Y(m_height / 2 + y);
+	X -= (int)(m_width / 2 * m_CurrentScale.x);
+	Y -= (int)(m_height / 2 * m_CurrentScale.y);
+	pic->Render(X, Y, (int)(m_width * m_CurrentScale.x), (int)(m_height * m_CurrentScale.y), 0, 0, m_width, m_height, shader, name);
+}
+
+void AnimAction::Stretch::Render(tdn2DObj* pic, int x, int y, int w, int h, int tx, int ty, int tw, int th, u32 dwFlags)
+{
+	int X(m_width / 2 + x), Y(m_height / 2 + y);
+	X -= (int)(m_width / 2 * m_CurrentScale.x);
+	Y -= (int)(m_height / 2 * m_CurrentScale.y);
+	pic->Render(X, Y, (int)(m_width * m_CurrentScale.x), (int)(m_height * m_CurrentScale.y), tx, ty, tw, th, dwFlags);
+}
+
+void AnimAction::Stretch::Render(tdn2DObj* pic, int x, int y, int w, int h, int tx, int ty, int tw, int th, tdnShader * shader, char * name)
+{
+	int X(m_width / 2 + x), Y(m_height / 2 + y);
+	X -= (int)(m_width / 2 * m_CurrentScale.x);
+	Y -= (int)(m_height / 2 * m_CurrentScale.y);
+	pic->Render(X, Y, (int)(m_width * m_CurrentScale.x), (int)(m_height * m_CurrentScale.y), tx, ty, tw, th, shader, name);
 }
 
 
@@ -723,4 +859,10 @@ void tdn2DAnim::OrderNone()
 {
 	if (m_pAction != nullptr) delete m_pAction;
 	m_pAction = new AnimAction::None();
+}
+
+void tdn2DAnim::OrderAlphaMove(int endFlame, int arrivalFrame, int vanishFrame)
+{
+	if (m_pAction != nullptr) delete m_pAction;
+	m_pAction = new AnimAction::AlphaMove(endFlame, arrivalFrame, vanishFrame);
 }

@@ -1,10 +1,5 @@
 #include "EntityManager.h"
 
-
-
-
-
-
 EntityManager* EntityManager::Instance()
 {
 	static EntityManager instance;
@@ -24,8 +19,6 @@ BaseGameEntity* EntityManager::GetEntityFromID(ENTITY_ID id)const
 	return ent->second;
 }
 
-
-
 // —v‘f“o˜^
 bool EntityManager::Register(BaseGameEntity* NewEntity)
 {
@@ -43,7 +36,7 @@ bool EntityManager::Register(BaseGameEntity* NewEntity)
 
 	// —v‘f‚ğ’Ç‰Á‚·‚é
 	m_EntityMap.insert(std::make_pair(NewEntity->GetID(), NewEntity));
-	MyDebugString("ID”Ô†@%d ‚ª“o˜^‚³‚ê‚Ü‚µ‚½\n", id);
+	//MyDebugString("ID”Ô†@%d ‚ª“o˜^‚³‚ê‚Ü‚µ‚½\n", id);
 
 	return true;
 }
@@ -64,7 +57,7 @@ bool EntityManager::Erace(BaseGameEntity* pEntity)
 
 	// —v‘f‚ğÁ‚·
 	m_EntityMap.erase(m_EntityMap.find(pEntity->GetID()));
-	MyDebugString("ID”Ô†@%d ‚ªíœ‚³‚ê‚Ü‚µ‚½\n", id);
+	//MyDebugString("ID”Ô†@%d ‚ªíœ‚³‚ê‚Ü‚µ‚½\n", id);
 
 	return true;
 }

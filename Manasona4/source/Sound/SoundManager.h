@@ -86,6 +86,10 @@ private:
 
 	tdnSoundBGM *play_manager;	// iexSound
 
+	// ストリーミング用
+	tdnStreamSound *m_pStreamSound;
+	bool m_bPlayStream;
+
 	void Play_in(int data_num, bool loop);
 	void Play_in(int data_num, const Vector3 &pos, const Vector3 &front, const Vector3 &move, bool loop);
 
@@ -131,6 +135,21 @@ public:
 	void SetVolume(LPSTR _ID, float volume){ play_manager->SetVolume(ID[_ID], volume); }
 	void SetListener(const Vector2 &pos, const Vector2 &move);											// リスナー情報
 	tdnStreamSound *PlayStream(LPSTR filename){ return play_manager->PlayStream(filename); }
+	tdnStreamSound *PlayStream(LPSTR filename, BYTE mode, int param){ return play_manager->PlayStream(filename, mode, param); }
+	void PlayStreamIn(LPSTR filename)
+	{
+		if (m_bPlayStream) m_pStreamSound->Stop();
+		m_pStreamSound = play_manager->PlayStream(filename);
+		m_bPlayStream = true;
+	}
+	void StopStreamIn()
+	{
+		if (m_bPlayStream)
+		{
+			m_pStreamSound->Stop();
+			m_bPlayStream = false;
+		}
+	}
 };
 
 
@@ -160,12 +179,16 @@ public:
 
 	std::vector<MyMusic*> *GetList(){ return &m_list; }	// リスト取得
 	void Play();// オレ曲からランダムで再生
-	void Stop(){ if (m_bPlay) m_pStreamSound->Stop(); }// オレ曲停止
+	void PlayHeaveHo();	// ヒーホードライブ音楽再生
 private:
 
 	std::vector<MyMusic*> m_list;	// オレ曲を格納するリスト
 	tdnStreamSound *m_pStreamSound;	// オレ曲再生するストリームサウンド
-	bool m_bPlay;	// 再生フラグ(2重再生防止用)
+	tdnStreamSound *m_pHeaveHoStream;;	// ひーほー再生用
+
+	bool m_bPlay;	// 2重再生防止用
+	bool m_bHeaveHoPlay;	// ヒーホー再生してたらふらgu
+
 };
 
 //===============================================

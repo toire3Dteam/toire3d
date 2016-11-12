@@ -12,6 +12,11 @@ namespace sys = std::tr2::sys;
 // 静的メンバ変数の宣言
 char tdnFile::strFile[256] = "";		// ダイアログとかでのパス
 
+
+// ※※※なんかエラー出る人はこれをコメントアウトする
+#define TDNFILE_VC_2013
+// ※※※※※※※※※※※※※※※※※※※※※※
+
 //*****************************************************
 //		ファイル関係で便利になりそうなのをまとめるクラス
 //*****************************************************
@@ -44,7 +49,11 @@ void tdnFile::EnumDirectory(char *path, DirectoryInfo *out, bool bExt)
 		if (sys::is_regular_file(it->path()))
 		{
 			// ファイル名の配列に格納
+#ifdef TDNFILE_VC_2013
 			out->FileNames.push_back((bExt) ? it->path().filename() : it->path().stem());	// 三項演算子で拡張子付きかそうでないかで分けている
+#else
+			out->FileNames.push_back((bExt) ? it->path().filename().string() : it->path().stem().string());	// 三項演算子で拡張子付きかそうでないかで分けている
+#endif
 		}
 
 		// フォルダーだったら
@@ -61,7 +70,11 @@ std::string tdnFile::GetFileExtention(char *path)
 	sys::path p(path);
 
 	// 拡張子を返す
+#ifdef TDNFILE_VC_2013
 	return p.extension();
+#else
+	return p.extension().string();
+#endif
 }
 
 std::string tdnFile::GetFileName(char *path, bool bExt)
@@ -69,7 +82,11 @@ std::string tdnFile::GetFileName(char *path, bool bExt)
 	sys::path p(path);
 
 	// trueなら拡張子付き、falseなら拡張子なしのファイル名を返す
+#ifdef TDNFILE_VC_2013
 	return (bExt) ? p.filename() : p.stem();
+#else
+	return (bExt) ? p.filename().string() : p.stem().string();
+#endif
 }
 
 std::string tdnFile::OpenFileDialog(char *filter)

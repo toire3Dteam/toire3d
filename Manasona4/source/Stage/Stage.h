@@ -1,10 +1,9 @@
 #pragma once
 
+#include "Data/SelectData.h"
+
 // 前方宣言ｎ
 class Camera;
-
-// ステージのタイプ
-enum class STAGE_ID{ SENJO, SYUTEN,A, HEAVE_HO, MAX };
 
 class BasePlayer;
 
@@ -26,9 +25,9 @@ namespace Stage
 
 		//virtual void Render_ShadowBuf() = 0;
 
-		static void CreateStage(Base**p, STAGE_ID id, Camera *pCamera);
+		static void CreateStage(Base**p, STAGE id, Camera *pCamera);
 
-		virtual STAGE_ID GetStageID() = 0;	// ステージのID取得
+		virtual STAGE GetStageID() = 0;	// ステージのID取得
 
 		void Collision(BasePlayer *player, Vector3 *move);
 		void Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2);
@@ -41,13 +40,16 @@ namespace Stage
 			m_pBack = (BackFileName) ? new iexMesh(BackFileName) : nullptr;
 		}
 
+		iexMesh *GetObj(){ return m_pObj; }
+
+		float GetBottom(){ return m_fBottom; }
+		float GetWidth(){ return m_fWidth; }
+
 	protected:
 		iexMesh *m_pObj;	// メッシュの実体
 		iexMesh *m_pBack;	// スカイドームとか、背景で使う
-		//std::vector<iexMesh*> gimmick_meshes;
-		//std::vector<GimmickBase*> gimmicks;
-
-		float m_DeadLineY; // 超えると死ぬ
+		float m_fWidth;		// ステージの幅
+		float m_fBottom;	// Y座標
 	};
 
 
@@ -62,7 +64,7 @@ namespace Stage
 		//void Render() override;
 		//void Render_ShadowBuf() override;
 
-		STAGE_ID GetStageID(){ return STAGE_ID::SENJO; }
+		STAGE GetStageID(){ return STAGE::SENJO; }
 	private:
 	};
 
@@ -77,7 +79,7 @@ namespace Stage
 		void Render() override;
 		//void Render_ShadowBuf() override;
 
-		STAGE_ID GetStageID(){ return STAGE_ID::SYUTEN; }
+		STAGE GetStageID(){ return STAGE::SYUTEN; }
 	private:
 	};
 
@@ -92,7 +94,7 @@ namespace Stage
 		//void Render() override;
 		//void Render_ShadowBuf() override;
 
-		STAGE_ID GetStageID(){ return STAGE_ID::SYUTEN; }
+		STAGE GetStageID(){ return STAGE::SYUTEN; }
 	private:
 	};
 

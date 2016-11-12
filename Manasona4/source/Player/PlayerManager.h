@@ -1,5 +1,7 @@
 #pragma once
 #include "BasePlayer.h"
+#include "Data/SelectData.h"
+#include "BaseEntity\Message\Message.h"
 
 // 前方宣言
 namespace Stand
@@ -19,16 +21,18 @@ public:
 	}
 
 	~PlayerManager();
-	void Initialize(int NumPlayer, Stage::Base *pStage);
+	void Initialize(int NumPlayer, Stage::Base *pStage, SideData aSideDatas[(int)SIDE::ARRAY_MAX]);
 	void Release(){ SAFE_DELETE(pInstance); }
 	void Update(bool bControl);
 	void Render();
 	void Render(tdnShader* shader, char* name);
+	void RenderShadow();
 	void RenderDeferred();
 	void RenderUI();
 
 	int GetNumPlayer() { return m_NumPlayer; }
 	BasePlayer *GetPlayer(int no) { return m_pPlayers[no]; }
+	BasePlayer *GetPlayerByDeviceID(int DeviceID){ FOR(m_NumPlayer) { if (m_pPlayers[i]->GetDeviceID() == DeviceID) return m_pPlayers[i]; }return nullptr; }	// デバイスIDから探す
 
 	void CalcTeamPoint();
 	
@@ -41,7 +45,6 @@ public:
 	// 引数のチームのやつを探し出す
 	BasePlayer* GetPlayer_TeamInSearch(SIDE side)
 	{	
-	
 		FOR(m_NumPlayer)
 		{
 			if (m_pPlayers[i]->GetSide() == side)
@@ -52,6 +55,22 @@ public:
 
 		MyAssert(0, "PLAYERMGR：見つからなかった！");
 		return m_pPlayers[0];
+	}
+
+	//
+	void SetIntroState(){ FOR(m_NumPlayer) m_pPlayers[i]->GetFSM()->ChangeState(BasePlayerState::Intro::GetInstance()); }
+
+	void GetInput(){}
+
+	// ラウンドを跨いだ時にリセットする用
+	void Reset(){ FOR(m_NumPlayer) m_pPlayers[i]->Reset(); }
+
+	// プレイヤーたちが勝っているいる数の合計(★実質のラウンド数)
+	int GetRoundNumber()
+	{
+		int sum(0);
+		FOR(m_NumPlayer)sum += m_pPlayers[i]->GetWinNum();
+		return sum;
 	}
 
 private:
@@ -66,11 +85,17 @@ private:
 	int m_PointAteam;
 	int m_PointBteam;
 
+	// ヒーホードライブ中の演出
+	bool m_bHeaveHoDriveOverFlow;
+
 	// 覚醒暗転
 	float m_OverDriveDim;
 
+	// プレイヤーが持っている敵への向きフラグを設定
+	void UpdatePlayerTargetDir(BasePlayer *my, BasePlayer *you);
+
 	// ★プレイヤーとプレイヤーの攻撃の判定
-	void CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_ATTACK_INFO **OutAttackInfo, HIT_DAMAGE_INFO **OutDamageInfo);
+	void CollisionPlayerAttack(BasePlayer *my, BasePlayer *you,  HIT_DAMAGE_INFO **OutDamageInfo);
 
 	// ★スタンドの攻撃に対するプレイヤーの判定
 	bool CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou);
@@ -78,7 +103,7 @@ private:
 	// ★投げの攻撃に対するプレイヤーの判定
 	bool CollisionThrowAttack(BasePlayer *my, BasePlayer *you);
 
-	void SendHitMessage(BasePlayer *pAttackPlayer, BasePlayer *pDamagePlayer, HIT_ATTACK_INFO *pHitAttackInfo, HIT_DAMAGE_INFO *pHitDamageInfo);
+	void SendHitMessage(BasePlayer *pAttackPlayer, BasePlayer *pDamagePlayer, HIT_DAMAGE_INFO *pHitDamageInfo);
 
 	// BaseGameEntiryサブクラスはメッセージを使って通信する
 	bool  HandleMessage(const Message& msg);

@@ -3,8 +3,15 @@
 #include	"../Scene/sceneMain.h"
 #include	"../Scene/sceneRenderingTest.h"
 #include	"../Scene/sceneResult.h"
+#include	"../Scene/sceneTitle.h"
+#include	"../Scene/SceneMenu.h"
+#include	"../Scene/SceneCollect.h"
 #include	"System.h"
 #include	"../Sound/SoundManager.h"
+#include	"../Data/PlayerData.h"
+#include	"../Effect/Particle.h"
+#include    "../MenuUI/TutorialManager.h"
+
 //*****************************/
 //		WinMain
 //*****************************/
@@ -34,15 +41,22 @@ BOOL InitApp(HINSTANCE hInstance, int nCmdShow)									// ƒQ[ƒ€‹N“®Žž‚ÌÅ‰‚Ì
 	tdnInput::Initialize();
 	SoundManager::Initialize();
 	tdnMovieManager::Initialize();
+	ParticleManager::Initialize("DATA/Effect/particle.png", 2048);	// ƒp[ƒeƒBƒNƒ‹‰Šú‰»(š‚È‚º‚±‚±‚É‘‚­‚©‚Æ‚¢‚¤‚ÆAƒV[ƒ€ƒŒƒXƒV[ƒ“‚É‚ÄA‰Šú‰»¨‰Šú‰»¨‰ð•ú‚É‚È‚Á‚Ä‚µ‚Ü‚¤‚½‚ß)
 
 	//IEX‚ÌƒVƒXƒeƒ€ŠÖ”‚ðˆêŽž“IÌ—pA˜b‚µ‡‚¢‚ÅSystem.h‚ð–•Á‚·‚é‚©Œˆ‚ß‚é
 	SYSTEM_Initialize();
 
 	//MainFrameEx = new Framework();			 // ƒƒCƒ“ƒtƒŒ[ƒ€ƒ[ƒN¶¬
-	MainFrameEx->ChangeScene(new sceneMain, true); // ‰ŠúƒV[ƒ“
+	//MainFrameEx->ChangeScene(new sceneMain, true); // ‰ŠúƒV[ƒ“
 	//MainFrameEx->ChangeScene(new sceneRenderingTest); // •`‰æƒeƒXƒgƒV[ƒ“
 	//MainFrameEx->ChangeScene(new sceneResult); // ƒŠƒUƒ‹ƒgƒV[ƒ“
 	//MainFrameEx->ChangeScene(new sceneEffectTool); // 
+	//MainFrameEx->ChangeScene(new sceneTitle);
+	MainFrameEx->ChangeScene(new sceneMenu);
+	//MainFrameEx->ChangeScene(new sceneCollect);
+	
+	// ƒf[ƒ^
+	PlayerDataMgr->Initialize();
 
 	return TRUE;
 }
@@ -54,7 +68,10 @@ BOOL EndApp()																	// ‚±‚Ì’†‚ÅƒVƒXƒeƒ€‚àŠÜ‚ß‚½‘S‚Ä‚ÌŒãˆ—‚ð‚·‚é‚Ì‚Åƒ
 {
 	//delete MainFrame;			// [’ˆÓ]System‚ªRelease‚³‚ê‚é‘O‚ÉÁ‚·Ž–
 	MainFrameEx->Release();
+	ParticleManager::Release();
 	SYSTEM_Release();
+	TutorialMgr->Rerease();
+	tdnFont::Release();
 	tdnSystem::Release();
 	tdnText::CleanUpModule();
 	tdnInput::Release();

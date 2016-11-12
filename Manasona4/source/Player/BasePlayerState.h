@@ -9,6 +9,28 @@ class BasePlayer;
 */
 
 
+bool JumpCancel(BasePlayer * pPerson);
+bool RunCancel(BasePlayer * pPerson);
+bool SquatCancel(BasePlayer * pPerson);
+bool SquatAttackCancel(BasePlayer * pPerson);
+bool StandCancel(BasePlayer * pPerson);
+bool AttackCancel(BasePlayer *pPerson);
+bool FinishAttackCancel(BasePlayer *pPerson);
+bool SkillCancel(BasePlayer *pPerson);
+bool OverDriveCancel(BasePlayer *pPerson);
+bool EscapeCancel(BasePlayer *pPerson);
+bool ThrowCancel(BasePlayer * pPerson);
+bool HeaveHoCancel(BasePlayer * pPerson);
+bool HeaveHoOverFlowCancel(BasePlayer * pPerson);
+bool DashCancel(BasePlayer * pPerson);
+bool AerialDashCancel(BasePlayer *pPerson);
+bool AerialAttackCancel(BasePlayer *pPerson);
+bool DokkoiAttackCancel(BasePlayer *pPerson);
+bool isInputGuardCommand(BasePlayer *pPerson);
+void GuardUpdate(BasePlayer *pPerson);
+bool isPossibleGuardState(BasePlayer *pPerson);
+
+
 namespace BasePlayerState
 {
 	/*******************************************************/
@@ -19,7 +41,7 @@ namespace BasePlayerState
 	public:
 
 		//this is a シングルトン
-		static Global* GetInstance();
+		static Global* GetInstance(){ static Global instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -54,7 +76,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static Wait* GetInstance();
+		static Wait* GetInstance(){ static Wait instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -88,7 +110,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static Walk* GetInstance();
+		static Walk* GetInstance(){ static Walk instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -115,6 +137,40 @@ namespace BasePlayerState
 	};
 
 	/*******************************************************/
+	//					後ろ歩き
+	/*******************************************************/
+	class BackWalk :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static BackWalk* GetInstance(){ static BackWalk instance; return &instance; }
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		BackWalk() {};
+		~BackWalk() {};
+
+		BackWalk(const BackWalk&) {}
+		BackWalk& operator=(const BackWalk&) {}
+	};
+
+	/*******************************************************/
 	//					走り移動
 	/*******************************************************/
 	class Run :public State<BasePlayer>
@@ -122,7 +178,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static Run* GetInstance();
+		static Run* GetInstance(){ static Run instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -149,14 +205,14 @@ namespace BasePlayerState
 	};
 
 	/*******************************************************/
-	//					フロントブレーキ
+	//					バクステ
 	/*******************************************************/
-	class FrontBrake :public State<BasePlayer>
+	class BackStep :public State<BasePlayer>
 	{
 	public:
 
 		// this is a シングルトン
-		static FrontBrake* GetInstance();
+		static BackStep* GetInstance(){ static BackStep instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -175,46 +231,81 @@ namespace BasePlayerState
 
 
 	private:
-		FrontBrake() {};
-		~FrontBrake() {};
+		BackStep() {};
+		~BackStep() {};
 
-		FrontBrake(const FrontBrake&) {}
-		FrontBrake& operator=(const FrontBrake&) {}
+		BackStep(const BackStep&) {}
+		BackStep& operator=(const BackStep&) {}
 	};
+
+
+	/*******************************************************/
+	//					ブレーキ
+	/*******************************************************/
+	//class FrontBrake :public State<BasePlayer>
+	//{
+	//public:
+
+	//	// this is a シングルトン
+	//	static FrontBrake* GetInstance();
+
+	//	// 入る
+	//	virtual void Enter(BasePlayer* pPerson);
+
+	//	// 実行します
+	//	virtual void Execute(BasePlayer* pPerson);
+
+	//	// 帰る
+	//	virtual void Exit(BasePlayer* pPerson);
+
+	//	// 描画
+	//	virtual void Render(BasePlayer* pPerson);
+
+	//	// エージェントからのメッセージを受信した場合、これが実行される
+	//	virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	//private:
+	//	FrontBrake() {};
+	//	~FrontBrake() {};
+
+	//	FrontBrake(const FrontBrake&) {}
+	//	FrontBrake& operator=(const FrontBrake&) {}
+	//};
 
 	/*******************************************************/
 	//					Uターンブレーキ
 	/*******************************************************/
-	class TurnOverBrake :public State<BasePlayer>
-	{
-	public:
+	//class TurnOverBrake :public State<BasePlayer>
+	//{
+	//public:
 
-		// this is a シングルトン
-		static TurnOverBrake* GetInstance();
+	//	// this is a シングルトン
+	//	static TurnOverBrake* GetInstance();
 
-		// 入る
-		virtual void Enter(BasePlayer* pPerson);
+	//	// 入る
+	//	virtual void Enter(BasePlayer* pPerson);
 
-		// 実行します
-		virtual void Execute(BasePlayer* pPerson);
+	//	// 実行します
+	//	virtual void Execute(BasePlayer* pPerson);
 
-		// 帰る
-		virtual void Exit(BasePlayer* pPerson);
+	//	// 帰る
+	//	virtual void Exit(BasePlayer* pPerson);
 
-		// 描画
-		virtual void Render(BasePlayer* pPerson);
+	//	// 描画
+	//	virtual void Render(BasePlayer* pPerson);
 
-		// エージェントからのメッセージを受信した場合、これが実行される
-		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+	//	// エージェントからのメッセージを受信した場合、これが実行される
+	//	virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
 
 
-	private:
-		TurnOverBrake() {};
-		~TurnOverBrake() {};
+	//private:
+	//	TurnOverBrake() {};
+	//	~TurnOverBrake() {};
 
-		TurnOverBrake(const TurnOverBrake&) {}
-		TurnOverBrake& operator=(const TurnOverBrake&) {}
-	};
+	//	TurnOverBrake(const TurnOverBrake&) {}
+	//	TurnOverBrake& operator=(const TurnOverBrake&) {}
+	//};
 
 	/*******************************************************/
 	//					ジャンプ
@@ -224,7 +315,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static Jump* GetInstance();
+		static Jump* GetInstance(){ static Jump instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -259,7 +350,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static AerialJump* GetInstance();
+		static AerialJump* GetInstance(){ static AerialJump instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -294,7 +385,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static Fall* GetInstance();
+		static Fall* GetInstance(){ static Fall instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -330,7 +421,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static Land* GetInstance();
+		static Land* GetInstance(){ static Land instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -366,7 +457,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static RushAttack* GetInstance();
+		static RushAttack* GetInstance(){ static RushAttack instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -401,7 +492,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static KnockBack* GetInstance();
+		static KnockBack* GetInstance(){ static KnockBack instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -436,7 +527,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static AerialKnockBack* GetInstance();
+		static AerialKnockBack* GetInstance(){ static AerialKnockBack instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -472,7 +563,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static KnockDown* GetInstance();
+		static KnockDown* GetInstance(){ static KnockDown instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -500,6 +591,41 @@ namespace BasePlayerState
 	};
 
 	/*******************************************************/
+	//					死に状態ステート
+	/*******************************************************/
+	class Die :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static Die* GetInstance(){ static Die instance; return &instance; }
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+
+		Die() {};
+		~Die() {};
+
+		Die(const Die&) {}
+		Die& operator=(const Die&) {}
+	};
+
+	/*******************************************************/
 	//					空中リカバリーステート
 	/*******************************************************/
 	class LandRecovery :public State<BasePlayer>
@@ -507,7 +633,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static LandRecovery* GetInstance();
+		static LandRecovery* GetInstance(){ static LandRecovery instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -542,7 +668,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static AerialRecovery* GetInstance();
+		static AerialRecovery* GetInstance(){ static AerialRecovery instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -570,14 +696,14 @@ namespace BasePlayerState
 	};
 
 	/*******************************************************/
-	//					待機
+	//					しゃがみ
 	/*******************************************************/
 	class Squat :public State<BasePlayer>
 	{
 	public:
 
 		// this is a シングルトン
-		static Squat* GetInstance();
+		static Squat* GetInstance(){ static Squat instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -604,14 +730,14 @@ namespace BasePlayerState
 	};
 
 	/*******************************************************/
-	//					待機攻撃
+	//					対空攻撃
 	/*******************************************************/
 	class SquatAttack :public State<BasePlayer>
 	{
 	public:
 
 		// this is a シングルトン
-		static SquatAttack* GetInstance();
+		static SquatAttack* GetInstance(){ static SquatAttack instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -638,6 +764,75 @@ namespace BasePlayerState
 	};
 
 	/*******************************************************/
+	//					下段攻撃
+	/*******************************************************/
+	class DownAttack :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static DownAttack* GetInstance() { static DownAttack instance; return &instance; }
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		DownAttack() {};
+		~DownAttack() {};
+
+		DownAttack(const DownAttack&) {}
+		DownAttack& operator=(const DownAttack&) {}
+	};
+
+
+	/*******************************************************/
+	//					中段攻撃
+	/*******************************************************/
+	class DokkoiAttack :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static DokkoiAttack* GetInstance() { static DokkoiAttack instance; return &instance; }
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		DokkoiAttack() {};
+		~DokkoiAttack() {};
+
+		DokkoiAttack(const DownAttack&) {}
+		DokkoiAttack& operator=(const DownAttack&) {}
+	};
+
+	/*******************************************************/
 	//					空中攻撃 
 	/*******************************************************/
 	class AerialAttack :public State<BasePlayer>
@@ -645,7 +840,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static AerialAttack* GetInstance();
+		static AerialAttack* GetInstance(){ static AerialAttack instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -674,36 +869,36 @@ namespace BasePlayerState
 	/*******************************************************/
 	//					空中下攻撃 
 	/*******************************************************/
-	class AerialDropAttack :public State<BasePlayer>
-	{
-	public:
+	//class AerialDropAttack :public State<BasePlayer>
+	//{
+	//public:
 
-		// this is a シングルトン
-		static AerialDropAttack* GetInstance();
+	//	// this is a シングルトン
+	//	static AerialDropAttack* GetInstance();
 
-		// 入る
-		virtual void Enter(BasePlayer* pPerson);
+	//	// 入る
+	//	virtual void Enter(BasePlayer* pPerson);
 
-		// 実行します
-		virtual void Execute(BasePlayer* pPerson);
+	//	// 実行します
+	//	virtual void Execute(BasePlayer* pPerson);
 
-		// 帰る
-		virtual void Exit(BasePlayer* pPerson);
+	//	// 帰る
+	//	virtual void Exit(BasePlayer* pPerson);
 
-		// 描画
-		virtual void Render(BasePlayer* pPerson);
+	//	// 描画
+	//	virtual void Render(BasePlayer* pPerson);
 
-		// エージェントからのメッセージを受信した場合、これが実行される
-		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+	//	// エージェントからのメッセージを受信した場合、これが実行される
+	//	virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
 
 
-	private:
-		AerialDropAttack() {};
-		~AerialDropAttack() {};
+	//private:
+	//	AerialDropAttack() {};
+	//	~AerialDropAttack() {};
 
-		AerialDropAttack(const AerialDropAttack&) {}
-		AerialDropAttack& operator=(const AerialDropAttack&) {}
-	};
+	//	AerialDropAttack(const AerialDropAttack&) {}
+	//	AerialDropAttack& operator=(const AerialDropAttack&) {}
+	//};
 
 	/*******************************************************/
 	//					回避
@@ -713,7 +908,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static Escape* GetInstance();
+		static Escape* GetInstance(){ static Escape instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -748,7 +943,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static StandAction* GetInstance();
+		static StandAction* GetInstance(){ static StandAction instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -782,7 +977,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static FinishAttack* GetInstance();
+		static FinishAttack* GetInstance(){ static FinishAttack instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -816,7 +1011,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static Skill* GetInstance();
+		static Skill* GetInstance(){ static Skill instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -850,7 +1045,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static OverDrive_OneMore* GetInstance();
+		static OverDrive_OneMore* GetInstance(){ static OverDrive_OneMore instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -884,7 +1079,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static OverDrive_Burst* GetInstance();
+		static OverDrive_Burst* GetInstance(){ static OverDrive_Burst instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -917,7 +1112,7 @@ namespace BasePlayerState
 	{
 	public:
 		// this is a シングルトン
-		static Guard* GetInstance();
+		static Guard* GetInstance(){ static Guard instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -951,7 +1146,7 @@ namespace BasePlayerState
 	{
 	public:
 		// this is a シングルトン
-		static Throw* GetInstance();
+		static Throw* GetInstance(){ static Throw instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -978,14 +1173,14 @@ namespace BasePlayerState
 	};
 
 	/*******************************************************/
-	//				投げ失敗モーション
+	//				投げ成功モーション
 	/*******************************************************/
-	class ThrowMiss :public State<BasePlayer>
+	class ThrowSuccess :public State<BasePlayer>
 	{
 	public:
 
 		// this is a シングルトン
-		static ThrowMiss* GetInstance();
+		static ThrowSuccess* GetInstance(){ static ThrowSuccess instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -1004,11 +1199,11 @@ namespace BasePlayerState
 
 
 	private:
-		ThrowMiss() {};
-		~ThrowMiss() {};
+		ThrowSuccess() {};
+		~ThrowSuccess() {};
 
-		ThrowMiss(const ThrowMiss&) {}
-		ThrowMiss& operator=(const ThrowMiss&) {}
+		ThrowSuccess(const ThrowSuccess&) {}
+		ThrowSuccess& operator=(const ThrowSuccess&) {}
 	};
 
 	/*******************************************************/
@@ -1019,7 +1214,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static ThrowBind* GetInstance();
+		static ThrowBind* GetInstance(){ static ThrowBind instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -1053,7 +1248,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static SuccessThrowRelease* GetInstance();
+		static SuccessThrowRelease* GetInstance(){ static SuccessThrowRelease instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -1087,7 +1282,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static HeavehoDrive* GetInstance();
+		static HeavehoDrive* GetInstance(){ static HeavehoDrive instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -1121,7 +1316,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static HeavehoDriveOverFlow* GetInstance();
+		static HeavehoDriveOverFlow* GetInstance(){ static HeavehoDriveOverFlow instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -1156,7 +1351,7 @@ namespace BasePlayerState
 	public:
 
 		// this is a シングルトン
-		static HeavehoDriveOverFlow_Success* GetInstance();
+		static HeavehoDriveOverFlow_Success* GetInstance(){ static HeavehoDriveOverFlow_Success instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -1181,4 +1376,174 @@ namespace BasePlayerState
 		HeavehoDriveOverFlow_Success(const HeavehoDriveOverFlow_Success&) {}
 		HeavehoDriveOverFlow_Success& operator=(const HeavehoDriveOverFlow_Success&) {}
 	};
+
+	/*******************************************************/
+	//				ラウンド取得(WIN)
+	/*******************************************************/
+	class Win :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static Win* GetInstance(){ static Win instance; return &instance; }
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		Win() {};
+		~Win() {};
+
+		Win(const Win&) {}
+		Win& operator=(const Win&) {}
+	};
+
+	/*******************************************************/
+	//				空中ダッシュ
+	/*******************************************************/
+	class AerialDash :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static AerialDash* GetInstance() { static AerialDash instance; return &instance; }
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		AerialDash() {};
+		~AerialDash() {};
+
+		AerialDash(const AerialDash&) {}
+		AerialDash& operator=(const AerialDash&) {}
+	};
+
+	/*******************************************************/
+	//				空中バックダッシュ
+	/*******************************************************/
+	class AerialBackDash :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static AerialBackDash* GetInstance() { static AerialBackDash instance; return &instance; }
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+	private:
+		AerialBackDash() {};
+		~AerialBackDash() {};
+
+		AerialBackDash(const AerialBackDash&) {}
+		AerialBackDash& operator=(const AerialBackDash&) {}
+	};
+
+	/*******************************************************/
+	//				イントロ演出用
+	/*******************************************************/
+	class Intro :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static Intro* GetInstance() { static Intro instance; return &instance; }
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+	private:
+		Intro() {};
+		~Intro() {};
+
+		Intro(const Intro&) {}
+		Intro& operator=(const Intro&) {}
+	};
+
+	/*******************************************************/
+	//				強攻撃 (三段目)
+	/*******************************************************/
+	//class StrongAttack :public State<BasePlayer>
+	//{
+	//public:
+	//
+	//	// this is a シングルトン
+	//	static StrongAttack* GetInstance() { static StrongAttack instance; return &instance; }
+	//
+	//	// 入る
+	//	virtual void Enter(BasePlayer* pPerson);
+	//
+	//	// 実行します
+	//	virtual void Execute(BasePlayer* pPerson);
+	//
+	//	// 帰る
+	//	virtual void Exit(BasePlayer* pPerson);
+	//
+	//	// 描画
+	//	virtual void Render(BasePlayer* pPerson);
+	//
+	//	// エージェントからのメッセージを受信した場合、これが実行される
+	//	virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+	//
+	//
+	//private:
+	//	StrongAttack() {};
+	//	~StrongAttack() {};
+	//
+	//	StrongAttack(const StrongAttack&) {}
+	//	StrongAttack& operator=(const StrongAttack&) {}
+	//};
+
 }
+

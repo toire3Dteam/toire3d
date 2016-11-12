@@ -29,8 +29,10 @@ public:
 	virtual void StopRoop();
 
 	AnimationUV* GetUV() { return m_pic; }
-
 	void SetPos(Vector3 pos){ m_pos = pos; }
+	void SetScaleAnimation(float startScale, float endScale) { m_pic->ScaleAnimation(startScale, endScale); }
+	void SetAngleAnimation(Vector3 startAngle, Vector3 endAngle) { m_pic->AngleAnimation(startAngle, endAngle); }
+
 protected:
 	AnimationUV* m_pic;
 	Vector3 m_pos;
@@ -75,7 +77,7 @@ class HitImpactEffect :public BaseUVEffect
 public:
 	HitImpactEffect()
 	{
-		m_pic = new AnimationUV("Data/UVeffect/hitImpact.imo", -0.01f, 0.0f, 8, false, 2, 4);
+		m_pic = new AnimationUV("Data/UVeffect/HitEffect/penetrateEffect.imo", 0.00f, 0.0f, 8, false, 2, 4);
 	};
 	~HitImpactEffect() {};
 
@@ -304,6 +306,413 @@ public:
 
 	void Update() { BaseUVEffect::Update(); };
 	void Render() { BaseUVEffect::Render(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/**************************/
+//	ヒットリングエフェクト　
+/**************************/
+class HitRingEffect :public BaseUVEffect
+{
+public:
+	HitRingEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/HitEffect/HitRing.imo", 0.00f, 0.0f, 16, false, 2, 10);
+	};
+	~HitRingEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/*****************************/
+//	アイル―ドリルエフェクト
+/*****************************/
+class AirouDrillEffect :public BaseUVEffect
+{
+public:
+	AirouDrillEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Airou/AirouDrill.IMO", 0.0f, 0.07f, 46, false, 1, 42);
+	};
+	~AirouDrillEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::Render(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/*****************************/
+//	[アイル―超必殺技用]メテオエフェクト
+/*****************************/
+class AirouBoostEffect :public BaseUVEffect
+{
+public:
+	AirouBoostEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Airou/AirouBoost.IMO", 0.08f, 0.0f, 46, false, 1, 40);
+	};
+	~AirouBoostEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+
+/*****************************/
+//	[アイル―超必殺技用]衝撃波エフェクト 
+/*****************************/
+class AirouImpactEffect :public BaseUVEffect
+{
+public:
+	AirouImpactEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Airou/AirouImpact.IMO", 0.0f, 0.0f, 12, false, 1, 8);
+	};
+	~AirouImpactEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+
+/*****************************/
+//	[超必殺技用]スピードライン青エフェクト 
+/*****************************/
+class SpeedLineBlueEffect :public BaseUVEffect
+{
+public:
+	SpeedLineBlueEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/OverFlow/SpeedLineBlue.IMO", 0.03f, 0.0f, 10, false, 1, 6);
+	};
+	~SpeedLineBlueEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/*****************************/
+//	[超必殺技用]スピードライン緑エフェクト 
+/*****************************/
+class SpeedLineGreenEffect :public BaseUVEffect
+{
+public:
+	SpeedLineGreenEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/OverFlow/SpeedLineGreen.IMO", 0.03f, 0.0f, 10, false, 1, 6);
+	};
+	~SpeedLineGreenEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/*****************************************/
+//	★ブレイクインパクト
+/*****************************************/
+class BreakImpactEffect :public BaseUVEffect
+{
+public:
+	BreakImpactEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Airou/AirouBreakImpact.IMO", 0.0f, 0.0f, 16, false, 3, 11);
+	};
+	~BreakImpactEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+
+};
+
+/*****************************************/
+//	★ファイアーリング
+/*****************************************/
+class FireRingEffect :public BaseUVEffect
+{
+public:
+	FireRingEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/HitEffect/FireRing.IMO", 0.0f, 0.0f, 18, false, 3, 12);
+	};
+	~FireRingEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+
+};
+
+/*****************************************/
+//	サークルウィンド
+/*****************************************/
+class SircleWindEffect :public BaseUVEffect
+{
+public:
+	SircleWindEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Airou/SircleWind.IMO", 0.0f, 0.0f, 28, false, 4, 24);
+	};
+	~SircleWindEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::Render(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+
+};
+
+/*****************/
+//	波紋ウェーブ
+/*****************/
+class GuardWaveEffect :public BaseUVEffect
+{
+public:
+	GuardWaveEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Guard/GuardWave.imo", 0.0f, 0.01f, 16, false, 1, 10);
+	};
+	~GuardWaveEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+
+/*****************/
+//	ガードグリッドエフェクト
+/*****************/
+class GuardGridEffect :public BaseUVEffect
+{
+public:
+	GuardGridEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Guard/GuardGrid.imo", 0.0f, 0.0f, 14, false, 2, 8);
+	};
+	~GuardGridEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/*****************/
+//	アイル―サークルグリッドエフェクト
+/*****************/
+class AirouCircleGridEffect :public BaseUVEffect
+{
+public:
+	AirouCircleGridEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Airou/AirouCircle.imo", 0.0f, 0.0f, 14, false, 2, 8);
+	};
+	~AirouCircleGridEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/*****************/
+//	ヒットリップエフェクト
+/*****************/
+class HitRipGridEffect :public BaseUVEffect
+{
+public:
+	HitRipGridEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/HitEffect/HitRip.IMO", 0.0f, 0.0f, 14, false, 2, 8);
+	};
+	~HitRipGridEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/*****************/
+//	ヒットスラッシュエフェクト
+/*****************/
+class HitSlashGridEffect :public BaseUVEffect
+{
+public:
+	HitSlashGridEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/HitEffect/HitSlash.IMO", 0.0f, 0.0f, 14, false, 2, 8);
+	};
+	~HitSlashGridEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/*************************/
+//	アイル―登場エフェクト
+/*************************/
+class AirouEntryEffect :public BaseUVEffect
+{
+public:
+	AirouEntryEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Airou/darkZone.IMO", 0.0f, 0.0f, 150, false, 24, 140);
+	};
+	~AirouEntryEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::Render(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/*************************/
+//	アイル―登場サークルエフェクト
+/*************************/
+class AirouEntrySircleEffect :public BaseUVEffect
+{
+public:
+	AirouEntrySircleEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Airou/wave.IMO", 0.0f, 0.01f, 18, true, 1, 12);
+	};
+	~AirouEntrySircleEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::Render(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/*************************/
+//	オーバードライブエフェクト
+/*************************/
+class OverDriveRingEffect:public BaseUVEffect
+{
+public:
+	OverDriveRingEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/OverDrive/OverDriveRing.IMO", 0.0f, 0.0f, 18, false, 2, 12);
+	};
+	~OverDriveRingEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+
+/**************************/
+//	ジャンプ波紋ウェーブ
+/**************************/
+class JumpWaveEffect :public BaseUVEffect
+{
+public:
+	JumpWaveEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Jump/wave.imo", 0.0f, 0.015f, 16, false, 1, 10);
+	};
+	~JumpWaveEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/**************************/
+//	ジャンプスピード線
+/**************************/
+class JumpSpeedLineEffect :public BaseUVEffect
+{
+public:
+	JumpSpeedLineEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Jump/JumpSpeedLine.imo", 0.0f, 0.03f, 16, false, 1, 10);
+	};
+	~JumpSpeedLineEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/**************************/
+//	プレッシャー
+/**************************/
+class PressureEffect :public BaseUVEffect
+{
+public:
+	PressureEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Skill/Pressure.imo", 0.0f, 0.05f, 10, false, 1, 4);
+	};
+	~PressureEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+
+/*************************/
+//	オレンジバーストエフェクト
+/*************************/
+class OrangeBurstEffect :public BaseUVEffect
+{
+public:
+	OrangeBurstEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Skill/OrangeBurst.IMO", 0.0f, 0.0f, 12, false, 1, 8);
+	};
+	~OrangeBurstEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
 	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
 
 private:

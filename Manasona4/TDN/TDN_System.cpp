@@ -1,6 +1,9 @@
 #include	"TDNLIB.h"
 #include	"../source/resource.h"
 
+// デバイス関係のdefine的なのが定義されているヘッダー
+#include	"Dbt.h"
+
 /********************************************/
 //	tdnSystem
 /********************************************/
@@ -169,8 +172,19 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	{
 							//char filename[256] = {};
 							//DRAG_AND_DROP::Get_file_path(filename, 256, wParam);
-							break;
 	}
+		break;
+
+	case WM_DEVICECHANGE:	// デバイスが変わったイベント
+
+		// コントローラーさしても抜いてもこれが出たので、これでいいかな
+		if (wParam == DBT_DEVNODES_CHANGED)
+		{
+			tdnInput::Reset();
+		}
+
+		break;
+
 	}
 	return DefWindowProc(hWnd, message, wParam, lParam);// 自分で処理しないメッセージをWindowsの方で処理してもらう
 

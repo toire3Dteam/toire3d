@@ -19,7 +19,7 @@
 //	初期化
 //------------------------------------------------------
 Camera::Camera() :BaseGameEntity(ENTITY_ID::CAMERA_MGR),	// エンティティIDの登録
-m_angle(Vector3(0, 0, 0)), m_pos(Vector3(0, 20, -100)), m_ipos(m_pos), m_target(Vector3(0, 0, 0)), m_OrgPos(Vector3(0,0,0)),
+m_angle(Vector3(0, 0, 0)),
 m_NumPlayer(-1), m_pPlayerPosReferences(nullptr)
 {
 	//	ビュー設定
@@ -28,10 +28,13 @@ m_NumPlayer(-1), m_pPlayerPosReferences(nullptr)
 	m_projection.Near = .1f;
 	m_projection.Far = 2000.0f;
 
+	m_ViewData.pos = m_ipos = Vector3(0, 20, -100);
+	m_ViewData.target = m_itarget = Vector3(0, 0, 0);
+
 	m_MaxDist = 25.0f;
 	m_MinDist = 22.0f;
 
-	m_pEffectCamera = new EffectCamera(this);
+	m_pEffectCamera = new EffectCamera(&m_ViewData, "DATA/Camera/script.txt");
 
 	/* ステートマシン初期化 */
 	m_pStateMachine = new StateMachine<Camera>(this);
@@ -72,31 +75,31 @@ void Camera::SetStageCameraInfo(char *path)
 	ifs >> skip;
 	char cType[16];
 	ifs >> cType;
-	m_CameraData.bSumabura = (strcmp(cType, "SUMABURA") == 0);	// スマブラかどうか
+	m_GameCameraData.bSumabura = (strcmp(cType, "SUMABURA") == 0);	// スマブラかどうか
 
 	// XYの範囲
 	ifs >> skip;
-	ifs >> m_CameraData.FullRange.x;
-	ifs >> m_CameraData.FullRange.y;
+	ifs >> m_GameCameraData.FullRange.x;
+	ifs >> m_GameCameraData.FullRange.y;
 
 	// YZの何ちゃら
 	ifs >> skip;
-	ifs >> m_CameraData.FullZ;
+	ifs >> m_GameCameraData.FullZ;
 	ifs >> skip;
-	ifs >> m_CameraData.FullY;
+	ifs >> m_GameCameraData.FullY;
 
 	// XYの最大値
 	ifs >> skip;
-	ifs >> m_CameraData.MoveMax.x;
-	ifs >> m_CameraData.MoveMax.y;
+	ifs >> m_GameCameraData.MoveMax.x;
+	ifs >> m_GameCameraData.MoveMax.y;
 
 	// XYの最小値
 	ifs >> skip;
-	ifs >> m_CameraData.MoveMin.x;
-	ifs >> m_CameraData.MoveMin.y;
+	ifs >> m_GameCameraData.MoveMin.x;
+	ifs >> m_GameCameraData.MoveMin.y;
 
 	// スマブラカメラステージなら
-	if (m_CameraData.bSumabura)
+	if (m_GameCameraData.bSumabura)
 		m_pStateMachine->SetCurrentState(SumaburaCameraState::GetInstance());
 	else assert(0);
 }
@@ -137,7 +140,7 @@ void Camera::Activate()
 	tdnView::Activate();
 	tdnView::Clear();
 
-	//Text::Draw(32, 64, 0xffffff00, "CameraFar : %.1f", projection.Far);
+	//tdnText::Draw(32, 640, 0xffffff00, "CameraEventFrame : %d", m_pEffectCamera->GetEventTime());
 	//Text::Draw(32, 128, 0xffffff00, "CameraFov : %.2f", projection.fovY);
 
 	//if (KeyBoard(KB_NUMPAD4)) m_angle.z += .05f;
@@ -183,8 +186,8 @@ void GlobalCameraState::ShakeData::Start(float power, unsigned int frame)
 
 void GlobalCameraState::ShakeData::Update(Camera *camera)
 {
-	ShakedTarget = camera->m_target;
-	ShakedPos = camera->m_pos;
+	ShakedTarget = camera->m_ViewData.target;
+	ShakedPos = camera->m_ViewData.pos;
 
 	if (MaxFrame == 0) return;
 
@@ -223,7 +226,7 @@ void GlobalCameraState::Execute(Camera *pCamera)
 	m_ShakeData.Update(pCamera);
 
 	// 座標と注視点の設定	★グローバルステートでやる
-	tdnView::Set(pCamera->m_pos, m_ShakeData.ShakedTarget, pCamera->m_angle.z);
+	tdnView::Set(pCamera->m_ViewData.pos, m_ShakeData.ShakedTarget, pCamera->m_angle.z);
 }
 
 // 出口
@@ -289,8 +292,8 @@ void SumaburaCameraState::Execute(Camera *pCamera)
 		}
 	}
 
-	MAX_X = Math::Clamp(MAX_X, pCamera->m_CameraData.MoveMin.x, pCamera->m_CameraData.MoveMax.x);
-	MAX_Y = Math::Clamp(MAX_Y, pCamera->m_CameraData.MoveMin.y, pCamera->m_CameraData.MoveMax.y);
+	MAX_X = Math::Clamp(MAX_X, pCamera->m_GameCameraData.MoveMin.x, pCamera->m_GameCameraData.MoveMax.x);
+	MAX_Y = Math::Clamp(MAX_Y, pCamera->m_GameCameraData.MoveMin.y, pCamera->m_GameCameraData.MoveMax.y);
 
 	//　次に幅を求めるのと真ん中を求める
 	float senter_X, senter_Y;
@@ -303,8 +306,8 @@ void SumaburaCameraState::Execute(Camera *pCamera)
 
 	float percent_X = 0.0f, percent_Y = 0.0f;
 
-	percent_X = range_X / pCamera->m_CameraData.FullRange.x;
-	percent_Y = range_Y / pCamera->m_CameraData.FullRange.y;
+	percent_X = range_X / pCamera->m_GameCameraData.FullRange.x;
+	percent_Y = range_Y / pCamera->m_GameCameraData.FullRange.y;
 
 	//　パーセント取得
 	float percent = 0.0f;
@@ -312,13 +315,13 @@ void SumaburaCameraState::Execute(Camera *pCamera)
 	else percent = percent_Y;
 
 	//Z値
-	pCamera->m_ipos.z = (pCamera->m_CameraData.FullZ * percent) - 40;//パーセントによってカメラを近づけさす －40は補正
+	pCamera->m_ipos.z = (pCamera->m_GameCameraData.FullZ * percent) - 40;//パーセントによってカメラを近づけさす －40は補正
 
 	//　動けるX＆Y
-	float max_move_x = pCamera->m_CameraData.MoveMax.x * (1.0f - percent);
-	float max_move_y = pCamera->m_CameraData.MoveMax.y * (1.0f - percent);
-	float min_move_x = pCamera->m_CameraData.MoveMin.x * (1.0f - percent);
-	float min_move_y = pCamera->m_CameraData.MoveMin.y * (1.0f - percent);
+	float max_move_x = pCamera->m_GameCameraData.MoveMax.x * (1.0f - percent);
+	float max_move_y = pCamera->m_GameCameraData.MoveMax.y * (1.0f - percent);
+	float min_move_x = pCamera->m_GameCameraData.MoveMin.x * (1.0f - percent);
+	float min_move_y = pCamera->m_GameCameraData.MoveMin.y * (1.0f - percent);
 
 	//　まずは中心に
 	pCamera->m_ipos.x = senter_X;
@@ -354,12 +357,14 @@ void SumaburaCameraState::Execute(Camera *pCamera)
 	//itarget.y += 5;
 
 	//Y値 補正
-	pCamera->m_ipos.y += (pCamera->m_CameraData.FullY * percent) + 5;//パーセントによってカメラを近づけさす +αは補正
-	pCamera->m_itarget.y += (pCamera->m_CameraData.FullY * percent);
+	pCamera->m_ipos.y += (pCamera->m_GameCameraData.FullY * percent) + 1;//パーセントによってカメラを近づけさす +αは補正
+	pCamera->m_itarget.y += (pCamera->m_GameCameraData.FullY * percent);
 
 	// 補間
-	pCamera->m_pos = pCamera->m_pos * 0.9f + pCamera->m_ipos * 0.1f;
-	pCamera->m_target = pCamera->m_target * .95f + pCamera->m_itarget * .05f;
+	pCamera->m_ViewData.pos = pCamera->m_ViewData.pos * 0.9f + pCamera->m_ipos * 0.1f;
+	pCamera->m_ViewData.target = pCamera->m_ViewData.target * .95f + pCamera->m_itarget * .05f;
+
+	pCamera->m_ViewData.target.x = pCamera->m_ViewData.pos.x;
 }
 
 // 出口
@@ -370,18 +375,21 @@ void SumaburaCameraState::Exit(Camera *pCamera)
 
 bool SumaburaCameraState::OnMessage(Camera *pCamera, const Message &msg)
 {
-
 	// メッセージタイプ
 	switch ((MESSAGE_TYPE)msg.Msg)
 	{
 	case MESSAGE_TYPE::EFFECT_CAMERA:
 	{
 										EFFECT_CAMERA_INFO *eci = (EFFECT_CAMERA_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
-										pCamera->m_OrgPos = (eci->pOrgPos) ? *eci->pOrgPos : VECTOR_ZERO;	// 原点座標入ってたら代入
+										//pCamera->m_OrgPos = (eci->pOrgPos) ? *eci->pOrgPos : VECTOR_ZERO;	// 原点座標入ってたら代入
 										pCamera->OnEffectCamera(eci->scriptID);								// エフェクトカメラ開始
 										return true;
 										break;
 	}
+	case MESSAGE_TYPE::WINNER_CAMERA:
+		pCamera->m_NumPlayer = 1;
+		pCamera->m_pPlayerPosReferences[0] = (Vector3*)msg.ExtraInfo;
+		break;
 	}
 
 	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
@@ -389,7 +397,6 @@ bool SumaburaCameraState::OnMessage(Camera *pCamera, const Message &msg)
 }
 //
 //*****************************************************************************************************************************
-
 
 //*****************************************************************************************************************************
 //
@@ -403,6 +410,12 @@ void EffectCameraState::Execute(Camera *pCamera)
 {	
 	// エフェクトカメラ更新
 	pCamera->m_pEffectCamera->Update();
+
+	// エフェクトカメラが終わったら
+	if (!pCamera->m_pEffectCamera->isAction())
+	{
+		pCamera->OffEffectCamera();
+	}
 }
 
 // 出口
@@ -490,3 +503,5 @@ bool EffectCameraState::OnMessage(Camera *pCamera, const Message &msg)
 //}
 //
 //*****************************************************************************************************************************
+
+int Camera::GetEventFrame(){ return m_pEffectCamera->GetEventTime(); }

@@ -14,7 +14,7 @@ enum class UI_SIDE
 class HpGage
 {
 public:
-	HpGage(BasePlayer* pPlayer, SIDE bSide);
+	HpGage(BasePlayer* pPlayer);
 	~HpGage();
 
 	void Update();
@@ -32,6 +32,9 @@ private:
 	int m_iGageWidth;
 	int m_iGageHeight;
 	
+	tdn2DObj* m_pGageUsually;	// 普通位の色
+	tdn2DObj* m_pGagePinch;		// ピンチの色
+
 	tdn2DObj* m_pDamageGage;
 	int m_iDamagePoint;
 	float m_fDamageRate;

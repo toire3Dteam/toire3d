@@ -7,7 +7,10 @@
 #include "HpGage.h"
 #include "SpGage.h"
 #include "PersonaUI.h"
-//#include "Combo.h"
+#include "RoundIcon.h"
+#include "FacePic.h"
+#include "OverDriveCutin\OverDriveCutin.h"
+#include "ComboUI.h"
 
 
 class GameUIManager :public BaseGameEntity
@@ -34,10 +37,12 @@ public:
 	}
 
 	// 参照させる
-	void ReferencesPlayer(BasePlayer* pLeftPlayer, BasePlayer* pRightPlayer);
+	void InitData(BasePlayer* pLeftPlayer, BasePlayer* pRightPlayer,int iRoundNum);
 
 	void Update();
 	void Render();
+	void RenderBack();
+
 
 	void Action();
 
@@ -62,6 +67,25 @@ private:
 	// ペルソナ用
 	PersonaUI* m_pPersona1P;
 	PersonaUI* m_pPersona2P;
+
+	// ラウンドアイコン用
+	RoundIcon* m_pRoundIcon1P;
+	RoundIcon* m_pRoundIcon2P;
+
+	// 顔グラ
+	FacePic* m_pFacePic1P;
+	FacePic* m_pFacePic2P;
+
+	// オーバードライブのカットイン
+	OverDriveCutin* m_pOverDriveCutin1P;
+	OverDriveCutin* m_pOverDriveCutin2P;
+	
+	// UI
+	ComboUI*  m_pCombo1P;
+	ComboUI*  m_pCombo2P;
+
+	// 奥行
+	Surface* m_pStencilSurface;
 
 	//struct  HPGage
 	//{

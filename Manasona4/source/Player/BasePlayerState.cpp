@@ -4,64 +4,90 @@
 #include "../Sound/SoundManager.h"
 #include "../Effect/Particle.h"
 #include "../BaseEntity/Message/MessageDispatcher.h"
+#include "PlayerManager.h"
+#include "../Cutin/CutIn.h"
+#include "../Camera/camera.h"
 
 // 定数
 static const float HUTTOBI_LINE = 3.0f;
 static const float REPEAT_ATTACK_RATE = 0.85f;		// 同じ攻撃当たるなレート
 
+#define GUARD_ON	// ガードあり
+
 /*******************************************************/
 //	ファンクション
 /*******************************************************/
-bool JumpCansel(BasePlayer * pPerson)
+bool JumpCancel(BasePlayer * pPerson)
 {
 	//////////////////////////////////////////////
 	//	ジャンプボタンでジャンプキャンセル
 	//============================================
-	if (pPerson->GetInputList(PLAYER_INPUT::C) == 3 || pPerson->GetInputList(PLAYER_INPUT::UP) == 3)
+	// 地面についていたら
+	if (pPerson->isLand() == true)
 	{
-		// 地面についていたら
-		if (pPerson->isLand() == true)
+		// 押しっぱなしでキャンセル
+		if (pPerson->isPushInput(PLAYER_COMMAND_BIT::UP))
 		{
 			// ジャンプステートに行く
 			pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
 			return true;
 		}
-		else if (pPerson->isAerialJump() == true)	// 空中で空中ジャンプの権利があれば
+	}
+	else if (pPerson->isAerialJump() == true)	// 空中で空中ジャンプの権利があれば
+	{
+		// ★ジャンプ時のみトリガー
+		if (
+			//pPerson->GetInputList(PLAYER_COMMAND_BIT::C) == 3 ||	// ボタンでジャンプを封印
+			pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::UP, true))
 		{
+			// 先行入力リセット
+			pPerson->AheadCommandReset();
+
 			// 空中ジャンプステートに行く
 			pPerson->GetFSM()->ChangeState(BasePlayerState::AerialJump::GetInstance());
 			return true;
 		}
-		else return false;
-	
 	}
-	else return false;
+
+	return false;
 }
 
-bool RunCansel(BasePlayer * pPerson)
+bool RunCancel(BasePlayer * pPerson)
 {
 	//////////////////////////////////////////////
 	//	左右キーで走りキャンセル
 	//============================================
-	if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::LEFT, true))
 	{
-		pPerson->SetDir(DIR::LEFT);
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
-		return true;
+		//pPerson->SetDir(DIR::LEFT);
+		if (pPerson->GetDir() == DIR::LEFT)
+		{
+			// 先行入力リセット
+			pPerson->AheadCommandReset();
+
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+			return true;
+		}
 	}
-	else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
+	else if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::RIGHT, true))
 	{
-		pPerson->SetDir(DIR::RIGHT);
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
-		return true;
+		//pPerson->SetDir(DIR::RIGHT);
+		if (pPerson->GetDir() == DIR::RIGHT)
+		{
+			// 先行入力リセット
+			pPerson->AheadCommandReset();
+
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+			return true;
+		}
 	}
-	else return false;
+	return false;
 }
 
-bool SquatCansel(BasePlayer * pPerson)
+bool SquatCancel(BasePlayer * pPerson)
 {
 	// しゃがみキャンセル
-	if (pPerson->isPushInput(PLAYER_INPUT::DOWN))
+	if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN))
 	{
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Squat::GetInstance());
 		return true;
@@ -69,31 +95,65 @@ bool SquatCansel(BasePlayer * pPerson)
 	else return false;
 }
 
-bool StandCansel(BasePlayer * pPerson)
+bool SquatAttackCancel(BasePlayer * pPerson)
+{
+	// しゃがみ攻撃キャンセル
+	if ((pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN, true)) && pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::C, true))
+	{
+		// 先行入力リセット
+		pPerson->AheadCommandReset();
+
+		pPerson->GetFSM()->ChangeState(BasePlayerState::SquatAttack::GetInstance());
+		return true;
+	}
+	else return false;
+}
+
+bool StandCancel(BasePlayer * pPerson)
 {
 	// スタンドキャンセル
-	if (pPerson->isPushInput(PLAYER_INPUT::L1))
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::L1, true))
 	{
 		// 追記　スタンドストックがないときはキャンセルできない
 		if (pPerson->GetStand()->GetStandStock() <= 0)return false;
+
+		// 先行入力リセット
+		pPerson->AheadCommandReset();
+
 		pPerson->GetFSM()->ChangeState(BasePlayerState::StandAction::GetInstance());
 		return true;
 	}
 	else return false;
 }
 
-bool RushAttackCansel(BasePlayer *pPerson)
+bool AttackCancel(BasePlayer *pPerson)
 {
 	// 攻撃キャンセル
-	if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::C, true))
 	{
+		// 先行入力リセット
+		pPerson->AheadCommandReset();
+
 		if (pPerson->isLand() == true)
 		{
-			pPerson->GetFSM()->ChangeState(BasePlayerState::RushAttack::GetInstance());
-			return true;
+			if (/*pPerson->isSquat() == false*/
+				pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN))
+			{
+				// しゃがみ
+				pPerson->GetFSM()->ChangeState(BasePlayerState::SquatAttack::GetInstance());
+				return true;
+			}
+			else
+			{
+				// 通常
+				pPerson->GetFSM()->ChangeState(BasePlayerState::RushAttack::GetInstance());
+				return true;
+			}
+
 		}
-		else
+		else 
 		{
+			// 空中
 			pPerson->GetFSM()->ChangeState(BasePlayerState::AerialAttack::GetInstance());
 			return true;
 		}
@@ -101,21 +161,24 @@ bool RushAttackCansel(BasePlayer *pPerson)
 	else return false;
 }
 
-bool FinishAttackCansel(BasePlayer *pPerson)
+bool FinishAttackCancel(BasePlayer *pPerson)
 {
 	// 攻撃キャンセル
-	if (pPerson->isPushInput(PLAYER_INPUT::R2))
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R2, true))
 	{
+		// 先行入力リセット
+		pPerson->AheadCommandReset();
+
 		pPerson->GetFSM()->ChangeState(BasePlayerState::FinishAttack::GetInstance());
 		return true;
 	}
 	else return false;
 }
 
-bool SkillCansel(BasePlayer *pPerson)
+bool SkillCancel(BasePlayer *pPerson)
 {
 	// 攻撃キャンセル
-	if (pPerson->GetInputList(PLAYER_INPUT::D) == 3)
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::D, true))
 	{
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Skill::GetInstance());
 		return true;
@@ -123,17 +186,21 @@ bool SkillCansel(BasePlayer *pPerson)
 	else return false;
 }
 
-bool OverDriveCansel(BasePlayer *pPerson)
+bool OverDriveCancel(BasePlayer *pPerson)
 {
 	if ((pPerson->GetFSM()->isInState(*BasePlayerState::Throw::GetInstance()) == true && pPerson->GetActionFrame() != FRAME_STATE::FOLLOW) ||
-		pPerson->GetFSM()->isInState(*BasePlayerState::ThrowMiss::GetInstance()) == true ||
-		pPerson->GetFSM()->isInState(*BasePlayerState::ThrowBind::GetInstance()) == true)// 投げてるときは勘弁
+		pPerson->GetFSM()->isInState(*BasePlayerState::ThrowSuccess::GetInstance()) == true ||
+		pPerson->GetFSM()->isInState(*BasePlayerState::ThrowBind::GetInstance()) == true ||// 投げてるときは勘弁
+		pPerson->GetFSM()->isInState(*BasePlayerState::HeavehoDrive::GetInstance()))
 		return false;
 
 
 	// 覚醒（バースト）キャンセル
-	if (pPerson->GetInputList(PLAYER_INPUT::R3)==3)
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R3, true))
 	{
+		// 先行入力リセット
+		pPerson->AheadCommandReset();
+
 		// ゲージが溜まってたら
 		if (pPerson->GetOverDriveGage() == BasePlayer::c_OVERDRIVE_MAX_GAGE)
 		{
@@ -157,38 +224,46 @@ bool OverDriveCansel(BasePlayer *pPerson)
 	else return false;
 }
 
-bool EscapeCansel(BasePlayer *pPerson)
+bool EscapeCancel(BasePlayer *pPerson)
 {
-	//if (pPerson->GetInputList(PLAYER_INPUT::R1) == 3)
-	//{
-	//	// エスケープステートに行く
-	//	pPerson->GetFSM()->ChangeState(BasePlayerState::Escape::GetInstance());
-	//	return true;
-	//}
-	//else return false;
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R2, true))
+	{
+		// 先行入力リセット
+		pPerson->AheadCommandReset();
 
-	if (pPerson->GetInputList(PLAYER_INPUT::LEFT) == 3)
-	{
-		pPerson->SetDir(DIR::LEFT);// 向きを変える
-		// エスケープステートに行く
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Escape::GetInstance());
-		return true;
-	}
-	else if (pPerson->GetInputList(PLAYER_INPUT::RIGHT) == 3)
-	{
-		
-		pPerson->SetDir(DIR::RIGHT);// 向きを変える
 		// エスケープステートに行く
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Escape::GetInstance());
 		return true;
 	}
 	else return false;
+
+	//if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::LEFT))
+	//{
+	//	//pPerson->SetDir(DIR::LEFT);// 向きを変える
+	//	// エスケープステートに行く
+	//	//if (pPerson->GetDir() == DIR::LEFT)
+	//	{
+	//		pPerson->GetFSM()->ChangeState(BasePlayerState::Escape::GetInstance());
+	//		return true;
+	//	}
+	//}
+	//else if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::RIGHT))
+	//{
+	//	//pPerson->SetDir(DIR::RIGHT);// 向きを変える
+	//	// エスケープステートに行く
+	//	//if (pPerson->GetDir() == DIR::RIGHT)
+	//	{
+	//		pPerson->GetFSM()->ChangeState(BasePlayerState::Escape::GetInstance());
+	//		return true;
+	//	}
+	//}
+	//return false;
 }
 
-bool ThrowCansel(BasePlayer * pPerson)
+bool ThrowCancel(BasePlayer * pPerson)
 {
 	// 投げキャンセル
-	if (pPerson->GetInputList(PLAYER_INPUT::L2) == 3)
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::L2))
 	{
 		// 地面についていないとないときはキャンセルできない
 		if (pPerson->isLand() == false)return false;
@@ -198,44 +273,62 @@ bool ThrowCansel(BasePlayer * pPerson)
 	else return false;
 }
 
-bool GuardCansel(BasePlayer * pPerson)
-{
-	// ガードキャンセル
-	if (pPerson->isPushInput(PLAYER_INPUT::R1))
-	{
-		// 地面についていないとないときはキャンセルできない
-		if (pPerson->isLand() == false)return false;
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Guard::GetInstance());
-		return true;
-	}
-	else return false;
-}
+//bool GuardCancel(BasePlayer * pPerson)
+//{
+//	// ガードキャンセル
+//	if (pPerson->isPushInput(PLAYER_COMMAND_BIT::R1))
+//	{
+//		// 地面についていないとないときはキャンセルできない
+//		if (pPerson->isLand() == false)return false;
+//		pPerson->GetFSM()->ChangeState(BasePlayerState::Guard::GetInstance());
+//		return true;
+//	}
+//	else return false;
+//}
 
-bool HeaveHoCansel(BasePlayer * pPerson)
+bool HeaveHoCancel(BasePlayer * pPerson)
 {
 	// 必殺技キャンセル
-	if (pPerson->GetInputList(PLAYER_INPUT::A) == 3)
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::B))
 	{	
+		// オーバードライブ中ならゲージなしで打てる
+		if (pPerson->isOverDrive())
+		{
+			// オーバードライブを終了して発動
+			pPerson->SetOverDriveFrame(0);
+
+		}else
+		{
+			// まずゲージが50％あるかないか
+			if (pPerson->GetOverDriveGage() < 50)return false;
+
+			// 50%消費
+			pPerson->AddOverDriveGage(-50);
+		}
+
+		// 必殺ステートへ
 		pPerson->GetFSM()->ChangeState(BasePlayerState::HeavehoDrive::GetInstance());
 		return true;
 	}
 	else return false;
 }
 
-bool HeaveHoOverFlowCansel(BasePlayer * pPerson)
+bool HeaveHoOverFlowCancel(BasePlayer * pPerson)
 {
 	if (pPerson->isOverDrive() == false)return false;
 
 	// 超必殺技キャンセル
-	if (pPerson->GetInputList(PLAYER_INPUT::R3) == 3)
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R3))
 	{
 		if ((pPerson->GetFSM()->isInState(*BasePlayerState::Throw::GetInstance()) == true && pPerson->GetActionFrame() != FRAME_STATE::FOLLOW) ||
-			pPerson->GetFSM()->isInState(*BasePlayerState::ThrowMiss::GetInstance()) == true ||
+			pPerson->GetFSM()->isInState(*BasePlayerState::ThrowSuccess::GetInstance()) == true ||
 			pPerson->GetFSM()->isInState(*BasePlayerState::ThrowBind::GetInstance()) == true || 
 			pPerson->GetFSM()->isInState(*BasePlayerState::KnockBack::GetInstance()) == true || 
 			pPerson->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) == true ||
 			pPerson->GetFSM()->isInState(*BasePlayerState::AerialKnockBack::GetInstance()) == true||
-			pPerson->GetFSM()->isInState(*BasePlayerState::OverDrive_OneMore::GetInstance()) == true
+			pPerson->GetFSM()->isInState(*BasePlayerState::OverDrive_OneMore::GetInstance()) == true ||
+			pPerson->GetFSM()->isInState(*BasePlayerState::HeavehoDriveOverFlow::GetInstance()) == true||
+			pPerson->GetFSM()->isInState(*BasePlayerState::HeavehoDrive::GetInstance()) == true
 			)// 投げてるときは勘弁
 			return false;
 
@@ -245,16 +338,245 @@ bool HeaveHoOverFlowCansel(BasePlayer * pPerson)
 	else return false;
 }
 
+bool DashCancel(BasePlayer * pPerson)
+{
+	// ダッシュキャンセル
+	if (pPerson->isDoublePush(PLAYER_COMMAND_BIT::RIGHT, 12))
+	{
+		// 同じ方向なら走る
+		if (pPerson->GetDir() == DIR::RIGHT) pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+		
+		// 逆方向ならバクステ
+		else pPerson->GetFSM()->ChangeState(BasePlayerState::BackStep::GetInstance());
+
+		return true;
+	}
+	if (pPerson->isDoublePush(PLAYER_COMMAND_BIT::LEFT, 12))
+	{
+		// 同じ方向なら走る
+		if (pPerson->GetDir() == DIR::LEFT) pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+
+		// 逆方向ならバクステ
+		else pPerson->GetFSM()->ChangeState(BasePlayerState::BackStep::GetInstance());
+
+		return true;
+	}
+	
+	return false;
+}
+
+bool AerialDashCancel(BasePlayer *pPerson)
+{
+	// 空中ダッシュキャンセル
+	if (pPerson->isDoublePush(PLAYER_COMMAND_BIT::RIGHT, 12))
+	{
+		// 同じ方向なら走る
+		if (pPerson->GetDir() == DIR::RIGHT)
+		{
+			pPerson->GetFSM()->ChangeState(BasePlayerState::AerialDash::GetInstance());
+		}
+		// 逆方向ならバクステ
+		else pPerson->GetFSM()->ChangeState(BasePlayerState::AerialBackDash::GetInstance());
+
+		return true;
+	}
+	if (pPerson->isDoublePush(PLAYER_COMMAND_BIT::LEFT, 12))
+	{
+		// 同じ方向なら走る
+		if (pPerson->GetDir() == DIR::LEFT)
+		{
+			pPerson->GetFSM()->ChangeState(BasePlayerState::AerialDash::GetInstance());
+		}
+
+		// 逆方向ならバクステ
+		else pPerson->GetFSM()->ChangeState(BasePlayerState::AerialBackDash::GetInstance());
+
+		return true;
+	}
+
+	return false;
+}
+
+bool AerialAttackCancel(BasePlayer *pPerson)
+{
+	// 攻撃ボタンと崩しボタン入力で空中攻撃
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::A) ||
+		pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::C))
+	{
+		// 空下封印
+		//if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN) == true)
+		//{
+		//	// 空中下攻撃ステートに行く
+		//	pPerson->GetFSM()->ChangeState(BasePlayerState::AerialDropAttack::GetInstance());
+		//}
+		//else
+		{
+			// 空中攻撃ステートに行く
+			pPerson->GetFSM()->ChangeState(BasePlayerState::AerialAttack::GetInstance());
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+bool DokkoiAttackCancel(BasePlayer *pPerson)
+{
+	// どっこい攻撃キャンセル
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::A, true))
+	{
+		// 先行入力リセット
+		pPerson->AheadCommandReset();
+
+		if (pPerson->isLand() == true)
+		{
+			if (/*pPerson->isSquat() == false*/
+				pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN))
+			{
+				// しゃがみ
+				pPerson->GetFSM()->ChangeState(BasePlayerState::DownAttack::GetInstance());
+				return true;
+			}
+			else
+			{
+				// 通常
+				pPerson->GetFSM()->ChangeState(BasePlayerState::DokkoiAttack::GetInstance());
+				return true;
+
+			}
+
+		}
+		else
+		{
+			// 空中
+			pPerson->GetFSM()->ChangeState(BasePlayerState::AerialAttack::GetInstance());
+			return true;
+		}
+	}
+	else return false;
+
+}
+
+bool isInputGuardCommand(BasePlayer *pPerson)
+{
+	bool bGuardCommand(false);
+
+	// 相手に対する向き(例えば右向きに走ってても左に相手がいるならそれは左向き)
+	if (pPerson->GetTargetDir() == DIR::LEFT)
+	{
+		// 相手に対して反対の方を入力してたら
+		if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT)) bGuardCommand = true;
+	}
+	// 反対
+	else
+	{
+		// 相手に対して反対の方を入力してたら
+		if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT)) bGuardCommand = true;
+	}
+
+	return bGuardCommand;
+}
+
+void GuardUpdate(BasePlayer *pPerson)
+{
+#ifdef GUARD_ON
+	// ガードコマンドを入力してたら
+	if (isInputGuardCommand(pPerson))
+	{
+		// ★相手が何かしらの攻撃をしていたら、ガードステートに移行
+		if ((pPerson->GetTargetPlayer()->isAttackState() || (pPerson->GetTargetPlayer()->GetStand()->isActive() && pPerson->GetTargetPlayer()->GetStand()->GetAttackData())) &&															// 相手が攻撃状態
+			Math::Length(pPerson->GetPos(),pPerson->GetTargetPlayer()->GetPos()) < BasePlayer::c_GUARD_DISTANCE)	// ガード発動距離
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Guard::GetInstance());
+
+		//// しゃがみガード
+		//if (pPerson->GetFSM()->isInState(*BasePlayerState::Squat::GetInstance()))
+		//{
+		//	// ガードステートを設定する
+		//	pPerson->SetGuardState(GUARD_STATE::DOWN_GUARD);
+		//
+		//	// 相手が何かしらの攻撃をしていたら、ガードモーションをとる
+		//	if (pPerson->GetTargetPlayer()->isAttackState())
+		//	{
+		//		// TODO:モーション戻す時どうする
+		//		pPerson->SetMotion(MOTION_TYPE::DOWN_GUARD);
+		//	}
+		//}
+		//
+		//// 立ちガード
+		//else
+		//{
+		//	// ガードステートを設定する
+		//	pPerson->SetGuardState(GUARD_STATE::UP_GUARD);
+		//
+		//	// 相手が何かしらの攻撃をしていたら、ガードモーションをとる
+		//	if (pPerson->GetTargetPlayer()->isAttackState())
+		//	{
+		//		// TODO:モーション戻す時どうする
+		//		pPerson->SetMotion(MOTION_TYPE::UP_GUARD);
+		//	}
+		//}
+	}
+
+	// ガードコマンドを入力していないので、ガードしてないステートを設定
+	else
+#endif
+	{
+		pPerson->SetGuardState(GUARD_STATE::NO_GUARD);
+	}
+
+}
+
+bool isPossibleGuardState(BasePlayer *pPerson)
+{
+	// ガードができるステートかどうか
+	StateMachine<BasePlayer> *pState(pPerson->GetFSM());
+	bool bGuardState(pState->isInState(*BasePlayerState::Wait::GetInstance()) ||
+		pState->isInState(*BasePlayerState::BackWalk::GetInstance()) ||
+		pState->isInState(*BasePlayerState::Run::GetInstance()) ||
+		//pState->isInState(*BasePlayerState::AerialJump::GetInstance()) ||
+		//pState->isInState(*BasePlayerState::Fall::GetInstance()) ||
+		pState->isInState(*BasePlayerState::Squat::GetInstance()));
+	
+	if (!bGuardState)
+	{
+		if (pState->isInState(*BasePlayerState::Jump::GetInstance()))
+		{
+			// ★ジャンプの瞬間のガードできないフレーム
+			if (!pPerson->GetJump()->bHold) bGuardState = true;
+		}
+	}
+
+	return bGuardState;
+}
+
+bool WalkCancel(BasePlayer *pPerson)
+{
+	//////////////////////////////////////////////
+	//	移動ボタン
+	//============================================
+	if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
+	{
+		//pPerson->SetDir(DIR::RIGHT);
+		// 歩きステートにいく
+		if (pPerson->GetDir() == DIR::RIGHT)pPerson->GetFSM()->ChangeState(BasePlayerState::Walk::GetInstance());
+		else pPerson->GetFSM()->ChangeState(BasePlayerState::BackWalk::GetInstance());
+		return true;
+	}
+	if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
+	{
+		//pPerson->SetDir(DIR::LEFT);
+		// 歩きステートにいく
+		if (pPerson->GetDir() == DIR::LEFT)pPerson->GetFSM()->ChangeState(BasePlayerState::Walk::GetInstance());
+		else pPerson->GetFSM()->ChangeState(BasePlayerState::BackWalk::GetInstance());
+		return true;
+	}
+	return false;
+}
+
 /*******************************************************/
 //					グローバルステート
 /*******************************************************/
-
-BasePlayerState::Global * BasePlayerState::Global::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::Global instance;
-	return &instance;
-}
 
 void BasePlayerState::Global::Enter(BasePlayer * pPerson)
 {
@@ -263,14 +585,19 @@ void BasePlayerState::Global::Enter(BasePlayer * pPerson)
 void BasePlayerState::Global::Execute(BasePlayer * pPerson)
 {
 	////////////////////////////////////////////////////////////////
+	//	ガード更新処理
+	//==============================================================
+	if (isPossibleGuardState(pPerson)) GuardUpdate(pPerson);
+
+	////////////////////////////////////////////////////////////////
 	//	オーバードライブ時のみできる超必殺技　
 	//==============================================================
-	if (HeaveHoOverFlowCansel(pPerson)) return;
+	if (HeaveHoOverFlowCancel(pPerson)) return;
 
 	////////////////////////////////////////////////////////////////
 	//	オーバードライブ　どこからでも出せる最強のキャンセルルート
 	//==============================================================
-	if (OverDriveCansel(pPerson)) return;
+	if (OverDriveCancel(pPerson)) return;
 	
 
 
@@ -290,112 +617,260 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 	// メッセージタイプ
 	switch (msg.Msg)
 	{
-	// 掴まれたよメッセージ
+		// 掴まれたよメッセージ
 	case MESSAGE_TYPE::BE_THROWN:
 	{
-		BE_THROWN_INFO *ThrowInfo = (BE_THROWN_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
-		pPerson->SetThrowPlayerID(ThrowInfo->ThrowPlayerID);
-		pPerson->SetDir((ThrowInfo->iThrowPlayerDir == (int)DIR::LEFT) ? DIR::RIGHT : DIR::LEFT);	// 要は掴んだ相手の方を向く
-
-		pPerson->GetFSM()->ChangeState(ThrowBind::GetInstance());		// 投げくらいステートへ
-		break;
+									pPerson->SetDir((pPerson->GetTargetPlayer()->GetDir() == DIR::LEFT) ? DIR::RIGHT : DIR::LEFT);	// 要は掴んだ相手の方を向く
+									pPerson->GetFSM()->ChangeState(ThrowBind::GetInstance());		// 投げくらいステートへ
+									break;
 	}
 		// 攻撃くらったよメッセージ
 	case MESSAGE_TYPE::HIT_DAMAGE:
 	{
-		//// もしバースト中ならはじく
-		//if (pPerson->GetFSM()->isInState(*BasePlayerState::OverDrive::GetInstance()) == true)
-		//{
-		//	 // アクションフレームが続いてたら
-		//	 if (pPerson->isFrameAction())
-		//	 {			 
-		//		 return true;
-		//	 }
-		//}
+									 //// もしバースト中ならはじく
+									 //if (pPerson->GetFSM()->isInState(*BasePlayerState::OverDrive::GetInstance()) == true)
+									 //{
+									 //	 // アクションフレームが続いてたら
+									 //	 if (pPerson->isFrameAction())
+									 //	 {			 
+									 //		 return true;
+									 //	 }
+									 //}
 
-		// アクションステートオフ(つまり現在までやったいた動きが消える)
-		pPerson->SetActionState(BASE_ACTION_STATE::NO_ACTION);
+									 HIT_DAMAGE_INFO *HitDamageInfo = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
 
-		HIT_DAMAGE_INFO *hdi = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+									 // ★ダメージを与えた人に送り返す(ガードしても必殺が発動するバグを直すために、このHandleMessageを受け取ったら発動という風にする)
+									 HIT_ATTACK_INFO HitAttackInfo;
+									 HitAttackInfo.bOverDrive = HitDamageInfo->bOverDrive;
+									 HitAttackInfo.HitScore = HitDamageInfo->damage;
+									 HitAttackInfo.hitStopFlame = HitDamageInfo->hitStopFlame;
+									 MsgMgr->Dispatch(0, msg.Receiver, msg.Sender, MESSAGE_TYPE::HIT_ATTACK, &HitAttackInfo);
 
-		// 向きを攻撃された方向へ向くように
-		if (hdi->FlyVector.x > 0.0f)	pPerson->SetDir(DIR::LEFT);
-		else		pPerson->SetDir(DIR::RIGHT);
+									 //bool bGuardSuccess(false);
+									 //if (pPerson->GetGuardState() == GUARD_STATE::UP_GUARD)
+									 //{
+										// // ★相手が立ちガードしてて、下段攻撃じゃなかったらガード成功！
+										// if (HitDamageInfo->iAntiGuard != (int)ANTIGUARD_ATTACK::DOWN_ATTACK) bGuardSuccess = true;
+									 //}
+									 //else if (pPerson->GetGuardState() == GUARD_STATE::DOWN_GUARD)
+									 //{
+										// // ★相手がしゃがみガードしてて、上段攻撃じゃなかったらガード成功！
+										// if (HitDamageInfo->iAntiGuard != (int)ANTIGUARD_ATTACK::UP_ATTACK) bGuardSuccess = true;
+									 //}
 
-		// 吹っ飛びベクトルを加算 (A列車)加算から代入に変更
-		//pPerson->AddMove(Vector3(hdi->LandFlyVector.x, hdi->LandFlyVector.y, 0));	
-		pPerson->SetMove(Vector3(hdi->FlyVector.x, hdi->FlyVector.y, 0));
+									 //// ★ガード成功してたら！！！
+									 //if (bGuardSuccess)
+									 //{
+										// // (A列車)ここにガード成功時のSE、エフェクト
+										// se->Play("ガード");
 
-		// ヒットストップ
-		pPerson->SetHitStopFrame(hdi->hitStopFlame);
+										// // 懇親の
+										// if (pPerson->GetDir() == DIR::RIGHT)
+										// {
+										//	 pPerson->SetMove(Vector3(-0.5f, 0, 0));
+										// }
+										// else
+										// {
+										//	 pPerson->SetMove(Vector3(0.5f, 0, 0));
+										// }
 
-		// 硬直フレーム設定
-		int RecoveryFrame = hdi->recoveryFlame;
-		for (auto it : *pPerson->GetRecoveryDamageCount())
-		{
-			if (it == (BASE_ACTION_STATE)hdi->iAttackType)
-			{
-				RecoveryFrame = (int)(RecoveryFrame * REPEAT_ATTACK_RATE);	// 同技補正
-			}
-		}
-		pPerson->SetRecoveryFrame(RecoveryFrame);
+										// pPerson->GetComboUI()->Guard();// ガードされた
 
-		// くらった攻撃リスト追加
-		pPerson->GetRecoveryDamageCount()->push_back((BASE_ACTION_STATE)hdi->iAttackType);
+										// // ガードステートに行く
 
-		// (追加)ヒットエフェクト発動! 
-		// (A列車)エフェクトを今は自分のポジションにおいてる！！！　後でヒットポジションとかいるかも
-		pPerson->AddEffectAction(pPerson->GetPos()+Vector3(0,4,-3),(EFFECT_TYPE)hdi->HitEffectType);
+										// // 以降のダメージ処理を省く
+										// return true;
+									 //}
+									 
+									 // ダメージSEの再生
+									 LPCSTR seID = HitDamageInfo->HitSE;
+									 if (seID) se->Play((LPSTR)seID);
 
-		// 空中ジャンプの権利復活
-		pPerson->SetAerialJump(true);
+									 // 数字エフェクト追加
+									// Vector2 screenPos = Math::WorldToScreen(pPerson->GetPos());
+									// NumberEffect.AddNumber((int)screenPos.x, (int)screenPos.y - 200, HitDamageInfo->damage, Number_Effect::COLOR_TYPE::WHITE, Number::NUM_KIND::NORMAL);
 
-		// 攻撃に相手を無敵にさせる属性が入ってたら
-		if (hdi->BeInvincible)
-		{
-			//むてきつくった
-			// ★やっぱりここで無敵時間設定
-			pPerson->SetInvincible(90, 1);
-		}
+									 // 空中ダッシュ消す
+									 pPerson->SetAerialDashFrame(0);
 
-		// 吹っ飛び距離	に　応じて	ダメージステートを変える
-		const float len = hdi->FlyVector.Length();
-		if (len <  HUTTOBI_LINE)
-		{
-			// ここで空中でくらってるか地上でくらってるかを分ける
-			if (pPerson->isLand() == true)
-			{
-				// 地上ノックバックに行く
-				pPerson->GetFSM()->ChangeState(BasePlayerState::KnockBack::GetInstance());
-			}
-			else
-			{
-				// 空中ノックバックに行く
-				pPerson->GetFSM()->ChangeState(BasePlayerState::AerialKnockBack::GetInstance());
-			}
-		
-		}
-		else
-		{
-			// ノックダウンに行く
-			pPerson->GetFSM()->ChangeState(BasePlayerState::KnockDown::GetInstance());
+									 // ペルソナブレイク
+									 pPerson->GetStand()->Break();
 
-		}
+									 // アクションステートオフ(つまり現在までやったいた動きが消える)
+									 pPerson->SetActionState(BASE_ACTION_STATE::NO_ACTION);
 
-		return true;
-		break;
+									 // 向きを攻撃された方向へ向くように
+									 if (HitDamageInfo->FlyVector.x > 0.0f)	pPerson->SetDir(DIR::LEFT);
+									 else		pPerson->SetDir(DIR::RIGHT);
+
+									 // 吹っ飛びベクトルを加算 (A列車)加算から代入に変更
+									 //pPerson->AddMove(Vector3(HitDamageInfo->LandFlyVector.x, HitDamageInfo->LandFlyVector.y, 0));	
+									 pPerson->SetMove(Vector3(HitDamageInfo->FlyVector.x, HitDamageInfo->FlyVector.y, 0));
+
+									 // ヒットストップ
+									 pPerson->SetHitStopFrame(HitDamageInfo->hitStopFlame);
+
+									 // 硬直フレーム設定
+									 int RecoveryFrame(HitDamageInfo->HitRecoveryFrame);
+
+									 // ★必殺技中は同技補正を無視(アイルーのやつとかひどいことになるから)
+									 if (!HitDamageInfo->bOverDrive)
+									 {
+										 for (auto it : *pPerson->GetRecoveryDamageCount())
+										 {
+											 if (it == (BASE_ACTION_STATE)HitDamageInfo->iAttackType)
+											 {
+												 RecoveryFrame = (int)(RecoveryFrame * REPEAT_ATTACK_RATE);	// 同技補正
+											 }
+										 }
+									 }
+									 pPerson->SetRecoveryFrame(RecoveryFrame);
+
+									 // ★コンボUI エフェクト(カウント)発動
+									 COMBO_DESK comboDesk;
+									 comboDesk.side = pPerson->GetSide();
+									 comboDesk.damage = HitDamageInfo->damage;
+									 comboDesk.recoveryFrame = RecoveryFrame;
+									 MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, ENTITY_ID::UI_MGR, MESSAGE_TYPE::COMBO_COUNT, &comboDesk);
+
+									 // くらった攻撃リスト追加
+									 pPerson->GetRecoveryDamageCount()->push_back((BASE_ACTION_STATE)HitDamageInfo->iAttackType);
+
+									 // (追加)ヒットエフェクト発動! 
+									 // (A列車)エフェクトを今は自分のポジションにおいてる！！！　後でヒットポジションとかいるかも
+									 pPerson->AddEffectAction(pPerson->GetCenterPos() + Vector3(0, 4, 0), (EFFECT_TYPE)HitDamageInfo->HitEffectType);
+
+									 // 空中ジャンプの権利復活
+									 pPerson->SetAerialJump(true);
+
+									 // 攻撃に相手を無敵にさせる属性が入ってたら
+									 if (HitDamageInfo->BeInvincible)
+									 {
+										 //むてきつくった
+										 // ★やっぱりここで無敵時間設定
+										 pPerson->SetInvincible(90, 1);
+									 }
+
+									 // ダメージ処理
+									 const int DamagedHP(max(pPerson->GetHP() - HitDamageInfo->damage, 0));
+									 // ダメージを受けた後のHPを設定
+									 pPerson->SetHP(DamagedHP);
+									 if (DamagedHP == 0)
+									 {
+										 // フィニッシュフラグのある攻撃なら
+										 if (HitDamageInfo->bFinishOK)
+										 {
+											 // ★KOのメッセージを送る
+											 KO_INFO KOInfo;
+											 KOInfo.FinishType = HitDamageInfo->bOverDrive ? FINISH_TYPE::OVER_DRIVE : FINISH_TYPE::NORMAL;
+											 KOInfo.iNumWinnerRound = pPerson->GetTargetPlayer()->GetWinNum();	// 倒したやつの勝った数;
+											 KOInfo.WinnerSide = pPerson->GetSide();
+											 // 
+											 MsgMgr->Dispatch(0, pPerson->GetTargetPlayer()->GetID(), ENTITY_ID::SCENE_MAIN, MESSAGE_TYPE::KO, &KOInfo);
+
+											 // 死に
+											 pPerson->GetFSM()->ChangeState(BasePlayerState::Die::GetInstance());
+										 }
+									 }
+
+									 else
+									 {
+										 // 吹っ飛び距離	に　応じて	ダメージステートを変える
+										 const float len = HitDamageInfo->FlyVector.Length();
+										 if (len < HUTTOBI_LINE)
+										 {
+											 // ここで空中でくらってるか地上でくらってるかを分ける
+											 if (pPerson->isLand() == true)
+											 {
+												 // 地上ノックバックに行く
+												 pPerson->GetFSM()->ChangeState(BasePlayerState::KnockBack::GetInstance());
+											 }
+											 else
+											 {
+												 // 空中ノックバックに行く
+												 pPerson->GetFSM()->ChangeState(BasePlayerState::AerialKnockBack::GetInstance());
+											 }
+
+										 }
+										 else
+										 {
+											 // ノックダウンに行く
+											 pPerson->GetFSM()->ChangeState(BasePlayerState::KnockDown::GetInstance());
+
+										 }
+									 }
+									 return true;
+									 break;
 	}
 
-	// 攻撃当たったよメッセージ
+		// 攻撃当たったよメッセージ
 	case MESSAGE_TYPE::HIT_ATTACK:
 	{
-		HIT_ATTACK_INFO *HitAttackInfo = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
-		pPerson->SetHitStopFrame(HitAttackInfo->hitStopFlame);// ヒットストップ
-		pPerson->AddCollectScore(HitAttackInfo->HitScore);	// 実体前のスコアを加算
-		if (HitAttackInfo->bFinishAttack) pPerson->ConversionScore();	// フィニッシュアタックならスコア生産
-		break;
+									 if (pPerson->isAttackState())
+									 {
+										 pPerson->GetAttackData()->bHitSuccess = true;	// マジで当たったガーーーーール！！！！
+#ifdef _DEBUG
+										 // コンボが当たった時間
+										 Vector2 screenPos = Math::WorldToScreen(pPerson->GetPos());
+										 NumberEffect.AddNumber((int)screenPos.x, (int)screenPos.y - 200, pPerson->GetCurrentFrame(), Number_Effect::COLOR_TYPE::WHITE, Number::NUM_KIND::NORMAL);
+#endif
+									 }
+
+									 HIT_ATTACK_INFO *HitAttackInfo = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+									 pPerson->SetHitStopFrame(HitAttackInfo->hitStopFlame);// ヒットストップ
+									 pPerson->AddCollectScore(HitAttackInfo->HitScore);	// 実体前のスコアを加算
+									 if (HitAttackInfo->bOverDrive) pPerson->ConversionScore();	// フィニッシュアタックならスコア生産
+									 // 必殺以外
+									 else
+									 {
+										 // 攻撃を当ててSPゲージ上昇だ！
+										 if (HitAttackInfo->HitScore <= 200)
+										 {
+											 pPerson->AddOverDriveGage(2);
+										 }
+										 else if (HitAttackInfo->HitScore <= 500)
+										 {
+											 pPerson->AddOverDriveGage(3);
+
+										 }
+										 else if (HitAttackInfo->HitScore <= 900)
+										 {
+											 pPerson->AddOverDriveGage(5);
+
+										 }
+										 else if (HitAttackInfo->HitScore <= 1200)
+										 {
+											 pPerson->AddOverDriveGage(6);
+										 }
+										 else
+										 {
+											 pPerson->AddOverDriveGage(8);
+										 }
+									 }
+
+
+									 //// この攻撃で相手が相手が死んでたら
+									 //if (pPerson->GetTargetPlayer()->GetHP() == 0)
+									 //{
+									//	 // KOのメッセージを送る
+									//	 FINISH_TYPE FinishType(HitAttackInfo->bOverDrive ? FINISH_TYPE::OVER_DRIVE : FINISH_TYPE::NORMAL);
+									 //
+									//	 // 
+									//	 MsgMgr->Dispatch(0, pPerson->GetID(), ENTITY_ID::SCENE_MAIN, MESSAGE_TYPE::KO, &FinishType);
+									 //}
+									 break;
 	}
 
+	case HEAVE_HO_OVERFLOW_START:
+	{
+									// メッセージが届いたらオーバーフローへ移動
+									pPerson->GetFSM()->ChangeState(BasePlayerState::HeavehoDriveOverFlow_Success::GetInstance());
+									return true;
+	}break;
+
+	case MESSAGE_TYPE::END_FINISHCALL:	// フィニッシュのコールが終わったら、勝ちモーションに行く
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Win::GetInstance());
+		break;
 
 	// (A列車)死んだぜメッセージ
 	}
@@ -407,13 +882,6 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 /*******************************************************/
 //					待機ステート
 /*******************************************************/
-
-BasePlayerState::Wait * BasePlayerState::Wait::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::Wait instance;
-	return &instance;
-}
 
 void BasePlayerState::Wait::Enter(BasePlayer * pPerson)
 {
@@ -427,71 +895,67 @@ void BasePlayerState::Wait::Execute(BasePlayer * pPerson)
 	//////////////////////////////////////////////
 	//	スキルキャンセル
 	//============================================
-	if (SkillCansel(pPerson)) return;
+	if (SkillCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	ジャンプキャンセル
 	//============================================
-	if (JumpCansel(pPerson)) return;
+	if (JumpCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	エスケープボタン
 	//============================================
-	//if (EscapeCansel(pPerson)) return;
+	if (EscapeCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	攻撃ボタン
 	//============================================
-	if (RushAttackCansel(pPerson)) return;
+	if (AttackCancel(pPerson)) return;
+
+	//////////////////////////////////////////////
+	//	どっこい攻撃キャンセル
+	//============================================
+	if (DokkoiAttackCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	ヒーホードライブボタン
 	//============================================
-	if (HeaveHoCansel(pPerson)) return;
+	if (HeaveHoCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	フィニッシュ攻撃ボタン
 	//============================================
-	if (FinishAttackCansel(pPerson)) return;
+	if (FinishAttackCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	スタンドキャンセル
 	//============================================
-	if (StandCansel(pPerson)) return;
+	if (StandCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	しゃがみキャンセル
 	//============================================
-	if (SquatCansel(pPerson)) return;
+	if (SquatCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	投げキャンセル
 	//============================================
-	if (ThrowCansel(pPerson)) return;
+	if (ThrowCancel(pPerson)) return;
 	
 	//////////////////////////////////////////////
 	//	ガードキャンセル
 	//============================================
-	if (GuardCansel(pPerson)) return;
-	
+	//if (GuardCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
-	//	移動ボタン
+	//	ダッシュキャンセル
 	//============================================
-	if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
-	{
-		pPerson->SetDir(DIR::RIGHT);
-		// 歩きステートにいく
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Walk::GetInstance());
-	}
-	if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
-	{
-		pPerson->SetDir(DIR::LEFT);
-		// 歩きステートにいく
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Walk::GetInstance());
-	}
-
-
+	if (DashCancel(pPerson))return;
+	
+	//////////////////////////////////////////////
+	//	移動キャンセル
+	//============================================
+	if (WalkCancel(pPerson))return;
 
 }
 
@@ -529,13 +993,6 @@ bool BasePlayerState::Wait::OnMessage(BasePlayer * pPerson, const Message & msg)
 //					歩くステート
 /*******************************************************/
 
-BasePlayerState::Walk * BasePlayerState::Walk::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::Walk instance;
-	return &instance;
-}
-
 void BasePlayerState::Walk::Enter(BasePlayer * pPerson)
 {
 	// 歩きモーションに変える
@@ -564,76 +1021,101 @@ void BasePlayerState::Walk::Execute(BasePlayer * pPerson)
 	//////////////////////////////////////////////
 	//	スキルキャンセル
 	//============================================
-	if (SkillCansel(pPerson)) return;
+	if (SkillCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	ジャンプキャンセル
 	//============================================
-	if (JumpCansel(pPerson)) return;
+	if (JumpCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	エスケープボタン
 	//============================================
-	//if (EscapeCansel(pPerson)) return;
+	if (EscapeCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	フィニッシュ攻撃ボタン
 	//============================================
-	if (FinishAttackCansel(pPerson)) return;
+	if (FinishAttackCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	攻撃キャンセル
 	//============================================
-	if (RushAttackCansel(pPerson)) return;
+	if (AttackCancel(pPerson)) return;
+
+	//////////////////////////////////////////////
+	//	どっこい攻撃キャンセル
+	//============================================
+	if (DokkoiAttackCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	ヒーホードライブボタン
 	//============================================
-	if (HeaveHoCansel(pPerson)) return;
+	if (HeaveHoCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	スタンドキャンセル
 	//============================================
-	if (StandCansel(pPerson)) return;
+	if (StandCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	投げキャンセル
 	//============================================
-	if (ThrowCansel(pPerson)) return;
+	if (ThrowCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	ガードキャンセル
 	//============================================
-	if (GuardCansel(pPerson)) return;
+	//if (GuardCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	しゃがみキャンセル
 	//============================================
-	if (SquatCansel(pPerson)) return;
+	if (SquatCancel(pPerson)) return;
 
-	if (pPerson->GetInputList(PLAYER_INPUT::RIGHT) == 3)
-	{
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
-		pPerson->SetDir(DIR::RIGHT);
-		return;
-	}
+	//if (pPerson->GetInputList(PLAYER_COMMAND_BIT::RIGHT) == 3)
+	//{
+	//	// 同じ方向なら走る
+	//	if (pPerson->GetDir() == DIR::RIGHT) pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+	//	//pPerson->SetDir(DIR::RIGHT);
+	//	return;
+	//}
 
-	if (pPerson->GetInputList(PLAYER_INPUT::LEFT) == 3)
-	{
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
-		pPerson->SetDir(DIR::LEFT);
-		return;
-	}
+	//if (pPerson->GetInputList(PLAYER_COMMAND_BIT::LEFT) == 3)
+	//{
+	//	// 同じ方向なら走る
+	//	if (pPerson->GetDir() == DIR::LEFT) pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+	//	//pPerson->SetDir(DIR::LEFT);
+	//	return;
+	//}
 
-	if (pPerson->GetInputList(PLAYER_INPUT::RIGHT) == 1)
+	//////////////////////////////////////////////
+	//	ダッシュキャンセル
+	//============================================
+	if (DashCancel(pPerson))return;
+
+
+	if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
 	{
 		pPerson->AddMove(Vector3(0.1f, 0.0f, 0.0f));
-		pPerson->SetDir(DIR::RIGHT);
+		//pPerson->SetDir(DIR::RIGHT);
+		// 途中で相手が反対向きなら後ろ歩き
+		if (pPerson->GetTargetDir() == DIR::LEFT)
+		{
+			pPerson->GetFSM()->ChangeState(BasePlayerState::BackWalk::GetInstance());
+			return;
+		}
 	}
-	else if (pPerson->GetInputList(PLAYER_INPUT::LEFT) == 1)
+	else if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
 	{
 		pPerson->AddMove(Vector3(-0.1f, 0.0f, 0.0f));
-		pPerson->SetDir(DIR::LEFT);
+		//pPerson->SetDir(DIR::LEFT);
+		// 途中で相手が反対向きなら後ろ歩き
+		if (pPerson->GetTargetDir() == DIR::RIGHT)
+		{
+			pPerson->GetFSM()->ChangeState(BasePlayerState::BackWalk::GetInstance());
+			return;
+		}
 	}
 	else // ニュートラル
 	{
@@ -650,7 +1132,7 @@ void BasePlayerState::Walk::Execute(BasePlayer * pPerson)
 	}
 
 	// 移動地制御
-	pPerson->MoveClampX(pPerson->GetMaxSpeed() * .7f);
+	pPerson->MoveClampX(pPerson->GetMaxSpeed() * .5f);
 }
 
 void BasePlayerState::Walk::Exit(BasePlayer * pPerson)
@@ -683,18 +1165,186 @@ bool BasePlayerState::Walk::OnMessage(BasePlayer * pPerson, const Message & msg)
 }
 
 
+/*******************************************************/
+//					後ろ歩きステート
+/*******************************************************/
+
+void BasePlayerState::BackWalk::Enter(BasePlayer * pPerson)
+{
+	// 歩きモーションに変える
+	pPerson->SetMotion(MOTION_TYPE::BACK_WALK);
+
+	// 初速度の設定
+	Vector3 move = pPerson->GetMove();
+	switch (pPerson->GetDir())
+	{
+	case DIR::LEFT:
+		move.x += .75f;
+		break;
+	case DIR::RIGHT:
+		move.x -= .75f;
+		break;
+	default:
+		MyAssert(0, "ふぁっきゅー");
+		break;
+	}
+
+	pPerson->SetMove(move);
+}
+
+void BasePlayerState::BackWalk::Execute(BasePlayer * pPerson)
+{
+	//////////////////////////////////////////////
+	//	スキルキャンセル
+	//============================================
+	if (SkillCancel(pPerson)) return;
+
+	//////////////////////////////////////////////
+	//	ジャンプキャンセル
+	//============================================
+	if (JumpCancel(pPerson)) return;
+
+	//////////////////////////////////////////////
+	//	エスケープボタン
+	//============================================
+	if (EscapeCancel(pPerson)) return;
+
+	//////////////////////////////////////////////
+	//	フィニッシュ攻撃ボタン
+	//============================================
+	if (FinishAttackCancel(pPerson)) return;
+
+	//////////////////////////////////////////////
+	//	攻撃キャンセル
+	//============================================
+	if (AttackCancel(pPerson)) return;
+
+	//////////////////////////////////////////////
+	//	どっこい攻撃キャンセル
+	//============================================
+	if (DokkoiAttackCancel(pPerson)) return;
+
+	//////////////////////////////////////////////
+	//	ヒーホードライブボタン
+	//============================================
+	if (HeaveHoCancel(pPerson)) return;
+
+	//////////////////////////////////////////////
+	//	スタンドキャンセル
+	//============================================
+	if (StandCancel(pPerson)) return;
+
+	//////////////////////////////////////////////
+	//	投げキャンセル
+	//============================================
+	if (ThrowCancel(pPerson)) return;
+
+	//////////////////////////////////////////////
+	//	ガードキャンセル
+	//============================================
+	//if (GuardCancel(pPerson)) return;
+
+	//////////////////////////////////////////////
+	//	しゃがみキャンセル
+	//============================================
+	if (SquatCancel(pPerson)) return;
+
+	//if (pPerson->GetInputList(PLAYER_COMMAND_BIT::RIGHT) == 3)
+	//{
+	//	// 同じ方向ならその向きに歩く
+	//	if(pPerson->GetDir() == DIR::RIGHT) pPerson->GetFSM()->ChangeState(BasePlayerState::Walk::GetInstance());
+	//	else pPerson->GetFSM()->ChangeState(BasePlayerState::BackStep::GetInstance());
+	//
+	//	//pPerson->SetDir(DIR::RIGHT);
+	//	return;
+	//}
+	//
+	//if (pPerson->GetInputList(PLAYER_COMMAND_BIT::LEFT) == 3)
+	//{
+	//	// 同じ方向ならその向きに歩く
+	//	if(pPerson->GetDir() == DIR::LEFT) pPerson->GetFSM()->ChangeState(BasePlayerState::Walk::GetInstance());
+	//	else pPerson->GetFSM()->ChangeState(BasePlayerState::BackStep::GetInstance());
+	//
+	//	//pPerson->SetDir(DIR::LEFT);
+	//	return;
+	//}
+
+	//////////////////////////////////////////////
+	//	ダッシュキャンセル
+	//============================================
+	if (DashCancel(pPerson))return;
+
+	if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
+	{
+		pPerson->AddMove(Vector3(0.1f, 0.0f, 0.0f));
+		//pPerson->SetDir(DIR::RIGHT);
+		if (pPerson->GetTargetDir() == DIR::RIGHT)
+		{
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Walk::GetInstance());
+			return;
+		}
+	}
+	else if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
+	{
+		pPerson->AddMove(Vector3(-0.1f, 0.0f, 0.0f));
+		//pPerson->SetDir(DIR::LEFT);
+		if (pPerson->GetTargetDir() == DIR::LEFT)
+		{
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Walk::GetInstance());
+			return;
+		}
+	}
+	else // ニュートラル
+	{
+		//Vector3 move = pPerson->GetMove();
+		//
+		//// ほぼ止まってたら、Waitステートに移行(減速自体はBaseのアップデートでやってる)
+		//if (
+		//	//move.Length() < .1f
+		//	abs(move.x) < BasePlayer::c_END_MOVE_LINE
+		//	)
+		{
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		}
+	}
+
+	// 移動地制御
+	pPerson->MoveClampX(pPerson->GetMaxSpeed() * .35f);
+}
+
+void BasePlayerState::BackWalk::Exit(BasePlayer * pPerson)
+{
+
+
+}
+
+void BasePlayerState::BackWalk::Render(BasePlayer * pPerson)
+{
+	tdnText::Draw(20, 690, 0xffffffff, "BackWalkState");
+}
+
+bool BasePlayerState::BackWalk::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	switch (msg.Msg)
+	{
+		// 落下してるよメッセージ
+	case MESSAGE_TYPE::FALL:
+	{
+							   // 落下ステートに行く！
+							   pPerson->GetFSM()->ChangeState(Fall::GetInstance());
+							   break;
+	}
+	}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
 
 
 /*******************************************************/
 //					走るステート
 /*******************************************************/
-
-BasePlayerState::Run * BasePlayerState::Run::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::Run instance;
-	return &instance;
-}
 
 void BasePlayerState::Run::Enter(BasePlayer * pPerson)
 {
@@ -730,94 +1380,106 @@ void BasePlayerState::Run::Execute(BasePlayer * pPerson)
 	//////////////////////////////////////////////
 	//	スキルキャンセル
 	//============================================
-	if (SkillCansel(pPerson)) return;
+	if (SkillCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	ジャンプキャンセル
 	//============================================
-	if (JumpCansel(pPerson)) return;
+	if (JumpCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	エスケープボタン
 	//============================================
-	//if (EscapeCansel(pPerson)) return;
+	if (EscapeCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	攻撃キャンセル
 	//============================================
-	if (RushAttackCansel(pPerson)) return;
+	if (AttackCancel(pPerson)) return;
+
+	//////////////////////////////////////////////
+	//	どっこい攻撃キャンセル
+	//============================================
+	if (DokkoiAttackCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	ヒーホードライブボタン
 	//============================================
-	if (HeaveHoCansel(pPerson)) return;
+	if (HeaveHoCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	フィニッシュ攻撃ボタン
 	//============================================
-	if (FinishAttackCansel(pPerson)) return;
+	if (FinishAttackCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	しゃがみキャンセル
 	//============================================
-	if (SquatCansel(pPerson)) return;
+	if (SquatCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	スタンドキャンセル
 	//============================================
-	if (StandCansel(pPerson)) return;
+	if (StandCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	投げキャンセル
 	//============================================
-	if (ThrowCansel(pPerson)) return;
+	if (ThrowCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	ガードキャンセル
 	//============================================
-	if (GuardCansel(pPerson)) return;
+	//if (GuardCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	左
 	//============================================
 	// 押した瞬間
-	if (pPerson->GetInputList(PLAYER_INPUT::LEFT) == 3)
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::LEFT))
 	{
-		// 反対方向
-		if (pPerson->GetDir() == DIR::RIGHT)
+		// 相手に対して反対方向
+		if (pPerson->GetTargetDir() == DIR::RIGHT)
 		{
-			pPerson->SetDir(DIR::LEFT);
-			// ブレーキステートへ
-			pPerson->GetFSM()->ChangeState(BasePlayerState::TurnOverBrake::GetInstance());
+			// 後ろ歩きステートへ
+			pPerson->GetFSM()->ChangeState(BasePlayerState::BackWalk::GetInstance());
+		}
+		else
+		{
+			// 前歩きステートへ
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Walk::GetInstance());
 		}
 	}
 	// 押してる間
-	else if (pPerson->GetInputList(PLAYER_INPUT::LEFT) == 1)
+	else if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
 	{
 		pPerson->AddMove(Vector3(-0.1f, 0.0f, 0.0f));
-		pPerson->SetDir(DIR::LEFT);
-
+		//pPerson->SetDir(DIR::LEFT);
 	}
 
 	//////////////////////////////////////////////
 	//	右
 	//============================================
 	// 押した瞬間 理論上　★二回連続押すことはありえない　ニュートラルを挟む
-	else if (pPerson->GetInputList(PLAYER_INPUT::RIGHT) == 3)
-	{
-		// 反対方向
-		if (pPerson->GetDir() == DIR::LEFT)
-		{
-			pPerson->SetDir(DIR::RIGHT);
-			// ブレーキステートへ
-			pPerson->GetFSM()->ChangeState(BasePlayerState::TurnOverBrake::GetInstance());
-		}
-	}
+	//else if (pPerson->GetInputList(PLAYER_COMMAND_BIT::RIGHT) == 3)
+	//{
+	//	// 相手に対して反対方向
+	//	if (pPerson->GetTargetDir() == DIR::LEFT)
+	//	{
+	//		// 後ろ歩きステートへ
+	//		pPerson->GetFSM()->ChangeState(BasePlayerState::BackWalk::GetInstance());
+	//	}
+	//	else
+	//	{
+	//		// 前歩きステートへ
+	//		pPerson->GetFSM()->ChangeState(BasePlayerState::Walk::GetInstance());
+	//	}
+	//}
 	// 押してる間
-	else if (pPerson->GetInputList(PLAYER_INPUT::RIGHT) == 1)
+	else if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
 	{
 		pPerson->AddMove(Vector3(0.1f, 0.0f, 0.0f));
-		pPerson->SetDir(DIR::RIGHT);
+		//pPerson->SetDir(DIR::RIGHT);
 	}
 
 
@@ -827,10 +1489,10 @@ void BasePlayerState::Run::Execute(BasePlayer * pPerson)
 		// ある程度減速したら、前ブレーキステートに移行(減速自体はBaseのアップデートでやってる)
 		//if (abs(move.x) < BasePlayer::c_FRONT_BRAKE_LINE)
 		{
-			// 前のステートがUターンブレーキだったら、「待機」ステートに戻る(ターンブレーキの後にフロントブレーキが発生してしまうから)
-			if (pPerson->GetFSM()->isPrevState(*BasePlayerState::TurnOverBrake::GetInstance()))
-				pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
-			else
+			//// 前のステートがUターンブレーキだったら、「待機」ステートに戻る(ターンブレーキの後にフロントブレーキが発生してしまうから)
+			//if (pPerson->GetFSM()->isPrevState(*BasePlayerState::TurnOverBrake::GetInstance()))
+			//	pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+			//else
 			{
 				// ★　フロントブレーキ封印して待機にした
 				//pPerson->GetFSM()->ChangeState(BasePlayerState::FrontBrake::GetInstance());
@@ -875,80 +1537,86 @@ bool BasePlayerState::Run::OnMessage(BasePlayer * pPerson, const Message & msg)
 }
 
 
-
-
 /*******************************************************/
-//					フロントブレーキステート
+//					バクステステート
 /*******************************************************/
 
-BasePlayerState::FrontBrake * BasePlayerState::FrontBrake::GetInstance()
+void BasePlayerState::BackStep::Enter(BasePlayer * pPerson)
 {
-	// ここに変数を作る
-	static BasePlayerState::FrontBrake instance;
-	return &instance;
-}
+	// 走るモーションに変える
+	pPerson->SetMotion(MOTION_TYPE::BACK_STEP);
 
-void BasePlayerState::FrontBrake::Enter(BasePlayer * pPerson)
-{
-	// 前ブレーキモーションに変える
-	pPerson->SetMotion(MOTION_TYPE::BRAKE);
+	// バクステアクションに変える
+	pPerson->SetActionState(BASE_ACTION_STATE::BACKSTEP);
 
-	// SE再生
-	se->Play("ブレーキ1");
-}
+	// 走るエフェクト発動！
+	pPerson->AddEffectAction(pPerson->GetPos(), EFFECT_TYPE::RUN);
 
-void BasePlayerState::FrontBrake::Execute(BasePlayer * pPerson)
-{
-	//////////////////////////////////////////////
-	//	ジャンプキャンセル
-	//============================================
-	if (JumpCansel(pPerson)) return;
-
+	// 初速度の設定
 	Vector3 move = pPerson->GetMove();
-	
-	// A列車: MOVE値をここで直書きしている
-	move *= .95f;
+	switch (pPerson->GetDir())
+	{
+	case DIR::LEFT:
+		move.x += 1.5f;
+		break;
+	case DIR::RIGHT:
+		move.x -= 1.5f;
+		break;
+	default:
+		MyAssert(0, "ふぁっきゅー");
+		break;
+	}
+
 	pPerson->SetMove(move);
 
-	// ほぼ止まってたら、(減速自体はBaseのアップデートでやってる)
-	if (
-		//move.Length() < .1f
-		abs(move.x) < BasePlayer::c_END_MOVE_LINE
-		)
+	// SE再生
+	se->Play("ダッシュ");
+}
+
+void BasePlayerState::BackStep::Execute(BasePlayer * pPerson)
+{
+	// エスケープの時間更新&エスケープ時間終わったら
+	switch (pPerson->GetActionFrame())
 	{
-		// 方向キーを入力していたら、再度「走り」ステートへ
-		if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
-		{
-			pPerson->SetDir(DIR::LEFT);
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
-		}
-		else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
-		{
-			pPerson->SetDir(DIR::RIGHT);
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
-		}
+	case FRAME_STATE::START:
+		// フラグ設定
+		pPerson->SetEscapeFlag(false);
+		break;
 
-		// 左右方向キーを押してなかったら、待機ステートへ
-		else
-		{
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
-		}
+	case FRAME_STATE::ACTIVE:
+		// フラグ設定
+		pPerson->SetEscapeFlag(true);
+		break;
 
+	case FRAME_STATE::FOLLOW:
+		// フラグ設定
+		pPerson->SetEscapeFlag(false);
+		break;
+
+	case FRAME_STATE::END:
+		// 待機モーションに戻る
+	{
+		Vector3 move = pPerson->GetMove();
+		move *= .5f;	// 慣性を弱くする
+		pPerson->SetMove(move);
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+	}
+		break;
 	}
 }
 
-void BasePlayerState::FrontBrake::Exit(BasePlayer * pPerson)
+void BasePlayerState::BackStep::Exit(BasePlayer * pPerson)
 {
 
 
 }
 
-void BasePlayerState::FrontBrake::Render(BasePlayer * pPerson)
+void BasePlayerState::BackStep::Render(BasePlayer * pPerson)
 {
-	tdnText::Draw(20, 690, 0xffffffff, "フロントBrakeState");
+	tdnText::Draw(20, 690, 0xffffffff, "BackStepState");
 }
 
-bool BasePlayerState::FrontBrake::OnMessage(BasePlayer * pPerson, const Message & msg)
+bool BasePlayerState::BackStep::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
 	// メッセージタイプ
 	switch (msg.Msg)
@@ -956,15 +1624,105 @@ bool BasePlayerState::FrontBrake::OnMessage(BasePlayer * pPerson, const Message 
 		// 落下してるよメッセージ
 	case MESSAGE_TYPE::FALL:
 	{
-		// 落下ステートに行く！
-		pPerson->GetFSM()->ChangeState(Fall::GetInstance());
-		break;
+							   // 落下ステートに行く！
+							   pPerson->GetFSM()->ChangeState(Fall::GetInstance());
+							   break;
 	}
 	}
 
 	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
 	return false;
 }
+
+
+/*******************************************************/
+//					フロントブレーキステート
+/*******************************************************/
+
+//BasePlayerState::FrontBrake * BasePlayerState::FrontBrake::GetInstance()
+//{
+//	// ここに変数を作る
+//	static BasePlayerState::FrontBrake instance;
+//	return &instance;
+//}
+//
+//void BasePlayerState::FrontBrake::Enter(BasePlayer * pPerson)
+//{
+//	// 前ブレーキモーションに変える
+//	pPerson->SetMotion(MOTION_TYPE::BRAKE);
+//
+//	// SE再生
+//	se->Play("ブレーキ1");
+//}
+//
+//void BasePlayerState::FrontBrake::Execute(BasePlayer * pPerson)
+//{
+//	//////////////////////////////////////////////
+//	//	ジャンプキャンセル
+//	//============================================
+//	if (JumpCancel(pPerson)) return;
+//
+//	Vector3 move = pPerson->GetMove();
+//	
+//	// A列車: MOVE値をここで直書きしている
+//	move *= .95f;
+//	pPerson->SetMove(move);
+//
+//	// ほぼ止まってたら、(減速自体はBaseのアップデートでやってる)
+//	if (
+//		//move.Length() < .1f
+//		abs(move.x) < BasePlayer::c_END_MOVE_LINE
+//		)
+//	{
+//		// 方向キーを入力していたら、再度「走り」ステートへ
+//		if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
+//		{
+//			pPerson->SetDir(DIR::LEFT);
+//			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+//		}
+//		else if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
+//		{
+//			pPerson->SetDir(DIR::RIGHT);
+//			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+//		}
+//
+//		// 左右方向キーを押してなかったら、待機ステートへ
+//		else
+//		{
+//			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+//		}
+//
+//	}
+//}
+//
+//void BasePlayerState::FrontBrake::Exit(BasePlayer * pPerson)
+//{
+//
+//
+//}
+//
+//void BasePlayerState::FrontBrake::Render(BasePlayer * pPerson)
+//{
+//	tdnText::Draw(20, 690, 0xffffffff, "フロントBrakeState");
+//}
+//
+//bool BasePlayerState::FrontBrake::OnMessage(BasePlayer * pPerson, const Message & msg)
+//{
+//	// メッセージタイプ
+//	switch (msg.Msg)
+//	{
+//		// 落下してるよメッセージ
+//	case MESSAGE_TYPE::FALL:
+//	{
+//		// 落下ステートに行く！
+//		pPerson->GetFSM()->ChangeState(Fall::GetInstance());
+//		break;
+//	}
+//	}
+//
+//	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+//	return false;
+//}
 
 
 
@@ -972,97 +1730,90 @@ bool BasePlayerState::FrontBrake::OnMessage(BasePlayer * pPerson, const Message 
 //					Uターンブレーキステート
 /*******************************************************/
 
-BasePlayerState::TurnOverBrake * BasePlayerState::TurnOverBrake::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::TurnOverBrake instance;
-	return &instance;
-}
-
-void BasePlayerState::TurnOverBrake::Enter(BasePlayer * pPerson)
-{
-	// Uターンブレーキモーションに変える
-	pPerson->SetMotion(MOTION_TYPE::U_TURN);
-
-	// SE再生
-	se->Play("ブレーキ1");
-}
-
-void BasePlayerState::TurnOverBrake::Execute(BasePlayer * pPerson)
-{
-	//////////////////////////////////////////////
-	//	ジャンプキャンセル
-	//============================================
-	if (JumpCansel(pPerson)) return;
-
-	Vector3 move = pPerson->GetMove();
-
-	// ほぼ止まってたら、Waitステートに移行(減速自体はBaseのアップデートでやってる)
-	if (
-		//move.Length() < .1f
-		abs(move.x) < BasePlayer::c_END_MOVE_LINE
-		)
-	{
-		// 方向キーを入力していたら、再度「走り」ステートへ
-		if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
-		{
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
-		}
-		else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
-		{
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
-		}
-
-		// 左右方向キーを押してなかったら、待機ステートへ
-		else
-		{
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
-		}
-
-	}
-}
-
-void BasePlayerState::TurnOverBrake::Exit(BasePlayer * pPerson)
-{
-
-
-}
-
-void BasePlayerState::TurnOverBrake::Render(BasePlayer * pPerson)
-{
-	tdnText::Draw(20, 690, 0xffffffff, "TurnOverBrakeState");
-}
-
-bool BasePlayerState::TurnOverBrake::OnMessage(BasePlayer * pPerson, const Message & msg)
-{
-	// メッセージタイプ
-	switch (msg.Msg)
-	{
-		// 落下してるよメッセージ
-	case MESSAGE_TYPE::FALL:
-	{
-		// 落下ステートに行く！
-		pPerson->GetFSM()->ChangeState(Fall::GetInstance());
-		break;
-	}
-	}
-
-	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
-	return false;
-}
+//BasePlayerState::TurnOverBrake * BasePlayerState::TurnOverBrake::GetInstance()
+//{
+//	// ここに変数を作る
+//	static BasePlayerState::TurnOverBrake instance;
+//	return &instance;
+//}
+//
+//void BasePlayerState::TurnOverBrake::Enter(BasePlayer * pPerson)
+//{
+//	// Uターンブレーキモーションに変える
+//	pPerson->SetMotion(MOTION_TYPE::U_TURN);
+//
+//	// SE再生
+//	se->Play("ブレーキ1");
+//}
+//
+//void BasePlayerState::TurnOverBrake::Execute(BasePlayer * pPerson)
+//{
+//	//////////////////////////////////////////////
+//	//	ジャンプキャンセル
+//	//============================================
+//	if (JumpCancel(pPerson)) return;
+//
+//	Vector3 move = pPerson->GetMove();
+//
+//	// ほぼ止まってたら、Waitステートに移行(減速自体はBaseのアップデートでやってる)
+//	if (
+//		//move.Length() < .1f
+//		abs(move.x) < BasePlayer::c_END_MOVE_LINE
+//		)
+//	{
+//		// 方向キーを入力していたら、再度「走り」ステートへ
+//		if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
+//		{
+//			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+//		}
+//		else if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
+//		{
+//			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+//		}
+//
+//		// 左右方向キーを押してなかったら、待機ステートへ
+//		else
+//		{
+//			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+//		}
+//
+//	}
+//}
+//
+//void BasePlayerState::TurnOverBrake::Exit(BasePlayer * pPerson)
+//{
+//
+//
+//}
+//
+//void BasePlayerState::TurnOverBrake::Render(BasePlayer * pPerson)
+//{
+//	tdnText::Draw(20, 690, 0xffffffff, "TurnOverBrakeState");
+//}
+//
+//bool BasePlayerState::TurnOverBrake::OnMessage(BasePlayer * pPerson, const Message & msg)
+//{
+//	// メッセージタイプ
+//	switch (msg.Msg)
+//	{
+//		// 落下してるよメッセージ
+//	case MESSAGE_TYPE::FALL:
+//	{
+//		// 落下ステートに行く！
+//		pPerson->GetFSM()->ChangeState(Fall::GetInstance());
+//		break;
+//	}
+//	}
+//
+//	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+//	return false;
+//}
 
 
 
 /*******************************************************/
 //					ジャンプステート
 /*******************************************************/
-
-BasePlayerState::Jump * BasePlayerState::Jump::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::Jump instance;
-	return &instance;
-}
 
 void BasePlayerState::Jump::Enter(BasePlayer * pPerson)
 {
@@ -1080,13 +1831,13 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 	//============================================
 	if (pPerson->GetJump()->bHold)
 	{
-		if (pPerson->isPushInput(PLAYER_INPUT::C))
+		if (pPerson->isPushInput(PLAYER_COMMAND_BIT::C))
 		{
 			// プレイヤーが押してる時間計測
 			pPerson->GetJump()->PlayerHoldTimer++;
 		}
 
-		if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
+		if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::B))
 			pPerson->GetJump()->bAttackPush = true;
 
 		if (++pPerson->GetJump()->HoldTimer > 2)
@@ -1106,11 +1857,22 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 			//}
 
 			// 左右入力
-			//if (pPerson->isPushInput(PLAYER_INPUT::LEFT))		add.x = -.25f;
-			//else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT)) add.x = .25f;
+			if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))		add.x = -.5f;
+			else if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT)) add.x = .5f;
 
 			// 移動地を足す！
-			pPerson->AddMove(add);
+			if (pPerson->GetFSM()->isPrevState(*Run::GetInstance()))
+			{
+				add.x *= .25f;
+				pPerson->AddMove(add);
+			}
+			else
+			{
+				pPerson->SetMove(add);
+			}
+
+			// ★ジャンプエフェクト
+			pPerson->AddEffectAction(pPerson->GetPos(), EFFECT_TYPE::JUMP);
 
 			// 地上フラグオフ！
 			//pPerson->SetLand(false);
@@ -1121,12 +1883,13 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 			// しゃがんでる最中に攻撃ボタンを押してたら
 			if (pPerson->GetJump()->bAttackPush)
 			{
-				if (pPerson->isPushInput(PLAYER_INPUT::DOWN) == true)
-				{
-					// 空中下攻撃ステートに行く
-					pPerson->GetFSM()->ChangeState(BasePlayerState::AerialDropAttack::GetInstance());
-				}
-				else
+				// 空下封印
+				//if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN) == true)
+				//{
+				//	// 空中下攻撃ステートに行く
+				//	pPerson->GetFSM()->ChangeState(BasePlayerState::AerialDropAttack::GetInstance());
+				//}
+				//else
 				{
 					// 空中攻撃ステートに行く
 					pPerson->GetFSM()->ChangeState(BasePlayerState::AerialAttack::GetInstance());
@@ -1155,47 +1918,47 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 		//////////////////////////////////////////////
 		//	スキルキャンセル
 		//============================================
-		if (SkillCansel(pPerson)) return;
+		if (SkillCancel(pPerson)) return;
+
+		////////////////////////////////////////////////
+		////	空中攻撃キャンセル
+		////============================================
+		//if (AerialAttackCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
-		//	攻撃ボタン
+		//	攻撃キャンセル
 		//============================================
-	
-		if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
-		{
-			if (pPerson->isPushInput(PLAYER_INPUT::DOWN) == true)
-			{
-				// 空中下攻撃ステートに行く
-				pPerson->GetFSM()->ChangeState(BasePlayerState::AerialDropAttack::GetInstance());
-			}
-			else
-			{
-				// 空中攻撃ステートに行く
-				pPerson->GetFSM()->ChangeState(BasePlayerState::AerialAttack::GetInstance());
-			}
-		
-			return;
-		}
+		if (AttackCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	どっこい攻撃キャンセル
+		//============================================
+		if (DokkoiAttackCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	ヒーホードライブボタン
 		//============================================
-		if (HeaveHoCansel(pPerson)) return;
+		if (HeaveHoCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	フィニッシュ攻撃ボタン
 		//============================================
-		if (FinishAttackCansel(pPerson)) return;
+		if (FinishAttackCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	スタンドキャンセル
 		//============================================
-		if (StandCansel(pPerson)) return;
+		if (StandCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	空中ダッシュキャンセル
+		//============================================
+		if (AerialDashCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	空中ジャンプボタン
 		//============================================
-		//if (pPerson->GetInputList(PLAYER_INPUT::C) == 3)
+		//if (pPerson->GetInputList(PLAYER_COMMAND_BIT::C) == 3)
 		//{
 		//	// 空中ジャンプの権利がなかったら弾く
 		//	if (pPerson->isAerialJump() == true)
@@ -1204,27 +1967,27 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 		//		pPerson->GetFSM()->ChangeState(BasePlayerState::AerialJump::GetInstance());
 		//	}
 		//}
-		if (JumpCansel(pPerson))return;
+		if (JumpCancel(pPerson))return;
 
 		//////////////////////////////////////////////
 		//	左入力
 		//============================================
-		if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
-		{
-			pPerson->AddMove(Vector3(-0.03f, 0.0f, 0.0f));
-		}
+		//if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
+		//{
+		//	pPerson->AddMove(Vector3(-0.03f, 0.0f, 0.0f));
+		//}
 
 
 		//////////////////////////////////////////////
 		//	右入力
 		//============================================
-		else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
-		{
-			pPerson->AddMove(Vector3(0.03f, 0.0f, 0.0f));
-		}
-
-		// 移動地制御
-		pPerson->MoveClampX(pPerson->GetMaxSpeed() * 0.8f);
+		//else if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
+		//{
+		//	pPerson->AddMove(Vector3(0.03f, 0.0f, 0.0f));
+		//}
+		//
+		//// 移動地制御
+		pPerson->MoveClampX(pPerson->GetMaxSpeed());
 	}
 }
 
@@ -1248,13 +2011,6 @@ bool BasePlayerState::Jump::OnMessage(BasePlayer * pPerson, const Message & msg)
 //					空中ジャンプステート
 /*******************************************************/
 
-BasePlayerState::AerialJump * BasePlayerState::AerialJump::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::AerialJump instance;
-	return &instance;
-}
-
 void BasePlayerState::AerialJump::Enter(BasePlayer * pPerson)
 {
 	// ジャンプモーションに変える
@@ -1264,14 +2020,15 @@ void BasePlayerState::AerialJump::Enter(BasePlayer * pPerson)
 	pPerson->SetAerialJump(false);
 
 	// 移動地を足す！
-	Vector3 set(pPerson->GetMove() * .5f);//c_MAX_AerialJump
-	if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
+	//Vector3 set(pPerson->GetMove());//c_MAX_AerialJump
+	Vector3 set(0, 0, 0);
+	if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
 	{
-		set.x -= .075f;
+		set.x = -.475f;
 	}
-	else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
+	else if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
 	{
-		set.x += .075f;
+		set.x = .475f;
 	}
 	set.y = 2.0f;
 	pPerson->SetMove(set);// 前回のMOVE値を消す
@@ -1294,71 +2051,61 @@ void BasePlayerState::AerialJump::Execute(BasePlayer * pPerson)
 	//////////////////////////////////////////////
 	//	スキルキャンセル
 	//============================================
-	if (SkillCansel(pPerson)) return;
+	if (SkillCancel(pPerson)) return;
 
-		//////////////////////////////////////////////
-		//	攻撃ボタン
-		//============================================
+	//////////////////////////////////////////////
+	//	空中攻撃キャンセル
+	//============================================
+	//if (AerialAttackCancel(pPerson)) return;
 
-		if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
-		{
-			if (pPerson->isPushInput(PLAYER_INPUT::DOWN) == true)
-			{
-				// 空中下攻撃ステートに行く
-				pPerson->GetFSM()->ChangeState(BasePlayerState::AerialDropAttack::GetInstance());
-			}
-			else
-			{
-				// 空中攻撃ステートに行く
-				pPerson->GetFSM()->ChangeState(BasePlayerState::AerialAttack::GetInstance());
-			}
+	//////////////////////////////////////////////
+	//	攻撃キャンセル
+	//============================================
+	if (AttackCancel(pPerson)) return;
 
-			return;
-		}
+	//////////////////////////////////////////////
+	//	ヒーホードライブボタン
+	//============================================
+	if (HeaveHoCancel(pPerson)) return;
 
-		//////////////////////////////////////////////
-		//	ヒーホードライブボタン
-		//============================================
-		if (HeaveHoCansel(pPerson)) return;
+	//////////////////////////////////////////////
+	//	スタンドキャンセル
+	//============================================
+	if (StandCancel(pPerson)) return;
 
-		//////////////////////////////////////////////
-		//	スタンドキャンセル
-		//============================================
-		if (StandCansel(pPerson)) return;
+	//////////////////////////////////////////////
+	//	フィニッシュ攻撃ボタン
+	//============================================
+	if (FinishAttackCancel(pPerson)) return;
 
-		//////////////////////////////////////////////
-		//	フィニッシュ攻撃ボタン
-		//============================================
-		if (FinishAttackCansel(pPerson)) return;
-
-		//////////////////////////////////////////////
-		//	左入力
-		//============================================
-		if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
-		{
-			pPerson->AddMove(Vector3(-0.025f, 0.0f, 0.0f));
-		}
+	//////////////////////////////////////////////
+	//	左入力
+	//============================================
+	//if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
+	//{
+	//	pPerson->AddMove(Vector3(-0.025f, 0.0f, 0.0f));
+	//}
 
 
-		//////////////////////////////////////////////
-		//	右入力
-		//============================================
-		else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
-		{
-			pPerson->AddMove(Vector3(0.025f, 0.0f, 0.0f));
-		}
+	//////////////////////////////////////////////
+	//	右入力
+	//============================================
+	//else if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
+	//{
+	//	pPerson->AddMove(Vector3(0.025f, 0.0f, 0.0f));
+	//}
 
-		// 移動地制御
-		pPerson->MoveClampX(pPerson->GetMaxSpeed() * 0.8f);
+	// 移動地制御
+	pPerson->MoveClampX(pPerson->GetMaxSpeed() * 0.5f);
 
 
-		// 地上フラグtrue(着地したら)
-		if (pPerson->isLand())
-		{
-			// 着地ステートに移行
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Land::GetInstance());
-		}
-	
+	// 地上フラグtrue(着地したら)
+	if (pPerson->isLand())
+	{
+		// 着地ステートに移行
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Land::GetInstance());
+	}
+
 }
 
 void BasePlayerState::AerialJump::Exit(BasePlayer * pPerson)
@@ -1382,13 +2129,6 @@ bool BasePlayerState::AerialJump::OnMessage(BasePlayer * pPerson, const Message 
 /*******************************************************/
 //					落下
 /*******************************************************/
-
-BasePlayerState::Fall * BasePlayerState::Fall::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::Fall instance;
-	return &instance;
-}
 
 void BasePlayerState::Fall::Enter(BasePlayer * pPerson)
 {
@@ -1416,65 +2156,55 @@ void BasePlayerState::Fall::Execute(BasePlayer * pPerson)
 	//////////////////////////////////////////////
 	//	スキルキャンセル
 	//============================================
-	if (SkillCansel(pPerson)) return;
+	if (SkillCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	ジャンプキャンセル
 	//============================================
-	if (JumpCansel(pPerson)) return;
+	if (JumpCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	ヒーホードライブボタン
 	//============================================
-	if (HeaveHoCansel(pPerson)) return;
+	if (HeaveHoCancel(pPerson)) return;
 
 
 	//////////////////////////////////////////////
-	//	攻撃ボタン
+	//	空中攻撃キャンセル
 	//============================================
+	//if (AerialAttackCancel(pPerson)) return;
 
-	if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
-	{
-		if (pPerson->isPushInput(PLAYER_INPUT::DOWN) == true)
-		{
-			// 空中下攻撃ステートに行く
-			pPerson->GetFSM()->ChangeState(BasePlayerState::AerialDropAttack::GetInstance());
-		}
-		else
-		{
-			// 空中攻撃ステートに行く
-			pPerson->GetFSM()->ChangeState(BasePlayerState::AerialAttack::GetInstance());
-		}
-
-		return;
-	}
+	//////////////////////////////////////////////
+	//	攻撃キャンセル
+	//============================================
+	if (AttackCancel(pPerson))return;
 
 	//////////////////////////////////////////////
 	//	フィニッシュ攻撃ボタン
 	//============================================
-	if (FinishAttackCansel(pPerson)) return;
+	if (FinishAttackCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	スタンドキャンセル
 	//============================================
-	if (StandCansel(pPerson)) return;
+	if (StandCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	左入力
 	//============================================
-	if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
-	{
-		pPerson->AddMove(Vector3(-0.05f, 0.0f, 0.0f));
-	}
-
-
-	//////////////////////////////////////////////
+	//if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
+	//{
+	//	pPerson->AddMove(Vector3(-0.05f, 0.0f, 0.0f));
+	//}
+	//
+	//
+	////////////////////////////////////////////////
 	//	右入力
 	//============================================
-	else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
-	{
-		pPerson->AddMove(Vector3(0.05f, 0.0f, 0.0f));
-	}
+	//else if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
+	//{
+	//	pPerson->AddMove(Vector3(0.05f, 0.0f, 0.0f));
+	//}
 
 	// 移動地制御
 	pPerson->MoveClampX(pPerson->GetMaxSpeed() * 1.1f);
@@ -1501,13 +2231,6 @@ bool BasePlayerState::Fall::OnMessage(BasePlayer * pPerson, const Message & msg)
 /*******************************************************/
 //					着地ステート
 /*******************************************************/
-
-BasePlayerState::Land * BasePlayerState::Land::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::Land instance;
-	return &instance;
-}
 
 void BasePlayerState::Land::Enter(BasePlayer * pPerson)
 {
@@ -1537,58 +2260,60 @@ void BasePlayerState::Land::Execute(BasePlayer * pPerson)
 		//////////////////////////////////////////////
 		//	スキルキャンセル
 		//============================================
-		if (SkillCansel(pPerson)) return;
+		if (SkillCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	ジャンプキャンセル
 		//============================================
-		if (JumpCansel(pPerson))
+		if (JumpCancel(pPerson))
 			return;
 
 		//////////////////////////////////////////////
 		//	ヒーホードライブボタン
 		//============================================
-		if (HeaveHoCansel(pPerson)) return;
+		if (HeaveHoCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	攻撃キャンセル
 		//============================================
-		if (RushAttackCansel(pPerson)) return;
+		if (AttackCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	フィニッシュ攻撃ボタン
 		//============================================
-		if (FinishAttackCansel(pPerson)) return;
+		if (FinishAttackCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	スタンドキャンセル
 		//============================================
-		if (StandCansel(pPerson)) return;
+		if (StandCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	しゃがみキャンセル
 		//============================================
-		if (SquatCansel(pPerson)) return;
+		if (SquatCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	はしりキャンセル
 		//============================================
-		if (RunCansel(pPerson)) return;
+		if (RunCancel(pPerson)) return;
 	}
 
 	// 一定時間着地したら
 	if (++pPerson->GetJump()->LandTimer > 12)
 	{
 		// 方向キーを入力していたら、「走り」ステートへ
-		if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
+		if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
 		{
-			pPerson->SetDir(DIR::LEFT);
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+			//pPerson->SetDir(DIR::LEFT);
+			if (pPerson->GetDir() == DIR::LEFT) pPerson->GetFSM()->ChangeState(BasePlayerState::Walk::GetInstance());
+			else pPerson->GetFSM()->ChangeState(BasePlayerState::BackWalk::GetInstance());
 		}
-		else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
+		else if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
 		{
-			pPerson->SetDir(DIR::RIGHT);
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+			//pPerson->SetDir(DIR::RIGHT);
+			if (pPerson->GetDir() == DIR::RIGHT) pPerson->GetFSM()->ChangeState(BasePlayerState::Walk::GetInstance());
+			else pPerson->GetFSM()->ChangeState(BasePlayerState::BackWalk::GetInstance());
 		}
 
 		// 左右方向キーを押してなかったら、「待機」ステートへ
@@ -1622,15 +2347,11 @@ bool BasePlayerState::Land::OnMessage(BasePlayer * pPerson, const Message & msg)
 //					ラッシュ攻撃ステート
 /*******************************************************/
 
-BasePlayerState::RushAttack * BasePlayerState::RushAttack::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::RushAttack instance;
-	return &instance;
-}
-
 void BasePlayerState::RushAttack::Enter(BasePlayer * pPerson)
 {
+	// 正面向きながら攻撃防止
+	pPerson->SetDirAngle();
+
 	// 初撃モーションに変える
 	pPerson->SetMotion(MOTION_TYPE::RUSH_ATTACK1);
 
@@ -1662,42 +2383,66 @@ void BasePlayerState::RushAttack::Enter(BasePlayer * pPerson)
 
 void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 {
+	// 攻撃終了してたら
+	if (!pPerson->isAttackState())
+	{
+		// 待機モーションに戻る
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		return;
+	}
+
 	switch (pPerson->GetRushAttack()->step)
 	{
 	case 0:	// 1段目
-			// 攻撃終了してたら
-		if (!pPerson->isAttackState())
-		{
-			// 待機モーションに戻る
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
-		}
+
+		// ★若干早い段階から先行入力を受け付ける
+		if (pPerson->GetActionFrame() == FRAME_STATE::START && pPerson->GetCurrentFrame() > BasePlayer::c_RUSH_AHEAD_START) pPerson->AheadCommandUpdate();
 
 		// ヒットしてる状態
-		else if (pPerson->GetAttackData()->bHit)
+		if (pPerson->GetAttackData()->bHit)
 		{
-			/* キャンセルルート */
-			
-			//////////////////////////////////////////////
-			//	スキルキャンセル
-			//============================================
-			if (SkillCansel(pPerson)) return;
-
-			//////////////////////////////////////////////
-			//	スタンドキャンセル
-			//============================================
-			if (StandCansel(pPerson)) return;
-
-			//////////////////////////////////////////////
-			//	しゃがみキャンセル
-			//============================================
-			if (SquatCansel(pPerson)) return;
-
 			// フォローモーション(次の攻撃へ)
-			if (pPerson->GetActionFrame() == FRAME_STATE::FOLLOW)
+			//if (pPerson->GetActionFrame() == FRAME_STATE::FOLLOW)
 			{
+				/* キャンセルルート */
+
+				//////////////////////////////////////////////
+				//	スキルキャンセル
+				//============================================
+				if (SkillCancel(pPerson)) return;
+
+				//////////////////////////////////////////////
+				//	スタンドキャンセル
+				//============================================
+				if (StandCancel(pPerson)) return;
+
+				//////////////////////////////////////////////
+				//	しゃがみ攻撃キャンセル
+				//============================================
+				if (SquatAttackCancel(pPerson)) return;
+				//ここのきゃんせるどうするか
+				// ★★★★★★★★★
+
+				//////////////////////////////////////////////
+				//	どっこい攻撃キャンセル
+				//============================================
+				if (DokkoiAttackCancel(pPerson)) return;
+
+				//////////////////////////////////////////////
+				//	ヒーホードライブキャンセル
+				//============================================
+				if (HeaveHoCancel(pPerson)) return;
+
+				//////////////////////////////////////////////
+				//	ヒーホードライブオーバーフローキャンセル
+				//============================================
+				if (HeaveHoOverFlowCancel(pPerson)) return;
 				// 攻撃ボタン押したら(押しっぱなし込み)
-				if (pPerson->isPushInput(PLAYER_INPUT::B))
+				if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::C, true))
 				{
+					// 先行入力リセット
+					pPerson->AheadCommandReset();
+
 					// 次のモーションセット
 					pPerson->SetMotion(MOTION_TYPE::RUSH_ATTACK2);
 
@@ -1708,18 +2453,18 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 					//pPerson->GetRushAttack()->bNextOK = false;
 
 					// 向いてる方向にキーを入力すると移動
-					const float pow = 0.8f;	
-					if(pPerson->GetDir() == DIR::RIGHT)
+					const float pow = 0.8f;
+					if (pPerson->GetDir() == DIR::RIGHT)
 					{
-						if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))// 方向キーを入力してたら
-						pPerson->AddMove(Vector3(pow, 0, 0));
+						if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))// 方向キーを入力してたら
+							pPerson->AddMove(Vector3(pow, 0, 0));
 					}
 					else
 					{
-						if (pPerson->isPushInput(PLAYER_INPUT::LEFT)) // 方向キーを入力してたら
-						pPerson->AddMove(Vector3(-pow, 0, 0));
+						if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT)) // 方向キーを入力してたら
+							pPerson->AddMove(Vector3(-pow, 0, 0));
 					}
-						
+
 				}
 			}
 		}
@@ -1727,82 +2472,85 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 		break;
 	case 1:	// 2段目
 
-		// 攻撃終了してたら
-		if (!pPerson->isAttackState())
-		{
-			// 待機モーションに戻る
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
-		}
+		// ★若干早い段階から先行入力を受け付ける
+		if (pPerson->GetActionFrame() == FRAME_STATE::START && pPerson->GetCurrentFrame() > BasePlayer::c_RUSH_AHEAD_START) pPerson->AheadCommandUpdate();
 
 		// ヒットしてる状態
-		else if (pPerson->GetAttackData()->bHit)
+		if (pPerson->GetAttackData()->bHit)
 		{
-			/* キャンセルルート */
-			//////////////////////////////////////////////
-			//	スキルキャンセル
-			//============================================
-			if (SkillCansel(pPerson)) return;
-
-			//////////////////////////////////////////////
-			//	スタンドキャンセル
-			//============================================
-			if (StandCansel(pPerson)) return;
-
-			//////////////////////////////////////////////
-			//	しゃがみキャンセル
-			//============================================
-			if (SquatCansel(pPerson)) return;
-
 			// フォローモーション(次の攻撃へ)
-			if (pPerson->GetActionFrame() == FRAME_STATE::FOLLOW)
+			//if (pPerson->GetActionFrame() == FRAME_STATE::FOLLOW)
 			{
-				// 攻撃ボタン押したら(押しっぱなし込み)
-				if (pPerson->isPushInput(PLAYER_INPUT::B))
-				{
-					// 次のモーションセット
-					pPerson->SetMotion(MOTION_TYPE::RUSH_ATTACK3);
+				/* キャンセルルート */
+				//////////////////////////////////////////////
+				//	スキルキャンセル
+				//============================================
+				if (SkillCancel(pPerson)) return;
 
-					// 攻撃ステートを3段目に設定する
-					pPerson->SetActionState(BASE_ACTION_STATE::RUSH3);
+				//////////////////////////////////////////////
+				//	スタンドキャンセル
+				//============================================
+				if (StandCancel(pPerson)) return;
+
+				//////////////////////////////////////////////
+				//	しゃがみ攻撃キャンセル
+				//============================================
+				if (SquatAttackCancel(pPerson)) return;
+
+				//////////////////////////////////////////////
+				//	どっこい攻撃キャンセル
+				//============================================
+				if (DokkoiAttackCancel(pPerson)) return;
+
+				//////////////////////////////////////////////
+				//	ヒーホードライブキャンセル
+				//============================================
+				if (HeaveHoCancel(pPerson)) return;
+
+				//////////////////////////////////////////////
+				//	ヒーホードライブオーバーフローキャンセル
+				//============================================
+				if (HeaveHoOverFlowCancel(pPerson)) return;
+
+				// 攻撃ボタン押したら(押しっぱなし込み)
+				if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::C, true))
+				{
+					// 先行入力リセット
+					pPerson->AheadCommandReset();
 
 					pPerson->GetRushAttack()->step++;
 					//pPerson->GetRushAttack()->bNextOK = false;
 
-					//const float pow = 0.2f;
-					//pPerson->AddMove((pPerson->GetDir() == DIR::RIGHT) ? Vector3(pow, 0, 0) : Vector3(-pow, 0, 0));
-
 					// 向いてる方向にキーを入力すると移動
-					const float pow = 0.4f;
+					const float pow = 0.8f;
 					if (pPerson->GetDir() == DIR::RIGHT)
 					{
-						if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))// 方向キーを入力してたら
+						if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))// 方向キーを入力してたら
 							pPerson->AddMove(Vector3(pow, 0, 0));
 					}
 					else
 					{
-						if (pPerson->isPushInput(PLAYER_INPUT::LEFT)) // 方向キーを入力してたら
+						if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT)) // 方向キーを入力してたら
 							pPerson->AddMove(Vector3(-pow, 0, 0));
 					}
+
+					pPerson->ThirdRushInit();
 				}
 			}
 		}
 
 		break;
 	case 2:	// 3段目
-		// 攻撃終了してたら
-		if (!pPerson->isAttackState())
-		{
-			// 待機モーションに戻る
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
-		}
+		pPerson->ThirdRushUpdate();
 		break;
 	}
 }
 
 void BasePlayerState::RushAttack::Exit(BasePlayer * pPerson)
 {
-	// 攻撃ステートをやめさせる
-	//pPerson->SetActionState(BASE_ACTION_STATE::NO_ACTION);
+	if (pPerson->GetRushAttack()->step == 2) pPerson->ThirdRushExit();
+	// 先行入力リセット
+	pPerson->AheadCommandReset();
 }
 
 void BasePlayerState::RushAttack::Render(BasePlayer * pPerson)
@@ -1836,14 +2584,6 @@ bool BasePlayerState::RushAttack::OnMessage(BasePlayer * pPerson, const Message 
 //					ノックバックステート
 /*******************************************************/
 
-BasePlayerState::KnockBack * BasePlayerState::KnockBack::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::KnockBack instance;
-	return &instance;
-}
-
-
 void BasePlayerState::KnockBack::Enter(BasePlayer * pPerson)
 {
 	// ダメージモーションに変える
@@ -1859,7 +2599,8 @@ void BasePlayerState::KnockBack::Execute(BasePlayer * pPerson)
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
 		// 喰らったカウントリセット
 		pPerson->GetRecoveryDamageCount()->clear();
-		
+		// 先行入力リセット
+		pPerson->AheadCommandReset();
 
 	}
 }
@@ -1883,9 +2624,9 @@ bool BasePlayerState::KnockBack::OnMessage(BasePlayer * pPerson, const Message &
 	//	// 攻撃くらったよメッセージ
 	//case MESSAGE_TYPE::HIT_DAMAGE:
 	//{
-	//								 HIT_DAMAGE_INFO *hdi = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+	//								 HIT_DAMAGE_INFO *HitDamageInfo = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
 	//								 // 喰らってる状態でくらった攻撃リスト追加
-	//								 pPerson->GetRecoveryDamageCount()->push_back((BASE_ACTION_STATE)hdi->iAttackType);
+	//								 pPerson->GetRecoveryDamageCount()->push_back((BASE_ACTION_STATE)HitDamageInfo->iAttackType);
 	//								 // trueは返さない。ここでは、ダウン状態でのくらったカウントを取るだけなので。
 	//}
 	//}
@@ -1897,13 +2638,6 @@ bool BasePlayerState::KnockBack::OnMessage(BasePlayer * pPerson, const Message &
 /*******************************************************/
 //					エアリアルノックバックステート
 /*******************************************************/
-
-BasePlayerState::AerialKnockBack * BasePlayerState::AerialKnockBack::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::AerialKnockBack instance;
-	return &instance;
-}
 
 void BasePlayerState::AerialKnockBack::Enter(BasePlayer * pPerson)
 {
@@ -1918,11 +2652,11 @@ void BasePlayerState::AerialKnockBack::Execute(BasePlayer * pPerson)
 	if (pPerson->GetRecoveryFrame() <= 0)
 	{
 		// 硬直が0になったら　なおかついずれかのボタンを押していたら復帰ステートへ
-		if (pPerson->isPushInput(PLAYER_INPUT::A)||
-			pPerson->isPushInput(PLAYER_INPUT::B)||
-			pPerson->isPushInput(PLAYER_INPUT::C)||
-			pPerson->isPushInput(PLAYER_INPUT::D)||
-			pPerson->isPushInput(PLAYER_INPUT::R1))
+		if (pPerson->isPushInput(PLAYER_COMMAND_BIT::A)||
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::B)||
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::C)||
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::D)||
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::R1))
 		{
 
 			// 地上オア空中
@@ -1930,17 +2664,17 @@ void BasePlayerState::AerialKnockBack::Execute(BasePlayer * pPerson)
 			{
 				// 地上リカバリーステートへ！
 				pPerson->GetFSM()->ChangeState(BasePlayerState::LandRecovery::GetInstance());
-				// 喰らったカウントリセット
-				pPerson->GetRecoveryDamageCount()->clear();
 			}
 			else
 			{
 				// 空中リカバリーステートへ！
 				pPerson->GetFSM()->ChangeState(BasePlayerState::AerialRecovery::GetInstance());
-				// 喰らったカウントリセット
-				pPerson->GetRecoveryDamageCount()->clear();
 			}
 
+			// 喰らったカウントリセット
+			pPerson->GetRecoveryDamageCount()->clear();
+			// 先行入力リセット
+			pPerson->AheadCommandReset();
 		}
 	}
 }
@@ -1964,9 +2698,9 @@ bool BasePlayerState::AerialKnockBack::OnMessage(BasePlayer * pPerson, const Mes
 		//	// 攻撃くらったよメッセージ
 		//case MESSAGE_TYPE::HIT_DAMAGE:
 		//{
-		//								 HIT_DAMAGE_INFO *hdi = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+		//								 HIT_DAMAGE_INFO *HitDamageInfo = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
 		//								 // 喰らってる状態でくらった攻撃リスト追加
-		//								 pPerson->GetRecoveryDamageCount()->push_back((BASE_ACTION_STATE)hdi->iAttackType);
+		//								 pPerson->GetRecoveryDamageCount()->push_back((BASE_ACTION_STATE)HitDamageInfo->iAttackType);
 		//								 // trueは返さない。ここでは、ダウン状態でのくらったカウントを取るだけなので。
 		//}
 		//}
@@ -1979,13 +2713,6 @@ bool BasePlayerState::AerialKnockBack::OnMessage(BasePlayer * pPerson, const Mes
 /*******************************************************/
 //					ノックダウンステート
 /*******************************************************/
-
-BasePlayerState::KnockDown * BasePlayerState::KnockDown::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::KnockDown instance;
-	return &instance;
-}
 
 void BasePlayerState::KnockDown::Enter(BasePlayer * pPerson)
 {
@@ -2007,7 +2734,7 @@ void BasePlayerState::KnockDown::Execute(BasePlayer * pPerson)
 	{
 		// 吹っ飛びけむりパーティクル
 		ParticleManager::EffectFlySmoke(pPerson->GetPos());
-		return;
+		//return; // [10/20日]　空中でも復帰できるようにしました
 	}
 
 	// 硬直が0以下なら硬直終了
@@ -2015,17 +2742,28 @@ void BasePlayerState::KnockDown::Execute(BasePlayer * pPerson)
 	{
 		//pPerson->SetInvincible(60, 1);
 
-		if (pPerson->isPushInput(PLAYER_INPUT::A) ||
-			pPerson->isPushInput(PLAYER_INPUT::B) ||
-			pPerson->isPushInput(PLAYER_INPUT::C) ||
-			pPerson->isPushInput(PLAYER_INPUT::D) ||
-			pPerson->isPushInput(PLAYER_INPUT::R1)  )
+		if (pPerson->isPushInput(PLAYER_COMMAND_BIT::A) ||
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::B) ||
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::C) ||
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::D) ||
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::R1)  )
 		{
-			// 待機ステートに戻る
-			pPerson->GetFSM()->ChangeState(BasePlayerState::LandRecovery::GetInstance());
+			// 地上オア空中
+			if (pPerson->isLand() == true)
+			{
+				// 地上リカバリーステートへ！
+				pPerson->GetFSM()->ChangeState(BasePlayerState::LandRecovery::GetInstance());
+			}
+			else
+			{
+				// 空中リカバリーステートへ！
+				pPerson->GetFSM()->ChangeState(BasePlayerState::AerialRecovery::GetInstance());
+			}
 
 			// 喰らったカウントリセット
 			pPerson->GetRecoveryDamageCount()->clear();
+			// 先行入力リセット
+			pPerson->AheadCommandReset();
 		}
 
 	}
@@ -2050,12 +2788,44 @@ bool BasePlayerState::KnockDown::OnMessage(BasePlayer * pPerson, const Message &
 	//	// 攻撃くらったよメッセージ
 	//case MESSAGE_TYPE::HIT_DAMAGE:
 	//{
-	//								 HIT_DAMAGE_INFO *hdi = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+	//								 HIT_DAMAGE_INFO *HitDamageInfo = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
 	//								 // 喰らってる状態でくらった攻撃リスト追加
-	//								 pPerson->GetRecoveryDamageCount()->push_back((BASE_ACTION_STATE)hdi->iAttackType);
+	//								 pPerson->GetRecoveryDamageCount()->push_back((BASE_ACTION_STATE)HitDamageInfo->iAttackType);
 	//								 // trueは返さない。ここでは、ダウン状態でのくらったカウントを取るだけなので。
 	//}
 	//}
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
+
+
+
+/*******************************************************/
+//					死に状態ステート
+/*******************************************************/
+
+void BasePlayerState::Die::Enter(BasePlayer * pPerson)
+{
+	// 死にモーションに変える
+	pPerson->SetMotion(MOTION_TYPE::DIE);
+}
+
+void BasePlayerState::Die::Execute(BasePlayer * pPerson)
+{
+}
+
+void BasePlayerState::Die::Exit(BasePlayer * pPerson)
+{
+
+}
+
+void BasePlayerState::Die::Render(BasePlayer * pPerson)
+{
+	tdnText::Draw(20, 650, 0xffffffff, "死に");
+}
+
+bool BasePlayerState::Die::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
 	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
 	return false;
 }
@@ -2065,24 +2835,29 @@ bool BasePlayerState::KnockDown::OnMessage(BasePlayer * pPerson, const Message &
 //					地上リカバリーステート
 /*******************************************************/
 
-BasePlayerState::LandRecovery * BasePlayerState::LandRecovery::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::LandRecovery instance;
-	return &instance;
-}
-
 void BasePlayerState::LandRecovery::Enter(BasePlayer * pPerson)
 {
 	// リカバリーに変える
-	pPerson->SetMotion(MOTION_TYPE::WAIT);
+	pPerson->SetMotion(MOTION_TYPE::REVERSAL);
 
 	// りかバリーかうんとを初期化
-	pPerson->SetRecoveryCount(0);
+	//pPerson->SetRecoveryCount(0);
+
+	// カウントをするステートに変更
+	pPerson->SetActionState(BASE_ACTION_STATE::FRAMECOUNT);
+
+	// 喰らったカウントリセット
+	pPerson->GetRecoveryDamageCount()->clear();
 
 	// リカバー中は無敵！！！
 	//pPerson->SetInvincibleLV(1);
-	pPerson->SetInvincible(12, 1);
+	pPerson->SetInvincible(
+#ifdef GUARD_ON
+		12
+#else
+		40
+#endif
+		, 1);	// 1031 無敵時間を12→40にした
 
 	// エフェクト発動」
 	pPerson->AddEffectAction(pPerson->GetPos() + Vector3(0, 5, -3), EFFECT_TYPE::RECOVERY);
@@ -2090,27 +2865,39 @@ void BasePlayerState::LandRecovery::Enter(BasePlayer * pPerson)
 
 void BasePlayerState::LandRecovery::Execute(BasePlayer * pPerson)
 {
-	pPerson->AddRecoveryCount(1);
+	//pPerson->AddRecoveryCount(1);
+
+	const int iRecoveryCount(pPerson->GetCurrentFrame());
+
+	// ★5フレーム前から先行入力受付(リバサ無敵用)
+	if (iRecoveryCount > BasePlayer::c_RECOVERY_FLAME - 5)pPerson->AheadCommandUpdate();
 
 	// リカバリーフレームを超えたら終わり！
-	if (pPerson->GetRecoveryCount() >= BasePlayer::c_RECOVERY_FLAME)
+	if (iRecoveryCount >= BasePlayer::c_RECOVERY_FLAME)
 	{
-		// 待機ステートへ
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		// リバサ無敵
+		if (FinishAttackCancel(pPerson)) return;
 
-		// 喰らったカウントリセット
-		pPerson->GetRecoveryDamageCount()->clear();
+		// 小パン暴れ
+		if (AttackCancel(pPerson)) return;
+
+		// ガード
+		//if (isInputGuardCommand(pPerson)) pPerson->GetFSM(Guard::GetInstance());
+
+		// ↑いれっぱでジャンプ逃げ
+		if (pPerson->isPushInput(PLAYER_COMMAND_BIT::UP))
+		{
+			pPerson->GetFSM()->ChangeState(Jump::GetInstance());
+			return;
+		}
+
+		// 待機ステートへ
+		pPerson->GetFSM()->ChangeState(Wait::GetInstance());
 	}
 }
 
 void BasePlayerState::LandRecovery::Exit(BasePlayer * pPerson)
-{
-	// 無敵解除！！
-	//pPerson->InvincibleOff();
-
-	// りかバリーかうんとを初期化
-	pPerson->SetRecoveryCount(0);
-}
+{}
 
 void BasePlayerState::LandRecovery::Render(BasePlayer * pPerson)
 {
@@ -2127,20 +2914,19 @@ bool BasePlayerState::LandRecovery::OnMessage(BasePlayer * pPerson, const Messag
 //					空中リカバリーステート (空中)
 /*******************************************************/
 
-BasePlayerState::AerialRecovery * BasePlayerState::AerialRecovery::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::AerialRecovery instance;
-	return &instance;
-}
-
 void BasePlayerState::AerialRecovery::Enter(BasePlayer * pPerson)
 {
 	// リカバリーに変える
 	pPerson->SetMotion(MOTION_TYPE::FALL);
 
 	// りかバリーかうんとを初期化
-	pPerson->SetRecoveryCount(0);
+	//pPerson->SetRecoveryCount(0);
+
+	// カウントをするステートに変更
+	pPerson->SetActionState(BASE_ACTION_STATE::FRAMECOUNT);
+
+	// 喰らったカウントリセット
+	pPerson->GetRecoveryDamageCount()->clear();
 
 	// リカバー中は無敵！！！
 	//pPerson->SetInvincibleLV(1);
@@ -2148,21 +2934,27 @@ void BasePlayerState::AerialRecovery::Enter(BasePlayer * pPerson)
 
 	Vector3 move;
 	move = pPerson->GetMove()*0.25f;
-	pPerson->SetMove(move);
+	move += Vector3(0, 1.5f, 0);
+	//pPerson->SetMove(move);
 
+	// [10/20] moveではなくセットに
 	// ＋Ｍｏｖｅ
-	Vector3 addMove = Vector3(0, 2.55f, 0);
+	//Vector3 addMove = Vector3(0, 2.55f, 0);
 
-	if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
+	if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
 	{
-		addMove += Vector3(0.7f, 0, 0);
+		//addMove += Vector3(0.7f, 0, 0);
+		move += Vector3(0.7f, 0, 0);
 	}
-	else if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
+	else if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
 	{
-		addMove += Vector3(-0.7f, 0, 0);
+		//addMove += Vector3(-0.7f, 0, 0);
+		move += Vector3(-0.7f, 0, 0);
 	}
 	
-	pPerson->AddMove(addMove);
+	pPerson->SetMove(move);
+
+	//pPerson->AddMove(addMove);
 
 	// エフェクト発動」
 	pPerson->AddEffectAction(pPerson->GetPos() + Vector3(0, 5, -3) , EFFECT_TYPE::RECOVERY);
@@ -2170,26 +2962,22 @@ void BasePlayerState::AerialRecovery::Enter(BasePlayer * pPerson)
 
 void BasePlayerState::AerialRecovery::Execute(BasePlayer * pPerson)
 {
-	pPerson->AddRecoveryCount(1);
+	//pPerson->AddRecoveryCount(1);
+	const int iRecoveryCount(pPerson->GetCurrentFrame());
+
+	// ★5フレーム前から先行入力受付(リバサ無敵用)
+	if (iRecoveryCount > BasePlayer::c_RECOVERY_FLAME - 5)pPerson->AheadCommandUpdate();
 
 	// リカバリーフレームを超えたら終わり！
-	if (pPerson->GetRecoveryCount() >= BasePlayer::c_RECOVERY_FLAME)
+	if (iRecoveryCount >= BasePlayer::c_RECOVERY_FLAME)
 	{
 		// 空中なので落ちるステートに
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Fall::GetInstance());
-
-		// 喰らったカウントリセット
-		pPerson->GetRecoveryDamageCount()->clear();
 	}
 }
 
 void BasePlayerState::AerialRecovery::Exit(BasePlayer * pPerson)
-{
-	// 無敵解除！！
-	//pPerson->InvincibleOff();
-
-	pPerson->SetRecoveryCount(0);
-}
+{}
 
 void BasePlayerState::AerialRecovery::Render(BasePlayer * pPerson)
 {
@@ -2207,47 +2995,63 @@ bool BasePlayerState::AerialRecovery::OnMessage(BasePlayer * pPerson, const Mess
 //					しゃがみステート
 /*******************************************************/
 
-BasePlayerState::Squat * BasePlayerState::Squat::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::Squat instance;
-	return &instance;
-}
-
 void BasePlayerState::Squat::Enter(BasePlayer * pPerson)
 {
 	// 待機モーションに変える
 	pPerson->SetMotion(MOTION_TYPE::SQUAT);
+
+	// しゃがみフラグON
+	pPerson->SetSquat(true);
 
 }
 
 void BasePlayerState::Squat::Execute(BasePlayer * pPerson)
 {
 	//	しゃがみ攻撃ボタン
-	if (pPerson->GetInputList(PLAYER_INPUT::B) == 3)
-	{
-		// しゃがみ攻撃ステートに行く
-		pPerson->GetFSM()->ChangeState(BasePlayerState::SquatAttack::GetInstance());
-		return;
-	}
+	//if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::A))
+	//{
+	//	// しゃがみ攻撃ステートに行く
+	//	pPerson->GetFSM()->ChangeState(BasePlayerState::SquatAttack::GetInstance());
+	//	return;
+	//}
+
+	//////////////////////////////////////////////
+	//	攻撃キャンセル
+	//============================================
+	if (AttackCancel(pPerson))return;
+
+	//////////////////////////////////////////////
+	//	スキルキャンセル
+	//============================================
+	if (SkillCancel(pPerson)) return;
+
+	//////////////////////////////////////////////
+	//	どっこい攻撃キャンセル
+	//============================================
+	if (DokkoiAttackCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	スタンドキャンセル
 	//============================================
-	if (StandCansel(pPerson)) return;
+	if (StandCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	ジャンプキャンセル
 	//============================================
-	if (JumpCansel(pPerson)) return;
+	if (JumpCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	ヒーホードライブボタン
 	//============================================
-	if (HeaveHoCansel(pPerson)) return;
+	if (HeaveHoCancel(pPerson)) return;
+
+	//////////////////////////////////////////////
+	//	逆切れキャンセル
+	//============================================
+	if (FinishAttackCancel(pPerson)) return;
 
 	// しゃがみボタンを離したら待機に戻る
-	if (pPerson->isPushInput(PLAYER_INPUT::DOWN) == false)
+	if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN) == false)
 	{
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
 	}
@@ -2256,7 +3060,8 @@ void BasePlayerState::Squat::Execute(BasePlayer * pPerson)
 
 void BasePlayerState::Squat::Exit(BasePlayer * pPerson)
 {
-
+	// しゃがみフラグOFF
+	pPerson->SetSquat(false);
 
 }
 
@@ -2275,13 +3080,6 @@ bool BasePlayerState::Squat::OnMessage(BasePlayer * pPerson, const Message & msg
 /*******************************************************/
 //					しゃがみ攻撃ステート
 /*******************************************************/
-
-BasePlayerState::SquatAttack * BasePlayerState::SquatAttack::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::SquatAttack instance;
-	return &instance;
-}
 
 void BasePlayerState::SquatAttack::Enter(BasePlayer * pPerson)
 {
@@ -2310,30 +3108,30 @@ void BasePlayerState::SquatAttack::Execute(BasePlayer * pPerson)
 		//////////////////////////////////////////////
 		//	スキルキャンセル
 		//============================================
-		if (SkillCansel(pPerson)) return;
+		if (SkillCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	スタンドキャンセル
 		//============================================
-		if (StandCansel(pPerson)) return;
+		if (StandCancel(pPerson)) return;
 
 
 		//////////////////////////////////////////////
 		//	ヒーホードライブキャンセル
 		//============================================
-		if (HeaveHoCansel(pPerson)) return;
+		if (HeaveHoCancel(pPerson)) return;
 
 		//============================================
 		//	ジャンプボタン
 		//============================================
-		//if (pPerson->GetInputList(PLAYER_INPUT::C) == 3)
+		//if (pPerson->GetInputList(PLAYER_COMMAND_BIT::C) == 3)
 		//{
 
-		//	if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
+		//	if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
 		//	{
 		//		pPerson->AddMove(Vector3(0.8f, 0.0f, 0.0f));		
 		//	}
-		//	if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
+		//	if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
 		//	{
 		//		pPerson->AddMove(Vector3(-0.8f, 0.0f, 0.0f));
 		//	}
@@ -2346,12 +3144,12 @@ void BasePlayerState::SquatAttack::Execute(BasePlayer * pPerson)
 		//	return;
 		//}
 		
-		if (JumpCansel(pPerson))
+		if (JumpCancel(pPerson))
 		{
-			if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
+			if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
 				pPerson->AddMove(Vector3(0.8f, 0.0f, 0.0f));
 		
-			if (pPerson->isPushInput(PLAYER_INPUT::LEFT))	
+			if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))	
 				pPerson->AddMove(Vector3(-0.8f, 0.0f, 0.0f));
 		
 			// 高く飛ばす 
@@ -2392,16 +3190,165 @@ bool BasePlayerState::SquatAttack::OnMessage(BasePlayer * pPerson, const Message
 	return false;
 }
 
+
+/*******************************************************/
+//					足払い攻撃ステート
+/*******************************************************/
+
+void BasePlayerState::DownAttack::Enter(BasePlayer * pPerson)
+{
+	// 待機モーションに変える
+	pPerson->SetMotion(MOTION_TYPE::DOWN_ATTACK);
+
+	// ★攻撃ステートを2段目に設定する　↓でHITフラグを消している
+	pPerson->SetActionState(BASE_ACTION_STATE::DOWN_ATTACK);
+}
+
+void BasePlayerState::DownAttack::Execute(BasePlayer * pPerson)
+{
+	// 攻撃終了してたら
+	if (!pPerson->isAttackState())
+	{
+		// 待機モーションに戻る
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		return;
+	}
+
+	// HITしていたらキャンセルできる
+	if (pPerson->GetAttackData()->bHit == true)
+	{
+		//////////////////////////////////////////////
+		//	スキルキャンセル
+		//============================================
+		if (SkillCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	スタンドキャンセル
+		//============================================
+		if (StandCancel(pPerson)) return;
+
+
+		//////////////////////////////////////////////
+		//	ヒーホードライブキャンセル
+		//============================================
+		if (HeaveHoCancel(pPerson)) return;
+	}
+
+}
+
+void BasePlayerState::DownAttack::Exit(BasePlayer * pPerson)
+{
+
+
+}
+
+void BasePlayerState::DownAttack::Render(BasePlayer * pPerson)
+{
+
+	tdnText::Draw(20, 690, 0xffffffff, "DownAttackState");
+}
+
+bool BasePlayerState::DownAttack::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+	//	// 攻撃当たったよメッセージ
+	//case MESSAGE_TYPE::HIT_ATTACK:
+	//{
+	//	HIT_ATTACK_INFO *hai = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+	//	pPerson->SetHitStopFrame(hai->hitStopFlame);// ヒットストップ
+	//	break;
+	//}
+	//}
+	return false;
+}
+
+
+/*******************************************************/
+//					中段攻撃(どっこいアタック)ステート
+/*******************************************************/
+
+void BasePlayerState::DokkoiAttack::Enter(BasePlayer * pPerson)
+{
+	// 待機モーションに変える
+	pPerson->SetMotion(MOTION_TYPE::DOKKOI_ATTACK);
+
+	// ★中段攻撃ステートを設定
+	pPerson->SetActionState(BASE_ACTION_STATE::DOKKOI_ATTACK);
+
+	// 仮
+	pPerson->AddEffectAction(pPerson->GetPos(), EFFECT_TYPE::DOKKOI);
+}
+
+void BasePlayerState::DokkoiAttack::Execute(BasePlayer * pPerson)
+{
+	// 攻撃終了してたら
+	if (!pPerson->isAttackState())
+	{
+		// 待機モーションに戻る
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		return;
+	}
+
+	// HITしていたらキャンセルできる
+	if (pPerson->GetAttackData()->bHitSuccess == true)
+	{
+		//////////////////////////////////////////////
+		//	スキルキャンセル
+		//============================================
+		if (SkillCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	スタンドキャンセル
+		//============================================
+		if (StandCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	ダッシュキャンセル
+		//============================================
+		if (DashCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	ヒーホードライブキャンセル
+		//============================================
+		if (HeaveHoCancel(pPerson)) return;
+	}
+
+}
+
+void BasePlayerState::DokkoiAttack::Exit(BasePlayer * pPerson)
+{
+
+
+}
+
+void BasePlayerState::DokkoiAttack::Render(BasePlayer * pPerson)
+{
+
+	tdnText::Draw(20, 690, 0xffffffff, "DokkoiAttackState");
+}
+
+bool BasePlayerState::DokkoiAttack::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+	//	// 攻撃当たったよメッセージ
+	//case MESSAGE_TYPE::HIT_ATTACK:
+	//{
+	//	HIT_ATTACK_INFO *hai = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+	//	pPerson->SetHitStopFrame(hai->hitStopFlame);// ヒットストップ
+	//	break;
+	//}
+	//}
+	return false;
+}
+
+
 /*******************************************************/
 //					空中攻撃ステート
 /*******************************************************/
-
-BasePlayerState::AerialAttack * BasePlayerState::AerialAttack::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::AerialAttack instance;
-	return &instance;
-}
 
 void BasePlayerState::AerialAttack::Enter(BasePlayer * pPerson)
 {
@@ -2412,16 +3359,18 @@ void BasePlayerState::AerialAttack::Enter(BasePlayer * pPerson)
 	// ★攻撃ステートを設定する　↓でHITフラグを消している
 	pPerson->SetActionState(BASE_ACTION_STATE::AERIAL);
 
+	// アングルを相手の向きへ
+	pPerson->SetDirAngle();
 
 	// 入力方向に向く
-	if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
-	{
-		pPerson->SetDir(DIR::RIGHT);
-	}
-	else if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
-	{
-		pPerson->SetDir(DIR::LEFT);
-	}
+	//if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
+	//{
+	//	pPerson->SetDir(DIR::RIGHT);
+	//}
+	//else if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
+	//{
+	//	pPerson->SetDir(DIR::LEFT);
+	//}
 }
 
 void BasePlayerState::AerialAttack::Execute(BasePlayer * pPerson)
@@ -2437,8 +3386,11 @@ void BasePlayerState::AerialAttack::Execute(BasePlayer * pPerson)
 	// 攻撃終了してたら
 	if (!pPerson->isAttackState())
 	{
-		// 待機モーションに戻る
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		// 地上、空中で分岐
+		//if (pPerson->isLand())
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		//else if(pPerson->isAerialJump()) pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
+		//else pPerson->GetFSM()->ChangeState(BasePlayerState::Fall::GetInstance());
 		return;
 	}
 
@@ -2448,19 +3400,19 @@ void BasePlayerState::AerialAttack::Execute(BasePlayer * pPerson)
 		//////////////////////////////////////////////
 		//	スタンドキャンセル
 		//============================================
-		if (StandCansel(pPerson)) return;
+		if (StandCancel(pPerson)) return;
 
 		//============================================
 		//	空中ジャンプキャンセルボタン
 		//============================================
-		//if (pPerson->GetInputList(PLAYER_INPUT::C) == 3)
+		//if (pPerson->GetInputList(PLAYER_COMMAND_BIT::C) == 3)
 		//{
 
-		//	//if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
+		//	//if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
 		//	//{
 		//	//	pPerson->AddMove(Vector3(0.8f, 0.0f, 0.0f));
 		//	//}
-		//	//if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
+		//	//if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
 		//	//{
 		//	//	pPerson->AddMove(Vector3(-0.8f, 0.0f, 0.0f));
 		//	//}
@@ -2478,7 +3430,7 @@ void BasePlayerState::AerialAttack::Execute(BasePlayer * pPerson)
 		//	
 		//	return;
 		//}
-		if (JumpCansel(pPerson))return;
+		if (JumpCancel(pPerson))return;
 		
 
 	}
@@ -2488,8 +3440,8 @@ void BasePlayerState::AerialAttack::Execute(BasePlayer * pPerson)
 
 void BasePlayerState::AerialAttack::Exit(BasePlayer * pPerson)
 {
-
-
+	// 先行入力初期化
+	pPerson->AheadCommandReset();
 }
 
 void BasePlayerState::AerialAttack::Render(BasePlayer * pPerson)
@@ -2518,126 +3470,119 @@ bool BasePlayerState::AerialAttack::OnMessage(BasePlayer * pPerson, const Messag
 //					空中下攻撃ステート
 /*******************************************************/
 
-BasePlayerState::AerialDropAttack * BasePlayerState::AerialDropAttack::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::AerialDropAttack instance;
-	return &instance;
-}
-
-void BasePlayerState::AerialDropAttack::Enter(BasePlayer * pPerson)
-{
-	// 空中下攻撃モーションに変える
-	pPerson->SetMotion(MOTION_TYPE::AERIALDROP_ATTACK);
-
-
-	// ★攻撃ステートを設定する　↓でHITフラグを消している
-	pPerson->SetActionState(BASE_ACTION_STATE::AERIALDROP);
-
-	// 入力方向に向く
-	if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
-	{
-		pPerson->SetDir(DIR::RIGHT);
-	}
-	else if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
-	{
-		pPerson->SetDir(DIR::LEFT);
-	}
-
-}
-
-void BasePlayerState::AerialDropAttack::Execute(BasePlayer * pPerson)
-{
-	// 地上フラグtrue(着地したら)
-	if (pPerson->isLand())
-	{
-		// 着地ステートに移行
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Land::GetInstance());
-		return;
-	}
-
-	// 攻撃終了してたら
-	if (!pPerson->isAttackState())
-	{
-		// 待機モーションに戻る
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
-		return;
-	}
-
-	// HITしていたらキャンセルできる
-	if (pPerson->GetAttackData()->bHit == true)
-	{
-		//============================================
-		//	ジャンプボタン
-		//============================================
-		//if (pPerson->GetInputList(PLAYER_INPUT::C) == 3)
-		//{
-
-		//	//if (pPerson->isPushInput(PLAYER_INPUT::RIGHT))
-		//	//{
-		//	//	pPerson->AddMove(Vector3(0.8f, 0.0f, 0.0f));
-		//	//}
-		//	//if (pPerson->isPushInput(PLAYER_INPUT::LEFT))
-		//	//{
-		//	//	pPerson->AddMove(Vector3(-0.8f, 0.0f, 0.0f));
-		//	//}
-
-		//	//// 高く飛ばす 
-		//	//pPerson->AddMove(Vector3(0.0f, 0.5f, 0.0f));
-
-		//	// 空中ジャンプの権利がなかったら弾く
-		//	if (pPerson->isAerialJump() == true)
-		//	{
-		//		// 空中ジャンプステートに行く
-		//		pPerson->GetFSM()->ChangeState(BasePlayerState::AerialJump::GetInstance());
-		//	}
-		//	return;
-		//}
-		if (JumpCansel(pPerson))return;
-	
-
-	}
-
-}
-
-void BasePlayerState::AerialDropAttack::Exit(BasePlayer * pPerson)
-{
-
-
-}
-
-void BasePlayerState::AerialDropAttack::Render(BasePlayer * pPerson)
-{
-
-	tdnText::Draw(20, 690, 0xffffffff, "AerialDropAttackState");
-}
-
-bool BasePlayerState::AerialDropAttack::OnMessage(BasePlayer * pPerson, const Message & msg)
-{
-	//// メッセージタイプ
-	//switch (msg.Msg)
-	//{
-	//	// 攻撃当たったよメッセージ
-	//case MESSAGE_TYPE::HIT_ATTACK:
-	//{
-	//	HIT_ATTACK_INFO *hai = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
-	//	pPerson->SetHitStopFrame(hai->hitStopFlame);// ヒットストップ
-	//	break;
-	//}
-	//}
-	return false;
-}
+//BasePlayerState::AerialDropAttack * BasePlayerState::AerialDropAttack::GetInstance()
+//{
+//	// ここに変数を作る
+//	static BasePlayerState::AerialDropAttack instance;
+//	return &instance;
+//}
+//
+//void BasePlayerState::AerialDropAttack::Enter(BasePlayer * pPerson)
+//{
+//	// 空中下攻撃モーションに変える
+//	pPerson->SetMotion(MOTION_TYPE::AERIALDROP_ATTACK);
+//
+//
+//	// ★攻撃ステートを設定する　↓でHITフラグを消している
+//	pPerson->SetActionState(BASE_ACTION_STATE::AERIALDROP);
+//
+//	// 入力方向に向く
+//	if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
+//	{
+//		pPerson->SetDir(DIR::RIGHT);
+//	}
+//	else if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
+//	{
+//		pPerson->SetDir(DIR::LEFT);
+//	}
+//
+//}
+//
+//void BasePlayerState::AerialDropAttack::Execute(BasePlayer * pPerson)
+//{
+//	// 地上フラグtrue(着地したら)
+//	if (pPerson->isLand())
+//	{
+//		// 着地ステートに移行
+//		pPerson->GetFSM()->ChangeState(BasePlayerState::Land::GetInstance());
+//		return;
+//	}
+//
+//	// 攻撃終了してたら
+//	if (!pPerson->isAttackState())
+//	{
+//		// 待機モーションに戻る
+//		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+//		return;
+//	}
+//
+//	// HITしていたらキャンセルできる
+//	if (pPerson->GetAttackData()->bHit == true)
+//	{
+//		//============================================
+//		//	ジャンプボタン
+//		//============================================
+//		//if (pPerson->GetInputList(PLAYER_COMMAND_BIT::C) == 3)
+//		//{
+//
+//		//	//if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
+//		//	//{
+//		//	//	pPerson->AddMove(Vector3(0.8f, 0.0f, 0.0f));
+//		//	//}
+//		//	//if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
+//		//	//{
+//		//	//	pPerson->AddMove(Vector3(-0.8f, 0.0f, 0.0f));
+//		//	//}
+//
+//		//	//// 高く飛ばす 
+//		//	//pPerson->AddMove(Vector3(0.0f, 0.5f, 0.0f));
+//
+//		//	// 空中ジャンプの権利がなかったら弾く
+//		//	if (pPerson->isAerialJump() == true)
+//		//	{
+//		//		// 空中ジャンプステートに行く
+//		//		pPerson->GetFSM()->ChangeState(BasePlayerState::AerialJump::GetInstance());
+//		//	}
+//		//	return;
+//		//}
+//		if (JumpCancel(pPerson))return;
+//	
+//
+//	}
+//
+//}
+//
+//void BasePlayerState::AerialDropAttack::Exit(BasePlayer * pPerson)
+//{
+//
+//
+//}
+//
+//void BasePlayerState::AerialDropAttack::Render(BasePlayer * pPerson)
+//{
+//
+//	tdnText::Draw(20, 690, 0xffffffff, "AerialDropAttackState");
+//}
+//
+//bool BasePlayerState::AerialDropAttack::OnMessage(BasePlayer * pPerson, const Message & msg)
+//{
+//	//// メッセージタイプ
+//	//switch (msg.Msg)
+//	//{
+//	//	// 攻撃当たったよメッセージ
+//	//case MESSAGE_TYPE::HIT_ATTACK:
+//	//{
+//	//	HIT_ATTACK_INFO *hai = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+//	//	pPerson->SetHitStopFrame(hai->hitStopFlame);// ヒットストップ
+//	//	break;
+//	//}
+//	//}
+//	return false;
+//}
 
 /*******************************************************/
 //					回避ステート
 /*******************************************************/
-
-BasePlayerState::Escape * BasePlayerState::Escape::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::Escape instance;
-	return &instance;
-}
 
 void BasePlayerState::Escape::Enter(BasePlayer * pPerson)
 {
@@ -2648,7 +3593,7 @@ void BasePlayerState::Escape::Enter(BasePlayer * pPerson)
 	pPerson->SetActionState(BASE_ACTION_STATE::ESCAPE);
 	
 	// 逆の向きを向く
-	pPerson->TurnOverDir();
+	//pPerson->TurnOverDir();
 
 	// SE再生
 	se->Play("エスケープ");
@@ -2664,7 +3609,7 @@ void BasePlayerState::Escape::Execute(BasePlayer * pPerson)
 		pPerson->SetEscapeFlag(false);
 		// クイックエスケープ
 		// 向いている方向にスゥーっと移動
-		if (pPerson->GetDir() != DIR::RIGHT)
+		if (pPerson->GetDir() == DIR::RIGHT)
 		{
 			pPerson->SetMove(Vector3(.1f, 0, 0));
 		}
@@ -2679,7 +3624,7 @@ void BasePlayerState::Escape::Execute(BasePlayer * pPerson)
 		pPerson->SetEscapeFlag(true);
 		// クイックエスケープ
 		// 向いている方向にスゥーっと移動
-		if (pPerson->GetDir() != DIR::RIGHT)
+		if (pPerson->GetDir() == DIR::RIGHT)
 		{
 			pPerson->SetMove(Vector3(1.75f, 0, 0));
 		}
@@ -2694,7 +3639,7 @@ void BasePlayerState::Escape::Execute(BasePlayer * pPerson)
 		pPerson->SetEscapeFlag(false);
 		// クイックエスケープ
 		// 向いている方向にスゥーっと移動
-		if (pPerson->GetDir() != DIR::RIGHT)
+		if (pPerson->GetDir() == DIR::RIGHT)
 		{
 			pPerson->SetMove(Vector3(.1f, 0, 0));
 		}
@@ -2752,13 +3697,6 @@ bool BasePlayerState::Escape::OnMessage(BasePlayer * pPerson, const Message & ms
 //					ペルソナ召喚モーションステート
 /*******************************************************/
 
-BasePlayerState::StandAction * BasePlayerState::StandAction::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::StandAction instance;
-	return &instance;
-}
-
 void BasePlayerState::StandAction::Enter(BasePlayer * pPerson)
 {
 	// 召喚モーションに変える
@@ -2768,7 +3706,7 @@ void BasePlayerState::StandAction::Enter(BasePlayer * pPerson)
 	pPerson->SetActionState(BASE_ACTION_STATE::STAND);
 
 	// ★スタンドアクション発動
-	pPerson->GetStand()->Action(Stand::ACTION_TYPE::LAND);
+	pPerson->GetStand()->Action(SKILL_ACTION_TYPE::LAND);
 
 	// 重力の影響受けるな！
 	pPerson->SetMoveUpdate(false);
@@ -2795,24 +3733,24 @@ void BasePlayerState::StandAction::Execute(BasePlayer * pPerson)
 		//////////////////////////////////////////////
 		//	スキルキャンセル
 		//============================================
-		if (SkillCansel(pPerson)) return;
+		if (SkillCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	しゃがみキャンセル
 		//============================================
-		if (SquatCansel(pPerson)) return;
+		if (SquatCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	ジャンプキャンセル
 		//============================================
-		if (JumpCansel(pPerson))
+		if (JumpCancel(pPerson))
 		{
 
-			if (pPerson->isPushInput(PLAYER_INPUT::LEFT) == true)
+			if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT) == true)
 			{
 				pPerson->AddMove(Vector3(-0.45f, 0, 0));
 			}
-			else if (pPerson->isPushInput(PLAYER_INPUT::RIGHT) == true)
+			else if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT) == true)
 			{
 				pPerson->AddMove(Vector3(0.45f, 0, 0));
 			}
@@ -2823,17 +3761,17 @@ void BasePlayerState::StandAction::Execute(BasePlayer * pPerson)
 		//////////////////////////////////////////////
 		//	ヒーホードライブキャンセル
 		//============================================
-		if (HeaveHoCansel(pPerson)) return;
+		if (HeaveHoCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	左右キーで走りキャンセル
 		//============================================
-		if (pPerson->GetInputList(PLAYER_INPUT::LEFT) == 3)
+		if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::LEFT))
 		{
 			pPerson->SetDir(DIR::LEFT);
 			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
 		}
-		else if (pPerson->GetInputList(PLAYER_INPUT::LEFT) == 3)
+		else if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::LEFT))
 		{
 			pPerson->SetDir(DIR::RIGHT);
 			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
@@ -2858,12 +3796,10 @@ void BasePlayerState::StandAction::Exit(BasePlayer * pPerson)
 {
 	// 重力の影響を元に戻す
 	pPerson->SetMoveUpdate(true);
-	
 }
 
 void BasePlayerState::StandAction::Render(BasePlayer * pPerson)
 {
-
 	tdnText::Draw(20, 690, 0xffffffff, "EscapeState");
 }
 
@@ -2889,20 +3825,19 @@ bool BasePlayerState::StandAction::OnMessage(BasePlayer * pPerson, const Message
 //					フィニッシュアタックステート
 /*******************************************************/
 
-BasePlayerState::FinishAttack * BasePlayerState::FinishAttack::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::FinishAttack instance;
-	return &instance;
-}
-
 void BasePlayerState::FinishAttack::Enter(BasePlayer * pPerson)
 {
 	// モーションに変える
 	pPerson->SetMotion(MOTION_TYPE::FINISH_ATTACK);
 
 	// アクションステート変更
-	pPerson->SetActionState(BASE_ACTION_STATE::FINISH);
+	pPerson->SetActionState(BASE_ACTION_STATE::INVINCIBLE_ATTACK);
+
+	// ★無敵フラグをONにする
+	pPerson->SetInvincible(114514, 1);
+
+	// 始動エフェクト
+	pPerson->AddEffectAction(pPerson->GetPos() , EFFECT_TYPE::INVINCIBLE_ATTACK);
 
 	// SE再生
 	//se->Play("ペルソナ召喚");
@@ -2916,16 +3851,18 @@ void BasePlayerState::FinishAttack::Execute(BasePlayer * pPerson)
 		// 待機ステートに(さすがにキャンセルはやめておこう)
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
 	}
+	// ★フォローモーションになったら無敵を解除
+	if (pPerson->GetActionFrame() == FRAME_STATE::FOLLOW)
+	{
+		pPerson->SetInvincible(0, 0);
+	}
 }
 
 void BasePlayerState::FinishAttack::Exit(BasePlayer * pPerson)
-{
-
-}
+{}
 
 void BasePlayerState::FinishAttack::Render(BasePlayer * pPerson)
 {
-
 	tdnText::Draw(20, 690, 0xffffffff, "フィニッシュあたっくState");
 }
 
@@ -2951,47 +3888,47 @@ bool BasePlayerState::FinishAttack::OnMessage(BasePlayer * pPerson, const Messag
 //					スキルステート
 /*******************************************************/
 
-BasePlayerState::Skill * BasePlayerState::Skill::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::Skill instance;
-	return &instance;
-}
-
 void BasePlayerState::Skill::Enter(BasePlayer * pPerson)
 {
-	// モーションに変える
-	pPerson->SetMotion(MOTION_TYPE::CHARA_ATTACK_LAND);
+	// 空下キャラ固有
+	if (!pPerson->isLand())
+		pPerson->SetSkillActionType(pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN, true) ? SKILL_ACTION_TYPE::AERIALDROP : SKILL_ACTION_TYPE::AERIAL);
+	else
+		pPerson->SetSkillActionType(pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN, true) ? SKILL_ACTION_TYPE::SQUAT : SKILL_ACTION_TYPE::LAND);
 
-	// アクションステート変更
-	pPerson->SetActionState(BASE_ACTION_STATE::SKILL);
+	// 先行入力リセット
+	pPerson->AheadCommandReset();
 
 	// スキル用変数初期化
 	pPerson->SkillInit();
 
 	// SE再生
-	se->Play("ペルソナ召喚");
-
+	//se->Play("ペルソナ召喚");
 }
 
 void BasePlayerState::Skill::Execute(BasePlayer * pPerson)
 {
-
 	// そのキャラクターのスキルの更新
-	pPerson->SkillUpdate();
-
-
-	//////////////////////////////////////////////
-	//	ヒーホードライブキャンセル
-	//============================================
-	if (HeaveHoCansel(pPerson)) return;
+	const bool bEnd = pPerson->SkillUpdate();
 
 	// 攻撃ステート終わったら
-	if (pPerson->GetActionFrame()==FRAME_STATE::END)
+	//if (pPerson->GetActionFrame()==FRAME_STATE::END)
+	if (bEnd)
 	{
 		// 待機ステートに(さすがにキャンセルはやめておこう)
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		if(pPerson->isLand())pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		else pPerson->GetFSM()->ChangeState(BasePlayerState::Fall::GetInstance());
+		return;
 	}
+
+	// 攻撃が当たっていたら
+	//if (pPerson->GetAttackData()->bHit)
+	//{
+	//	//////////////////////////////////////////////
+	//	//	ヒーホードライブキャンセル
+	//	//============================================
+	//	if (HeaveHoCancel(pPerson)) return;
+	//}
 }
 
 void BasePlayerState::Skill::Exit(BasePlayer * pPerson)
@@ -3005,7 +3942,6 @@ void BasePlayerState::Skill::Exit(BasePlayer * pPerson)
 
 void BasePlayerState::Skill::Render(BasePlayer * pPerson)
 {
-
 	tdnText::Draw(20, 690, 0xffffffff, "スキルState");
 }
 
@@ -3030,13 +3966,6 @@ bool BasePlayerState::Skill::OnMessage(BasePlayer * pPerson, const Message & msg
 //					1more覚醒ステート
 /*******************************************************/
 
-BasePlayerState::OverDrive_OneMore * BasePlayerState::OverDrive_OneMore::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::OverDrive_OneMore instance;
-	return &instance;
-}
-
 void BasePlayerState::OverDrive_OneMore::Enter(BasePlayer * pPerson)
 {
 	// モーションに変える
@@ -3049,7 +3978,7 @@ void BasePlayerState::OverDrive_OneMore::Enter(BasePlayer * pPerson)
 	pPerson->ActionOverDrive(OVERDRIVE_TYPE::ONEMORE);
 
 	// SE再生
-	se->Play("ペルソナ召喚");
+	se->Play("オーバードライブ開始");
 
 	// 上に浮く
 	pPerson->SetMove(Vector3(0, 1, 0));
@@ -3060,10 +3989,15 @@ void BasePlayerState::OverDrive_OneMore::Enter(BasePlayer * pPerson)
 	// ゲームを止めるフラグ
 	pPerson->SetGameTimerStopFlag(true);
 
+	// ★相手の同技補正を解除する
+	pPerson->GetTargetPlayer()->GetRecoveryDamageCount()->clear();
 }
 
 void BasePlayerState::OverDrive_OneMore::Execute(BasePlayer * pPerson)
 {
+
+	// ★この間ゲージ減らんといてくれの処理
+	pPerson->SetOverDriveFrame(BasePlayer::c_OVERDRIVE_MAX_TIME);
 
 	if (pPerson->GetActionFrame() == FRAME_STATE::START)
 	{
@@ -3083,32 +4017,32 @@ void BasePlayerState::OverDrive_OneMore::Execute(BasePlayer * pPerson)
 		//////////////////////////////////////////////
 		//	スキルキャンセル
 		//============================================
-		if (SkillCansel(pPerson)) return;
+		if (SkillCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	ジャンプキャンセル
 		//============================================
-		if (JumpCansel(pPerson)) return;
+		if (JumpCancel(pPerson)) return;
 		
 		//////////////////////////////////////////////
 		//	ヒーホードライブボタン
 		//============================================
-		if (HeaveHoCansel(pPerson)) return;
+		if (HeaveHoCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	攻撃ボタン
 		//============================================
-		if (RushAttackCansel(pPerson)) return;
+		if (AttackCancel(pPerson)) return;
 		
 		//////////////////////////////////////////////
 		//	フィニッシュ攻撃ボタン
 		//============================================
-		if (FinishAttackCansel(pPerson)) return;
+		if (FinishAttackCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	スタンドキャンセル
 		//============================================
-		if (StandCansel(pPerson)) return;
+		if (StandCancel(pPerson)) return;
 
 		// 動きを止める
 		pPerson->SetMove(Vector3(0, 0, 0));
@@ -3140,11 +4074,11 @@ void BasePlayerState::OverDrive_OneMore::Exit(BasePlayer * pPerson)
 	// ゲームを止めるフラグ
 	pPerson->SetGameTimerStopFlag(false);
 
+
 }
 
 void BasePlayerState::OverDrive_OneMore::Render(BasePlayer * pPerson)
 {
-
 	tdnText::Draw(20, 690, 0xffffffff, "OverDrive_OneMoreState");
 }
 
@@ -3177,13 +4111,6 @@ bool BasePlayerState::OverDrive_OneMore::OnMessage(BasePlayer * pPerson, const M
 /*******************************************************/
 //					Burst覚醒ステート
 /*******************************************************/
-
-BasePlayerState::OverDrive_Burst * BasePlayerState::OverDrive_Burst::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::OverDrive_Burst instance;
-	return &instance;
-}
 
 void BasePlayerState::OverDrive_Burst::Enter(BasePlayer * pPerson)
 {
@@ -3225,14 +4152,10 @@ void BasePlayerState::OverDrive_Burst::Execute(BasePlayer * pPerson)
 }
 
 void BasePlayerState::OverDrive_Burst::Exit(BasePlayer * pPerson)
-{
-
-
-}
+{}
 
 void BasePlayerState::OverDrive_Burst::Render(BasePlayer * pPerson)
 {
-
 	tdnText::Draw(20, 690, 0xffffffff, "OverDrive_BurstState");
 }
 
@@ -3264,23 +4187,25 @@ bool BasePlayerState::OverDrive_Burst::OnMessage(BasePlayer * pPerson, const Mes
 //					ガードステート
 /*******************************************************/
 
-BasePlayerState::Guard * BasePlayerState::Guard::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::Guard instance;
-	return &instance;
-}
-
 void BasePlayerState::Guard::Enter(BasePlayer * pPerson)
 {
-	// モーションに変える
-	pPerson->SetMotion(MOTION_TYPE::BURST);
+	/* しゃがみガード */
+	if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN))
+	{
+		pPerson->SetMotion(MOTION_TYPE::DOWN_GUARD);
 
-	pPerson->GuardEffectAction();
+		// ガードステートを設定する
+		pPerson->SetGuardState(GUARD_STATE::DOWN_GUARD);
+	}
 
-	// 初期化
-	pPerson->SetGuard(true);// ガード状態へ
-	pPerson->SetGuardFollowFrame(0);
+	/* 立ちガード */
+	else
+	{
+		pPerson->SetMotion(MOTION_TYPE::UP_GUARD);
+
+		// ガードステートを設定する
+		pPerson->SetGuardState(GUARD_STATE::UP_GUARD);
+	}
 
 }
 
@@ -3289,79 +4214,123 @@ void BasePlayerState::Guard::Execute(BasePlayer * pPerson)
 	// ★硬直が0以下なら硬直終了
 	if (pPerson->GetRecoveryFrame() <= 0)
 	{
-		if (pPerson->isGuard())
+		//////////////////////////////////////////////
+		//	攻撃キャンセル
+		//============================================
+		if (AttackCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	どっこい攻撃キャンセル
+		//============================================
+		if (DokkoiAttackCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	回避キャンセル
+		//============================================
+		if (EscapeCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	スタンドキャンセル
+		//============================================
+		if (StandCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	ジャンプキャンセル
+		//============================================
+		if (JumpCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	ヒーホードライブボタン
+		//============================================
+		if (HeaveHoCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	投げキャンセル
+		//============================================
+		if (ThrowCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	逆切れキャンセル
+		//============================================
+		if (FinishAttackCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	ダッシュキャンセル
+		//============================================
+		if (DashCancel(pPerson))return;
+
+		if (isInputGuardCommand(pPerson))
 		{
-
-			//////////////////////////////////////////////
-			//	回避キャンセル
-			//============================================
-			if (EscapeCansel(pPerson)) return;
-
-			//////////////////////////////////////////////
-			//	スタンドキャンセル
-			//============================================
-			if (StandCansel(pPerson)) return;
-
-			//////////////////////////////////////////////
-			//	ジャンプキャンセル
-			//============================================
-			if (JumpCansel(pPerson)) return;
-
-			//////////////////////////////////////////////
-			//	ヒーホードライブボタン
-			//============================================
-			if (HeaveHoCansel(pPerson)) return;
-
-			//////////////////////////////////////////////
-			//	投げキャンセル
-			//============================================
-			if (ThrowCansel(pPerson)) return;
-
-			// ガードボタンを離したら
-			if (pPerson->isPushInput(PLAYER_INPUT::R1) == false)
+			// 相手キャラが攻撃ステートなら
+			if (pPerson->GetTargetPlayer()->isAttackState() || (pPerson->GetTargetPlayer()->GetStand()->isActive() && pPerson->GetTargetPlayer()->GetStand()->GetAttackData()))
 			{
-				pPerson->GuardEffectStop();
-				pPerson->SetGuard(false);// ガード状態解除へ
-			}
+				/* しゃがみガード */
+				if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN))
+				{
+					pPerson->SetMotion(MOTION_TYPE::DOWN_GUARD);
 
+					// ガードステートを設定する
+					pPerson->SetGuardState(GUARD_STATE::DOWN_GUARD);
+				}
+
+				/* 立ちガード */
+				else
+				{
+					pPerson->SetMotion(MOTION_TYPE::UP_GUARD);
+
+					// ガードステートを設定する
+					pPerson->SetGuardState(GUARD_STATE::UP_GUARD);
+				}
+			}
 		}
 		else
 		{
-			// カウント
-			pPerson->AddGuardFollowFrame();
-
-			enum { FOLLOE_END = 6 };
-			if (pPerson->GetGuardFollowFrame() >= FOLLOE_END)
+			// 相手が攻撃ステートじゃなかったら
+			//if (!pPerson->GetTargetPlayer()->isAttackState() && !(pPerson->GetTargetPlayer()->GetStand()->isActive() && pPerson->GetTargetPlayer()->GetStand()->GetAttackData()))
 			{
-				pPerson->SetGuardFollowFrame(0);
+				//pPerson->GuardEffectStop();
+				//pPerson->SetGuard(false);// ガード状態解除へ
 				pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
-				return;
-			}	
-
+			}
 		}
-
 	}
+
+	//else
+	//{
+	//	// カウント
+	//	pPerson->AddGuardFollowFrame();
+	//
+	//	enum { FOLLOE_END = 6 };
+	//	if (pPerson->GetGuardFollowFrame() >= FOLLOE_END)
+	//	{
+	//		pPerson->SetGuardFollowFrame(0);
+	//		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+	//		return;
+	//	}
+	//
+	//}
 
 	// ★解除時に好きがほしい
 }
 
+
+
+
 void BasePlayerState::Guard::Exit(BasePlayer * pPerson)
 {
-	pPerson->SetGuard(false);// ガード状態解除
+	pPerson->SetGuardState(GUARD_STATE::NO_GUARD);// ガード状態解除
 
 	pPerson->GuardEffectStop();
-
 }
 
 void BasePlayerState::Guard::Render(BasePlayer * pPerson)
 {
-
 	tdnText::Draw(20, 690, 0xffffffff, "GuardState");
 }
 
 bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
-	if (pPerson->isGuard() == false)return false;
+	//if (pPerson->isGuard() == false)return false;
 
 	// メッセージタイプ
 	switch (msg.Msg)
@@ -3369,59 +4338,108 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 		// ★ガード中は無敵！
 	case MESSAGE_TYPE::HIT_DAMAGE:
 	{
-
-									 HIT_DAMAGE_INFO *hdi = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+									 HIT_DAMAGE_INFO *HitDamageInfo = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
 									 
-									 // ★フィニッシュアーツは通す
-									 if (hdi->bFinishAttack == true)
+									 bool bGuardSuccess(false);
+									 if (pPerson->GetGuardState() == GUARD_STATE::UP_GUARD)
 									 {
-										 pPerson->AddEffectAction(pPerson->GetCenterPos(), EFFECT_TYPE::GUARD_BREAK);
-										 return false;
+										 // ★相手が立ちガードしてて、下段攻撃じゃなかったらガード成功！
+										 if (HitDamageInfo->iAntiGuard != (int)ANTIGUARD_ATTACK::DOWN_ATTACK) bGuardSuccess = true;
+									 }
+									 else if (pPerson->GetGuardState() == GUARD_STATE::DOWN_GUARD)
+									 {
+										 // ★相手がしゃがみガードしてて、上段攻撃じゃなかったらガード成功！
+										 if (HitDamageInfo->iAntiGuard != (int)ANTIGUARD_ATTACK::UP_ATTACK) bGuardSuccess = true;
 									 }
 
-									 // 受ける技のレベルによりガードの硬直を変化　（GGX式）
-									 const float len = hdi->FlyVector.Length();
-									 int RecoveryFrame = 0;
-									 if (len < HUTTOBI_LINE)
+									 // ★ガード成功してたら！！！
+									 if (bGuardSuccess)
 									 {
-										 // レベル1　　（GGX式）
-										 RecoveryFrame = 14;
-
-										 // 向きを攻撃された方向へ向くように＆動き
-										 if (hdi->FlyVector.x > 0.0f)
+										 // (A列車)ここにガード成功時のSE、エフェクト
+										 char *seID;
+										 switch (rand() % 3)
 										 {
-											 pPerson->SetDir(DIR::LEFT);
-											 pPerson->SetMove(Vector3(1.0f, 0, 0));
+										 case 0:
+											 seID = "ガード小";
+											 break;
+										 case 1:
+											 seID = "ガード中";
+											 break;
+										 case 2:
+											 seID = "ガード強";
+											 break;
+
+										 }
+										 se->Play(seID);
+
+										 // 懇親の
+										 if (pPerson->GetTargetPlayer()->GetDir() == DIR::RIGHT)
+										 {
+											 pPerson->GetTargetPlayer()->SetMove(Vector3(-0.025f, 0, 0));
 										 }
 										 else
 										 {
-											 pPerson->SetDir(DIR::RIGHT);
-											 pPerson->SetMove(Vector3(-1.0f, 0, 0));
+											 pPerson->GetTargetPlayer()->SetMove(Vector3(0.025f, 0, 0));
 										 }
-										
 
+										 // コンボ用
+										 COMBO_DESK comboDesk;
+										 comboDesk.side = pPerson->GetSide();
+										 comboDesk.damage = HitDamageInfo->damage;
+										 comboDesk.recoveryFrame = 0;
+										 MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, ENTITY_ID::UI_MGR, MESSAGE_TYPE::COMBO_GUARD, &comboDesk);
+									 }
+									 // ガード失敗
+									 else
+									 {
+										 // ウィークエフェクト発生！
+										 pPerson->GetPanelEffectManager()->AddEffect(pPerson->GetCenterPos(), PANEL_EFFECT_TYPE::WEAK);
+
+										 return false;	// ダメージ喰らってどうぞ
+									 }
+
+
+									 // ★フィニッシュアーツは通す
+									 //if (HitDamageInfo->bOverDrive == true)
+									 //{
+									//	 pPerson->AddEffectAction(pPerson->GetCenterPos(), EFFECT_TYPE::GUARD_BREAK);
+									//	 return false;
+									 //}
+
+									// // 受ける技のレベルによりガードの硬直を変化　（GGX式）
+									// const float len = HitDamageInfo->FlyVector.Length();
+									// int RecoveryFrame = 0;
+									// if (len < HUTTOBI_LINE)
+									// {
+									//	 // レベル1　　（GGX式）
+									//	 RecoveryFrame = 12*2;
+									// }
+									// else
+									// {
+									//	 // レベル2　　（GGX式）
+									//	 RecoveryFrame = 18 * 2;
+									// }
+
+									 // 向きを攻撃された方向へ向くように＆動き
+									 if (HitDamageInfo->FlyVector.x > 0.0f)
+									 {
+										 pPerson->SetDir(DIR::LEFT);
+										 pPerson->SetMove(Vector3(1.0f, 0, 0));
 									 }
 									 else
 									 {
-										 // レベル2　　（GGX式）
-										 RecoveryFrame = 22;
-										 // 向きを攻撃された方向へ向くように＆動き
-										 if (hdi->FlyVector.x > 0.0f)
-										 {
-											 pPerson->SetDir(DIR::LEFT);
-											 pPerson->SetMove(Vector3(1.5f, 0, 0));
-										 }
-										 else
-										 {
-											 pPerson->SetDir(DIR::RIGHT);
-											 pPerson->SetMove(Vector3(-1.5f, 0, 0));
-										 }
+										 pPerson->SetDir(DIR::RIGHT);
+										 pPerson->SetMove(Vector3(-1.0f, 0, 0));
 									 }
 
+									 // (追加)ガードエフェクト発動! 
+									 pPerson->AddEffectAction(pPerson->GetFlontPos(), EFFECT_TYPE::GUARD_WAVE);
+
 									 // 技の攻撃に依存　(スマブラ式)
-									 int RecoveryFrame2 = (int)(hdi->recoveryFlame *0.3f)+2;
-									 
-									 pPerson->SetRecoveryFrame(RecoveryFrame2);
+									 //int RecoveryFrame2 = (int)(HitDamageInfo->recoveryFlame *0.3f)+2;
+
+									 // 技ごとに設定されている硬直フレームを設定
+									 pPerson->SetRecoveryFrame(HitDamageInfo->GuardRecoveryFrame);
 
 									 // グローバルステートに行かないようにする！
 									 return true;
@@ -3437,20 +4455,16 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 //					投げステート
 /*******************************************************/
 
-BasePlayerState::Throw * BasePlayerState::Throw::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::Throw instance;
-	return &instance;
-}
-
 void BasePlayerState::Throw::Enter(BasePlayer * pPerson)
 {
 	// モーションに変える
-	pPerson->SetMotion(MOTION_TYPE::BURST);
+	pPerson->SetMotion(MOTION_TYPE::THROW);
 
 	// アクションステート変更
 	pPerson->SetActionState(BASE_ACTION_STATE::THROW);
+
+	// むーぶ0
+	pPerson->SetMove(VECTOR_ZERO);
 
 	// SE再生
 	se->Play("掴み");
@@ -3460,21 +4474,7 @@ void BasePlayerState::Throw::Enter(BasePlayer * pPerson)
 }
 
 void BasePlayerState::Throw::Execute(BasePlayer * pPerson)
-{		
-
-	// 投げぬけ猶予フレーム
-	if (BasePlayer::c_THROW_ESCAPE_FRAME > pPerson->GetCurrentFrame())
-	{
-		// もし相手をつかんでなかったら、攻撃判定が出る前にミス投げステートへ
-		// このThrowSuccessはプレイヤーマネージャーの投げ判定関数の中で書き換えている
-		if (!pPerson->isThrowSuccess())
-		{
-			pPerson->GetFSM()->ChangeState(BasePlayerState::ThrowMiss::GetInstance());
-			return;
-		}
-	}
-	
-
+{	
 	// 投げ終了してたら
 	if (!pPerson->isAttackState())
 	{
@@ -3483,39 +4483,27 @@ void BasePlayerState::Throw::Execute(BasePlayer * pPerson)
 		return;
 	}
 
-	// ヒットしてる状態
-	else if (pPerson->GetAttackData()->bHit)
+	// 投げぬけ猶予フレーム過ぎたら
+	if (
+		//BasePlayer::c_THROW_ESCAPE_FRAME > pPerson->GetCurrentFrame()
+		pPerson->GetActionFrame() == FRAME_STATE::FOLLOW
+		)
 	{
-		/* キャンセルルート */
-		
-		//////////////////////////////////////////////
-		//	スキルキャンセル
-		//============================================
-		if (SkillCansel(pPerson)) return;
-
-		//////////////////////////////////////////////
-		//	スタンドキャンセル
-		//============================================
-		if (StandCansel(pPerson)) return;
-
-		//////////////////////////////////////////////
-		//	オーバードライブキャンセル
-		//============================================
-		if (OverDriveCansel(pPerson)) return;
+		// もし相手を掴んでいて、猶予が終わったら投げ成功ステートに行く
+		// このThrowSuccessはプレイヤーマネージャーの投げ判定関数の中で書き換えている
+		if (pPerson->isThrowSuccess())
+		{
+			pPerson->GetFSM()->ChangeState(BasePlayerState::ThrowSuccess::GetInstance());
+			return;
+		}
 	}
-
-
 }
 
 void BasePlayerState::Throw::Exit(BasePlayer * pPerson)
-{
-
-
-}
+{}
 
 void BasePlayerState::Throw::Render(BasePlayer * pPerson)
 {
-
 	tdnText::Draw(20, 690, 0xffffffff, "ThrowState");
 }
 
@@ -3530,7 +4518,10 @@ bool BasePlayerState::Throw::OnMessage(BasePlayer * pPerson, const Message & msg
 		break;
 	case MESSAGE_TYPE::CAN_THROW_RELEASE:	// 掴んでる人から、投げ抜けしてぇと送られてくるメッセージ
 		// 猶予フレーム中だったら解除
-		if ( pPerson->GetCurrentFrame() < BasePlayer::c_THROW_ESCAPE_FRAME)// ※ここは数値をじかにかいたほうがいいかと
+		if ( 
+			//pPerson->GetCurrentFrame() < BasePlayer::c_THROW_ESCAPE_FRAME
+			pPerson->GetActionFrame() == FRAME_STATE::ACTIVE
+			)// ※ここは数値をじかにかいたほうがいいかと
 		{
 			MsgMgr->Dispatch(0, pPerson->GetID(), msg.Sender, MESSAGE_TYPE::THROW_RELEASE, nullptr);	// 送り主に投げ抜けOKと送り返す
 
@@ -3538,6 +4529,10 @@ bool BasePlayerState::Throw::OnMessage(BasePlayer * pPerson, const Message & msg
 			pPerson->GetFSM()->ChangeState(SuccessThrowRelease::GetInstance());
 		}
 		return true;
+		break;
+		// 攻撃くらったよメッセージ
+	case MESSAGE_TYPE::HIT_DAMAGE:
+		if(pPerson->isThrowSuccess()) return true;	// ダメージメッセージガン無視
 		break;
 	}
 
@@ -3547,54 +4542,67 @@ bool BasePlayerState::Throw::OnMessage(BasePlayer * pPerson, const Message & msg
 
 
 /*******************************************************/
-//					ミス投げステート
+//					投げ成功ステート
 /*******************************************************/
 
-BasePlayerState::ThrowMiss * BasePlayerState::ThrowMiss::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::ThrowMiss instance;
-	return &instance;
-}
-
-void BasePlayerState::ThrowMiss::Enter(BasePlayer * pPerson)
+void BasePlayerState::ThrowSuccess::Enter(BasePlayer * pPerson)
 {
 	// モーションに変える
-	pPerson->SetMotion(MOTION_TYPE::BURST);
+	pPerson->SetMotion(MOTION_TYPE::THROW_SUCCESS);
 
-	// フレームカウント用
-	pPerson->SetActionState(BASE_ACTION_STATE::FRAMECOUNT);
+	// アクションを成功モードに
+	pPerson->SetActionState(BASE_ACTION_STATE::THROW_SUCCESS);
 }
 
-void BasePlayerState::ThrowMiss::Execute(BasePlayer * pPerson)
+void BasePlayerState::ThrowSuccess::Execute(BasePlayer * pPerson)
 {
-	// 投げ失敗硬直終了フレーム
-	if (pPerson->GetCurrentFrame() >= BasePlayer::c_THROW_MISS_FRAME)
+	// 投げ終了してたら
+	if (!pPerson->isAttackState())
 	{
 		// 待機モーションに戻る
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		return;
+	}
+	// ヒットしてる状態
+	else if (pPerson->GetAttackData()->bHit)
+	{
+		/* キャンセルルート */
+
+		//////////////////////////////////////////////
+		//	スキルキャンセル
+		//============================================
+		if (SkillCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	スタンドキャンセル
+		//============================================
+		if (StandCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	オーバードライブキャンセル
+		//============================================
+		if (OverDriveCancel(pPerson)) return;
 	}
 }
 
-void BasePlayerState::ThrowMiss::Exit(BasePlayer * pPerson)
+void BasePlayerState::ThrowSuccess::Exit(BasePlayer * pPerson)
+{}
+
+void BasePlayerState::ThrowSuccess::Render(BasePlayer * pPerson)
 {
-
-
+	tdnText::Draw(20, 690, 0xffffffff, "ThrowSuccessState");
 }
 
-void BasePlayerState::ThrowMiss::Render(BasePlayer * pPerson)
-{
-
-	tdnText::Draw(20, 690, 0xffffffff, "ThrowMissState");
-}
-
-bool BasePlayerState::ThrowMiss::OnMessage(BasePlayer * pPerson, const Message & msg)
+bool BasePlayerState::ThrowSuccess::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
 	// メッセージタイプ
-	//switch (msg.Msg)
-	//{
-
-	//}
+	switch (msg.Msg)
+	{
+		// 攻撃くらったよメッセージ
+	case MESSAGE_TYPE::HIT_DAMAGE:
+		return true;	// ダメージメッセージガン無視
+		break;
+	}
 
 	return false;
 }
@@ -3603,13 +4611,6 @@ bool BasePlayerState::ThrowMiss::OnMessage(BasePlayer * pPerson, const Message &
 /*******************************************************/
 //					掴まれたステート
 /*******************************************************/
-
-BasePlayerState::ThrowBind * BasePlayerState::ThrowBind::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::ThrowBind instance;
-	return &instance;
-}
 
 void BasePlayerState::ThrowBind::Enter(BasePlayer * pPerson)
 {
@@ -3624,6 +4625,9 @@ void BasePlayerState::ThrowBind::Enter(BasePlayer * pPerson)
 
 	// 重力とか無視する
 	pPerson->SetMoveUpdate(false);
+
+	// ペルソナブレイク
+	pPerson->GetStand()->Break();
 }
 
 void BasePlayerState::ThrowBind::Execute(BasePlayer * pPerson)
@@ -3631,10 +4635,10 @@ void BasePlayerState::ThrowBind::Execute(BasePlayer * pPerson)
 	// 相手依存なので自分からかえることはできない。多分ダメージステートに行くと信じて
 
 	// 投げ抜けボタン
-	if (pPerson->GetInputList(PLAYER_INPUT::L2) == 3)
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::L2))
 	{
 		// 掴んでるやつに対して投げ抜けしたいとメッセージを送る(猶予フレーム内なら抜けていいよをメッセージを送り返してくれる)
-		MsgMgr->Dispatch(0, pPerson->GetID(), pPerson->GetThrowPlayerID(), MESSAGE_TYPE::CAN_THROW_RELEASE, nullptr);
+		MsgMgr->Dispatch(0, pPerson->GetID(), pPerson->GetTargetPlayer()->GetID(), MESSAGE_TYPE::CAN_THROW_RELEASE, nullptr);
 	}
 }
 
@@ -3647,7 +4651,6 @@ void BasePlayerState::ThrowBind::Exit(BasePlayer * pPerson)
 
 void BasePlayerState::ThrowBind::Render(BasePlayer * pPerson)
 {
-
 	tdnText::Draw(20, 690, 0xffffffff, "ThrowBindState");
 }
 
@@ -3673,17 +4676,10 @@ bool BasePlayerState::ThrowBind::OnMessage(BasePlayer * pPerson, const Message &
 //				掴み解除成功してはじくステート
 /*******************************************************/
 
-BasePlayerState::SuccessThrowRelease * BasePlayerState::SuccessThrowRelease::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::SuccessThrowRelease instance;
-	return &instance;
-}
-
 void BasePlayerState::SuccessThrowRelease::Enter(BasePlayer * pPerson)
 {
 	// モーションに変える
-	pPerson->SetMotion(MOTION_TYPE::KNOCKBACK);
+	pPerson->SetMotion(MOTION_TYPE::THROW_DRAW);
 
 	// アクションステート変更
 	pPerson->SetActionState(BASE_ACTION_STATE::FRAMECOUNT);
@@ -3704,14 +4700,10 @@ void BasePlayerState::SuccessThrowRelease::Execute(BasePlayer * pPerson)
 }
 
 void BasePlayerState::SuccessThrowRelease::Exit(BasePlayer * pPerson)
-{
-
-
-}
+{}
 
 void BasePlayerState::SuccessThrowRelease::Render(BasePlayer * pPerson)
 {
-
 	tdnText::Draw(20, 690, 0xffffffff, "SuccessThrowReleaseState");
 }
 
@@ -3722,36 +4714,33 @@ bool BasePlayerState::SuccessThrowRelease::OnMessage(BasePlayer * pPerson, const
 }
 
 /*******************************************************/
-//				掴み解除成功してはじくステート
+//				ヒーホードライブ
 /*******************************************************/
-
-BasePlayerState::HeavehoDrive * BasePlayerState::HeavehoDrive::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::HeavehoDrive instance;
-	return &instance;
-}
 
 void BasePlayerState::HeavehoDrive::Enter(BasePlayer * pPerson)
 {
-	// モーションに変える
-	pPerson->SetMotion(MOTION_TYPE::HEAVEHO_DRIVE);
-
-	// アクションステート変更
-	pPerson->SetActionState(BASE_ACTION_STATE::HEAVEHO_DRIVE);
-
 	// ヒーホー用変数初期化
 	pPerson->HeavehoDriveInit();
+
+	// 背景変更
+	bool bDriveStage(true);
+	MsgMgr->Dispatch(0, pPerson->GetID(), ENTITY_ID::SCENE_MAIN, MESSAGE_TYPE::OVER_DRIVE_STAGE, &bDriveStage);
+
+	// SE
+	se->Play("必殺発動");
+
+	// 必殺始動エフェクト
+	pPerson->AddEffectAction(pPerson->GetCenterPos(),EFFECT_TYPE::OVER_DRIVE_ACTION);
 
 }
 
 void BasePlayerState::HeavehoDrive::Execute(BasePlayer * pPerson)
 {
 	// そのキャラクターのヒーホーの更新
-	pPerson->HeavehoDriveUpdate();
+	const bool bEnd(pPerson->HeavehoDriveUpdate());
 
-	// 攻撃ステート終わったら
-	if (!pPerson->isAttackState())
+	// 終わったら
+	if (bEnd)
 	{
 		// 待機ステートに(さすがにキャンセルはやめておこう)
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
@@ -3763,17 +4752,26 @@ void BasePlayerState::HeavehoDrive::Exit(BasePlayer * pPerson)
 	// ヒーホーの終わり
 	pPerson->HeavehoDriveExit();
 
+	// 背景変更
+	bool bDriveStage(false);
+	MsgMgr->Dispatch(0, pPerson->GetID(), ENTITY_ID::SCENE_MAIN, MESSAGE_TYPE::OVER_DRIVE_STAGE, &bDriveStage);
 }
 
 void BasePlayerState::HeavehoDrive::Render(BasePlayer * pPerson)
 {
-
 	tdnText::Draw(20, 690, 0xffffffff, "HeavehoDrive");
 }
 
 bool BasePlayerState::HeavehoDrive::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
 	// メッセージタイプ
+	switch (msg.Msg)
+	{
+	case MESSAGE_TYPE::HIT_ATTACK:
+		pPerson->HeavehoDriveHitEvent();
+		break;
+	}
+
 	return false;
 }
 
@@ -3781,24 +4779,19 @@ bool BasePlayerState::HeavehoDrive::OnMessage(BasePlayer * pPerson, const Messag
 //				超必殺技ステート
 /*******************************************************/
 
-BasePlayerState::HeavehoDriveOverFlow * BasePlayerState::HeavehoDriveOverFlow::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::HeavehoDriveOverFlow instance;
-	return &instance;
-}
-
 void BasePlayerState::HeavehoDriveOverFlow::Enter(BasePlayer * pPerson)
 {
 	// モーションに変える
-	pPerson->SetMotion(MOTION_TYPE::HEAVEHO_DRIVE);
+	pPerson->SetMotion(MOTION_TYPE::HEAVEHO_DRIVE_OVERFLOW);
 
 	// アクションステート変更
-	pPerson->SetActionState(BASE_ACTION_STATE::HEAVEHO_DRIVE);
+	pPerson->SetActionState(BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW);
 
-	// ヒーホー用変数初期化
-	pPerson->HeavehoDriveInit();
+	// ヒーホードライブオーバーフロー用変数初期化
+	pPerson->HeavehoDriveOverFlowInit();
 
+	// SE
+	se->Play("超必殺発動");
 }
 
 void BasePlayerState::HeavehoDriveOverFlow::Execute(BasePlayer * pPerson)
@@ -3814,29 +4807,57 @@ void BasePlayerState::HeavehoDriveOverFlow::Execute(BasePlayer * pPerson)
 		return;
 	}
 
-	// ヒットしてたら成功・演出ステートに行く
-	if (pPerson->GetAttackData()->bHit)
-	{
-
-	}
+	// HandleMessageに移植
+	//static bool flag = false;
+	//// ヒットしてたら成功・演出ステートに行く
+	//if (pPerson->GetAttackData()->bHit)
+	//{
+	//	if (flag == false)
+	//	{
+	//		flag = true;
+	//		// カットイン発動メッセージを送る
+	//		CUTIN_TYPE_NAME data = CUTIN_TYPE_NAME::AIROU;
+	//		MsgMgr->Dispatch(0, pPerson->GetID(), ENTITY_ID::CUTIN_MGR, MESSAGE_TYPE::CUTIN_ACTION, &data);
+	//
+	//		// シーンメインステートに対して曲変更メッセージ
+	//		MsgMgr->Dispatch(0, pPerson->GetID(), ENTITY_ID::SCENE_MAIN, MESSAGE_TYPE::HEAVE_HO_OVERFLOW_START, nullptr);
+	//		return;
+	//	}
+	//}
 }
 
 void BasePlayerState::HeavehoDriveOverFlow::Exit(BasePlayer * pPerson)
 {
 	// ヒーホーの終わり
 	pPerson->HeavehoDriveExit();
-
+	pPerson->SetOverDriveFrame(0);
 }
 
 void BasePlayerState::HeavehoDriveOverFlow::Render(BasePlayer * pPerson)
 {
-
 	tdnText::Draw(20, 690, 0xffffffff, "HeavehoDriveOverFlow");
 }
 
 bool BasePlayerState::HeavehoDriveOverFlow::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
 	// メッセージタイプ
+	switch (msg.Msg)
+	{
+		// 攻撃当たってたら
+	case MESSAGE_TYPE::HIT_ATTACK:
+	{
+									 pPerson->HeavehoDriveOverFlowSuccessInit();	// 必殺のターゲットとなる相手の実体を初期化のときに突っ込む
+									 // カットイン発動メッセージを送る
+									 CUTIN_TYPE_NAME data = CUTIN_TYPE_NAME::AIROU;
+									 MsgMgr->Dispatch(0, pPerson->GetID(), ENTITY_ID::CUTIN_MGR, MESSAGE_TYPE::CUTIN_ACTION, &data);
+
+									 // シーンメインステートに対して曲変更メッセージ
+									 MsgMgr->Dispatch(0, pPerson->GetID(), ENTITY_ID::SCENE_MAIN, MESSAGE_TYPE::HEAVE_HO_OVERFLOW_START, nullptr);
+
+									 // return trueはしない。SPゲージ関連の処理をGlobalStateのメッセージを行っているため
+									 break;
+	}
+	}
 	return false;
 }
 
@@ -3844,33 +4865,42 @@ bool BasePlayerState::HeavehoDriveOverFlow::OnMessage(BasePlayer * pPerson, cons
 //				超必殺技_成功ステート
 /*******************************************************/
 
-BasePlayerState::HeavehoDriveOverFlow_Success * BasePlayerState::HeavehoDriveOverFlow_Success::GetInstance()
-{
-	// ここに変数を作る
-	static BasePlayerState::HeavehoDriveOverFlow_Success instance;
-	return &instance;
-}
-
 void BasePlayerState::HeavehoDriveOverFlow_Success::Enter(BasePlayer * pPerson)
 {
+	// シーンメインに成功したことを伝える
+	MsgMgr->Dispatch(0, pPerson->GetID(), ENTITY_ID::SCENE_MAIN, MESSAGE_TYPE::HEAVE_HO_OVER_DRIVE_HIT, nullptr);
 
+	// プレイヤーマネージャーにも伝える
+	MsgMgr->Dispatch(0, pPerson->GetID(), ENTITY_ID::PLAYER_MGR, MESSAGE_TYPE::HEAVE_HO_OVER_DRIVE_HIT, nullptr);
 
+	// カメラにエフェクトカメラの発動をお願いする
+	EFFECT_CAMERA_INFO EffectCameraInfo;
+	EffectCameraInfo.scriptID = (int)EFFECT_CAMERA_ID::AIROU_OVERFLOW;	// 仮
+	MsgMgr->Dispatch(0, pPerson->GetID(), ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::EFFECT_CAMERA, &EffectCameraInfo);
+
+	// オブジェクト変更
+	pPerson->ChangeHeaveHoDriveOverFlowObj();
+
+	// アングル固定
+	pPerson->SetAngleY(PI);
+
+	// 原点に置く
+	pPerson->SetPos(VECTOR_ZERO);
 }
 
 void BasePlayerState::HeavehoDriveOverFlow_Success::Execute(BasePlayer * pPerson)
 {
+	// 原点に置く
+	pPerson->SetPos(VECTOR_ZERO);
 
+	pPerson->HeavehoDriveOverFlowSuccessUpdate();
 }
 
 void BasePlayerState::HeavehoDriveOverFlow_Success::Exit(BasePlayer * pPerson)
-{
-
-
-}
+{}
 
 void BasePlayerState::HeavehoDriveOverFlow_Success::Render(BasePlayer * pPerson)
 {
-
 	tdnText::Draw(20, 690, 0xffffffff, "HeavehoDriveOverFlow_Success");
 }
 
@@ -3879,3 +4909,358 @@ bool BasePlayerState::HeavehoDriveOverFlow_Success::OnMessage(BasePlayer * pPers
 	// メッセージタイプ
 	return false;
 }
+
+/*******************************************************/
+//				WINステート
+/*******************************************************/
+
+void BasePlayerState::Win::Enter(BasePlayer * pPerson)
+{
+	// UIにメッセージを送る
+	SIDE side(pPerson->GetSide());
+	MsgMgr->Dispatch(0, pPerson->GetID(), ENTITY_ID::UI_MGR, MESSAGE_TYPE::APP_WIN_ICON, &side);
+
+	// カメラにメッセージを送る
+	MsgMgr->Dispatch(0, pPerson->GetID(), ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::WINNER_CAMERA, pPerson->GetPosAddress());
+
+	// 何もしないアクション
+	pPerson->SetActionState(BASE_ACTION_STATE::FRAMECOUNT);
+
+	// 勝ちモーション
+	pPerson->SetMotion(MOTION_TYPE::WIN);
+
+	// 勝ってる数カウント
+	pPerson->AddWinNum(1);
+
+	// 正面を向く
+	pPerson->SetAngleY(PI);
+}
+
+void BasePlayerState::Win::Execute(BasePlayer * pPerson)
+{
+	if (pPerson->GetCurrentFrame() == BasePlayer::c_WINNER_TIME || pPerson->isAnyPushKey())
+	{
+		// シーンメインに終わったよメッセージ
+		MsgMgr->Dispatch(0, pPerson->GetID(), ENTITY_ID::SCENE_MAIN, MESSAGE_TYPE::END_WINNER, nullptr);
+	}
+}
+
+void BasePlayerState::Win::Exit(BasePlayer * pPerson)
+{}
+
+void BasePlayerState::Win::Render(BasePlayer * pPerson)
+{
+	tdnText::Draw(20, 690, 0xffffffff, "Win");
+}
+
+bool BasePlayerState::Win::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	return false;
+}
+
+/*******************************************************/
+//				空中ダッシュステート
+/*******************************************************/
+
+void BasePlayerState::AerialDash::Enter(BasePlayer * pPerson)
+{
+	// とりあえずフレーム数えてみる
+	pPerson->SetActionState(BASE_ACTION_STATE::FRAMECOUNT);
+
+	// ダッシュモーション
+	pPerson->SetMotion(MOTION_TYPE::AERIAL_DASH);
+
+	// SE
+	se->Play("空中ダッシュ");
+
+	// 空中ジャンプの権利喪失
+	pPerson->SetAerialJump(false);
+
+	// 空中ダッシュフラグ
+	pPerson->SetAerialDash(true);
+	// タイマー
+	pPerson->SetAerialDashFrame(16);
+
+	const float MoveY(pPerson->GetMove().y);
+
+	// 移動
+	if (pPerson->GetDir() == DIR::RIGHT)
+	{
+		// わっしょい
+		pPerson->SetMove(Vector3(1.35f, 0, 0));
+	}
+	else
+	{
+		// わっしょい
+		pPerson->SetMove(Vector3(-1.35f, 0, 0));
+	}
+
+	if (MoveY > 0)pPerson->AddMove(Vector3(0, MoveY, 0));
+
+	// 空中ダッシュエフェクト
+	pPerson->AddEffectAction(pPerson->GetCenterPos(), EFFECT_TYPE::AERIAL_JUMP);
+
+}
+
+void BasePlayerState::AerialDash::Execute(BasePlayer * pPerson)
+{
+	//////////////////////////////////////////////
+	//	空中攻撃キャンセル
+	//============================================
+	if (AerialAttackCancel(pPerson)) return;
+
+	if (pPerson->GetAerialDashFrame() <= 0)
+	{
+		// 地上、空中で分岐
+		if (pPerson->isLand())pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		else pPerson->GetFSM()->ChangeState(BasePlayerState::Fall::GetInstance());
+	}
+
+	//// 移動地
+	//// 移動
+	//if (pPerson->GetDir() == DIR::RIGHT)
+	//{
+	//	// わっしょい
+	//	pPerson->SetMove(Vector3(1.5f, 0, 0));
+	//}
+	//else
+	//{
+	//	// わっしょい
+	//	pPerson->SetMove(Vector3(-1.5f, 0, 0));
+	//}
+
+}
+
+void BasePlayerState::AerialDash::Exit(BasePlayer * pPerson)
+{
+	// 空中ダッシュフラグオフ
+	//pPerson->SetAerialDash(false);
+
+}
+
+void BasePlayerState::AerialDash::Render(BasePlayer * pPerson)
+{
+	tdnText::Draw(20, 690, 0xffffffff, "AerialDash");
+}
+
+bool BasePlayerState::AerialDash::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	return false;
+}
+
+/*******************************************************/
+//				空中バックダッシュステート
+/*******************************************************/
+
+void BasePlayerState::AerialBackDash::Enter(BasePlayer * pPerson)
+{
+	// ダッシュモーション
+	pPerson->SetMotion(MOTION_TYPE::BACK_STEP);
+
+	// 空中ジャンプの権利喪失
+	pPerson->SetAerialJump(false);
+
+	// SE
+	se->Play("空中ダッシュ");
+
+	// とりあえずフレーム数えてみる
+	pPerson->SetActionState(BASE_ACTION_STATE::FRAMECOUNT);
+
+	// 空中ダッシュフラグ
+	pPerson->SetAerialDash(true);
+	// タイマー
+	pPerson->SetAerialDashFrame(14);
+
+	const float MoveY(pPerson->GetMove().y);
+
+	// 移動
+	if (pPerson->GetDir() == DIR::RIGHT)
+	{
+		// わっしょい
+		pPerson->SetMove(Vector3(-.75f, 0, 0));
+	}
+	else
+	{
+		// わっしょい
+		pPerson->SetMove(Vector3(.75f, 0, 0));
+	}
+
+	if (MoveY > 0)pPerson->AddMove(Vector3(0, MoveY, 0));
+
+	// 空中ダッシュエフェクト
+	pPerson->AddEffectAction(pPerson->GetCenterPos(), EFFECT_TYPE::AERIAL_JUMP);
+}
+
+void BasePlayerState::AerialBackDash::Execute(BasePlayer * pPerson)
+{
+	//////////////////////////////////////////////
+	//	空中攻撃キャンセル
+	//============================================
+	//if (AerialAttackCancel(pPerson)) return;
+
+	if (pPerson->GetAerialDashFrame() <= 0)
+	{
+		// 地上、空中で分岐
+		if(pPerson->isLand())pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		else 
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Fall::GetInstance());
+	}
+
+	//// 移動地
+	//// 移動
+	//if (pPerson->GetDir() == DIR::RIGHT)
+	//{
+	//	// わっしょい
+	//	pPerson->SetMove(Vector3(1.5f, 0, 0));
+	//}
+	//else
+	//{
+	//	// わっしょい
+	//	pPerson->SetMove(Vector3(-1.5f, 0, 0));
+	//}
+
+}
+
+void BasePlayerState::AerialBackDash::Exit(BasePlayer * pPerson)
+{
+	// 空中ダッシュフラグオフ
+	//pPerson->SetAerialDash(false);
+
+}
+
+void BasePlayerState::AerialBackDash::Render(BasePlayer * pPerson)
+{
+	tdnText::Draw(20, 690, 0xffffffff, "AerialBackDash");
+}
+
+bool BasePlayerState::AerialBackDash::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	return false;
+}
+
+
+/*******************************************************/
+//				イントロ演出用ステート
+/*******************************************************/
+
+void BasePlayerState::Intro::Enter(BasePlayer * pPerson)
+{
+	// イントロ用モーション
+	pPerson->SetMotion(MOTION_TYPE::APPEAR);
+
+	// キャラごとの掛け合いの初期化
+	pPerson->KakeaiInit();
+}
+
+void BasePlayerState::Intro::Execute(BasePlayer * pPerson)
+{
+	// キャラごとの掛け合いの更新
+	pPerson->KakeaiUpdate();
+}
+
+void BasePlayerState::Intro::Exit(BasePlayer * pPerson)
+{
+	// キャラごとの掛け合いの終了
+	pPerson->KakeaiExit();
+}
+
+void BasePlayerState::Intro::Render(BasePlayer * pPerson)
+{
+	tdnText::Draw(20, 690, 0xffffffff, "Intro");
+}
+
+bool BasePlayerState::Intro::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	switch (msg.Msg)
+	{
+	case MESSAGE_TYPE::KAKEAI_END:
+		pPerson->GetFSM()->ChangeState(Wait::GetInstance());
+		return true;
+		break;
+	}
+	return false;
+}
+
+/*******************************************************/
+//				どっこい攻撃 (三段目)
+/*******************************************************/
+
+//void BasePlayerState::StrongAttack::Enter(BasePlayer * pPerson)
+//{
+//	//　モーションセット
+//	pPerson->SetMotion(MOTION_TYPE::RUSH_ATTACK3);
+//
+//	// 攻撃ステートを3段目に設定する
+//	pPerson->SetActionState(BASE_ACTION_STATE::RUSH3);
+//
+//
+//
+//
+//}
+//
+//void BasePlayerState::StrongAttack::Execute(BasePlayer * pPerson)
+//{
+//
+//	// 攻撃終了してたら
+//	if (!pPerson->isAttackState())
+//	{
+//		// 待機モーションに戻る
+//		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+//		return;
+//	}
+//
+//	// ヒットしてる状態
+//	if (pPerson->GetAttackData()->bHit)
+//	{
+//		/* キャンセルルート */
+//		//////////////////////////////////////////////
+//		//	スキルキャンセル
+//		//============================================
+//		if (SkillCancel(pPerson)) return;
+//
+//		//////////////////////////////////////////////
+//		//	スタンドキャンセル
+//		//============================================
+//		if (StandCancel(pPerson)) return;
+//
+//		//////////////////////////////////////////////
+//		//	ヒーホードライブキャンセル
+//		//============================================
+//		if (HeaveHoCancel(pPerson)) return;
+//
+//		//////////////////////////////////////////////
+//		//	ヒーホードライブオーバーフローキャンセル
+//		//============================================
+//		if (HeaveHoOverFlowCancel(pPerson)) return;
+//
+//		// 攻撃終了してたら
+//		if (!pPerson->isAttackState())
+//		{
+//			// 待機モーションに戻る
+//			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+//		}
+//	}
+//
+//}
+//
+//void BasePlayerState::StrongAttack::Exit(BasePlayer * pPerson)
+//{
+//	// 空中ダッシュフラグオフ
+//	//pPerson->SetAerialDash(false);
+//
+//}
+//
+//void BasePlayerState::StrongAttack::Render(BasePlayer * pPerson)
+//{
+//	tdnText::Draw(20, 690, 0xffffffff, "StrongAttack");
+//}
+//
+//bool BasePlayerState::StrongAttack::OnMessage(BasePlayer * pPerson, const Message & msg)
+//{
+//	// メッセージタイプ
+//	return false;
+//}

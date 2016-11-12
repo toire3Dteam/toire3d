@@ -14,34 +14,62 @@
 //==============================================================================================
 const SE_Manager::DATA all_dataS[] =
 {
-	{ "通常1段ヒット",		"DATA/Sound/SE/Battle/attack1.wav",	2, false },
-	{ "通常2段ヒット",		"DATA/Sound/SE/Battle/attack2.wav",	2, false },
-	{ "通常3段ヒット",		"DATA/Sound/SE/Battle/attack3.wav",	2, false },
-	{ "空中攻撃ヒット",		"DATA/Sound/SE/Battle/hit1.wav", 2, false },
-	{ "空中下攻撃ヒット",	"DATA/Sound/SE/Battle/hit2.wav", 2, false },
-	{ "全ブレイク",			"DATA/Sound/SE/Battle/all_break.wav",	2, false },
-	{ "チャージ",			"DATA/Sound/SE/Battle/charge.wav",2, false },
-	{ "チャージ溜まる",		"DATA/Sound/SE/Battle/fill.wav",2, false },
+	//{ "通常1段ヒット",		"DATA/Sound/SE/Battle/attack1.wav",	2, false },
+	//{ "通常2段ヒット",		"DATA/Sound/SE/Battle/attack2.wav",	2, false },
+	//{ "通常3段ヒット",		"DATA/Sound/SE/Battle/attack3.wav",	2, false },
+	{ "ヒット1",	"DATA/Sound/SE/P4U2/hit1.wav",	2, false },
+	{ "ヒット2",	"DATA/Sound/SE/P4U2/hit2.wav",	2, false },
+	{ "ヒット3",	"DATA/Sound/SE/P4U2/hit3.wav",	2, false },
+	{ "ヒット4",	"DATA/Sound/SE/BlazBlue/hit1.wav", 2, false },
+	{ "ヒット5",	"DATA/Sound/SE/BlazBlue/hit2.wav", 2, false },
+	{ "ヒット6",	"DATA/Sound/SE/BlazBlue/hit3.wav", 2, false },
+	{ "ぐちょヒット",		"DATA/Sound/SE/Battle/gutyo.wav", 8, false },
+	//{ "空中攻撃ヒット",		"DATA/Sound/SE/Battle/hit1.wav", 2, false },
+	//{ "空中下攻撃ヒット",	"DATA/Sound/SE/Battle/hit2.wav", 2, false },
+	//{ "全ブレイク",			"DATA/Sound/SE/Battle/all_break.wav",	2, false },
+	//{ "チャージ",			"DATA/Sound/SE/Battle/charge.wav",2, false },
+	//{ "チャージ溜まる",		"DATA/Sound/SE/Battle/fill.wav",2, false },
 	{ "フィニッシュ小",		"DATA/Sound/SE/Battle/finish_base.wav",2, false },
 	{ "フィニッシュ中",		"DATA/Sound/SE/Battle/finish2.wav",	2, false },
 	{ "フィニッシュ大",		"DATA/Sound/SE/Battle/finish3.wav",	2, false },
 	{ "撃ち落とし",			"DATA/Sound/SE/Battle/smack_down.wav",	2, false },
-	{ "ジャンプ",			"DATA/Sound/SE/Battle/jump.wav",	2, false },
-	{ "空振り1",			"DATA/Sound/SE/Battle/whiff1.wav",	2, false },
-	{ "空振り2",			"DATA/Sound/SE/Battle/whiff2.wav",	2, false },
+	{ "ジャンプ",			"DATA/Sound/SE/BlazBlue/jump.wav",	2, false },
+	{ "空振り1",			"DATA/Sound/SE/BlazBlue/whiff1.wav", 2, false },
+	{ "空振り2",			"DATA/Sound/SE/BlazBlue/whiff2.wav", 2, false },
+	//{ "空振り3",			"DATA/Sound/SE/BlazBlue/whiff3.wav", 2, false },
+	{ "空振り4",			"DATA/Sound/SE/BlazBlue/whiff4.wav", 2, false },
+	{ "空振り5",			"DATA/Sound/SE/BlazBlue/whiff5.wav", 2, false },
+	{ "空振り6",			"DATA/Sound/SE/BlazBlue/whiff6.wav", 2, false },
+	{ "アイルードリル",		"DATA/Sound/SE/BlazBlue/drill.wav", 2, false },
 	{ "エスケープ",			"DATA/Sound/SE/Battle/escape.wav",	2, false },
-	{ "ガード",				"DATA/Sound/SE/Battle/guard.wav",	8, false },
+	{ "ガード小",				"DATA/Sound/SE/BlazBlue/guard1.wav", 8, false },
+	{ "ガード中",				"DATA/Sound/SE/BlazBlue/guard2.wav", 4, false },
+	{ "ガード強",				"DATA/Sound/SE/BlazBlue/guard3.wav", 4, false },
+	{ "空中ダッシュ",		"DATA/Sound/SE/BlazBlue/aerial_dash.wav", 2, false },
 	//{ "Eカウンター成功",	"DATA/Sound/SE/Battle/counter_success.wav",	2, false },
-	{ "ブレーキ1",			"DATA/Sound/SE/Battle/brake1.wav",	2, false },
+	//{ "ブレーキ1",			"DATA/Sound/SE/Battle/brake1.wav",	2, false },
 	{ "ダッシュ",			"DATA/Sound/SE/Battle/dash.wav", 2, false },
 	{ "ペルソナ召喚",		"DATA/Sound/SE/Battle/kyuin.wav", 2, false },
 	{ "掴み",				"DATA/Sound/SE/Battle/wriff_catch.wav", 1, false },
 	{ "掴み成功",			"DATA/Sound/SE/Battle/catch.wav", 1, false },
 	{ "投げ抜け",			"DATA/Sound/SE/Battle/throw_escape.wav", 1, false },	
-	{ "バースト",			"DATA/Sound/SE/Battle/special.wav", 4, false },
-	{ "リザルト1", "DATA/Sound/SE/Result/result1.wav", 1, false },
-	{ "リザルト2", "DATA/Sound/SE/Result/result2.wav", 1, false },
-	{ "リザルト3", "DATA/Sound/SE/Result/result3.wav", 1, false },
+	{ "オーバードライブ開始",		"DATA/Sound/SE/BlazBlue/over_drive.wav", 2, false },
+	{ "オーバードライブ終了",		"DATA/Sound/SE/BlazBlue/over_drive_end.wav", 2, false },
+	{ "必殺発動",			"DATA/Sound/SE/P4U2/special1.wav", 2, false },
+	{ "超必殺発動",			"DATA/Sound/SE/P4U2/special2.wav", 2, false },
+	{ "リザルト1",			"DATA/Sound/SE/Result/result1.wav", 1, false },
+	{ "リザルト2",			"DATA/Sound/SE/Result/result2.wav", 1, false },
+	{ "リザルト3",			"DATA/Sound/SE/Result/result3.wav", 1, false },
+
+	{ "カーソル1",	"DATA/Sound/SE/P4U2/cursor.wav", 2, false },
+	{ "決定1",		"DATA/Sound/SE/P4U2/decide.wav", 2, false },
+
+	{ "フェイトイズターニング",	"DATA/Sound/SE/BlazBlue/voice/the_wheel.wav",	1, false },
+	{ "リベル",					"DATA/Sound/SE/BlazBlue/voice/revel.wav",		1, false },
+	{ "ワン",					"DATA/Sound/SE/BlazBlue/voice/one.wav",			1, false },
+	{ "ツー",					"DATA/Sound/SE/BlazBlue/voice/two.wav",			1, false },
+	{ "スリー",					"DATA/Sound/SE/BlazBlue/voice/three.wav",		1, false },
+	{ "アクション",				"DATA/Sound/SE/BlazBlue/voice/action.wav",		1, false },
 };
 
 //==============================================================================================
@@ -271,6 +299,7 @@ void SE_Manager::SetListener(const Vector2 &pos)
 void BGM_Manager::Initialize()
 {
 	play_manager = new tdnSoundBGM;
+	m_bPlayStream = false;
 
 	for (int i = 0;; i++)
 	{
@@ -391,7 +420,7 @@ BGM_Manager *bgm;
 
 
 
-MyMusicManager::MyMusicManager(MY_MUSIC_ID id) :m_bPlay(false)
+MyMusicManager::MyMusicManager(MY_MUSIC_ID id) :m_bPlay(false), m_pStreamSound(nullptr), m_pHeaveHoStream(nullptr), m_bHeaveHoPlay(false)
 {
 	std::string directory = "DATA/Sound/BGM/MyMusic";
 	switch (id)
@@ -438,7 +467,10 @@ MyMusicManager::MyMusicManager(MY_MUSIC_ID id) :m_bPlay(false)
 MyMusicManager::~MyMusicManager()
 {
 	for (auto it : m_list) delete it;	// リスト消去
-	Stop();			// 曲ストップ
+	
+	// 曲のストップ
+	if(m_bPlay)m_pStreamSound->Stop();	
+	if(m_bHeaveHoPlay)m_pHeaveHoStream->Stop();
 }
 
 void MyMusicManager::Play()
@@ -474,4 +506,14 @@ void MyMusicManager::Play()
 
 	// 解放
 	delete[] numbers;
+}
+
+void MyMusicManager::PlayHeaveHo()
+{
+	// 現在流してるやつと超必殺のBGMをクロスフェードさせる
+	m_pStreamSound->SetMode(STR_FADEOUT, 16);
+	m_bPlay = false;
+
+	m_pHeaveHoStream = bgm->PlayStream("DATA/Sound/BGM/battle/HeaveHo.ogg");
+	m_bHeaveHoPlay = true;
 }

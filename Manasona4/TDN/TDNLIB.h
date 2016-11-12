@@ -42,6 +42,7 @@
 //	定数	
 /********************************************/
 #define VECTOR_ZERO Vector3(0.0f,0.0f,0.0f)
+#define VECTOR2_ZERO Vector2(0.0f,0.0f)
 #define	PI	((FLOAT)  3.141592654f)
 
 /********************************************/
@@ -422,6 +423,63 @@ public:
 */
 Quaternion QuaternionSlerp(Quaternion& q, Quaternion& r, float a);
 
+
+/********************************************/
+//				tdnView				     
+/********************************************/
+
+// カメラ用構造体
+struct ViewData
+{
+	Vector3 pos, target;
+	float roll;
+	ViewData() :pos(0, 0, 0), target(0, 0, 0), roll(0) {}
+	ViewData(const Vector3 &pos, const Vector3 &target, float roll) :pos(pos), target(target), roll(roll){}
+	ViewData(const ViewData &copy) :pos(copy.pos), target(copy.target), roll(copy.roll){}
+	ViewData& operator = (CONST ViewData& info){ pos = info.pos; target = info.target; roll = info.roll; return *this; }
+};
+
+/**
+*@brief		カメラの空間を制御するクラス
+*@author		Nishida・Yamagoe
+*/
+class tdnView
+{
+public:
+	// 初期化
+	static void Init();
+
+	//	視界クリア
+	static void Clear(DWORD color = 0, bool bClearZ = true);
+	static void ClearZ();
+
+	//	視点設定
+	static void Set(const Vector& pos, const Vector& target, float roll = .0f);
+	static void Set(const ViewData &data){ m_ViewData = data; }
+	static void Set(float x, float y, float z, float ax, float ay, float az);
+
+	//	投影平面設定
+	static void SetViewport();
+	static void SetViewport(int x, int y, int w, int h);
+
+	//	投影設定
+	static void SetProjection(float FovY, float Near, float Far);
+	static void SetProjection(float FovY, float Near, float Far, float asp);
+
+	// 行列・ビューポート更新
+	static void Activate();
+
+protected:
+	static ViewData m_ViewData;			// 座標、注視点、Z回転の情報	
+	// ビューポート
+	static D3DVIEWPORT9	Viewport;		// Window画面のどの領域まで3Dを描画するか
+	static float FovY;					// 視野角
+	static float Near, Far;				// 投影の手前の位置と一番奥の位置 
+	static float Aspect;				// 
+
+};
+
+
 /*************************************************/
 //	行列やベクトルに関する計算のプロトタイプ宣言
 /*************************************************/
@@ -536,6 +594,13 @@ namespace Math
 	Vector2 WorldToScreen(const Vector3 &WorldPos);
 
 	/**
+	*@brief						座標変換
+	*@param[in]		WorldPos	ワールド座標
+	*@return		ワールド座標からプロジェクション座標(-1.0~1.0)を返す
+	*/
+	Vector2 WorldToProj(const Vector3 &WorldPos);
+
+	/**
 	*@brief								座標変換
 	*@param[in]		ScreenPos			スクリーン座標
 	*@param[in]		ProjectiveSpaceZ	カメラのプロジェクションのNearとFarのパーセンテージ(0.0～1.0)
@@ -571,6 +636,16 @@ namespace Math
 	*@return		上記ベジエ関数のfloat版
 	*/
 	void Bezier(float *out, float FloatArray[], int NumArray, float percentage);
+
+	/**
+	*@brief									ベジエ計算
+	*@param[out]		out					計算結果吐き出し
+	*@param[in]		CameraInfoArray				CameraInfoの配列(複数の点)
+	*@param[in]		NumArray		配列の個数
+	*@param[in]		percentage				どれぐらいの割合の位置か(0.0～1.0)
+	*@return		上記ベジエ関数のカメラ版
+	*/
+	void Bezier(ViewData *out, ViewData DataArray[], int NumArray, float percentage);
 
 	/**
 	*@brief									最小値と最大値を範囲内に値を収める
@@ -738,51 +813,6 @@ public:
 
 
 /********************************************/
-//				tdnView				     
-/********************************************/
-
-/**
-*@brief		カメラの空間を制御するクラス
-*@author		Nishida・Yamagoe
-*/
-class tdnView
-{
-public:
-	// 初期化
-	static void Init();
-
-	//	視界クリア
-	static void Clear(DWORD color = 0, bool bClearZ = true);
-	static void ClearZ();
-
-	//	視点設定
-	static void Set(const Vector& pos, const Vector& target, float roll = .0f);
-	static void Set(float x, float y, float z, float ax, float ay, float az);
-
-	//	投影平面設定
-	static void SetViewport();
-	static void SetViewport(int x, int y, int w, int h);
-
-	//	投影設定
-	static void SetProjection(float FovY, float Near, float Far);
-	static void SetProjection(float FovY, float Near, float Far, float asp);
-
-	// 行列・ビューポート更新
-	static void Activate();
-
-protected:
-	static Vector  Pos, Target;			// 始点と目線	
-	// ビューポート
-	static D3DVIEWPORT9	Viewport;		// Window画面のどの領域まで3Dを描画するか
-	static float FovY;					// 視野角
-	static float Near, Far;				// 投影の手前の位置と一番奥の位置 
-	static float Aspect;				// 
-	static float m_roll;				// カメラのroll値(Z軸回転)
-
-};
-
-
-/********************************************/
 //				tdnRenderState				     
 /********************************************/
 typedef enum RS
@@ -793,7 +823,8 @@ typedef enum RS
 	SUB = 4,
 	MUL = 5,
 	NEGA = 6,
-	INVERT = 7
+	INVERT = 7,
+	SCREEN = 8
 }RM;
 
 /**
@@ -1050,7 +1081,7 @@ public:
 	tdn2DObj(UINT width, UINT height, FMT2D fmtFlag);		// レンダーターゲット作成
 	tdn2DObj(Texture2D *texture);							// テクスチャ参照型(主に動画で使う)
 
-	bool LoadFontTexture(LPCSTR character, UINT size, LPCSTR fontName); // 文字テクスチャ作成
+	bool LoadFontTexture(LPCSTR character, UINT size, LPCSTR fontName = "メイリオ"); // 文字テクスチャ作成
 
 
 	~tdn2DObj();											// 画像orレンダーターゲット解放
@@ -1135,19 +1166,20 @@ namespace AnimAction
 	class Base
 	{
 	public:
-		Base() :m_bActionFlag(false), m_bEndFlag(false), m_iDelayFlame(0){};
+		Base() :m_bActionFlag(false), m_bEndFlag(false), m_iDelayFrame(0){};
 		~Base() {};
 
 		virtual void Update(tdn2DObj* pic) {};// tdn2DObjの実態を中へ	
-											  // 基本的にアニメの始動		
+		// 基本的にアニメの始動		
 
-		virtual void Action(tdn2DObj* pic,int delay) {
-			m_iDelayFlame = delay;
+		virtual void Action(tdn2DObj* pic, int delay) {
+			m_iDelayFrame = delay;
 			m_bActionFlag = true; /* 実行フラグOn */
 			m_bEndFlag = false;	// エンドフラグ
+			m_bFirstUpdateCheak = false;
 		};
 		virtual void Stop(tdn2DObj* pic) { m_bActionFlag = false;/* 実行フラグOff */ };
-		
+
 		/******************************************/
 		// アニメ用描画
 		/******************************************/
@@ -1166,7 +1198,8 @@ namespace AnimAction
 		virtual void RenderSpecial(tdn2DObj* pic, int x, int y);
 
 		// アクションチェック
-		bool ActionCheck();
+		bool ActionCheckUpdate();
+		bool ActionCheakRender();
 
 		// Get
 		bool IsAction() { return m_bActionFlag; }
@@ -1177,7 +1210,10 @@ namespace AnimAction
 		// 終了フラグ	 
 		bool m_bEndFlag;
 		// ディレイ
-		int m_iDelayFlame;
+		int m_iDelayFrame;
+		// 最初更新したあとかチェック
+		bool m_bFirstUpdateCheak;
+
 	};
 
 	/**
@@ -1188,7 +1224,7 @@ namespace AnimAction
 	{
 	public:
 		// 引数で設定
-		Ripple(int endFlame, float startScale , float moveScale);
+		Ripple(int endFlame, float startScale, float moveScale);
 		~Ripple();
 
 		void Update(tdn2DObj* pic);// tdn2DObjの実態を中へ
@@ -1211,7 +1247,7 @@ namespace AnimAction
 	{
 	public:
 		// 引数で設定
-		MoveAppeared(int endflame,int startX, int startY);
+		MoveAppeared(int endflame, int startX, int startY);
 		~MoveAppeared();
 
 		void Update(tdn2DObj* pic);// tdn2DObjの実態を中へ
@@ -1251,7 +1287,7 @@ namespace AnimAction
 		void Update(tdn2DObj* pic);// tdn2DObjの実態を中へ
 		void Action(tdn2DObj* pic, int delay);// 基本的にアニメの始動
 
-											  // 描画
+		// 描画
 		void Render(tdn2DObj* pic, int x, int y, u32 dwFlags = RS::COPY);// { pic->Render(x, y, dwFlags); }
 		void Render(tdn2DObj* pic, int x, int y, tdnShader* shader, char* name);// shader適用
 		void Render(tdn2DObj* pic, int x, int y, int w, int h, int tx, int ty, int tw, int th, u32 dwFlags = RS::COPY);
@@ -1289,7 +1325,7 @@ namespace AnimAction
 		void Update(tdn2DObj* pic);// tdn2DObjの実態を中へ
 		void Action(tdn2DObj* pic, int delay);// 基本的にアニメの始動
 
-											  // 描画
+		// 描画
 		void Render(tdn2DObj* pic, int x, int y, u32 dwFlags = RS::COPY);// { pic->Render(x, y, dwFlags); }
 		void Render(tdn2DObj* pic, int x, int y, tdnShader* shader, char* name);// shader適用
 		void Render(tdn2DObj* pic, int x, int y, int w, int h, int tx, int ty, int tw, int th, u32 dwFlags = RS::COPY);
@@ -1322,6 +1358,8 @@ namespace AnimAction
 		void Update(tdn2DObj* pic);// tdn2DObjの実態を中へ
 		void Action(tdn2DObj* pic, int delay);// 基本的にアニメの始動
 
+		void Render(tdn2DObj* pic, int x, int y, u32 dwFlags = RS::COPY);// { pic->Render(x, y, dwFlags); }
+
 	private:
 		int m_nowFlame;
 		int m_endFlame;
@@ -1335,7 +1373,7 @@ namespace AnimAction
 		float m_orgAlpha;
 		float m_alpha;
 	};
-	
+
 	/**
 	*@brief		大きくなるエフェクト
 	*@author		Nishida
@@ -1376,6 +1414,59 @@ namespace AnimAction
 	private:
 
 	};
+
+	/**
+	*@brief		アルファ変更
+	*@author		Nishida
+	*/
+	class AlphaMove :public Base
+	{
+	public:
+		// 引数で設定
+		AlphaMove(int endFlame, int arrivalFrame, int vanishFrame);
+		~AlphaMove();
+
+		void Update(tdn2DObj* pic);// tdn2DObjの実態を中へ
+		void Action(tdn2DObj* pic, int delay);// 基本的にアニメの始動
+
+	private:
+		int m_iNowFrame;
+		int m_iEndFrame;
+
+		int m_iArrivalFrame;
+		int m_iVanishFrame;
+
+	};
+
+
+	/**
+	*@brief		引き伸ばされるように元のサイズに戻るエフェクト
+	*@author	Yamagoe
+	*/
+	class Stretch :public Base
+	{
+	public:
+		// 引数で設定
+		Stretch(int endFrame, float startScaleX, float startScaleY, UINT width, UINT height) :Base(), m_width(width), m_height(height), m_nowFrame(0), m_endFrame(endFrame), m_StartScale(startScaleX, startScaleY), m_CurrentScale(m_StartScale){}
+		~Stretch();
+
+		void Update(tdn2DObj* pic);// tdn2DObjの実態を中へ
+		void Action(tdn2DObj* pic, int delay);// 基本的にアニメの始動
+
+		// 描画
+		void Render(tdn2DObj* pic, int x, int y, u32 dwFlags = RS::COPY);// { pic->Render(x, y, dwFlags); }
+		void Render(tdn2DObj* pic, int x, int y, tdnShader* shader, char* name);// shader適用
+		void Render(tdn2DObj* pic, int x, int y, int w, int h, int tx, int ty, int tw, int th, u32 dwFlags = RS::COPY);
+		void Render(tdn2DObj* pic, int x, int y, int w, int h, int tx, int ty, int tw, int th, tdnShader* shader, char* name);
+
+	private:
+		int m_nowFrame;
+		int m_endFrame;
+		Vector2 m_StartScale;
+		Vector2 m_CurrentScale;
+
+		const UINT m_width, m_height;	// 画像のサイズ保存用
+	};
 }
 
 /**
@@ -1394,7 +1485,7 @@ public:
 	tdn2DAnim(Texture2D *texture) : m_obj(new tdn2DObj(texture)), m_pAction(nullptr){}
 	tdn2DAnim(const char* IDName, const char* pArchiveName) :m_obj(new tdn2DObj(IDName, pArchiveName)){ m_pAction = nullptr; }
 
-	~tdn2DAnim() { SAFE_DELETE(m_pAction); SAFE_DELETE(m_obj);	}
+	~tdn2DAnim() { SAFE_DELETE(m_pAction); SAFE_DELETE(m_obj); }
 
 	// 注文
 	void OrderRipple(int endFlame, float startScale, float addScale);
@@ -1403,8 +1494,22 @@ public:
 	void OrderJump(int endFlame, float startScale, float addScale);
 	void OrderShrink(int endFlame, float startScale, float maxScale);
 	void OrderGrow(int endFlame, float startScale, float addScale);
-
 	void OrderNone();
+	void OrderAlphaMove(int endFlame, int arrivalFrame, int vanishFrame);
+
+	/**
+	*@brief							引き伸ばしアニメ注文(最初は小さくて、元のサイズに引き伸ばされる感覚)
+	*@author		Yamagoe
+	*@param[in]		endFrame		終了フレーム(完全に元のサイズに戻るフレーム)
+	*@param[in]		startScaleX		開始時のXスケール(0～1)
+	*@param[in]		startScaleY		開始時のYスケール(0～1)
+	*/
+	void OrderStretch(int endFrame, float startScaleX, float startScaleY)
+	{
+		if (m_pAction) delete m_pAction;// 既存のバッファの開放
+		m_pAction = new AnimAction::Stretch(endFrame, startScaleX, startScaleY, m_obj->GetWidth(), m_obj->GetHeight());
+	}
+
 
 	// 実行・始動
 	void Update()
@@ -1413,8 +1518,8 @@ public:
 		m_pAction->Update(m_obj);
 	}
 
-	void Action(int delayTimer = 0) 
-	{ 
+	void Action(int delayTimer = 0)
+	{
 		MyAssert((m_pAction != nullptr), "特殊エフェクトがセットされていない!\n[Order関数を呼びましょう]");
 		m_pAction->Action(m_obj, delayTimer);
 	}
@@ -1434,8 +1539,8 @@ public:
 	void SetARGB(BYTE A, BYTE R, BYTE G, BYTE B) { m_obj->SetARGB(A, R, G, B); };
 	void SetARGB(int A, int R, int G, int B) { m_obj->SetARGB(A, R, G, B); };
 	void SetARGB(DWORD ARGB) { m_obj->SetARGB(ARGB); };
-	void SetAlpha(int A){ m_obj->SetAlpha(A);	}
-	void SetRGB(BYTE R, BYTE G, BYTE B) { m_obj->SetRGB(R,G,B); };
+	void SetAlpha(int A){ m_obj->SetAlpha(A); }
+	void SetRGB(BYTE R, BYTE G, BYTE B) { m_obj->SetRGB(R, G, B); };
 
 	void SetTurnOver(bool turnFlag) { m_obj->SetTurnOver(turnFlag); };
 	void SetShiftCenter(bool ShiftFlag) { m_obj->SetShiftCenter(ShiftFlag); };
@@ -1459,7 +1564,7 @@ public:
 		MyAssert((m_pAction != nullptr), "特殊エフェクトがセットされていない!\n[Order関数を呼びましょう]");
 		m_pAction->Render(m_obj, x, y, dwFlags);
 	}
-	void Render(int x, int y, tdnShader* shader, char* name) 
+	void Render(int x, int y, tdnShader* shader, char* name)
 	{
 		MyAssert((m_pAction != nullptr), "特殊エフェクトがセットされていない!\n[Order関数を呼びましょう]");
 		m_pAction->Render(m_obj, x, y, shader, name);
@@ -1607,12 +1712,29 @@ private:
 
 };
 
-// 3Dオブジェクト
+//#define LOAD_FBX
+
+// TDNLIB でインクルード
+
+// Doxygenの記法
+//
+//   *@brief		説明文
+//	 *@author		作者名
+//	 *@return 		返り値
+//	 *@param[in]	引数
+//	 *@param[out]	値を変える引数
+//	 *@note			メモ
+//	 !<@brief		変数の後ろ(右)に説明文を付ける時には
+//
+
+/*
+*@author Hidaka
+*/
 class tdnMesh
 {
 public:
 	tdnMesh();
-	~tdnMesh();
+	virtual ~tdnMesh();
 
 	/********/
 	/* 作成 */
@@ -1632,33 +1754,45 @@ public:
 		void              *streamArray; // 頂点情報（インデックス毎）の配列
 
 		D3DVERTEXELEMENT9 *decl;        // シェーダーに送る頂点構造体の定義
+
+		inline CreateData() : numVertexes( 0 ), vertexSize( 0 ), vertexArray( nullptr ),
+			numIndexes( 0 ), indexArray( nullptr ),
+			numStream( 0 ), streamSize( 0 ), streamArray( nullptr )
+		{}
+		inline ~CreateData()
+		{
+			delete[]vertexArray;
+			delete[]indexArray;
+			delete[]streamArray;
+		}
+
 	};
-	bool Create(const CreateData &data);
+	virtual bool Create( const CreateData &data );
 	bool CreateVertex(
 		unsigned int numVertex,    // 頂点数
 		unsigned int vertexSize,   // 頂点構造体のバイト数
-		void *vertexArray);       // 頂点配列
+		void *vertexArray );       // 頂点配列
 	bool CreateIndexes(
 		unsigned int numIndexes,   // インデックスの数
-		const DWORD *indexArray); // インデックス配列
-	bool CreateStream(unsigned int numData, unsigned int dataSize, void *dataArray);
+		const DWORD *indexArray ); // インデックス配列
+	bool CreateStream( unsigned int numData, unsigned int dataSize, void *dataArray );
 	bool CreateDeclaration(
 		unsigned int declArySize,  // 頂点構造体のバイト数
-		D3DVERTEXELEMENT9 *decl); // シェーダー上での頂点構造体の宣言
+		D3DVERTEXELEMENT9 *decl ); // シェーダー上での頂点構造体の宣言
 
-	// xy平面に正三角形作成
+								   // xy平面に正三角形作成
 	bool CreateTriangle(
 		float radius,    // 外接円の半径
-		DWORD color);
+		DWORD color );
 	// xy平面に長方形作成
 	bool CreateRectangle(
 		float width,
 		float height,
-		DWORD color);
+		DWORD color );
 	// 正四面体作成
 	bool CreateTriangular(
 		float radius, // 外接円の半径
-		DWORD color);
+		DWORD color );
 	// 直方体作成
 	bool CreateCube(
 		float width,
@@ -1666,13 +1800,25 @@ public:
 		float depth,
 		DWORD color,
 		Vector3 *posList = nullptr,
-		unsigned int numPos = 0);
+		unsigned int numPos = 0 );
 
 	/************/
 	/* 読み込み */
 	/************/
 
-	bool LoadMqo(char *filename);
+	bool LoadMqo( char *filename );
+
+#ifdef LOAD_FBX
+	virtual bool LoadFbx( const char *filename );
+#endif
+
+	bool LoadTDNM( const char* fileName );
+
+	/************/
+	/* 書き出し */
+	/************/
+	// 頂点はMESHVERTEX2に限る
+	void OutPutTDNM( const char* fileName );
 
 	/********/
 	/* 更新 */
@@ -1685,28 +1831,31 @@ public:
 	/* 描画 */
 	/********/
 
-	void Render(tdnShader *shader, char *technique);
+	void Render( tdnShader *shader, char *technique );
 
 	/*********************/
 	/* セッター ゲッター */
 	/*********************/
 
 	const Vector3& Pos();
-	void Pos(const Vector3& in);
+	void Pos( const Vector3& in );
 	const Vector3& Scale();
-	void Scale(const Vector3& in);
-	void Scale(float in){ this->Scale(Vector3(in, in, in)); }
+	void Scale( const Vector3& in );
+	void Scale( float in ) { this->Scale( Vector3( in, in, in ) ); }
 	const Quaternion& Rot();
-	void Rot(const Quaternion& in);
+	void Rot( const Quaternion& in );
 	const Matrix& WorldMatrix();
-	void WorldMatrix(const Matrix& in);
+	void WorldMatrix( const Matrix& in );
+	void Texture( const char* fileName );
+	Texture2D *Texture();
 
-private:
+protected:
 	IDirect3DVertexDeclaration9* decl;         // 頂点デコレーション（FVF）
 	unsigned int                 declSize;     // 頂点構造体のバイト数
 
 	IDirect3DVertexBuffer9*      vertexBuffer;
 	unsigned int                 numVertexes;
+	void*						 vertexArray;
 
 	IDirect3DIndexBuffer9*       indexBuffer;
 	unsigned int                 numIndexes;
@@ -1721,9 +1870,311 @@ private:
 	Vector3    scale;
 	Quaternion rot;
 	Matrix     worldMatrix;
-public:
+
+	char* textureName;
 	Texture2D *texture;
+
+	void OutPutTDNM( FILE* file );
+	bool LoadTDNM( FILE* file, const char* fileName );
 };
+
+/*
+*@author Hidaka
+*/
+class tdnBone
+{
+public:
+	D3DXVECTOR3 scale;
+	D3DXQUATERNION rotate;
+	D3DXVECTOR3 translate;
+
+	tdnBone() {}
+	~tdnBone() {}
+
+	// ※ 名前変？
+	// rate : pose2 の影響率 0~1
+	static void Slerp( const tdnBone& pose1, const tdnBone& pose2, float rate, D3DXMATRIX* out );
+
+	// 行列から 拡縮 回転 移動 を取得
+	void SetSRTMatrix( const D3DXMATRIX& in );
+	void GetSRTMatrix( D3DXMATRIX* out );
+	static void CreateSRTMatrix( const D3DXVECTOR3& scale, const D3DXQUATERNION& rotate, const D3DXVECTOR3& translate, D3DXMATRIX* out );
+};
+
+/*
+*@author Hidaka
+*/
+class tdnChainBone : public tdnBone
+{
+public:
+	int parent;
+	std::vector<int> children;
+	D3DXMATRIX srt;
+
+	tdnChainBone() : tdnBone() {}
+	~tdnChainBone() {}
+};
+
+/*
+*@author Hidaka
+*/
+class tdnBoneChain
+{
+public:
+	std::vector<tdnChainBone> bones;
+	std::map<std::string, int> boneName;
+
+	tdnBoneChain() {}
+	~tdnBoneChain() {}
+};
+
+/*
+*@author Hidaka
+*/
+class tdnSkinCreateData
+{
+public:
+	class BoneCreateData
+	{
+	public:
+		int numIndex;
+		float* weightArray;
+		unsigned long* indexArray;
+
+		BoneCreateData() : numIndex( 0 ), weightArray( nullptr ), indexArray( nullptr )
+		{}
+		~BoneCreateData()
+		{
+			delete[]weightArray;
+			delete[]indexArray;
+		}
+	};
+	int numBone;
+	BoneCreateData* boneArray;
+
+	int numFrame;
+	class Pose
+	{
+	public:
+		D3DXMATRIX* boneArray = nullptr;
+		std::vector<tdnBone> pose;
+
+		Pose() {}
+		~Pose() { delete[] boneArray; }
+	};
+	Pose* poseArray;
+	D3DXMATRIX* neutralPoseArray;
+
+	int boneCount;
+	std::vector<tdnBone> pose;
+
+	tdnSkinCreateData() : numBone( 0 ), boneArray( nullptr )
+	{}
+	~tdnSkinCreateData()
+	{
+		delete[] neutralPoseArray;
+		delete[] poseArray;
+		delete[] boneArray;
+	}
+};
+
+/*
+*@author Hidaka
+*/
+class tdnSkinAnimation
+{
+public:
+	class Frame
+	{
+	public:
+		std::vector<tdnBone> boneArray;
+
+		Frame() {}
+		~Frame() {}
+	};
+
+	unsigned int numFrame = 0;
+	unsigned int numBone = 0;
+	std::vector<Frame> poseArray;
+	Frame currentBone;
+
+	tdnSkinAnimation();
+	~tdnSkinAnimation() {}
+
+	void Resize( unsigned int numFrame, unsigned int numBone );
+};
+
+/*
+*@author Hidaka
+*/
+class tdnAnimationFrame
+{
+public:
+	class ComJump
+	{
+	public:
+		int start, end, nextCom;
+
+		// start   : 始めるフレーム
+		// end     : 終わるフレーム
+		// nextCom : 次のコマンド
+		ComJump( int start, int end, int nextCom );
+
+		void Start( float* frame );
+		int Check( float* frame );
+	};
+
+	tdnAnimationFrame();
+	~tdnAnimationFrame();
+
+	bool Load( const char* filename );
+	void OutPut( const char* filename );
+	// Command は new で確保
+	void AddCommand( ComJump* com );
+	void Select( int comNum, bool waitAnimEnd );
+
+	void AddFrame( float add );
+	float GetFrame();
+
+	void Update();
+
+	void SetFrame( float frame );
+
+
+	int GetCommandId();
+	int GetStartFrame();
+	int GetEndFrame();
+	int GetNextCom();
+	int GetNumCom();
+	void SetStartFrame( int frame );
+	void SetEndFrame( int frame );
+	void SetNextCom( int com );
+	void EraseCom();
+
+private:
+	float frame;
+	int command;
+
+	std::vector<ComJump*> comArray;
+};
+
+/*
+*@author Hidaka
+*/
+class tdnSkinMesh : public tdnMesh
+{
+public:
+	class WeightCreateData
+	{
+	public:
+		// ※ verticesとweightsの要素数はあわせる
+		class BoneWeight
+		{
+		public:
+			// 影響する頂点
+			std::vector<DWORD> vertices;
+			// 上の影響率
+			std::vector<FLOAT> weights;
+		};
+		// ボーンと同数作る
+		std::vector<BoneWeight> bonesWeight;
+	};
+
+	tdnSkinMesh();
+	~tdnSkinMesh() override;
+
+	bool CreateWeight( WeightCreateData& weights );
+	bool CreateSkinInfo();
+
+	void SetBoneChain( tdnBoneChain* chain );
+
+#ifdef LOAD_FBX
+	bool LoadFbx( const char *filename ) override;
+#endif
+
+	bool UpdateSkin();
+	void UpdateBoneMatrix();
+	void SetCurPose();
+
+	std::string GetBoneName( int index );
+	void GetBone( std::string boneName, Matrix *outMat );
+	bool GetBone( int index, Matrix *outMat );
+	bool GetCureBone( int index, Matrix *outMat );
+	void SetCureBone( int index, Matrix &inMat );
+
+	bool AddFrame( float in );
+	// animation が無い、終端まで来た場合 false
+	bool SetFrame( float in );
+	float GetFrame();
+
+	void OutPutTDNSM( const char* fileName );
+
+	bool LoadTDNSM( const char* fileName );
+
+protected:
+	ID3DXSkinInfo* skinInfo = nullptr;
+
+	int numBone = 0;
+	class BoneChain
+	{
+	public:
+		// ウェイトのインデックス
+		int index = -1;
+
+		int parent;
+		std::vector<int> children;
+
+		BoneChain() {}
+		~BoneChain() {}
+	};
+	int boneCount;
+	D3DXMATRIX* boneArray = nullptr;
+
+	tdnSkinAnimation* animation = nullptr;
+	float frame = 0.0f;
+
+	std::vector<int>rootBones;
+	tdnBoneChain* boneChain = nullptr;
+
+	// rootBone から始める
+	void UpdateBoneChain( int index );
+
+	void OutPutTDNSM( FILE* file );
+
+	bool LoadTDNSM( FILE* file );
+};
+
+/*
+*@author Hidaka
+*/
+class tdn3DObj
+{
+public:
+	tdn3DObj( char* meshFile, char* motionFile );
+	~tdn3DObj();
+	void Update();
+	void SetMotion( int motion, bool waitAnimEnd = false );
+	inline int GetMotion() { return ( motion ) ? motion->GetCommandId() : -1; }
+
+	inline void SetFrame( float frame ) { motion->SetFrame( frame ); }
+	inline float GetFrame() { return motion->GetFrame(); }
+	inline tdnSkinMesh* GetSkinMesh(){ return skinMesh; }
+
+	void Animation( float speed );
+
+	void Render( tdnShader* shader, char* name );
+
+	void GetBone( int n, Matrix* outMat ) { skinMesh->GetBone( n, outMat ); }
+
+	void UpdateSkinMeshFrame( float frame );
+	void UpdateBoneMatrix();
+	void UpdateSkinMesh();
+
+private:
+	tdnSkinMesh* skinMesh;
+	tdnAnimationFrame* motion;
+};
+
 
 //*****************************************************************************************************************************
 //		tdnInput
@@ -1780,6 +2231,7 @@ public:
 	static LPSTR GetGroupID(int no){ return m_GroupID[no]; }
 	static LPSTR GetDeviceInstanceName(int no){ return m_DeviceInstances[no].tszInstanceName; }
 	static IDirectInputDevice8* GetMouseDevice(){ return m_pMouse; }
+	static int GetNumDevice(){ return m_NumDevice; }
 };
 
 enum KEYCODE
@@ -1884,6 +2336,7 @@ private:
 public:
 	static void Initialize();
 	static void Release();
+	static void Reset();	// 抜き差ししたら呼び出す
 	static void Update();
 	static void PadAsign(LPSTR config, int no = 0);
 
@@ -2532,6 +2985,9 @@ public:
 
 	typedef std::uniform_int_distribution < int > INT;
 	typedef std::uniform_int_distribution < float > FLOAT;
+
+	// 全方向に対するランダム単位ベクトルを生成
+	static void GetRandomVector3(Vector3 &out);
 };
 
 
@@ -2545,71 +3001,71 @@ public:
 
 
 
-//// ファイルディレクトリ列挙に使用される構造体
-//typedef struct tagDirectoryInfo
-//{
-//	// newとかめんどくさくなりそうなのでvector使う
-//	//int NumFile;				// ファイルの個数
-//	//std::string *FileNames;		// ファイルの名前(可変長)
-//	//int NumFolder;				// フォルダの個数
-//	//std::string *FolderNames;	// フォルダの名前(可変長)
-//
-//	// string型での動的配列で、ファイル名とフォルダー名を格納
-//	std::vector<std::string> FileNames;		// 列挙されたファイル名
-//	std::vector<std::string> FolderNames;	// 列挙されたフォルダ名
-//
-//	tagDirectoryInfo(){ FileNames.clear(), FolderNames.clear(); }
-//	~tagDirectoryInfo(){ FileNames.clear(), FolderNames.clear(); }
-//}DirectoryInfo;
-//
-//class tdnFile
-//{
-//public:
-//
-//	/**
-//	*@brief			フォルダ(ディレクトリ)作成
-//	*@param[in]		*path	example…"DATA/CHR/Airou"ならCHRフォルダにAirouというフォルダが作られる
-//	*@return		成功したら「0」フォルダが既に作られていたりして失敗したら「-1」が返る
-//	*/
-//	static int CreateFolder(char *path);
-//
-//	/**
-//	*@brief					ディレクトリの列挙
-//	*@param[in]		*path	ディレクトリパス("DATA/CHR"ならCHRフォルダの中が列挙される)
-//	*@param[in]		*out	列挙したファイル名をフォルダー名を格納する構造体へのアドレス
-//	*@param[in]		bExt	ファイル名の場合、拡張子をつけるかつけないか
-//	*/
-//	static void EnumDirectory(char *path, DirectoryInfo *out, bool bExt = true);
-//
-//	/**
-//	*@brief					ファイルの拡張子を返す("tdn.txt"なら.txtが返る)
-//	*@param[in]		*path	ファイルパス
-//	*/
-//	static std::string GetFileExtention(char *path);
-//
-//	/**
-//	*@brief					ファイルパスからファイル名を返す("DATA/Text/tdn.txt"ならtdn.txtが返る)
-//	*@param[in]		*path	ファイルパス
-//	*@param[in]		bExt	拡張子をくっつけるか　[true: return tdn.txt]　[false: return tdn]
-//	*/
-//	static std::string GetFileName(char *path, bool bExt = true);
-//
-//	/**
-//	*@brief					ファイルを開くダイアログを作成
-//	*@param[in]		*filter	拡張子フィルター example:"TEXT DATA(*.txt)\0 *.txt\0\0"
-//	*@return				成功したらダイアログで選択された絶対パスを返す、失敗したら""(空の文字列)
-//	*/
-//	static std::string OpenFileDialog(char *filter = "すべてのファイル(*.*)\0 * .*\0\0");
-//
-//	/**
-//	*@brief					ファイルを保存するダイアログを作成
-//	*@param[in]		*filter	拡張子フィルター example:"TEXT DATA(*.txt)\0 *.txt\0\0"
-//	*@return				成功したらダイアログで選択された絶対パスを返す、失敗したら""(空の文字列)
-//	*/
-//	static std::string SaveFileDialog(char *filter = "すべてのファイル(*.*)\0 * .*\0\0");
-//private:
-//	static char strFile[256];			// ダイアログを開くときに、前のパスを残したいときとかに
-//};
+// ファイルディレクトリ列挙に使用される構造体
+typedef struct tagDirectoryInfo
+{
+	// newとかめんどくさくなりそうなのでvector使う
+	//int NumFile;				// ファイルの個数
+	//std::string *FileNames;		// ファイルの名前(可変長)
+	//int NumFolder;				// フォルダの個数
+	//std::string *FolderNames;	// フォルダの名前(可変長)
+
+	// string型での動的配列で、ファイル名とフォルダー名を格納
+	std::vector<std::string> FileNames;		// 列挙されたファイル名
+	std::vector<std::string> FolderNames;	// 列挙されたフォルダ名
+
+	tagDirectoryInfo(){ FileNames.clear(), FolderNames.clear(); }
+	~tagDirectoryInfo(){ FileNames.clear(), FolderNames.clear(); }
+}DirectoryInfo;
+
+class tdnFile
+{
+public:
+
+	/**
+	*@brief			フォルダ(ディレクトリ)作成
+	*@param[in]		*path	example…"DATA/CHR/Airou"ならCHRフォルダにAirouというフォルダが作られる
+	*@return		成功したら「0」フォルダが既に作られていたりして失敗したら「-1」が返る
+	*/
+	static int CreateFolder(char *path);
+
+	/**
+	*@brief					ディレクトリの列挙
+	*@param[in]		*path	ディレクトリパス("DATA/CHR"ならCHRフォルダの中が列挙される)
+	*@param[in]		*out	列挙したファイル名をフォルダー名を格納する構造体へのアドレス
+	*@param[in]		bExt	ファイル名の場合、拡張子をつけるかつけないか
+	*/
+	static void EnumDirectory(char *path, DirectoryInfo *out, bool bExt = true);
+
+	/**
+	*@brief					ファイルの拡張子を返す("tdn.txt"なら.txtが返る)
+	*@param[in]		*path	ファイルパス
+	*/
+	static std::string GetFileExtention(char *path);
+
+	/**
+	*@brief					ファイルパスからファイル名を返す("DATA/Text/tdn.txt"ならtdn.txtが返る)
+	*@param[in]		*path	ファイルパス
+	*@param[in]		bExt	拡張子をくっつけるか　[true: return tdn.txt]　[false: return tdn]
+	*/
+	static std::string GetFileName(char *path, bool bExt = true);
+
+	/**
+	*@brief					ファイルを開くダイアログを作成
+	*@param[in]		*filter	拡張子フィルター example:"TEXT DATA(*.txt)\0 *.txt\0\0"
+	*@return				成功したらダイアログで選択された絶対パスを返す、失敗したら""(空の文字列)
+	*/
+	static std::string OpenFileDialog(char *filter = "すべてのファイル(*.*)\0 * .*\0\0");
+
+	/**
+	*@brief					ファイルを保存するダイアログを作成
+	*@param[in]		*filter	拡張子フィルター example:"TEXT DATA(*.txt)\0 *.txt\0\0"
+	*@return				成功したらダイアログで選択された絶対パスを返す、失敗したら""(空の文字列)
+	*/
+	static std::string SaveFileDialog(char *filter = "すべてのファイル(*.*)\0 * .*\0\0");
+private:
+	static char strFile[256];			// ダイアログを開くときに、前のパスを残したいときとかに
+};
 
 
 
@@ -2749,11 +3205,15 @@ public:
 
 	// 文字列描画
 	static	void	RenderString(LPCSTR string, LPCSTR fontName, int fontSize, int drawX, int  drawY, DWORD color, DWORD RenderFlag);
+
 	// 一文字描画
 	static	Vector2	RenderCharacter(LPCSTR character, LPCSTR fontName, int fontSize, int drawX, int  drawY, DWORD color, DWORD RenderFlag);
 
 	//  簡易
 	static void RenderFont2D(LPCSTR _String, int _FontSize, int _DrawX, int _DrawY, DWORD col);
+
+	// 文字列中央揃へ描画
+	static	void RenderStringCentering(LPCSTR string, LPCSTR fontName, int fontSize, int drawX, int  drawY, DWORD color, DWORD RenderFlag);
 
 private:
 
@@ -2782,6 +3242,14 @@ private:
 	//	 2DObjから文字を作るサポート関数
 	/****************************************/
 	static	UINT	SearchCache(LPCSTR chara, UINT size, LPCSTR fontName);
+
+
+	/****************************************/
+	//	 真夏のファイト4の絵文字サポート関数
+	//***************************************/
+	static tdn2DObj* m_pPictograph;
+	static bool SearchPictograph(char buffer[3], int x, int y, UINT size,DWORD color, DWORD RenderFlag);
+
 
 };
 

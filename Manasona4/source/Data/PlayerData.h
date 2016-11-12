@@ -65,8 +65,7 @@ public:
 	PlayerData::Trophy m_TrophyData;			// トロフィー
 	PlayerData::Secret m_SecretData;			// 隠し要素
 
-	// コンストラクタ・デストラクタ(ダブルポインタ関連をこの中で完結させてるので、使う人は気にしなくてOK)
-	PlayerDataManager();
+	// デストラクタ(ダブルポインタ関連をこの中で完結させてるので、使う人は気にしなくてOK)
 	~PlayerDataManager();
 
 	// 新規データ作成
@@ -83,6 +82,10 @@ private:
 	bool m_bSaveFlag;	// trueにしたら消したときにセーブする
 
 	clock_t m_StartClock;	// プレイ時間加算用
+
+	PlayerDataManager();
+	PlayerDataManager(const PlayerDataManager&){}
+	PlayerDataManager &operator=(const PlayerDataManager&){}
 };
 
 #define PlayerDataMgr (PlayerDataManager::GetInstance())

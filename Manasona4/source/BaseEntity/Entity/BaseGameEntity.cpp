@@ -36,6 +36,3 @@ BaseGameEntity::~BaseGameEntity()
 	MyAssert(EntityMgr->Erace(this), "IDìoò^Ç…é∏îsÇµÇ‹ÇµÇΩ \n IDî‘çÜ= %d ", m_ID);
 
 }
-
-
-

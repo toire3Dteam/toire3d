@@ -450,7 +450,7 @@ void tdnInputDevice::PadAsign(const PADSET &padset)
 //*****************************************************************************************************************************
 //		アクセス関数群
 //*****************************************************************************************************************************
-tdnInputDevice* tdnInput::device[tdnInputEnum::INPUT_DEVICE_MAX];
+tdnInputDevice* tdnInput::device[tdnInputEnum::INPUT_DEVICE_MAX] = { nullptr };
 
 //------------------------------------------------------
 //	初期化
@@ -459,7 +459,10 @@ void tdnInput::Initialize()
 {
 	// デバイス初期化
 	tdnInputManager::Initialize();
-	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++) device[i] = new tdnInputDevice(i);
+	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++)
+	{
+		device[i] = new tdnInputDevice(i);
+	}
 
 	// とりあえず全員デフォルトのキーコンフィグ
 	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++) PadAsign(tdnInputManager::GetGroupID(i), i);
@@ -472,8 +475,29 @@ void tdnInput::Initialize()
 //------------------------------------------------------
 void tdnInput::Release()
 {
+	// デバイス解放
+	tdnInputManager::Release();
 	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++) SAFE_DELETE(device[i]);
 	OKB_Release();
+}
+
+//------------------------------------------------------
+//	リセット
+//------------------------------------------------------
+void tdnInput::Reset()
+{
+	// 解放
+	tdnInputManager::Release();
+
+	// 初期化
+	tdnInputManager::Initialize();
+	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++)
+	{
+		if (device[i]) delete device[i];
+		device[i] = new tdnInputDevice(i);
+	}
+	// とりあえず全員デフォルトのキーコンフィグ
+	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++) PadAsign(tdnInputManager::GetGroupID(i), i);
 }
 
 //------------------------------------------------------
@@ -695,14 +719,14 @@ BYTE OwatasoKeyBoard::AnyTRG()
 //*****************************************************************************************************************************
 //	非クラス領域
 //*****************************************************************************************************************************
-static OwatasoKeyBoard *key_board;
+static OwatasoKeyBoard *key_board(nullptr);
 
 //------------------------------------------------------
 //	初期化
 //------------------------------------------------------
 void OKB_Init()
 {
-	key_board = new OwatasoKeyBoard;
+	if(!key_board)key_board = new OwatasoKeyBoard;
 }
 
 //------------------------------------------------------

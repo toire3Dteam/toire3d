@@ -120,6 +120,15 @@ void tdnRenderState::Set(DWORD state, D3DMATERIAL9* lpMaterial, Texture2D* lpTex
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_LIGHTING, FALSE);
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 		break;
+	case RS::SCREEN:	/*	スクリーン		*/
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_INVDESTCOLOR);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);			// 後に描いている物体も全力描画
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_FOGENABLE, FALSE);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_LIGHTING, FALSE);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+		break;
+
 	}
 
 	//	マテリアル設定

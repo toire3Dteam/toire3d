@@ -13,7 +13,7 @@ GameUIManager::GameUIManager() :BaseGameEntity(ENTITY_ID::UI_MGR)	// ƒGƒ“ƒeƒBƒeƒ
 	m_pHpFrame = new tdn2DAnim("Data/UI/Game/HPFrame.png");
 	m_pHpFrame->OrderMoveAppeared(18, 0, -100);
 
-	m_pSpFrame = new tdn2DAnim("Data/UI/Game/SPFrame.png");
+	m_pSpFrame = new tdn2DAnim("Data/UI/Game/SPFrame2.png");
 	m_pSpFrame->OrderMoveAppeared(16, 0, -80);
 	
 	m_pHpGage1P = nullptr;
@@ -24,6 +24,24 @@ GameUIManager::GameUIManager() :BaseGameEntity(ENTITY_ID::UI_MGR)	// ƒGƒ“ƒeƒBƒeƒ
 
 	m_pPersona1P = nullptr;
 	m_pPersona2P = nullptr;
+
+	m_pRoundIcon1P = nullptr;
+	m_pRoundIcon2P = nullptr;
+
+	m_pFacePic1P = nullptr;
+	m_pFacePic2P = nullptr;
+
+	m_pOverDriveCutin1P = nullptr;
+	m_pOverDriveCutin2P = nullptr;
+	
+	m_pCombo1P = nullptr;
+	m_pCombo2P = nullptr;
+
+	if (FAILED(tdnSystem::GetDevice()->CreateDepthStencilSurface(1280, 720, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, FALSE, &m_pStencilSurface, NULL)))
+	{
+		MessageBox(tdnSystem::GetWindow(), "[“xƒoƒbƒtƒ@‚ªì¬‚Å‚«‚È‚©‚Á‚½", "ERROR", MB_OK);
+	}
+
 }
 
 
@@ -40,18 +58,44 @@ GameUIManager::~GameUIManager()
 
 	SAFE_DELETE(m_pPersona1P);
 	SAFE_DELETE(m_pPersona2P);
+
+	SAFE_DELETE(m_pRoundIcon1P);	
+	SAFE_DELETE(m_pRoundIcon2P);
+
+	SAFE_DELETE(m_pFacePic1P);
+	SAFE_DELETE(m_pFacePic2P);
+
+	SAFE_DELETE(m_pOverDriveCutin1P);
+	SAFE_DELETE(m_pOverDriveCutin2P);
+
+	SAFE_RELEASE(m_pStencilSurface);
+
+	SAFE_DELETE(m_pCombo1P);
+	SAFE_DELETE(m_pCombo2P);
 }
 
-void GameUIManager::ReferencesPlayer(BasePlayer* pLeftPlayer, BasePlayer* pRightPlayer)
+void GameUIManager::InitData(BasePlayer* pLeftPlayer, BasePlayer* pRightPlayer, int iRoundNum)
 {
-	m_pHpGage1P = new HpGage(pLeftPlayer, pLeftPlayer->GetSide());
-	m_pHpGage2P = new HpGage(pRightPlayer, pRightPlayer->GetSide());
+	m_pHpGage1P = new HpGage(pLeftPlayer);
+	m_pHpGage2P = new HpGage(pRightPlayer);
 
-	m_pSpGage1P = new SpGage(pLeftPlayer, pLeftPlayer->GetSide());
-	m_pSpGage2P = new SpGage(pRightPlayer, pRightPlayer->GetSide());
+	m_pSpGage1P = new SpGage(pLeftPlayer);
+	m_pSpGage2P = new SpGage(pRightPlayer);
 
-	m_pPersona1P = new PersonaUI(pLeftPlayer, true);
-	m_pPersona2P = new PersonaUI(pRightPlayer, false);
+	m_pPersona1P = new PersonaUI(pLeftPlayer);
+	m_pPersona2P = new PersonaUI(pRightPlayer);
+
+	m_pRoundIcon1P = new RoundIcon(pLeftPlayer, iRoundNum);
+	m_pRoundIcon2P = new RoundIcon(pRightPlayer, iRoundNum);
+
+	m_pFacePic1P = new FacePic(pLeftPlayer);
+	m_pFacePic2P = new FacePic(pRightPlayer);
+
+	m_pOverDriveCutin1P = new OverDriveCutin(pLeftPlayer);
+	m_pOverDriveCutin2P = new OverDriveCutin(pRightPlayer);
+
+	m_pCombo1P = new ComboUI(pLeftPlayer);
+	m_pCombo2P = new ComboUI(pRightPlayer);
 }
 
 void GameUIManager::Update()
@@ -72,6 +116,24 @@ void GameUIManager::Update()
 	// ƒyƒ‹ƒ\ƒiUI
 	m_pPersona1P->Update();
 	m_pPersona2P->Update();
+
+	// ƒ‰ƒEƒ“ƒhƒAƒCƒRƒ“
+	m_pRoundIcon1P->Update();
+	m_pRoundIcon2P->Update();
+
+	// ŠçƒOƒ‰
+	m_pFacePic1P->Update();
+	m_pFacePic2P->Update();
+
+	// ƒI[ƒo[ƒhƒ‰ƒCƒu—p‚ÌƒJƒbƒgƒCƒ“XV
+	m_pOverDriveCutin1P->Update();
+	m_pOverDriveCutin2P->Update();
+
+	// ƒRƒ“ƒ{
+	m_pCombo1P->Update();
+	m_pCombo2P->Update();
+
+
 }
 
 void GameUIManager::Action() 
@@ -83,10 +145,22 @@ void GameUIManager::Action()
 	m_pHpGage1P->FirstAction(18);
 	m_pHpGage2P->FirstAction(18);
 
-
 	// ƒyƒ‹ƒ\ƒiUI
 	m_pPersona1P->Action(18);
 	m_pPersona2P->Action(18);
+
+	// ƒ‰ƒEƒ“ƒhƒAƒCƒRƒ“
+	m_pRoundIcon1P->Action(18);
+	m_pRoundIcon2P->Action(18);
+
+	// ŠçƒOƒ‰
+	m_pFacePic1P->Action(24);
+	m_pFacePic2P->Action(24);
+
+	// SPƒQ[ƒW
+	m_pSpGage1P->Action(26);
+	m_pSpGage2P->Action(26);
+
 }
 
 void GameUIManager::Render()
@@ -104,12 +178,41 @@ void GameUIManager::Render()
 	m_pSpGage1P->Render();
 	m_pSpGage2P->Render();
 
+	// ŠçƒOƒ‰
+	m_pFacePic1P->Render();
+	m_pFacePic2P->Render();
+
 	// ƒyƒ‹ƒ\ƒi
 	m_pPersona1P->Render();
 	m_pPersona2P->Render();
 
-	tdnText::Draw(350,70,0xffff00ff,"%d", PlayerMgr->GetPointA());
-	tdnText::Draw(900, 70, 0xffff00ff, "%d", PlayerMgr->GetPointB());
+	// ƒ‰ƒEƒ“ƒhƒAƒCƒRƒ“
+	m_pRoundIcon1P->Render();
+	m_pRoundIcon2P->Render();
+
+
+	//tdnText::Draw(350,70,0xffff00ff,"%d", PlayerMgr->GetPointA());
+	//tdnText::Draw(900, 70, 0xffff00ff, "%d", PlayerMgr->GetPointB());
+}
+
+void GameUIManager::RenderBack()
+{
+	Surface* saveZ;
+	// Œ»İ‚ÌƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@‚ğˆê•ÛŠÇ
+	tdnSystem::GetDevice()->GetDepthStencilSurface(&saveZ);
+	// Zƒoƒbƒtƒ@‚ğØ‚è‘Ö‚¦
+	tdnSystem::GetDevice()->SetDepthStencilSurface(m_pStencilSurface);
+
+	// ƒI[ƒo[ƒhƒ‰ƒCƒu—p‚ÌƒJƒbƒgƒCƒ“•`‰æ
+	m_pOverDriveCutin1P->Render();
+	m_pOverDriveCutin2P->Render();
+
+	// ƒRƒ“ƒ{
+	m_pCombo1P->Render(100, 200);
+	m_pCombo2P->Render(1050, 200);
+
+	tdnSystem::GetDevice()->SetDepthStencilSurface(saveZ); //ƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@‚Ì•œŒ³
+
 }
 
 bool GameUIManager::HandleMessage(const Message& msg)
@@ -131,7 +234,7 @@ bool GameUIManager::HandleMessage(const Message& msg)
 		{
 			m_pPersona2P->UpEffectAction();
 		}
-
+		return true;
 	}
 		break;
 	case PERSONA_CARD_COUNT_DOWN:
@@ -147,11 +250,80 @@ bool GameUIManager::HandleMessage(const Message& msg)
 		{
 			m_pPersona2P->DownEffectAction();
 		}
-
+		return true;
 	}
 		break;
-	case OTHER:
+	case APP_WIN_ICON:
+	{
+		SIDE *data = (SIDE*)msg.ExtraInfo;		// ƒIƒŠƒWƒiƒ‹î•ñ\‘¢‘Ìó‚¯æ‚é
+		SIDE side = *data;
+
+		if (side == SIDE::LEFT)
+		{
+			m_pRoundIcon1P->AppIcon();
+		}
+		else
+		{
+			m_pRoundIcon2P->AppIcon();
+		}
+		return true;
+	}
 		break;
+	case OVER_DRIVE_CUTIN:
+	{	
+		// •KEƒJƒbƒgƒCƒ“
+			SIDE *data = (SIDE*)msg.ExtraInfo;		// ƒIƒŠƒWƒiƒ‹î•ñ\‘¢‘Ìó‚¯æ‚é
+			SIDE side = *data;
+
+			if (side == SIDE::LEFT)
+			{
+				m_pOverDriveCutin1P->Action();
+			}
+			else
+			{
+				m_pOverDriveCutin2P->Action();
+			}
+			return true;
+	
+	}	break;
+	case MESSAGE_TYPE::COMBO_COUNT:
+	{
+		// ƒRƒ“ƒ{—p
+		COMBO_DESK *data;
+		data = (COMBO_DESK*)msg.ExtraInfo;		// ƒIƒŠƒWƒiƒ‹î•ñ\‘¢‘Ìó‚¯æ‚é
+
+		SIDE side = data->side;
+
+		if (side == SIDE::LEFT)
+		{
+			m_pCombo1P->Count(data->damage, data->recoveryFrame);
+		}else
+		{
+			m_pCombo2P->Count(data->damage, data->recoveryFrame);
+		}
+
+		return true;
+
+	}	break;
+	case MESSAGE_TYPE::COMBO_GUARD:
+	{
+		// ƒRƒ“ƒ{—p
+		COMBO_DESK *data;
+		data = (COMBO_DESK*)msg.ExtraInfo;		// ƒIƒŠƒWƒiƒ‹î•ñ\‘¢‘Ìó‚¯æ‚é
+
+		SIDE side = data->side;
+
+		if (side == SIDE::LEFT)
+		{
+			m_pCombo1P->Guard();
+		}
+		else
+		{
+			m_pCombo2P->Guard();
+		}
+		return true;
+
+	}	break;
 	default:
 		break;
 	}

@@ -67,6 +67,9 @@ void sceneLoading::Update()
 	// ロード割合補間処理
 	m_fLoadGaugePercent = m_fLoadGaugePercent*.5f + m_newScene->m_fLoadPercentage*.5f;
 
+	// ロードのコメント
+	strcpy_s(m_LoadComment, 256, m_newScene->m_LoadComment);
+
 	//ロードが終わったら、シーンをチェンジ
 	if (!isThread)
 	{
@@ -91,6 +94,9 @@ void sceneLoading::Render()
 	m_pGauge->Render(720, 620, (int)(m_fLoadGaugePercent * 512), 64, 0, 64, (int)(m_fLoadGaugePercent * 512), 64);
 	// ゲージ枠
 	m_pGauge->Render(720, 620, 512, 64, 0, 0, 512, 64);
+
+	// ロードのコメント
+	tdnText::Draw(320, 620, 0xffffffff, "%s", m_LoadComment);
 }
 //
 //=============================================================================================

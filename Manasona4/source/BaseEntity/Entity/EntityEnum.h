@@ -14,10 +14,13 @@ namespace GAME_ID
 	{
 		ID_ERROR,					//エラーID
 		SCENE_MAIN,					// シーンメイン
+		SCENE_MENU,					// シーンメニュー
 		PLAYER_MGR,					// マネージャーのID 
 		JUDGE_MNG,					// ジャッジマネージャーID
 		CAMERA_MGR,					// カメラマネージャーID
 		UI_MGR,						// UIマネージャー
+		CUTIN_MGR,					// カットインマネージャー
+		ROUND_CALL_MGR,				// ラウンドコールマネージャー
 
 		ID_PLAYER_FIRST,			//人のIDの初め
 		ID_PLAYER_MAX = ID_PLAYER_FIRST + GAME_PLAYER_MAX,	//人の最大ID+1
@@ -28,4 +31,3 @@ namespace GAME_ID
 	};
 }
 typedef GAME_ID::_ENUM_ENTITY_ID	ENTITY_ID;	//ゲーム内ID
-

@@ -1,12 +1,13 @@
 #pragma once
 #include "TDNLIB.h"
+#include "Player\BasePlayer.h"
 #include "../Number/Number.h"
 
 class ComboUI
 {
 public:
 	ComboUI();
-	ComboUI(int* recoveryFrame);
+	ComboUI(BasePlayer* PlayerData);
 	~ComboUI();
 
 	void Update();
@@ -18,10 +19,12 @@ public:
 
 	// ƒJƒEƒ“ƒg
 	void Count(int damage,int maxRecovery);
-	void Count(int damage, int maxRecovery,int* recovery);
+	//void Count(int damage, int maxRecovery,int* recovery);
 	void Guard();
 
 private:
+	BasePlayer* m_pPlayerData;
+
 	Number* m_num;
 	Number* m_damageNum;
 
@@ -38,7 +41,6 @@ private:
 	tdn2DObj* m_gageBackPic;
 	tdn2DObj* m_gagePic;
 
-	int* m_pRecoveryFrame;
 	int m_iRecoveryFrame;
 	int m_iMaxRecoveryFrame;
 

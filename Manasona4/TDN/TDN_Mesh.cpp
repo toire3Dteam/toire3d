@@ -1,21 +1,22 @@
 
 #include "TDNLIB.h"
-#include <fstream>
-#include <string>
-#include <vector>
 
-tdnMesh::tdnMesh() : decl( nullptr ), declSize( 0 ), vertexBuffer( nullptr ), numVertexes( 0 ), indexBuffer( nullptr ), numIndexes( 0 ), streamBuffer( nullptr ), streamSize( 0 ), numStream( 0 ), numFaces( 0 ), pos( 0, 0, 0 ), scale( 1, 1, 1 ), rot( 0, 0, 0, 1 ), texture( nullptr )
+tdnMesh::tdnMesh() : decl( nullptr ), declSize( 0 ), vertexBuffer( nullptr ), numVertexes( 0 ), vertexArray( nullptr ), indexBuffer( nullptr ), numIndexes( 0 ), streamBuffer( nullptr ), streamSize( 0 ), numStream( 0 ), numFaces( 0 ), pos( 0, 0, 0 ), scale( 1, 1, 1 ), rot( 0, 0, 0, 1 ), textureName( nullptr ), texture( nullptr )
 {
 	D3DXMatrixIdentity( &worldMatrix );
 }
 tdnMesh::~tdnMesh()
 {
-	if( decl )
+	if ( decl )
 		decl->Release();
-	if( vertexBuffer )
+	if ( vertexBuffer )
 		vertexBuffer->Release();
-	if( indexBuffer )
+	if ( indexBuffer )
 		indexBuffer->Release();
+	if ( vertexArray )
+		delete[] vertexArray;
+	if ( textureName )
+		delete[] textureName;
 }
 
 /********/
@@ -33,23 +34,30 @@ bool tdnMesh::CreateVertex( unsigned int numVertexes, unsigned int vertexSize, v
 	// バッファnew
 	hr = tdnSystem::GetDevice()->CreateVertexBuffer(
 		vertexesSize,    // 頂点配列のバイト数
-		0,               // 使用方法 D3DUSAGE
+		D3DUSAGE_DYNAMIC,               // 使用方法 D3DUSAGE
 		D3DFVF_MESHVERTEX2,      // ?
-		D3DPOOL_MANAGED, // 保存したデータの使用方法（読み込み専用, 最適化する ...）
+		D3DPOOL_SYSTEMMEM, // 保存したデータの使用方法（読み込み専用, 最適化する ...）
 		&vertexBuffer,   // 頂点バッファ <out>
 		0 );             // ?
-	if( FAILED( hr ) )
+	if ( FAILED( hr ) )
 		return false;
 
 	// バッファにコピー
 	void* workVertex( nullptr );
 	hr = vertexBuffer->Lock( 0, 0, ( void** ) &workVertex, 0 );      // バッファロック (バファのポインター取得)
-	if( FAILED( hr ) )
+	if ( FAILED( hr ) )
 		return false;
 	memcpy_s( workVertex, vertexesSize, vertexArray, vertexesSize ); // バッファに頂点情報をコピー
 	hr = vertexBuffer->Unlock();                                     // バッファロックを解除
-	if( FAILED( hr ) )
+	if ( FAILED( hr ) )
 		return false;
+
+	if ( vertexArray != this->vertexArray )
+	{
+		delete[] this->vertexArray;
+		this->vertexArray = new MESHVERTEX2[numVertexes];
+		memcpy_s( this->vertexArray, vertexesSize, vertexArray, vertexesSize ); // 配列に頂点情報をコピー
+	}
 
 	return true;
 }
@@ -69,17 +77,17 @@ bool tdnMesh::CreateIndexes( unsigned int numIndexes, const DWORD *indexArray )
 		D3DPOOL_MANAGED, // ?
 		&indexBuffer,    // インデックスバッファ <out>
 		NULL );          // ?
-	if( FAILED( hr ) )
+	if ( FAILED( hr ) )
 		return false;
 
 	// バッファにコピー
 	DWORD* workIndex( nullptr );
 	hr = indexBuffer->Lock( 0, 0, ( void** ) &workIndex, 0 );    // バッファロック (バファのポインター取得)
-	if( FAILED( hr ) )
+	if ( FAILED( hr ) )
 		return false;
 	memcpy_s( workIndex, indexesSize, indexArray, indexesSize ); // バッファにインデックス情報をコピー
 	hr = indexBuffer->Unlock();                                  // バッファロックを解除
-	if( FAILED( hr ) )
+	if ( FAILED( hr ) )
 		return false;
 
 	return true;
@@ -101,17 +109,17 @@ bool tdnMesh::CreateStream( unsigned int numData, unsigned int dataSize, void *d
 		D3DPOOL_MANAGED, // 保存したデータの使用方法（読み込み専用, 最適化する ...）
 		&streamBuffer,   // バッファ <out>
 		0 );             // ?
-	if( FAILED( hr ) )
+	if ( FAILED( hr ) )
 		return false;
 
 	// バッファにコピー
 	void* workData( nullptr );
 	hr = streamBuffer->Lock( 0, 0, ( void** ) &workData, 0 );      // バッファロック (バファのポインター取得)
-	if( FAILED( hr ) )
+	if ( FAILED( hr ) )
 		return false;
 	memcpy_s( workData, dataArraySize, dataArray, dataArraySize ); // バッファに頂点情報をコピー
 	hr = streamBuffer->Unlock();                                     // バッファロックを解除
-	if( FAILED( hr ) )
+	if ( FAILED( hr ) )
 		return false;
 
 	return true;
@@ -123,22 +131,22 @@ bool tdnMesh::CreateDeclaration( unsigned int declSize, D3DVERTEXELEMENT9 *decl 
 	this->declSize = declSize;
 	//FVF作成
 	hr = tdnSystem::GetDevice()->CreateVertexDeclaration( decl, &this->decl );
-	if( FAILED( hr ) )
+	if ( FAILED( hr ) )
 		return false;
 
 	return true;
 }
 bool tdnMesh::Create( const CreateData &data )
 {
-	if( CreateVertex( data.numVertexes, data.vertexSize, data.vertexArray ) == false )
+	if ( CreateVertex( data.numVertexes, data.vertexSize, data.vertexArray ) == false )
 		return false;
-	if( data.numIndexes != 0 && data.indexArray != nullptr)
-		if( CreateIndexes( data.numIndexes, data.indexArray ) == false )
+	if ( data.numIndexes != 0 && data.indexArray != nullptr )
+		if ( CreateIndexes( data.numIndexes, data.indexArray ) == false )
 			return false;
-	if( data.streamSize != 0 && data.streamArray != nullptr && data.numStream != 0 )
-		if( CreateStream( data.numStream, data.streamSize, data.streamArray ) == false )
+	if ( data.streamSize != 0 && data.streamArray != nullptr && data.numStream != 0 )
+		if ( CreateStream( data.numStream, data.streamSize, data.streamArray ) == false )
 			return false;
-	if( CreateDeclaration( data.vertexSize, data.decl ) == false )
+	if ( CreateDeclaration( data.vertexSize, data.decl ) == false )
 		return false;
 	numFaces = data.numIndexes / 3;
 	return true;
@@ -182,7 +190,7 @@ bool tdnMesh::CreateRectangle( float width, float height, DWORD color )
 	height *= 0.5f;
 	VECTOR_LINE vertexArray[]
 	{
-		{ -width, -height, 0, color},
+		{ -width, -height, 0, color },
 		{ -width, height, 0, color },
 		{ width, -height, 0, color },
 		{ width, height, 0, color }
@@ -194,7 +202,7 @@ bool tdnMesh::CreateRectangle( float width, float height, DWORD color )
 	DWORD indexArray[]
 	{
 		0, 1, 2,
-			1, 3, 2
+		1, 3, 2
 	};
 	data.indexArray = indexArray;
 	data.numIndexes = ARRAYSIZE( indexArray );
@@ -215,7 +223,7 @@ bool tdnMesh::CreateTriangular( float radius, DWORD color )
 	float s( sinf( rad120 ) ), c( cosf( rad120 ) );
 	VECTOR_LINE vertexArray[]
 	{
-		{0, radius, 0, color},
+		{ 0, radius, 0, color },
 		{ 0, c*radius, radius, color },
 		{ -s*radius, c*radius, c*radius, color },
 		{ s*radius, c*radius, c*radius, color }
@@ -227,9 +235,9 @@ bool tdnMesh::CreateTriangular( float radius, DWORD color )
 	DWORD indexArray[]
 	{
 		0, 3, 2,
-			0, 1, 3,
-			0, 2, 1,
-			1, 2, 3,
+		0, 1, 3,
+		0, 2, 1,
+		1, 2, 3,
 	};
 	data.indexArray = indexArray;
 	data.numIndexes = ARRAYSIZE( indexArray );
@@ -251,7 +259,7 @@ bool tdnMesh::CreateCube( float width, float height, float depth, DWORD color, V
 	depth *= 0.5f;
 	VECTOR_LINE vertexArray[]
 	{
-		{ -width, -height, -depth, color},
+		{ -width, -height, -depth, color },
 		{ -width, -height, depth, color },
 		{ -width, height, -depth, color },
 		{ -width, height, depth, color },
@@ -267,22 +275,22 @@ bool tdnMesh::CreateCube( float width, float height, float depth, DWORD color, V
 	DWORD indexArray[]
 	{
 		0, 2, 6,
-			0, 6, 4,
-			4, 6, 7,
-			4, 7, 5,
-			3, 5, 7,
-			1, 5, 3,
-			1, 3, 2,
-			2, 0, 1,
-			0, 4, 1,
-			4, 5, 1,
-			2, 3, 7,
-			7, 6, 2
+		0, 6, 4,
+		4, 6, 7,
+		4, 7, 5,
+		3, 5, 7,
+		1, 5, 3,
+		1, 3, 2,
+		2, 0, 1,
+		0, 4, 1,
+		4, 5, 1,
+		2, 3, 7,
+		7, 6, 2
 	};
 	data.indexArray = indexArray;
 	data.numIndexes = ARRAYSIZE( indexArray );
 
-	if( numPos > 0 )
+	if ( numPos > 0 )
 	{
 		D3DVERTEXELEMENT9 declAry[] = {
 			{ 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
@@ -314,10 +322,78 @@ bool tdnMesh::CreateCube( float width, float height, float depth, DWORD color, V
 /* 読み込み */
 /************/
 
+bool tdnMesh::LoadTDNM( const char* fileName )
+{
+	FILE* file( nullptr );
+	fopen_s( &file, fileName, "rb" );
+	if ( file == nullptr )
+		return false;
+
+	LoadTDNM( file, fileName );
+
+	fclose( file );
+
+	return true;
+}
+
+bool tdnMesh::LoadTDNM(FILE* file, const char* fileName)
+{
+	unsigned int vertexSize( sizeof( MESHVERTEX2 ) );
+
+	// 頂点読み込み
+	numVertexes = 0;
+	fread_s( &numVertexes, sizeof( numVertexes ), sizeof( numVertexes ), 1, file );
+	delete[] vertexArray;
+	vertexArray = new MESHVERTEX2[numVertexes];
+	fread_s( vertexArray, vertexSize * numVertexes, vertexSize * numVertexes, 1, file );
+
+	if ( !CreateVertex( numVertexes, sizeof( MESHVERTEX2 ), vertexArray ) )
+		return false;
+
+	// インデックス設定
+	DWORD* indexArray = new DWORD[numVertexes];
+	for ( unsigned int i = 0; i < numVertexes; i++ )
+	{
+		indexArray[i] = i;
+	}
+	CreateIndexes( numVertexes, indexArray );
+	delete[]indexArray;
+
+	// 面数
+	numFaces = numVertexes / 3;
+
+	// 頂点情報
+	D3DVERTEXELEMENT9 declAry[] = {
+		{ 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 }, // 位置
+		{ 0, sizeof( float ) * 3, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 }, // 法線
+		{ 0, sizeof( float ) * 6, D3DDECLTYPE_UBYTE4N, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0 }, // 頂点色
+		{ 0, sizeof( float ) * 6 + sizeof( COLOR ), D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 }, // UV座標
+		D3DDECL_END()
+	};
+	CreateDeclaration( sizeof( MESHVERTEX2 ), declAry );
+
+	// テクスチャ読み込み
+	std::string workFileName = fileName;
+	unsigned int filePathLength = workFileName.find_last_of('/');
+	if (filePathLength == std::string::npos)
+		filePathLength = workFileName.find_last_of('\\');
+	workFileName = workFileName.substr(0, filePathLength + 1);
+	size_t textureNameLen( 0 );
+	fread_s( &textureNameLen, sizeof( size_t ), sizeof( size_t ), 1, file );
+	delete[] textureName;
+	textureName = new char[textureNameLen + 1];
+	fread_s( textureName, textureNameLen + 1, textureNameLen, 1, file );
+	textureName[textureNameLen] = '\0';
+	workFileName += textureName;
+	texture = tdnTexture::Load(workFileName.c_str());
+
+	return true;
+}
+
 template<class TYPE_FSTREAM> bool OpenFstream( TYPE_FSTREAM *out, std::string filename )
 {
 	out->open( filename );
-	if( out->fail() ) // 開けなかった
+	if ( out->fail() ) // 開けなかった
 	{
 		char text[256] = {};
 		sprintf_s( text, "%s が開けません", filename );
@@ -347,7 +423,7 @@ protected:
 	inline void LoadName(
 		std::ifstream &mqoFile, // <in> : 読み込むファイル
 		std::string &name       // <out>: 読み込んだ文字列から " " の間を取り出したもの
-		)
+	)
 	{
 		mqoFile >> name;
 		name = name.substr( 1, name.size() - 2 ); // 前後の " " を消す
@@ -355,22 +431,22 @@ protected:
 
 	template< class type, // <省略可> outの形
 		size_t size>      // <省略可> 配列の要素数
-		// type の配列を読み込む
+						  // type の配列を読み込む
 		inline FPCODE LoadArray(
-		std::ifstream &mqoFile,  // <in> : 読み込むファイル
-		const std::string& load, // <in> : 前回読み込んだ文字列
-		const std::string& com,  // <in> : 判定用文字列
-		type( &out )[size]       // <out>: ここに読み込む
+			std::ifstream &mqoFile,  // <in> : 読み込むファイル
+			const std::string& load, // <in> : 前回読み込んだ文字列
+			const std::string& com,  // <in> : 判定用文字列
+			type( &out )[size]       // <out>: ここに読み込む
 		)
 	{
 		// 終了
-		if( load == "}" )
+		if ( load == "}" )
 			return FPCODE::END;
 		// 違う
-		if( load != com )
+		if ( load != com )
 			return FPCODE::FAILURE;
 		// 配列分読み込み
-		for( size_t i = 0; i < size; i++ )
+		for ( size_t i = 0; i < size; i++ )
 		{
 			mqoFile >> out[i];
 		}
@@ -391,18 +467,18 @@ protected:
 	}
 
 	template <class type> // <省略可> 取り出す型
-	// com(type) の形の文字列を読み込みtypeの取り出す
+						  // com(type) の形の文字列を読み込みtypeの取り出す
 	inline FPCODE LoadParenthesi(
 		const std::string& load, // <in> : 前回読み込んだ文字列
 		const std::string com,   // <in> : 判定用文字列
 		type *out                // <out>: ここに読み込む
-		)
+	)
 	{
 		// 終了
-		if( load == "}" )
+		if ( load == "}" )
 			return FPCODE::END;
 		// 違う
-		if( load.substr( 0, com.size() ) != com )
+		if ( load.substr( 0, com.size() ) != com )
 			return FPCODE::FAILURE;
 		// 取り出す
 		sto( load.substr( com.size() + 1 ), out );
@@ -414,13 +490,13 @@ protected:
 		const std::string& load, // <in> : 前回読み込んだ文字列
 		const std::string com,   // <in> : 判定用文字列
 		std::string* out         // <out>: ここに読み込む
-		)
+	)
 	{
 		// 終了
-		if( load == "}" )
+		if ( load == "}" )
 			return FPCODE::END;
 		// 違う
-		if( load.substr( 0, com.size() ) != com )
+		if ( load.substr( 0, com.size() ) != com )
 			return FPCODE::FAILURE;
 		// 取り出す
 		*out = load.substr( com.size() + 2, load.size() - com.size() - 4 );
@@ -429,23 +505,23 @@ protected:
 
 	template<class type, // 取り出す型
 		size_t size>     // 配列の要素数
-		// com(type type ...) の形の文字列を読み込みtypeの配列を取り出す
+						 // com(type type ...) の形の文字列を読み込みtypeの配列を取り出す
 		inline FPCODE LoadArrayParenthesi(
-		std::ifstream& mqoFile, // <in> : 読み込むファイル
-		std::string& load,      // <in> : 前回読み込んだ文字列
-		const std::string com,  // <in> : 判定用文字列
-		type( &out )[size]      // <out>: ここに読み込む
+			std::ifstream& mqoFile, // <in> : 読み込むファイル
+			std::string& load,      // <in> : 前回読み込んだ文字列
+			const std::string com,  // <in> : 判定用文字列
+			type( &out )[size]      // <out>: ここに読み込む
 		)
 	{
 		// 終了
-		if( load == "}" )
+		if ( load == "}" )
 			return FPCODE::END;
 		// 違う
-		if( load.substr( 0, com.size() ) != com )
+		if ( load.substr( 0, com.size() ) != com )
 			return FPCODE::FAILURE;
 		// 数字を取り出す
 		out[0] = stof( load.substr( com.size() + 1 ) );
-		for( size_t i = 1; i < size; i++ )
+		for ( size_t i = 1; i < size; i++ )
 		{
 			mqoFile >> out[i];
 		}
@@ -455,24 +531,24 @@ protected:
 	}
 
 	template<class LoadObjectClass> // MqoLoadObject を継承したクラス 
-	// 関数ポインターの配列を回す
+									// 関数ポインターの配列を回す
 	void LoadLoop(
 		LoadObjectClass* me,    // <in> : thisポインター入れる
 		std::ifstream &mqoFile, // <in> : 読み込むファイル
 		FPCODE( LoadObjectClass::*loadFP[] )( std::ifstream&, std::string& load ), // <in> : 関数ポインタ配列
 		unsigned int numFP      // <in> : 配列お要素数
-		)
+	)
 	{
-		for( unsigned int step( 0 ); step < numFP; )
+		for ( unsigned int step( 0 ); step < numFP; )
 		{
 			std::string workString;
 			mqoFile >> workString;
-			if( mqoFile.eof() )
+			if ( mqoFile.eof() )
 				break;
 			// 関数ポインター分回す
-			for( unsigned int i = step; i < numFP; i++ )
+			for ( unsigned int i = step; i < numFP; i++ )
 			{
-				switch( ( me->*loadFP[i] )( mqoFile, workString ) )
+				switch ( ( me->*loadFP[i] )( mqoFile, workString ) )
 				{
 					case FPCODE::FAILURE: // 違った
 						break;
@@ -625,7 +701,7 @@ public:
 		std::string workString;
 		mqoFile >> workString; // { を読み込む
 
-		for( size_t i = 0; i < numVertex; i++ )
+		for ( size_t i = 0; i < numVertex; i++ )
 		{
 			list[i].Load( mqoFile );
 		}
@@ -662,7 +738,7 @@ public:
 		void LoadV( std::ifstream &mqoFile, const std::string& load )
 		{
 			vertex[0].V = std::stoi( load.substr( 2 ) );
-			for( size_t i = 1; i < vertex.size(); i++ )
+			for ( size_t i = 1; i < vertex.size(); i++ )
 			{
 				mqoFile >> vertex[i].V;
 			}
@@ -675,7 +751,7 @@ public:
 		{
 			vertex[0].UV[0] = std::stof( load.substr( 3 ) );
 			mqoFile >> vertex[0].UV[1];
-			for( size_t i = 1; i < vertex.size(); i++ )
+			for ( size_t i = 1; i < vertex.size(); i++ )
 			{
 				mqoFile >> vertex[i].UV[0];
 				mqoFile >> vertex[i].UV[1];
@@ -684,7 +760,7 @@ public:
 		void LoadCOL( std::ifstream &mqoFile, const std::string& load )
 		{
 			vertex[0].COL = std::stoi( load.substr( 4 ) );
-			for( size_t i = 1; i < vertex.size(); i++ )
+			for ( size_t i = 1; i < vertex.size(); i++ )
 			{
 				mqoFile >> vertex[i].COL;
 			}
@@ -701,35 +777,35 @@ public:
 		std::string workString;
 		mqoFile >> workString; // { 読み込み
 
-		for( size_t i = 0; i <= list.size(); )
+		for ( size_t i = 0; i <= list.size(); )
 		{
 			mqoFile >> workString;
-			if( workString == "}" )
+			if ( workString == "}" )
 				break;
 
-			if( "0" <= workString && workString <= "9" )
+			if ( "0" <= workString && workString <= "9" )
 			{
 				i++;
 				list[i - 1].vertex.resize( std::stoi( workString ) );
 				continue;
 			}
 
-			if( i <= 0 )
+			if ( i <= 0 )
 				continue;
 
-			if( workString.find( "COL" ) != std::string::npos )
+			if ( workString.find( "COL" ) != std::string::npos )
 			{
 				list[i - 1].LoadCOL( mqoFile, workString );
 			}
-			else if( workString.find( "UV" ) != std::string::npos )
+			else if ( workString.find( "UV" ) != std::string::npos )
 			{
 				list[i - 1].LoadUV( mqoFile, workString );
 			}
-			else if( workString.find( "V" ) != std::string::npos )
+			else if ( workString.find( "V" ) != std::string::npos )
 			{
 				list[i - 1].LoadV( mqoFile, workString );
 			}
-			else if( workString.find( "M" ) != std::string::npos )
+			else if ( workString.find( "M" ) != std::string::npos )
 			{
 				list[i - 1].LoadM( workString );
 			}
@@ -784,10 +860,10 @@ private:
 	}
 	FPCODE LoadtVisible( std::ifstream &mqoFile, std::string& load )
 	{
-		if( load == "}" )
+		if ( load == "}" )
 			return FPCODE::END;
 
-		if( load != "visible" )
+		if ( load != "visible" )
 			return FPCODE::FAILURE;
 
 		mqoFile >> visible;
@@ -799,10 +875,10 @@ private:
 	}
 	FPCODE LoadVertex( std::ifstream &mqoFile, std::string& load )
 	{
-		if( load == "}" )
+		if ( load == "}" )
 			return FPCODE::END;
 
-		if( load != "vertex" )
+		if ( load != "vertex" )
 			return FPCODE::FAILURE;
 
 		vertexList.Load( mqoFile );
@@ -810,10 +886,10 @@ private:
 	}
 	FPCODE LoadFace( std::ifstream &mqoFile, std::string& load )
 	{
-		if( load == "}" )
+		if ( load == "}" )
 			return FPCODE::END;
 
-		if( load != "face" )
+		if ( load != "face" )
 			return FPCODE::FAILURE;
 
 		faceList.Load( mqoFile );
@@ -828,9 +904,10 @@ public:
 	{}
 	~MQOLoader()
 	{
-		SAFE_DELETE( vertexList );
-		SAFE_DELETE( indexList );
-		SAFE_DELETE( vertexDataList );
+		SAFE_DELETE_ARRAY( vertexList );
+		// tdnMesh::CreateData のデストラクタで消される
+		//SAFE_DELETE_ARRAY( indexList );
+		//SAFE_DELETE_ARRAY( vertexDataList );
 	}
 
 	bool CreateMesh( tdnMesh *mesh, std::string filename )
@@ -857,7 +934,7 @@ public:
 			{ 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
 			{ 0, sizeof( float ) * 3, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },
 			{ 0, sizeof( float ) * 6, D3DDECLTYPE_UBYTE4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0 },
-			{ 0, sizeof( float ) * 6 + sizeof(COLOR), D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
+			{ 0, sizeof( float ) * 6 + sizeof( COLOR ), D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
 			D3DDECL_END()
 		};
 		data.decl = declAry;
@@ -866,10 +943,11 @@ public:
 		ret = mesh->Create( data );
 
 		std::string filepath;
-		UINT seekl = filename.find_last_of( "/" );
-		filepath = filename.substr( 0, seekl + 1 );
+		float seekl = ( float ) filename.find_last_of( "/" );
+		filepath = filename.substr( 0, ( int ) seekl + 1 );
 		filepath += materialList[0].tex;
-		mesh->texture = tdnTexture::Load( "DATA/mqo/box/box.png" );
+
+		mesh->Texture( "DATA/mqo/box/box.png" );
 
 		return ret;
 	}
@@ -893,27 +971,27 @@ private:
 	// 読み込む
 	void Load( std::ifstream &mqoFile )
 	{
-		while( true )
+		while ( true )
 		{
 			std::string command;
 			mqoFile >> command;
-			if( mqoFile.eof() )
+			if ( mqoFile.eof() )
 				break;
 
 			// マテリアル読み込み
-			if( command.find( "Material" ) != std::string::npos )
+			if ( command.find( "Material" ) != std::string::npos )
 			{
 				unsigned int numMaterial;
 				mqoFile >> numMaterial;
 				materialList.resize( numMaterial );
 
-				for( unsigned int i = 0; i < numMaterial; i++ )
+				for ( unsigned int i = 0; i < numMaterial; i++ )
 				{
 					materialList[i].Load( mqoFile );
 				}
 			}
 			// オブジェクト読み込み
-			else if( command.find( "Object" ) != std::string::npos )
+			else if ( command.find( "Object" ) != std::string::npos )
 			{
 				objectList.push_back( MqoObject() );
 				objectList.rbegin()->Load( mqoFile );
@@ -924,19 +1002,19 @@ private:
 	// 位置だけ設定
 	void CreateVertexArray()
 	{
-		for( unsigned int i1 = 0; i1 < objectList.size(); i1++ )
+		for ( unsigned int i1 = 0; i1 < objectList.size(); i1++ )
 		{
 			numVtx += objectList[i1].vertexList.list.size();
 		}
-		SAFE_DELETE( vertexList );
+		SAFE_DELETE_ARRAY( vertexList );
 		vertexList = new Vertex[numVtx]
 		{};
 
-		for( unsigned int vi = 0; vi < numVtx; )
+		for ( unsigned int vi = 0; vi < numVtx; )
 		{
-			for( unsigned int i1 = 0; i1 < objectList.size(); i1++ )
+			for ( unsigned int i1 = 0; i1 < objectList.size(); i1++ )
 			{
-				for( unsigned int i2 = 0; i2 < objectList[i1].vertexList.list.size(); i2++ )
+				for ( unsigned int i2 = 0; i2 < objectList[i1].vertexList.list.size(); i2++ )
 				{
 					vertexList[vi].position.x = objectList[i1].vertexList.list[i2].pos[0];
 					vertexList[vi].position.y = objectList[i1].vertexList.list[i2].pos[1];
@@ -950,28 +1028,28 @@ private:
 	void CreateIndexAndDataArray()
 	{
 		// インデックス数
-		for( unsigned int i1 = 0; i1 < objectList.size(); i1++ )
+		for ( unsigned int i1 = 0; i1 < objectList.size(); i1++ )
 		{
-			for( unsigned int i2 = 0; i2 < objectList[i1].faceList.list.size(); i2++ ) // 三角ポリゴンに変更
+			for ( unsigned int i2 = 0; i2 < objectList[i1].faceList.list.size(); i2++ ) // 三角ポリゴンに変更
 				numIdx += 3 * ( objectList[i1].faceList.list[i2].vertex.size() - 2 );
 		}
 		// 配列new
-		SAFE_DELETE( indexList );
+		SAFE_DELETE_ARRAY( indexList );
 		indexList = new DWORD[numIdx]
 		{};
-		for( unsigned int i = 0; i < numIdx; i++ )
+		for ( unsigned int i = 0; i < numIdx; i++ )
 		{
 			indexList[i] = i;
 		}
-		SAFE_DELETE( vertexDataList );
+		SAFE_DELETE_ARRAY( vertexDataList );
 		vertexDataList = new MESHVERTEX2[numIdx]
 		{};
 
 		// 法線計算
-		for( unsigned int i1 = 0; i1 < objectList.size(); i1++ )
-			for( unsigned int i2 = 0; i2 < objectList[i1].faceList.list.size(); i2++ )
+		for ( unsigned int i1 = 0; i1 < objectList.size(); i1++ )
+			for ( unsigned int i2 = 0; i2 < objectList[i1].faceList.list.size(); i2++ )
 				// 三角ポリゴンで法線計算
-				for( unsigned int i3 = 0; i3 + 2 < objectList[i1].faceList.list[i2].vertex.size(); i3++ )
+				for ( unsigned int i3 = 0; i3 + 2 < objectList[i1].faceList.list[i2].vertex.size(); i3++ )
 				{
 					// インデックス
 					unsigned int index[3];
@@ -993,13 +1071,13 @@ private:
 					vertexList[index[2]].normal += Normal;
 				}
 		// 正規化
-		for( unsigned int i1 = 0; i1 < numVtx; i1++ )
+		for ( unsigned int i1 = 0; i1 < numVtx; i1++ )
 			vertexList[i1].normal.Normalize();
 
 		// 頂点配列設定
-		for( unsigned int iIndex = 0, i1 = 0; i1 < objectList.size(); i1++ )
-			for( unsigned int i2 = 0; i2 < objectList[i1].faceList.list.size(); i2++ )
-				for( unsigned int i3 = 0; i3 + 2 < objectList[i1].faceList.list[i2].vertex.size(); i3++ )
+		for ( unsigned int iIndex = 0, i1 = 0; i1 < objectList.size(); i1++ )
+			for ( unsigned int i2 = 0; i2 < objectList[i1].faceList.list.size(); i2++ )
+				for ( unsigned int i3 = 0; i3 + 2 < objectList[i1].faceList.list[i2].vertex.size(); i3++ )
 				{
 					// インデックス
 					unsigned int index[3];
@@ -1007,7 +1085,7 @@ private:
 					index[1] = objectList[i1].faceList.list[i2].vertex[i3 + 1].V;
 					index[2] = objectList[i1].faceList.list[i2].vertex[i3 + 2].V;
 
-					auto setData = [&]( unsigned int index1, unsigned int index2, unsigned int index3 )
+					auto setData = [ & ] ( unsigned int index1, unsigned int index2, unsigned int index3 )
 					{
 						vertexDataList[index1].x = vertexList[index2].position.x;
 						vertexDataList[index1].y = vertexList[index2].position.y;
@@ -1028,19 +1106,56 @@ private:
 				}
 
 	}
-
 };
 
 bool tdnMesh::LoadMqo( char *filename )
 {
 	std::ifstream mqoFile;
-	if( OpenFstream( &mqoFile, filename ) == false )
+	if ( OpenFstream( &mqoFile, filename ) == false )
 		return false;
 
 	MQOLoader loader;
 	loader.CreateMesh( this, filename );
 
 	return true;
+}
+
+/************/
+/* 書き出し */
+/************/
+
+/*
+numVertexes
+vertexArray
+textureNameのサイズ
+textureName
+*/
+void tdnMesh::OutPutTDNM( const char* fileName )
+{
+	FILE* file( nullptr );
+	//char filePath[MAX_PATH];
+	// 拡張子付与
+	//strcat_s( filePath, fileName );
+	//strcat_s( filePath, ".TDNM" );
+	fopen_s( &file, fileName, "wb" );
+
+	OutPutTDNM( file );
+
+	fclose( file );
+}
+
+void tdnMesh::OutPutTDNM( FILE * file )
+{
+	// 頂点数、頂点書き出し
+	fwrite( &numVertexes, sizeof( numVertexes ), 1, file );
+	fwrite( vertexArray, sizeof( MESHVERTEX2 ) * numVertexes, 1, file );
+	size_t textureNameLen = strlen(textureName);
+	std::string outTextureName;
+	for (; textureNameLen > 0 && textureName[textureNameLen] != '\\' && textureName[textureNameLen] != '/'; --textureNameLen);
+	outTextureName = &textureName[textureNameLen + 1];
+	textureNameLen = outTextureName.length();
+	fwrite( &textureNameLen, sizeof( textureNameLen ), 1, file );
+	fwrite(outTextureName.c_str(), textureNameLen, 1, file);
 }
 
 /********/
@@ -1074,16 +1189,21 @@ void tdnMesh::UpdateWorldMatrix()
 
 void tdnMesh::Render( tdnShader *shader, char *technique )
 {
+	if ( vertexBuffer == nullptr )
+		return;
+
 	unsigned int numPass = shader->Begin( technique );
 
-	shader->SetValue( "worldMatrix", worldMatrix );
-	if( texture )
+	Matrix m = worldMatrix * matView * matProjection;
+	shader->SetValue( "WMatrix", worldMatrix );
+	shader->SetWVPMatrix(&m);
+	if ( texture )
 		shader->SetValue( "Texture", texture );
 
 	//使用ストリーム指定と頂点バッファ設定
 	tdnSystem::GetDevice()->SetStreamSource( 0, vertexBuffer, 0, declSize );
 	tdnSystem::GetDevice()->SetStreamSourceFreq( 0, D3DSTREAMSOURCE_INDEXEDDATA | numStream ); // ４回描画する
-	if( numStream > 0 )
+	if ( numStream > 0 )
 	{
 		tdnSystem::GetDevice()->SetStreamSource( 1, streamBuffer, 0, streamSize );
 		tdnSystem::GetDevice()->SetStreamSourceFreq( 1, D3DSTREAMSOURCE_INSTANCEDATA | 1 ); // １回描画する毎に次のデータに変更
@@ -1093,25 +1213,25 @@ void tdnMesh::Render( tdnShader *shader, char *technique )
 	tdnSystem::GetDevice()->SetIndices( indexBuffer );
 	//頂点構造体指定
 	tdnSystem::GetDevice()->SetVertexDeclaration( decl );
-	for( unsigned int i = 0; i < numPass; i++ )
+	for ( unsigned int i = 0; i < numPass; i++ )
 	{
 		shader->BeginPass( i );
 
 		//描画(面二つと０から始まる頂点と指定)
-		if( isIndex )
-		tdnSystem::GetDevice()->DrawIndexedPrimitive(
-			D3DPT_TRIANGLELIST,
-			0, //開始地点からの相対位置
-			0, //最小インデックス番号
-			numIndexes, //最大インデックス番号
-			0, //インデックス配列の読み取り位置	
-			numFaces //面の数
+		if ( isIndex )
+			tdnSystem::GetDevice()->DrawIndexedPrimitive(
+				D3DPT_TRIANGLELIST,
+				0, //開始地点からの相対位置
+				0, //最小インデックス番号
+				numIndexes, //最大インデックス番号
+				0, //インデックス配列の読み取り位置	
+				numFaces //面の数
 			);
 		else
 			tdnSystem::GetDevice()->DrawPrimitive(
-			D3DPT_TRIANGLELIST,
-			0,
-			numFaces //面の数
+				D3DPT_TRIANGLELIST,
+				0,
+				numFaces //面の数
 			);
 		shader->EndPass();
 	}
@@ -1154,4 +1274,17 @@ const Matrix& tdnMesh::WorldMatrix()
 void tdnMesh::WorldMatrix( const Matrix& in )
 {
 	worldMatrix = in;
+}
+
+void tdnMesh::Texture( const char* fileName )
+{
+	int len = strlen( fileName );
+	textureName = new char[len + 1];
+	strcpy_s( textureName, len + 1, fileName );
+	texture = tdnTexture::Load( fileName );
+}
+
+Texture2D *tdnMesh::Texture()
+{
+	return texture;
 }

@@ -36,7 +36,7 @@ void DeferredEx::Release()
 DeferredEx::DeferredEx()
 {
 	// 極小バッファのサイズ
-	MiniSizeLv = 4;
+	MiniSizeLv = 6;
 	MiniSizeX = tdnSystem::GetScreenSize().right / MiniSizeLv;
 	MiniSizeY = tdnSystem::GetScreenSize().bottom / MiniSizeLv;
 
@@ -76,11 +76,11 @@ DeferredEx::DeferredEx()
 
 			break;
 		case SURFACE_NAME_EX::BLOOM:
-			m_pSurface[i] = new tdn2DObj(MiniSizeX, MiniSizeY, TDN2D::USEALPHA);
+			m_pSurface[i] = new tdn2DObj(MiniSizeX, MiniSizeY, TDN2D::HDR);
 
 			break;
 		case SURFACE_NAME_EX::BLOOM_SEED:
-			m_pSurface[i] = new tdn2DObj(tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom, TDN2D::USEALPHA);
+			m_pSurface[i] = new tdn2DObj(tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom, TDN2D::RENDERTARGET);
 
 			break;
 		case SURFACE_NAME_EX::SCREEN:
@@ -376,7 +376,7 @@ void DeferredEx::BloomRender()
 		tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom);
 
 	//ボケ度　回数が少ないほどボケない
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		m_pSurface[(int)SURFACE_NAME_EX::BLOOM]->Render(0, 0, MiniSizeX, MiniSizeY,
 			0, 0, MiniSizeX, MiniSizeY, shaderM, "gaussZ");//奥行を禁止
@@ -386,9 +386,11 @@ void DeferredEx::BloomRender()
 	tdnSystem::GetDevice()->SetRenderTarget(0, m_pSaveBackBuffer);
 
 	// HDRブルームを乗算　
-	m_pSurface[(int)SURFACE_NAME_EX::BLOOM]->Render(0, 0, tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom,
-		0, 0, MiniSizeX, MiniSizeY, shaderM, "add_hdrBloom");
-
+	//for (int i = 0; i < 2; i++)// 回数が大きいほどブルームが強くなる
+	{
+		m_pSurface[(int)SURFACE_NAME_EX::BLOOM]->Render(0, 0, tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom,
+			0, 0, MiniSizeX, MiniSizeY, shaderM, "add_hdrBloom");
+	}
 };
 
 
@@ -630,13 +632,28 @@ void DeferredEx::CtrlExposure()
 	}
 
 
-	tdnText::Draw(10, 600, 0xff00ffff, "露光度%.1f", m_fExposure);
+	//tdnText::Draw(10, 600, 0xff00ffff, "露光度%.1f", m_fExposure);
 	shaderM->SetValue("exposure", m_fExposure);
 }
 
 //****************************
 //		RADIAL_BLUR
 //****************************
+void DeferredEx::SetRadialBlur(Vector3 pos, float power)
+{
+	// ブラ―
+	m_blurPower = power;
+	shaderM->SetValue("BluePower", m_blurPower);
+
+	// スクリーン座標に変換
+	Vector2 screenPos = Math::WorldToProj(pos);
+	
+	// 場所
+	shaderM->SetValue("CenterX", screenPos.x);
+	shaderM->SetValue("CenterY", screenPos.y);
+
+}
+
 void DeferredEx::SetRadialBlur(Vector2 pos, float power)
 {
 	// ブラ―
@@ -651,7 +668,7 @@ void DeferredEx::SetRadialBlur(Vector2 pos, float power)
 
 void DeferredEx::RadialBlurUpdate()
 {
-	m_blurPower -= 1.0f;
+	m_blurPower -= 0.25f;
 	m_blurPower = Math::Clamp(m_blurPower, 0.0f, 30.0f);
 
 	// ブラ―

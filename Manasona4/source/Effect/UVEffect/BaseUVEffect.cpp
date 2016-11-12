@@ -101,9 +101,7 @@ ConvEffect2::ConvEffect2()
 };
 ConvEffect3::ConvEffect3()
 {
-
 	m_pic = new AnimationUV("Data/UVeffect/convEffect/convEffect4.IMO", 0.00f, 0.04f, 20, false, 2, 16);
-
 }
 ConvEffect4::ConvEffect4()
 {

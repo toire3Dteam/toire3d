@@ -5,6 +5,7 @@ ComboUI::ComboUI()
 	m_num = new Number("DATA/UI/Combo/Number.png", 128, Number::NUM_KIND::COMBO);
 	m_damageNum = new Number("DATA/UI/Combo/damageNumber.png", 32, Number::NUM_KIND::NORMAL);
 	//m_num->SetCol(Number::RGB(,255,255,255));
+
 	// コンボ
 	m_iCount = 0;
 	m_iMaxCount = 0;
@@ -20,13 +21,13 @@ ComboUI::ComboUI()
 	m_gageBackPic = new tdn2DObj("DATA/UI/Combo/comboGageFrameBack.png");
 	m_gagePic = new tdn2DObj("DATA/UI/Combo/comboGage.png");
 
-	m_pRecoveryFrame = nullptr;
+	m_pPlayerData = nullptr;
 	m_iRecoveryFrame = 0;
 	m_iMaxRecoveryFrame = 100;
 
 }
 
-ComboUI::ComboUI(int* recoveryFrame)
+ComboUI::ComboUI(BasePlayer* PlayerData)
 {
 	m_num = new Number("DATA/UI/Combo/Number.png", 128, Number::NUM_KIND::COMBO);
 	m_damageNum = new Number("DATA/UI/Combo/damageNumber.png", 32, Number::NUM_KIND::NORMAL);
@@ -46,7 +47,7 @@ ComboUI::ComboUI(int* recoveryFrame)
 	m_gageBackPic = new tdn2DObj("DATA/UI/Combo/comboGageFrameBack.png");
 	m_gagePic = new tdn2DObj("DATA/UI/Combo/comboGage.png");
 
-	m_pRecoveryFrame = recoveryFrame;
+	m_pPlayerData = PlayerData;
 	m_iRecoveryFrame = 0;
 	m_iMaxRecoveryFrame = 100;
 
@@ -76,7 +77,7 @@ void ComboUI::Update()
 	// 数字の更新
 	m_num->Update();
 
-	float rate = float(*m_pRecoveryFrame) / float(m_iMaxRecoveryFrame);
+	float rate = float(m_pPlayerData->GetRecoveryFrame()) / float(m_iMaxRecoveryFrame);
 
 	if (rate > 0.0f)
 	{
@@ -111,7 +112,7 @@ void ComboUI::Render(int x, int y)
 
 	// ゲージ類
 	m_gageBackPic->Render(x + gageX, y + gageY,RS::COPY_NOZ);
-	float rate = float(*m_pRecoveryFrame) / float(m_iMaxRecoveryFrame);
+	float rate = float(m_pPlayerData->GetRecoveryFrame()) / float(m_iMaxRecoveryFrame);
 	if (m_bGuardFlag == true)rate = 0.0f;
 	m_gagePic->Render(x + gageX, y + gageY, int(128 * rate), 64, 0, 0, int(128 * rate), 64, RS::COPY_NOZ);
 	m_gageFramePic->Render(x + gageX, y + gageY,RS::COPY_NOZ);
@@ -122,7 +123,7 @@ void ComboUI::Render(int x, int y)
 
 void ComboUI::GageUpdate()
 {
-	float rate = float(*m_pRecoveryFrame) / float(m_iMaxRecoveryFrame);
+	float rate = float(m_pPlayerData->GetRecoveryFrame()) / float(m_iMaxRecoveryFrame);
 	
 	if (rate > 0.0f)
 	{
@@ -166,38 +167,38 @@ void ComboUI::Count(int damage, int maxRecovery)
 		
 }
 
-void ComboUI::Count(int damage, int maxRecovery,int* recovery)
-{
-	// ウェイトタイマーが作動してるじょうたいなら
-	if (m_iRenderFlagWaitFrame >= 1)
-	{
-		// 初期化
-		m_iCount = 0;
-		m_iDamage = 0;
-	}
-
-	m_num->Action();
-	
-	m_bGuardFlag = false;
-
-	m_iCount++;
-	// 最大コンボ数を保存
-	if (m_iMaxCount <= m_iCount)
-	{
-		m_iMaxCount = m_iCount;
-	}
-
-	m_iDamage += damage;
-	// 最大コンボ数を保存
-	if (m_iMaxDamage <= m_iDamage)
-	{
-		m_iMaxDamage = m_iDamage;
-	}
-
-	m_iMaxRecoveryFrame = maxRecovery;
-
-	m_pRecoveryFrame = recovery;
-}
+//void ComboUI::Count(int damage, int maxRecovery,int* recovery)
+//{
+//	// ウェイトタイマーが作動してるじょうたいなら
+//	if (m_iRenderFlagWaitFrame >= 1)
+//	{
+//		// 初期化
+//		m_iCount = 0;
+//		m_iDamage = 0;
+//	}
+//
+//	m_num->Action();
+//	
+//	m_bGuardFlag = false;
+//
+//	m_iCount++;
+//	// 最大コンボ数を保存
+//	if (m_iMaxCount <= m_iCount)
+//	{
+//		m_iMaxCount = m_iCount;
+//	}
+//
+//	m_iDamage += damage;
+//	// 最大コンボ数を保存
+//	if (m_iMaxDamage <= m_iDamage)
+//	{
+//		m_iMaxDamage = m_iDamage;
+//	}
+//
+//	m_iMaxRecoveryFrame = maxRecovery;
+//
+//	m_pRecoveryFrame = recovery;
+//}
 
 void ComboUI::Guard()
 {

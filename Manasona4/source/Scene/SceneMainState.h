@@ -4,16 +4,17 @@
 
 // 前方宣言
 class sceneMain;
+class LoadSceneThread;
 struct Message;
 
 namespace SceneMainState
 {
 	//--------------------ゲーム開始時ステート
-	class Intro : public State<sceneMain>
+	class StageIntro : public State<sceneMain>
 	{
 	public:
 		// this is a シングルトン
-		static Intro* GetInstance(){ static Intro state; return &state; }
+		static StageIntro* GetInstance(){ static StageIntro state; return &state; }
 
 		// 入る
 		virtual void Enter(sceneMain* pMain);
@@ -31,11 +32,77 @@ namespace SceneMainState
 		virtual bool OnMessage(sceneMain* pMain, const Message& msg);
 
 	private:
-		Intro() {};
-		~Intro() {};
+		bool m_bSkip;	// イントロスキップしてフェードしたかどうか
 
-		Intro(const Intro&){}
-		Intro& operator=(const Intro&){}
+		StageIntro() {};
+		~StageIntro() {};
+
+		StageIntro(const StageIntro&){}
+		StageIntro& operator=(const StageIntro&){}
+	};
+
+	//--------------------ゲーム開始時ステート
+	class CharaIntro : public State<sceneMain>
+	{
+	public:
+		// this is a シングルトン
+		static CharaIntro* GetInstance(){ static CharaIntro state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMain* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMain* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMain* pMain);
+
+		// 描画
+		virtual void Render(sceneMain* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMain* pMain, const Message& msg);
+
+	private:
+
+		bool m_bSkip;		// イントロスキップしてフェードしたかどうか
+		int m_iKakeaiTimer;	// 掛け合いの時間計測用
+
+		CharaIntro() {};
+		~CharaIntro() {};
+
+		CharaIntro(const CharaIntro&){}
+		CharaIntro& operator=(const CharaIntro&){}
+	};
+
+	//--------------------ラウンドコール
+	class Round : public State<sceneMain>
+	{
+	public:
+		// this is a シングルトン
+		static Round* GetInstance(){ static Round state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMain* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMain* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMain* pMain);
+
+		// 描画
+		virtual void Render(sceneMain* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMain* pMain, const Message& msg);
+
+	private:
+		Round() {};
+		~Round() {};
+
+		Round(const Round&){}
+		Round& operator=(const Round&){}
 	};
 
 	//--------------------メインステート
@@ -69,12 +136,12 @@ namespace SceneMainState
 		Main& operator=(const Main&){}
 	};
 
-	//--------------------試合終了中ステート
-	class End : public State<sceneMain>
+	//--------------------フィニッシュステート(ラウンドをまたぐかリザルトに行くかの分岐はこの中で行う予定)
+	class Finish : public State<sceneMain>
 	{
 	public:
 		// this is a シングルトン
-		static End* GetInstance(){ static End state; return &state; }
+		static Finish* GetInstance(){ static Finish state; return &state; }
 
 		// 入る
 		virtual void Enter(sceneMain* pMain);
@@ -93,10 +160,138 @@ namespace SceneMainState
 
 
 	private:
-		End() {};
-		~End() {};
+		bool m_bEndCall;
 
-		End(const End&){}
-		End& operator=(const End&){}
+		Finish() :m_bEndCall(false) {};
+		~Finish() {};
+
+		Finish(const Finish&){}
+		Finish& operator=(const Finish&){}
+	};
+
+	//--------------------ヒーホーオーバーフロー成功演出中ステート
+	class HeaveHoDriveOverFlowSuccess : public State<sceneMain>
+	{
+	public:
+		// this is a シングルトン
+		static HeaveHoDriveOverFlowSuccess* GetInstance() { static HeaveHoDriveOverFlowSuccess state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMain* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMain* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMain* pMain);
+
+		// 描画
+		virtual void Render(sceneMain* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMain* pMain, const Message& msg);
+
+
+	private:
+		HeaveHoDriveOverFlowSuccess(){};
+		~HeaveHoDriveOverFlowSuccess(){}
+
+		HeaveHoDriveOverFlowSuccess(const HeaveHoDriveOverFlowSuccess&) {}
+		HeaveHoDriveOverFlowSuccess& operator=(const HeaveHoDriveOverFlowSuccess&) {}
+	};
+
+
+	//--------------------チュートリアル（イントロ）ステート
+	class TutorialIntro : public State<sceneMain>
+	{
+	public:
+		// this is a シングルトン
+		static TutorialIntro* GetInstance() { static TutorialIntro state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMain* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMain* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMain* pMain);
+
+		// 描画
+		virtual void Render(sceneMain* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMain* pMain, const Message& msg);
+
+
+	private:
+		TutorialIntro() {};
+		~TutorialIntro() {};
+
+		TutorialIntro(const TutorialIntro&) {}
+		TutorialIntro& operator=(const TutorialIntro&) {}
+	};
+	
+	//--------------------チュートリアル（メイン）ステート
+	class TutorialMain : public State<sceneMain>
+	{
+	public:
+		// this is a シングルトン
+		static TutorialMain* GetInstance() { static TutorialMain state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMain* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMain* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMain* pMain);
+
+		// 描画
+		virtual void Render(sceneMain* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMain* pMain, const Message& msg);
+
+
+	private:
+		TutorialMain() {};
+		~TutorialMain() {};
+
+		TutorialMain(const TutorialMain&) {}
+		TutorialMain& operator=(const TutorialMain&) {}
+	};
+
+
+	//--------------------チュートリアル（クリア）ステート
+	class TutorialClear: public State<sceneMain>
+	{
+	public:
+		// this is a シングルトン
+		static TutorialClear* GetInstance() { static TutorialClear state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMain* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMain* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMain* pMain);
+
+		// 描画
+		virtual void Render(sceneMain* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMain* pMain, const Message& msg);
+
+
+	private:
+		TutorialClear() {};
+		~TutorialClear() {};
+
+		TutorialClear(const TutorialClear&) {}
+		TutorialClear& operator=(const TutorialClear&) {}
 	};
 }

@@ -85,6 +85,10 @@ AnimationUV::AnimationUV(char* name, float moveTU, float moveTV, int EndFlame, b
 	m_startScale  = 1.0f;
 	m_endScale   =	1.0f;
 
+	// [10/07“ú]ƒAƒ“ƒOƒ‹‰Šú‰»
+	m_angle = VECTOR_ZERO;
+	m_startAngle = VECTOR_ZERO;
+	m_endAngle = VECTOR_ZERO;
 }
 
 

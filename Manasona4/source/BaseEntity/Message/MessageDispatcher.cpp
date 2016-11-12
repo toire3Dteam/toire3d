@@ -20,13 +20,13 @@ void MessageDispatcher::Discharge(BaseGameEntity* pReceiver,
 	{
 		// ここに来たということは受信者側が対応してなくて弾かれた可能性がある
 		printf("ID[%d] の送ったメッセージが処理されません\n", (int)telegram.Sender);
-		MyDebugString("ID[%d] の送ったメッセージが処理されませんでした\n", (int)telegram.Sender);
+		//MyDebugString("ID[%d] の送ったメッセージが処理されませんでした\n", (int)telegram.Sender);
 	}
 	else
 	{
 		// Trueなら
 		printf("ID[%d] の送ったメッセージが上手く処理されました。\n", (int)telegram.Sender);
-		MyDebugString("ID[%d] の送ったメッセージが上手く処理されました。\n", (int)telegram.Sender);
+		//MyDebugString("ID[%d] の送ったメッセージが上手く処理されました。\n", (int)telegram.Sender);
 
 	}
 }
@@ -47,7 +47,7 @@ void MessageDispatcher::Dispatch(double  delay,
 	if (pReceiver == NULL)
 	{
 		printf("[警告]この ID[%d] を持つ受信者はいません\n",(int)receiver);
-		MyDebugString("[警告]この ID[%d] を持つ受信者はいません\n",(int)receiver);
+		//MyDebugString("[警告]この ID[%d] を持つ受信者はいません\n",(int)receiver);
 		return;
 	}
 
@@ -58,7 +58,7 @@ void MessageDispatcher::Dispatch(double  delay,
 	if (delay <= 0.0f)
 	{
 		printf("ID[%d] からのメッセージを ID[%d] に送信\n", (int)sender, (int)receiver);
-		MyDebugString("ID[%d] からのメッセージを ID[%d] に送信\n", (int)sender, (int)receiver);
+		//MyDebugString("ID[%d] からのメッセージを ID[%d] に送信\n", (int)sender, (int)receiver);
 
 		// 受信者に電報を送るぜ
 		Discharge(pReceiver, telegram);

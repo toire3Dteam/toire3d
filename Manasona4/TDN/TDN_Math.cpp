@@ -315,10 +315,6 @@ inline float Math::Length(Vector3 PosA, Vector3 PosB)
 Vector2 Math::WorldToScreen(const Vector3 &WorldPos)
 {
 	// 3Dを2D座標にする
-	//ラムダ式Min~Maxの範囲に抑える　
-	auto Clamp = [](float val, float Min, float Max){
-		return min(Max, max(val, Min));
-	};
 	Matrix m = matView * matProjection;
 
 	Vector2 ret;
@@ -336,6 +332,27 @@ Vector2 Math::WorldToScreen(const Vector3 &WorldPos)
 
 	ret.x = (ret.x + 1) * (tdnSystem::GetScreenSize().right / 2);
 	ret.y = (((ret.y * -1) + 1) * (tdnSystem::GetScreenSize().bottom / 2));
+
+	return ret;
+}
+
+Vector2 Math::WorldToProj(const Vector3 & WorldPos)
+{
+	// 3Dを2D座標にする
+	Matrix m = matView * matProjection;
+
+	Vector2 ret;
+	ret.x = WorldPos.x * m._11 + WorldPos.y * m._21 + WorldPos.z * m._31 + 1 * m._41;
+	ret.y = WorldPos.x * m._12 + WorldPos.y * m._22 + WorldPos.z * m._32 + 1 * m._42;
+	float w = WorldPos.x * m._14 + WorldPos.y * m._24 + WorldPos.z * m._34 + 1 * m._44;
+
+	if (w == 0) ret.x = ret.y = 0;
+	else {
+		ret.x /= w;
+		ret.y /= w;
+	}
+	ret.x = Clamp(ret.x, -1.0f, 1.0f);
+	ret.y = Clamp(ret.y, -1.0f, 1.0f);
 
 	return ret;
 }
@@ -439,13 +456,6 @@ void Math::Bezier(float *out, float FloatArray[], int NumArray, float percentage
 	float b = percentage;
 	float a = 1 - b;
 
-	/*				//		参考資料		//
-	//ベジェ曲線↓　まず　　最初と中間　　　　次に　　　　中間と最後
-	pos->x = a*a*a* p1.x + 3 * a*a*b*p2.x + 3 * a*b*b*p2.x + b*b*b*p3.x;
-	pos->y = a*a*a* p1.y + 3 * a*a*b*p2.y + 3 * a*b*b*p2.y + b*b*b*p3.y;
-	pos->z = a*a*a* p1.z + 3 * a*a*b*p2.z + 3 * a*b*b*p2.z + b*b*b*p3.z;
-	*/
-
 	// 2点間の直線の場合、ベジエ計算をするとおかしくなるので、割合による直線の計算にする
 	if (NumArray == 2)
 	{
@@ -469,6 +479,45 @@ void Math::Bezier(float *out, float FloatArray[], int NumArray, float percentage
 
 	// 終点
 	*out += FloatArray[NumArray - 1] * (float)pow(b, NumArray);
+}
+void Math::Bezier(ViewData *out, ViewData InfoArray[], int NumArray, float percentage)
+{
+	assert(NumArray > 0);
+
+	float b = percentage;
+	float a = 1 - b;
+
+	// 2点間の直線の場合、ベジエ計算をするとおかしくなるので、割合による直線の計算にする
+	if (NumArray == 2)
+	{
+		out->pos = InfoArray[0].pos * a + InfoArray[1].pos * b;
+		out->target = InfoArray[0].target * a + InfoArray[1].target * b;
+		out->roll = InfoArray[0].roll * a + InfoArray[1].roll * b;
+		return;
+	}
+
+	// 始点
+	out->pos = InfoArray[0].pos * (float)pow(a, NumArray);
+	out->target = InfoArray[0].target * (float)pow(a, NumArray);
+	out->roll = InfoArray[0].roll * (float)pow(a, NumArray);
+
+	// 中間
+	for (int i = 1; i < NumArray - 1; i++)	// -1なのは終点を省くから
+	{
+		float mult = b;
+		for (int j = 1; j < NumArray - 1; j++)
+		{
+			mult *= (j >= i) ? a : b;
+		}
+		out->pos += InfoArray[i].pos * (NumArray * mult);
+		out->target += InfoArray[i].target * (NumArray * mult);
+		out->roll += InfoArray[i].roll * (NumArray * mult);
+	}
+
+	// 終点
+	out->pos += InfoArray[NumArray - 1].pos * (float)pow(b, NumArray);
+	out->target += InfoArray[NumArray - 1].target * (float)pow(b, NumArray);
+	out->roll += InfoArray[NumArray - 1].roll * (float)pow(b, NumArray);
 }
 
 // 補間
