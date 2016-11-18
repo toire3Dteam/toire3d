@@ -9,7 +9,10 @@
 //*****************************************************************************
 
 // キャラクターのタイプ
-enum class CHARACTER { AIROU, END };
+enum class CHARACTER { AIROU, TEKI, END };
+
+// パートナーのタイプ
+enum class PARTNER { MOKOI, MAYA, END };
 
 // ステージのタイプ
 enum class STAGE { SENJO, SYUTEN, A, HEAVE_HO, MAX };

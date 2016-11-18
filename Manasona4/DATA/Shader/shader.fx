@@ -387,7 +387,7 @@ VS_DEFERRED VS_G_Buffer(VS_INPUT In)
 
 	// 頂点スクリーン座標系算出
 	float3	vx;
-	float3	vy = { .0f, 1.0f, 0.0001f };			// 仮のy方向ベクトル  0.001f は　外積を成功させる為にずらしている　同じ値で外積すると0ベクトルになる
+	float3	vy = { .0f, 1.0f, 0.5f };			// 仮のy方向ベクトル  0.001f は　外積を成功させる為にずらしている　同じ値で外積すると0ベクトルになる
 
 	vx = cross(N, vy);
 	vx = normalize(vx);

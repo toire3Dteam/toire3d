@@ -281,6 +281,11 @@ bool SceneMenuState::BattleControllerSelectStep::PadUpdate(sceneMenu *pMain, int
 			// (★)誰も選んでないのでAIフラグをONにする
 			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = true;
 		}
+		else
+		{
+			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = false;
+			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = false;
+		}
 
 		// SEの再生
 		se->Play("決定1");

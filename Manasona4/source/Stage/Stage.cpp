@@ -82,13 +82,16 @@ void Stage::Base::Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2)
 void Stage::Senjo::Initialize(Camera *pCamera)
 {
 	//m_pObj = new iexMesh("DATA/Stage/Senjo/pupupu2.IMO");
-	m_pObj = new iexMesh("DATA/Stage/Stage/sandStage.IMO");
+	//m_pObj = new iexMesh("DATA/Stage/Stage/sandStage.IMO");
+	m_pObj = new iexMesh("DATA/Stage/Sister/stage.IMO");
 	//m_pObj->SetScale(2);
 	//m_pObj->Update();
 
 	m_pBack = new iexMesh("DATA/Stage/Senjo/Skydome.IMO");
 	m_pBack->SetPos(Vector3(0, 0, 300));
 	m_pBack->SetScale(3.5f);
+	//m_pBack->SetPos(Vector3(0, 0, 300));
+	//m_pBack->SetScale(5.5f);
 	m_pBack->Update();
 	m_fBottom = 0;
 	m_fWidth = 150;

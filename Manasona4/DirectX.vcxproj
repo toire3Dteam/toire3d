@@ -166,8 +166,13 @@
     <ClCompile Include="source\Scene\SceneMenuState.cpp" />
     <ClCompile Include="source\Scene\sceneRenderingTest.cpp" />
     <ClCompile Include="source\Scene\sceneResult.cpp" />
+    <ClCompile Include="source\Scene\SceneSelect.cpp" />
+    <ClCompile Include="source\Scene\SceneSelectState.cpp" />
     <ClCompile Include="source\Scene\sceneTitle.cpp" />
     <ClCompile Include="source\Scene\sceneTutorial.cpp" />
+    <ClCompile Include="source\SelectUI\SelectUIManager.cpp" />
+    <ClCompile Include="source\SelectUI\SelectUI.cpp" />
+    <ClCompile Include="source\SelectUI\SelectUIState.cpp" />
     <ClCompile Include="source\Stage\OverDriveStage\OverDriveStage.cpp" />
     <ClCompile Include="source\Stage\Stage.cpp" />
     <ClCompile Include="source\Stand\Stand.cpp" />
@@ -202,7 +207,7 @@
     <ClCompile Include="TDN\TDN_File.cpp">
       <DeploymentContent>false</DeploymentContent>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="TDN\TDN_Font.cpp" />
     <ClCompile Include="TDN\TDN_Input.cpp" />
@@ -291,8 +296,13 @@
     <ClInclude Include="source\Scene\SceneMenuState.h" />
     <ClInclude Include="source\Scene\sceneRenderingTest.h" />
     <ClInclude Include="source\Scene\sceneResult.h" />
+    <ClInclude Include="source\Scene\SceneSelect.h" />
+    <ClInclude Include="source\Scene\SceneSelectState.h" />
     <ClInclude Include="source\Scene\sceneTitle.h" />
     <ClInclude Include="source\Scene\sceneTutorial.h" />
+    <ClInclude Include="source\SelectUI\SelectUIManager.h" />
+    <ClInclude Include="source\SelectUI\SelectUI.h" />
+    <ClInclude Include="source\SelectUI\SelectUIState.h" />
     <ClInclude Include="source\Sound\BattleMusic.h" />
     <ClInclude Include="source\Stage\OverDriveStage\OverDriveStage.h" />
     <ClInclude Include="source\Stage\Stage.h" />

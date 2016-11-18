@@ -500,8 +500,8 @@ void sceneMain::Render()
 
 	//com->Render(400, 400);
 
-	//tdnText::Draw(0, 30, 0xffffffff, "CameraPos    : %.1f %.1f %.1f", CameraMgr->m_pos.x, CameraMgr->m_pos.y, CameraMgr->m_pos.z);
-	//tdnText::Draw(0, 60, 0xffffffff, "CameraTarget : %.1f %.1f %.1f", CameraMgr->m_target.x, CameraMgr->m_target.y, CameraMgr->m_target.z);
+	//tdnText::Draw(0, 30, 0xffffffff, "CameraPos    : %.8f %.8f %.8f", CameraMgr->m_ViewData.pos.x, CameraMgr->m_ViewData.pos.y, CameraMgr->m_ViewData.pos.z);
+	//tdnText::Draw(0, 60, 0xffffffff, "CameraTarget : %.8f %.8f %.8f", CameraMgr->m_ViewData.target.x, CameraMgr->m_ViewData.target.y, CameraMgr->m_ViewData.target.z);
 	//tdnText::Draw(0, 90, 0xffffffff, "CameraEvent  : %d", CameraMgr->GetEventFrame());
 }
 
@@ -547,7 +547,7 @@ void sceneMain::RenderShadow()
 void sceneMain::SurfaceRender()
 {
 	enum {
-		X = 320 / 2, Y = 180 / 2
+		X = 320 , Y = 180 
 	};
 
 	int texX = 0;

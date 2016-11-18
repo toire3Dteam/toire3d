@@ -15,7 +15,7 @@ bool SquatCancel(BasePlayer * pPerson);
 bool SquatAttackCancel(BasePlayer * pPerson);
 bool StandCancel(BasePlayer * pPerson);
 bool AttackCancel(BasePlayer *pPerson);
-bool FinishAttackCancel(BasePlayer *pPerson);
+bool InvincibleAttackCancel(BasePlayer *pPerson);
 bool SkillCancel(BasePlayer *pPerson);
 bool OverDriveCancel(BasePlayer *pPerson);
 bool EscapeCancel(BasePlayer *pPerson);

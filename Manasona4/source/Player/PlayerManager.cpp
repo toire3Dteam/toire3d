@@ -480,7 +480,7 @@ bool PlayerManager::CollisionThrowAttack(BasePlayer *my, BasePlayer *you)
 		// 掴み成功したよとメッセージを送る
 		MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, my->GetID(), MESSAGE_TYPE::THROW_SUCCESS, nullptr);
 
-		// そして、掴まれた人に送信
+		// 掴まれたメッセージ
 		MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, you->GetID(), MESSAGE_TYPE::BE_THROWN, nullptr);
 
 		// 掴みSEをここで再生

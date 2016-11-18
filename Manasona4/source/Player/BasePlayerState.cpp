@@ -161,7 +161,7 @@ bool AttackCancel(BasePlayer *pPerson)
 	else return false;
 }
 
-bool FinishAttackCancel(BasePlayer *pPerson)
+bool InvincibleAttackCancel(BasePlayer *pPerson)
 {
 	// 攻撃キャンセル
 	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R2, true))
@@ -226,7 +226,7 @@ bool OverDriveCancel(BasePlayer *pPerson)
 
 bool EscapeCancel(BasePlayer *pPerson)
 {
-	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R2, true))
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R1, true))
 	{
 		// 先行入力リセット
 		pPerson->AheadCommandReset();
@@ -538,14 +538,14 @@ bool isPossibleGuardState(BasePlayer *pPerson)
 		//pState->isInState(*BasePlayerState::Fall::GetInstance()) ||
 		pState->isInState(*BasePlayerState::Squat::GetInstance()));
 	
-	if (!bGuardState)
-	{
-		if (pState->isInState(*BasePlayerState::Jump::GetInstance()))
-		{
-			// ★ジャンプの瞬間のガードできないフレーム
-			if (!pPerson->GetJump()->bHold) bGuardState = true;
-		}
-	}
+	//if (!bGuardState)
+	//{
+	//	if (pState->isInState(*BasePlayerState::Jump::GetInstance()))
+	//	{
+	//		// ★ジャンプの瞬間のガードできないフレーム
+	//		if (!pPerson->GetJump()->bHold) bGuardState = true;
+	//	}
+	//}
 
 	return bGuardState;
 }
@@ -888,6 +888,8 @@ void BasePlayerState::Wait::Enter(BasePlayer * pPerson)
 	// 待機モーションに変える
 	pPerson->SetMotion(MOTION_TYPE::WAIT);
 
+	//	アングル補間
+	pPerson->SetDirAngle();
 }
 
 void BasePlayerState::Wait::Execute(BasePlayer * pPerson)
@@ -925,7 +927,7 @@ void BasePlayerState::Wait::Execute(BasePlayer * pPerson)
 	//////////////////////////////////////////////
 	//	フィニッシュ攻撃ボタン
 	//============================================
-	if (FinishAttackCancel(pPerson)) return;
+	if (InvincibleAttackCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	スタンドキャンセル
@@ -1036,7 +1038,7 @@ void BasePlayerState::Walk::Execute(BasePlayer * pPerson)
 	//////////////////////////////////////////////
 	//	フィニッシュ攻撃ボタン
 	//============================================
-	if (FinishAttackCancel(pPerson)) return;
+	if (InvincibleAttackCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	攻撃キャンセル
@@ -1212,7 +1214,7 @@ void BasePlayerState::BackWalk::Execute(BasePlayer * pPerson)
 	//////////////////////////////////////////////
 	//	フィニッシュ攻撃ボタン
 	//============================================
-	if (FinishAttackCancel(pPerson)) return;
+	if (InvincibleAttackCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	攻撃キャンセル
@@ -1410,7 +1412,7 @@ void BasePlayerState::Run::Execute(BasePlayer * pPerson)
 	//////////////////////////////////////////////
 	//	フィニッシュ攻撃ボタン
 	//============================================
-	if (FinishAttackCancel(pPerson)) return;
+	if (InvincibleAttackCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	しゃがみキャンセル
@@ -1607,8 +1609,7 @@ void BasePlayerState::BackStep::Execute(BasePlayer * pPerson)
 
 void BasePlayerState::BackStep::Exit(BasePlayer * pPerson)
 {
-
-
+	pPerson->SetEscapeFlag(false);
 }
 
 void BasePlayerState::BackStep::Render(BasePlayer * pPerson)
@@ -1822,6 +1823,8 @@ void BasePlayerState::Jump::Enter(BasePlayer * pPerson)
 
 	// しゃがみフラグ初期化
 	pPerson->GetJump()->Clear();
+
+	pPerson->SetDirAngle();
 }
 
 void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
@@ -1943,7 +1946,7 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 		//////////////////////////////////////////////
 		//	フィニッシュ攻撃ボタン
 		//============================================
-		if (FinishAttackCancel(pPerson)) return;
+		if (InvincibleAttackCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	スタンドキャンセル
@@ -2076,7 +2079,7 @@ void BasePlayerState::AerialJump::Execute(BasePlayer * pPerson)
 	//////////////////////////////////////////////
 	//	フィニッシュ攻撃ボタン
 	//============================================
-	if (FinishAttackCancel(pPerson)) return;
+	if (InvincibleAttackCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	左入力
@@ -2182,7 +2185,7 @@ void BasePlayerState::Fall::Execute(BasePlayer * pPerson)
 	//////////////////////////////////////////////
 	//	フィニッシュ攻撃ボタン
 	//============================================
-	if (FinishAttackCancel(pPerson)) return;
+	if (InvincibleAttackCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	スタンドキャンセル
@@ -2281,7 +2284,7 @@ void BasePlayerState::Land::Execute(BasePlayer * pPerson)
 		//////////////////////////////////////////////
 		//	フィニッシュ攻撃ボタン
 		//============================================
-		if (FinishAttackCancel(pPerson)) return;
+		if (InvincibleAttackCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	スタンドキャンセル
@@ -2876,7 +2879,7 @@ void BasePlayerState::LandRecovery::Execute(BasePlayer * pPerson)
 	if (iRecoveryCount >= BasePlayer::c_RECOVERY_FLAME)
 	{
 		// リバサ無敵
-		if (FinishAttackCancel(pPerson)) return;
+		if (InvincibleAttackCancel(pPerson)) return;
 
 		// 小パン暴れ
 		if (AttackCancel(pPerson)) return;
@@ -3048,7 +3051,7 @@ void BasePlayerState::Squat::Execute(BasePlayer * pPerson)
 	//////////////////////////////////////////////
 	//	逆切れキャンセル
 	//============================================
-	if (FinishAttackCancel(pPerson)) return;
+	if (InvincibleAttackCancel(pPerson)) return;
 
 	// しゃがみボタンを離したら待機に戻る
 	if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN) == false)
@@ -4037,7 +4040,7 @@ void BasePlayerState::OverDrive_OneMore::Execute(BasePlayer * pPerson)
 		//////////////////////////////////////////////
 		//	フィニッシュ攻撃ボタン
 		//============================================
-		if (FinishAttackCancel(pPerson)) return;
+		if (InvincibleAttackCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	スタンドキャンセル
@@ -4252,7 +4255,7 @@ void BasePlayerState::Guard::Execute(BasePlayer * pPerson)
 		//////////////////////////////////////////////
 		//	逆切れキャンセル
 		//============================================
-		if (FinishAttackCancel(pPerson)) return;
+		if (InvincibleAttackCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	ダッシュキャンセル
@@ -4375,11 +4378,11 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 										 // 懇親の
 										 if (pPerson->GetTargetPlayer()->GetDir() == DIR::RIGHT)
 										 {
-											 pPerson->GetTargetPlayer()->SetMove(Vector3(-0.025f, 0, 0));
+											 pPerson->GetTargetPlayer()->SetMove(Vector3(-0.001f, 0, 0));
 										 }
 										 else
 										 {
-											 pPerson->GetTargetPlayer()->SetMove(Vector3(0.025f, 0, 0));
+											 pPerson->GetTargetPlayer()->SetMove(Vector3(0.001f, 0, 0));
 										 }
 
 										 // コンボ用

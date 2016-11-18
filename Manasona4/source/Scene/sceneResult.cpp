@@ -72,9 +72,6 @@ bool sceneResult::Initialize()
 	m_FrontScreen = new tdn2DObj(tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom, TDN2D::USEALPHA);
 	m_AllScreen = new tdn2DObj(tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom, TDN2D::RENDERTARGET);
 
-	// BackBuffer‚Ì•Û‘¶
-	tdnSystem::GetDevice()->GetRenderTarget(0, &m_pBackBuffer);
-
 	// ŸŽÒ
 	switch ((SelectDataMgr->Get()->tagSideDatas[(int)m_WinnerSide].CharacterType))
 	{
@@ -333,6 +330,11 @@ void sceneResult::Update()
 
 void sceneResult::Render()
 {
+
+	// BackBuffer‚Ì•Û‘¶
+	tdnSystem::GetDevice()->GetRenderTarget(0, &m_pBackBuffer);
+
+
 #ifdef USE_EFFECT_CAMERA
 	//CameraMgr->Activate();
 	tdnView::Activate();
@@ -341,6 +343,7 @@ void sceneResult::Render()
 	tdnView::Activate();
 	tdnView::Clear();
 #endif
+
 
 	WaveRender();
 

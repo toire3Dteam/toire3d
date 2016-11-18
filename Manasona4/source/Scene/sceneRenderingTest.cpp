@@ -29,6 +29,8 @@
 
 iexMesh* g_stage;
 iexMesh* g_sky;
+iexMesh* g_test;
+
 tdn3DObj* g_airou;
 
 tdn2DObj* g_ScrennShot;
@@ -63,7 +65,7 @@ bool sceneRenderingTest::Initialize()
 {
 	m_pPanel = new AirouWindEffect();
 
-
+	g_test = new iexMesh("Data/test.imo");
 
 	m_pSpeedLine = new SpeedLineGreenEffect();
 	m_pSpeedLine->ActionRoop(Vector3(0, 0, 0), 0.5f, 0.5f);
@@ -100,7 +102,7 @@ bool sceneRenderingTest::Initialize()
 	//Effect2DMgr;
 	//Effect2DMgr.AddNode();
 	
-	g_stage = new iexMesh("Data/Stage/Stage/sandstage.IMO");
+	g_stage = new iexMesh("Data/Stage/Sister/iwym.IMO");
 	g_sky = new iexMesh("Data/Stage/senjo/Skydome.IMO");
 	g_sky->SetScale(2.5f);
 	g_sky->SetPos(Vector3(0, -30, 0));
@@ -176,11 +178,14 @@ void sceneRenderingTest::Update()
 	static float cameraRange= 100;
 
 	// アングル
-	if (KeyBoard(KB_A)) { cameraAngle -= 0.05f; }
-	if (KeyBoard(KB_D)) { cameraAngle += 0.05f; }
+	if (KeyBoard(KB_A)) { cameraAngle -= 0.1f; }
+	if (KeyBoard(KB_D)) { cameraAngle += 0.1f; }
 
 	if (KeyBoard(KB_W)) { cameraRange -= 1; }
 	if (KeyBoard(KB_S)) { cameraRange += 1; }
+
+	if (KeyBoard(KB_Q)) { m_camera.pos.y -= 1.0f; }
+	if (KeyBoard(KB_E)) { m_camera.pos.y += 1.0f; }
 
 	m_camera.pos.x = sinf(cameraAngle) * cameraRange;
 	m_camera.pos.z = cosf(cameraAngle) * cameraRange;
@@ -384,6 +389,8 @@ void sceneRenderingTest::Render()
 		// ステージ描画
 		g_stage->Render(shaderM, "G_Buffer");
 
+		g_test->Render(shaderM, "G_Buffer");
+
 		// シェーダ終わり
 		DeferredManagerEx.G_End();
 
@@ -416,6 +423,8 @@ void sceneRenderingTest::Render()
 			m_pSpeedLine->Render();
 
 			m_pPanel->Render3D();
+
+			g_test->Render(shaderM, "DefaultLighting");
 
 			HeaveHoFinishUI->Render();
 
@@ -492,7 +501,7 @@ void sceneRenderingTest::Render()
 	}
 	else
 	{
-
+		g_test->Render();
 
 	}
 
@@ -531,7 +540,7 @@ void sceneRenderingTest::RenderShadow()
 void sceneRenderingTest::SurfaceRender()
 {
 	enum {
-		X = 320 / 2, Y = 180 / 2
+		X = 320 , Y = 180
 	};
 
 	int texX = 0;

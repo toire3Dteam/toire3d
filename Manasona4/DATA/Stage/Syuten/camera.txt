@@ -1,6 +1,6 @@
 TYPE: SUMABURA
 RangeXY: 320 200
-FullZ: -200
+FullZ: -120
 FullY: 22
-MoveMaxXY: 150 165
-MoveMinXY: -250 -50
+MoveMaxXY: 50 100
+MoveMinXY: -50 15

@@ -6,6 +6,7 @@
 #include	"../Scene/sceneTitle.h"
 #include	"../Scene/SceneMenu.h"
 #include	"../Scene/SceneCollect.h"
+#include	"../Scene/SceneSelect.h"
 #include	"System.h"
 #include	"../Sound/SoundManager.h"
 #include	"../Data/PlayerData.h"
@@ -52,9 +53,9 @@ BOOL InitApp(HINSTANCE hInstance, int nCmdShow)									// ƒQ[ƒ€‹N“®Žž‚ÌÅ‰‚Ì
 	//MainFrameEx->ChangeScene(new sceneResult); // ƒŠƒUƒ‹ƒgƒV[ƒ“
 	//MainFrameEx->ChangeScene(new sceneEffectTool); // 
 	//MainFrameEx->ChangeScene(new sceneTitle);
-	MainFrameEx->ChangeScene(new sceneMenu);
+	//MainFrameEx->ChangeScene(new sceneMenu);
 	//MainFrameEx->ChangeScene(new sceneCollect);
-	
+	MainFrameEx->ChangeScene(new sceneSelect);
 	// ƒf[ƒ^
 	PlayerDataMgr->Initialize();
 
