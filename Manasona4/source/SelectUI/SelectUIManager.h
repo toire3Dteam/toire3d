@@ -17,6 +17,22 @@ public:
 
 	void FirstAction();// 最初の演出
 
+	// 両方選択したか
+	bool IsOK()
+	{
+		if (m_pLeftSide->IsOK() == true &&
+			m_pRightSide->IsOK() == true)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+
+	};
+
+
 private:
 	// (TODO) 両サイド分　SelectUI
 	SelectUI* m_pLeftSide;
@@ -25,17 +41,17 @@ private:
 
 	// 共通の画像
 	// 画像
-	enum PIC_TYPE
-	{
-		BG,
-		TITLE,
-		BLACK_LINE,
-		INFO_PLATE,
-		//INFO_BOX_LEFT,
-		//INFO_BOX_RIGHT,
-		ARRAY_END,
-	};
-	tdn2DAnim* m_pPic[PIC_TYPE::ARRAY_END];
+	//enum PIC_TYPE
+	//{
+	//	BG,
+	//	TITLE,
+	//	BLACK_LINE,
+	//	INFO_PLATE,
+	//	//INFO_BOX_LEFT,
+	//	//INFO_BOX_RIGHT,
+	//	ARRAY_END,
+	//};
+	//tdn2DAnim* m_pPic[PIC_TYPE::ARRAY_END];
 
 	// キャラクター分のアイコン
 	tdn2DAnim* m_pCharacterIcon[(int)CHARACTER::END];

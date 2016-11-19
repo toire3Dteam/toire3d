@@ -39,6 +39,9 @@ public:
 	void Update();
 	//描画
 	void Render();
+	void StageAndBGMRender();
+
+	void FirstAction();
 
 	// ステートマシン取得
 	StateMachine<sceneSelect> *GetFSM() { return m_pStateMachine; }
@@ -62,8 +65,50 @@ private:
 
 	StateMachine<sceneSelect> *m_pStateMachine;	// ステートマシン
 												
+												// 画像
+	enum PIC_TYPE
+	{
+		BG,
+		TITLE,
+		BLACK_LINE,
+		INFO_PLATE,
+		ARRAY_END,
+	};
+	tdn2DAnim* m_pPic[PIC_TYPE::ARRAY_END];
+
+	int m_iRectAlpha;
+
+	// ステージとBGMの選択番号
+	static int m_iSelectStageNo;
+	static int m_iSelectBGMNo;
+
+	// ステージとBGM
+	// 画像はっつけるだけ
+	struct SECOND_SELECT
+	{
+		int iX, iY;
+
+		bool bBGMSelect;	
+
+		tdn2DObj* pPlate;
+		tdn2DObj* pStagePlate;
+		tdn2DObj* pBGMPlate;
+		tdn2DObj* pStagePic;
+
+		// 矢印
+		tdn2DObj* pArrow;
+
+		tdn2DAnim* pStageLeftRip;
+		tdn2DAnim* pStageRightRip;			 
+		tdn2DAnim* pBGMLeftRip;
+		tdn2DAnim* pBGMRightRip;
+	};
+
+	SECOND_SELECT m_tagSecondSelect;
+
 
 	// 奇跡のフレンドクラスの使い道
-	//friend class SceneSelectState::FirstStep;	
-
+	friend class SceneSelectState::Intro;	
+	friend class SceneSelectState::CharaSelect;
+	friend class SceneSelectState::StageAndBGM;
 };

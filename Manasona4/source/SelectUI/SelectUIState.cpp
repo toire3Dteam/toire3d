@@ -231,7 +231,7 @@ void SelectUIState::SecondStep::Execute(SelectUI *pMain)
 	if (tdnInput::KeyGet(KEYCODE::KEY_B, pMain->m_iDeviceID) == 3)
 	{
 
-		pMain->GetFSM()->ChangeState(OKStep::GetInstance());
+		pMain->GetFSM()->ChangeState(SecondToOKStep::GetInstance());
 		return;
 	}
 	
@@ -274,16 +274,18 @@ bool SelectUIState::SecondStep::OnMessage(SelectUI *pMain, const Message & msg)
 
 void SelectUIState::SecondToOKStep::Enter(SelectUI *pMain)
 {
-	pMain->ActionOKStep();
-
+	// 演出
+	pMain->SecondToOKAction();
+	pMain->m_iWaitFrame = 0;
 }
 void SelectUIState::SecondToOKStep::Execute(SelectUI *pMain)
 {
-	// 戻る
-	if (tdnInput::KeyGet(KEYCODE::KEY_A, pMain->m_iDeviceID) == 3)
+	pMain->m_iWaitFrame++;
+
+	if (pMain->m_iWaitFrame >= 24)
 	{
-		pMain->BackOKStep();
-		pMain->GetFSM()->ChangeState(SecondStep::GetInstance());
+		pMain->m_iWaitFrame = 0;
+		pMain->GetFSM()->ChangeState(OKStep::GetInstance());
 		return;
 	}
 
@@ -319,6 +321,9 @@ void SelectUIState::OKStep::Enter(SelectUI *pMain)
 {
 	pMain->ActionOKStep();
 
+	// 準備完了フラグをON！
+	pMain->m_bOK = true;
+
 }
 void SelectUIState::OKStep::Execute(SelectUI *pMain)
 {
@@ -334,7 +339,8 @@ void SelectUIState::OKStep::Execute(SelectUI *pMain)
 
 void SelectUIState::OKStep::Exit(SelectUI *pMain)
 {
-	
+	// 準備完了フラグをOFF
+	pMain->m_bOK = false;
 }
 
 void SelectUIState::OKStep::Render(SelectUI *pMain)

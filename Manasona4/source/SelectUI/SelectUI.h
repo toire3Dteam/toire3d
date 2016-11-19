@@ -48,6 +48,8 @@ public:
 
 	void MiddleAction();
 
+	void SecondToOKAction();
+
 	// ステートマシン取得
 	StateMachine<SelectUI> *GetFSM() { return m_pStateMachine; }
 
@@ -63,6 +65,8 @@ public:
 	{
 		return m_iSelectPartnerNo;
 	}
+
+	bool IsOK() { return m_bOK; }
 
 private:
 
@@ -87,6 +91,7 @@ private:
 	SelectPicture m_tagCharaName[(int)CHARACTER::END];// キャラクター分の名前
 
 	SelectPicture m_tagPartnerPic[(int)PARTNER::END];// パートナー分の画像
+	SelectPicture m_tagPartnerPicRip[(int)PARTNER::END];// パートナー分の波紋
 	SelectPicture m_tagPartnerInfo[(int)PARTNER::END];// パートナー分の説明
 	SelectPicture m_tagPartnerName[(int)PARTNER::END];// パートナー分の名前
 	SelectPicture m_tagPartneSirclePic[(int)PARTNER::END];// パートナー分の最後の画像
@@ -104,9 +109,15 @@ private:
 	// 選択カーソル
 	SelectPicture m_pSelect;
 
+	// 最後のOK!の文字
+	SelectPicture m_tagOKfont;
+
 	// タイマー
 	int m_iWaitFrame;
-
+	
+	// OKフラグ
+	bool m_bOK;
+	//このOKふらぐでうんたら
 	// ステートマシンは中も触れるように
 	// フレンド
 	friend class SelectUIState::Intro;

@@ -44,12 +44,12 @@ namespace SceneSelectState
 		Intro& operator=(const Intro&) {}
 	};
 
-	//--------------------最初の選択
-	class FirstStep : public State<sceneSelect>
+	//--------------------キャラクターの選択
+	class CharaSelect : public State<sceneSelect>
 	{
 	public:
 		// this is a シングルトン
-		static FirstStep* GetInstance() { static FirstStep state; return &state; }
+		static CharaSelect* GetInstance() { static CharaSelect state; return &state; }
 
 		// 入る
 		virtual void Enter(sceneSelect* pMain);
@@ -67,11 +67,44 @@ namespace SceneSelectState
 		virtual bool OnMessage(sceneSelect* pMain, const Message& msg);
 
 	private:
-		FirstStep() {};
-		~FirstStep() {};
+		CharaSelect() {};
+		~CharaSelect() {};
 
-		FirstStep(const FirstStep&) {}
-		FirstStep& operator=(const FirstStep&) {}
+		CharaSelect(const CharaSelect&) {}
+		CharaSelect& operator=(const CharaSelect&) {}
+
+		bool PadUpdate(sceneSelect* pMain, int DeviceID);
+	};
+
+
+	//--------------------ステージ＆BGMの選択
+	class StageAndBGM : public State<sceneSelect>
+	{
+	public:
+		// this is a シングルトン
+		static StageAndBGM* GetInstance() { static StageAndBGM state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneSelect* pMain);
+
+		// 実行します
+		virtual void Execute(sceneSelect* pMain);
+
+		// 帰る
+		virtual void Exit(sceneSelect* pMain);
+
+		// 描画
+		virtual void Render(sceneSelect* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneSelect* pMain, const Message& msg);
+
+	private:
+		StageAndBGM() {};
+		~StageAndBGM() {};
+
+		StageAndBGM(const StageAndBGM&) {}
+		StageAndBGM& operator=(const StageAndBGM&) {}
 
 		bool PadUpdate(sceneSelect* pMain, int DeviceID);
 	};
