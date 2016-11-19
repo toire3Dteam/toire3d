@@ -32,6 +32,31 @@ public:
 
 	};
 
+	// ★★★お互いの選択したキャラとパートナーを取得するアクセサ
+	int GetSelectCharacter(SIDE side) 
+	{
+		if (side == SIDE::LEFT)
+		{
+			return m_pLeftSide->GetSelectCharacter();
+		}
+		else
+		{
+			return m_pRightSide->GetSelectCharacter();
+		}
+	}
+
+	int GetSelectPartner(SIDE side)
+	{
+		if (side == SIDE::LEFT)
+		{
+			return m_pLeftSide->GetSelectPartner();
+		}
+		else
+		{
+			return m_pRightSide->GetSelectPartner();
+		}
+	}
+
 
 private:
 	// (TODO) 両サイド分　SelectUI

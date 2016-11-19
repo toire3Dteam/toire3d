@@ -56,6 +56,7 @@ public:
 	// メッセージ受信(BaseEntityによるオーバーライド)
 	bool  HandleMessage(const Message& msg) { return m_pStateMachine->HandleMessage(msg); }
 
+	// ★★★選択したキャラとパートナーを取得するアクセサ
 	int GetSelectCharacter()
 	{
 		return m_iSelectCharacterNo;

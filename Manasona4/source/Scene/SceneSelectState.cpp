@@ -2,6 +2,7 @@
 #include "SceneSelect.h"
 #include "SceneSelectState.h"
 #include "SceneCollect.h"
+#include "SceneMain.h"
 #include "../BaseEntity/Message/Message.h"
 #include "../Fade/Fade.h"
 #include "../Sound/SoundManager.h"
@@ -210,6 +211,13 @@ bool SceneSelectState::StageAndBGM::PadUpdate(sceneSelect *pMain, int DeviceID)
 		}
 	}
 
+	// ○で完了
+	if (tdnInput::KeyGet(KEYCODE::KEY_B, DeviceID) == 3)
+	{
+		// 次のステートへ
+		pMain->GetFSM()->ChangeState(SceneSelectState::End::GetInstance());
+		bChangedState = true;
+	}
 
 	return bChangedState;
 }
@@ -229,6 +237,60 @@ void SceneSelectState::StageAndBGM::Render(sceneSelect *pMain)
 }
 
 bool SceneSelectState::StageAndBGM::OnMessage(sceneSelect *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+
+	//default:
+	//	break;
+	//}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
+
+
+/*******************************************************/
+//					おわり（メインへ）
+/*******************************************************/
+
+void SceneSelectState::End::Enter(sceneSelect *pMain)
+{
+	pMain->m_iRectAlpha = 0;
+	// フェード初期化
+	Fade::Set(Fade::FLAG::FADE_OUT, 8, 0xFF000000);
+
+}
+
+void SceneSelectState::End::Execute(sceneSelect *pMain)
+{
+	// メインへ
+	if (Fade::isFadeOutCompletion())
+	{
+		MainFrameEx->ChangeScene(new sceneMain());
+		return;
+	}
+
+}
+
+bool SceneSelectState::End::PadUpdate(sceneSelect *pMain, int DeviceID)
+{
+	bool bChangedState(false);
+
+	return bChangedState;
+}
+
+void SceneSelectState::End::Exit(sceneSelect *pMain)
+{
+}
+
+void SceneSelectState::End::Render(sceneSelect *pMain)
+{
+	tdnText::Draw(0, 0, 0xffffffff, "End");
+}
+
+bool SceneSelectState::End::OnMessage(sceneSelect *pMain, const Message & msg)
 {
 	// メッセージタイプ
 	//switch (msg.Msg)

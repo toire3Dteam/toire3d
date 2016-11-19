@@ -65,7 +65,7 @@ private:
 
 	StateMachine<sceneSelect> *m_pStateMachine;	// ステートマシン
 												
-												// 画像
+	// 画像
 	enum PIC_TYPE
 	{
 		BG,
@@ -106,9 +106,9 @@ private:
 
 	SECOND_SELECT m_tagSecondSelect;
 
-
-	// 奇跡のフレンドクラスの使い道
+	// フレンド
 	friend class SceneSelectState::Intro;	
 	friend class SceneSelectState::CharaSelect;
 	friend class SceneSelectState::StageAndBGM;
+	friend class SceneSelectState::End;
 };
