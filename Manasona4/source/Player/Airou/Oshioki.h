@@ -29,23 +29,6 @@ namespace OshiokiAirou
 		bool m_bErase;			// 消去フラグ
 		float c_SPEED;	// 移動速度
 		const float c_APP_RADIUS;	// くらってるやつに対する初期座標の半径
-		void SetTransMatrixMoveVec(Matrix &out)
-		{
-			Matrix m;
-			Math::LookAtLH(m, m_vPos, m_vPos + m_vMoveVec, Vector3(0, 1, 0));
-			out._11 = m._11;
-			out._12 = m._21;
-			out._13 = m._31;
-			out._21 = m._12;
-			out._22 = m._22;
-			out._23 = m._32;
-			out._31 = m._13;
-			out._32 = m._23;
-			out._33 = m._33;
-			out._41 = m_vPos.x;
-			out._42 = m_vPos.y;
-			out._43 = m_vPos.z;
-		}
 	};
 
 	class OverDrive : public Base
@@ -161,7 +144,7 @@ namespace OshiokiAirou
 		void Render(iex3DObj *pObj)
 		{
 			// 向き&作成
-			Base::SetTransMatrixMoveVec(pObj->TransMatrix);
+			Math::SetTransMatrixFrontVec(&pObj->TransMatrix, m_vPos, m_vMoveVec);
 
 			//MyAssert(pObj->GetPos().x != 0 && pObj->GetPos().y != 0 && pObj->GetPos().z != 0, "おしおきアイルーが原点にいる");
 

@@ -11,7 +11,7 @@ namespace OshiokiManager
 class Airou : public BasePlayer
 {
 public:
-	Airou(int deviceID, SIDE side, bool bAI);
+	Airou(SIDE side, const SideData &data);
 	~Airou();
 	void Update(bool bControl)override;
 	void Render()override;

@@ -27,6 +27,7 @@ namespace Stage
 {
 	class Base;
 }
+struct SideData;
 
 // 定数
 enum class PLAYER_INPUT
@@ -105,9 +106,10 @@ enum class BASE_ACTION_STATE
 	RUSH1,				// 通常1段目
 	RUSH2,				// 通常2段目
 	//RUSH3,				// 通常3段目
-	SQUAT,				// 対空攻撃
-	DOKKOI_ATTACK,		// 中断攻撃
-	DOWN_ATTACK,		// 下段攻撃
+	ANTI_AIR,				// 対空攻撃
+	DOKKOI_ATTACK,		// 中段攻撃
+	SQUAT_ATTACK,		// しゃがみ攻撃
+	DOWN_ATTACK,		// 足払い攻撃
 	AERIAL,				// 空中攻撃
 	AERIALDROP,			// 空中下攻撃
 	INVINCIBLE_ATTACK,	// フィニッシュアーツ→無敵技
@@ -147,7 +149,8 @@ enum class MOTION_TYPE
 	//RUSH_ATTACK3,			// ラッシュ最後
 	FINISH_ATTACK,			// フィニッシュアーツ
 	SQUAT,					// しゃがみ
-	SQUAT_ATTACK,			// しゃがみ攻撃
+	SQUAT_ATTACK,		// しゃがみ攻撃
+	ANTI_AIR_ATTACK,		// しゃがみ攻撃
 	DOKKOI_ATTACK,			// 中段攻撃
 	DOWN_ATTACK,			// 下段攻撃
 	JUMP,					// ジャンプ
@@ -171,10 +174,11 @@ enum class MOTION_TYPE
 	DOWN_GUARD,				// 下段ガード
 	ESCAPE,					// 回避
 	KNOCKBACK,
-	KNOCKDOWN_RAND,
-	KNOCKDOWN_AERIAL,
+	KNOCKDOWN,				// 吹っ飛び
+	KNOCKDOWN_DOWN,			// 足払いくらった
+	//KNOCKDOWN_AERIAL,
 	REVERSAL,				// 起き上がり
-	DIE,
+	//DIE,
 	APPEAR,					// 登場(掛け合い)
 	WIN,
 	MAX
@@ -248,6 +252,7 @@ public:
 	ANTIGUARD_ATTACK AntiGuard;		// ガードを突き破る攻撃のタイプ
 	SHAKE_CAMERA_INFO ShakeCameraInfo;	// カメラ振動用構造体
 	int GuardRecoveryFrame;		// ガードされたときに「ガードしている相手に与える」硬直時間
+	float fGuardKnockBackPower;	// ガードさせたときのけぞり力
 
 	// ★★★地上ヒットと空中ヒットで分けたい情報
 	struct
@@ -258,8 +263,9 @@ public:
 		Vector2 FlyVector;
 		int hitStopFlame;			// ヒットストップの時間
 		int HitRecoveryFrame;		// 攻撃がヒットした際に「相手に与える」硬直の時間
+		DAMAGE_MOTION DamageMotion;	// 喰らった時のモーション
 	}places[(int)HIT_PLACE::MAX];
-	AttackData() :HitSE(nullptr), WhiffSE(nullptr), bHit(false), bHitSuccess(false), HitScore(0), damage(0), WhiffDelayFrame(0), pierceLV(0), bAntiAir(false), bFinish(true), AntiGuard(ANTIGUARD_ATTACK::NONE), pCollisionShape(new CollisionShape::Square){}
+	AttackData() :HitSE(nullptr), WhiffSE(nullptr), bHit(false), bHitSuccess(false), HitScore(0), damage(0), WhiffDelayFrame(0), pierceLV(0), bAntiAir(false), bFinish(true), AntiGuard(ANTIGUARD_ATTACK::NONE), pCollisionShape(new CollisionShape::Square),fGuardKnockBackPower(0){}
 	~AttackData(){ SAFE_DELETE(pCollisionShape); }
 };
 
@@ -345,7 +351,7 @@ public:
 	//------------------------------------------------------
 	//	コンストラクタ・初期化
 	//------------------------------------------------------
-	BasePlayer(int deviceID, SIDE side, bool bAI);
+	BasePlayer(SIDE side, const SideData &data);
 	void InitAI();	// AI用の初期化
 
 	//------------------------------------------------------

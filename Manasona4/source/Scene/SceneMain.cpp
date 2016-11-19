@@ -23,7 +23,7 @@
 #include	"../Cutin/CutIn.h"
 #include "../Sound/BattleMusic.h"
 #include "UI/HeaveHoFinish/HeaveHoFinish.h"
-
+#include "../Shot/ShotManager.h"
 #include "RoundCall\RoundCallManager.h"
 #include "Stage\OverDriveStage\OverDriveStage.h"
 
@@ -53,16 +53,20 @@ bool sceneMain::Initialize()
 
 	m_dirLight = Vector3(1, -1, 1);
 
-#ifdef _DEBUG
-	sprintf_s(m_LoadComment, 256, "UVエフェクトとか初期化");
-#endif
-
 	//g_eff = new HitEffect();
+
+#ifdef _DEBUG
+	sprintf_s(m_LoadComment, 256, "パネルエフェクト初期化");
+#endif
 	m_panel = new PanelEffectManager();
 	m_fLoadPercentage = .05f;	// ロード割合
-	g_uvEffect = new UVEffectManager();
 
+#ifdef _DEBUG
+	sprintf_s(m_LoadComment, 256, "UVエフェクト初期化");
+#endif
+	g_uvEffect = new UVEffectManager();
 	m_fLoadPercentage = .1f;	// ロード割合
+
 	// カメラ初期化
 	//CameraMgr = new Camera();
 
@@ -133,6 +137,8 @@ bool sceneMain::Initialize()
 	sprintf_s(m_LoadComment, 256, "その他初期化");
 #endif
 
+	m_pShotMgr = new ShotManager;
+
 	TimeMgr->Init();
 	TimeMgr->Reset(60);
 
@@ -200,7 +206,7 @@ sceneMain::~sceneMain()
 	SAFE_DELETE(m_stageScreen);
 	HeaveHoFinishUI->Rerease();
 	PointLightMgr->Release();
-
+	delete m_pShotMgr;
 	NumberEffect.Release();
 
 	GameUIMgr->Rerease();
@@ -239,6 +245,9 @@ void sceneMain::Update()
 
 	// カメラ更新(ステートマシンに書いた)
 	//CameraMgr->Update();
+
+	// ショット更新
+	m_pShotMgr->Update();
 
 	// ステージ更新
 	m_pStage->Update();
@@ -397,6 +406,7 @@ void sceneMain::Render()
 		// プレイヤー
 		PlayerMgr->RenderDeferred();
 
+
 		// シェーダ終わり
 		DeferredManagerEx.G_End();
 
@@ -435,6 +445,9 @@ void sceneMain::Render()
 
 			// プレイヤー
 			PlayerMgr->Render();
+
+			// ショット
+			m_pShotMgr->Render();
 
 			// パーティクル
 			ParticleManager::Render();

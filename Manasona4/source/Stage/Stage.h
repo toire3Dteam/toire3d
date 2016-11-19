@@ -30,7 +30,7 @@ namespace Stage
 		virtual STAGE GetStageID() = 0;	// ステージのID取得
 
 		void Collision(BasePlayer *player, Vector3 *move);
-		void Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2);
+		//void Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2);
 
 		void ChangeObj(char *ObjFileName, char *BackFileName)
 		{

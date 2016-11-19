@@ -520,6 +520,13 @@ namespace Math
 	*/
 	void	SetTransformMatrixXYZ(Matrix *Mat, float posX, float posY, float posZ, float angleX, float angleY, float angleZ);
 
+	/**
+	*@brief				位置・向きベクトルからの行列を作る
+	*@param[out]	Mat		変換行列の受け取り先
+	*@param[in]	vPos		位置
+	*@param[in]	vVec		向く向き
+	*/
+	void SetTransMatrixFrontVec(Matrix *Mat, Vector3 &vPos, Vector3 &vFrontVec);
 
 	/**
 	*@brief						左手座標系ビュー変換行列の生成
@@ -576,7 +583,7 @@ namespace Math
 	*@param[in]		PosB	点Bの位置
 	*@return		AとBの距離を返す
 	*/
-	inline float Length(Vector2 PosA, Vector2 PosB);
+	float Length(const Vector2 &PosA, const Vector2 &PosB);
 	
 	/**
 	*@brief					距離計算
@@ -584,7 +591,7 @@ namespace Math
 	*@param[in]		PosB	点Bの位置
 	*@return		AとBの距離を返す
 	*/
-	inline float Length(Vector3 PosA, Vector3 PosB);
+	float Length(const Vector3 &PosA, const Vector3 &PosB);
 
 	/**
 	*@brief						座標変換
@@ -681,14 +688,14 @@ namespace Math
 *@brief		当たり判定をまとめた名前空間
 *@author		nishida
 */
-namespace Collision
-{
-
-	bool SphereAndSphere(Vector3 PosA, float RadiusA, Vector3 PosB, float RadiusB);
-
-
-
-}
+//namespace Collision
+//{
+//
+//	bool SphereAndSphere(Vector3 PosA, float RadiusA, Vector3 PosB, float RadiusB);
+//
+//
+//
+//}
 
 
 

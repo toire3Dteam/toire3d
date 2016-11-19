@@ -170,9 +170,11 @@
     <ClCompile Include="source\Scene\SceneSelectState.cpp" />
     <ClCompile Include="source\Scene\sceneTitle.cpp" />
     <ClCompile Include="source\Scene\sceneTutorial.cpp" />
-    <ClCompile Include="source\SelectUI\SelectUIManager.cpp" />
     <ClCompile Include="source\SelectUI\SelectUI.cpp" />
+    <ClCompile Include="source\SelectUI\SelectUIManager.cpp" />
     <ClCompile Include="source\SelectUI\SelectUIState.cpp" />
+    <ClCompile Include="source\Shot\BaseShot.cpp" />
+    <ClCompile Include="source\Shot\ShotManager.cpp" />
     <ClCompile Include="source\Stage\OverDriveStage\OverDriveStage.cpp" />
     <ClCompile Include="source\Stage\Stage.cpp" />
     <ClCompile Include="source\Stand\Stand.cpp" />
@@ -300,9 +302,11 @@
     <ClInclude Include="source\Scene\SceneSelectState.h" />
     <ClInclude Include="source\Scene\sceneTitle.h" />
     <ClInclude Include="source\Scene\sceneTutorial.h" />
-    <ClInclude Include="source\SelectUI\SelectUIManager.h" />
     <ClInclude Include="source\SelectUI\SelectUI.h" />
+    <ClInclude Include="source\SelectUI\SelectUIManager.h" />
     <ClInclude Include="source\SelectUI\SelectUIState.h" />
+    <ClInclude Include="source\Shot\BaseShot.h" />
+    <ClInclude Include="source\Shot\ShotManager.h" />
     <ClInclude Include="source\Sound\BattleMusic.h" />
     <ClInclude Include="source\Stage\OverDriveStage\OverDriveStage.h" />
     <ClInclude Include="source\Stage\Stage.h" />

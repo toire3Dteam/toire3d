@@ -74,6 +74,24 @@ void	Math::SetTransformMatrixZXY(Matrix *Mat, float posX, float posY, float posZ
 	Mat->_44 = 1.0f;
 }
 
+void Math::SetTransMatrixFrontVec(Matrix *Mat, Vector3 &vPos, Vector3 &vFrontVec)
+{
+	Matrix m;
+	LookAtLH(m, vPos, vPos + vFrontVec, Vector3(0, 1, 0));
+	Mat->_11 = m._11;
+	Mat->_12 = m._21;
+	Mat->_13 = m._31;
+	Mat->_21 = m._12;
+	Mat->_22 = m._22;
+	Mat->_23 = m._32;
+	Mat->_31 = m._13;
+	Mat->_32 = m._23;
+	Mat->_33 = m._33;
+	Mat->_41 = vPos.x;
+	Mat->_42 = vPos.y;
+	Mat->_43 = vPos.z;
+}
+
 //*****************************************************************************
 //		ビュー変換行列
 //*****************************************************************************
@@ -298,7 +316,13 @@ float Math::Length(float x1, float y1, float x2, float y2)
 	return sqrtf(x*x + y*y);
 }
 
-inline float Math::Length(Vector3 PosA, Vector3 PosB)
+float Math::Length(const Vector2 &PosA, const Vector2 &PosB)
+{
+	const Vector2 v(PosA - PosB);
+	return sqrtf(v.x * v.x + v.y * v.y);
+}
+
+float Math::Length(const Vector3 &PosA, const Vector3 &PosB)
 {
 	//  PosAとPosBとのベクトルを計算
 	//（今回は距離を求めるだけなので方向は関係ない）
@@ -563,16 +587,16 @@ Vector2 Math::GetProjPos(Vector2 pos)
 //************************************************************************************
 //		球と球との当たり判定(当たっている：trueを返す　当たっていない：falseを返す)
 //************************************************************************************
-bool Collision::SphereAndSphere(Vector3 PosA, float RadiusA, Vector3 PosB, float RadiusB)
-{
-	//  PosAとPosBの距離を求める
-	float Dist = Math::Length(PosA, PosB);
-
-	//  もしも、距離の方が当たり判定の半径＋当たり判定の半径より小さくなったら
-	if ((RadiusA + RadiusB) > Dist){
-		// 当たっているので true を返す
-		return true;
-	}
-	// 違うならば、隙間がある(当たっていない)ので false を返す
-	return false;
-}
+//bool Collision::SphereAndSphere(Vector3 PosA, float RadiusA, Vector3 PosB, float RadiusB)
+//{
+//	//  PosAとPosBの距離を求める
+//	float Dist = Math::Length(PosA, PosB);
+//
+//	//  もしも、距離の方が当たり判定の半径＋当たり判定の半径より小さくなったら
+//	if ((RadiusA + RadiusB) > Dist){
+//		// 当たっているので true を返す
+//		return true;
+//	}
+//	// 違うならば、隙間がある(当たっていない)ので false を返す
+//	return false;
+//}

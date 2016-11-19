@@ -19,11 +19,12 @@ enum class STAGE { SENJO, SYUTEN, A, HEAVE_HO, MAX };
 
 struct SideData
 {
-	CHARACTER CharacterType;
+	CHARACTER character;
+	PARTNER partner;
 	int iDeviceID;	// コントローラーデバイスのID
 	bool bAI;		// AIフラグ
-	SideData() :CharacterType(CHARACTER::AIROU), iDeviceID(0), bAI(false) {}
-	SideData &operator=(const SideData &data) { CharacterType = data.CharacterType, iDeviceID = data.iDeviceID, bAI = data.bAI; return *this; }
+	SideData() :character(CHARACTER::AIROU), partner(PARTNER::MAYA), iDeviceID(0), bAI(false) {}
+	SideData &operator=(const SideData &data) { character = data.character, partner = data.partner, iDeviceID = data.iDeviceID, bAI = data.bAI; return *this; }
 };
 
 struct SelectData
@@ -35,7 +36,7 @@ struct SelectData
 	int iBattleMusicID;		// 戦闘曲の番号
 
 	SelectData();
-	SelectData &operator=(const SelectData &data) { tagSideDatas[(int)SIDE::LEFT] = data.tagSideDatas[(int)SIDE::LEFT], tagSideDatas[(int)SIDE::RIGHT] = data.tagSideDatas[(int)SIDE::RIGHT], stage = data.stage, bTutorial = data.bTutorial; return *this; }
+	SelectData &operator=(const SelectData &data) { tagSideDatas[(int)SIDE::LEFT] = data.tagSideDatas[(int)SIDE::LEFT], tagSideDatas[(int)SIDE::RIGHT] = data.tagSideDatas[(int)SIDE::RIGHT], stage = data.stage, bTutorial = data.bTutorial, iWinRound = data.iWinRound, iBattleMusicID = data.iBattleMusicID; return *this; }
 };
 
 class SelectDataManager
@@ -43,10 +44,10 @@ class SelectDataManager
 public:
 	static SelectDataManager *GetInstance(){ static SelectDataManager i; return &i; }
 
-	SelectData *Get() { return &m_data; }
+	SelectData *Get() { return &m_tagData; }
 private:
 
-	SelectData m_data;
+	SelectData m_tagData;
 
 	SelectDataManager(){}
 	SelectDataManager(const SelectDataManager&) {}

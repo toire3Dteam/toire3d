@@ -14,7 +14,7 @@ namespace Stand
 		virtual void Render(tdnShader* shader,char* name);
 
 		// プレイヤーがペルソナボタン押したら呼び出す
-		virtual void Action(SKILL_ACTION_TYPE type) = 0;
+		virtual void Action(SKILL_ACTION_TYPE type);
 
 		// ペルソナブレイク
 		void Break()
@@ -100,5 +100,20 @@ namespace Stand
 
 		// 純粋仮想オーバーライド
 		void Action(SKILL_ACTION_TYPE type);
+	};
+
+	/**************************/
+	//		マーヤ
+	class Maya : public Base
+	{
+	public:
+		Maya(BasePlayer *pPlayer);
+		~Maya();
+		void Update(bool bControl);
+		// 純粋仮想オーバーライド
+		void Action(SKILL_ACTION_TYPE type);
+	private:
+		iexMesh *m_pBullet;	// 飛び道具のメッシュの実体(玉に参照させる)
+
 	};
 }

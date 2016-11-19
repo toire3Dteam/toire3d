@@ -73,10 +73,10 @@ void Stage::Base::Collision(BasePlayer *player, Vector3 *move)
 	Collision::Raypic(this, player, move);
 }
 
-void Stage::Base::Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2)
-{
-	Collision::Sinking(this, pPlayer1, pPlayer2);
-}
+//void Stage::Base::Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2)
+//{
+//	Collision::Sinking(this, pPlayer1, pPlayer2);
+//}
 
 
 void Stage::Senjo::Initialize(Camera *pCamera)

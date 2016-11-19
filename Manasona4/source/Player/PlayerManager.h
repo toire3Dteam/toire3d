@@ -24,6 +24,8 @@ public:
 	void Initialize(int NumPlayer, Stage::Base *pStage, SideData aSideDatas[(int)SIDE::ARRAY_MAX]);
 	void Release(){ SAFE_DELETE(pInstance); }
 	void Update(bool bControl);
+	void UpdateHit();
+	void UpdatePos();
 	void Render();
 	void Render(tdnShader* shader, char* name);
 	void RenderShadow();
@@ -92,18 +94,18 @@ private:
 	float m_OverDriveDim;
 
 	// プレイヤーが持っている敵への向きフラグを設定
-	void UpdatePlayerTargetDir(BasePlayer *my, BasePlayer *you);
+	//void UpdatePlayerTargetDir(BasePlayer *my, BasePlayer *you);
 
 	// ★プレイヤーとプレイヤーの攻撃の判定
-	void CollisionPlayerAttack(BasePlayer *my, BasePlayer *you,  HIT_DAMAGE_INFO **OutDamageInfo);
+	//void CollisionPlayerAttack(BasePlayer *my, BasePlayer *you,  HIT_DAMAGE_INFO **OutDamageInfo);
 
 	// ★スタンドの攻撃に対するプレイヤーの判定
-	bool CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou);
+	//bool CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou);
 
 	// ★投げの攻撃に対するプレイヤーの判定
-	bool CollisionThrowAttack(BasePlayer *my, BasePlayer *you);
+	//bool CollisionThrowAttack(BasePlayer *my, BasePlayer *you);
 
-	void SendHitMessage(BasePlayer *pAttackPlayer, BasePlayer *pDamagePlayer, HIT_DAMAGE_INFO *pHitDamageInfo);
+	//void SendHitMessage(BasePlayer *pAttackPlayer, BasePlayer *pDamagePlayer, HIT_DAMAGE_INFO *pHitDamageInfo);
 
 	// BaseGameEntiryサブクラスはメッセージを使って通信する
 	bool  HandleMessage(const Message& msg);

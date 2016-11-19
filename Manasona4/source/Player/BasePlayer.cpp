@@ -9,6 +9,7 @@
 #include "../system/System.h"
 #include "../PointLight/PointLight.h"
 #include "../DeferredEx/DeferredEx.h"
+#include "../Data/SelectData.h"
 
 //_/_/_/_/_/_/__/_/__/_/__/_/__
 // 定数
@@ -18,7 +19,7 @@ const int	BasePlayer::c_RUSH_AHEAD_START = 5;		// ラッシュ中の先行入力受付開始フ
 const float BasePlayer::c_GRAVITY = .1f;
 const float BasePlayer::c_MAX_JUMP = 1.9f;
 
-const int BasePlayer::c_RECOVERY_FLAME = 8;			// リカバリーステートにいる時間
+const int BasePlayer::c_RECOVERY_FLAME = 32;			// リカバリーステートにいる時間
 
 const int BasePlayer::c_OVERDRIVE_MAX_GAGE = 100;	// 覚醒ゲージの最大値
 const int BasePlayer::c_OVERDRIVE_MAX_TIME = 420;	// 覚醒が切れるまでの時間
@@ -59,8 +60,8 @@ void BasePlayer::LoadAttackFrameList(char *filename)
 	}
 }
 
-BasePlayer::BasePlayer(int deviceID, SIDE side, bool bAI) :m_bAI(bAI), m_side(side), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + deviceID)),
-m_maxSpeed(1.0f), m_dir(DIR::LEFT), m_deviceID(deviceID), m_pHitSquare(new CollisionShape::Square), m_pDefaultObj(nullptr),
+BasePlayer::BasePlayer(SIDE side, const SideData &data) :m_bAI(data.bAI), m_deviceID(data.iDeviceID), m_side(side), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + data.iDeviceID)),
+m_maxSpeed(1.0f), m_dir(DIR::LEFT), m_pHitSquare(new CollisionShape::Square), m_pDefaultObj(nullptr),
 m_pObj(nullptr),
 m_move(VECTOR_ZERO), m_bLand(false),m_bSquat(false), m_bAerialJump(true), m_bAerialDash(false),m_iAerialDashFrame(0), m_ActionState(BASE_ACTION_STATE::NO_ACTION),
 m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentActionFrame(0), m_RecoveryFlame(0), m_bEscape(false), m_score(0), m_CollectScore(0), m_pAI(nullptr),
@@ -75,8 +76,19 @@ m_pFacePic(nullptr), m_pTargetPlayer(nullptr), m_pSpeedLine(nullptr), m_SkillAct
 m_fOrangeColRate(0), m_fMagentaColRate(0),
 m_pCutinPic(nullptr), m_pName("None")
 {
-	// とりあえず、モコイさん
-	m_pStand = new Stand::Mokoi(this);
+	// スタンド
+	switch (data.partner)
+	{
+	case PARTNER::MOKOI:
+		m_pStand = new Stand::Mokoi(this);
+		break;
+	case PARTNER::MAYA:
+		m_pStand = new Stand::Maya(this);
+		break;
+	default:
+		assert(0);
+		break;
+	}
 
 
 	// デフォルト設定
@@ -103,7 +115,7 @@ m_pCutinPic(nullptr), m_pName("None")
 	m_pAI = nullptr;
 
 	// IDで座標の分岐
-	switch (deviceID)
+	switch (m_deviceID)
 	{
 	case 0:
 		m_pos.Set(-25, 0, 0);
@@ -391,7 +403,7 @@ void BasePlayer::Update(bool bControl)
 		if (!m_pStateMachine->isInState(*BasePlayerState::Skill::GetInstance()) &&
 			!m_pStateMachine->isInState(*BasePlayerState::KnockDown::GetInstance()) &&
 			!m_pStateMachine->isInState(*BasePlayerState::Run::GetInstance()) &&
-			!m_pStateMachine->isInState(*BasePlayerState::AerialKnockBack::GetInstance()) &&
+			!m_pStateMachine->isInState(*BasePlayerState::DownFall::GetInstance()) &&
 			!m_pStateMachine->isInState(*BasePlayerState::RushAttack::GetInstance()) &&
 			!m_pStateMachine->isInState(*BasePlayerState::DokkoiAttack::GetInstance()) &&
 			!m_pStateMachine->isInState(*BasePlayerState::Jump::GetInstance()) &&
@@ -409,7 +421,8 @@ void BasePlayer::Update(bool bControl)
 			// アングル補間処理
 			const float AnglePercentage = (m_pStateMachine->isInState(*BasePlayerState::Escape::GetInstance())) ? .9f : .65f;
 
-			if (m_pStateMachine->isInState(*BasePlayerState::Wait::GetInstance()))
+			if (m_pStateMachine->isInState(*BasePlayerState::Wait::GetInstance()) || 
+				m_pStateMachine->isInState(*BasePlayerState::Intro::GetInstance()))
 			{
 				m_angleY = DIR_ANGLE[(int)m_dir];
 				m_angleY += (m_dir == DIR::LEFT) ? PI * -.1f : PI * .1f;
@@ -907,7 +920,7 @@ void BasePlayer::Render()
 	// ここで現在のステートマシンの状態を確認
 	if (m_deviceID == 0)
 	{
-		tdnText::Draw(30, 320, 0xffffffff, "フレーム:%d", m_CurrentActionFrame);
+		//tdnText::Draw(30, 320, 0xffffffff, "フレーム:%d", m_CurrentActionFrame);
 		//m_pStateMachine->Render();// ステートマシンでの描画
 		//
 		//if (m_pAI != nullptr)

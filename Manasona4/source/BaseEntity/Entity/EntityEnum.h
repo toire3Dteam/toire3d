@@ -22,9 +22,9 @@ namespace GAME_ID
 		UI_MGR,						// UIマネージャー
 		CUTIN_MGR,					// カットインマネージャー
 		ROUND_CALL_MGR,				// ラウンドコールマネージャー
+		SHOT_MGR,					// ショットマネージャー
 		SELECT_UI_LEFT,				// キャラクターセレクトのUI左
 		SELECT_UI_RIGHT,			// キャラクターセレクトのUI右
-
 		ID_PLAYER_FIRST,			//人のIDの初め
 		ID_PLAYER_MAX = ID_PLAYER_FIRST + GAME_PLAYER_MAX,	//人の最大ID+1
 

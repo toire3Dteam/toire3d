@@ -1,8 +1,472 @@
 #include "TDNLIB.h"
 #include "Collision.h"
 #include "../Player/BasePlayer.h"
+#include "../Player/PlayerManager.h"
+#include "../BaseEntity/Message/Message.h"
 #include "../BaseEntity/Message/MessageDispatcher.h"
 #include "../Stage/Stage.h"
+#include "../Shot/ShotManager.h"
+#include "../Shot/BaseShot.h"
+#include "../Stand/Stand.h"
+
+void Collision::PlayerCollision(PlayerManager *pPlayerMgr, ShotManager *pShotMgr, Stage::Base *pStage)
+{
+	BasePlayer *pPlayer1(pPlayerMgr->GetPlayer(0)), *pPlayer2(pPlayerMgr->GetPlayer(1));
+
+	/* ƒvƒŒƒCƒ„[VSƒvƒŒƒCƒ„[‚ÌUŒ‚”»’è */
+	HIT_DAMAGE_INFO *pHitDamageInfo[(int)SIDE::ARRAY_MAX] = { nullptr };
+
+	// “G‚Ö‚Ì•ûŒüƒtƒ‰ƒOXV
+	{
+		const Vector3 v(pPlayer1->GetPos() - pPlayer2->GetPos());
+		if (v.x > 0)
+		{
+			pPlayer1->SetTargetDir(DIR::LEFT);
+			pPlayer2->SetTargetDir(DIR::RIGHT);
+		}
+		else if (v.x < 0)
+		{
+			pPlayer1->SetTargetDir(DIR::RIGHT);
+			pPlayer2->SetTargetDir(DIR::LEFT);
+		}
+	}
+
+	// ‚ß‚èž‚Ý”»’è
+	if (!pPlayer1->isEscape() && !pPlayer2->isEscape()) Collision::Sinking(pStage, pPlayer1, pPlayer2);
+
+	/* ƒvƒŒƒCƒ„[VSƒvƒŒƒCƒ„[‚ÌUŒ‚”»’è */
+	/* ƒvƒŒƒCƒ„[VSƒvƒŒƒCƒ„[‚Ì“Š‚°’Í‚Ý”»’è */
+	if (pPlayer1->GetFSM()->isInState(*BasePlayerState::Throw::GetInstance()))	// Ž©•ª‚ª“Š‚°ƒ‚[ƒh‚É“ü‚Á‚Ä‚½‚ç
+		CollisionThrowAttack(pPlayer1, pPlayer2, pStage);	// “Š‚°”»’èŠÖ”
+	else
+		CollisionPlayerAttack(pPlayer1, pPlayer2, &pHitDamageInfo[1]);
+
+	if (pPlayer2->GetFSM()->isInState(*BasePlayerState::Throw::GetInstance()))	// Ž©•ª‚ª“Š‚°ƒ‚[ƒh‚É“ü‚Á‚Ä‚½‚ç
+		CollisionThrowAttack(pPlayer2, pPlayer1, pStage);	// “Š‚°”»’èŠÖ”
+	else
+		CollisionPlayerAttack(pPlayer2, pPlayer1, &pHitDamageInfo[0]);
+
+
+	/* ƒXƒ^ƒ“ƒhVSƒvƒŒƒCƒ„[‚ÌUŒ‚”»’è */
+	bool receive;	// ”»’èŒ‹‰ÊŽóŽæ‚è—p•Ï”
+	receive = CollisionStandAttack(pPlayer1->GetStand(), pPlayer2);
+	if (receive) pPlayer1->GetStand()->GetAttackData()->bHit = true;
+	receive = CollisionStandAttack(pPlayer2->GetStand(), pPlayer1);
+	if (receive) pPlayer2->GetStand()->GetAttackData()->bHit = true;
+
+
+	// ƒvƒŒƒCƒ„[VSƒvƒŒƒCƒ„[UŒ‚Œ‹‰ÊŠm’è
+
+	// “–‚½‚Á‚Ä‚½‚ç
+	if (pHitDamageInfo[0])
+	{
+		// ƒƒbƒZ[ƒW‚ð‘—M
+		SendHitMessage(pPlayer2, pPlayer1, pHitDamageInfo[0]);
+
+		// 2dƒqƒbƒg–hŽ~—p‚Ìƒtƒ‰ƒO‚ðON‚É‚·‚é
+		if (pPlayer2->isAttackState())pPlayer2->GetAttackData()->bHit = true;
+	}
+	if (pHitDamageInfo[1])
+	{
+		// ƒƒbƒZ[ƒW‚ð‘—M
+		SendHitMessage(pPlayer1, pPlayer2, pHitDamageInfo[1]);
+
+		// 2dƒqƒbƒg–hŽ~—p‚Ìƒtƒ‰ƒO‚ðON‚É‚·‚é
+		if (pPlayer1->isAttackState())pPlayer1->GetAttackData()->bHit = true;
+	}
+
+	/* ‹ÊVS”»’è */
+	{
+		SIDE Player1Side(pPlayer1->GetSide());
+		for (auto it : *pShotMgr->GetList(Player1Side))
+		{
+			// ‹ÊVSƒXƒe[ƒW
+			if(RaypicShot(pStage, it)) it->Erase();
+
+			// ‹ÊVSƒvƒŒƒCƒ„[
+			else if (CollisionShot(it,pPlayer2)) it->Erase();
+		}
+	}
+
+	{
+		SIDE Player2Side(pPlayer2->GetSide());
+		for (auto it : *pShotMgr->GetList(Player2Side))
+		{
+			// ‹ÊVSƒXƒe[ƒW
+			if (RaypicShot(pStage, it)) it->Erase();
+
+			// ‹ÊVSƒvƒŒƒCƒ„[
+			else if (CollisionShot(it, pPlayer1)) it->Erase();
+		}
+	}
+
+
+	// ‰ð•ú
+	FOR((int)SIDE::ARRAY_MAX)
+	{
+		if (pHitDamageInfo[i]) delete pHitDamageInfo[i];
+	}
+
+}
+
+void Collision::SendHitMessage(BasePlayer *pAttackPlayer, BasePlayer *pDamagePlayer, HIT_DAMAGE_INFO *pHitDamageInfo)
+{
+	/* ƒƒbƒZ[ƒW‘—M */
+
+	// ƒ_ƒ[ƒWŽó‚¯‚½‚æƒƒbƒZ[ƒW
+	MsgMgr->Dispatch(0, pAttackPlayer->GetID(), pDamagePlayer->GetID(), MESSAGE_TYPE::HIT_DAMAGE, pHitDamageInfo);
+
+	// ƒ_ƒ[ƒW‚ð—^‚¦‚é‚â‚Â‚É‘Î‚µ‚ÄƒqƒbƒgƒXƒgƒbƒv‚ð‚©‚¯‚é
+	pAttackPlayer->SetHitStopFrame(pHitDamageInfo->hitStopFlame);
+	//pDamagePlayer->SetHitStopFrame(pHitDamageInfo->hitStopFlame);
+}
+
+void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAGE_INFO **OutDamageInfo)
+{
+	// ƒ`[ƒ€“¯‚¶‚¾‚æI
+	if (my->GetSide() == you->GetSide()) return;
+
+	// UŒ‚Œn‚ÌƒXƒe[ƒg‚¶‚á‚È‚¢‚æI
+	if (!my->isAttackState()) return;
+
+	// ‘ŠŽè‚ªƒGƒXƒP[ƒv’†‚¾‚æI
+	if (you->isEscape()) return;
+
+	if (my->isActiveFrame()) // UŒ‚ƒtƒŒ[ƒ€’†‚È‚ç
+	{
+		// ŸÓg‚Ì‘Î‹ó‚Ìˆ—
+		/***************************************/
+		// ‘ŠŽè‚àUŒ‚’†‚È‚ç
+		if (you->isAttackState() == true)
+		{
+			// ‚»‚ÌUŒ‚‚ª@‚à‚µŽn“®EŽ‘±‚ÌŠÔ‚É
+			// u‘Î‹óvŒø‰Ê‚ðŽ‚Á‚Ä‚¢‚½ê‡
+			if ((you->GetActionFrame() == FRAME_STATE::ACTIVE ||
+				you->GetActionFrame() == FRAME_STATE::START)
+				&& you->GetAttackData()->bAntiAir== true)
+			{
+				// Ž©•ª‚ª‹ó’†‚ÅUŒ‚‚µ‚Ä‚¢‚½ê‡
+				if (my->isLand() == false)return;
+			}
+
+		}
+		/******************************************/
+
+		if (you->GetInvincibleLV() <= my->GetAttackData()->pierceLV &&	// ‘ŠŽè‚ª–³“G‚Å‚È‚¢
+			!my->GetAttackData()->bHit)									// ‚Ü‚¾UŒ‚‚ð“–‚Ä‚Ä‚È‚¢
+		{
+			// UŒ‚”»’èŒ`ó‚Æ‘ŠŽè‚ÌŽlŠp‚Å”»’è‚ð‚Æ‚é
+			CollisionShape::Square AttackShape, YouShape;
+			memcpy_s(&AttackShape, sizeof(CollisionShape::Square), my->GetAttackData()->pCollisionShape, sizeof(CollisionShape::Square));
+			memcpy_s(&YouShape, sizeof(CollisionShape::Square), you->GetHitSquare(), sizeof(CollisionShape::Square));
+			if (my->GetDir() == DIR::LEFT) AttackShape.pos.x *= -1;	// ‚±‚Ìpos‚Íâ‘Î+(‰E)‚È‚Ì‚ÅA¶Œü‚«‚È‚ç‹t‚É‚·‚é
+			AttackShape.pos += my->GetPos();
+			YouShape.pos += you->GetPos();
+			if (Collision::HitCheck(&AttackShape, &YouShape))
+			{
+				// ƒqƒbƒgŽž‚Ìˆ—
+				//my->GetAttackData()->bHit = true;	// 2dƒqƒbƒg–hŽ~—p‚Ìƒtƒ‰ƒO‚ðON‚É‚·‚é
+
+				/* ƒƒbƒZ[ƒW‘—M */
+
+				// ‘ŠŽè‚ªƒqƒbƒg‚µ‚½‚Æ‚«‚Ì’nã‚É‚¢‚½‚©‹ó’†‚É‚¢‚½‚©
+				int iHitPlace((you->isLand()) ? (int)AttackData::HIT_PLACE::LAND : (int)AttackData::HIT_PLACE::AERIAL);
+
+				// (A—ñŽÔ)(TODO) ššš‚±‚ê‚¾‚ÆƒtƒBƒjƒbƒVƒ…ƒA[ƒc‚ª‚Ð‚Æ‚Â‚µ‚©‘¶Ý‚µ‚È‚­‚È‚é‚Ì‚Å‚Ç‚¤‚É‚©‚µ‚æ‚¤
+				// ƒtƒBƒjƒbƒVƒ…ƒA[ƒc‚©‚Ç‚¤‚©
+				bool bOverDrive(my->GetActionState() == BASE_ACTION_STATE::HEAVEHO_DRIVE);
+				
+				int hitScore(my->GetAttackData()->HitScore);
+				//if (you->isGuard()) // ‘ŠŽè‚ªƒK[ƒh’†‚È‚ç
+				//{
+				//	hitScore = (int)(hitScore * 0.25f);// ƒXƒRƒA”¼Œ¸
+				//
+				//	// §e‚Ì
+				//	if (my->GetDir() == DIR::RIGHT)
+				//	{
+				//		my->SetMove(Vector3(-0.5f,0,0));
+				//	}
+				//	else
+				//	{
+				//		my->SetMove(Vector3(0.5f, 0, 0));
+				//	}
+				//}
+
+				// ‚»‚µ‚ÄAƒ_ƒ[ƒW‚ðŽó‚¯‚½l‚É‘—M
+				*OutDamageInfo = new HIT_DAMAGE_INFO;
+				(*OutDamageInfo)->BeInvincible = my->GetAttackData()->places[iHitPlace].bBeInvincible;	// –³“G‚É‚È‚é‚©‚Ç‚¤‚©
+				(*OutDamageInfo)->damage = my->GetAttackData()->damage;				// ƒ_ƒ[ƒW(ƒXƒRƒA)
+				(*OutDamageInfo)->FlyVector = my->GetAttackData()->places[iHitPlace].FlyVector;			// ‚Á”ò‚ÑƒxƒNƒgƒ‹
+				(*OutDamageInfo)->hitStopFlame = my->GetAttackData()->places[iHitPlace].hitStopFlame;		// ƒqƒbƒgƒXƒgƒbƒv
+				(*OutDamageInfo)->HitRecoveryFrame = my->GetAttackData()->places[iHitPlace].HitRecoveryFrame;		// d’¼ŽžŠÔ
+				(*OutDamageInfo)->GuardRecoveryFrame = my->GetAttackData()->GuardRecoveryFrame;		// d’¼ŽžŠÔ
+				(*OutDamageInfo)->HitEffectType = (int)my->GetAttackData()->HitEffectType;			// ‚±‚ÌUŒ‚‚ÌƒqƒbƒgƒGƒtƒFƒNƒg‚ð‘ŠŽè‚É‘—‚é
+				(*OutDamageInfo)->iAttackType = (int)my->GetActionState();						// ‰½‚ÌUŒ‚‚©‚Ìƒ^ƒCƒv(ƒRƒ“ƒ{’†‚É“¯‚¶UŒ‚‚ðŽg‚í‚¹‚È‚¢‚æ‚¤‚É)
+				(*OutDamageInfo)->bOverDrive = bOverDrive;										// ‚Ó‚¡‚É‚µ‚ãƒA[ƒc‚©‚Ç‚¤‚©	
+				(*OutDamageInfo)->iAntiGuard = (int)my->GetAttackData()->AntiGuard;				// ƒK[ƒh“Ë‚«”j‚èƒ^ƒCƒv
+				(*OutDamageInfo)->HitSE = my->GetAttackData()->HitSE;
+				(*OutDamageInfo)->bFinishOK = my->GetAttackData()->bFinish;
+				(*OutDamageInfo)->fGuardKnockBackPower = my->GetAttackData()->fGuardKnockBackPower;
+				(*OutDamageInfo)->DamageMotion = my->GetAttackData()->places[iHitPlace].DamageMotion;
+
+				// šƒRƒ“ƒ{UI ƒGƒtƒFƒNƒg(ƒJƒEƒ“ƒg)”­“®
+				// ššƒvƒŒƒCƒ„[‚ÌƒOƒ[ƒoƒ‹ƒXƒe[ƒg‚Ìƒ_ƒ[ƒW‚Ì‚Æ‚±‚ë‚ÉˆÚ‚µ‚Ü‚µ‚½
+				//if (you->isGuard() == false)
+				//	you->GetComboUI()->Count(hitScore, (*OutDamageInfo)->recoveryFlame); // ‘ŠŽè‚ªƒK[ƒh’†‚Å‚È‚¯‚ê‚Î
+				//else you->GetComboUI()->Guard();// ƒK[ƒh‚³‚ê‚½
+
+				// ššš’´â‰¼
+				//my->SetHP(my->GetMaxHP() - my->GetCollectScore());
+				//you->SetHP(my->GetMaxHP() - my->GetCollectScore());
+
+				if (
+					//my->GetPos().x > you->GetPos().x// ˆÊ’uŠÖŒW‚É‚æ‚éƒxƒNƒgƒ‹
+					my->GetDir() == DIR::LEFT			// “–‚Ä‚½l‚ÌŒü‚«‚É‚æ‚éƒxƒNƒgƒ‹
+					) (*OutDamageInfo)->FlyVector.x *= -1;
+				//MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, you->GetID(), MESSAGE_TYPE::HIT_DAMAGE, &HitDamageInfo);
+
+				// ƒJƒƒ‰‚ÉU“®ƒƒbƒZ[ƒW‚ð‘—‚é
+				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::SHAKE_CAMERA, &my->GetAttackData()->ShakeCameraInfo);
+			}
+		}
+	}
+}
+
+bool Collision::CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou)
+{
+	// ƒ`[ƒ€“¯‚¶‚¾‚æI
+	if (pStand->GetPlayer()->GetSide() == pYou->GetSide()) return false;
+
+	// ƒXƒ^ƒ“ƒh‚ªƒAƒNƒeƒBƒu‚¶‚á‚È‚¢‚æI
+	if (!pStand->isActive()) return false;
+
+	// ‘ŠŽè‚ªƒGƒXƒP[ƒv’†‚¾‚æI
+	if (pYou->isEscape()) return false;
+
+	// ƒXƒ^ƒ“ƒh‚ªƒAƒ^ƒbƒNƒ^ƒCƒv‚¶‚á‚È‚¢‚æI
+	AttackData *pStandAttackData(pStand->GetAttackData());
+	if (pStandAttackData == nullptr)return false;
+
+	if (pStand->isAttackFrame()) // UŒ‚ƒtƒŒ[ƒ€’†‚È‚ç
+	{
+		if (pYou->GetInvincibleLV() == 0 &&								// ‘ŠŽè‚ª–³“G‚Å‚È‚¢
+			!pStandAttackData->bHit)									// ‚Ü‚¾UŒ‚‚ð“–‚Ä‚Ä‚È‚¢
+		{
+			// UŒ‚”»’èŒ`ó‚Æ‘ŠŽè‚ÌŽlŠp‚Å”»’è‚ð‚Æ‚é
+			CollisionShape::Square AttackShape, YouShape;
+			memcpy_s(&AttackShape, sizeof(CollisionShape::Square), pStandAttackData->pCollisionShape, sizeof(CollisionShape::Square));
+			memcpy_s(&YouShape, sizeof(CollisionShape::Square), pYou->GetHitSquare(), sizeof(CollisionShape::Square));
+			if (pStand->GetDir() == DIR::LEFT) AttackShape.pos.x *= -1;	// ‚±‚Ìpos‚Íâ‘Î+(‰E)‚È‚Ì‚ÅA¶Œü‚«‚È‚ç‹t‚É‚·‚é
+			AttackShape.pos += pStand->GetPos();
+			YouShape.pos += pYou->GetPos();
+			if (Collision::HitCheck(&AttackShape, &YouShape))
+			{
+				// ƒqƒbƒgŽž‚Ìˆ—
+				//my->GetAttackData()->bHit = true;	// 2dƒqƒbƒg–hŽ~—p‚Ìƒtƒ‰ƒO‚ðON‚É‚·‚é
+	
+				/* ƒƒbƒZ[ƒW‘—M */
+	
+				// ‘ŠŽè‚ªƒqƒbƒg‚µ‚½‚Æ‚«‚Ì’nã‚É‚¢‚½‚©‹ó’†‚É‚¢‚½‚©
+				int iHitPlace = (pYou->isLand()) ? (int)AttackData::HIT_PLACE::LAND : (int)AttackData::HIT_PLACE::AERIAL;
+
+				// ‚Ü‚¸AUŒ‚‚ðƒqƒbƒg‚³‚¹‚½l‚É‘—M
+				//HIT_ATTACK_INFO hai;
+				//hai.bOverDrive = false;
+				//hai.hitStopFlame = pStandAttackData->places[iHitPlace].hitStopFlame;		// Ž©•ªŽ©g‚É‚à‚ÌŽ©•ª‚ÌƒqƒbƒgƒXƒgƒbƒv
+				//hai.HitScore = pStandAttackData->HitScore;				// ƒ_ƒ[ƒW(ƒXƒRƒA)
+				//MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + pStand->GetDeviceID()), MESSAGE_TYPE::HIT_ATTACK, &hai);
+				//// ”ŽšƒGƒtƒFƒNƒg’Ç‰Á
+				//Vector2 screenPos = Math::WorldToScreen(pStand->GetPos());
+				//NumberEffect.AddNumber((int)screenPos.x, (int)screenPos.y - 200, pStandAttackData->damage, Number_Effect::COLOR_TYPE::WHITE, Number::NUM_KIND::NORMAL);
+
+				// ‚»‚µ‚ÄAƒ_ƒ[ƒW‚ðŽó‚¯‚½l‚É‘—M
+				HIT_DAMAGE_INFO HitDamageInfo;
+				HitDamageInfo.bOverDrive = false;// š(‰¼)
+				HitDamageInfo.BeInvincible = pStandAttackData->places[iHitPlace].bBeInvincible;	// –³“G‚É‚È‚é‚©‚Ç‚¤‚©
+				HitDamageInfo.damage = pStandAttackData->damage;				// ƒ_ƒ[ƒW(ƒXƒRƒA)
+				HitDamageInfo.FlyVector = pStandAttackData->places[iHitPlace].FlyVector;			// ‚Á”ò‚ÑƒxƒNƒgƒ‹
+				HitDamageInfo.hitStopFlame = pStandAttackData->places[iHitPlace].hitStopFlame;		// ƒqƒbƒgƒXƒgƒbƒv
+				HitDamageInfo.HitRecoveryFrame = pStandAttackData->places[iHitPlace].HitRecoveryFrame;		// d’¼ŽžŠÔ
+				HitDamageInfo.GuardRecoveryFrame = pStandAttackData->GuardRecoveryFrame;		// d’¼ŽžŠÔ
+				HitDamageInfo.HitEffectType = (int)pStandAttackData->HitEffectType;			// ‚±‚ÌUŒ‚‚ÌƒqƒbƒgƒGƒtƒFƒNƒg‚ð‘ŠŽè‚É‘—‚é
+				HitDamageInfo.iAttackType = (int)BASE_ACTION_STATE::NO_ACTION;	// NO_ACTION‚Ì‚Æ‚«‚ÍAƒRƒ“ƒ{Œp‘±ŠÖ˜A‚Ì‚ð–³Ž‹‚·‚é
+				HitDamageInfo.iAntiGuard = (int)pStandAttackData->AntiGuard;				// ƒK[ƒh“Ë‚«”j‚èƒ^ƒCƒv
+				HitDamageInfo.HitSE = pStandAttackData->HitSE;
+				HitDamageInfo.bFinishOK = pStandAttackData->bFinish;
+				HitDamageInfo.fGuardKnockBackPower = pStandAttackData->fGuardKnockBackPower;
+				HitDamageInfo.DamageMotion = pStandAttackData->places[iHitPlace].DamageMotion;
+
+				// ƒRƒ“ƒ{—p
+				//COMBO_DESK comboDesk;
+				//comboDesk.side = pYou->GetSide();
+				//comboDesk.damage = HitDamageInfo.damage;
+				//comboDesk.recoveryFrame = HitDamageInfo.recoveryFlame;
+				//
+				//// šƒRƒ“ƒ{UI ƒGƒtƒFƒNƒg(ƒJƒEƒ“ƒg)”­“®
+				//if (pYou->GetGuardState() == GUARD_STATE::NO_GUARD)
+				//	MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, ENTITY_ID::UI_MGR, MESSAGE_TYPE::COMBO_COUNT, &comboDesk);
+				//else
+				//	MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, ENTITY_ID::UI_MGR, MESSAGE_TYPE::COMBO_GUARD, &comboDesk);
+				if (
+					//my->GetPos().x > you->GetPos().x// ˆÊ’uŠÖŒW‚É‚æ‚éƒxƒNƒgƒ‹
+					pStand->GetDir() == DIR::LEFT			// “–‚Ä‚½l‚ÌŒü‚«‚É‚æ‚éƒxƒNƒgƒ‹
+					) HitDamageInfo.FlyVector.x *= -1;
+				MsgMgr->Dispatch(0, pStand->GetPlayer()->GetID(), pYou->GetID(), MESSAGE_TYPE::HIT_DAMAGE, &HitDamageInfo);
+	
+
+				// ƒJƒƒ‰‚ÉU“®ƒƒbƒZ[ƒW‚ð‘—‚é
+				MsgMgr->Dispatch(0, pStand->GetPlayer()->GetID(), ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::SHAKE_CAMERA, &pStandAttackData->ShakeCameraInfo);
+	
+				return true;	// “–‚½‚Á‚½
+			}
+		}
+	}
+	return false;	// “–‚½‚ç‚È‚©‚Á‚½
+}
+
+bool Collision::CollisionShot(Shot::Base *shot, BasePlayer *you)
+{
+	// ‘ŠŽè‚ªƒGƒXƒP[ƒv’†‚¾‚æI
+	if (you->isEscape()) return false;
+
+	if (you->GetInvincibleLV() != 0) return false;									// ‘ŠŽè‚ª–³“G‚¶‚á‚È‚¢
+
+	AttackData *pShotAttackData(shot->GetAttackData());
+
+	// UŒ‚”»’èŒ`ó‚Æ‘ŠŽè‚ÌŽlŠp‚Å”»’è‚ð‚Æ‚é
+	CollisionShape::Square AttackShape, YouShape;
+	memcpy_s(&AttackShape, sizeof(CollisionShape::Square), pShotAttackData->pCollisionShape, sizeof(CollisionShape::Square));
+	memcpy_s(&YouShape, sizeof(CollisionShape::Square), you->GetHitSquare(), sizeof(CollisionShape::Square));
+	AttackShape.pos += shot->GetPos();
+	YouShape.pos += you->GetPos();
+	if (Collision::HitCheck(&AttackShape, &YouShape))
+	{
+		// ƒqƒbƒgŽž‚Ìˆ—
+		//my->GetAttackData()->bHit = true;	// 2dƒqƒbƒg–hŽ~—p‚Ìƒtƒ‰ƒO‚ðON‚É‚·‚é
+
+		/* ƒƒbƒZ[ƒW‘—M */
+
+		// ‘ŠŽè‚ªƒqƒbƒg‚µ‚½‚Æ‚«‚Ì’nã‚É‚¢‚½‚©‹ó’†‚É‚¢‚½‚©
+		int iHitPlace = (you->isLand()) ? (int)AttackData::HIT_PLACE::LAND : (int)AttackData::HIT_PLACE::AERIAL;
+
+		// ‚»‚µ‚ÄAƒ_ƒ[ƒW‚ðŽó‚¯‚½l‚É‘—M
+		HIT_DAMAGE_INFO HitDamageInfo;
+		HitDamageInfo.bOverDrive = false;// š(‰¼)
+		HitDamageInfo.BeInvincible = pShotAttackData->places[iHitPlace].bBeInvincible;	// –³“G‚É‚È‚é‚©‚Ç‚¤‚©
+		HitDamageInfo.damage = pShotAttackData->damage;				// ƒ_ƒ[ƒW(ƒXƒRƒA)
+		HitDamageInfo.FlyVector = pShotAttackData->places[iHitPlace].FlyVector;			// ‚Á”ò‚ÑƒxƒNƒgƒ‹
+		HitDamageInfo.hitStopFlame = pShotAttackData->places[iHitPlace].hitStopFlame;		// ƒqƒbƒgƒXƒgƒbƒv
+		HitDamageInfo.HitRecoveryFrame = pShotAttackData->places[iHitPlace].HitRecoveryFrame;		// d’¼ŽžŠÔ
+		HitDamageInfo.GuardRecoveryFrame = pShotAttackData->GuardRecoveryFrame;		// d’¼ŽžŠÔ
+		HitDamageInfo.HitEffectType = (int)pShotAttackData->HitEffectType;			// ‚±‚ÌUŒ‚‚ÌƒqƒbƒgƒGƒtƒFƒNƒg‚ð‘ŠŽè‚É‘—‚é
+		HitDamageInfo.iAttackType = (int)BASE_ACTION_STATE::NO_ACTION;	// NO_ACTION‚Ì‚Æ‚«‚ÍAƒRƒ“ƒ{Œp‘±ŠÖ˜A‚Ì‚ð–³Ž‹‚·‚é
+		HitDamageInfo.iAntiGuard = (int)pShotAttackData->AntiGuard;				// ƒK[ƒh“Ë‚«”j‚èƒ^ƒCƒv
+		HitDamageInfo.HitSE = pShotAttackData->HitSE;
+		HitDamageInfo.bFinishOK = pShotAttackData->bFinish;
+		HitDamageInfo.fGuardKnockBackPower = pShotAttackData->fGuardKnockBackPower;
+		HitDamageInfo.DamageMotion = pShotAttackData->places[iHitPlace].DamageMotion;
+
+		if (shot->GetVec().x < 0) HitDamageInfo.FlyVector.x *= -1;
+		MsgMgr->Dispatch(0, shot->GetPlayer()->GetID(), you->GetID(), MESSAGE_TYPE::HIT_DAMAGE, &HitDamageInfo);
+
+		// ƒJƒƒ‰‚ÉU“®ƒƒbƒZ[ƒW‚ð‘—‚é
+		MsgMgr->Dispatch(0, shot->GetPlayer()->GetID(), ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::SHAKE_CAMERA, &pShotAttackData->ShakeCameraInfo);
+
+		return true;	// “–‚½‚Á‚½
+	}
+	else return false;
+}
+
+
+// š“Š‚°‚ÌUŒ‚‚É‘Î‚·‚éƒvƒŒƒCƒ„[‚Ì”»’è
+bool Collision::CollisionThrowAttack(BasePlayer *my, BasePlayer *you, Stage::Base *pStage)
+{
+	// ƒ`[ƒ€“¯‚¶‚¾‚æI
+	if (my->GetSide() == you->GetSide()) return false;
+
+	// ‘ŠŽè‚ª‹ó’†‚¾‚Á‚½‚ç‚Â‚©‚ß‚È‚¢
+	if (!you->isLand()) return false;
+
+	// ‚à‚¤‚·‚Å‚É’Í‚ñ‚Å‚é‚æI
+	if (my->isThrowSuccess()) return false;
+
+	// ‘ŠŽè‚ª–³“Gó‘Ô
+	if (you->GetInvincibleLV() > my->GetAttackData()->pierceLV) return false;
+
+	// “Š‚°—P—\‰ß‚¬‚½‚æI
+	if (
+		//my->GetCurrentFrame() >= BasePlayer::c_THROW_ESCAPE_FRAME
+		my->GetActionFrame() != FRAME_STATE::ACTIVE
+		) return false;
+
+	// ‹…‹——£”»’è
+	Vector3 v(you->GetPos() - my->GetPos());
+	if (v.x * v.x + v.y * v.y < 10 * 10 &&
+		((v.x > 0 && my->GetDir() == DIR::RIGHT) || (v.x < 0 && my->GetDir() == DIR::LEFT)))
+	{
+		// š‚±‚±‚Å‚Â‚©‚Ü‚ê‚½‘ŠŽè‚ÌÀ•W‚ð‚Â‚©‚ñ‚¾‘ŠŽè‚Ì’Í‚ÝÀ•W‚ÉˆÚ“®(•’Ê‚É‘ã“ü‚·‚é‚Æ•Ç”²‚¯‚·‚é‚Ì‚ÅA•Ç”»’è‚à‚ë‚à‚ë‚±‚±‚Å‚â‚Á‚Ä‚µ‚Ü‚¨‚¤‚Æ‚¢‚¤Ž–)
+		if (my->GetDir() == DIR::LEFT  && my->isPushInput(PLAYER_COMMAND_BIT::RIGHT) ||
+			my->GetDir() == DIR::RIGHT && my->isPushInput(PLAYER_COMMAND_BIT::LEFT))
+		{
+			// Œü‚«‚ð‹t‚É‚·‚é
+			my->ReverseDir();
+
+			// ‘ŠŽè‚ÌÀ•W‚ÆŽ©•ª‚ÌÀ•W‚ð“ü‚ê‘Ö‚¦‚é
+			Vector3 temp(my->GetPos());
+			my->SetPos(you->GetPos());
+			you->SetPos(temp);
+		}
+
+		const Vector3 p(my->GetPos());
+		Vector3 v(my->GetFlontPos() - p), v2(v);
+
+		pStage->Collision(my, &v);	// ƒXƒe[ƒW‚Æ‚Ì”»’è‚ÅAmove’l‚ð‚Ç‚¤‚±‚¤‚¢‚¶‚Á‚½Œã‚É
+		if (fabsf(v.x) == 0)
+		{
+			my->GetPosAddress()->x -= v2.x;
+			you->SetPos(my->GetPos() + v2);
+		}
+		else you->SetPos(p + v);
+
+		/* ƒƒbƒZ[ƒW‘—M */
+
+		// ’Í‚Ý¬Œ÷‚µ‚½‚æ‚ÆƒƒbƒZ[ƒW‚ð‘—‚é
+		MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, my->GetID(), MESSAGE_TYPE::THROW_SUCCESS, nullptr);
+
+		// ’Í‚Ü‚ê‚½ƒƒbƒZ[ƒW
+		MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, you->GetID(), MESSAGE_TYPE::BE_THROWN, nullptr);
+
+		return true;
+	}
+
+	return false;
+}
+
+bool Collision::RaypicShot(Stage::Base *obj, Shot::Base *shot)
+{
+	const Vector3 move(shot->GetMove());
+	const Vector3 pos(shot->GetPos());
+
+	if (move.y > 0) // ã
+	{
+		if (pos.y + move.y > 100) return true;
+	}
+	else if (move.y < 0) // ‰º
+	{
+		if (pos.y + move.y < obj->GetBottom()) return true;
+	}
+
+	if (move.x > 0) // ‰E
+	{
+		if (pos.x + move.x > obj->GetWidth() / 2) return true;
+	}
+	else if (move.x < 0) // ¶
+	{
+		if (pos.x + move.x < -obj->GetWidth() / 2) return true;
+	}
+
+	return false;
+}
 
 void Collision::Raypic(Stage::Base *obj, BasePlayer *player, Vector3 *move) // ƒXƒe[ƒW‚ÆƒvƒŒƒCƒ„[
 {
@@ -19,13 +483,19 @@ void Collision::Raypic(Stage::Base *obj, BasePlayer *player, Vector3 *move) // ƒ
 		RaypicDown(obj, player, move);
 	}
 
-	if (move->x > 0) // ‰E
+	if (move->x != 0)
 	{
-		RaypicRight(obj, player, move);
-	}
-	else if (move->x < 0) // ¶
-	{
-		RaypicLeft(obj, player, move);
+		// ƒvƒŒƒCƒ„[‚ÆƒvƒŒƒCƒ„[‚Ì‹——£
+		const float fTargetVecX(player->GetTargetPlayer()->GetPos().x - player->GetPos().x);
+
+		if (move->x > 0) // ‰E
+		{
+			RaypicRight(obj, player, move, fTargetVecX);
+		}
+		else if (move->x < 0) // ¶
+		{
+			RaypicLeft(obj, player, move, fTargetVecX);
+		}
 	}
 }
 
@@ -127,14 +597,16 @@ void Collision::RaypicDown(Stage::Base *obj, BasePlayer *player, Vector3 *move)
 		//}
 	}
 }
-void Collision::RaypicLeft(Stage::Base *obj, BasePlayer *player, Vector3 *move)
+void Collision::RaypicLeft(Stage::Base *obj, BasePlayer *player, Vector3 *move, float fTargetVecX)
 {
 	Vector3 pos(player->GetPos());
 	const CollisionShape::Square *square(player->GetHitSquare());
 
 	Vector3 ray_pos;
 
-	const float width(obj->GetWidth()/2);
+	const float width(
+		//(fabsf(fTargetVecX) > 50) ? pos.x : 
+		-obj->GetWidth()/2);
 
 	if (move->x < 0) // ¶
 	{
@@ -145,9 +617,9 @@ void Collision::RaypicLeft(Stage::Base *obj, BasePlayer *player, Vector3 *move)
 
 		//if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // “–‚½‚Á‚½
 		{
-			if (pos.x - square->width + move->x <= -width)
+			if (pos.x - square->width + move->x <= width)
 			{
-				pos.x = -width + square->width - square->pos.x;
+				pos.x = width + square->width - square->pos.x;
 				move->x = 0;
 
 				//player->SetMove(move);
@@ -155,43 +627,9 @@ void Collision::RaypicLeft(Stage::Base *obj, BasePlayer *player, Vector3 *move)
 				hit = true;
 			}
 		}
-		
-		//if(!hit) // “–‚½‚ç‚È‚©‚Á‚½‚©‚çã‰º‚©‚çrayo‚· 
-		//{
-		//	float h(0);
-		//	if (move->y > 0) // ã
-		//	{
-		//		h = square->height * 0.85f;
-		//	}
-		//	else // ‰º
-		//	{
-		//		h = -square->height * 0.85f;
-		//	}
-		//	ray_pos = pos;
-		//	ray_pos += square->pos;
-		//	ray_pos.y += h;
-		//	ray_vec.Set(-1, 0, 0);
-		//	dist = square->width - move->x + 1;
-		//
-		//
-		//
-		//	if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // “–‚½‚Á‚½
-		//	{
-		//		dist = abs(hit_pos.x - ray_pos.x);
-		//		if (dist <= square->width - move->x)
-		//		{
-		//			pos.x = hit_pos.x + square->width - square->pos.x;
-		//			move->x = 0;
-		//
-		//			// ƒvƒŒƒCƒ„[‚ÉƒZƒbƒg‚·‚é‚Ì‚Å‚Í‚È‚­Amove’l‚ÌƒAƒhƒŒƒX‚ðˆø”‚Å‚à‚ç‚Á‚Ä’¼Ú‘‚«Š·‚¦‚éŒ`‚É‚µ‚½B(‚ß‚èž‚Ý”»’è‚ÅA‚ß‚èž‚Ý”»’è—p‚Ìmove’l‚ðŽg‚¤‚±‚Æ‚É‚È‚Á‚½‚Ì‚Å)
-		//			//player->SetMove(move);
-		//			player->SetPos(pos);
-		//		}
-		//	}
-		//}
 	}
 }
-void Collision::RaypicRight(Stage::Base *obj, BasePlayer *player, Vector3 *move)
+void Collision::RaypicRight(Stage::Base *obj, BasePlayer *player, Vector3 *move, float fTargetVecX)
 {
 	Vector3 pos(player->GetPos());
 	const CollisionShape::Square *square(player->GetHitSquare());
@@ -206,7 +644,9 @@ void Collision::RaypicRight(Stage::Base *obj, BasePlayer *player, Vector3 *move)
 		ray_pos += square->pos;
 		ray_pos.y += square->height * 0.1f;
 
-		const float width(obj->GetWidth() / 2);
+		const float width(
+			//(fabsf(fTargetVecX) > 50) ? pos.x : 
+			obj->GetWidth() / 2);
 
 		//if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // “–‚½‚Á‚½
 		{

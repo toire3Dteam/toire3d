@@ -520,14 +520,14 @@ namespace BasePlayerState
 	};
 
 	/*******************************************************/
-	//		エアリアルノックバックステート(空中やられ)　
+	//		足払い喰らいステート　
 	/*******************************************************/
-	class AerialKnockBack :public State<BasePlayer>
+	class DownFall :public State<BasePlayer>
 	{
 	public:
 
 		// this is a シングルトン
-		static AerialKnockBack* GetInstance(){ static AerialKnockBack instance; return &instance; }
+		static DownFall* GetInstance(){ static DownFall instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -547,11 +547,11 @@ namespace BasePlayerState
 
 	private:
 
-		AerialKnockBack() {};
-		~AerialKnockBack() {};
+		DownFall() {};
+		~DownFall() {};
 
-		AerialKnockBack(const AerialKnockBack&) {}
-		AerialKnockBack& operator=(const AerialKnockBack&) {}
+		DownFall(const DownFall&) {}
+		DownFall& operator=(const DownFall&) {}
 	};
 
 
@@ -730,7 +730,7 @@ namespace BasePlayerState
 	};
 
 	/*******************************************************/
-	//					対空攻撃
+	//					2B攻撃
 	/*******************************************************/
 	class SquatAttack :public State<BasePlayer>
 	{
@@ -761,6 +761,40 @@ namespace BasePlayerState
 
 		SquatAttack(const SquatAttack&) {}
 		SquatAttack& operator=(const SquatAttack&) {}
+	};
+
+	/*******************************************************/
+	//					対空攻撃
+	/*******************************************************/
+	class AntiAirAttack :public State<BasePlayer>
+	{
+	public:
+
+		// this is a シングルトン
+		static AntiAirAttack* GetInstance(){ static AntiAirAttack instance; return &instance; }
+
+		// 入る
+		virtual void Enter(BasePlayer* pPerson);
+
+		// 実行します
+		virtual void Execute(BasePlayer* pPerson);
+
+		// 帰る
+		virtual void Exit(BasePlayer* pPerson);
+
+		// 描画
+		virtual void Render(BasePlayer* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(BasePlayer* pPerson, const Message& msg);
+
+
+	private:
+		AntiAirAttack() {};
+		~AntiAirAttack() {};
+
+		AntiAirAttack(const AntiAirAttack&) {}
+		AntiAirAttack& operator=(const AntiAirAttack&) {}
 	};
 
 	/*******************************************************/

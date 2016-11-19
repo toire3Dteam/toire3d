@@ -33,9 +33,13 @@ sceneTitle::~sceneTitle()
 void sceneTitle::Update()
 {
 	// エンターキーでスタート
-	if (KeyBoardTRG(KB_ENTER) || m_pMovie->isEndPos())
+	FOR(4)
 	{
-		MainFrameEx->ChangeScene(new sceneMenu);
+		if (KEY(KEY_A, i) == 3 || KEY(KEY_B, 1) == 3 || KEY(KEY_C, 1) == 3 || KEY(KEY_D, 1) == 3)
+		{
+			MainFrameEx->ChangeScene(new sceneMenu);
+			break;
+		}
 	}
 }
 //

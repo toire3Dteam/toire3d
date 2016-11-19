@@ -18,7 +18,7 @@
 #include "../BaseEntity/Message/MessageDispatcher.h"
 
 // これを定義するとラウンドコールがスキップされる(デバッグ時短用)
-//#define ROUND_SKIP
+#define ROUND_SKIP
 
 //#ifdef ROUND_SKIP
 #include "../UI/GameUI.h"
@@ -67,6 +67,7 @@ void SceneMainState::StageIntro::Execute(sceneMain *pMain)
 
 	// プレイヤー更新
 	PlayerMgr->Update(false);
+	PlayerMgr->UpdatePos();
 
 	// カメラ更新
 	CameraMgr->Update();
@@ -96,7 +97,7 @@ bool SceneMainState::StageIntro::OnMessage(sceneMain *pMain, const Message & msg
 void SceneMainState::CharaIntro::Enter(sceneMain *pMain)
 {
 	// フェード初期化
-	if(Fade::m_alpha >= 200) Fade::Set(Fade::FLAG::FADE_IN, 8, 0x00000000);
+	if(Fade::m_alpha >= 128) Fade::Set(Fade::FLAG::FADE_IN, 8, 0x00000000);
 
 	// キャラクターたちのイントロ
 	PlayerMgr->SetIntroState();
@@ -138,6 +139,7 @@ void SceneMainState::CharaIntro::Execute(sceneMain *pMain)
 
 	// プレイヤー更新
 	PlayerMgr->Update(false);
+	PlayerMgr->UpdatePos();
 
 	// カメラ更新
 	CameraMgr->Update();
@@ -167,7 +169,7 @@ bool SceneMainState::CharaIntro::OnMessage(sceneMain *pMain, const Message & msg
 void SceneMainState::Round::Enter(sceneMain *pMain)
 {
 	// フェード初期化
-	if (Fade::m_alpha >= 200) Fade::Set(Fade::FLAG::FADE_IN, 8, 0x00000000);
+	if (Fade::m_alpha >= 128) Fade::Set(Fade::FLAG::FADE_IN, 8, 0x00000000);
 
 #ifdef ROUND_SKIP
 	GameUIMgr->Action();
@@ -188,6 +190,7 @@ void SceneMainState::Round::Execute(sceneMain *pMain)
 
 	// プレイヤー更新
 	PlayerMgr->Update(false);
+	PlayerMgr->UpdatePos();
 
 	// カメラ更新
 	CameraMgr->Update();
@@ -219,6 +222,13 @@ void SceneMainState::Main::Execute(sceneMain *pMain)
 {
 	// プレイヤー更新
 	PlayerMgr->Update(true);
+
+	// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
+	Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager(), pMain->GetStage());
+
+	// プレイヤー位置確定
+	PlayerMgr->UpdatePos();
+
 
 	// カメラ更新
 	CameraMgr->Update();
@@ -322,6 +332,12 @@ void SceneMainState::Finish::Execute(sceneMain *pMain)
 	{
 		// プレイヤー更新
 		PlayerMgr->Update(false);
+
+		// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
+		Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager(), pMain->GetStage());
+
+		// プレイヤー位置確定
+		PlayerMgr->UpdatePos();
 
 		// カメラ更新
 		CameraMgr->Update();
@@ -429,6 +445,12 @@ void SceneMainState::HeaveHoDriveOverFlowSuccess::Execute(sceneMain *pMain)
 		// プレイヤー更新
 		PlayerMgr->Update(false);
 
+		// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
+		Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager(), pMain->GetStage());
+
+		// プレイヤー位置確定
+		PlayerMgr->UpdatePos();
+
 		// カメラ更新
 		CameraMgr->Update();
 
@@ -482,6 +504,7 @@ void SceneMainState::TutorialIntro::Execute(sceneMain *pMain)
 
 	// プレイヤー更新
 	PlayerMgr->Update(false);
+	PlayerMgr->UpdatePos();
 
 	// カメラ更新
 	CameraMgr->Update();
@@ -541,11 +564,23 @@ void SceneMainState::TutorialMain::Execute(sceneMain *pMain)
 	{
 		// クリアにたので動きを止める
 		PlayerMgr->Update(false);
+
+		// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
+		Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager(), pMain->GetStage());
+
+		// プレイヤー位置確定
+		PlayerMgr->UpdatePos();
 	}
 	else
 	{
 		// 通常
 		PlayerMgr->Update(true);
+
+		// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
+		Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager(), pMain->GetStage());
+
+		// プレイヤー位置確定
+		PlayerMgr->UpdatePos();
 	}
 
 	// カメラ更新
@@ -662,6 +697,7 @@ void SceneMainState::TutorialClear::Execute(sceneMain *pMain)
 
 	// プレイヤー更新
 	PlayerMgr->Update(false);
+	PlayerMgr->UpdatePos();
 
 	// カメラ更新
 	CameraMgr->Update();

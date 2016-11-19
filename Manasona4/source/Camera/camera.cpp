@@ -6,6 +6,11 @@
 #include "../Player/BasePlayer.h"
 #include "../Player/PlayerManager.h"
 
+float senter_X, senter_Y;
+float range_X, range_Y;
+float percent_X = 0.0f, percent_Y = 0.0f;
+float percent = 0.0f;
+
 //*****************************************************************************************************************************
 //
 //		カメラクラス
@@ -77,7 +82,7 @@ void Camera::SetStageCameraInfo(char *path)
 	ifs >> cType;
 	m_GameCameraData.bSumabura = (strcmp(cType, "SUMABURA") == 0);	// スマブラかどうか
 
-	// XYの範囲
+	// XYの範囲	※この値のXを下げれば下げるほど、端端でのキャラの全体像が入りやすくなる！
 	ifs >> skip;
 	ifs >> m_GameCameraData.FullRange.x;
 	ifs >> m_GameCameraData.FullRange.y;
@@ -139,9 +144,12 @@ void Camera::Activate()
 {
 	tdnView::Activate();
 	tdnView::Clear();
+}
 
+void Camera::DebugRender()
+{
 	//tdnText::Draw(32, 640, 0xffffff00, "CameraEventFrame : %d", m_pEffectCamera->GetEventTime());
-	//Text::Draw(32, 128, 0xffffff00, "CameraFov : %.2f", projection.fovY);
+	tdnText::Draw(32, 120, 0xffffff00, "centerX : %.2f\nrangeX : %.2f\npercentX : %.2f\npercent : %.2f", senter_X, range_X, percent_X, percent);
 
 	//if (KeyBoard(KB_NUMPAD4)) m_angle.z += .05f;
 	//if (KeyBoard(KB_NUMPAD6)) m_angle.z -= .05f;
@@ -292,25 +300,26 @@ void SumaburaCameraState::Execute(Camera *pCamera)
 		}
 	}
 
-	MAX_X = Math::Clamp(MAX_X, pCamera->m_GameCameraData.MoveMin.x, pCamera->m_GameCameraData.MoveMax.x);
-	MAX_Y = Math::Clamp(MAX_Y, pCamera->m_GameCameraData.MoveMin.y, pCamera->m_GameCameraData.MoveMax.y);
+	// ★1118追加 この分を消したらキャラ画面外がなくなった
+	//MAX_X = Math::Clamp(MAX_X, pCamera->m_GameCameraData.MoveMin.x, pCamera->m_GameCameraData.MoveMax.x);
+	//MAX_Y = Math::Clamp(MAX_Y, pCamera->m_GameCameraData.MoveMin.y, pCamera->m_GameCameraData.MoveMax.y);
 
 	//　次に幅を求めるのと真ん中を求める
-	float senter_X, senter_Y;
-	float range_X, range_Y;
+	//float senter_X, senter_Y;
+	//float range_X, range_Y;
 	range_X = abs(MAX_X - MIN_X);//今のXの幅
 	range_Y = abs(MAX_Y - MIN_Y);//今のYの幅
 
 	senter_X = (MAX_X + MIN_X) / 2;//中心X取得
 	senter_Y = (MAX_Y + MIN_Y) / 2;//中心Y取得
 
-	float percent_X = 0.0f, percent_Y = 0.0f;
+	//float percent_X = 0.0f, percent_Y = 0.0f;
 
 	percent_X = range_X / pCamera->m_GameCameraData.FullRange.x;
 	percent_Y = range_Y / pCamera->m_GameCameraData.FullRange.y;
 
 	//　パーセント取得
-	float percent = 0.0f;
+	//float percent = 0.0f;
 	if (percent_X > percent_Y)percent = percent_X;
 	else percent = percent_Y;
 
@@ -318,10 +327,8 @@ void SumaburaCameraState::Execute(Camera *pCamera)
 	pCamera->m_ipos.z = (pCamera->m_GameCameraData.FullZ * percent) - 40;//パーセントによってカメラを近づけさす －40は補正
 
 	//　動けるX＆Y
-	float max_move_x = pCamera->m_GameCameraData.MoveMax.x * (1.0f - percent);
-	float max_move_y = pCamera->m_GameCameraData.MoveMax.y * (1.0f - percent);
-	float min_move_x = pCamera->m_GameCameraData.MoveMin.x * (1.0f - percent);
-	float min_move_y = pCamera->m_GameCameraData.MoveMin.y * (1.0f - percent);
+	Vector2 MaxMove(pCamera->m_GameCameraData.MoveMax.x * (1.0f - percent), pCamera->m_GameCameraData.MoveMax.y * (1.0f - percent));
+	Vector2 MinMove(pCamera->m_GameCameraData.MoveMin.x * (1.0f - percent), pCamera->m_GameCameraData.MoveMin.y * (1.0f - percent));
 
 	//　まずは中心に
 	pCamera->m_ipos.x = senter_X;
@@ -330,25 +337,25 @@ void SumaburaCameraState::Execute(Camera *pCamera)
 	pCamera->m_itarget.y = senter_Y;
 
 	//補正
-	if (max_move_x <= pCamera->m_ipos.x)
+	if (MaxMove.x <= pCamera->m_ipos.x)
 	{
-		pCamera->m_ipos.x = max_move_x;
-		pCamera->m_itarget.x = max_move_x;
+		pCamera->m_ipos.x = MaxMove.x;
+		pCamera->m_itarget.x = MaxMove.x;
 	}
-	if (min_move_x >= pCamera->m_ipos.x)
+	if (MinMove.x >= pCamera->m_ipos.x)
 	{
-		pCamera->m_ipos.x = min_move_x;
-		pCamera->m_itarget.x = min_move_x;
+		pCamera->m_ipos.x = MinMove.x;
+		pCamera->m_itarget.x = MinMove.x;
 	}
-	if (max_move_y <= pCamera->m_ipos.y)
+	if (MaxMove.y <= pCamera->m_ipos.y)
 	{
-		pCamera->m_ipos.y = max_move_y;
-		pCamera->m_itarget.y = max_move_y;
+		pCamera->m_ipos.y = MaxMove.y;
+		pCamera->m_itarget.y = MaxMove.y;
 	}
-	if (min_move_y >= pCamera->m_ipos.y)
+	if (MinMove.y >= pCamera->m_ipos.y)
 	{
-		pCamera->m_ipos.y = min_move_y;
-		pCamera->m_itarget.y = min_move_y;
+		pCamera->m_ipos.y = MinMove.y;
+		pCamera->m_itarget.y = MinMove.y;
 	}
 
 

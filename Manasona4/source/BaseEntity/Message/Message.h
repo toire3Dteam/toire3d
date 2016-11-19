@@ -30,6 +30,7 @@ enum MESSAGE_TYPE
 	KAKEAI_END,			// 掛け合い終了
 	COMBO_COUNT,		// コンボカウント
 	COMBO_GUARD,		// コンボガードされたぜ
+	ADD_SHOT,			// ショットの実体を格納してね
 	OTHER				// その他。
 };
 
@@ -65,6 +66,13 @@ struct KO_INFO
 	SIDE WinnerSide;			// KOしたやつのサイド
 };
 
+enum class DAMAGE_MOTION
+{
+	KNOCK_BACK,	// のけぞり
+	KNOCK_DOWN,	// 吹っ飛び
+	DOWN_FALL,	// 足払いくらい
+};
+
 // 攻撃喰らった相手用
 struct HIT_DAMAGE_INFO
 {
@@ -80,14 +88,14 @@ struct HIT_DAMAGE_INFO
 	int iAntiGuard;			// ガード突き破る攻撃の種類
 	LPCSTR HitSE;			// ヒットするSEのID
 	bool bFinishOK;			// フィニッシュする攻撃か
-
-	HIT_DAMAGE_INFO():BeInvincible(false), damage(0), FlyVector(0,0), hitStopFlame(0), HitRecoveryFrame(0), GuardRecoveryFrame(0), HitEffectType(0), bOverDrive(false), iAttackType(0), iAntiGuard(0), HitSE(nullptr), bFinishOK(true){}
+	float fGuardKnockBackPower;	// ガードのけぞりの力
+	DAMAGE_MOTION DamageMotion;	// 喰らったモーションタイプ
+	HIT_DAMAGE_INFO():BeInvincible(false), damage(0), FlyVector(0,0), hitStopFlame(0), HitRecoveryFrame(0), GuardRecoveryFrame(0), HitEffectType(0), bOverDrive(false), iAttackType(0), iAntiGuard(0), HitSE(nullptr), bFinishOK(true), DamageMotion(DAMAGE_MOTION::KNOCK_BACK), fGuardKnockBackPower(0){}
 };
 
 // 攻撃ヒットしたプレイヤー用
 struct HIT_ATTACK_INFO
 {
-	//int HitPlayerDeviceID;	// ダメージを与えた相手の番号
 	int hitStopFlame;		// ヒットストップフレーム
 	int HitScore;			// 加算されるスコア
 	bool bOverDrive;		// フィニッシュアタック

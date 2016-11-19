@@ -147,7 +147,7 @@ void AIState::Global::Execute(AI * pPerson)
 {
 	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::KnockBack::GetInstance()) == true ||
 		MyPlayer->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) == true ||
-		MyPlayer->GetFSM()->isInState(*BasePlayerState::AerialKnockBack::GetInstance()) == true
+		MyPlayer->GetFSM()->isInState(*BasePlayerState::DownFall::GetInstance()) == true
 		)
 	{
 		// 復帰モードに戻る
@@ -285,7 +285,7 @@ void AIState::PracticeLand::Execute(AI * pPerson)
 	// ★何か攻撃を受けている最中ならば
 	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::KnockBack::GetInstance()) == true ||
 		MyPlayer->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) == true ||
-		MyPlayer->GetFSM()->isInState(*BasePlayerState::AerialKnockBack::GetInstance()) == true
+		MyPlayer->GetFSM()->isInState(*BasePlayerState::DownFall::GetInstance()) == true
 		)
 	{
 		// 復帰ボタン
@@ -1177,7 +1177,7 @@ void AIState::Recovery::Execute(AI * pPerson)
 
 	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::KnockBack::GetInstance()) == false &&
 		MyPlayer->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) == false &&
-		MyPlayer->GetFSM()->isInState(*BasePlayerState::AerialKnockBack::GetInstance()) == false)
+		MyPlayer->GetFSM()->isInState(*BasePlayerState::DownFall::GetInstance()) == false)
 	{
 			// 追跡モードに戻る
 			pPerson->GetFSM()->ChangeState(AIState::Chase::GetInstance());
