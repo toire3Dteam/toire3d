@@ -382,7 +382,7 @@ Stand::Maya::Maya(BasePlayer *pPlayer) :Base(pPlayer)
 	m_pObj = new iex3DObj("DATA/CHR/Stand/Maya/maya.IEM");
 
 	// 玉の実体
-	m_pBullet = new iexMesh("DATA/UVeffect/Airou/AirouBoost.IMO");
+	m_pBullet = new  AirouDrillEffect();/*iexMesh("DATA/UVeffect/Airou/AirouBoost.IMO");*/
 
 	// アクションフレームロードする
 	LoadActionFrameList("DATA/CHR/Stand/Maya/FrameList.txt");

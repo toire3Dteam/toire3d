@@ -113,7 +113,7 @@ namespace Stand
 		// 純粋仮想オーバーライド
 		void Action(SKILL_ACTION_TYPE type);
 	private:
-		iexMesh *m_pBullet;	// 飛び道具のメッシュの実体(玉に参照させる)
+		BaseUVEffect *m_pBullet;	// 飛び道具のメッシュの実体(玉に参照させる)
 
 	};
 }

@@ -3,6 +3,7 @@
 // 前方宣言
 class AttackData;
 class BasePlayer;
+class BaseUVEffect;
 
 namespace Shot
 {
@@ -17,7 +18,7 @@ namespace Shot
 		//------------------------------------------------------
 		//	コンストラクタ
 		//------------------------------------------------------
-		Base(BasePlayer *pPlayer, AttackData *pAttackData, iexMesh *pObj, const Vector3 &pos, const Vector3 &vVec, const Vector3 &vVelocity, const Vector3 &vAccel = Vector3(0, 0, 0));
+		Base(BasePlayer *pPlayer, AttackData *pAttackData, BaseUVEffect *pObj, const Vector3 &pos, const Vector3 &vVec, const Vector3 &vVelocity, const Vector3 &vAccel = Vector3(0, 0, 0));
 
 		//------------------------------------------------------
 		//	デストラクタ
@@ -55,12 +56,12 @@ namespace Shot
 		//------------------------------------------------------
 		void Erase(){ m_bErase = true; }
 
-	private:
+	protected:
 
 		//------------------------------------------------------
 		//	メッシュ
 		//------------------------------------------------------
-		iexMesh *m_pObj;	// メッシュの実体(参照するだけ)
+		BaseUVEffect *m_pObj;	// メッシュの実体(参照するだけ)
 
 
 		//------------------------------------------------------
@@ -91,7 +92,7 @@ namespace Shot
 	class Maya :public Base
 	{
 	public:
-		Maya(BasePlayer *pPlayer, AttackData *pAttackData, iexMesh *pObj, const Vector3 &vPos, const Vector3 &vVec);
+		Maya(BasePlayer *pPlayer, AttackData *pAttackData,  BaseUVEffect *pObj, const Vector3 &vPos, const Vector3 &vVec);
 		~Maya();
 		void Update();
 		void Render();

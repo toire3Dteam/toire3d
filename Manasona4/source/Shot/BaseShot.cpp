@@ -2,16 +2,34 @@
 #include "BaseShot.h"
 #include "../Player/BasePlayer.h"
 #include "../Collision/Collision.h"
+#include "PointLight\PointLight.h"
+#include "DeferredEx\DeferredEx.h"
 
-Shot::Base::Base(BasePlayer *pPlayer, AttackData *pAttackData, iexMesh *pObj, const Vector3 &vPos, const Vector3 &vVec, const Vector3 &vVelocity, const Vector3 &vAccel):m_pPlayer(pPlayer), m_ptagAttackData(pAttackData), m_pObj(pObj), m_vPos(vPos), m_vVec(vVec), m_vVelocity(vVelocity), m_vAccel(vAccel), m_bErase(false)
+Shot::Base::Base(BasePlayer *pPlayer, AttackData *pAttackData,
+	BaseUVEffect *pObj,
+	const Vector3 &vPos,
+	const Vector3 &vVec,
+	const Vector3 &vVelocity,
+	const Vector3 &vAccel):
+	m_pPlayer(pPlayer),
+	m_ptagAttackData(pAttackData),
+	m_pObj(pObj),
+	m_vPos(vPos),
+	m_vVec(vVec),
+	m_vVelocity(vVelocity),
+	m_vAccel(vAccel),
+	m_bErase(false)
 {
-
+	m_pObj->ActionRoop(m_vPos);
 }
 
 void Shot::Base::Render()
 {
 	m_pObj->SetPos(m_vPos);
-	m_pObj->SetAngle(0, 0, atan2f(-m_vVec.x, m_vVec.y));
+	m_pObj->SetAngleAnimation(
+		Vector3(0, 0, atan2f(-m_vVec.x, m_vVec.y)),
+		Vector3(0, 0, atan2f(-m_vVec.x, m_vVec.y))
+		);
 	m_pObj->Update();
 
 	// 自分で行列を作る(位置・移動ベクトル情報から)
@@ -46,7 +64,12 @@ void Shot::Base::Render()
 }
 
 
-Shot::Maya::Maya(BasePlayer *pPlayer, AttackData *pAttackData, iexMesh *pObj, const Vector3 &vPos, const Vector3 &vVec) :Base(pPlayer, pAttackData, pObj, vPos, vVec, vVec*1.25f)
+Shot::Maya::Maya(BasePlayer *pPlayer,
+	AttackData *pAttackData,
+	BaseUVEffect *pObj,
+	const Vector3 &vPos,
+	const Vector3 &vVec) :
+	Base(pPlayer, pAttackData, pObj, vPos, vVec, vVec*1.25f)
 {
 }
 
@@ -59,6 +82,14 @@ void Shot::Maya::Update()
 {
 // 基底クラスの更新
 Base::Update();
+
+// マーヤは闇の光追加
+PointLightMgr->AddPointLight(m_vPos + Vector3(0, 5, 0), 
+	Vector3(1.0f, 0.4f, 1.0f), 20, 4, 3, 1, 2);// ポイントライトエフェクト！
+	
+											   // ここでポイントライトに詰める
+//DeferredManagerEx.AddPLSdata(m_vPos, Vector3(1.0f, 2.4f, 0.0f), 100, 2);
+
 }
 
 void Shot::Maya::Render()

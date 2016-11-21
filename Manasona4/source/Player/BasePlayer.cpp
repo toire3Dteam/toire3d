@@ -1280,7 +1280,7 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType)
 		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::HIT_RING, 2, 3, Vector3(0, supportAngleY, z), Vector3(0, supportAngleY, z));
 
 		// 
-		PointLightMgr->AddPointLight(pos + Vector3(0, 5, 0), Vector3(1.0f, 0.4f, 0.0f), 20, 4, 20, 4, 15);// ポイントライトエフェクト！
+		PointLightMgr->AddPointLight(pos + Vector3(0, 5, 0), Vector3(1.4f, 0.8f, 0.0f), 20, 4, 20, 4, 15);// ポイントライトエフェクト！
 		Vector3 FlyVector(m_move);
 		FlyVector.Normalize();
 		ParticleManager::EffectHit(pos, FlyVector);
