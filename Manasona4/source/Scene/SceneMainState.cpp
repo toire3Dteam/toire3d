@@ -16,9 +16,9 @@
 #include "../SceneSwitch/SceneSwitch.h"
 #include "MenuUI\TutorialManager.h"
 #include "../BaseEntity/Message/MessageDispatcher.h"
-
+#include "SceneMenu.h"
 // これを定義するとラウンドコールがスキップされる(デバッグ時短用)
-#define ROUND_SKIP
+//#define ROUND_SKIP
 
 //#ifdef ROUND_SKIP
 #include "../UI/GameUI.h"
@@ -66,7 +66,7 @@ void SceneMainState::StageIntro::Execute(sceneMain *pMain)
 	}
 
 	// プレイヤー更新
-	PlayerMgr->Update(false);
+	PlayerMgr->Update(PLAYER_UPDATE::CONTROL_NO);
 	PlayerMgr->UpdatePos();
 
 	// カメラ更新
@@ -138,7 +138,7 @@ void SceneMainState::CharaIntro::Execute(sceneMain *pMain)
 	if(++m_iKakeaiTimer > 180) pMain->GetFSM()->ChangeState(Round::GetInstance());
 
 	// プレイヤー更新
-	PlayerMgr->Update(false);
+	PlayerMgr->Update(PLAYER_UPDATE::CONTROL_NO);
 	PlayerMgr->UpdatePos();
 
 	// カメラ更新
@@ -172,24 +172,44 @@ void SceneMainState::Round::Enter(sceneMain *pMain)
 	if (Fade::m_alpha >= 128) Fade::Set(Fade::FLAG::FADE_IN, 8, 0x00000000);
 
 #ifdef ROUND_SKIP
-	GameUIMgr->Action();
+	//if (pMain->GetRoundNum() == 0)
+	{
+		GameUIMgr->Action();
+	}
 #else
-	// The Wheel of Fate is Turning.
-	const int RoundNumber(PlayerMgr->GetRoundNumber());
+	// ラウンド数が0の時はコールしない
+	if (pMain->GetRoundNum() != 0)
+	{
+		// The Wheel of Fate is Turning.
+		const int RoundNumber(PlayerMgr->GetRoundNumber());
 
-	// 初回なら
-	if (RoundNumber == 0)pMain->GetRoundCall()->CallFirstGameRound();
-	else pMain->GetRoundCall()->CallRound(RoundNumber + 1);
+		// 初回なら
+		if (RoundNumber == 0)pMain->GetRoundCall()->CallFirstGameRound();
+		else pMain->GetRoundCall()->CallRound(RoundNumber + 1);
+	}
+	else
+	{
+		GameUIMgr->Action();
+	}
+
 #endif
 }
 void SceneMainState::Round::Execute(sceneMain *pMain)
 {
 #ifdef ROUND_SKIP
-	pMain->GetFSM()->ChangeState(Main::GetInstance());
+	//if (pMain->GetRoundNum() == 0)
+	{
+		pMain->GetFSM()->ChangeState(Main::GetInstance());
+	}
 #endif
+	
+	if (pMain->GetRoundNum() == 0)
+	{
+		pMain->GetFSM()->ChangeState(Main::GetInstance());
+	}
 
 	// プレイヤー更新
-	PlayerMgr->Update(false);
+	PlayerMgr->Update(PLAYER_UPDATE::NO_FSM);
 	PlayerMgr->UpdatePos();
 
 	// カメラ更新
@@ -221,7 +241,7 @@ void SceneMainState::Main::Enter(sceneMain *pMain){}
 void SceneMainState::Main::Execute(sceneMain *pMain)
 {
 	// プレイヤー更新
-	PlayerMgr->Update(true);
+	PlayerMgr->Update(PLAYER_UPDATE::CONTROL_OK);
 
 	// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
 	Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager(), pMain->GetStage());
@@ -331,7 +351,7 @@ void SceneMainState::Finish::Execute(sceneMain *pMain)
 	else
 	{
 		// プレイヤー更新
-		PlayerMgr->Update(false);
+		PlayerMgr->Update(PLAYER_UPDATE::CONTROL_NO);
 
 		// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
 		Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager(), pMain->GetStage());
@@ -360,6 +380,19 @@ void SceneMainState::Finish::Execute(sceneMain *pMain)
 				}
 			}
 		}
+		else
+		{
+			// ここに来たということは、たぶんトレーニングで敵を倒した場合
+			if (Fade::isFadeOutCompletion())
+			{
+				// チュートリアルで殺してしまった
+				if(pMain->GetFSM()->isPrevState(*SceneMainState::TutorialMain::GetInstance()))
+					pMain->GetFSM()->ChangeState(SceneMainState::TutorialIntro::GetInstance());
+
+				// (TODO)トレーニングモードで殺してしまった
+				//if()
+			}
+		}
 	}
 }
 void SceneMainState::Finish::Exit(sceneMain *pMain){}
@@ -382,18 +415,28 @@ bool SceneMainState::Finish::OnMessage(sceneMain *pMain, const Message & msg)
 
 	case MESSAGE_TYPE::END_FINISHCALL:
 
-		// プレイヤーがラウンドとってリザルトに行くのが確定しているなら
-		if (LoadSceneThreadMgr->isAction())
+		// チュートリアルorトレーニング
+		if (pMain->GetRoundNum() == 0)
 		{
-			// リザルト切り替わり発動
-			pMain->GetSceneSwitchPrev()->Action();
+			Fade::Set(Fade::FLAG::FADE_OUT, 8, 0x00000000);
 		}
 
-		// それ以外なら勝ったプレイヤーの勝ち演出
+		// マジ対戦
 		else
 		{
-			ENTITY_ID *WinnerID = (ENTITY_ID*)msg.ExtraInfo;
-			MsgMgr->Dispatch(0, ENTITY_ID::SCENE_MAIN, *WinnerID, MESSAGE_TYPE::END_FINISHCALL, nullptr);
+			// プレイヤーがラウンドとってリザルトに行くのが確定しているなら
+			if (LoadSceneThreadMgr->isAction())
+			{
+				// リザルト切り替わり発動
+				pMain->GetSceneSwitchPrev()->Action();
+			}
+
+			// それ以外なら勝ったプレイヤーの勝ち演出
+			else
+			{
+				ENTITY_ID *WinnerID = (ENTITY_ID*)msg.ExtraInfo;
+				MsgMgr->Dispatch(0, ENTITY_ID::SCENE_MAIN, *WinnerID, MESSAGE_TYPE::END_FINISHCALL, nullptr);
+			}
 		}
 		break;
 	case MESSAGE_TYPE::END_WINNER:
@@ -443,7 +486,7 @@ void SceneMainState::HeaveHoDriveOverFlowSuccess::Execute(sceneMain *pMain)
 	else
 	{
 		// プレイヤー更新
-		PlayerMgr->Update(false);
+		PlayerMgr->Update(PLAYER_UPDATE::CONTROL_NO);
 
 		// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
 		Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager(), pMain->GetStage());
@@ -486,10 +529,19 @@ void SceneMainState::TutorialIntro::Enter(sceneMain *pMain)
 	Fade::Set(Fade::FLAG::FADE_IN, 16, 0x00000000);
 
 	// (仮)歩き
-	TutorialMgr->Init(TUTORIAL_TYPE::WALK);
+	TutorialMgr->Init(pMain->GetSelectTutorial());
 	TutorialMgr->GetTutorial()->ActionIntroTips();// イントロのTipsを用意
 	
-	GameUIMgr->Action();
+	// 最初の一回だけ
+	//if (pMain->GetFSM()->isPrevState(*SceneMainState::TutorialClear::GetInstance()) == false)
+	{
+		GameUIMgr->Action();
+	}
+
+	// 情報初期化
+	PlayerMgr->Reset();
+	CameraMgr->SetPlayersPos();
+	ParticleManager::Reset();
 }
 
 // 更新
@@ -503,14 +555,15 @@ void SceneMainState::TutorialIntro::Execute(sceneMain *pMain)
 	TutorialMgr->Update();
 
 	// プレイヤー更新
-	PlayerMgr->Update(false);
+	PlayerMgr->Update(PLAYER_UPDATE::NO_FSM);
 	PlayerMgr->UpdatePos();
 
 	// カメラ更新
 	CameraMgr->Update();
 
-	// ◎ボタンで進む
-	if (tdnInput::KeyGet(KEYCODE::KEY_B, 0) == 3)
+	// ヒントカードを読み終えたら
+	if (TutorialMgr->GetTutorial()->
+		GetIntroTipsCard()->GetSelectState()== TipsCard::SELECT_STATE::OK)
 	{
 		pMain->GetFSM()->ChangeState(TutorialMain::GetInstance());
 		return;
@@ -563,7 +616,7 @@ void SceneMainState::TutorialMain::Execute(sceneMain *pMain)
 	if (TutorialMgr->GetTutorial()->isClear())
 	{
 		// クリアにたので動きを止める
-		PlayerMgr->Update(false);
+		PlayerMgr->Update(PLAYER_UPDATE::CONTROL_NO);
 
 		// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
 		Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager(), pMain->GetStage());
@@ -574,7 +627,7 @@ void SceneMainState::TutorialMain::Execute(sceneMain *pMain)
 	else
 	{
 		// 通常
-		PlayerMgr->Update(true);
+		PlayerMgr->Update(PLAYER_UPDATE::CONTROL_OK);
 
 		// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
 		Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager(), pMain->GetStage());
@@ -686,6 +739,15 @@ void SceneMainState::TutorialClear::Enter(sceneMain *pMain)
 	// クリア後のTipsを用意
 	TutorialMgr->GetTutorial()->ActionClearTips();
 
+	// 次のチュートリアルへ
+	// (TODO)ここで配列の最後まできたらメニューに戻る処理
+	// お疲れ様でした！とかは最後のクリアティップスで書こう。
+	pMain->SetSelectTutorial(TUTORIAL_TYPE(pMain->GetSelectTutorial() + (TUTORIAL_TYPE)1));
+	if (pMain->GetSelectTutorial() == TUTORIAL_TYPE::ARRAY_END)
+	{
+
+	}
+
 }
 
 // 更新
@@ -696,35 +758,43 @@ void SceneMainState::TutorialClear::Execute(sceneMain *pMain)
 	TutorialMgr->Update();
 
 	// プレイヤー更新
-	PlayerMgr->Update(false);
+	PlayerMgr->Update(PLAYER_UPDATE::CONTROL_NO);
 	PlayerMgr->UpdatePos();
 
 	// カメラ更新
 	CameraMgr->Update();
 
-	
-	if (Fade::GetMode() != Fade::FLAG::FADE_OUT)
-	{
-
-		// ◎ボタンで進む
-		if (tdnInput::KeyGet(KEYCODE::KEY_B, 0) == 3)
+	if (Fade::isFadeOutCompletion() == false) {
+		if (Fade::GetMode() != Fade::FLAG::FADE_OUT)
 		{
-			// クリア後のTipsを閉じる
-			TutorialMgr->GetTutorial()->StopClearTips();
 
-			// フェードアウト
-			Fade::Set(Fade::FLAG::FADE_OUT, 16, 0x00000000);
+			// ヒントカードを読み終えたら
+			if (TutorialMgr->GetTutorial()->
+				GetClearTipsCard()->GetSelectState() == TipsCard::SELECT_STATE::OK)
+			{
+				// クリア後のTipsを閉じる
+				TutorialMgr->GetTutorial()->StopClearTips();
 
+				// フェードアウト
+				Fade::Set(Fade::FLAG::FADE_OUT, 16, 0x00000000);
+
+			}
+		}
+	}else// フェードアウト完了後	
+	{
+		// (TODO)ここで配列の最後まできたらメニューに戻る処理
+		if (pMain->GetSelectTutorial() == TUTORIAL_TYPE::ARRAY_END)
+		{
+			MainFrameEx->ChangeScene(new sceneMenu());
+			return;
+		}
+		else
+		{
+			// チュートリアルのイントロへ
+			pMain->GetFSM()->ChangeState(TutorialIntro::GetInstance());
+			return;
 		}
 
-	}
-
-	// フェードアウト完了後
-	if (Fade::isFadeOutCompletion())
-	{
-		// チュートリアルのイントロへ
-		pMain->GetFSM()->ChangeState(TutorialIntro::GetInstance());
-		return;
 	}
 
 }

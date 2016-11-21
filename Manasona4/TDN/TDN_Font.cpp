@@ -141,8 +141,8 @@ Vector2	tdnFont::RenderCharacter(LPCSTR character, LPCSTR fontName, int fontSize
 			bDraw = false;
 		}
 
-		// ★絵文字検索
-		bDraw = SearchPictograph(buffer, drawX, drawY, pImage->GetWidth(), color, RenderFlag);
+		// ★絵文字検索　[11/21]サイズを指定したもの固定で
+		bDraw = SearchPictograph(buffer, drawX, drawY, createSize/* pImage->GetWidth()*/, color, RenderFlag);
 
 	}
 	break;

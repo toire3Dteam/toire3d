@@ -13,7 +13,7 @@ class Airou : public BasePlayer
 public:
 	Airou(SIDE side, const SideData &data);
 	~Airou();
-	void Update(bool bControl)override;
+	void Update(PLAYER_UPDATE flag)override;
 	void Render()override;
 	void RenderDrive()override;
 

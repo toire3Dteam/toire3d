@@ -7,6 +7,8 @@
 #include "../BaseEntity/Entity/BaseGameEntity.h"
 #include "../BaseEntity/State/StateMachine.h"
 
+#include "MenuUI\TutorialManager.h"
+
 // 前方宣言
 class ShotManager;
 class Camera;
@@ -56,6 +58,9 @@ public:
 	void OverDriveAction();
 	void OverDriveEnd();
 
+	TUTORIAL_TYPE GetSelectTutorial() { return m_eSelectTutorial; }
+	void SetSelectTutorial(TUTORIAL_TYPE tutorial) { m_eSelectTutorial = tutorial; }
+
 private:
 	int m_iRoundNum;				// ラウンド数
 
@@ -86,5 +91,5 @@ private:
 
 	// （仮）チュートリアルかどうか
 	bool m_bTutorialFlag;
-
+	TUTORIAL_TYPE m_eSelectTutorial;		// 選択してるチュートリアル
 };

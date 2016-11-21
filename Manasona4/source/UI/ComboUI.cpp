@@ -137,6 +137,9 @@ void ComboUI::GageUpdate()
 
 void ComboUI::Count(int damage, int maxRecovery)
 {
+	MyAssert(maxRecovery != 0, "最大値が0だと0で割ることになる");
+
+
 	// ウェイトタイマーが作動してるじょうたいなら
 	if (m_iRenderFlagWaitFrame >= 1)
 	{

@@ -17,6 +17,21 @@ TutorialManager::TutorialManager()
 		case WALK:
 			m_pTutorial[i] = new WalkTutorial();
 			break;
+		case SQUAT:
+			m_pTutorial[i] = new SquatTutorial();
+			break;
+		case JUMP:
+			m_pTutorial[i] = new JumpTutorial();
+			break;
+		case ATTACK:
+			m_pTutorial[i] = new AttackTutorial();
+			break;
+		case SKILL:
+			m_pTutorial[i] = new SkillTutorial();
+			break;
+		case OVER_DRIVE:
+			m_pTutorial[i] = new OverDriveTutorial();
+			break;
 		case ARRAY_END:
 			assert(0);
 			break;

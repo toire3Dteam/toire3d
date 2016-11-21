@@ -70,6 +70,13 @@ enum class PLAYER_COMMAND_BIT
 	L3 = 1 << 14,
 };
 
+enum class PLAYER_UPDATE
+{
+	CONTROL_NO,		// BasePlayerStateを通すけどコントロールはしない
+	NO_FSM,			// コントロールは受け付けるけど、BasePlayerStateは発動しない
+	CONTROL_OK		// どっちもOK
+};
+
 //static CommandList[(int)PLAYER_INPUT::MAX] = 
 //{
 //	
@@ -362,7 +369,7 @@ public:
 	//------------------------------------------------------
 	//	更新
 	//------------------------------------------------------
-	virtual void Update(bool bControl);	// 基本的な更新
+	virtual void Update(PLAYER_UPDATE flag);	// 基本的な更新
 	virtual void UpdateDrive();			// ヒーホードライブオーバーフローのときだけ通る更新
 	void UpdatePos();			// 座標更新(判定後に呼び出す)
 	void MoveUpdate();			// 動きの制御
@@ -514,6 +521,7 @@ public:
 		return m_ActionDatas[(int)state].pAttackData;
 	}
 	AttackData *GetAttackData(){ return GetAttackData(m_ActionState);}// 自分の状態の攻撃データを渡す
+	bool isHitAttack() { return (isAttackState()) ? GetAttackData()->bHit : false; }
 	bool isFrameAction() { return (m_ActionState != BASE_ACTION_STATE::NO_ACTION); }
 	bool isAttackState()
 	{

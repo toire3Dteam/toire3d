@@ -23,7 +23,7 @@ public:
 	~PlayerManager();
 	void Initialize(int NumPlayer, Stage::Base *pStage, SideData aSideDatas[(int)SIDE::ARRAY_MAX]);
 	void Release(){ SAFE_DELETE(pInstance); }
-	void Update(bool bControl);
+	void Update(PLAYER_UPDATE flag);
 	void UpdateHit();
 	void UpdatePos();
 	void Render();

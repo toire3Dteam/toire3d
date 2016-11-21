@@ -71,6 +71,9 @@ public:
 	//
 	bool isClear() { return m_bClearFlag; }
 
+	TipsCard* GetIntroTipsCard() { return m_pIntroTips; }
+	TipsCard* GetClearTipsCard() { return m_pClearTips; }
+
 	// それぞれのやること
 	virtual void TaskUpdate(BasePlayer* pPerson) = 0; //★一つずつbClearを点灯させていく
 	//virtual void TaskReset() = 0; // ミスった時に発動
@@ -111,6 +114,7 @@ protected:
 	bool m_bAllTaskClear;
 
 	tdn2DAnim* m_pClearPic;
+	tdn2DAnim* m_pClearPicRip;
 };
 
 //+-----------------------------
@@ -130,5 +134,99 @@ public:
 private:
 	int m_iWalkFrame;
 	int m_iBackFrame;
+
+};
+
+
+//+-----------------------------
+//	しゃがみの説明
+//+-----------------------------
+class  SquatTutorial :public BaseTutorial
+{
+public:
+	SquatTutorial();
+	~SquatTutorial() {};
+
+	void Init();
+
+	// それぞれのタスクをここで作る
+	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
+
+private:
+	int m_iSquatFrame;
+
+};
+
+//+-----------------------------
+//	ジャンプの説明
+//+-----------------------------
+class  JumpTutorial :public BaseTutorial
+{
+public:
+	JumpTutorial();
+	~JumpTutorial() {};
+
+	void Init();
+
+	// それぞれのタスクをここで作る
+	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
+
+private:
+
+};
+
+
+//+-----------------------------
+//	攻撃の説明
+//+-----------------------------
+class  AttackTutorial :public BaseTutorial
+{
+public:
+	AttackTutorial();
+	~AttackTutorial() {};
+
+	void Init();
+
+	// それぞれのタスクをここで作る
+	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
+
+private:
+
+};
+
+//+-----------------------------
+//	スキル攻撃の説明
+//+-----------------------------
+class  SkillTutorial :public BaseTutorial
+{
+public:
+	SkillTutorial();
+	~SkillTutorial() {};
+
+	void Init();
+
+	// それぞれのタスクをここで作る
+	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
+
+private:
+
+};
+
+
+//+-----------------------------
+//	必殺技の説明
+//+-----------------------------
+class  OverDriveTutorial :public BaseTutorial
+{
+public:
+	OverDriveTutorial();
+	~OverDriveTutorial() {};
+
+	void Init();
+
+	// それぞれのタスクをここで作る
+	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
+
+private:
 
 };

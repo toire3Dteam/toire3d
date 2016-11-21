@@ -767,6 +767,7 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 											 }
 										 }
 									 }
+									 RecoveryFrame = max(RecoveryFrame, 1);		// 絶対1以上！
 									 pPerson->SetRecoveryFrame(RecoveryFrame);
 
 									 // ★コンボUI エフェクト(カウント)発動
@@ -2784,8 +2785,10 @@ bool BasePlayerState::DownFall::OnMessage(BasePlayer * pPerson, const Message & 
 
 void BasePlayerState::KnockDown::Enter(BasePlayer * pPerson)
 {
+	const float MoveLen(pPerson->GetMove().LengthSq());
+
 	// ノックダウンモーションに変える
-	pPerson->SetMotion(MOTION_TYPE::KNOCKDOWN);
+	pPerson->SetMotion((MoveLen > 1) ? MOTION_TYPE::KNOCKDOWN : MOTION_TYPE::KNOCKDOWN_DOWN);
 
 	//むてきつくった
 	// ★やっぱりここで無敵時間設定(GlobalのMessageで書きます)

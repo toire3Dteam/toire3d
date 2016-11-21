@@ -8,6 +8,11 @@
 enum TUTORIAL_TYPE
 {
 	WALK,
+	SQUAT,
+	JUMP,
+	ATTACK,
+	SKILL,
+	OVER_DRIVE,
 	ARRAY_END
 };
 

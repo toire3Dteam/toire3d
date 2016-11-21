@@ -19,7 +19,7 @@ BaseTutorial::BaseTutorial()
 	// タスク一覧
 	m_aTask.clear();
 	m_vTaskPos.x = 50;
-	m_vTaskPos.y = 200;
+	m_vTaskPos.y = 250;
 
 	// タイトル名
 	m_pTaskTitle.pSting = "None";
@@ -31,6 +31,10 @@ BaseTutorial::BaseTutorial()
 
 	m_pClearPic = new tdn2DAnim("Data/UI/Tutorial/Clear.png");
 	m_pClearPic->OrderAlphaMove(55, 6, 45);
+	
+	m_pClearPicRip = new tdn2DAnim("Data/UI/Tutorial/Clear.png");
+	m_pClearPicRip->OrderRipple(14, 1, 0.025f);
+
 
 }
 
@@ -40,6 +44,8 @@ BaseTutorial::~BaseTutorial()
 	SAFE_DELETE(m_pIntroTips);
 	SAFE_DELETE(m_pClearTips);
 	SAFE_DELETE(m_pClearPic);
+	SAFE_DELETE(m_pClearPicRip);
+
 	m_aTask.clear();	
 }
 
@@ -99,6 +105,7 @@ void BaseTutorial::Update()
 
 	// クリア演出用
 	m_pClearPic->Update();
+	m_pClearPicRip->Update();
 
 }
 
@@ -138,7 +145,7 @@ void BaseTutorial::Render()
 
 	// クリア演出用
 	m_pClearPic->Render(0, 0);
-	
+	m_pClearPicRip->Render(0, 0, RS::ADD);
 }
 
 void BaseTutorial::ActionIntroTips()
@@ -169,7 +176,7 @@ void BaseTutorial::ActionClear()
 
 	// ↓でクリア演出
 	m_pClearPic->Action();
-
+	m_pClearPicRip->Action();
 }
 
 
@@ -248,7 +255,7 @@ WalkTutorial::WalkTutorial()
 	m_pTaskTitle.iStingLength = addByte;
 
 	// Tips
-	m_pIntroTips = new TipsCard("まずは移動の基本、「歩き」です。□で殺す\n方向キーでキャラクターを動かしてみましょう。");
+	m_pIntroTips = new TipsCard("まずは移動の基本、「歩き」です。\n方向キーでキャラクターを動かしてみましょう。");
 	m_pClearTips = new TipsCard("よくできました！\n「歩き」は移動の基本です。");
 
 
@@ -323,6 +330,330 @@ void WalkTutorial::TaskUpdate(BasePlayer * pPerson)
 	else
 	{
 		m_iBackFrame = 0;
+	}
+
+}
+
+
+//+------------------------------------------------------
+//	しゃがみ説明
+//+------------------------------------------------------
+
+SquatTutorial::SquatTutorial()
+{
+	// タイトル名
+	m_pTaskTitle.pSting = "No.02 しゃがみ";
+
+	// クリアから終りまで
+	m_iWaitFrameMAX = 60;
+	
+	// 文字の長さを調べる
+	UINT	myByte = 0; UINT	addByte = 0;
+	// 終端文字までループ
+	for (UINT i = 0; m_pTaskTitle.pSting[i] != '\0'; i += myByte)
+	{
+		//	文字のバイト数を調べる	
+		myByte = _mbclen((BYTE*)&m_pTaskTitle.pSting[i]);
+		addByte += myByte;
+	}
+	m_pTaskTitle.iStingLength = addByte;
+
+	// Tips
+	m_pIntroTips = new TipsCard("次はしゃがみです。\n↓でしゃがみます。");
+	m_pClearTips = new TipsCard("よくできました！\n「しゃがみ」は楽しいね。");
+
+	// タスクセット
+	AddTaskData("しゃがみ－↓押しっぱなし");
+
+	Init();
+}
+
+void SquatTutorial::Init()
+{
+	// ★共通
+	BaseTutorial::Init();
+
+	m_iSquatFrame = 0;
+}
+
+// それぞれのクリア処理
+void SquatTutorial::TaskUpdate(BasePlayer * pPerson)
+{
+	//ここで色々クリア処理頑張る！
+
+	enum
+	{
+		SQUAT = 0
+	};
+
+	// 30フレームしゃがみステートにいたらクリア
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::Squat::GetInstance()))
+	{
+		m_iSquatFrame++;
+
+		if (m_iSquatFrame >= 30)
+		{
+			TaskSuccess(SQUAT);
+		}
+	
+	}else
+	{
+		m_iSquatFrame = 0;
+	}
+
+
+}
+
+
+//+------------------------------------------------------
+//	ジャンプの説明
+//+------------------------------------------------------
+
+JumpTutorial::JumpTutorial()
+{
+	// タイトル名
+	m_pTaskTitle.pSting = "No.03 ジャンプ";
+
+	// クリアから終りまで
+	m_iWaitFrameMAX = 60;
+
+	// 文字の長さを調べる
+	UINT	myByte = 0; UINT	addByte = 0;
+	// 終端文字までループ
+	for (UINT i = 0; m_pTaskTitle.pSting[i] != '\0'; i += myByte)
+	{
+		//	文字のバイト数を調べる	
+		myByte = _mbclen((BYTE*)&m_pTaskTitle.pSting[i]);
+		addByte += myByte;
+	}
+	m_pTaskTitle.iStingLength = addByte;
+
+	// Tips
+	m_pIntroTips = new TipsCard("次はジャンプです。\n↑でジャンプします。\nもう一度↑で空中で飛べます。");
+	m_pClearTips = new TipsCard("よくできました！\n「ジャンプ」は楽しいね。");
+
+	// タスクセット
+	AddTaskData("ジャンプ－↑");
+	AddTaskData("空中ジャンプ－空中で↑");
+
+	Init();
+}
+
+void JumpTutorial::Init()
+{
+	// ★共通
+	BaseTutorial::Init();
+
+}
+
+// それぞれのクリア処理
+void JumpTutorial::TaskUpdate(BasePlayer * pPerson)
+{
+	//ここで色々クリア処理頑張る！
+
+	enum
+	{
+		JUMP = 0, AERIAL_JUMP = 1
+	};
+
+	// ジャンプステートにいたらクリア
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::Jump::GetInstance()))
+	{
+		TaskSuccess(JUMP);
+	}
+
+	// 空中ジャンプステートにいたらクリア
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::AerialJump::GetInstance()))
+	{
+		TaskSuccess(AERIAL_JUMP);
+	}
+
+}
+
+
+//+------------------------------------------------------
+//	攻撃の説明
+//+------------------------------------------------------
+
+AttackTutorial::AttackTutorial()
+{
+	// タイトル名
+	m_pTaskTitle.pSting = "No.04 攻撃";
+
+	// クリアから終りまで
+	m_iWaitFrameMAX = 60;
+
+	// 文字の長さを調べる
+	UINT	myByte = 0; UINT	addByte = 0;
+
+	// 終端文字までループ
+	for (UINT i = 0; m_pTaskTitle.pSting[i] != '\0'; i += myByte)
+	{
+		//	文字のバイト数を調べる	
+		myByte = _mbclen((BYTE*)&m_pTaskTitle.pSting[i]);
+		addByte += myByte;
+	}
+	m_pTaskTitle.iStingLength = addByte;
+
+	// Tips
+	m_pIntroTips = new TipsCard("次は攻撃です。\n□で攻撃します。");
+	m_pClearTips = new TipsCard("よくできました！\n「攻撃」は楽しいね。アー♂");
+
+	// タスクセット
+	AddTaskData("攻撃－□");
+
+	Init();
+}
+
+void AttackTutorial::Init()
+{
+	// ★共通
+	BaseTutorial::Init();
+
+}
+
+// それぞれのクリア処理
+void AttackTutorial::TaskUpdate(BasePlayer * pPerson)
+{
+	//ここで色々クリア処理頑張る！
+
+	enum
+	{
+		ATTACK = 0
+	};
+
+	// 攻撃ステートにいたらクリア
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::RushAttack::GetInstance()))
+	{
+		if (pPerson->isHitAttack()==true)
+		{
+			TaskSuccess(ATTACK);
+		}	
+	}
+
+}
+
+//+------------------------------------------------------
+//	スキル攻撃の説明
+//+------------------------------------------------------
+
+SkillTutorial::SkillTutorial()
+{
+	// タイトル名
+	m_pTaskTitle.pSting = "No.05 ドライブ攻撃";
+
+	// クリアから終りまで
+	m_iWaitFrameMAX = 60;
+
+	// 文字の長さを調べる
+	UINT	myByte = 0; UINT	addByte = 0;
+
+	// 終端文字までループ
+	for (UINT i = 0; m_pTaskTitle.pSting[i] != '\0'; i += myByte)
+	{
+		//	文字のバイト数を調べる	
+		myByte = _mbclen((BYTE*)&m_pTaskTitle.pSting[i]);
+		addByte += myByte;
+	}
+	m_pTaskTitle.iStingLength = addByte;
+
+	// Tips
+	m_pIntroTips = new TipsCard("次はドライブ攻撃です。\nキャラクタ－により色々なドライブ攻撃があります。 \n△でドライブ攻撃です。");
+	m_pClearTips = new TipsCard("よくできました！\n「ドライブ」は楽しいね。列車ぁぁぁアー♂");
+
+	// タスクセット
+	AddTaskData("ドライブ攻撃－△");
+
+	Init();
+}
+
+void SkillTutorial::Init()
+{
+	// ★共通
+	BaseTutorial::Init();
+
+}
+
+// それぞれのクリア処理
+void SkillTutorial::TaskUpdate(BasePlayer * pPerson)
+{
+	//ここで色々クリア処理頑張る！
+	enum
+	{
+		SKILL = 0
+	};
+
+	// スキルステートにいたらクリア
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::Skill::GetInstance()))
+	{
+		if (pPerson->isHitAttack() == true)
+		{
+			TaskSuccess(SKILL);
+		}
+
+	}
+
+}
+
+
+//+------------------------------------------------------
+//	必殺技の説明
+//+------------------------------------------------------
+
+OverDriveTutorial::OverDriveTutorial()
+{
+	// タイトル名
+	m_pTaskTitle.pSting = "No.06 必殺技";
+
+	// クリアから終りまで
+	m_iWaitFrameMAX = 120;
+
+	// 文字の長さを調べる
+	UINT	myByte = 0; UINT	addByte = 0;
+
+	// 終端文字までループ
+	for (UINT i = 0; m_pTaskTitle.pSting[i] != '\0'; i += myByte)
+	{
+		//	文字のバイト数を調べる	
+		myByte = _mbclen((BYTE*)&m_pTaskTitle.pSting[i]);
+		addByte += myByte;
+	}
+	m_pTaskTitle.iStingLength = addByte;
+
+	// Tips
+	m_pIntroTips = new TipsCard("次は必殺技です。\nゲージを50%以上で○で必殺技です。");
+	m_pClearTips = new TipsCard("よくできました！\n「必殺技」はマジキチだね。列車ぁぁぁアー♂");
+
+	// タスクセット
+	AddTaskData("必殺技－ゲージ50%以上で○");
+
+	Init();
+}
+
+void OverDriveTutorial::Init()
+{
+	// ★共通
+	BaseTutorial::Init();
+
+}
+
+// それぞれのクリア処理
+void OverDriveTutorial::TaskUpdate(BasePlayer * pPerson)
+{
+	//ここで色々クリア処理頑張る！
+	enum
+	{
+		OVER_DRIVE = 0
+	};
+
+	// 必殺技ステートにいたらクリア
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::HeavehoDrive::GetInstance()))
+	{
+		if (pPerson->isHitAttack() == true)
+		{
+			TaskSuccess(OVER_DRIVE);
+		}
+
 	}
 
 }

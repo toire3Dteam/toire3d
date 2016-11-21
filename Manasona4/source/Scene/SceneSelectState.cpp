@@ -8,6 +8,7 @@
 #include "../Fade/Fade.h"
 #include "../Sound/SoundManager.h"
 #include "Data\SelectData.h"
+#include "../Sound/BattleMusic.h"
 
 //+--------------------
 // ì‹ÆŒø—¦‰»
@@ -229,11 +230,21 @@ bool SceneSelectState::StageAndBGM::PadUpdate(sceneSelect *pMain, int DeviceID)
 		{
 			pMain->m_iSelectBGMNo--;
 			pMain->m_tagSecondSelect.pBGMLeftRip->Action();
+			// -1‚É‚È‚ê‚ÎÅŒã‚Ì‹È‚É‚·‚é
+			if (pMain->m_iSelectBGMNo < 0)
+			{
+				pMain->m_iSelectBGMNo = BattleMusicMgr->GetNumMusic() - 1;
+			}
 		}
 		else if (tdnInput::KeyGet(KEYCODE::KEY_RIGHT, DeviceID) == 3)
 		{
 			pMain->m_iSelectBGMNo++;
 			pMain->m_tagSecondSelect.pBGMRightRip->Action();
+			// Å‘å‹È”‚Ü‚Å‚«‚½‚çÅ‰‚É–ß‚·
+			if (pMain->m_iSelectBGMNo >=  BattleMusicMgr->GetNumMusic())
+			{
+				pMain->m_iSelectBGMNo = 0;
+			}
 		}
 	}
 	else
@@ -275,7 +286,8 @@ void SceneSelectState::StageAndBGM::Render(sceneSelect *pMain)
 	tdnText::Draw(0, 0, 0xffffffff, "StageAndBGM");
 	
 	tdnText::Draw(68, 128, 0xffffffff, "m_iSelectStageNo->%d",pMain->m_iSelectStageNo);
-	tdnText::Draw(68, 156, 0xffffffff, "m_iSelectBGMNo->%d",pMain->m_iSelectBGMNo);
+	//tdnText::Draw(68, 156, 0xffffffff, "m_iSelectBGMNo->%d",pMain->m_iSelectBGMNo);
+	//tdnText::Draw(68, 256, 0xffffffff, "‹È‚ß‚¢->%s", BattleMusicMgr->GetMusicName(pMain->m_iSelectBGMNo).c_str());
 }
 
 bool SceneSelectState::StageAndBGM::OnMessage(sceneSelect *pMain, const Message & msg)

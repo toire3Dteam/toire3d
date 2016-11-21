@@ -5,6 +5,7 @@
 #include "../BaseEntity/Message/Message.h"
 #include "../Fade/Fade.h"
 #include "../Sound/SoundManager.h"
+#include "../Sound/BattleMusic.h"
 
 //#include "sceneResult.h"
 //#include "SceneSwitch/SceneSwitch.h"
@@ -207,6 +208,10 @@ void sceneSelect::StageAndBGMRender()
 
 	// ステージのイラスト
 	m_tagSecondSelect.pStagePic->Render(512, 244, 256, 128, m_iSelectStageNo * 256 , 0, 256, 128);
+
+	// 曲名
+	tdnFont::RenderStringCentering(BattleMusicMgr->GetMusicName(m_iSelectBGMNo).c_str(), "HGｺﾞｼｯｸE", 26,
+		(1280 / 2) + 16, 423 , 0xff000000, RS::COPY);
 
 	// 矢印
 	m_tagSecondSelect.pArrow->SetTurnOver(false);

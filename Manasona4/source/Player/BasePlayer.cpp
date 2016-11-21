@@ -262,7 +262,7 @@ BasePlayer::~BasePlayer()
 	delete m_pHitSquare;
 }
 
-void BasePlayer::Update(bool bControl)
+void BasePlayer::Update(PLAYER_UPDATE flag)
 {
 	// デバッグ
 	if (KeyBoardTRG(KB_G))
@@ -285,7 +285,7 @@ void BasePlayer::Update(bool bControl)
 	if (GetFSM()->isInState(*BasePlayerState::OverDrive_OneMore::GetInstance()) == false)
 	{
 		// スタンド更新
-		m_pStand->Update(bControl);
+		m_pStand->Update((flag != PLAYER_UPDATE::CONTROL_NO));
 	}
 
 	// 無敵時間の更新
@@ -299,7 +299,7 @@ void BasePlayer::Update(bool bControl)
 	ColorUpdate();
 
 	// 入力受付
-	if (bControl)
+	if (flag != PLAYER_UPDATE::CONTROL_NO)
 	{
 		if (m_bAI)	AIControl();
 		else		Control();
@@ -436,7 +436,7 @@ void BasePlayer::Update(bool bControl)
 		}
 
 		// 入力受付後にステートマシン更新
-		m_pStateMachine->Update();
+		if (flag != PLAYER_UPDATE::NO_FSM) m_pStateMachine->Update();
 
 		//if (m_InputList[(int)PLAYER_INPUT::LEFT] == 1) m_move.x = -2;
 		//else m_move.x = 0;
@@ -1070,7 +1070,7 @@ void BasePlayer::Render()
 		//}
 
 		//tdnText::Draw(10 + (i % 30) * 30, 640 + (i / 30 * 30), 0xffffffff, "%s", c);
-		tdnFont::RenderString(c, "メイリオ", 64, 10 + (i % 64) * 30, 640 + (i / 30 * 30), 0xffffffff, RS::COPY);
+		tdnFont::RenderString(c, "メイリオ", 32, 10 + (i % 64) * 30, 640 + (i / 30 * 30), 0xffffffff, RS::COPY);
 
 	}
 

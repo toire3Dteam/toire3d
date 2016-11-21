@@ -276,8 +276,8 @@ AirouResultPerformance::AirouResultPerformance()
 	m_whiteSoul.pic = new tdn2DAnim("DATA/Result/Aramitama/WhiteSplash.png");
 	m_whiteSoul.pic->OrderMoveAppeared(8, -650, -500);
 
-	m_movieMgr = new tdnMovie("DATA/Result/Aramitama/backmovie.wmv");
-	m_movieTex = new tdn2DObj(m_movieMgr->GetTexture());
+	//m_movieMgr = new tdnMovie("DATA/Result/Aramitama/backmovie.wmv");
+	//m_movieTex = new tdn2DObj(m_movieMgr->GetTexture());
 
 
 
@@ -310,8 +310,8 @@ AirouResultPerformance::~AirouResultPerformance()
 	SAFE_DELETE(m_blackInk.pic);
 	SAFE_DELETE(m_susi.pic);
 
-	SAFE_DELETE(m_movieMgr);
-	SAFE_DELETE(m_movieTex);
+	//SAFE_DELETE(m_movieMgr);
+	//SAFE_DELETE(m_movieTex);
 
 	SAFE_DELETE(m_eccmanBody.pic);
 	SAFE_DELETE(m_eccmanHead.pic);

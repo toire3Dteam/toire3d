@@ -75,14 +75,14 @@ PlayerManager::~PlayerManager()
 	delete[] m_pPlayers;
 }
 
-void PlayerManager::Update(bool bControl)
+void PlayerManager::Update(PLAYER_UPDATE flag)
 {	
 	// 誰かが1More覚醒していたら全員の動きを止める
 	FOR(m_NumPlayer)
 	{
 		if (m_pPlayers[i]->isGameTimerStopFlag() == true)
 		{
-			m_pPlayers[i]->Update(bControl);			// モーションとか移動値の作成とか、基本的な更新。
+			m_pPlayers[i]->Update(flag);			// モーションとか移動値の作成とか、基本的な更新。
 			
 			//m_pStage->Collision(m_pPlayers[i], m_pPlayers[i]->GetMoveAddress());	// ステージとの判定で、move値をどうこういじった後に
 			//m_pPlayers[i]->UpdatePos();			// 座標にmove値を足す更新
@@ -105,7 +105,7 @@ void PlayerManager::Update(bool bControl)
 	FOR(m_NumPlayer)
 	{
 		if(m_bHeaveHoDriveOverFlow)m_pPlayers[i]->UpdateDrive();			// モーションとか移動値の作成とか、基本的な更新。
-		else m_pPlayers[i]->Update(bControl);
+		else m_pPlayers[i]->Update(flag);
 	}
 
 	// チームポイント計算

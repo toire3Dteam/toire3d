@@ -170,7 +170,7 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 				/* メッセージ送信 */
 
 				// 相手がヒットしたときの地上にいたか空中にいたか
-				int iHitPlace((you->isLand()) ? (int)AttackData::HIT_PLACE::LAND : (int)AttackData::HIT_PLACE::AERIAL);
+				int iHitPlace((!you->isLand() || you->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) || you->GetFSM()->isInState(*BasePlayerState::DownFall::GetInstance())) ? (int)AttackData::HIT_PLACE::AERIAL : (int)AttackData::HIT_PLACE::LAND);
 
 				// (A列車)(TODO) ★★★これだとフィニッシュアーツがひとつしか存在しなくなるのでどうにかしよう
 				// フィニッシュアーツかどうか
@@ -267,8 +267,7 @@ bool Collision::CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou)
 				/* メッセージ送信 */
 	
 				// 相手がヒットしたときの地上にいたか空中にいたか
-				int iHitPlace = (pYou->isLand()) ? (int)AttackData::HIT_PLACE::LAND : (int)AttackData::HIT_PLACE::AERIAL;
-
+				int iHitPlace((!pYou->isLand() || pYou->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) || pYou->GetFSM()->isInState(*BasePlayerState::DownFall::GetInstance())) ? (int)AttackData::HIT_PLACE::AERIAL : (int)AttackData::HIT_PLACE::LAND);
 				// まず、攻撃をヒットさせた人に送信
 				//HIT_ATTACK_INFO hai;
 				//hai.bOverDrive = false;

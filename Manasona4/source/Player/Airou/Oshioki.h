@@ -102,6 +102,7 @@ namespace OshiokiAirou
 								  DamageInfo.iAttackType = (int)BASE_ACTION_STATE::HEAVEHO_DRIVE;						// 何の攻撃かのタイプ(コンボ中に同じ攻撃を使わせないように)
 								  DamageInfo.bOverDrive = true;
 								  DamageInfo.HitSE = "ぐちょヒット";
+								  DamageInfo.DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 
 								  // 最後の1撃だけフィニッシュ判定
 								  DamageInfo.bFinishOK = true;
@@ -123,6 +124,7 @@ namespace OshiokiAirou
 								  DamageInfo.bOverDrive = true;
 								  DamageInfo.HitSE = "ぐちょヒット";
 								  DamageInfo.bFinishOK = false;
+								  DamageInfo.DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 							  }
 							  MsgMgr->Dispatch(0, m_pUser->GetID(), m_pTarget->GetID(), MESSAGE_TYPE::HIT_DAMAGE, &DamageInfo);
 
@@ -472,7 +474,7 @@ namespace OshiokiManager
 				if (++m_iCreateTimer % m_CreateInterval == 0)
 				{
 					// だんだん間隔短くしていく
-					if (m_iCreateCount % 3 == 0) m_CreateInterval = max((int)(m_CreateInterval * .9f), 3);
+					if (m_iCreateCount % 2 == 0) m_CreateInterval = max((int)(m_CreateInterval * .9f), 2);
 
 					m_iCreateTimer = 0;
 					m_list.push_back(new OshiokiAirou::OverDrive(m_pAirouPlayer, m_pTarget, (++m_iCreateCount == c_NUM_CREATE)));

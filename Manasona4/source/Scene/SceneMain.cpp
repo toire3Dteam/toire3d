@@ -28,7 +28,6 @@
 #include "Stage\OverDriveStage\OverDriveStage.h"
 
 
-#include "MenuUI\TutorialManager.h"
 
 
 //BaseEffect* g_eff;
@@ -47,7 +46,7 @@ bool sceneMain::Initialize()
 	// ラウンド数
 	// (TODO)[11/4]ラウンド数が0の時はラウンドコールを抜く処理がしたい
 	// トレーニングやチュートリアルのため
-	m_iRoundNum = SelectDataMgr->Get()->iWinRound;
+	m_iRoundNum = 0 /*SelectDataMgr->Get()->iWinRound*/;
 
 	//com = new Combo();
 
@@ -162,6 +161,7 @@ bool sceneMain::Initialize()
 
 	//（TODO）チュートリアル・トレーニングだったら分岐
 	m_bTutorialFlag = SelectDataMgr->Get()->bTutorial;
+	m_eSelectTutorial = (TUTORIAL_TYPE)0;// (TODO)選んだチュートリアルを設定してあげる 
 	m_bTutorialFlag = true;
 	if (m_bTutorialFlag == true)
 	{
