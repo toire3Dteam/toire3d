@@ -190,8 +190,8 @@ void SelectUI::InitCharcterPos()
 	for (int i = 0; i < (int)CHARACTER::END; i++)
 	{
 
-		m_tagCharaPic[i].iY = 0;
-		m_tagCharaPicRip[i].iY = 0;
+		m_tagCharaPic[i].iY = -96;
+		m_tagCharaPicRip[i].iY = -96;
 		m_tagCharaInfo[i].iY = 354 + adjustY - 16;
 		m_tagCharaName[i].iY = 200 + adjustY;
 
@@ -220,11 +220,13 @@ void SelectUI::InitCharcterPos()
 
 			// ポジション設定
 			// キャラ絵
-			m_tagCharaPic[i].iX = 899;
+			m_tagCharaPic[i].iX = 899-64;
+			m_tagCharaPic[i].pPic->SetTurnOver(true);
 
 			// キャラ絵波紋
-			m_tagCharaPicRip[i].iX = 899;
-
+			m_tagCharaPicRip[i].iX = 899 - 64;
+			m_tagCharaPicRip[i].pPic->SetTurnOver(true);
+			
 			// キャラの説明絵
 			m_tagCharaInfo[i].iX = 899;
 
@@ -347,7 +349,7 @@ SelectUI::~SelectUI()
 	SAFE_DELETE(m_tagOKfont.pPic);
 }
 
-void SelectUI::Update()
+void SelectUI::Update(bool bControl)
 {
 	// キャラクター系の更新
 	for (int i = 0; i < (int)CHARACTER::END; i++)
@@ -395,27 +397,17 @@ void SelectUI::Update()
 	m_tagOKfont.pPic->Update();
 
 	// ★ステートマシン更新
-	m_pStateMachine->Update();
+	if (bControl == true)
+	{
+		m_pStateMachine->Update();
+	}
+
 	return;
 
 }
 
 void SelectUI::Render()
 {	
-	// 立ち絵
-	if (GetFSM()->isInState(*SelectUIState::SecondStep::GetInstance())||
-		GetFSM()->isInState(*SelectUIState::SecondToOKStep::GetInstance()))
-	{
-		m_tagCharaPic[m_iSelectCharacterNo].pPic->SetARGB(0x77555555);
-		m_tagCharaPic[m_iSelectCharacterNo].pPic->Render(m_tagCharaPic[m_iSelectCharacterNo].iX, m_tagCharaPic[m_iSelectCharacterNo].iY);
-	}else
-	{
-		m_tagCharaPic[m_iSelectCharacterNo].pPic->Render(m_tagCharaPic[m_iSelectCharacterNo].iX, m_tagCharaPic[m_iSelectCharacterNo].iY);
-	}
-
-	// 立ち絵波紋
-	m_tagCharaPicRip[m_iSelectCharacterNo].pPic->Render(m_tagCharaPicRip[m_iSelectCharacterNo].iX, m_tagCharaPicRip[m_iSelectCharacterNo].iY, RS::ADD);
-	m_tagCharaPicRip[m_iSelectCharacterNo].pPic->Render(m_tagCharaPicRip[m_iSelectCharacterNo].iX, m_tagCharaPicRip[m_iSelectCharacterNo].iY, RS::ADD);
 
 	// 説明用ボックス
 	m_tagInfoBox.pPic->Render(m_tagInfoBox.iX, m_tagInfoBox.iY);
@@ -520,6 +512,26 @@ void SelectUI::Render()
 	// ★ここにステートマシン描画
 	m_pStateMachine->Render();
 
+
+}
+
+void SelectUI::RenderCharacter()
+{
+	// 立ち絵
+	if (GetFSM()->isInState(*SelectUIState::SecondStep::GetInstance()) ||
+		GetFSM()->isInState(*SelectUIState::SecondToOKStep::GetInstance()))
+	{
+		m_tagCharaPic[m_iSelectCharacterNo].pPic->SetARGB(0x77555555);
+		m_tagCharaPic[m_iSelectCharacterNo].pPic->Render(m_tagCharaPic[m_iSelectCharacterNo].iX, m_tagCharaPic[m_iSelectCharacterNo].iY);
+	}
+	else
+	{
+		m_tagCharaPic[m_iSelectCharacterNo].pPic->Render(m_tagCharaPic[m_iSelectCharacterNo].iX, m_tagCharaPic[m_iSelectCharacterNo].iY);
+	}
+
+	// 立ち絵波紋
+	m_tagCharaPicRip[m_iSelectCharacterNo].pPic->Render(m_tagCharaPicRip[m_iSelectCharacterNo].iX, m_tagCharaPicRip[m_iSelectCharacterNo].iY, RS::ADD);
+	m_tagCharaPicRip[m_iSelectCharacterNo].pPic->Render(m_tagCharaPicRip[m_iSelectCharacterNo].iX, m_tagCharaPicRip[m_iSelectCharacterNo].iY, RS::ADD);
 
 }
 

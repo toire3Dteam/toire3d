@@ -28,11 +28,13 @@ public:
 	void InitPartnerPos();
 	~SelectUI();
 
-	//ˆ—
-	void Update();
-	//•`‰æ
+	// ˆ—
+	void Update(bool bControl = true);
+	// •`‰æ
 	void Render();
-	
+	// ƒLƒƒƒ‰ƒNƒ^[•`‰æ
+	void RenderCharacter();
+
 	void ActionChara();
 	void ActionCharaPlate();
 
@@ -68,6 +70,8 @@ public:
 	}
 
 	bool IsOK() { return m_bOK; }
+
+	int GetDevice() { return m_iDeviceID; }
 
 private:
 

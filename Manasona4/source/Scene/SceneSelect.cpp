@@ -42,8 +42,18 @@ bool sceneSelect::Initialize()
 
 	m_pPic[PIC_TYPE::INFO_PLATE] = new tdn2DAnim("DATA/UI/CharacterSelect/Information.png");
 	m_pPic[PIC_TYPE::INFO_PLATE]->OrderMoveAppeared(24, 0, 592 + 200);
+		
+	m_pPic[PIC_TYPE::SELECT_INFO] = new tdn2DAnim("DATA/UI/CharacterSelect/info/Selectinfo.png");
+	m_pPic[PIC_TYPE::SELECT_INFO]->OrderMoveAppeared(8, 1280/3, 592 + 10);
+
+	m_pPic[PIC_TYPE::SECOND_SELECT_INFO] = new tdn2DAnim("DATA/UI/CharacterSelect/info/SecondSelectinfo.png");
+	m_pPic[PIC_TYPE::SECOND_SELECT_INFO]->OrderMoveAppeared(8, 1280/3, 592 + 10);
+	
 
 	m_iRectAlpha = 0;
+
+	m_pBackMenuTips = new TipsCard("メニュー画面に戻りますか？",true);
+
 
 	// Selectマネージャー
 	m_pSelectUIMgr = new SelectUIManager();
@@ -106,6 +116,8 @@ sceneSelect::~sceneSelect()
 	SAFE_DELETE(m_tagSecondSelect.pStageRightRip);
 	SAFE_DELETE(m_tagSecondSelect.pBGMLeftRip);
 	SAFE_DELETE(m_tagSecondSelect.pBGMRightRip);
+
+	SAFE_DELETE(m_pBackMenuTips);
 }				
 
 //******************************************************************
@@ -121,7 +133,10 @@ void sceneSelect::Update()
 	}
 
 	// セレクトマネージャー
-	m_pSelectUIMgr->Update();
+	bool bCtrl = true;
+	if (GetFSM()->isInState(*SceneSelectState::BackMenu::GetInstance()))bCtrl = false;
+	m_pSelectUIMgr->Update(bCtrl);
+
 
 	// 矢印のアニメ
 	m_tagSecondSelect.pStageLeftRip->Update();
@@ -131,6 +146,10 @@ void sceneSelect::Update()
 
 	// フェード
 	Fade::Update();
+
+	// ヒントカード
+	m_pBackMenuTips->Update(m_iSenderDeviceID);
+	m_iSenderDeviceID = 0;
 
 	{
 		// ★ステートマシン更新(何故ここに書くかというと、中でシーンチェンジの処理を行っているため)
@@ -150,6 +169,9 @@ void sceneSelect::Render()
 
 	m_pPic[PIC_TYPE::BG]->Render(0, 0);
 
+	// 立ち絵を後ろの方に描画
+	m_pSelectUIMgr->RenderCharacter();
+
 	m_pPic[PIC_TYPE::BLACK_LINE]->Render(0, 0);
 
 	// セレクトマネージャー
@@ -166,6 +188,11 @@ void sceneSelect::Render()
 
 	m_pPic[PIC_TYPE::TITLE]->Render(0, 0);
 	m_pPic[PIC_TYPE::INFO_PLATE]->Render(0, 592 + 5);
+	m_pPic[PIC_TYPE::SELECT_INFO]->Render(0, 592 + 10);
+	m_pPic[PIC_TYPE::SECOND_SELECT_INFO]->Render(0, 592 + 10);
+
+	// ヒントカード
+	m_pBackMenuTips->Render();
 
 	// フェード
 	Fade::Render();
@@ -179,7 +206,7 @@ void sceneSelect::StageAndBGMRender()
 	m_tagSecondSelect.pBGMPlate->Render(m_tagSecondSelect.iX, m_tagSecondSelect.iY, 689, 323, 0, (m_tagSecondSelect.bBGMSelect * 323), 689, 323);
 
 	// ステージのイラスト
-	m_tagSecondSelect.pStagePic->Render(512, 244, 256, 128, 0, 0, 256, 128);
+	m_tagSecondSelect.pStagePic->Render(512, 244, 256, 128, m_iSelectStageNo * 256 , 0, 256, 128);
 
 	// 矢印
 	m_tagSecondSelect.pArrow->SetTurnOver(false);
@@ -202,7 +229,6 @@ void sceneSelect::FirstAction()
 	m_pPic[PIC_TYPE::TITLE]->Action();
 	m_pPic[PIC_TYPE::BLACK_LINE]->Action(6);
 	m_pPic[PIC_TYPE::INFO_PLATE]->Action(6);
-	
 	m_pSelectUIMgr->FirstAction();
 
 }

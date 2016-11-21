@@ -3,6 +3,7 @@
 #include "SceneSelectState.h"
 #include "SceneCollect.h"
 #include "SceneMain.h"
+#include "SceneMenu.h"
 #include "../BaseEntity/Message/Message.h"
 #include "../Fade/Fade.h"
 #include "../Sound/SoundManager.h"
@@ -66,14 +67,12 @@ bool SceneSelectState::Intro::OnMessage(sceneSelect *pMain, const Message & msg)
 
 void SceneSelectState::CharaSelect::Enter(sceneSelect *pMain)
 {
-	
+	// 説明文
+	pMain->m_pPic[sceneSelect::PIC_TYPE::SELECT_INFO]->Action();
 }
 
 void SceneSelectState::CharaSelect::Execute(sceneSelect *pMain)
 {
-
-
-
 
 	// ここで全員OKになったらステージ&BGMへ
 	if (pMain->GetSelectUIMgr()->IsOK())
@@ -81,12 +80,43 @@ void SceneSelectState::CharaSelect::Execute(sceneSelect *pMain)
 		pMain->GetFSM()->ChangeState(SceneSelectState::StageAndBGM::GetInstance());
 		return;
 	}
+
+	/**********************/
+	//	キャラセレの操作
+	/**********************/
+
+	// パッド分更新
+	const int NumDevice(tdnInputManager::GetNumDevice());
+	// パッド何もささってないとき用
+	if (NumDevice == 0)
+	{
+		if (PadUpdate(pMain, 0)) return;
+	}
+	else
+	{
+		for (int i = 0; i < NumDevice; i++)
+		{
+			if (PadUpdate(pMain, i)) return;
+		}
+	}
+
 }
 
 bool SceneSelectState::CharaSelect::PadUpdate(sceneSelect *pMain, int DeviceID)
 {
 	bool bChangedState(false);
 
+	//// 戻るボタンを押したコントローラーが初期状態じゃなかったら返す
+	//if (pMain->GetSelectUIMgr()->isFirstStep(DeviceID) == false)return bChangedState;
+	//
+	//// ×でメニューに戻る
+	//if (tdnInput::KeyGet(KEYCODE::KEY_A, DeviceID) == 3)
+	//{
+	//	
+	//	// 次のステートへ
+	//	pMain->GetFSM()->ChangeState(SceneSelectState::BackMenu::GetInstance());
+	//	bChangedState = true;
+	//}
 
 
 	return bChangedState;
@@ -94,7 +124,7 @@ bool SceneSelectState::CharaSelect::PadUpdate(sceneSelect *pMain, int DeviceID)
 
 void SceneSelectState::CharaSelect::Exit(sceneSelect *pMain)
 {
-	//M_UIMgr->InfoStop();
+	pMain->m_pPic[sceneSelect::PIC_TYPE::SELECT_INFO]->Stop();
 }
 
 void SceneSelectState::CharaSelect::Render(sceneSelect *pMain)
@@ -108,12 +138,20 @@ void SceneSelectState::CharaSelect::Render(sceneSelect *pMain)
 bool SceneSelectState::CharaSelect::OnMessage(sceneSelect *pMain, const Message & msg)
 {
 	// メッセージタイプ
-	//switch (msg.Msg)
-	//{
+	switch (msg.Msg)
+	{
+	case MESSAGE_TYPE::BACK_MENU:
+	{
+		int *senderID = (int*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+		pMain->m_iSenderDeviceID = *senderID;
+		// バックメニューステートへ
+		pMain->GetFSM()->ChangeState(SceneSelectState::BackMenu::GetInstance());
 
-	//default:
-	//	break;
-	//}
+		return true;
+	}	break;
+	default:
+		break;
+	}
 
 	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
 	return false;
@@ -127,7 +165,9 @@ bool SceneSelectState::CharaSelect::OnMessage(sceneSelect *pMain, const Message 
 void SceneSelectState::StageAndBGM::Enter(sceneSelect *pMain)
 {
 	pMain->m_iRectAlpha = 0;
-
+	
+	// 説明文
+	pMain->m_pPic[sceneSelect::PIC_TYPE::SECOND_SELECT_INFO]->Action();
 }
 
 void SceneSelectState::StageAndBGM::Execute(sceneSelect *pMain)
@@ -225,6 +265,8 @@ bool SceneSelectState::StageAndBGM::PadUpdate(sceneSelect *pMain, int DeviceID)
 void SceneSelectState::StageAndBGM::Exit(sceneSelect *pMain)
 {
 	pMain->m_iRectAlpha = 0;
+
+	pMain->m_pPic[sceneSelect::PIC_TYPE::SECOND_SELECT_INFO]->Stop();
 }
 
 void SceneSelectState::StageAndBGM::Render(sceneSelect *pMain)
@@ -241,11 +283,9 @@ bool SceneSelectState::StageAndBGM::OnMessage(sceneSelect *pMain, const Message 
 	// メッセージタイプ
 	//switch (msg.Msg)
 	//{
-
 	//default:
 	//	break;
 	//}
-
 	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
 	return false;
 }
@@ -296,6 +336,94 @@ bool SceneSelectState::End::OnMessage(sceneSelect *pMain, const Message & msg)
 	//switch (msg.Msg)
 	//{
 
+	//default:
+	//	break;
+	//}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
+
+
+/*******************************************************/
+//					ゲーム開始ステート
+/*******************************************************/
+
+void SceneSelectState::BackMenu::Enter(sceneSelect *pMain)
+{
+	pMain->m_iRectAlpha = 0;
+	pMain->m_pBackMenuTips->Action();
+
+}
+
+void SceneSelectState::BackMenu::Execute(sceneSelect *pMain)
+{
+	// 暗転用
+	pMain->m_iRectAlpha += 18;
+	if (pMain->m_iRectAlpha >= 156)
+	{
+		pMain->m_iRectAlpha = 156;
+	}
+
+	// (仮 後で消す)最初の選択へ戻る
+	//if (tdnInput::KeyGet(KEYCODE::KEY_A, pMain->m_iSenderDeviceID) == 3)
+	//{
+	//	if (pMain->m_pBackMenuTips->GetStep() == TipsCard::STEP::EXECUTE)
+	//	{
+	//		// 次のステートへ
+	//		pMain->GetFSM()->ChangeState(SceneSelectState::CharaSelect::GetInstance());
+	//		return;
+	//	}
+	//}
+
+	if (Fade::isFadeOutCompletion())
+	{
+		// メニューへ
+		MainFrameEx->ChangeScene(new sceneMenu());
+		return;
+	}
+
+	// (TODO)フェードの処理なんとかする　
+	if (Fade::GetMode() != Fade::FADE_OUT)
+	{
+
+		if (pMain->GetBackMenuTips()->GetSelectState() == TipsCard::SELECT_STATE::OK)
+		{
+			// フェード
+			Fade::Set(Fade::FLAG::FADE_OUT, 8, 0xFF000000);
+			return;
+		}
+
+		if (pMain->GetBackMenuTips()->GetSelectState() == TipsCard::SELECT_STATE::CANCEL)
+		{
+			// キャラセレに戻る
+			pMain->GetFSM()->ChangeState(SceneSelectState::CharaSelect::GetInstance());
+			return;
+		}
+
+	}
+
+
+
+
+}
+
+void SceneSelectState::BackMenu::Exit(sceneSelect *pMain) 
+{
+	pMain->m_iRectAlpha = 0;
+	pMain->m_pBackMenuTips->End();
+}
+
+void SceneSelectState::BackMenu::Render(sceneSelect *pMain)
+{
+	tdnText::Draw(0, 0, 0xffffffff, "BackMenu");
+}
+
+bool SceneSelectState::BackMenu::OnMessage(sceneSelect *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
 	//default:
 	//	break;
 	//}

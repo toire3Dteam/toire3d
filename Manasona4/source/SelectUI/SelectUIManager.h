@@ -12,8 +12,9 @@ public:
 	SelectUIManager();
 	~SelectUIManager();
 
-	void  Update();
+	void  Update(bool bControl = true);
 	void  Render();
+	void  RenderCharacter();
 
 	void FirstAction();// 最初の演出
 
@@ -57,7 +58,27 @@ public:
 		}
 	}
 
+	bool isFirstStep(int device) 
+	{
+		if (m_pLeftSide->GetDevice() == device)
+		{
+			if (m_pLeftSide->GetFSM()->isInState(*SelectUIState::FirstStep::GetInstance()) == true)
+			{
+				return true;
+			}
+		}
+		if (m_pRightSide->GetDevice() == device)
+		{
+			if (m_pRightSide->GetFSM()->isInState(*SelectUIState::FirstStep::GetInstance()) == true)
+			{
+				return true;
+			}
+		}
 
+		// ないです
+		return false;
+
+	}
 private:
 	// (TODO) 両サイド分　SelectUI
 	SelectUI* m_pLeftSide;

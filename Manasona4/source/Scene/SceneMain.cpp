@@ -162,6 +162,7 @@ bool sceneMain::Initialize()
 
 	//（TODO）チュートリアル・トレーニングだったら分岐
 	m_bTutorialFlag = SelectDataMgr->Get()->bTutorial;
+	m_bTutorialFlag = true;
 	if (m_bTutorialFlag == true)
 	{
 		// チュートリアル用の対戦

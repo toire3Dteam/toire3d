@@ -765,7 +765,7 @@ void AnimAction::Stretch::Update(tdn2DObj * pic)
 		return; // 終り
 	}
 
-	const float rate((float)m_nowFrame / m_endFrame);
+	const float rate((float)(m_nowFrame / (m_endFrame - 1.0f)));// 終わる前にレートが最大になるように-1
 	m_CurrentScale.x = Math::Blend(rate, m_StartScale.x, 1);
 	m_CurrentScale.y = Math::Blend(rate, m_StartScale.y, 1);
 }

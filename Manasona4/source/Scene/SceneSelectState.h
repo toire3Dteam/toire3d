@@ -142,4 +142,37 @@ namespace SceneSelectState
 
 		bool PadUpdate(sceneSelect* pMain, int DeviceID);
 	};
+
+
+	//--------------------メニュー画面に戻るステート
+	class BackMenu : public State<sceneSelect>
+	{
+	public:
+		// this is a シングルトン
+		static BackMenu* GetInstance() { static BackMenu state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneSelect* pMain);
+
+		// 実行します
+		virtual void Execute(sceneSelect* pMain);
+
+		// 帰る
+		virtual void Exit(sceneSelect* pMain);
+
+		// 描画
+		virtual void Render(sceneSelect* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneSelect* pMain, const Message& msg);
+
+	private:
+		BackMenu() {};
+		~BackMenu() {};
+
+		BackMenu(const BackMenu&) {}
+		BackMenu& operator=(const BackMenu&) {}
+	};
+
+
 }

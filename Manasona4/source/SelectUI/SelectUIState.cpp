@@ -5,7 +5,8 @@
 #include "../Fade/Fade.h"
 #include "../Sound/SoundManager.h"
 #include "Data\SelectData.h"
-
+#include "BaseEntity\Message\Message.h"
+#include "BaseEntity\Message\MessageDispatcher.h"
 //+--------------------
 // 作業効率化
 //+--------------------
@@ -102,7 +103,15 @@ void SelectUIState::FirstStep::Execute(SelectUI *pMain)
 		return;
 	}
 
+	// ×でメニューに戻る
+	if (tdnInput::KeyGet(KEYCODE::KEY_A, pMain->m_iDeviceID) == 3)
+	{
+		// メニューに戻りたいプレイヤーがいることを
+		// シーン側に伝える
+		int senderID = pMain->m_iDeviceID;
+		MsgMgr->Dispatch(0, pMain->GetID(), ENTITY_ID::SCENE_SELECT, MESSAGE_TYPE::BACK_MENU, &senderID);
 
+	}
 }
 
 void SelectUIState::FirstStep::Exit(SelectUI *pMain)

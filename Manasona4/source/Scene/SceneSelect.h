@@ -17,6 +17,7 @@
 // セレクト
 #include "SelectUI\SelectUIManager.h"
 
+#include "../MenuUI/TipsCard.h"
 
 
 // 前方宣言
@@ -56,6 +57,7 @@ public:
 	//void SetSelectNo(int set) { m_iSelectNo = set; }
 
 	SelectUIManager*	 GetSelectUIMgr() { return m_pSelectUIMgr; }
+	TipsCard* GetBackMenuTips() { return m_pBackMenuTips; }
 private:
 
 	// selectUI
@@ -72,6 +74,8 @@ private:
 		TITLE,
 		BLACK_LINE,
 		INFO_PLATE,
+		SELECT_INFO,
+		SECOND_SELECT_INFO,
 		ARRAY_END,
 	};
 	tdn2DAnim* m_pPic[PIC_TYPE::ARRAY_END];
@@ -106,9 +110,14 @@ private:
 
 	SECOND_SELECT m_tagSecondSelect;
 
+	// 出る前に確認で表示用
+	TipsCard* m_pBackMenuTips;
+	int m_iSenderDeviceID;
+
 	// フレンド
 	friend class SceneSelectState::Intro;	
 	friend class SceneSelectState::CharaSelect;
 	friend class SceneSelectState::StageAndBGM;
 	friend class SceneSelectState::End;
+	friend class SceneSelectState::BackMenu;
 };

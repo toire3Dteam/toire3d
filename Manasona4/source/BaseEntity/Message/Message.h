@@ -31,6 +31,7 @@ enum MESSAGE_TYPE
 	COMBO_COUNT,		// コンボカウント
 	COMBO_GUARD,		// コンボガードされたぜ
 	ADD_SHOT,			// ショットの実体を格納してね
+	BACK_MENU,			// メニュー画面にもどりたいです。
 	OTHER				// その他。
 };
 

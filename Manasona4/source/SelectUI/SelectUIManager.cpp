@@ -79,7 +79,7 @@ SelectUIManager::~SelectUIManager()
 }
 
 //	更新時にデバイス取得
-void SelectUIManager::Update()
+void SelectUIManager::Update(bool bControl)
 {
 
 	
@@ -96,8 +96,8 @@ void SelectUIManager::Update()
 	}
 
 	// 中でステートマシンによる複雑な更新がある
-	m_pLeftSide->Update();
-	m_pRightSide->Update();
+	m_pLeftSide->Update(bControl);
+	m_pRightSide->Update(bControl);
 	
 }
 
@@ -130,6 +130,15 @@ void SelectUIManager::Render()
 
 	//m_pPic[PIC_TYPE::TITLE]->Render(0, 0);
 	//m_pPic[PIC_TYPE::INFO_PLATE]->Render(0, 592 + 5);
+
+}
+
+// 立ち絵描画
+void SelectUIManager::RenderCharacter()
+{
+	// 両方の立ち絵
+	m_pLeftSide->RenderCharacter();
+	m_pRightSide->RenderCharacter();
 
 }
 

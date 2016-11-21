@@ -56,6 +56,7 @@ BOOL InitApp(HINSTANCE hInstance, int nCmdShow)									// ƒQ[ƒ€‹N“®Žž‚ÌÅ‰‚Ì
 	//MainFrameEx->ChangeScene(new sceneMenu);
 	//MainFrameEx->ChangeScene(new sceneCollect);
 	MainFrameEx->ChangeScene(new sceneSelect);
+	
 	// ƒf[ƒ^
 	PlayerDataMgr->Initialize();
 

@@ -23,7 +23,7 @@ Airou::Airou(SIDE side, const SideData &data) :BasePlayer(side, data)
 
 	// ƒLƒƒƒ‰‚²‚Æ‚Ìİ’è
 	m_pName = "AIROU";
-	m_pCutinPic = new tdn2DAnim("DATA/UI/CharacterSelect/Airou.png");
+	m_pCutinPic = new tdn2DAnim("DATA/UI/Game/OverDriveCutin/Airou.png");
 	m_pCutinPic->OrderMoveAppeared(8, -400, +200);
 
 	// ƒtƒŒ[ƒ€“Ç‚İ‚İ
