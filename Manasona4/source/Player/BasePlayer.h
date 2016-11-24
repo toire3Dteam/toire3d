@@ -232,7 +232,15 @@ enum class ANTIGUARD_ATTACK
 	NONE,			// どのガードでも防げる普通の攻撃
 	DOWN_ATTACK,	// 俗にいう下段
 	UP_ATTACK,		// 俗にいう上段
-	THROW,			// 投げ(ガード不可)
+	ALL_BREAK,		// ガード不可
+};
+
+// 攻撃属性
+enum class ATTACK_ATTRIBUTE
+{
+	STRIKE,	// 打撃属性
+	BULLET,	// 弾属性
+	THROW,	// 投げ属性
 };
 
 /****************************************/
@@ -257,10 +265,13 @@ public:
 	int pierceLV;				// 貫通レベル
 	bool bAntiAir;				// 対空攻撃かどうか　(追加)
 	bool bFinish;				// フィニッシュになる攻撃かどうか
-	ANTIGUARD_ATTACK AntiGuard;		// ガードを突き破る攻撃のタイプ
+	ANTIGUARD_ATTACK AntiGuard;	// ガードを突き破る攻撃のタイプ
+	ATTACK_ATTRIBUTE attribute;	// 攻撃の属性(弾、投げ、打撃)
 	SHAKE_CAMERA_INFO ShakeCameraInfo;	// カメラ振動用構造体
 	int GuardRecoveryFrame;		// ガードされたときに「ガードしている相手に与える」硬直時間
 	float fGuardKnockBackPower;	// ガードさせたときのけぞり力
+	float fComboRate;			// コンボ補正(0.8なら次の攻撃に0.8倍の補正がかかる、補正は掛け合わされる)
+
 
 	// ★★★地上ヒットと空中ヒットで分けたい情報
 	struct
@@ -273,7 +284,7 @@ public:
 		int HitRecoveryFrame;		// 攻撃がヒットした際に「相手に与える」硬直の時間
 		DAMAGE_MOTION DamageMotion;	// 喰らった時のモーション
 	}places[(int)HIT_PLACE::MAX];
-	AttackData() :HitSE(nullptr), WhiffSE(nullptr), bHit(false), bHitSuccess(false), HitScore(0), damage(0), WhiffDelayFrame(0), pierceLV(0), bAntiAir(false), bFinish(true), AntiGuard(ANTIGUARD_ATTACK::NONE), pCollisionShape(new CollisionShape::Square),fGuardKnockBackPower(0){}
+	AttackData() :fComboRate(1), attribute(ATTACK_ATTRIBUTE::STRIKE), HitSE(nullptr), WhiffSE(nullptr), bHit(false), bHitSuccess(false), HitScore(0), damage(0), WhiffDelayFrame(0), pierceLV(0), bAntiAir(false), bFinish(true), AntiGuard(ANTIGUARD_ATTACK::NONE), pCollisionShape(new CollisionShape::Square),fGuardKnockBackPower(0){}
 	~AttackData(){ SAFE_DELETE(pCollisionShape); }
 };
 
@@ -583,6 +594,7 @@ public:
 	//	攻撃のヒットストップ・硬直
 	//------------------------------------------------------
 	int GetRecoveryFrame() { return m_RecoveryFlame; }
+	int GetHitStopFrame(){ return m_HitStopFrame; }
 	void SetHitStopFrame(int frame) { m_HitStopFrame = frame; }
 	void SetRecoveryFrame(int frame) { m_RecoveryFlame = frame; }
 	std::list<BASE_ACTION_STATE> *GetRecoveryDamageCount(){ return &m_RecoveryDamageCount; }
@@ -592,13 +604,6 @@ public:
 	//------------------------------------------------------
 	GUARD_STATE GetGuardState(){ return m_GuardState; }
 	void SetGuardState(GUARD_STATE state){ m_GuardState = state; }
-
-
-	//------------------------------------------------------
-	//	投げ
-	//------------------------------------------------------
-	bool isThrowSuccess(){ return m_bThrowSuccess; }
-	void SetThrowSuccess(bool bSuccess){ m_bThrowSuccess = bSuccess; }
 
 
 	//------------------------------------------------------
@@ -912,9 +917,6 @@ protected:
 
 	// 継承してるやつに強制的に呼ばせる
 	void LoadAttackFrameList(char *filename);
-
-	// 投げ成功フラグ(投げ抜け猶予終了時にこのフラグがたってなかったら投げ失敗ステートへ)
-	bool m_bThrowSuccess;
 
 	// UI
 	//ComboUI* m_pComboUI;

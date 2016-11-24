@@ -342,10 +342,10 @@
     <ClCompile Include="source\Window\BaseWindow.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="source\Window\OptionWindow.cpp">
+    <ClCompile Include="source\Window\BattleWindow.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="source\Window\BattleWindow.cpp">
+    <ClCompile Include="source\Window\OptionWindow.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -755,10 +755,10 @@
     <ClInclude Include="source\Window\BaseWindow.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="source\Window\OptionWindow.h">
+    <ClInclude Include="source\Window\BattleWindow.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="source\Window\BattleWindow.h">
+    <ClInclude Include="source\Window\OptionWindow.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

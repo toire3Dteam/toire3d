@@ -70,7 +70,7 @@ void Stage::Base::Collision(BasePlayer *player, Vector3 *move)
 	}
 
 	// ステージとのあたり判定
-	Collision::Raypic(this, player, move);
+	Collision::Raypic(player, move);
 }
 
 //void Stage::Base::Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2)

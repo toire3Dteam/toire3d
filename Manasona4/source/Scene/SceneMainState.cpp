@@ -244,7 +244,7 @@ void SceneMainState::Main::Execute(sceneMain *pMain)
 	PlayerMgr->Update(PLAYER_UPDATE::CONTROL_OK);
 
 	// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
-	Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager(), pMain->GetStage());
+	Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager());
 
 	// プレイヤー位置確定
 	PlayerMgr->UpdatePos();
@@ -354,7 +354,7 @@ void SceneMainState::Finish::Execute(sceneMain *pMain)
 		PlayerMgr->Update(PLAYER_UPDATE::CONTROL_NO);
 
 		// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
-		Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager(), pMain->GetStage());
+		Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager());
 
 		// プレイヤー位置確定
 		PlayerMgr->UpdatePos();
@@ -489,7 +489,7 @@ void SceneMainState::HeaveHoDriveOverFlowSuccess::Execute(sceneMain *pMain)
 		PlayerMgr->Update(PLAYER_UPDATE::CONTROL_NO);
 
 		// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
-		Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager(), pMain->GetStage());
+		Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager());
 
 		// プレイヤー位置確定
 		PlayerMgr->UpdatePos();
@@ -615,7 +615,7 @@ void SceneMainState::TutorialMain::Execute(sceneMain *pMain)
 		PlayerMgr->Update(PLAYER_UPDATE::CONTROL_NO);
 
 		// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
-		Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager(), pMain->GetStage());
+		Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager());
 
 		// プレイヤー位置確定
 		PlayerMgr->UpdatePos();
@@ -626,7 +626,7 @@ void SceneMainState::TutorialMain::Execute(sceneMain *pMain)
 		PlayerMgr->Update(PLAYER_UPDATE::CONTROL_OK);
 
 		// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
-		Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager(), pMain->GetStage());
+		Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager());
 
 		// プレイヤー位置確定
 		PlayerMgr->UpdatePos();

@@ -120,14 +120,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 		else
 		{
-			static int TDNtimer = 0;
+			//static int TDNtimer = 0;
 
 			// ゲームの更新・描画
 			if (MainFrameEx->Update())
 			{
 				MainFrameEx->Render();
-				TDNtimer++;
-				MyAssert((TDNtimer != 60 * 60), "遊びすぎいいいいいいいい！！！！！");
+				//TDNtimer++;
+				//MyAssert((TDNtimer != 60 * 60), "遊びすぎいいいいいいいい！！！！！");
 			}			
 
 		}

@@ -10,6 +10,7 @@ class BasePlayer;
 
 
 bool JumpCancel(BasePlayer * pPerson);
+bool isThrownState(BasePlayer *pPerson);
 bool RunCancel(BasePlayer * pPerson);
 bool SquatCancel(BasePlayer * pPerson);
 bool SquatAttackCancel(BasePlayer * pPerson);

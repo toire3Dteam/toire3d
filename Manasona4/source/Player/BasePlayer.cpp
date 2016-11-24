@@ -68,7 +68,7 @@ m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentActionFrame(0), m_RecoveryFlame
 m_HitStopFrame(0),// ★★★バグの原因　ひっとすトップ初期化のし忘れ。
 m_InvincibleColRate(0), m_InvincibleColRateFlame(0), m_bInvincibleColRateUpFlag(false),
 m_OverDriveGage(0), m_bOverDrive(false), m_OverDriveFrame(0), m_OverDriveType(OVERDRIVE_TYPE::BURST),
-m_bMoveUpdate(true), m_bThrowSuccess(false),
+m_bMoveUpdate(true),
 m_MaxHP(0), m_HP(0),
 m_bGameTimerStopFlag(false), m_HeavehoStopTimer(0), m_HeaveHoDriveOverFlowFrame(0),
 m_WinNum(0), m_GuardState(GUARD_STATE::NO_GUARD),
@@ -190,7 +190,7 @@ void BasePlayer::Reset()
 	m_bEscape =
 	m_bInvincibleColRateUpFlag =
 	m_bOverDrive =
-	m_bThrowSuccess =
+	//m_bThrowSuccess =
 	//m_bGuard =
 	m_bGameTimerStopFlag =
 	m_bAerialDash =

@@ -52,18 +52,21 @@ class Collision
 {
 public:
 	// レイピック
-	static void Raypic(Stage::Base *obj, BasePlayer *player, Vector3 *move); // Squareで判定
-	//void RaypicUp(Stage::Base *obj, BasePlayer *player, Vector3 *move);
+	static void Raypic(BasePlayer *player, Vector3 *move); // Squareで判定
+	static float CheckMove(BasePlayer *pPlayer, const Vector3 &vMove);
 
 	// プレイヤーの判定
-	static void PlayerCollision(PlayerManager* pPlayerMgr, ShotManager *pShotMgr, Stage::Base *pStage);
+	static void PlayerCollision(PlayerManager* pPlayerMgr, ShotManager *pShotMgr);
 
 	// 形状で判定
 	static bool HitCheck(CollisionShape::Circle* c1, CollisionShape::Circle* c2);
 	static bool HitCheck(CollisionShape::Square* s1, CollisionShape::Square* s2);
 	static bool HitCheck(CollisionShape::Circle* c, CollisionShape::Square* s);
 
+	static void SetStage(Stage::Base *pStage){ m_pStage = pStage; }
 private:
+
+	static Stage::Base *m_pStage;	// どっからでもアクセスしたいので持つ
 
 	// 玉用の簡易版レイピック
 	static bool RaypicShot(Stage::Base *obj, Shot::Base *shot);
@@ -75,11 +78,11 @@ private:
 
 	static void CollisionPlayerAttack(BasePlayer *my, BasePlayer *you,  HIT_DAMAGE_INFO **OutDamageInfo);
 	static bool CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou);
-	static bool CollisionThrowAttack(BasePlayer *my, BasePlayer *you, Stage::Base *pStage);
+	//static bool CollisionThrowAttack(BasePlayer *my, BasePlayer *you, Stage::Base *pStage);
 	static bool CollisionShot(Shot::Base *shot, BasePlayer *you);
 
 	// めり込み
-	static void Sinking(Stage::Base *obj, BasePlayer *pPlayer1, BasePlayer *pPlayer2);
+	static void Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2);
 
 	static void SendHitMessage(BasePlayer *pAttackPlayer, BasePlayer *pDamagePlayer, HIT_DAMAGE_INFO *pHitDamageInfo);
 };

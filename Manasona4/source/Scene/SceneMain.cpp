@@ -77,6 +77,7 @@ bool sceneMain::Initialize()
 
 	// ステージ初期化(★セレクトしたステージのタイプを引数に渡す)
 	Stage::Base::CreateStage(&m_pStage, SelectDataMgr->Get()->stage, CameraMgr);	// 関数の中で作ってもらう
+	Collision::SetStage(m_pStage);
 
 	m_fLoadPercentage = .3f;	// ロード割合
 

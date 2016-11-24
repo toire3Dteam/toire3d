@@ -56,6 +56,17 @@ bool JumpCancel(BasePlayer * pPerson)
 	return false;
 }
 
+bool isThrownState(BasePlayer *pPerson)
+{
+	return (
+		pPerson->isLand() &&	// 地上にいて
+
+		// ダメージ系のステート以外だったら
+		!pPerson->GetFSM()->isInState(*BasePlayerState::KnockBack::GetInstance()) &&
+		!pPerson->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) &&
+		!pPerson->GetFSM()->isInState(*BasePlayerState::LandRecovery::GetInstance())
+		);
+}
 
 bool RunCancel(BasePlayer * pPerson)
 {
@@ -201,7 +212,7 @@ bool AttackCancel(BasePlayer *pPerson)
 bool InvincibleAttackCancel(BasePlayer *pPerson)
 {
 	// 攻撃キャンセル
-	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R2, true))
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::L2, true))
 	{
 		// 先行入力リセット
 		pPerson->AheadCommandReset();
@@ -263,7 +274,7 @@ bool OverDriveCancel(BasePlayer *pPerson)
 
 bool EscapeCancel(BasePlayer *pPerson)
 {
-	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R1, true))
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::B, true))
 	{
 		// 先行入力リセット
 		pPerson->AheadCommandReset();
@@ -300,7 +311,7 @@ bool EscapeCancel(BasePlayer *pPerson)
 bool ThrowCancel(BasePlayer * pPerson)
 {
 	// 投げキャンセル
-	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::L2))
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::A))
 	{
 		// 地面についていないとないときはキャンセルできない
 		if (pPerson->isLand() == false)return false;
@@ -326,7 +337,7 @@ bool ThrowCancel(BasePlayer * pPerson)
 bool HeaveHoCancel(BasePlayer * pPerson)
 {
 	// 必殺技キャンセル
-	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::B))
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R2))
 	{	
 		// オーバードライブ中ならゲージなしで打てる
 		if (pPerson->isOverDrive())
@@ -461,7 +472,7 @@ bool AerialAttackCancel(BasePlayer *pPerson)
 bool DokkoiAttackCancel(BasePlayer *pPerson)
 {
 	// どっこい攻撃キャンセル
-	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::A, true))
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R1, true))
 	{
 		if (pPerson->isLand() == true)
 		{
@@ -3821,11 +3832,11 @@ void BasePlayerState::Escape::Execute(BasePlayer * pPerson)
 		// 向いている方向にスゥーっと移動
 		if (pPerson->GetDir() == DIR::RIGHT)
 		{
-			pPerson->SetMove(Vector3(1.75f, 0, 0));
+			pPerson->SetMove(Vector3(1.45f, 0, 0));
 		}
 		else
 		{
-			pPerson->SetMove(Vector3(-1.75f, 0, 0));
+			pPerson->SetMove(Vector3(-1.45f, 0, 0));
 		}
 		break;
 
@@ -4457,10 +4468,10 @@ void BasePlayerState::Guard::Execute(BasePlayer * pPerson)
 		//============================================
 		if (DashCancel(pPerson))return;
 
-		if (isInputGuardCommand(pPerson))
+		// 相手キャラが攻撃ステートなら
+		if (pPerson->GetTargetPlayer()->isAttackState() || (pPerson->GetTargetPlayer()->GetStand()->isActive() && pPerson->GetTargetPlayer()->GetStand()->GetAttackData()))
 		{
-			// 相手キャラが攻撃ステートなら
-			if (pPerson->GetTargetPlayer()->isAttackState() || (pPerson->GetTargetPlayer()->GetStand()->isActive() && pPerson->GetTargetPlayer()->GetStand()->GetAttackData()))
+			if (isInputGuardCommand(pPerson))
 			{
 				/* しゃがみガード */
 				if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN))
@@ -4492,23 +4503,6 @@ void BasePlayerState::Guard::Execute(BasePlayer * pPerson)
 			}
 		}
 	}
-
-	//else
-	//{
-	//	// カウント
-	//	pPerson->AddGuardFollowFrame();
-	//
-	//	enum { FOLLOE_END = 6 };
-	//	if (pPerson->GetGuardFollowFrame() >= FOLLOE_END)
-	//	{
-	//		pPerson->SetGuardFollowFrame(0);
-	//		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
-	//		return;
-	//	}
-	//
-	//}
-
-	// ★解除時に好きがほしい
 }
 
 
@@ -4537,7 +4531,7 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 	case MESSAGE_TYPE::HIT_DAMAGE:
 	{
 									 HIT_DAMAGE_INFO *HitDamageInfo = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
-									 
+
 									 bool bGuardSuccess(false);
 									 if (pPerson->GetGuardState() == GUARD_STATE::UP_GUARD)
 									 {
@@ -4570,15 +4564,17 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 										 }
 										 se->Play(seID);
 
-										 // 懇親の
-										 //if (pPerson->GetTargetPlayer()->GetDir() == DIR::RIGHT)
-										 //{
-										//	 pPerson->GetTargetPlayer()->SetMove(Vector3(-0.001f, 0, 0));
-										 //}
-										 //else
-										 //{
-										//	 pPerson->GetTargetPlayer()->SetMove(Vector3(0.001f, 0, 0));
-										 //}
+										 // ガードのけぞり
+										 {
+											 float fGuardKnockBack(HitDamageInfo->fGuardKnockBackPower);
+											 if (pPerson->GetDir() == DIR::RIGHT) fGuardKnockBack *= -1;
+
+											 Vector3 vKnockBackMove(Collision::CheckMove(pPerson, Vector3(fGuardKnockBack, 0, 0)), 0, 0);
+											 pPerson->SetMove(vKnockBackMove);
+
+											 // 壁だとこっちに移動がかかる
+											 pPerson->GetTargetPlayer()->SetMove(Vector3(-(fGuardKnockBack - vKnockBackMove.x), 0, 0));
+										 }
 
 										 // コンボ用
 										 COMBO_DESK comboDesk;
@@ -4600,35 +4596,23 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 									 // ★フィニッシュアーツは通す
 									 //if (HitDamageInfo->bOverDrive == true)
 									 //{
-									//	 pPerson->AddEffectAction(pPerson->GetCenterPos(), EFFECT_TYPE::GUARD_BREAK);
-									//	 return false;
+									 //	 pPerson->AddEffectAction(pPerson->GetCenterPos(), EFFECT_TYPE::GUARD_BREAK);
+									 //	 return false;
 									 //}
 
-									// // 受ける技のレベルによりガードの硬直を変化　（GGX式）
-									// const float len = HitDamageInfo->FlyVector.Length();
-									// int RecoveryFrame = 0;
-									// if (len < HUTTOBI_LINE)
-									// {
-									//	 // レベル1　　（GGX式）
-									//	 RecoveryFrame = 12*2;
-									// }
-									// else
-									// {
-									//	 // レベル2　　（GGX式）
-									//	 RecoveryFrame = 18 * 2;
-									// }
-
-									 //// 向きを攻撃された方向へ向くように＆動き
-									 //if (HitDamageInfo->FlyVector.x > 0.0f)
-									 //{
-									//	 pPerson->SetDir(DIR::LEFT);
-									//	 pPerson->SetMove(Vector3(1.0f, 0, 0));
-									 //}
-									 //else
-									 //{
-									//	 pPerson->SetDir(DIR::RIGHT);
-									//	 pPerson->SetMove(Vector3(-1.0f, 0, 0));
-									 //}
+									 // // 受ける技のレベルによりガードの硬直を変化　（GGX式）
+									 // const float len = HitDamageInfo->FlyVector.Length();
+									 // int RecoveryFrame = 0;
+									 // if (len < HUTTOBI_LINE)
+									 // {
+									 //	 // レベル1　　（GGX式）
+									 //	 RecoveryFrame = 12*2;
+									 // }
+									 // else
+									 // {
+									 //	 // レベル2　　（GGX式）
+									 //	 RecoveryFrame = 18 * 2;
+									 // }
 
 									 // (追加)ガードエフェクト発動! 
 									 pPerson->AddEffectAction(pPerson->GetFlontPos(), EFFECT_TYPE::GUARD_WAVE);
@@ -4648,7 +4632,6 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 }
 
 
-
 /*******************************************************/
 //					投げステート
 /*******************************************************/
@@ -4666,9 +4649,6 @@ void BasePlayerState::Throw::Enter(BasePlayer * pPerson)
 
 	// SE再生
 	se->Play("掴み");
-
-	// 投げフラグ初期化
-	pPerson->SetThrowSuccess(false);
 }
 
 void BasePlayerState::Throw::Execute(BasePlayer * pPerson)
@@ -4681,15 +4661,11 @@ void BasePlayerState::Throw::Execute(BasePlayer * pPerson)
 		return;
 	}
 
-	// 投げぬけ猶予フレーム過ぎたら
-	if (
-		//BasePlayer::c_THROW_ESCAPE_FRAME > pPerson->GetCurrentFrame()
-		pPerson->GetActionFrame() == FRAME_STATE::FOLLOW
-		)
+	// 掴んでたら
+	if (pPerson->GetAttackData()->bHit)
 	{
-		// もし相手を掴んでいて、猶予が終わったら投げ成功ステートに行く
-		// このThrowSuccessはプレイヤーマネージャーの投げ判定関数の中で書き換えている
-		if (pPerson->isThrowSuccess())
+		// 投げ猶予終了
+		if (pPerson->GetHitStopFrame() == 0)
 		{
 			pPerson->GetFSM()->ChangeState(BasePlayerState::ThrowSuccess::GetInstance());
 			return;
@@ -4710,16 +4686,13 @@ bool BasePlayerState::Throw::OnMessage(BasePlayer * pPerson, const Message & msg
 	// メッセージタイプ
 	switch (msg.Msg)
 	{
-	case MESSAGE_TYPE::THROW_SUCCESS:	// 相手をつかんだよというメッセージ(同時に掴まれた相手にもメッセージが送られている)
-		pPerson->SetThrowSuccess(true);	// 掴み成功フラグON！
-		return true;
-		break;
+	//case MESSAGE_TYPE::THROW_SUCCESS:	// 相手をつかんだよというメッセージ(同時に掴まれた相手にもメッセージが送られている)
+	//	pPerson->SetThrowSuccess(true);	// 掴み成功フラグON！
+	//	return true;
+	//	break;
 	case MESSAGE_TYPE::CAN_THROW_RELEASE:	// 掴んでる人から、投げ抜けしてぇと送られてくるメッセージ
 		// 猶予フレーム中だったら解除
-		if ( 
-			//pPerson->GetCurrentFrame() < BasePlayer::c_THROW_ESCAPE_FRAME
-			pPerson->GetActionFrame() == FRAME_STATE::ACTIVE
-			)// ※ここは数値をじかにかいたほうがいいかと
+		if (pPerson->GetHitStopFrame() > 0)// ※ここは数値をじかにかいたほうがいいかと
 		{
 			MsgMgr->Dispatch(0, pPerson->GetID(), msg.Sender, MESSAGE_TYPE::THROW_RELEASE, nullptr);	// 送り主に投げ抜けOKと送り返す
 
@@ -4729,9 +4702,9 @@ bool BasePlayerState::Throw::OnMessage(BasePlayer * pPerson, const Message & msg
 		return true;
 		break;
 		// 攻撃くらったよメッセージ
-	case MESSAGE_TYPE::HIT_DAMAGE:
-		if(pPerson->isThrowSuccess()) return true;	// ダメージメッセージガン無視
-		break;
+	//case MESSAGE_TYPE::HIT_DAMAGE:
+	//	if(pPerson->GetAttackData) return true;	// ダメージメッセージガン無視
+	//	break;
 	}
 
 	return false;
@@ -4750,6 +4723,33 @@ void BasePlayerState::ThrowSuccess::Enter(BasePlayer * pPerson)
 
 	// アクションを成功モードに
 	pPerson->SetActionState(BASE_ACTION_STATE::THROW_SUCCESS);
+
+	BasePlayer *you(pPerson->GetTargetPlayer());
+	// ★ここでつかまれた相手の座標をつかんだ相手の掴み座標に移動(普通に代入すると壁抜けするので、壁判定もろもろここでやってしまおうという事)
+	if (pPerson->GetDir() == DIR::LEFT  && pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT) ||
+		pPerson->GetDir() == DIR::RIGHT && pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
+	{
+		// 向きを逆にする
+		pPerson->ReverseDir();
+	
+		// 相手の座標と自分の座標を入れ替える
+		Vector3 temp(pPerson->GetPos());
+		pPerson->SetPos(you->GetPos());
+		you->SetPos(temp);
+	}
+	
+	const Vector3 p(pPerson->GetPos());
+	Vector3 v(pPerson->GetFlontPos() - p);
+	v.y = 0;
+	Vector3 v2(v);
+	
+	// ステージとの判定で、move値をどうこういじった後に
+	if (Collision::CheckMove(pPerson, v) - v.x == 0)
+	{
+		pPerson->GetPosAddress()->x -= v2.x;
+		you->SetPos(pPerson->GetPos() + v2);
+	}
+	else you->SetPos(p + v);
 }
 
 void BasePlayerState::ThrowSuccess::Execute(BasePlayer * pPerson)

@@ -11,7 +11,7 @@ enum MESSAGE_TYPE
 	HIT_ATTACK,			// 攻撃をヒットさせた人に送るメッセージ！
 	HIT_DAMAGE,			// 攻撃がヒットした相手に送るメッセージ
 	FALL,				// プレイヤーが地面についていないときに送られるメッセージ
-	THROW_SUCCESS,		// 掴んだ人に送るメッセージ
+	//THROW_SUCCESS,		// 掴んだ人に送るメッセージ
 	BE_THROWN,			// 掴まれた相手に送るメッセージ(★掴んだ相手のIDを送ってあげる)
 	CAN_THROW_RELEASE,	// 掴まれた人が投げぬけコマンドを入力したときに掴んだやつに対して送るメッセージ
 	THROW_RELEASE,		// 投げぬけしていいよと送るメッセージ
@@ -91,7 +91,8 @@ struct HIT_DAMAGE_INFO
 	bool bFinishOK;			// フィニッシュする攻撃か
 	float fGuardKnockBackPower;	// ガードのけぞりの力
 	DAMAGE_MOTION DamageMotion;	// 喰らったモーションタイプ
-	HIT_DAMAGE_INFO():BeInvincible(false), damage(0), FlyVector(0,0), hitStopFlame(0), HitRecoveryFrame(0), GuardRecoveryFrame(0), HitEffectType(0), bOverDrive(false), iAttackType(0), iAntiGuard(0), HitSE(nullptr), bFinishOK(true), DamageMotion(DAMAGE_MOTION::KNOCK_BACK), fGuardKnockBackPower(0){}
+	float fComboRate;		// コンボ補正
+	HIT_DAMAGE_INFO():fComboRate(1), BeInvincible(false), damage(0), FlyVector(0,0), hitStopFlame(0), HitRecoveryFrame(0), GuardRecoveryFrame(0), HitEffectType(0), bOverDrive(false), iAttackType(0), iAntiGuard(0), HitSE(nullptr), bFinishOK(true), DamageMotion(DAMAGE_MOTION::KNOCK_BACK), fGuardKnockBackPower(0){}
 };
 
 // 攻撃ヒットしたプレイヤー用

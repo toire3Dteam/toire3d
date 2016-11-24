@@ -391,7 +391,7 @@ void tdn2DObj::Render(int x, int y, u32 dwFlags)
 		else
 			v[1].tu = v[3].tu = (float)abjustSize / (float)this->m_width;//
 
-		v[0].tu = v[2].tu = 1.0 - (float)abjustSize / (float)this->m_width;//  反対方向の色が付くためほんの少しUV座標をずらす
+		v[0].tu = v[2].tu = 1.0f - (float)abjustSize / (float)this->m_width;//  反対方向の色が付くためほんの少しUV座標をずらす
 	}
 	// 縦のuv座標は変わらず
 	v[0].tv = v[1].tv = (float)abjustSize / (float)this->m_height;// 
@@ -487,7 +487,7 @@ void tdn2DObj::Render(int x, int y, tdnShader* shader, char* name)
 		else
 			v[1].tu = v[3].tu = (float)abjustSize / (float)this->m_width;//
 
-		v[0].tu = v[2].tu = 1.0 - (float)abjustSize / (float)this->m_width;//  反対方向の色が付くためほんの少しUV座標をずらす
+		v[0].tu = v[2].tu = 1.0f - (float)abjustSize / (float)this->m_width;//  反対方向の色が付くためほんの少しUV座標をずらす
 	}
 	// 縦のuv座標は変わらず
 	v[0].tv = v[1].tv = (float)abjustSize / (float)this->m_height;// 
