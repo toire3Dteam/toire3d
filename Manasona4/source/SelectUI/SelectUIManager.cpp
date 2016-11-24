@@ -110,7 +110,7 @@ void SelectUIManager::Render()
 	// キャラアイコン
 	for (int i = 0; i < (int)CHARACTER::END; i++)
 	{
-		if (m_pLeftSide->GetSelectCharacter() == i|| m_pRightSide->GetSelectCharacter() == i)
+		if ((int)m_pLeftSide->GetSelectCharacter() == i|| (int)m_pRightSide->GetSelectCharacter() == i)
 		{
 			m_pCharacterIcon[i]->SetARGB(0xffffffff);
 		}else

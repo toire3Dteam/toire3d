@@ -28,12 +28,7 @@ namespace Shot
 		//------------------------------------------------------
 		//	更新
 		//------------------------------------------------------
-		virtual void Update()
-		{
-			// 基本的な移動量の更新
-			m_vVelocity += m_vAccel;
-			m_vPos += m_vVelocity;
-		}
+		virtual void Update();
 
 		//------------------------------------------------------
 		//	描画
@@ -48,6 +43,7 @@ namespace Shot
 		Vector3 &GetVec(){ return m_vVec; }
 		Vector3 &GetMove(){ return m_vVelocity; }
 		BasePlayer *GetPlayer(){ return m_pPlayer; }
+		BaseUVEffect *GetObj() { return m_pObj; }
 		AttackData *GetAttackData(){ return m_ptagAttackData; }
 		bool EraseOK(){ return m_bErase; }
 

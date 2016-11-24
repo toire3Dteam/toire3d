@@ -717,3 +717,41 @@ public:
 
 private:
 };
+
+/*****************************/
+//	マーヤショットエフェクト
+/*****************************/
+class MayaShotEffect :public BaseUVEffect
+{
+public:
+	MayaShotEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/maya/shot.IMO", 0.08f, 0.0f, 46, false, 1, 40);
+	};
+	~MayaShotEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/*****************************/
+//	マズルフラッシュエフェクト 
+/*****************************/
+class MuzzleFlashEffect :public BaseUVEffect
+{
+public:
+	MuzzleFlashEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/maya/MuzzleFlash.IMO", 0.0f, 0.0f, 12, false, 1, 3);
+	};
+	~MuzzleFlashEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};

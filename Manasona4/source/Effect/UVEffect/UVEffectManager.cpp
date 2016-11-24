@@ -85,6 +85,9 @@ UVEffectManager::UVEffectManager()
 		case UV_EFFECT_TYPE::ORANGE_BURST:
 			m_baseUVEffect[i] = new OrangeBurstEffect();
 			break;
+		case UV_EFFECT_TYPE::MUZZLE_FLASH:
+			m_baseUVEffect[i] = new MuzzleFlashEffect();
+			break;
 		default:
 			assert(0);	// "そんなエフェクトはない"
 			break;

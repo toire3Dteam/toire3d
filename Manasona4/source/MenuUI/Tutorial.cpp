@@ -256,7 +256,7 @@ WalkTutorial::WalkTutorial()
 
 	// Tips
 	m_pIntroTips = new TipsCard("まずは移動の基本、「歩き」です。\n方向キーでキャラクターを動かしてみましょう。");
-	m_pClearTips = new TipsCard("よくできました！\n「歩き」は移動の基本です。");
+	m_pClearTips = new TipsCard("よくできました！\n　相手の方向へ方向キーを押すと「前歩き」、\n相手の逆方向へ押すと「後ろ歩き」になります。");
 
 
 	// タスクセット
@@ -359,8 +359,8 @@ SquatTutorial::SquatTutorial()
 	m_pTaskTitle.iStingLength = addByte;
 
 	// Tips
-	m_pIntroTips = new TipsCard("次はしゃがみです。\n↓でしゃがみます。");
-	m_pClearTips = new TipsCard("よくできました！\n「しゃがみ」は楽しいね。");
+	m_pIntroTips = new TipsCard("次はキャラクターをしゃがませてみましょう。\n↓でその場でしゃがみます。");
+	m_pClearTips = new TipsCard("よくできました！\n／や＼と入力しても、しゃがむことが出来ます。");
 
 	// タスクセット
 	AddTaskData("しゃがみ－↓押しっぱなし");
@@ -429,8 +429,8 @@ JumpTutorial::JumpTutorial()
 	m_pTaskTitle.iStingLength = addByte;
 
 	// Tips
-	m_pIntroTips = new TipsCard("次はジャンプです。\n↑でジャンプします。\nもう一度↑で空中で飛べます。");
-	m_pClearTips = new TipsCard("よくできました！\n「ジャンプ」は楽しいね。");
+	m_pIntroTips = new TipsCard("「ジャンプ」と「空中ジャンプ」です。\n地上で↑を押すことで「ジャンプ」をします。\n空中でもう一度↑を押すと「空中ジャンプ」になります。");
+	m_pClearTips = new TipsCard("よくできました！\n「ジャンプ」は←や→と入力することで、\n「前ジャンプ」や「後ろジャンプ」になります。");
 
 	// タスクセット
 	AddTaskData("ジャンプ－↑");
@@ -496,11 +496,15 @@ AttackTutorial::AttackTutorial()
 	m_pTaskTitle.iStingLength = addByte;
 
 	// Tips
-	m_pIntroTips = new TipsCard("次は攻撃です。\n□で攻撃します。");
-	m_pClearTips = new TipsCard("よくできました！\n「攻撃」は楽しいね。アー♂");
+	m_pIntroTips = new TipsCard("さあ、今度は基本の攻撃方法を学びましょう。\nその場で□、しゃがんで□、ジャンプ中に□、\n相手と逆方向で□を押してみましょう。");
+	m_pClearTips = new TipsCard("よくできました！\n方向キーとの組み合わせで様々な攻撃が繰り出せます。\n「対空攻撃」は空中からの攻撃に対して【無敵】です。");
 
 	// タスクセット
 	AddTaskData("攻撃－□");
+	AddTaskData("しゃがみ攻撃－↓＋□");
+	AddTaskData("ジャンプ攻撃－空中で□");
+	AddTaskData("対空攻撃－←＋□");
+
 
 	Init();
 }
@@ -519,18 +523,44 @@ void AttackTutorial::TaskUpdate(BasePlayer * pPerson)
 
 	enum
 	{
-		ATTACK = 0
+		ATTACK = 0, SQUAT_ATTACK = 1, JUMP_ATTACK = 2, ANTIAIR_ATTACK = 3
 	};
 
 	// 攻撃ステートにいたらクリア
 	if (pPerson->GetFSM()->isInState(*BasePlayerState::RushAttack::GetInstance()))
 	{
-		if (pPerson->isHitAttack()==true)
+		//if (pPerson->isHitAttack()==true)
 		{
 			TaskSuccess(ATTACK);
 		}	
 	}
 
+	// しゃがみ攻撃ステートにいたらクリア
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::SquatAttack::GetInstance()))
+	{
+		//if (pPerson->isHitAttack() == true)
+		{
+			TaskSuccess(SQUAT_ATTACK);
+		}
+	}
+
+	// 空中攻撃ステートにいたらクリア
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::AerialAttack::GetInstance()))
+	{
+		//if (pPerson->isHitAttack() == true)
+		{
+			TaskSuccess(JUMP_ATTACK);
+		}
+	}
+
+	// 対空攻撃ステートにいたらクリア
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::AntiAirAttack::GetInstance()))
+	{
+		//if (pPerson->isHitAttack() == true)
+		{
+			TaskSuccess(ANTIAIR_ATTACK);
+		}
+	}
 }
 
 //+------------------------------------------------------
@@ -540,7 +570,7 @@ void AttackTutorial::TaskUpdate(BasePlayer * pPerson)
 SkillTutorial::SkillTutorial()
 {
 	// タイトル名
-	m_pTaskTitle.pSting = "No.05 ドライブ攻撃";
+	m_pTaskTitle.pSting = "No.05 スキル";
 
 	// クリアから終りまで
 	m_iWaitFrameMAX = 60;
@@ -558,11 +588,11 @@ SkillTutorial::SkillTutorial()
 	m_pTaskTitle.iStingLength = addByte;
 
 	// Tips
-	m_pIntroTips = new TipsCard("次はドライブ攻撃です。\nキャラクタ－により色々なドライブ攻撃があります。 \n△でドライブ攻撃です。");
-	m_pClearTips = new TipsCard("よくできました！\n「ドライブ」は楽しいね。列車ぁぁぁアー♂");
+	m_pIntroTips = new TipsCard("「スキル」はキャラクター毎にある強力な技です。\n△ボタンでスキルを発動できます。");
+	m_pClearTips = new TipsCard("よくできました！\n「スキル」はキャラクター毎に様々な技があります。\nまた「攻撃」から基本的に繋げて発動できます。");
 
 	// タスクセット
-	AddTaskData("ドライブ攻撃－△");
+	AddTaskData("スキル－△");
 
 	Init();
 }
@@ -586,7 +616,7 @@ void SkillTutorial::TaskUpdate(BasePlayer * pPerson)
 	// スキルステートにいたらクリア
 	if (pPerson->GetFSM()->isInState(*BasePlayerState::Skill::GetInstance()))
 	{
-		if (pPerson->isHitAttack() == true)
+		//if (pPerson->isHitAttack() == true)
 		{
 			TaskSuccess(SKILL);
 		}
@@ -621,11 +651,11 @@ OverDriveTutorial::OverDriveTutorial()
 	m_pTaskTitle.iStingLength = addByte;
 
 	// Tips
-	m_pIntroTips = new TipsCard("次は必殺技です。\nゲージを50%以上で○で必殺技です。");
-	m_pClearTips = new TipsCard("よくできました！\n「必殺技」はマジキチだね。列車ぁぁぁアー♂");
+	m_pIntroTips = new TipsCard("ゲージが50以上ある時に▽を押し込むと。\n「必殺技」を発動できます。");
+	m_pClearTips = new TipsCard("よくできました！\n「必殺技」はとても強力な技です。\nまた「攻撃」や「スキル」から繋げて発動できます。");
 
 	// タスクセット
-	AddTaskData("必殺技－ゲージ50%以上で○");
+	AddTaskData("必殺技－ゲージ50%以上で▽");
 
 	Init();
 }

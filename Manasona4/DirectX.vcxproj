@@ -135,6 +135,7 @@
     <ClCompile Include="source\Effect\UVEffect\BaseUVEffect.cpp" />
     <ClCompile Include="source\Effect\UVEffect\UVEffectManager.cpp" />
     <ClCompile Include="source\Fade\Fade.cpp" />
+    <ClCompile Include="source\MenuUI\CoinUI.cpp" />
     <ClCompile Include="source\MenuUI\ControllerSelectUI.cpp" />
     <ClCompile Include="source\MenuUI\MenuIcon.cpp" />
     <ClCompile Include="source\MenuUI\MenuUIManager.cpp" />
@@ -189,6 +190,9 @@
     <ClCompile Include="source\UI\PersonaUI.cpp" />
     <ClCompile Include="source\UI\RoundIcon.cpp" />
     <ClCompile Include="source\UI\SPGage.cpp" />
+    <ClCompile Include="source\Window\BaseWindow.cpp" />
+    <ClCompile Include="source\Window\BattleWindow.cpp" />
+    <ClCompile Include="source\Window\OptionWindow.cpp" />
     <ClCompile Include="TDN\DirectShow\baseclasses\amfilter.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClCompile>
@@ -265,6 +269,7 @@
     <ClInclude Include="source\Effect\UVEffect\BaseUVEffect.h" />
     <ClInclude Include="source\Effect\UVEffect\UVEffectManager.h" />
     <ClInclude Include="source\Fade\Fade.h" />
+    <ClInclude Include="source\MenuUI\CoinUI.h" />
     <ClInclude Include="source\MenuUI\ControllerSelectUI.h" />
     <ClInclude Include="source\MenuUI\MenuIcon.h" />
     <ClInclude Include="source\MenuUI\MenuUIManager.h" />
@@ -322,6 +327,9 @@
     <ClInclude Include="source\UI\PersonaUI.h" />
     <ClInclude Include="source\UI\RoundIcon.h" />
     <ClInclude Include="source\UI\SpGage.h" />
+    <ClInclude Include="source\Window\BaseWindow.h" />
+    <ClInclude Include="source\Window\BattleWindow.h" />
+    <ClInclude Include="source\Window\OptionWindow.h" />
     <ClInclude Include="TDN\DirectShow\baseclasses\amextra.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClInclude>

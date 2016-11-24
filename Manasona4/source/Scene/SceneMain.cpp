@@ -46,7 +46,7 @@ bool sceneMain::Initialize()
 	// ラウンド数
 	// (TODO)[11/4]ラウンド数が0の時はラウンドコールを抜く処理がしたい
 	// トレーニングやチュートリアルのため
-	m_iRoundNum = 0 /*SelectDataMgr->Get()->iWinRound*/;
+	m_iRoundNum = SelectDataMgr->Get()->iWinRound;
 
 	//com = new Combo();
 
@@ -159,12 +159,17 @@ bool sceneMain::Initialize()
 	/* ステートマシン初期化 */
 	m_pStateMachine = new StateMachine<sceneMain>(this);
 
+
+
 	//（TODO）チュートリアル・トレーニングだったら分岐
 	m_bTutorialFlag = SelectDataMgr->Get()->bTutorial;
-	m_eSelectTutorial = (TUTORIAL_TYPE)0;// (TODO)選んだチュートリアルを設定してあげる 
-	m_bTutorialFlag = true;
+	m_eSelectTutorial = (TUTORIAL_TYPE)0;// (TODO)選んだチュートリアルを設定してあげる 					 
+
+
 	if (m_bTutorialFlag == true)
-	{
+	{	
+		// UIを最初の一回だけ起動
+		GameUIMgr->Action();
 		// チュートリアル用の対戦
 		m_pStateMachine->SetCurrentState(SceneMainState::TutorialIntro::GetInstance());
 

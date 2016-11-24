@@ -10,6 +10,7 @@
 // メニューマネージャー
 #include "MenuUI\MenuUIManager.h"
 #include "MenuUI\ControllerSelectUI.h"
+
 // テンプレートクラスをフレンドクラスで扱うためには先に定義する必要がある
 #include "SceneMenuState.h"
 
@@ -18,10 +19,28 @@
 class MyMusicManager;
 class Camera;
 class RoundCallManager;
-
+class BaseWindow;
 //+-----------------------------------
 //	シーンメニュー
 //+-----------------------------------
+
+// ヒントカードの種類
+enum class TIPS_TYPE
+{
+	TUTORIAL, // チュートリアル確認
+	
+	ARRAY_END	// 配列終了
+
+};
+
+// メニューのウィンドウの種類
+enum class WINDOW_TYPE
+{
+	OPTION, // オプション
+
+	ARRAY_END	// 配列終了
+
+};
 
 class sceneMenu : public BaseScene, BaseGameEntity
 {
@@ -49,6 +68,9 @@ public:
 
 	ControllerSelectUI* GetCtrlSelectUI() { return m_pCtrlSelectUI; }
 
+	TipsCard* GetTips(TIPS_TYPE type) { return m_pTips[(int)type]; }
+	BaseWindow* GetWindow(WINDOW_TYPE type) { return m_pWindow[(int)type]; }
+
 private:
 
 	// メニューUI
@@ -57,6 +79,12 @@ private:
 
 	// コントローラーセレクト用
 	ControllerSelectUI* m_pCtrlSelectUI;
+
+	// 確認用ティップス
+	TipsCard* m_pTips[(int)TIPS_TYPE::ARRAY_END];
+
+	// Window類
+	BaseWindow* m_pWindow[(int)WINDOW_TYPE::ARRAY_END];
 
 	StateMachine<sceneMenu> *m_pStateMachine;	// ステートマシン
 												

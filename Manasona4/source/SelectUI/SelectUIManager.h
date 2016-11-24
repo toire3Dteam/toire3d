@@ -34,7 +34,7 @@ public:
 	};
 
 	// ★★★お互いの選択したキャラとパートナーを取得するアクセサ
-	int GetSelectCharacter(SIDE side) 
+	CHARACTER GetSelectCharacter(SIDE side) 
 	{
 		if (side == SIDE::LEFT)
 		{
@@ -46,7 +46,7 @@ public:
 		}
 	}
 
-	int GetSelectPartner(SIDE side)
+	PARTNER GetSelectPartner(SIDE side)
 	{
 		if (side == SIDE::LEFT)
 		{

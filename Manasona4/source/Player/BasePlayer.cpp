@@ -1246,9 +1246,12 @@ bool BasePlayer::HandleMessage(const Message & msg)
 }
 
 // ★エフェクト発動★　（全てのエフェクトの発動場所）
-void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType)
+void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 AttackVec)
 {
 	// 何のエフェクトを重ねるかはここで俺が決める。
+
+	// 攻撃する向きから角度を変える
+	float zAngle = atan2(-AttackVec.x, AttackVec.y);	
 
 	// キャラクター向きによる向き
 	float diaAngle = (m_dir == DIR::RIGHT) ? 0.0f : PI;
@@ -1478,6 +1481,16 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType)
 
 		// キャラクター自体をマゼンタに
 		m_fMagentaColRate = 1.0f;
+
+	}	break;
+	case EFFECT_TYPE::MUZZLE_FLASH:
+	{
+		// マズルフラッシュ
+		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::MUZZLE_FLASH, 0.90f, 1.0f, Vector3(0, 0, zAngle), Vector3(0, 0, zAngle));
+
+		// 飛び散る光
+		//m_PanelEffectMGR->AddEffect
+		//	(pos + Vector3(0, 8, -2), PANEL_EFFECT_TYPE::DOKKOI, 0);
 
 	}	break;
 	default:

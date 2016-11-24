@@ -281,8 +281,10 @@ bool tdnFont::SearchPictograph(char buffer[3], int x, int y, UINT size, DWORD co
 	// šŠG•¶ŽšŒŸõ
 	enum TYPE
 	{
-		A = 0, B = 32*1, C = 32 * 2, D = 32 * 3,
-		LEFT = 32 * 4,RIGHT = 32 * 5,UP = 32 * 6,DOWN = 32 * 7
+		A = 0, B = 32 * 1, C = 32 * 2, D = 32 * 3,
+		LEFT = 32 * 4, RIGHT = 32 * 5, UP = 32 * 6, DOWN = 32 * 7,
+		LEFT_DOWN = 32 * 8, RIGHT_DOWN = 32 * 9,
+		L1 = 32 * 10, R1 = 32 * 11, L2 = 32 * 12, R2 = 32 * 13, R3 = 32 * 14,
 
 	};
 
@@ -330,6 +332,41 @@ bool tdnFont::SearchPictograph(char buffer[3], int x, int y, UINT size, DWORD co
 	if (strcmp(buffer, "«") == 0)
 	{
 		m_pPictograph->Render(x, y, size, size, DOWN, 0, 32, 32, RenderFlag);
+		return false;
+	}
+	if (strcmp(buffer, "^") == 0)
+	{
+		m_pPictograph->Render(x, y, size, size, LEFT_DOWN, 0, 32, 32, RenderFlag);
+		return false;
+	}
+	if (strcmp(buffer, "_") == 0)
+	{
+		m_pPictograph->Render(x, y, size, size, RIGHT_DOWN, 0, 32, 32, RenderFlag);
+		return false;
+	}
+	if (strcmp(buffer, "ž") == 0)
+	{
+		m_pPictograph->Render(x, y, size, size, L1, 0, 32, 32, RenderFlag);
+		return false;
+	}
+	if (strcmp(buffer, "¤") == 0)
+	{
+		m_pPictograph->Render(x, y, size, size, R1, 0, 32, 32, RenderFlag);
+		return false;
+	}
+	if (strcmp(buffer, "‡ˆ") == 0)
+	{
+		m_pPictograph->Render(x, y, size, size, L2, 0, 32, 32, RenderFlag);
+		return false;
+	}
+	if (strcmp(buffer, "‡‰") == 0)
+	{
+		m_pPictograph->Render(x, y, size, size, R2, 0, 32, 32, RenderFlag);
+		return false;
+	}
+	if (strcmp(buffer, "") == 0)
+	{
+		m_pPictograph->Render(x, y, size, size, R3, 0, 32, 32, RenderFlag);
 		return false;
 	}
 

@@ -103,4 +103,68 @@ namespace SceneMenuState
 		bool PadUpdate(sceneMenu* pMain, int DeviceID);
 	};
 
+
+	//--------------------チュートリアル選択
+	class TutorialSelectStep : public State<sceneMenu>
+	{
+	public:
+		// this is a シングルトン
+		static TutorialSelectStep* GetInstance() { static TutorialSelectStep state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMenu* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMenu* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMenu* pMain);
+
+		// 描画
+		virtual void Render(sceneMenu* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMenu* pMain, const Message& msg);
+
+	private:
+		TutorialSelectStep() {};
+		~TutorialSelectStep() {};
+
+		TutorialSelectStep(const TutorialSelectStep&) {}
+		TutorialSelectStep& operator=(const TutorialSelectStep&) {}
+
+		bool PadUpdate(sceneMenu* pMain, int DeviceID);
+	};
+
+	//--------------------オプションウィンドウ
+	class OptionStep : public State<sceneMenu>
+	{
+	public:
+		// this is a シングルトン
+		static OptionStep* GetInstance() { static OptionStep state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMenu* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMenu* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMenu* pMain);
+
+		// 描画
+		virtual void Render(sceneMenu* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMenu* pMain, const Message& msg);
+
+	private:
+		OptionStep() {};
+		~OptionStep() {};
+
+		OptionStep(const OptionStep&) {}
+		OptionStep& operator=(const OptionStep&) {}
+
+		bool PadUpdate(sceneMenu* pMain, int DeviceID);
+	};
 }

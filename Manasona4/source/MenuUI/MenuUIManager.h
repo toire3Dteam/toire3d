@@ -1,5 +1,7 @@
 #pragma once
 #include "MenuIcon.h"
+#include "MenuUI\CoinUI.h"// お金
+
 
 //+--------------------------
 //	メニューUIマネージャー
@@ -21,7 +23,7 @@ enum class MENU_ICON_TYPE
 class MenuUIManager
 {
 public:
-	MenuUIManager();
+	MenuUIManager(int iSelectNo = 0);
 	~MenuUIManager();
 
 	void Update();
@@ -70,6 +72,9 @@ private:
 
 	// 仮
 	tdn2DObj* pExp;
+
+	// お金
+	CoinUI* m_pCoinUI;
 
 	// 動画
 	tdn2DObj* m_pMove;

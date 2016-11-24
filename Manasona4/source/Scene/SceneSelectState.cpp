@@ -320,6 +320,14 @@ void SceneSelectState::End::Execute(sceneSelect *pMain)
 	// メインへ
 	if (Fade::isFadeOutCompletion())
 	{
+		// (TODO) ↑で選択したキャラクター・パートナー・ステージ・BGMを設定する
+		
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].partner
+			= pMain->GetSelectUIMgr()->GetSelectPartner(SIDE::LEFT);
+
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].partner
+			= pMain->GetSelectUIMgr()->GetSelectPartner(SIDE::RIGHT);
+
 		MainFrameEx->ChangeScene(new sceneMain());
 		return;
 	}
@@ -358,7 +366,7 @@ bool SceneSelectState::End::OnMessage(sceneSelect *pMain, const Message & msg)
 
 
 /*******************************************************/
-//					ゲーム開始ステート
+//					戻るステート
 /*******************************************************/
 
 void SceneSelectState::BackMenu::Enter(sceneSelect *pMain)

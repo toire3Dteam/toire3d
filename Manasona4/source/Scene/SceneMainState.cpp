@@ -532,11 +532,7 @@ void SceneMainState::TutorialIntro::Enter(sceneMain *pMain)
 	TutorialMgr->Init(pMain->GetSelectTutorial());
 	TutorialMgr->GetTutorial()->ActionIntroTips();// イントロのTipsを用意
 	
-	// 最初の一回だけ
-	//if (pMain->GetFSM()->isPrevState(*SceneMainState::TutorialClear::GetInstance()) == false)
-	{
-		GameUIMgr->Action();
-	}
+
 
 	// 情報初期化
 	PlayerMgr->Reset();
@@ -764,10 +760,10 @@ void SceneMainState::TutorialClear::Execute(sceneMain *pMain)
 	// カメラ更新
 	CameraMgr->Update();
 
-	if (Fade::isFadeOutCompletion() == false) {
+	if (Fade::isFadeOutCompletion() == false)
+	{
 		if (Fade::GetMode() != Fade::FLAG::FADE_OUT)
 		{
-
 			// ヒントカードを読み終えたら
 			if (TutorialMgr->GetTutorial()->
 				GetClearTipsCard()->GetSelectState() == TipsCard::SELECT_STATE::OK)
@@ -780,6 +776,7 @@ void SceneMainState::TutorialClear::Execute(sceneMain *pMain)
 
 			}
 		}
+
 	}else// フェードアウト完了後	
 	{
 		// (TODO)ここで配列の最後まできたらメニューに戻る処理

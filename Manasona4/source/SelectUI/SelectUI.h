@@ -59,14 +59,14 @@ public:
 	bool  HandleMessage(const Message& msg) { return m_pStateMachine->HandleMessage(msg); }
 
 	// ★★★選択したキャラとパートナーを取得するアクセサ
-	int GetSelectCharacter()
+	CHARACTER GetSelectCharacter()
 	{
-		return m_iSelectCharacterNo;
+		return (CHARACTER)m_iSelectCharacterNo;
 	}
 
-	int GetSelectPartner()
+	PARTNER GetSelectPartner()
 	{
-		return m_iSelectPartnerNo;
+		return (PARTNER)m_iSelectPartnerNo;
 	}
 
 	bool IsOK() { return m_bOK; }

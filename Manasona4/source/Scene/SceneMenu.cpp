@@ -5,10 +5,10 @@
 #include "../BaseEntity/Message/Message.h"
 #include "../Fade/Fade.h"
 #include "../Sound/SoundManager.h"
+#include "Window\OptionWindow.h"	// •K—v‚ÈƒEƒBƒ“ƒhƒE
 
 //#include "sceneResult.h"
 //#include "SceneSwitch/SceneSwitch.h"
-//SceneSwitchPrev* prevEF;
 //+------------------------
 //	ƒV[ƒ“ƒƒjƒ…[
 //+------------------------
@@ -19,18 +19,45 @@ int sceneMenu::m_iSelectNo(0);	// ƒZƒŒƒNƒgƒiƒ“ƒo[(static‚É‚·‚é‚±‚Æ‚É‚æ‚Á‚ÄA‘O‰
 //******************************************************************
 sceneMenu::sceneMenu() :BaseGameEntity(ENTITY_ID::SCENE_MENU) {}
 bool sceneMenu::Initialize()
-{
-	//prevEF = new SceneSwitchPrev();
-
+{	
 	// ƒZƒŒƒNƒgƒiƒ“ƒo[
 	//m_iSelectNo = 0;
 
 	// UIƒ}ƒl[ƒWƒƒ[
-	m_pMenuUIMgr = new MenuUIManager();
+	m_pMenuUIMgr = new MenuUIManager(m_iSelectNo);
 	m_pMenuUIMgr->ChangeSelectNo(m_iSelectNo);
 	m_pMenuUIMgr->Action();
 
 	m_pCtrlSelectUI = new ControllerSelectUI();
+
+
+	// ƒqƒ“ƒgƒJ[ƒh——
+	for (int i = 0; i < (int)TIPS_TYPE::ARRAY_END; i++)
+	{
+		switch ((TIPS_TYPE)i)
+		{
+		case TIPS_TYPE::TUTORIAL:
+			m_pTips[i] = new TipsCard("ƒ`ƒ…[ƒgƒŠƒAƒ‹‚ğn‚ß‚Ü‚·‚©H", true);
+			break;
+		default:
+			MyAssert(0, "‚»‚ñ‚Èƒqƒ“ƒg‚Í‚È‚¢");
+			break;
+		}
+	}
+	
+	// ƒEƒBƒ“ƒhƒE——
+	for (int i = 0; i < (int)WINDOW_TYPE::ARRAY_END; i++)
+	{
+		switch ((WINDOW_TYPE)i)
+		{
+		case WINDOW_TYPE::OPTION:
+			m_pWindow[i] = new OptionWindow(Vector2(500, 250));
+			break;
+		default:
+			MyAssert(0, "‚»‚ñ‚ÈƒEƒBƒ“ƒhƒE‚Í‚È‚¢");
+			break;
+		}
+	}
 
 
 	/* ƒXƒe[ƒgƒ}ƒVƒ“‰Šú‰» */
@@ -49,6 +76,16 @@ sceneMenu::~sceneMenu()
 	delete m_pMenuUIMgr;
 	SAFE_DELETE(m_pCtrlSelectUI);
 	delete m_pStateMachine;
+	// ƒqƒ“ƒgƒJ[ƒh——
+	for (int i = 0; i < (int)TIPS_TYPE::ARRAY_END; i++)
+	{
+		SAFE_DELETE(m_pTips[i]);
+	}
+	// ƒEƒBƒ“ƒhƒE——
+	for (int i = 0; i < (int)WINDOW_TYPE::ARRAY_END; i++)
+	{
+		SAFE_DELETE(m_pWindow[i]);
+	}
 }
 
 //******************************************************************
@@ -57,16 +94,18 @@ sceneMenu::~sceneMenu()
 
 void sceneMenu::Update()
 {
-	//if (KeyBoardTRG(KB_F))
-	//{
-	//	prevEF->Action();
-	//}
-	//prevEF->Update();
-	//if (prevEF->IsEnd())
-	//{
-	//	MainFrameEx->ChangeScene(new sceneResult);
-	//	return;
-	//}
+
+	// ƒqƒ“ƒgƒJ[ƒh——
+	for (int i = 0; i < (int)TIPS_TYPE::ARRAY_END; i++)
+	{
+		m_pTips[i]->Update();
+	}
+
+	// ƒEƒBƒ“ƒhƒE——
+	for (int i = 0; i < (int)WINDOW_TYPE::ARRAY_END; i++)
+	{
+		m_pWindow[i]->Update();
+	}
 
 	// ƒtƒF[ƒh
 	Fade::Update();
@@ -91,9 +130,21 @@ void sceneMenu::Render()
 	// š‚±‚±‚ÉƒXƒe[ƒgƒ}ƒVƒ“•`‰æ(‘½•ª2DŠÖŒW‚ª‘½‚¢‚ñ‚¶‚á‚È‚¢‚©‚Æ)
 	m_pStateMachine->Render();
 
+	// ƒEƒBƒ“ƒhƒE——
+	for (int i = 0; i < (int)WINDOW_TYPE::ARRAY_END; i++)
+	{
+		m_pWindow[i]->Redner();
+	}
+
+	// ƒqƒ“ƒgƒJ[ƒh——
+	for (int i = 0; i < (int)TIPS_TYPE::ARRAY_END; i++)
+	{
+		m_pTips[i]->Render();
+	}
+	
+
 	// ƒtƒF[ƒh
 	Fade::Render();
 	
-	//prevEF->Render();
 }
 

@@ -4,6 +4,7 @@
 #include "../Collision/Collision.h"
 #include "PointLight\PointLight.h"
 #include "DeferredEx\DeferredEx.h"
+#include "Effect\Particle.h"
 
 Shot::Base::Base(BasePlayer *pPlayer, AttackData *pAttackData,
 	BaseUVEffect *pObj,
@@ -23,14 +24,27 @@ Shot::Base::Base(BasePlayer *pPlayer, AttackData *pAttackData,
 	m_pObj->ActionRoop(m_vPos);
 }
 
-void Shot::Base::Render()
+void Shot::Base::Update()
 {
+	// 基本的な移動量の更新
+	m_vVelocity += m_vAccel;
+	m_vPos += m_vVelocity;
+
+
+	// オブジェの更新
 	m_pObj->SetPos(m_vPos);
 	m_pObj->SetAngleAnimation(
 		Vector3(0, 0, atan2f(-m_vVec.x, m_vVec.y)),
 		Vector3(0, 0, atan2f(-m_vVec.x, m_vVec.y))
 		);
+
+	// UVエフェクト
 	m_pObj->Update();
+
+}
+
+void Shot::Base::Render()
+{
 
 	// 自分で行列を作る(位置・移動ベクトル情報から)
 	//Math::SetTransMatrixFrontVec(&m_pObj->TransMatrix, m_vPos, m_vVec);
@@ -69,7 +83,7 @@ Shot::Maya::Maya(BasePlayer *pPlayer,
 	BaseUVEffect *pObj,
 	const Vector3 &vPos,
 	const Vector3 &vVec) :
-	Base(pPlayer, pAttackData, pObj, vPos, vVec, vVec*1.25f)
+	Base(pPlayer, pAttackData, pObj, vPos, vVec, vVec*2.0f)
 {
 }
 
@@ -83,12 +97,14 @@ void Shot::Maya::Update()
 // 基底クラスの更新
 Base::Update();
 
+// 弾丸の演出
+
 // マーヤは闇の光追加
 PointLightMgr->AddPointLight(m_vPos + Vector3(0, 5, 0), 
-	Vector3(1.0f, 0.4f, 1.0f), 20, 4, 3, 1, 2);// ポイントライトエフェクト！
-	
-											   // ここでポイントライトに詰める
-//DeferredManagerEx.AddPLSdata(m_vPos, Vector3(1.0f, 2.4f, 0.0f), 100, 2);
+	Vector3(.0f, 0.25f, .95f), 20, 10, 3, 1, 2);// ポイントライトエフェクト！
+
+// 軌跡のパーティクル
+ParticleManager::EffectShotLocus(m_vPos);//m_vVelocity
 
 }
 

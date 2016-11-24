@@ -215,6 +215,7 @@ enum class EFFECT_TYPE
 	AERIAL_JUMP,		//空中ジャンプのエフェクト
 	INVINCIBLE_ATTACK, // 逆切れ（無敵技）
 	DOKKOI,				//	中段
+	MUZZLE_FLASH,		// マズルフラッシュ
 };
 
 // ガードの種類
@@ -748,7 +749,7 @@ public:
 	//------------------------------------------------------
 	PanelEffectManager* GetPanelEffectManager() { return m_PanelEffectMGR; }
 	UVEffectManager* GetUVEffectManager() { return m_UVEffectMGR; }
-	void AddEffectAction(Vector3 pos, EFFECT_TYPE effectType);
+	void AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 AttackVec = VECTOR_ZERO);
 	void GuardEffectAction();
 	void GuardEffectStop();
 	void GuardEffectUpdate();

@@ -281,6 +281,37 @@ void ParticleManager::EffectExplosion(const Vector3 &pos)
 	//Set2(7, 0, 1.0f, 75, .0f, 60, 1.0f, Pos, Move, Power, 1, 1, 1, 0, 0, 1.1f, 4, RS::ADD);
 }
 
+
+//*****************************************************************************
+//	弾の軌跡エフェクト
+//*****************************************************************************
+void ParticleManager::EffectShotLocus(const Vector3 & pos)
+{
+	Vector3 Pos = VECTOR_ZERO , Move = VECTOR_ZERO, Power = VECTOR_ZERO;
+
+	FOR(10)
+	{
+		Pos.x = pos.x + tdnRandom::Get(-3.0f, 3.0f);
+		Pos.y = pos.y + +tdnRandom::Get(-2.5f, 2.5f);
+		Pos.z = pos.z + tdnRandom::Get(-2.5f, 2.5f);
+		const int M = 2;
+		Move.x = tdnRandom::Get(-0.1f, 0.1f);
+		Move.y = tdnRandom::Get(-0.125f, 0.125f);
+		Move.z = tdnRandom::Get(-0.1f, 0.1f);
+		//Move.x = (rand() % M - (M / 2))*0.25f;
+		//Move.y = (rand() % M - (M / 2))*0.25f;
+		//Move.z = (rand() % M - (M / 2))*0.25f;
+		//Power.x = -Move.x*.01f;
+		//Power.y = -Move.y*.01f;
+		//Power.z = -Move.z*.01f;
+
+		// パーティクルセット
+		Set(6, 0, .0f, 50, .0f, 20, .9f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, rand() % 2 + 1.5f, RS::ADD);
+		// id  sf  s   ef   e   mf   m
+	}
+
+}
+
 //**************************************************************************************************
 //
 //		パーティクル管理クラス

@@ -4,10 +4,10 @@
 //	メニューUIマネージャー
 //+--------------------------
 
-MenuUIManager::MenuUIManager()
+MenuUIManager::MenuUIManager(int iSelectNo)
 {
 	// セレクトナンバー
-	m_iSelectNo = 0;
+	m_iSelectNo = iSelectNo;
 
 	//　アイコンの幅
 	m_fIconWidth = 256;
@@ -22,7 +22,7 @@ MenuUIManager::MenuUIManager()
 		switch (MENU_ICON_TYPE(i))
 		{
 		case MENU_ICON_TYPE::TUTORIAL:
-			m_pIcon[i] = new TutorialIcon();		
+			m_pIcon[i] = new TutorialIcon();
 			break;
 		case MENU_ICON_TYPE::BATTLE:
 			m_pIcon[i] = new BattleIcon();
@@ -81,8 +81,8 @@ MenuUIManager::MenuUIManager()
 	m_iInfoY = 592;
 	m_pInfo->OrderMoveAppeared(16, 0, m_iInfoY + 128);
 	
-
-	
+	// お金
+	m_pCoinUI = new CoinUI(Vector2(15.0f, 540.0f));
 
 	// 仮
 	pExp = new tdn2DObj("Data/UI/Menu/exp.png");
@@ -100,6 +100,8 @@ MenuUIManager::~MenuUIManager()
 	{
 		SAFE_DELETE(m_pIcon[i]);
 	}
+
+	SAFE_DELETE(m_pCoinUI);
 
 	SAFE_DELETE(m_pblueLine);
 	SAFE_DELETE(m_pBlackLine);
@@ -125,6 +127,8 @@ void MenuUIManager::Update()
 	m_pInfo->Update();
 
 	m_pBlackLine->Update();
+
+	m_pCoinUI->Update();
 
 	// 動く処理
 	Move();
@@ -156,6 +160,9 @@ void MenuUIManager::Render()
 	// 説明の淵
 	m_pInfo->Render(0, m_iInfoY);
 
+	// お金
+	m_pCoinUI->Render();
+
 	for (int i = 0; i < (int)MENU_ICON_TYPE::ARRAY_END; i++)
 	{
 		//if (m_iSelectNo == i)
@@ -175,9 +182,17 @@ void MenuUIManager::Render()
 // [初回]アクション
 void MenuUIManager::Action()
 {
+	int iWaitFrame = 0;
+
 	for (int i = 0; i < (int)MENU_ICON_TYPE::ARRAY_END; i++)
 	{
-		m_pIcon[i]->Action(i * 6);
+		if ( i >= m_iSelectNo)
+		{
+			iWaitFrame += 6;
+		}		
+
+		m_pIcon[i]->Action(iWaitFrame);
+
 
 		// 選択してるアイコンのみ
 		if (i == m_iSelectNo)
@@ -187,9 +202,8 @@ void MenuUIManager::Action()
 	}
 
 	m_pInfo->Action();
-
 	m_pBlackLine->Action();
-
+	m_pCoinUI->Action();
 }
 
 // 下るアクション[選択肢2へ]

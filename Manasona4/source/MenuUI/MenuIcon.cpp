@@ -104,7 +104,7 @@ TutorialIcon::TutorialIcon()
 	m_pIcon = new tdn2DAnim("Data/UI/Menu/Icon/TutorialIcon.png");	// アイコン画像
 
 	m_pInfo = new tdn2DAnim("Data/UI/Menu/Info/TutorialInfo.png");
-	m_pInfo->OrderMoveAppeared(12, (int)m_vInfoPos.x + 128 , (int)m_vInfoPos.y);
+	m_pInfo->OrderMoveAppeared(10, (int)m_vInfoPos.x + 128 , (int)m_vInfoPos.y);
 
 
 }
@@ -132,10 +132,10 @@ void TutorialIcon::Render()
 BattleIcon::BattleIcon()
 {
 	m_pIcon = new tdn2DAnim("Data/UI/Menu/Icon/battleIcon.png");	// アイコン画像
-	m_pIcon->OrderMoveAppeared(12, (int)m_vPos.x, (int)m_vPos.y + 128);
+	m_pIcon->OrderMoveAppeared(10, (int)m_vPos.x, (int)m_vPos.y + 128);
 
 	m_pInfo = new tdn2DAnim("Data/UI/Menu/Info/battleInfo.png");
-	m_pInfo->OrderMoveAppeared(12, (int)m_vInfoPos.x + 128, (int)m_vInfoPos.y);
+	m_pInfo->OrderMoveAppeared(10, (int)m_vInfoPos.x + 128, (int)m_vInfoPos.y);
 
 }
 
@@ -161,10 +161,10 @@ void BattleIcon::Render()
 TrainingIcon::TrainingIcon()
 {
 	m_pIcon = new tdn2DAnim("Data/UI/Menu/Icon/TrainingIcon.png");	// アイコン画像
-	m_pIcon->OrderMoveAppeared(12, (int)m_vPos.x, (int)m_vPos.y + 128);
+	m_pIcon->OrderMoveAppeared(10, (int)m_vPos.x, (int)m_vPos.y + 128);
 
 	m_pInfo = new tdn2DAnim("Data/UI/Menu/Info/TrainingInfo.png");
-	m_pInfo->OrderMoveAppeared(12, (int)m_vInfoPos.x + 128, (int)m_vInfoPos.y);
+	m_pInfo->OrderMoveAppeared(10, (int)m_vInfoPos.x + 128, (int)m_vInfoPos.y);
 
 
 }
@@ -191,10 +191,10 @@ void TrainingIcon::Render()
 CollectIcon::CollectIcon()
 {
 	m_pIcon = new tdn2DAnim("Data/UI/Menu/Icon/CollectIcon.png");	// アイコン画像
-	m_pIcon->OrderMoveAppeared(12, (int)m_vPos.x, (int)m_vPos.y + 128);
+	m_pIcon->OrderMoveAppeared(10, (int)m_vPos.x, (int)m_vPos.y + 128);
 
 	m_pInfo = new tdn2DAnim("Data/UI/Menu/Info/CollectInfo.png");
-	m_pInfo->OrderMoveAppeared(12, (int)m_vInfoPos.x + 128, (int)m_vInfoPos.y);
+	m_pInfo->OrderMoveAppeared(10, (int)m_vInfoPos.x + 128, (int)m_vInfoPos.y);
 
 
 }
@@ -221,10 +221,10 @@ void CollectIcon::Render()
 OptionIcon::OptionIcon()
 {
 	m_pIcon = new tdn2DAnim("Data/UI/Menu/Icon/OptionIcon.png");	// アイコン画像
-	m_pIcon->OrderMoveAppeared(12, (int)m_vPos.x, (int)m_vPos.y + 128);
+	m_pIcon->OrderMoveAppeared(10, (int)m_vPos.x, (int)m_vPos.y + 128);
 
 	m_pInfo = new tdn2DAnim("Data/UI/Menu/Info/OptionInfo.png");
-	m_pInfo->OrderMoveAppeared(12, (int)m_vInfoPos.x + 128, (int)m_vInfoPos.y);
+	m_pInfo->OrderMoveAppeared(10, (int)m_vInfoPos.x + 128, (int)m_vInfoPos.y);
 
 
 }

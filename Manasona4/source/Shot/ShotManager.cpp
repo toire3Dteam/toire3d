@@ -35,6 +35,7 @@ bool ShotManager::HandleMessage(const Message &msg)
 	{
 	case MESSAGE_TYPE::ADD_SHOT:
 		Shot::Base *pNewShot = (Shot::Base*)msg.ExtraInfo;
+		pNewShot->Update();//
 		AddShot(PlayerMgr->GetPlayerByDeviceID((int)msg.Sender - (int)ENTITY_ID::ID_PLAYER_FIRST)->GetSide(), pNewShot);
 		return true;
 		break;

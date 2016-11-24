@@ -81,6 +81,7 @@ public:
 	static void EffectHit(const Vector3 &pos, const Vector3 &v);
 	static void EffectResultSplash(const Vector3 &pos);		// ƒŠƒUƒ‹ƒg‚ÌŒŒ‚µ‚Ô‚«
 	static void EffectExplosion(const Vector3 &pos);		// ”š”­‚Ì‰Š
+	static void EffectShotLocus(const Vector3 &pos);		// ’e‚Ì‹OÕ
 	//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
 
 private:
