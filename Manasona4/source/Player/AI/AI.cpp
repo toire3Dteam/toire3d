@@ -5,8 +5,8 @@
 //		AIクラス
 /**********************************/
 
-AI::AI(int DeviceID,BasePlayer* myBasePlayer) 
-:BaseGameEntity((ENTITY_ID(ENTITY_ID::ID_AI_FIRST + DeviceID)))
+AI::AI(SIDE side,BasePlayer* myBasePlayer)
+:BaseGameEntity((ENTITY_ID(ENTITY_ID::ID_AI_FIRST + (int)side)))
 {
 	// AIに必要なパラメーター
 	m_iChaseFrame = 0;		// 一途に追いかけてる時間
@@ -16,7 +16,8 @@ AI::AI(int DeviceID,BasePlayer* myBasePlayer)
 	m_iPracticeGuardFrame = 120;
 	m_bPracticeGuardFlag = true;
 
-	m_pTargetPlayer = nullptr;
+	// [11/25] 親のターゲットと指定してるプレイヤーを指定
+	m_pTargetPlayer = myBasePlayer->GetTargetPlayer();
 
 	// このAIを所有しているプレイヤーのポインター
 	m_pMyBasePlayer = myBasePlayer;

@@ -135,7 +135,8 @@ void sceneSelect::Update()
 
 	// セレクトマネージャー
 	bool bCtrl = true;
-	if (GetFSM()->isInState(*SceneSelectState::BackMenu::GetInstance()))bCtrl = false;
+	if (GetFSM()->isInState(*SceneSelectState::BackMenu::GetInstance())||
+		GetFSM()->isInState(*SceneSelectState::End::GetInstance()))bCtrl = false;
 	m_pSelectUIMgr->Update(bCtrl);
 
 

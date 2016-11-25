@@ -95,23 +95,57 @@ void SelectUIState::FirstStep::Execute(SelectUI *pMain)
 	}
 	/**********************************************************/
 	
-
-	// キャラ決定
-	if (tdnInput::KeyGet(KEYCODE::KEY_B, pMain->m_iDeviceID) == 3)
+	// ×押してなかったら
+	if (tdnInput::KeyGet(KEYCODE::KEY_A, pMain->m_iDeviceID) == 0)
 	{
-		pMain->GetFSM()->ChangeState(MiddleStep::GetInstance());
-		return;
+		// キャラ決定
+		if (tdnInput::KeyGet(KEYCODE::KEY_B, pMain->m_iDeviceID) == 3)
+		{
+			pMain->GetFSM()->ChangeState(MiddleStep::GetInstance());
+			return;
+		}
 	}
 
-	// ×でメニューに戻る
-	if (tdnInput::KeyGet(KEYCODE::KEY_A, pMain->m_iDeviceID) == 3)
-	{
 		// メニューに戻りたいプレイヤーがいることを
 		// シーン側に伝える
 		int senderID = pMain->m_iDeviceID;
-		MsgMgr->Dispatch(0, pMain->GetID(), ENTITY_ID::SCENE_SELECT, MESSAGE_TYPE::BACK_MENU, &senderID);
+		
+		if (pMain->IsAI() == false)
+		{
+			// 【×押して】でメニューに戻る
+			if (tdnInput::KeyGet(KEYCODE::KEY_A, pMain->m_iDeviceID) == 3)
+			{
+				MsgMgr->Dispatch(0, pMain->GetID(), ENTITY_ID::SCENE_SELECT, MESSAGE_TYPE::BACK_MENU, &senderID);
+			}
+		}
+		else // AIならば
+		{	
+			// 【×離し】て自分の操作するプレイヤーへ戻る
+			if (tdnInput::KeyGet(KEYCODE::KEY_A, pMain->m_iDeviceID) == 3)
+			{
+				// 逆サイドに送り　一つ前に戻らす処理をする
+				ENTITY_ID id;
+				if (pMain->GetID() == ENTITY_ID::SELECT_UI_LEFT)
+				{
+					// 左なら右へ
+					MsgMgr->Dispatch(0, pMain->GetID(), ENTITY_ID::SELECT_UI_RIGHT, MESSAGE_TYPE::BACK_MENU, &senderID);
+				}
+				else
+				{
+					// 右なら左
+					MsgMgr->Dispatch(0, pMain->GetID(), ENTITY_ID::SELECT_UI_LEFT, MESSAGE_TYPE::BACK_MENU, &senderID);
+				}
+			}
+		}
 
-	}
+		// まずこのステートを持っているものがAIかをしるフラグを用意する
+		//	その次にAIならばここで？？？
+		//	（SIDEで判定して送り主を探す）にコントロールを元のやつにする処理をする
+		//
+		//	するとそいつは一つ前に戻る。ということはisOKがふぁｓぇになるということだ
+		//	つまりAIがうごかなくなる
+
+	
 }
 
 void SelectUIState::FirstStep::Exit(SelectUI *pMain)
@@ -360,11 +394,68 @@ void SelectUIState::OKStep::Render(SelectUI *pMain)
 bool SelectUIState::OKStep::OnMessage(SelectUI *pMain, const Message & msg)
 {
 	// メッセージタイプ
+	switch (msg.Msg)
+	{
+	case MESSAGE_TYPE::BACK_MENU:
+		// AIから戻れというメッセージがとどいたよ。
+		pMain->BackOKStep();
+		pMain->GetFSM()->ChangeState(OKToSecondStep::GetInstance());
+
+		return true;
+		break;
+	default:
+		break;
+	}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
+
+
+/*******************************************************/
+//			準備完了からパートナー選びに戻る
+/*******************************************************/
+
+void SelectUIState::OKToSecondStep::Enter(SelectUI *pMain)
+{
+	pMain->m_iWaitFrame = 0;
+}
+void SelectUIState::OKToSecondStep::Execute(SelectUI *pMain)
+{
+	pMain->m_iWaitFrame++;
+	// パートナーの選択へ
+	if (pMain->m_iWaitFrame >= 2)
+	{
+		pMain->GetFSM()->ChangeState(SecondStep::GetInstance());
+		return;
+	}
+}
+
+void SelectUIState::OKToSecondStep::Exit(SelectUI *pMain)
+{
+}
+
+void SelectUIState::OKToSecondStep::Render(SelectUI *pMain)
+{
+	tdnText::Draw(0, 0, 0xffffffff, "SecondToOKStep");
+}
+
+bool SelectUIState::OKToSecondStep::OnMessage(SelectUI *pMain, const Message & msg)
+{
+	// メッセージタイプ
 	//switch (msg.Msg)
 	//{
+	//case MESSAGE_TYPE::BACK_MENU:
+	//	// AIから戻れというメッセージがとどいたよ。
+	//	pMain->BackOKStep();
+	//	pMain->GetFSM()->ChangeState(SecondStep::GetInstance());
+
+	//	return true;
+	//	break;
 	//default:
 	//	break;
 	//}
+
 	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
 	return false;
 }

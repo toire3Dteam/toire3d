@@ -9,7 +9,7 @@
 class AI : public BaseGameEntity
 {
 public:
-	AI(int DeviceID, BasePlayer* myBasePlayer);
+	AI(SIDE side, BasePlayer* myBasePlayer);
 	~AI();
 
 	void Control();

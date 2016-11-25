@@ -23,7 +23,7 @@ struct SelectPicture
 class SelectUI : public BaseGameEntity
 {
 public:
-	SelectUI(SIDE side, ENTITY_ID id,int DeviceID);
+	SelectUI(SIDE side, ENTITY_ID id, int DeviceID, bool bAI);
 	void InitCharcterPos();
 	void InitPartnerPos();
 	~SelectUI();
@@ -70,6 +70,7 @@ public:
 	}
 
 	bool IsOK() { return m_bOK; }
+	bool IsAI() { return m_bAI; }
 
 	int GetDevice() { return m_iDeviceID; }
 
@@ -122,6 +123,10 @@ private:
 	
 	// OKフラグ
 	bool m_bOK;
+
+	// AIか
+	bool m_bAI;
+
 	//このOKふらぐでうんたら
 	// ステートマシンは中も触れるように
 	// フレンド
@@ -131,5 +136,5 @@ private:
 	friend class SelectUIState::SecondStep;
 	friend class SelectUIState::SecondToOKStep;
 	friend class SelectUIState::OKStep;
-
+	friend class SelectUIState::OKToSecondStep;
 };

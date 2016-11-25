@@ -7,9 +7,45 @@
 
 SelectUIManager::SelectUIManager()
 {
-	// ★★★★s女子　デバイス番号は今は仮
-	m_pLeftSide = new SelectUI(SIDE::LEFT, ENTITY_ID::SELECT_UI_LEFT, 0);
-	m_pRightSide = new SelectUI(SIDE::RIGHT, ENTITY_ID::SELECT_UI_RIGHT, 1);
+
+	// (TODO)一つの処理にまとめる
+
+	//// 左にAIが存在するかチェック
+	//if (SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI == true)
+	//{
+	//	// 二つのキャラセレを片方の一人が操作するように
+	//	m_pLeftSide = new SelectUI(SIDE::LEFT, ENTITY_ID::SELECT_UI_LEFT,
+	//		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID,
+	//		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI);
+	//	m_pRightSide = new SelectUI(SIDE::RIGHT, ENTITY_ID::SELECT_UI_RIGHT,
+	//		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID,
+	//		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI);
+
+	//}// 右にAIが存在するかチェック
+	//else if (SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI == true)
+	//{
+	//	// 二つのキャラセレを片方の一人が操作するように
+	//	m_pLeftSide = new SelectUI(SIDE::LEFT, ENTITY_ID::SELECT_UI_LEFT,
+	//		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID,
+	//		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI);
+
+	//	m_pRightSide = new SelectUI(SIDE::RIGHT, ENTITY_ID::SELECT_UI_RIGHT,
+	//		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID,
+	//		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI);
+	//}
+	//else // どちらもAIじゃなかった
+	{
+		// ★デバイス番号を設定　＆AIかどうか
+		m_pLeftSide = new SelectUI(SIDE::LEFT, ENTITY_ID::SELECT_UI_LEFT,
+			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID,
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI);
+
+		m_pRightSide = new SelectUI(SIDE::RIGHT, ENTITY_ID::SELECT_UI_RIGHT,
+			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID,
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI);
+	}
+
+
 
 	//for (int i = 0; i < PIC_TYPE::ARRAY_END; i++)
 	//{
@@ -95,9 +131,45 @@ void SelectUIManager::Update(bool bControl)
 		m_pCharacterIcon[i]->Update();
 	}
 
-	// 中でステートマシンによる複雑な更新がある
-	m_pLeftSide->Update(bControl);
-	m_pRightSide->Update(bControl);
+	// 左にAIが存在するかチェック
+	if (m_pLeftSide->IsAI() == true)
+	{
+		// 中でステートマシンによる複雑な更新がある
+		if (m_pRightSide->IsOK())
+		{
+			//
+			m_pLeftSide->Update(bControl);
+			m_pRightSide->Update(false);
+		}
+		else
+		{
+			m_pLeftSide->Update(false);
+			m_pRightSide->Update(bControl);
+		}
+
+	}else if (m_pRightSide->IsAI() == true)
+	{
+		// 中でステートマシンによる複雑な更新がある
+		if (m_pLeftSide->IsOK())
+		{
+			//
+			m_pLeftSide->Update(false);
+			m_pRightSide->Update(bControl);
+		}
+		else
+		{
+			m_pLeftSide->Update(bControl);
+			m_pRightSide->Update(false);
+
+		}
+
+	}else // 二人参加
+	{
+		// 中でステートマシンによる複雑な更新がある
+		m_pLeftSide->Update(bControl);
+		m_pRightSide->Update(bControl);
+	}
+
 	
 }
 
@@ -110,13 +182,33 @@ void SelectUIManager::Render()
 	// キャラアイコン
 	for (int i = 0; i < (int)CHARACTER::END; i++)
 	{
-		if ((int)m_pLeftSide->GetSelectCharacter() == i|| (int)m_pRightSide->GetSelectCharacter() == i)
+		if ((int)m_pLeftSide->GetSelectCharacter() == i)
 		{
-			m_pCharacterIcon[i]->SetARGB(0xffffffff);
-		}else
+			if (m_pLeftSide->GetFSM()->isInState(*SelectUIState::Intro::GetInstance()) == false)
+			{
+				m_pCharacterIcon[i]->SetARGB(0xffffffff);
+			}
+			else
+			{
+				m_pCharacterIcon[i]->SetARGB(0xffaaaaaa);
+			}
+
+		}else if ((int)m_pRightSide->GetSelectCharacter() == i)
+		{
+			if (m_pRightSide->GetFSM()->isInState(*SelectUIState::Intro::GetInstance()) == false)
+			{
+				m_pCharacterIcon[i]->SetARGB(0xffffffff);
+			}
+			else
+			{
+				m_pCharacterIcon[i]->SetARGB(0xffaaaaaa);
+			}
+		}
+		else
 		{
 			m_pCharacterIcon[i]->SetARGB(0xffaaaaaa);
 		}
+
 
 		m_pCharacterIcon[i]->Render(384 + (i * 88), 482);
 	}

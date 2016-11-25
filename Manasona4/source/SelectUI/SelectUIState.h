@@ -201,4 +201,37 @@ namespace SelectUIState
 		OKStep& operator=(const OKStep&) {}
 
 	};
+
+
+
+	//--------------------設定完了からセカンドまで
+	class OKToSecondStep : public State<SelectUI>
+	{
+	public:
+		// this is a シングルトン
+		static OKToSecondStep * GetInstance() { static OKToSecondStep state; return &state; }
+
+		// 入る
+		virtual void Enter(SelectUI* pMain);
+
+		// 実行します
+		virtual void Execute(SelectUI* pMain);
+
+		// 帰る
+		virtual void Exit(SelectUI* pMain);
+
+		// 描画
+		virtual void Render(SelectUI* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(SelectUI* pMain, const Message& msg);
+
+	private:
+		OKToSecondStep() {};
+		~OKToSecondStep() {};
+
+		OKToSecondStep(const OKToSecondStep&) {}
+		OKToSecondStep& operator=(const OKToSecondStep&) {}
+
+	};
 }

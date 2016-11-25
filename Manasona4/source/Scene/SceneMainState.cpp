@@ -17,6 +17,8 @@
 #include "MenuUI\TutorialManager.h"
 #include "../BaseEntity/Message/MessageDispatcher.h"
 #include "SceneMenu.h"
+#include "SceneSelect.h"
+
 // これを定義するとラウンドコールがスキップされる(デバッグ時短用)
 //#define ROUND_SKIP
 
@@ -257,6 +259,36 @@ void SceneMainState::Main::Execute(sceneMain *pMain)
 	if (TimeMgr->Update())
 	{
 		//pMain->GetFSM()->ChangeState(Finish::GetInstance());
+	}
+
+	//+--------------------------------------------
+	//	ポーズメニューの操作
+	//+--------------------------------------------
+
+	// パッド分更新
+	const int NumDevice(tdnInputManager::GetNumDevice());
+
+	// パッド何もささってないとき用
+	if (NumDevice == 0)
+	{
+		// メニュー切り替え
+		if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, 0) == 3)
+		{
+			pMain->GetFSM()->ChangeState(PoseMenu::GetInstance());
+			return;
+		}
+
+	}else
+	{
+		for (int i = 0; i < NumDevice; i++)
+		{
+			// メニュー切り替え
+			if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, i) == 3)
+			{
+				pMain->GetFSM()->ChangeState(PoseMenu::GetInstance());
+				return;
+			}
+		}
 	}
 
 }
@@ -807,6 +839,108 @@ void SceneMainState::TutorialClear::Render(sceneMain *pMain)
 }
 
 bool SceneMainState::TutorialClear::OnMessage(sceneMain *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+	//case MESSAGE_TYPE::END_ROUNDCALL:	// ラウンドコールが終わったというメッセージが届いたら
+	//	pMain->GetFSM()->ChangeState(Main::GetInstance());
+	//	break;
+	//}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
+
+
+/*******************************************************/
+//			ポーズメニューステート
+/*******************************************************/
+
+void SceneMainState::PoseMenu::Enter(sceneMain *pMain)
+{	
+	// ポーズウィンドウ起動 
+	pMain->GetWindow(BATTLE_WINDOW_TYPE::POSE)->Action();
+	pMain->SetPose(true);
+
+}
+
+// 更新
+void SceneMainState::PoseMenu::Execute(sceneMain *pMain)
+{
+
+	//+--------------------------------------------
+	//	ポーズメニューの操作
+	//+--------------------------------------------
+	// パッド分更新
+	const int NumDevice(tdnInputManager::GetNumDevice());
+	// パッド何もささってないとき用
+	if (NumDevice == 0)
+	{
+		// ポーズウィンドウの操作
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::POSE)->Ctrl(0);
+	}
+	else
+	{
+		for (int i = 0; i < NumDevice; i++)
+		{
+			// ポーズウィンドウの操作
+			pMain->GetWindow(BATTLE_WINDOW_TYPE::POSE)->Ctrl(i);
+		}
+	}
+
+
+
+	// プレイヤー更新を止める
+	//PlayerMgr->Update(PLAYER_UPDATE::CONTROL_NO);
+	//PlayerMgr->UpdatePos();
+
+	// カメラ更新
+	//CameraMgr->Update();
+
+	// 戻るボタンを押したら
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::POSE)->GetChoiceState() == PoseWindow::BATTLE_STATE::BACK)
+	{
+		// ポーズウィンドウ止める
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::POSE)->Stop();
+		pMain->GetFSM()->ChangeState(Main::GetInstance());	// メインへ戻る
+
+	}
+
+	// キャラクターへ
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::POSE)->GetChoiceState() == PoseWindow::BATTLE_STATE::BACK_MENU_SELECT)
+	{
+		// ポーズウィンドウ止める
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::POSE)->Stop();
+		MainFrameEx->ChangeScene(new sceneSelect());
+		return;
+	}
+
+	// メニューへ
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::POSE)->GetChoiceState() == PoseWindow::BATTLE_STATE::BACK_CHARA_SELECT)
+	{
+		// ポーズウィンドウ止める
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::POSE)->Stop();
+		MainFrameEx->ChangeScene(new sceneMenu());
+		return;
+	}
+
+
+
+
+}
+
+void SceneMainState::PoseMenu::Exit(sceneMain *pMain)
+{
+	pMain->SetPose(false);
+}
+
+void SceneMainState::PoseMenu::Render(sceneMain *pMain)
+{
+
+}
+
+bool SceneMainState::PoseMenu::OnMessage(sceneMain *pMain, const Message & msg)
 {
 	// メッセージタイプ
 	//switch (msg.Msg)

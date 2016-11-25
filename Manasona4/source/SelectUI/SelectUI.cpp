@@ -6,10 +6,13 @@ static int adjustY = +32;//24
 static float g_scale = 0.9f;
 
 
-SelectUI::SelectUI(SIDE side, ENTITY_ID id, int DeviceID) :BaseGameEntity(id)
+SelectUI::SelectUI(SIDE side, ENTITY_ID id, int DeviceID, bool bAI) :BaseGameEntity(id)
 {
 	// 遅延タイマー
 	m_iWaitFrame = 0;
+
+	// AI
+	m_bAI = bAI;
 
 	// ★UIが右か左サイドなのかを受け取る　演出が変わるの先に取得
 	m_eSide = side;
@@ -149,7 +152,11 @@ SelectUI::SelectUI(SIDE side, ENTITY_ID id, int DeviceID) :BaseGameEntity(id)
 	}
 
 	// 選択カーソル
-	if (m_eSide == SIDE::LEFT)
+	if (m_bAI == true)
+	{
+		m_pSelect.pPic = new tdn2DAnim("Data/UI/CharacterSelect/Icon/selectcpu.png");
+	}
+	else if (m_eSide == SIDE::LEFT)
 	{
 		m_pSelect.pPic = new tdn2DAnim("Data/UI/CharacterSelect/Icon/select1p.png");
 		

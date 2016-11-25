@@ -573,12 +573,12 @@ void Stand::Maya::Update(bool bControl)
 			break;
 		}
 
+		// ショットの向き逆
+		if (m_pPlayer->GetDir() == DIR::LEFT) ShotVec.x *= -1;
+
 		// マズルエフェクト発動！
 		m_pPlayer->AddEffectAction(m_pos + Vector3(0, 4, -2), EFFECT_TYPE::MUZZLE_FLASH, ShotVec);
 
-
-		// ショットの向き逆
-		if (m_pPlayer->GetDir() == DIR::LEFT) ShotVec.x *= -1;
 
 		// 玉の情報を格納
 		Shot::Base *pNewShot(new Shot::Maya(m_pPlayer, m_pAttackData[(int)m_ActionType], m_pBullet, m_pos + Vector3(0, 5, 0), ShotVec));

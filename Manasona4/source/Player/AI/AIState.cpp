@@ -63,7 +63,7 @@ bool SearchNearPlayer(AI * pPerson)
 	else
 	{	
 		// ターゲットととしてそのプレイヤーをセット
-		pPerson->SetTargetPlayer(PlayerMgr->GetPlayer(targetNo));
+		//pPerson->SetTargetPlayer(PlayerMgr->GetPlayer(targetNo));
 		return true;
 	}
 
@@ -121,7 +121,7 @@ bool SearchNearInvinciblePlayer(AI * pPerson)
 	else
 	{
 		// ターゲットととしてそのプレイヤーをセット
-		pPerson->SetTargetPlayer(PlayerMgr->GetPlayer(targetNo));
+		//pPerson->SetTargetPlayer(PlayerMgr->GetPlayer(targetNo));
 		return true;
 	}
 
@@ -401,6 +401,7 @@ void AIState::Space::Enter(AI * pPerson)
 
 void AIState::Space::Execute(AI * pPerson)
 {
+	BasePlayer* b = pPerson->GetTargetPlayer();
 	Vector3 TargetPos = pPerson->GetTargetPlayer()->GetPos();
 	Vector3 MyPos = MyPlayer->GetPos();
 

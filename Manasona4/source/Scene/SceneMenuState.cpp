@@ -268,38 +268,46 @@ bool SceneMenuState::BattleControllerSelectStep::PadUpdate(sceneMenu *pMain, int
 			return bChangedState;
 		}
 
-		// 自分がサイドを選択していて、かつもう片方が空いている状態(デバイスIDが被るのを防ぐ)
-		else if(C_UIMgr->IsLeftPlayer() == false)
-		{
-			// 0だったら0じゃないようにする
-			C_UIMgr->PadMoveLeftSide((DeviceID == 0) ? 1 : 0);
-
-			// (★)誰も選んでないのでAIフラグをONにする
-			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = true;
-		}
-		else if (C_UIMgr->IsRightPlayer() == false)
-		{
-			// 0だったら0じゃないようにする
-			C_UIMgr->PadMoveRightSide((DeviceID == 0) ? 1 : 0);
-
-			// (★)誰も選んでないのでAIフラグをONにする
-			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = true;
-		}
-		else
-		{
-			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = false;
-			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = false;
-		}
-
 		// SEの再生
 		se->Play("決定1");
 
 		//else
 		{
+			
 			//[10/30] ここで↑の情報をもとに誰がどっちサイドなのかを次のシーンに渡す
-			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = C_UIMgr->GetLeftPlayer().iPlayerDeviceID;//←このゲッターを使ってください
-			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = C_UIMgr->GetRightPlayer().iPlayerDeviceID;
 
+			// 自分がサイドを選択していて、かつもう片方が空いている状態なら
+			// 空いてるAI側に自分のデバイスを入れる
+			if (C_UIMgr->IsLeftPlayer() == false)
+			{
+				// (★)誰も選んでないのでAIフラグをONにする操作デバイスを同じに
+				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = true;
+				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = false;
+				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = C_UIMgr->GetRightPlayer().iPlayerDeviceID;
+				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = C_UIMgr->GetRightPlayer().iPlayerDeviceID;
+
+			}
+			else if (C_UIMgr->IsRightPlayer() == false)
+			{
+
+				// (★)誰も選んでないのでAIフラグをONにするの操作デバイスを同じに
+				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = false;
+				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = true;
+				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = C_UIMgr->GetLeftPlayer().iPlayerDeviceID;//
+				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = C_UIMgr->GetLeftPlayer().iPlayerDeviceID;// 
+
+			}
+			else
+			{
+				// 全員入ったら
+				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = false;
+				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = false;
+				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = C_UIMgr->GetLeftPlayer().iPlayerDeviceID;
+				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = C_UIMgr->GetRightPlayer().iPlayerDeviceID;
+
+			}
+
+		
 			// チュートリアルではない
 			SelectDataMgr->Get()->bTutorial = false;
 			

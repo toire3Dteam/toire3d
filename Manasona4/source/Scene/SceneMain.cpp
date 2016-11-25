@@ -188,6 +188,23 @@ bool sceneMain::Initialize()
 
 	m_pOverDriveStage = new OverDriveStage();
 
+	// ウィンドウ覧
+	for (int i = 0; i < (int)BATTLE_WINDOW_TYPE::ARRAY_END; i++)
+	{
+		switch ((BATTLE_WINDOW_TYPE)i)
+		{
+		case BATTLE_WINDOW_TYPE::POSE:
+			m_pWindow[i] = new PoseWindow(Vector2(424, 128));
+			break;
+		default:
+			MyAssert(0, "そんなウィンドウはない");
+			break;
+		}
+	}
+
+	// ポーズしてるか
+	m_bPose = false;
+
 	// オレ曲初期化
 	//m_pMyMusicMgr = new MyMusicManager(MY_MUSIC_ID::SENJO);
 	//m_pMyMusicMgr->Play();
@@ -215,19 +232,18 @@ sceneMain::~sceneMain()
 	PointLightMgr->Release();
 	delete m_pShotMgr;
 	NumberEffect.Release();
-
 	GameUIMgr->Rerease();
-
 	TimeMgr->Release();
-
 	CutInMgr->Rerease();
-
 	SAFE_DELETE(m_pRoundCallMgr);
-
 	SAFE_DELETE(m_pMaskScreen);
-
 	SAFE_DELETE(m_pOverDriveStage);
 	//SAFE_DELETE(com);
+	// ウィンドウ覧
+	for (int i = 0; i < (int)BATTLE_WINDOW_TYPE::ARRAY_END; i++)
+	{
+		SAFE_DELETE(m_pWindow[i]);
+	}
 }
 
 //******************************************************************
@@ -239,146 +255,156 @@ void sceneMain::Update()
 	HeaveHoFinishUI->Update();
 	if (HeaveHoFinishUI->IsAction() == true)return ;
 	
-	//	com->Update();
-
-	stopTimer++;
-	//if (stopTimer > 60 * 60)
-	//{
-	//	return true;
-	//}
-
-	// フェード更新
-	Fade::Update();
-
-	// カメラ更新(ステートマシンに書いた)
-	//CameraMgr->Update();
-
-	// ショット更新
-	m_pShotMgr->Update();
-
-	// ステージ更新
-	m_pStage->Update();
-
-	// プレイヤー更新
-	//PlayerMgr->Update();
-
-	// パーティクル更新
-	ParticleManager::Update();
-
-	static float lightAngle = 2.14f;
-	// アングル
-	if (KeyBoard(KB_R)) { lightAngle -= 0.05f; }
-	if (KeyBoard(KB_T)) { lightAngle += 0.05f; }
-
-	m_dirLight.x = sinf(lightAngle);
-	m_dirLight.z = cosf(lightAngle);
-	m_dirLight.y = -0.99f;
-
-	// ブラー更新
-	DeferredManagerEx.RadialBlurUpdate();
-
-	// ポイントライト更新
-	PointLightMgr->Update();
-
-	// 
-	NumberEffect.Update();
-
-	// エンターでエフェクトカメラ発動してみる
-	if (KeyBoardTRG(KB_ENTER))
+	// ポーズ中は更新しない
+	if (m_bPose == false)
 	{
-		//m_pMyMusicMgr->PlayHeaveHo();
-		//EFFECT_CAMERA_INFO eci;
-		//eci.scriptID = 0;
-		//MsgMgr->Dispatch(0, ENTITY_ID::CAMERA_MGR, ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::EFFECT_CAMERA, &eci);
-	}
 
+		//	com->Update();
 
-	if (KeyBoardTRG(KB_N))
-	{
-		// UIにメッセージを送る
-		SIDE side = SIDE::LEFT;
-		MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
-			MESSAGE_TYPE::APP_WIN_ICON, &side);
-	}
-	if (KeyBoardTRG(KB_M))
-	{
-		// UIにメッセージを送る
-		CUTIN_TYPE_NAME data = CUTIN_TYPE_NAME::AIROU;
-		MsgMgr->Dispatch(0, ENTITY_ID::CUTIN_MGR, ENTITY_ID::CUTIN_MGR,
-			MESSAGE_TYPE::CUTIN_ACTION, &data);
+		stopTimer++;
+		//if (stopTimer > 60 * 60)
+		//{
+		//	return true;
+		//}
 
-	}
+		// フェード更新
+		Fade::Update();
 
-	// 
-	if (KeyBoardTRG(KB_H))
-	{
-		SIDE data = SIDE::LEFT;	
+		// カメラ更新(ステートマシンに書いた)
+		//CameraMgr->Update();
+
+		// ショット更新
+		m_pShotMgr->Update();
+
+		// ステージ更新
+		m_pStage->Update();
+
+		// プレイヤー更新
+		//PlayerMgr->Update();
+
+		// パーティクル更新
+		ParticleManager::Update();
+
+		static float lightAngle = 2.14f;
+		// アングル
+		if (KeyBoard(KB_R)) { lightAngle -= 0.05f; }
+		if (KeyBoard(KB_T)) { lightAngle += 0.05f; }
+
+		m_dirLight.x = sinf(lightAngle);
+		m_dirLight.z = cosf(lightAngle);
+		m_dirLight.y = -0.99f;
+
+		// ブラー更新
+		DeferredManagerEx.RadialBlurUpdate();
+
+		// ポイントライト更新
+		PointLightMgr->Update();
+
 		// 
-		MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
-			MESSAGE_TYPE::OVER_DRIVE_CUTIN, &data);
+		NumberEffect.Update();
 
-	}
-	if (KeyBoardTRG(KB_J))
-	{
-
-		SIDE data = SIDE::RIGHT;
-		//
-		MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
-			MESSAGE_TYPE::OVER_DRIVE_CUTIN, &data);
-	}
-
-
-	if (KeyBoardTRG(KB_K))
-	{
-		if (m_bShaderFlag)
+		// エンターでエフェクトカメラ発動してみる
+		if (KeyBoardTRG(KB_ENTER))
 		{
-			m_bShaderFlag = false;
+			//m_pMyMusicMgr->PlayHeaveHo();
+			//EFFECT_CAMERA_INFO eci;
+			//eci.scriptID = 0;
+			//MsgMgr->Dispatch(0, ENTITY_ID::CAMERA_MGR, ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::EFFECT_CAMERA, &eci);
 		}
-		else
+
+
+		if (KeyBoardTRG(KB_N))
 		{
-			m_bShaderFlag = true;
+			// UIにメッセージを送る
+			SIDE side = SIDE::LEFT;
+			MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
+				MESSAGE_TYPE::APP_WIN_ICON, &side);
 		}
+		if (KeyBoardTRG(KB_M))
+		{
+			// UIにメッセージを送る
+			CUTIN_TYPE_NAME data = CUTIN_TYPE_NAME::AIROU;
+			MsgMgr->Dispatch(0, ENTITY_ID::CUTIN_MGR, ENTITY_ID::CUTIN_MGR,
+				MESSAGE_TYPE::CUTIN_ACTION, &data);
+
+		}
+
+		// 
+		if (KeyBoardTRG(KB_H))
+		{
+			SIDE data = SIDE::LEFT;
+			// 
+			MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
+				MESSAGE_TYPE::OVER_DRIVE_CUTIN, &data);
+
+		}
+		if (KeyBoardTRG(KB_J))
+		{
+
+			SIDE data = SIDE::RIGHT;
+			//
+			MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
+				MESSAGE_TYPE::OVER_DRIVE_CUTIN, &data);
+		}
+
+
+		if (KeyBoardTRG(KB_K))
+		{
+			if (m_bShaderFlag)
+			{
+				m_bShaderFlag = false;
+			}
+			else
+			{
+				m_bShaderFlag = true;
+			}
+		}
+
+		if (KeyBoardTRG(KB_U))
+		{
+			//TimeMgr->a
+			GameUIMgr->Action();
+		}
+		if (KeyBoardTRG(KB_I))
+		{
+			// UIにメッセージを送る
+			SIDE side = SIDE::LEFT;
+			MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
+				MESSAGE_TYPE::APP_WIN_ICON, &side);
+		}
+
+		if (KeyBoardTRG(KB_N))
+		{
+			OverDriveAction();
+		}
+
+		if (KeyBoardTRG(KB_B))
+		{
+			OverDriveEnd();
+		}
+
+		GameUIMgr->Update();
+
+		//g_eff->Update();
+		//EffectMgr.Update();
+		m_panel->Update();
+		g_uvEffect->Update();
+
+		//TimeMgr->Update();
+		CutInMgr->Update();
+
+		m_pRoundCallMgr->Update();// ラウンドコール
+
+		m_pOverDriveStage->Update();// 必殺背景
+
+		OverDriveUpdate();// オーバードライブ
 	}
 
-	if (KeyBoardTRG(KB_U))
+	// ウィンドウ覧 (ポーズウィンドウなど)
+	for (int i = 0; i < (int)BATTLE_WINDOW_TYPE::ARRAY_END; i++)
 	{
-		//TimeMgr->a
-		GameUIMgr->Action();
+		m_pWindow[i]->Update();
 	}
-	if (KeyBoardTRG(KB_I))
-	{
-		// UIにメッセージを送る
-		SIDE side = SIDE::LEFT;
-		MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
-			MESSAGE_TYPE::APP_WIN_ICON, &side);
-	}
-
-	if (KeyBoardTRG(KB_N))
-	{
-		OverDriveAction();
-	}
-
-	if (KeyBoardTRG(KB_B))
-	{
-		OverDriveEnd();
-	}
-
-	GameUIMgr->Update();
-
-	//g_eff->Update();
-	//EffectMgr.Update();
-	m_panel->Update();
-	g_uvEffect->Update();
-
-	//TimeMgr->Update();
-	CutInMgr->Update();
-
-	m_pRoundCallMgr->Update();// ラウンドコール
-
-	m_pOverDriveStage->Update();// 必殺背景
-
-	OverDriveUpdate();// オーバードライブ
-
 	// ★ステートマシン更新(何故ここに書くかというと、中でシーンチェンジの処理を行っているため)
 	m_pStateMachine->Update();
 }
@@ -482,6 +508,11 @@ void sceneMain::Render()
 		
 		HeaveHoFinishUI->Render();
 		
+		// ここでウィンドウ覧を描画するかステートマシンで個別で描画するかは後で判断
+		for (int i = 0; i < (int)BATTLE_WINDOW_TYPE::ARRAY_END; i++)
+		{
+			m_pWindow[i]->Redner();
+		}
 
 		// ★ここにステートマシン描画(多分2D関係が多いんじゃないかと)
 		m_pStateMachine->Render();

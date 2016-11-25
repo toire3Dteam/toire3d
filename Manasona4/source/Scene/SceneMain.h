@@ -9,6 +9,9 @@
 
 #include "MenuUI\TutorialManager.h"
 
+// ポーズウィンドウ
+#include "Window\PoseWindow.h"
+
 // 前方宣言
 class ShotManager;
 class Camera;
@@ -20,6 +23,15 @@ class SceneSwitchPrev;
 namespace Stage{		// ○
 	class Base;
 }
+
+// バトルのウィンドウの種類
+enum class BATTLE_WINDOW_TYPE
+{
+	POSE, // ポーズ
+
+	ARRAY_END	// 配列終了
+
+};
 
 class sceneMain : public BaseScene, BaseGameEntity
 {
@@ -61,6 +73,10 @@ public:
 	TUTORIAL_TYPE GetSelectTutorial() { return m_eSelectTutorial; }
 	void SetSelectTutorial(TUTORIAL_TYPE tutorial) { m_eSelectTutorial = tutorial; }
 
+	BaseWindow* GetWindow(BATTLE_WINDOW_TYPE type) { return m_pWindow[(int)type]; }
+
+	void SetPose(bool flag) { m_bPose = flag; }
+
 private:
 	int m_iRoundNum;				// ラウンド数
 
@@ -92,4 +108,9 @@ private:
 	// （仮）チュートリアルかどうか
 	bool m_bTutorialFlag;
 	TUTORIAL_TYPE m_eSelectTutorial;		// 選択してるチュートリアル
+
+	// Window類
+	BaseWindow* m_pWindow[(int)BATTLE_WINDOW_TYPE::ARRAY_END];
+	bool m_bPose;
+
 };

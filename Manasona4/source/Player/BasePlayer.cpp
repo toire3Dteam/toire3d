@@ -60,7 +60,7 @@ void BasePlayer::LoadAttackFrameList(char *filename)
 	}
 }
 
-BasePlayer::BasePlayer(SIDE side, const SideData &data) :m_bAI(data.bAI), m_deviceID(data.iDeviceID), m_side(side), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + data.iDeviceID)),
+BasePlayer::BasePlayer(SIDE side, const SideData &data) :m_bAI(data.bAI), m_deviceID(data.iDeviceID), m_side(side), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + (int)side)),
 m_maxSpeed(1.0f), m_dir(DIR::LEFT), m_pHitSquare(new CollisionShape::Square), m_pDefaultObj(nullptr),
 m_pObj(nullptr),
 m_move(VECTOR_ZERO), m_bLand(false),m_bSquat(false), m_bAerialJump(true), m_bAerialDash(false),m_iAerialDashFrame(0), m_ActionState(BASE_ACTION_STATE::NO_ACTION),
@@ -115,24 +115,16 @@ m_pCutinPic(nullptr), m_pName("None")
 	m_pAI = nullptr;
 
 	// IDで座標の分岐
-	switch (m_deviceID)
+	switch ((int)m_side)
 	{
-	case 0:
-		m_pos.Set(-25, 0, 0);
+	case (int)SIDE::LEFT:
+		m_pos.Set(-20, 0, 0);
 		m_TargetDir = DIR::RIGHT;
 		break;
 
-	case 1:
-		m_pos.Set(25, 0, 0);
+	case (int)SIDE::RIGHT:
+		m_pos.Set(20, 0, 0);
 		m_TargetDir = DIR::LEFT;
-		break;
-
-	case 2:
-		m_pos.Set(25, 0, 0);
-		break;
-
-	case 3:
-		m_pos.Set(50, 0, 0);
 		break;
 	}
 
@@ -212,26 +204,19 @@ void BasePlayer::Reset()
 	m_GuardState = GUARD_STATE::NO_GUARD;
 
 	// IDで座標の分岐
-	switch (m_deviceID)
+	switch ((int)m_side)
 	{
-	case 0:
-		m_pos.Set(-25, 0, 0);
+	case (int)SIDE::LEFT:
+		m_pos.Set(-20, 0, 0);
 		m_TargetDir = DIR::RIGHT;
 		break;
 
-	case 1:
-		m_pos.Set(25, 0, 0);
+	case (int)SIDE::RIGHT:
+		m_pos.Set(20, 0, 0);
 		m_TargetDir = DIR::LEFT;
 		break;
-
-	case 2:
-		m_pos.Set(25, 40, 0);
-		break;
-
-	case 3:
-		m_pos.Set(50, 50, 0);
-		break;
 	}
+
 
 	m_move.Set(0, 0, 0);
 
@@ -243,7 +228,7 @@ void BasePlayer::InitAI()
 {
 	// AIフラグかつ、AIがnewされてなかったら
 	//if (m_pAI) return;
-	if (m_bAI) m_pAI = new AI(m_deviceID, this);
+	if (m_bAI) m_pAI = new AI(m_side, this);
 }
 
 BasePlayer::~BasePlayer()

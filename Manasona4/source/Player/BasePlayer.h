@@ -745,7 +745,10 @@ public:
 	//------------------------------------------------------
 	//	‘Îí‘Šè‚Ìƒ|ƒCƒ“ƒ^
 	//------------------------------------------------------
-	void SetTargetPlayer(BasePlayer *pPlayer){ m_pTargetPlayer = pPlayer; }
+	void SetTargetPlayer(BasePlayer *pPlayer){
+
+		m_pTargetPlayer = pPlayer; 
+	}
 	BasePlayer *GetTargetPlayer(){ return m_pTargetPlayer; }
 
 
