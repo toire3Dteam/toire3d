@@ -61,7 +61,7 @@ void BasePlayer::LoadAttackFrameList(char *filename)
 	}
 }
 
-BasePlayer::BasePlayer(SIDE side, const SideData &data) :m_bAI(data.bAI), m_iDeviceID(data.iDeviceID), m_side(side), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + data.iDeviceID)),
+BasePlayer::BasePlayer(SIDE side, const SideData &data) :m_bAI(data.bAI), m_iDeviceID(data.iDeviceID), m_side(side), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + (int)side)),
 m_fMaxSpeed(1.0f), m_dir(DIR::LEFT), m_pHitSquare(new CollisionShape::Square), m_pDefaultObj(nullptr),
 m_pObj(nullptr),
 m_vMove(0,0,0), m_bLand(false),m_bSquat(false), m_bAerialJump(true), m_bAerialDash(false),m_iAerialDashFrame(0), m_ActionState(BASE_ACTION_STATE::NO_ACTION),
@@ -314,6 +314,7 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 		// ★硬直時間のデクリメント
 		if (m_iRecoveryFrame > 0)
 			m_iRecoveryFrame--;
+		else m_fDamageRate = 1.0f;	// コンボ切れたら、ダメージレートを戻す
 
 		// アクションフレームの更新
 		if (isFrameAction())

@@ -2,7 +2,7 @@
 #include "Stage.h"
 #include "../Player/BasePlayer.h"
 #include "../Collision/Collision.h"
-#include "../Camera/camera.h"
+
 
 Stage::Base::Base() : m_pObj(nullptr), m_pBack(nullptr), m_fBottom(0), m_fWidth(200)
 {
@@ -44,8 +44,11 @@ void Stage::Base::CreateStage(Stage::Base**p,STAGE id, Camera *pCamera)
 {
 	switch (id)
 	{
-	case STAGE::SENJO:
-		*p = new Stage::Senjo;
+	case STAGE::SAND:
+		*p = new Stage::Sand;
+		break;
+	case STAGE::SEA:
+		*p = new Stage::Sea;
 		break;
 	case STAGE::SYUTEN:
 		*p = new Stage::Syuten;
@@ -79,11 +82,10 @@ void Stage::Base::Collision(BasePlayer *player, Vector3 *move)
 //}
 
 
-void Stage::Senjo::Initialize(Camera *pCamera)
+void Stage::Sand::Initialize(Camera *pCamera)
 {
 	//m_pObj = new iexMesh("DATA/Stage/Senjo/pupupu2.IMO");
-	//m_pObj = new iexMesh("DATA/Stage/Stage/sandStage.IMO");
-	m_pObj = new iexMesh("DATA/Stage/Sister/stage.IMO");
+	m_pObj = new iexMesh("DATA/Stage/Stage/sandStage.IMO");
 	//m_pObj->SetScale(2);
 	//m_pObj->Update();
 
@@ -97,7 +99,22 @@ void Stage::Senjo::Initialize(Camera *pCamera)
 	m_fWidth = 150;
 
 	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
-	pCamera->SetStageCameraInfo("DATA/Stage/Senjo/camera.txt");
+	pCamera->SetStageCameraInfo("DATA/Stage/Stage/camera.txt");
+}
+
+void Stage::Sea::Initialize(Camera *pCamera)
+{
+	m_pObj = new iexMesh("DATA/Stage/Sister/stage.IMO");
+
+	m_pBack = new iexMesh("DATA/Stage/Senjo/Skydome.IMO");
+	m_pBack->SetPos(Vector3(0, 0, 300));
+	m_pBack->SetScale(3.5f);
+	m_pBack->Update();
+	m_fBottom = 0;
+	m_fWidth = 150;
+
+	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
+	pCamera->SetStageCameraInfo("DATA/Stage/Sister/camera.txt");
 }
 
 void Stage::Syuten::Initialize(Camera *pCamera)

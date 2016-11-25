@@ -37,7 +37,7 @@ void SceneMainState::StageIntro::Enter(sceneMain *pMain)
 
 	// ƒJƒƒ‰”­“®
 	EFFECT_CAMERA_INFO EffectCameraInfo;
-	EffectCameraInfo.scriptID = (int)EFFECT_CAMERA_ID::SAND_STAGE_INTRO;	// ‰¼
+	EffectCameraInfo.scriptID = (int)pMain->GetStage()->GetIntroCameraScriptID();
 	MsgMgr->Dispatch(0, ENTITY_ID::SCENE_MAIN, ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::EFFECT_CAMERA, &EffectCameraInfo);
 
 	m_bSkip = false;

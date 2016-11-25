@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Data/SelectData.h"
+#include "../Camera/camera.h"
 
 // 前方宣言ｎ
-class Camera;
 
 class BasePlayer;
 
@@ -27,7 +27,7 @@ namespace Stage
 
 		static void CreateStage(Base**p, STAGE id, Camera *pCamera);
 
-		virtual STAGE GetStageID() = 0;	// ステージのID取得
+		virtual EFFECT_CAMERA_ID GetIntroCameraScriptID() = 0;	// ステージのID取得
 
 		void Collision(BasePlayer *player, Vector3 *move);
 		//void Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2);
@@ -53,20 +53,28 @@ namespace Stage
 	};
 
 
-	// 戦場ステージ
-	class Senjo : public Base
+	// 砂ステージ
+	class Sand : public Base
 	{
 	public:
-		Senjo() :Base(){}
-		~Senjo(){}
+		Sand() :Base(){}
 		void Initialize(Camera *pCamera);
 		//void Update() override;
 		//void Render() override;
 		//void Render_ShadowBuf() override;
 
-		STAGE GetStageID(){ return STAGE::SENJO; }
+		EFFECT_CAMERA_ID GetIntroCameraScriptID(){ return EFFECT_CAMERA_ID::SAND_STAGE_INTRO; }
 	private:
 	};
+
+	// 海ステージ
+	class Sea : public Base
+{
+public:
+Sea() :Base(){}
+void Initialize(Camera *pCamera);
+		EFFECT_CAMERA_ID GetIntroCameraScriptID(){ return EFFECT_CAMERA_ID::SEA_STAGE_INTRO; }
+};
 
 	// 終点ステージ
 	class Syuten : public Base
@@ -79,7 +87,7 @@ namespace Stage
 		void Render() override;
 		//void Render_ShadowBuf() override;
 
-		STAGE GetStageID(){ return STAGE::SYUTEN; }
+		EFFECT_CAMERA_ID GetIntroCameraScriptID(){ return EFFECT_CAMERA_ID::SYUTEN_STAGE_INTRO; }
 	private:
 	};
 
@@ -94,7 +102,7 @@ namespace Stage
 		//void Render() override;
 		//void Render_ShadowBuf() override;
 
-		STAGE GetStageID(){ return STAGE::SYUTEN; }
+		EFFECT_CAMERA_ID GetIntroCameraScriptID(){ return EFFECT_CAMERA_ID::SYUTEN_STAGE_INTRO; }
 	private:
 	};
 
