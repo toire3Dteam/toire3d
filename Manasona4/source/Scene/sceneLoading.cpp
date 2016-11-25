@@ -11,10 +11,11 @@ bool sceneLoading::isThread;
 //		初	期	化	と	開	放
 bool sceneLoading::Initialize(BaseScene *newScene)
 {
-	m_pImage = new tdn2DObj("DATA/UI/Loading/loading.png");
+	m_pImage = new tdn2DObj("DATA/UI/Loading/loadPic.png");
 	m_pGauge = new tdn2DObj("DATA/UI/Loading/loading_gauge.png");
 	m_AnimeCount = m_AnimeFrame = 0;
 	m_fLoadGaugePercent = 0;
+	m_fLoadAngle = 0.0f;
 
 	//	別スレッド作成
 	//次のシーンのポインタは後で使うのでnewSceneに保存しておく。
@@ -64,6 +65,9 @@ void sceneLoading::Update()
 		if (++m_AnimeCount > 5) m_AnimeFrame = 0;
 	}
 
+	m_fLoadAngle -= 0.1f;
+	m_pImage->SetAngle(m_fLoadAngle);
+
 	// ロード割合補間処理
 	m_fLoadGaugePercent = m_fLoadGaugePercent*.5f + m_newScene->m_fLoadPercentage*.5f;
 
@@ -88,12 +92,14 @@ void sceneLoading::Render()
 	tdnView::Clear();
 
 	tdnPolygon::Rect(0, 0, tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom , RS::COPY, 0xff000000);
-	m_pImage->Render(720, 540, 512, 64, 0, m_AnimeCount * 64, 512, 64);
+	//m_pImage->Render(720, 540, 512, 64, 0, m_AnimeCount * 64, 512, 64);
+	
+	m_pImage->Render(1280 - 256 + 32, 720 - 256 + 32);
 
 	// ゲージ中身
-	m_pGauge->Render(720, 620, (int)(m_fLoadGaugePercent * 512), 64, 0, 64, (int)(m_fLoadGaugePercent * 512), 64);
+	//m_pGauge->Render(720, 620, (int)(m_fLoadGaugePercent * 512), 64, 0, 64, (int)(m_fLoadGaugePercent * 512), 64);
 	// ゲージ枠
-	m_pGauge->Render(720, 620, 512, 64, 0, 0, 512, 64);
+	//m_pGauge->Render(720, 620, 512, 64, 0, 0, 512, 64);
 
 	// ロードのコメント
 	tdnText::Draw(320, 620, 0xffffffff, "%s", m_LoadComment);

@@ -12,7 +12,7 @@ private:
 	int			m_AnimeFrame;
 	tdn2DObj	*m_pImage, *m_pGauge;
 	float		m_fLoadGaugePercent;		// •`‰æ—p‚Ìpercentage(š•âŠÔ‚Åg‚¤)
-
+	float		m_fLoadAngle;
 public:
 
 	//------------------------------------------------------

@@ -48,4 +48,7 @@ private:
 	int m_iRenderFlagWaitFrame;
 
 	bool m_bGuardFlag;
+
+	// カウンター
+	tdn2DAnim* m_pCounterPic;
 };

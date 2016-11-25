@@ -34,6 +34,7 @@ public:
 
 	int GetNumPlayer() { return m_NumPlayer; }
 	BasePlayer *GetPlayer(int no) { return m_pPlayers[no]; }
+	BasePlayer *GetPlayer(ENTITY_ID id){ FOR(m_NumPlayer) { if (m_pPlayers[i]->GetID() == id) return m_pPlayers[i]; }return nullptr; }
 	BasePlayer *GetPlayerByDeviceID(int DeviceID){ FOR(m_NumPlayer) { if (m_pPlayers[i]->GetDeviceID() == DeviceID) return m_pPlayers[i]; }return nullptr; }	// デバイスIDから探す
 
 	void CalcTeamPoint();

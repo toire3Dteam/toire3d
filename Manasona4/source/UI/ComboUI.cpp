@@ -25,6 +25,11 @@ ComboUI::ComboUI()
 	m_iRecoveryFrame = 0;
 	m_iMaxRecoveryFrame = 100;
 
+	// カウンター
+	m_pCounterPic = new tdn2DAnim("Data/UI/Combo/Counter.png");
+	m_pCounterPic->OrderAlphaMove(120, 2, 120 - 8);
+	
+
 }
 
 ComboUI::ComboUI(BasePlayer* PlayerData)
@@ -55,6 +60,12 @@ ComboUI::ComboUI(BasePlayer* PlayerData)
 	m_iRenderFlagWaitFrame = 0;
 
 	m_bGuardFlag = false;
+
+	// カウンター
+	m_pCounterPic = new tdn2DAnim("Data/UI/Combo/Counter.png");
+	m_pCounterPic->OrderAlphaMove(120, 2, 120 - 8);
+	m_pCounterPic->Action();
+
 }
 
 ComboUI::~ComboUI()
@@ -68,6 +79,9 @@ ComboUI::~ComboUI()
 	SAFE_DELETE(m_gageFramePic);
 	SAFE_DELETE(m_gageBackPic);
 	SAFE_DELETE(m_gagePic);
+
+	SAFE_DELETE(m_pCounterPic);
+
 }
 
 void ComboUI::Update()
@@ -86,8 +100,10 @@ void ComboUI::Update()
 	}
 	else
 	{
-	
-		if (++m_iRenderFlagWaitFrame > 120)
+		// レートが0ならば2秒後UIを消す
+
+		m_iRenderFlagWaitFrame++;
+		if (m_iRenderFlagWaitFrame > 120)
 		{
 			m_bRenderFlag = false;
 			m_iCount = 0;
@@ -95,6 +111,9 @@ void ComboUI::Update()
 		}	
 
 	}
+
+	// 更新
+	m_pCounterPic->Update();
 
 }
 
@@ -119,7 +138,11 @@ void ComboUI::Render(int x, int y)
 
 	m_damageNum->Render(x + gageX + 64, y + gageY - 30, m_iDamage, Number::NUM_KIND::DAMAGE_SCORE);// 数値
 
-}//つぎはげーじとかだめーじほぞんできるようにする
+
+	// カウンター
+	m_pCounterPic->Render(gageX + x,  y);
+
+}
 
 void ComboUI::GageUpdate()
 {
@@ -167,7 +190,9 @@ void ComboUI::Count(int damage, int maxRecovery)
 	}
 
 	m_iMaxRecoveryFrame = maxRecovery;
-		
+
+	// 仮
+	m_pCounterPic->Action();
 }
 
 //void ComboUI::Count(int damage, int maxRecovery,int* recovery)

@@ -29,7 +29,7 @@ void SelectUIState::Intro::Execute(SelectUI *pMain)
 {
 	pMain->m_iWaitFrame++;
 	// Å‰‚Ì‘I‘ð‚Ö
-	if (pMain->m_iWaitFrame >= 30)
+	if (pMain->m_iWaitFrame >= 24)
 	{
 		pMain->GetFSM()->ChangeState(FirstStep::GetInstance());
 		return;

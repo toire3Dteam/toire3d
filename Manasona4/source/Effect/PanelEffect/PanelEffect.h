@@ -63,7 +63,7 @@ public:
 	{
 		m_picSize = 256;
 		m_pic = new AnimationPanel("Data/Effect/eraseEffect.png", 256, 256, 15, 1, 4, false);
-		state = RS::ADD;
+		state = RS::ADD_NOZ;
 		m_pic3DScale = 80.0f;
 	};
 	~HitEffect() {};
@@ -102,7 +102,7 @@ public:
 	{
 		m_picSize = 256;
 		m_pic = new AnimationPanel("Data/Effect/Damage.png", 256, 256, 15, 1, 4, false);
-		state = RS::ADD;
+		state = RS::ADD_NOZ;
 	};
 	~DamageEffect() {};
 
@@ -552,7 +552,7 @@ public:
 	{
 		m_picSize = 256;
 		m_pic = new AnimationPanel("Data/Effect/OverDrive.png", 256, 256, 15, 2, 4, false);
-		state = RS::ADD;
+		state = RS::ADD_NOZ;
 		m_pic3DScale = 150;//3Dのスケール
 	};
 	~OverDriveEffect() {};
@@ -572,7 +572,7 @@ public:
 	{
 		m_picSize = 256;
 		m_pic = new AnimationPanel("Data/Effect/overDriveStart.png", 256, 256, 15, 1, 4, false);
-		state = RS::ADD;
+		state = RS::ADD_NOZ;
 		m_pic3DScale = 100;//3Dのスケール
 	};
 	~OverDriveStartEffect() {};
@@ -591,7 +591,7 @@ public:
 	{
 		m_picSize = 256;
 		m_pic = new AnimationPanel("Data/Effect/OrangeLight.png", 256, 256, 15, 1, 4, false);
-		state = RS::ADD;
+		state = RS::ADD_NOZ;
 		m_pic3DScale = 50;//3Dのスケール
 	};
 	~OrangeLightEffect() {};
@@ -611,7 +611,7 @@ public:
 	{
 		m_picSize = 256;
 		m_pic = new AnimationPanel("Data/Effect/dokkoi.png", 256, 256, 15, 1, 4, false);
-		state = RS::ADD;
+		state = RS::ADD_NOZ;
 		m_pic3DScale = 50;//3Dのスケール
 	};
 	~DokkoiEffect() {};

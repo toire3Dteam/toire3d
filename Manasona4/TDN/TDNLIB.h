@@ -831,7 +831,8 @@ typedef enum RS
 	MUL = 5,
 	NEGA = 6,
 	INVERT = 7,
-	SCREEN = 8
+	SCREEN = 8,
+	ADD_NOZ = 9,
 }RM;
 
 /**

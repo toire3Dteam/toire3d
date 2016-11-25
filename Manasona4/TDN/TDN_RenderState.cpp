@@ -67,6 +67,7 @@ void tdnRenderState::Set(DWORD state, D3DMATERIAL9* lpMaterial, Texture2D* lpTex
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_FOGENABLE, FALSE);					// フォグブレンディングを無効。シェーダーでフォグ作ればよくね？
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_LIGHTING, TRUE);					// Direct3D のライティングを有効にする
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);				// 深度バッファへの書き込みを有効にする
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
 		break;
 	case RS::COPY_NOZ:// 2Dに適用すると3Dの奥に描画できたり
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
@@ -75,6 +76,7 @@ void tdnRenderState::Set(DWORD state, D3DMATERIAL9* lpMaterial, Texture2D* lpTex
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_FOGENABLE, FALSE);
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_LIGHTING, TRUE);
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);				// 深度バッファへの書き込みを有効にする
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
 		break;
 	case RS::ADD:	//	加算合成
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
@@ -83,6 +85,7 @@ void tdnRenderState::Set(DWORD state, D3DMATERIAL9* lpMaterial, Texture2D* lpTex
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_FOGENABLE, FALSE);
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_LIGHTING, FALSE);
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
 		break;
 
 	case RS::SUB:
@@ -92,6 +95,7 @@ void tdnRenderState::Set(DWORD state, D3DMATERIAL9* lpMaterial, Texture2D* lpTex
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_FOGENABLE, FALSE);
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_LIGHTING, FALSE);
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
 		break;
 
 	case RS::MUL:
@@ -101,6 +105,7 @@ void tdnRenderState::Set(DWORD state, D3DMATERIAL9* lpMaterial, Texture2D* lpTex
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_FOGENABLE, FALSE);
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_LIGHTING, FALSE);
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
 		break;
 
 	case RS::NEGA:
@@ -110,6 +115,7 @@ void tdnRenderState::Set(DWORD state, D3DMATERIAL9* lpMaterial, Texture2D* lpTex
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_FOGENABLE, FALSE);
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_LIGHTING, FALSE);
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
 		break;
 
 	case RS::INVERT:	/*	反転		*/
@@ -119,6 +125,7 @@ void tdnRenderState::Set(DWORD state, D3DMATERIAL9* lpMaterial, Texture2D* lpTex
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_FOGENABLE, FALSE);
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_LIGHTING, FALSE);
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
 		break;
 	case RS::SCREEN:	/*	スクリーン		*/
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
@@ -127,8 +134,17 @@ void tdnRenderState::Set(DWORD state, D3DMATERIAL9* lpMaterial, Texture2D* lpTex
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_FOGENABLE, FALSE);
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_LIGHTING, FALSE);
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
 		break;
-
+	case RS::ADD_NOZ:	/*	加算Z値考慮せずに描画		*/
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);			// 後に描いている物体も全力描画
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_FOGENABLE, FALSE);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_LIGHTING, FALSE);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZENABLE, FALSE);
+		break;
 	}
 
 	//	マテリアル設定

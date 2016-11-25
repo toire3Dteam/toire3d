@@ -203,7 +203,7 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 	/*****************************/
 	// モコイの基本ステータス
 	m_standStockMAX = 1;
-	m_standGageMAX = 60*18;
+	m_standGageMAX = 60*8;
 
 	/*****************************/
 	// そのキャラクターのアイコン
@@ -394,7 +394,7 @@ Stand::Maya::Maya(BasePlayer *pPlayer) :Base(pPlayer)
 	/*****************************/
 	// マーヤの基本ステータス
 	m_standStockMAX = 1;
-	m_standGageMAX = 60*3;
+	m_standGageMAX = 60*4;
 
 	/*****************************/
 	// そのキャラクターのアイコン

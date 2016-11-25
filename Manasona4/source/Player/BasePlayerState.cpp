@@ -3521,7 +3521,7 @@ void BasePlayerState::DokkoiAttack::Execute(BasePlayer * pPerson)
 	else if (pPerson->GetAttackData()->bHitSuccess == true)
 	{
 		// 同じボタンか相手の方向
-		if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::A, true) || pPerson->isPushInputTRG((pPerson->GetDir() == DIR::LEFT) ? PLAYER_COMMAND_BIT::LEFT : PLAYER_COMMAND_BIT::RIGHT, true))
+		if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R1, true) || pPerson->isPushInputTRG((pPerson->GetDir() == DIR::LEFT) ? PLAYER_COMMAND_BIT::LEFT : PLAYER_COMMAND_BIT::RIGHT, true))
 		{
 			// 走りモーション
 			pPerson->SetMotion(MOTION_TYPE::RUN);
@@ -4208,7 +4208,7 @@ void BasePlayerState::OverDrive_OneMore::Enter(BasePlayer * pPerson)
 	pPerson->SetGameTimerStopFlag(true);
 
 	// ★相手の同技補正を解除する
-	//pPerson->GetTargetPlayer()->GetRecoveryDamageCount()->clear();
+	pPerson->GetTargetPlayer()->GetRecoveryDamageCount()->clear();
 	pPerson->GetTargetPlayer()->ResetDamageRate();
 }
 
@@ -4580,10 +4580,13 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 											 if (pPerson->GetDir() == DIR::RIGHT) fGuardKnockBack *= -1;
 
 											 Vector3 vKnockBackMove(Collision::CheckMove(pPerson, Vector3(fGuardKnockBack, 0, 0)), 0, 0);
-											 pPerson->SetMove(vKnockBackMove);
+											 pPerson->AddMove(vKnockBackMove);
 
-											 // 壁だとこっちに移動がかかる
-											 pPerson->GetTargetPlayer()->SetMove(Vector3(-(fGuardKnockBack - vKnockBackMove.x), 0, 0));
+											 if (HitDamageInfo->iAttribute == (int)ATTACK_ATTRIBUTE::STRIKE)
+											 {
+												 // 壁だとこっちに移動がかかる
+												 pPerson->GetTargetPlayer()->AddMove(Vector3(-(fGuardKnockBack - vKnockBackMove.x), 0, 0));
+											 }
 										 }
 
 										 // コンボ用
@@ -4702,7 +4705,8 @@ bool BasePlayerState::Throw::OnMessage(BasePlayer * pPerson, const Message & msg
 	//	break;
 	case MESSAGE_TYPE::CAN_THROW_RELEASE:	// 掴んでる人から、投げ抜けしてぇと送られてくるメッセージ
 		// 猶予フレーム中だったら解除
-		if (pPerson->GetHitStopFrame() > 0)// ※ここは数値をじかにかいたほうがいいかと
+		// ★★★★★★★★★片方が投げ抜けできて片方が投げ抜けできない。DeviceID関連かな
+		//if (pPerson->GetHitStopFrame() > 0)// ※ここは数値をじかにかいたほうがいいかと
 		{
 			MsgMgr->Dispatch(0, pPerson->GetID(), msg.Sender, MESSAGE_TYPE::THROW_RELEASE, nullptr);	// 送り主に投げ抜けOKと送り返す
 
@@ -4846,7 +4850,7 @@ void BasePlayerState::ThrowBind::Execute(BasePlayer * pPerson)
 	// 相手依存なので自分からかえることはできない。多分ダメージステートに行くと信じて
 
 	// 投げ抜けボタン
-	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::L2))
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::A, true))
 	{
 		// 掴んでるやつに対して投げ抜けしたいとメッセージを送る(猶予フレーム内なら抜けていいよをメッセージを送り返してくれる)
 		MsgMgr->Dispatch(0, pPerson->GetID(), pPerson->GetTargetPlayer()->GetID(), MESSAGE_TYPE::CAN_THROW_RELEASE, nullptr);

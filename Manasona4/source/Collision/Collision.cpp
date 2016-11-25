@@ -232,6 +232,7 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 				(*OutDamageInfo)->fGuardKnockBackPower = pAttackData->fGuardKnockBackPower;
 				(*OutDamageInfo)->DamageMotion = pAttackData->places[iHitPlace].DamageMotion;
 				(*OutDamageInfo)->fComboRate = pAttackData->fComboRate;
+				(*OutDamageInfo)->iAttribute = (int)pAttackData->attribute;
 
 				// ★コンボUI エフェクト(カウント)発動
 				// ★★プレイヤーのグローバルステートのダメージのところに移しました
@@ -318,6 +319,7 @@ bool Collision::CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou)
 			HitDamageInfo.fGuardKnockBackPower = pStandAttackData->fGuardKnockBackPower;
 			HitDamageInfo.DamageMotion = pStandAttackData->places[iHitPlace].DamageMotion;
 			HitDamageInfo.fComboRate = pStandAttackData->fComboRate;
+			HitDamageInfo.iAttribute = (int)pStandAttackData->attribute;
 
 			// コンボ用
 			//COMBO_DESK comboDesk;
@@ -355,6 +357,15 @@ bool Collision::CollisionShot(Shot::Base *shot, BasePlayer *you)
 
 	AttackData *pShotAttackData(shot->GetAttackData());
 
+	if (isInputGuardCommand(you))
+	{
+		if (Math::Length(you->GetPos(), shot->GetPos()) < BasePlayer::c_GUARD_DISTANCE)// ガード発動距離
+		{
+			you->GetFSM()->ChangeState(BasePlayerState::Guard::GetInstance());
+			//return false;
+		}
+	}
+
 	// 攻撃判定形状と相手の四角で判定をとる
 	CollisionShape::Square AttackShape, YouShape;
 	memcpy_s(&AttackShape, sizeof(CollisionShape::Square), pShotAttackData->pCollisionShape, sizeof(CollisionShape::Square));
@@ -387,6 +398,7 @@ bool Collision::CollisionShot(Shot::Base *shot, BasePlayer *you)
 		HitDamageInfo.bFinishOK = pShotAttackData->bFinish;
 		HitDamageInfo.fGuardKnockBackPower = pShotAttackData->fGuardKnockBackPower;
 		HitDamageInfo.DamageMotion = pShotAttackData->places[iHitPlace].DamageMotion;
+		HitDamageInfo.iAttribute = (int)pShotAttackData->attribute;
 
 		if (shot->GetVec().x < 0) HitDamageInfo.FlyVector.x *= -1;
 		MsgMgr->Dispatch(0, shot->GetPlayer()->GetID(), you->GetID(), MESSAGE_TYPE::HIT_DAMAGE, &HitDamageInfo);
@@ -591,7 +603,7 @@ void Collision::RaypicDown(Stage::Base *obj, BasePlayer *player, Vector3 *move)
 			{
 				//player->SetLand(false);//プレイヤーのポジションをセットした後に変更
 				// 落下メッセージ送信
-				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + player->GetDeviceID()), MESSAGE_TYPE::FALL, nullptr);
+				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + (int)player->GetSide()), MESSAGE_TYPE::FALL, nullptr);
 			}
 		}
 
