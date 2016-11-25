@@ -767,6 +767,10 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 // 硬直フレーム設定
 									 int RecoveryFrame(HitDamageInfo->HitRecoveryFrame);
 
+									 // ダメージ
+									 int damage((int)(HitDamageInfo->damage * pPerson->GetDamageRate()));							// ★自分のダメージレートにかけ合わせる
+									 if (pPerson->GetRecoveryDamageCount()->empty()) damage += BasePlayer::c_FIRST_HIT_ADD_DAMAGE;	// 初段だけダメージを増やす
+
 									 // ★必殺技中は同技補正を無視(アイルーのやつとかひどいことになるから)
 									 if (!HitDamageInfo->bOverDrive)
 									 {
@@ -784,7 +788,7 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 // ★コンボUI エフェクト(カウント)発動
 									 COMBO_DESK comboDesk;
 									 comboDesk.side = pPerson->GetSide();
-									 comboDesk.damage = HitDamageInfo->damage;
+									 comboDesk.damage = damage;
 									 comboDesk.recoveryFrame = RecoveryFrame;
 									 MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, ENTITY_ID::UI_MGR, MESSAGE_TYPE::COMBO_COUNT, &comboDesk);
 
@@ -807,7 +811,9 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 }
 
 									 // ダメージ処理
-									 const int DamagedHP(max(pPerson->GetHP() - HitDamageInfo->damage, 0));
+									 pPerson->MultDamageRate(HitDamageInfo->fComboRate);						// ダメージレートを受けた技のレートで乗算する(だんだんダメージが減っていく)
+
+									 const int DamagedHP(max(pPerson->GetHP() - damage, 0));
 									 // ダメージを受けた後のHPを設定
 									 pPerson->SetHP(DamagedHP);
 									 if (DamagedHP == 0)
@@ -2425,8 +2431,8 @@ void BasePlayerState::RushAttack::Enter(BasePlayer * pPerson)
 	// 初撃モーションに変える
 	pPerson->SetMotion(MOTION_TYPE::RUSH_ATTACK1);
 
-	// ラッシュ攻撃構造体初期化
-	pPerson->GetRushAttack()->Clear();
+	// ラッシュステップ初期化
+	pPerson->RushStepReset();
 
 	// 攻撃ステートを1段目に設定する
 	pPerson->SetActionState(BASE_ACTION_STATE::RUSH1);
@@ -2461,7 +2467,7 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 		return;
 	}
 
-	switch (pPerson->GetRushAttack()->step)
+	switch (pPerson->GetRushStep())
 	{
 	case 0:	// 1段目
 
@@ -2524,7 +2530,7 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 					// 攻撃ステートを2段目に設定する
 					pPerson->SetActionState(BASE_ACTION_STATE::RUSH2);
 
-					pPerson->GetRushAttack()->step++;
+					pPerson->AddRushStep();
 					//pPerson->GetRushAttack()->bNextOK = false;
 
 					// 向いてる方向にキーを入力すると移動
@@ -2598,7 +2604,7 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 					// 先行入力リセット
 					pPerson->AheadCommandReset();
 
-					pPerson->GetRushAttack()->step++;
+					pPerson->AddRushStep();
 					//pPerson->GetRushAttack()->bNextOK = false;
 
 					// 向いてる方向にキーを入力すると移動
@@ -2628,7 +2634,7 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 
 void BasePlayerState::RushAttack::Exit(BasePlayer * pPerson)
 {
-	if (pPerson->GetRushAttack()->step == 2) pPerson->ThirdRushExit();
+	if (pPerson->GetRushStep()) pPerson->ThirdRushExit();
 	// 先行入力リセット
 	pPerson->AheadCommandReset();
 }
@@ -2677,11 +2683,13 @@ void BasePlayerState::KnockBack::Execute(BasePlayer * pPerson)
 	{
 		// 待機ステートに戻る
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+
 		// 喰らったカウントリセット
 		pPerson->GetRecoveryDamageCount()->clear();
 		// 先行入力リセット
 		pPerson->AheadCommandReset();
-
+		// ダメージ補正リセット
+		pPerson->ResetDamageRate();
 	}
 }
 
@@ -2755,6 +2763,8 @@ void BasePlayerState::DownFall::Execute(BasePlayer * pPerson)
 			pPerson->GetRecoveryDamageCount()->clear();
 			// 先行入力リセット
 			pPerson->AheadCommandReset();
+			// ダメージ補正リセット
+			pPerson->ResetDamageRate();
 		}
 	}
 }
@@ -2846,6 +2856,8 @@ void BasePlayerState::KnockDown::Execute(BasePlayer * pPerson)
 			pPerson->GetRecoveryDamageCount()->clear();
 			// 先行入力リセット
 			pPerson->AheadCommandReset();
+			// ダメージ補正リセット
+			pPerson->ResetDamageRate();
 		}
 
 	}
@@ -2928,9 +2940,6 @@ void BasePlayerState::LandRecovery::Enter(BasePlayer * pPerson)
 	// カウントをするステートに変更
 	pPerson->SetActionState(BASE_ACTION_STATE::FRAMECOUNT);
 
-	// 喰らったカウントリセット
-	pPerson->GetRecoveryDamageCount()->clear();
-
 	// リカバー中は無敵！！！
 	//pPerson->SetInvincibleLV(1);
 	pPerson->SetInvincible(
@@ -3008,9 +3017,6 @@ void BasePlayerState::AerialRecovery::Enter(BasePlayer * pPerson)
 
 	// カウントをするステートに変更
 	pPerson->SetActionState(BASE_ACTION_STATE::FRAMECOUNT);
-
-	// 喰らったカウントリセット
-	pPerson->GetRecoveryDamageCount()->clear();
 
 	// リカバー中は無敵！！！
 	//pPerson->SetInvincibleLV(1);
@@ -3273,11 +3279,14 @@ bool BasePlayerState::SquatAttack::OnMessage(BasePlayer * pPerson, const Message
 
 void BasePlayerState::AntiAirAttack::Enter(BasePlayer * pPerson)
 {
-	// 待機モーションに変える
+	// 対空攻撃モーションに変える
 	pPerson->SetMotion(MOTION_TYPE::ANTI_AIR_ATTACK);
 
-	// ★攻撃ステートを2段目に設定する　↓でHITフラグを消している
+	// 攻撃ステートを対空に
 	pPerson->SetActionState(BASE_ACTION_STATE::ANTI_AIR);
+
+	// 慣性を消す
+	pPerson->SetMove(Vector3(0,0,0));
 }
 
 void BasePlayerState::AntiAirAttack::Execute(BasePlayer * pPerson)
@@ -4199,7 +4208,8 @@ void BasePlayerState::OverDrive_OneMore::Enter(BasePlayer * pPerson)
 	pPerson->SetGameTimerStopFlag(true);
 
 	// ★相手の同技補正を解除する
-	pPerson->GetTargetPlayer()->GetRecoveryDamageCount()->clear();
+	//pPerson->GetTargetPlayer()->GetRecoveryDamageCount()->clear();
+	pPerson->GetTargetPlayer()->ResetDamageRate();
 }
 
 void BasePlayerState::OverDrive_OneMore::Execute(BasePlayer * pPerson)

@@ -20,8 +20,8 @@ public:
 	/****************************/
 	//	キャラクター固有の様々なポジション
 	/****************************/
-	Vector3 GetCenterPos(){ return m_pos + Vector3(0, 5, 0); };	 // プレイヤーの真ん中の場所
-	Vector3 GetFlontPos() { return m_pos + Vector3((m_dir == DIR::RIGHT) ? 5.0f : -5.0f, 5.0f, 0); };   // つかみの相手の場所
+	Vector3 GetCenterPos(){ return m_vPos + Vector3(0, 5, 0); };	 // プレイヤーの真ん中の場所
+	Vector3 GetFlontPos() { return m_vPos + Vector3((m_dir == DIR::RIGHT) ? 5.0f : -5.0f, 5.0f, 0); };   // つかみの相手の場所
 
 	/****************************/
 	// ラウンド跨ぎの初期化
@@ -62,6 +62,7 @@ public:
 		protected:
 			Airou *m_pAirou;
 			int m_OrgDamage;
+			float m_fOrgComboRate;
 			CollisionShape::Square m_OrgHitSquare;
 			Vector2 m_OrgFlyVector[2];
 

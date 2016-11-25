@@ -29,6 +29,7 @@ const int BasePlayer::c_THROW_MISS_FRAME = 30;	// “Š‚°ŠO‚µƒƒX‚ÌƒtƒŒ[ƒ€(‘SƒLƒƒƒ
 const int BasePlayer::c_THROW_RELEASE_FRAME = 15;	// “Š‚°”²‚¯‚ÅAƒpƒVƒ“‚Ä‚È‚Á‚Ä‚éŠÔ‚ÌƒtƒŒ[ƒ€(‚±‚ê‚à‘SƒLƒƒƒ‰‹¤’Ê‚¾‚ë‚¤)
 const int BasePlayer::c_WINNER_TIME = 180;
 const float BasePlayer::c_GUARD_DISTANCE = 32.0f;
+const int BasePlayer::c_FIRST_HIT_ADD_DAMAGE = 300;	// ‰’iƒqƒbƒg‰ÁZƒ_ƒ[ƒW
 
 // ƒAƒNƒVƒ‡ƒ“ƒtƒŒ[ƒ€î•ñ“Ç‚İ‚İ
 void BasePlayer::LoadAttackFrameList(char *filename)
@@ -60,21 +61,21 @@ void BasePlayer::LoadAttackFrameList(char *filename)
 	}
 }
 
-BasePlayer::BasePlayer(SIDE side, const SideData &data) :m_bAI(data.bAI), m_deviceID(data.iDeviceID), m_side(side), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + (int)side)),
-m_maxSpeed(1.0f), m_dir(DIR::LEFT), m_pHitSquare(new CollisionShape::Square), m_pDefaultObj(nullptr),
+BasePlayer::BasePlayer(SIDE side, const SideData &data) :m_bAI(data.bAI), m_iDeviceID(data.iDeviceID), m_side(side), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + data.iDeviceID)),
+m_fMaxSpeed(1.0f), m_dir(DIR::LEFT), m_pHitSquare(new CollisionShape::Square), m_pDefaultObj(nullptr),
 m_pObj(nullptr),
-m_move(VECTOR_ZERO), m_bLand(false),m_bSquat(false), m_bAerialJump(true), m_bAerialDash(false),m_iAerialDashFrame(0), m_ActionState(BASE_ACTION_STATE::NO_ACTION),
-m_InvincibleLV(0), m_InvincibleTime(0), m_CurrentActionFrame(0), m_RecoveryFlame(0), m_bEscape(false), m_score(0), m_CollectScore(0), m_pAI(nullptr),
-m_HitStopFrame(0),// šššƒoƒO‚ÌŒ´ˆö@‚Ğ‚Á‚Æ‚·ƒgƒbƒv‰Šú‰»‚Ì‚µ–Y‚êB
-m_InvincibleColRate(0), m_InvincibleColRateFlame(0), m_bInvincibleColRateUpFlag(false),
+m_vMove(0,0,0), m_bLand(false),m_bSquat(false), m_bAerialJump(true), m_bAerialDash(false),m_iAerialDashFrame(0), m_ActionState(BASE_ACTION_STATE::NO_ACTION),
+m_iInvincibleLV(0), m_iInvincibleTime(0), m_iCurrentActionFrame(0), m_iRecoveryFrame(0), m_bEscape(false), m_iScore(0), m_iCollectScore(0), m_pAI(nullptr),
+m_iHitStopFrame(0),// šššƒoƒO‚ÌŒ´ˆö@‚Ğ‚Á‚Æ‚·ƒgƒbƒv‰Šú‰»‚Ì‚µ–Y‚êB
+m_fInvincibleColRate(0), m_iInvincibleColRateFlame(0), m_bInvincibleColRateUpFlag(false),
 m_OverDriveGage(0), m_bOverDrive(false), m_OverDriveFrame(0), m_OverDriveType(OVERDRIVE_TYPE::BURST),
 m_bMoveUpdate(true),
-m_MaxHP(0), m_HP(0),
-m_bGameTimerStopFlag(false), m_HeavehoStopTimer(0), m_HeaveHoDriveOverFlowFrame(0),
-m_WinNum(0), m_GuardState(GUARD_STATE::NO_GUARD),
+m_iMaxHP(0), m_iHP(0),
+m_bGameTimerStopFlag(false), m_iHeavehoStopTimer(0), m_iHeaveHoDriveOverFlowFrame(0),
+m_iWinNum(0), m_GuardState(GUARD_STATE::NO_GUARD),
 m_pFacePic(nullptr), m_pTargetPlayer(nullptr), m_pSpeedLine(nullptr), m_SkillActionType(SKILL_ACTION_TYPE::MAX),
 m_fOrangeColRate(0), m_fMagentaColRate(0),
-m_pCutinPic(nullptr), m_pName("None")
+m_pCutinPic(nullptr), m_pName("None"), m_iRushStep(0)
 {
 	// ƒXƒ^ƒ“ƒh
 	switch (data.partner)
@@ -97,13 +98,12 @@ m_pCutinPic(nullptr), m_pName("None")
 	m_pHitSquare->pos.Set(.0f, 4.0f, .0f);
 
 	// ƒGƒtƒFƒNƒgƒ}ƒl[ƒWƒƒ[
-	m_PanelEffectMGR = new PanelEffectManager();
-	m_UVEffectMGR	 = new UVEffectManager();
+	m_pPanelEffectMGR = new PanelEffectManager();
+	m_pUVEffectMGR	 = new UVEffectManager();
 
 	// ‰Šú‰»
-	memset(m_InputList, 0, sizeof(m_InputList));
+	memset(m_iInputList, 0, sizeof(m_iInputList));
 	ZeroMemory(&m_jump, sizeof(Jump));
-	ZeroMemory(&m_RushAttack, sizeof(RushAttack));
 	// ƒXƒe[ƒgƒ}ƒVƒ“@ˆø”‚Í©•ª©g‚Ìƒ|ƒCƒ“ƒ^
 	m_pStateMachine = new StateMachine<BasePlayer>(this);
 	m_pStateMachine->SetGlobalState(BasePlayerState::Global::GetInstance());// ƒOƒ[ƒoƒ‹
@@ -118,17 +118,17 @@ m_pCutinPic(nullptr), m_pName("None")
 	switch ((int)m_side)
 	{
 	case (int)SIDE::LEFT:
-		m_pos.Set(-20, 0, 0);
+		m_vPos.Set(-20, 0, 0);
 		m_TargetDir = DIR::RIGHT;
 		break;
 
 	case (int)SIDE::RIGHT:
-		m_pos.Set(20, 0, 0);
+		m_vPos.Set(20, 0, 0);
 		m_TargetDir = DIR::LEFT;
 		break;
 	}
 
-	m_angleY = DIR_ANGLE[(int)m_dir];
+	m_fAngleY = DIR_ANGLE[(int)m_dir];
 
 	// ‹ò‚ç‚Á‚Ä‚é’†‚É‹ò‚ç‚Á‚Ä‚é‚©‚¤‚ñ‚Æ‰Šú‰»
 	m_RecoveryDamageCount.clear();
@@ -137,7 +137,7 @@ m_pCutinPic(nullptr), m_pName("None")
 	//m_pComboUI = new ComboUI(&m_RecoveryFlame);
 
 	// ƒRƒ}ƒ“ƒh—š—ğ‰Šú‰»
-	memset(m_CommandHistory, (int)PLAYER_COMMAND_BIT::NEUTRAL, sizeof(m_CommandHistory));
+	memset(m_wCommandHistory, (int)PLAYER_COMMAND_BIT::NEUTRAL, sizeof(m_wCommandHistory));
 
 
 }
@@ -147,28 +147,33 @@ void BasePlayer::Reset()
 	/* [intŒ^]‚Ì‰Šú‰» */
 
 	/* 0‚Å‰Šú‰» */
-	m_InvincibleLV =
-	m_InvincibleTime =
-	m_CurrentActionFrame =
-	m_RecoveryFlame =
-	m_score =
-	m_CollectScore =
-	m_HitStopFrame =
-	m_InvincibleColRateFlame =
+	m_iInvincibleLV =
+	m_iInvincibleTime =
+	m_iCurrentActionFrame =
+	m_iRecoveryFrame =
+	m_iScore =
+	m_iCollectScore =
+	m_iHitStopFrame =
+	m_iInvincibleColRateFlame =
 	//m_OverDriveGage =			// ƒ‰ƒEƒ“ƒhˆøŒp‚¬
 	m_OverDriveFrame =
-	m_MaxHP = m_HP =
-	m_HeavehoStopTimer =
-	m_HeaveHoDriveOverFlowFrame =
+	m_iMaxHP = m_iHP =
+	m_iHeavehoStopTimer =
+	m_iHeaveHoDriveOverFlowFrame =
 	m_iAerialDashFrame =
-	m_AheadCommand =
+	m_iRushStep = 
+	m_wAheadCommand =
 	0;
 
 	/* [floatŒ^]‚Ì‰Šú‰» */
 
 	/* 0‚Å‰Šú‰» */
-	m_InvincibleColRate =
-	0;
+	m_fInvincibleColRate =
+	0.0f;
+
+	/* 1‚Å‰Šú‰» */
+	m_fDamageRate =
+	1.0f;
 
 
 	/* [boolŒ^]‚Ì‰Šú‰» */
@@ -194,7 +199,7 @@ void BasePlayer::Reset()
 	/* [ƒ|ƒCƒ“ƒ^Œ^]‚Ì‰Šú‰»(new‚µ‚Ä‚é‚â‚Â‚Í‹É—Í‚»‚Ì‚Ü‚Ü) */
 	//m_pTargetPlayer = nullptr;
 	m_pObj = m_pDefaultObj;
-	if (m_pObj) m_pObj->SetMotion(m_MotionNumbers[(int)MOTION_TYPE::WAIT]);
+	if (m_pObj) m_pObj->SetMotion(m_iMotionNumbers[(int)MOTION_TYPE::WAIT]);
 	m_pStateMachine->SetCurrentState(BasePlayerState::Wait::GetInstance());
 	m_pStateMachine->SetPreviousState(BasePlayerState::Wait::GetInstance());
 
@@ -207,21 +212,21 @@ void BasePlayer::Reset()
 	switch ((int)m_side)
 	{
 	case (int)SIDE::LEFT:
-		m_pos.Set(-20, 0, 0);
+		m_vPos.Set(-20, 0, 0);
 		m_TargetDir = DIR::RIGHT;
 		break;
 
 	case (int)SIDE::RIGHT:
-		m_pos.Set(20, 0, 0);
+		m_vPos.Set(20, 0, 0);
 		m_TargetDir = DIR::LEFT;
 		break;
 	}
 
 
-	m_move.Set(0, 0, 0);
+	m_vMove.Set(0, 0, 0);
 
 	/* ƒCƒ“ƒvƒbƒgƒŠƒXƒg‚Ì‰Šú‰» */
-	memset(m_InputList, 0, sizeof(m_InputList));
+	memset(m_iInputList, 0, sizeof(m_iInputList));
 }
 
 void BasePlayer::InitAI()
@@ -236,8 +241,8 @@ BasePlayer::~BasePlayer()
 	SAFE_DELETE(m_pDefaultObj);
 	SAFE_DELETE(m_pStateMachine);
 	SAFE_DELETE(m_pStand);
-	SAFE_DELETE(m_PanelEffectMGR);
-	SAFE_DELETE(m_UVEffectMGR);
+	SAFE_DELETE(m_pPanelEffectMGR);
+	SAFE_DELETE(m_pUVEffectMGR);
 	SAFE_DELETE(m_pAI);
 	//SAFE_DELETE(m_pComboUI);
 	SAFE_DELETE(m_pHHDOFObj);
@@ -257,7 +262,7 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 	}
 	if (KeyBoardTRG(KB_J))
 	{
-		m_HP = m_MaxHP;
+		m_iHP = m_iMaxHP;
 	}
 
 	// ŠoÁ‚ÌXV
@@ -291,14 +296,14 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 	}
 	else
 	{
-		memset(m_InputList, 0, sizeof(m_InputList));
-		memset(m_CommandHistory, 0, sizeof(m_CommandHistory));
+		memset(m_iInputList, 0, sizeof(m_iInputList));
+		memset(m_wCommandHistory, 0, sizeof(m_wCommandHistory));
 	}
 
 	// šƒqƒbƒgƒXƒgƒbƒv’†
-	if (m_HitStopFrame > 0)
+	if (m_iHitStopFrame > 0)
 	{
-		m_HitStopFrame--;
+		m_iHitStopFrame--;
 
 		// šæs“ü—Íó•t(‰Ÿ‚µ‚½uŠÔ‚¾‚¯æ“¾‚É•ÏX)
 		AheadCommandUpdate();
@@ -307,8 +312,8 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 	else
 	{
 		// šd’¼ŠÔ‚ÌƒfƒNƒŠƒƒ“ƒg
-		if (m_RecoveryFlame > 0)
-			m_RecoveryFlame--;
+		if (m_iRecoveryFrame > 0)
+			m_iRecoveryFrame--;
 
 		// ƒAƒNƒVƒ‡ƒ“ƒtƒŒ[ƒ€‚ÌXV
 		if (isFrameAction())
@@ -317,12 +322,12 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 			if (m_ActionDatas[(int)m_ActionState].isAttackData())
 			{
 				// ¡‚ÌŒo‰ßŠÔ‚ÆƒfƒBƒŒƒCƒtƒŒ[ƒ€‚É‚È‚Á‚½‚ç
-				if (m_ActionDatas[(int)m_ActionState].pAttackData->WhiffDelayFrame == m_CurrentActionFrame)
+				if (m_ActionDatas[(int)m_ActionState].pAttackData->WhiffDelayFrame == m_iCurrentActionFrame)
 				{
 					// (A—ñÔ)‚±‚±‚ÅUŒ‚”»’è‚ª”­“®‚µ‚½uŠÔ‚ğæ‚Á‚Ä‚«‚Ä‚é
 					
 					// U‚èƒGƒtƒFƒNƒg”­“®i‰¼jI
-					AddEffectAction(m_pos + Vector3(0, 5, -3) , m_ActionDatas[(int)m_ActionState].pAttackData->WhiffEffectType);
+					AddEffectAction(m_vPos + Vector3(0, 5, -3) , m_ActionDatas[(int)m_ActionState].pAttackData->WhiffEffectType);
 
 					LPCSTR SE_ID = m_ActionDatas[(int)m_ActionState].pAttackData->WhiffSE;
 					// ‹óU‚èSE“ü‚Á‚Ä‚½‚ç
@@ -330,6 +335,13 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 					{
 						// ƒfƒBƒŒƒCƒtƒŒ[ƒ€Œo‰ß‚µ‚½‚çÄ¶
 						se->Play((LPSTR)SE_ID);
+					}
+
+					// ”»’è•œŠˆƒtƒŒ[ƒ€
+					if (m_ActionFrameList[(int)m_ActionState][m_iCurrentActionFrame] == FRAME_STATE::RECOVERY_HIT)
+					{
+						// ”»’èƒŠƒZƒbƒg
+						GetAttackData()->bHit = GetAttackData()->bHitSuccess = false;
 					}
 				}
 
@@ -340,7 +352,7 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 				//	m_ActionFrameList[m_ActionState][m_CurrentActionFrame] == FRAME_STATE::START)
 				//	&& m_ActionDatas[(int)m_ActionState].pAttackData->bAntiAir == true	)
 				//{
-				//	m_move.y += 0.35f;
+				//	m_vMove.y += 0.35f;
 				//}
 				//else
 				//{
@@ -365,17 +377,17 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 			//		// ¡‚Ç‚Ì‹Æ‚ÌƒXƒe[ƒg‚©‚í‚©‚é
 			//		if (m_ActionDatas[(int)m_ActionState].pAttackData->bAntiAir == true)
 			//		{
-			//			m_move.y += 0.35f;
+			//			m_vMove.y += 0.35f;
 			//		}
 			//	}
 			//	
 			//}
 
 			// ƒ‚[ƒVƒ‡ƒ“‚ÌƒtƒŒ[ƒ€‚ğXVI
-			m_CurrentActionFrame++;
+			m_iCurrentActionFrame++;
 
 			// ƒtƒŒ[ƒ€ÅŒã‚Ü‚ÅÄ¶‚µ‚½‚ç
-			if (m_ActionFrameList[(int)m_ActionState][m_CurrentActionFrame] == FRAME_STATE::END)
+			if (m_ActionFrameList[(int)m_ActionState][m_iCurrentActionFrame] == FRAME_STATE::END)
 			{
 				// šƒAƒNƒVƒ‡ƒ“ƒXƒe[ƒg‰ğœ
 				m_ActionState = BASE_ACTION_STATE::NO_ACTION;
@@ -409,22 +421,22 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 			if (m_pStateMachine->isInState(*BasePlayerState::Wait::GetInstance()) || 
 				m_pStateMachine->isInState(*BasePlayerState::Intro::GetInstance()))
 			{
-				m_angleY = DIR_ANGLE[(int)m_dir];
-				m_angleY += (m_dir == DIR::LEFT) ? PI * -.1f : PI * .1f;
+				m_fAngleY = DIR_ANGLE[(int)m_dir];
+				m_fAngleY += (m_dir == DIR::LEFT) ? PI * -.1f : PI * .1f;
 			}
 
 			// Ÿ‚Á‚Ä‚éˆÈŠO‚È‚ç•â³
 			else if (!m_pStateMachine->isInState(*BasePlayerState::Win::GetInstance()))
 			{
-				m_angleY = m_angleY * AnglePercentage + DIR_ANGLE[(int)m_dir] * (1 - AnglePercentage);
+				m_fAngleY = m_fAngleY * AnglePercentage + DIR_ANGLE[(int)m_dir] * (1 - AnglePercentage);
 			}
 		}
 
 		// “ü—Íó•tŒã‚ÉƒXƒe[ƒgƒ}ƒVƒ“XV
 		if (flag != PLAYER_UPDATE::NO_FSM) m_pStateMachine->Update();
 
-		//if (m_InputList[(int)PLAYER_INPUT::LEFT] == 1) m_move.x = -2;
-		//else m_move.x = 0;
+		//if (m_InputList[(int)PLAYER_INPUT::LEFT] == 1) m_vMove.x = -2;
+		//else m_vMove.x = 0;
 
 		// ššš@‚È‚¼‚ÌƒoƒO‚Í@‚±‚±‚ğ‚Æ‚¨‚Á‚Ä‚È‚¢‚©‚ç‚¨‚±‚é
 
@@ -433,15 +445,15 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 
 		// ƒƒbƒVƒ…‚ÌXV
 		m_pObj->Animation();
-		m_pObj->SetAngle(m_angleY);	// ¶‰E‚ÌƒAƒ“ƒOƒ‹‚ÌƒZƒbƒg
-		m_pObj->SetPos(m_pos);
+		m_pObj->SetAngle(m_fAngleY);	// ¶‰E‚ÌƒAƒ“ƒOƒ‹‚ÌƒZƒbƒg
+		m_pObj->SetPos(m_vPos);
 		m_pObj->Update();
 	}
 
 
 	// ƒGƒtƒFƒNƒgƒ}ƒl[ƒWƒƒ[XV (ƒqƒbƒgƒXƒgƒbƒv–³‹)
-	m_PanelEffectMGR->Update();
-	m_UVEffectMGR->Update();
+	m_pPanelEffectMGR->Update();
+	m_pUVEffectMGR->Update();
 	
 	// ƒRƒ“ƒ{UI
 	//m_pComboUI->Update();
@@ -478,13 +490,13 @@ void BasePlayer::UpdateDrive()
 
 
 	// šd’¼ŠÔ‚ÌƒfƒNƒŠƒƒ“ƒg
-	if (m_RecoveryFlame > 0)
-		m_RecoveryFlame--;
+	if (m_iRecoveryFrame > 0)
+		m_iRecoveryFrame--;
 
 	// šƒqƒbƒgƒXƒgƒbƒv’†
-	if (m_HitStopFrame > 0)
+	if (m_iHitStopFrame > 0)
 	{
-		m_HitStopFrame--;
+		m_iHitStopFrame--;
 	}
 	// ƒqƒbƒgƒXƒgƒbƒv‚ªŒ¾‚í‚é‚Ü‚Å“®‚©‚È‚¢
 	else
@@ -496,12 +508,12 @@ void BasePlayer::UpdateDrive()
 			if (m_ActionDatas[(int)m_ActionState].isAttackData())
 			{
 				// ¡‚ÌŒo‰ßŠÔ‚ÆƒfƒBƒŒƒCƒtƒŒ[ƒ€‚É‚È‚Á‚½‚ç
-				if (m_ActionDatas[(int)m_ActionState].pAttackData->WhiffDelayFrame == m_CurrentActionFrame)
+				if (m_ActionDatas[(int)m_ActionState].pAttackData->WhiffDelayFrame == m_iCurrentActionFrame)
 				{
 					// (A—ñÔ)‚±‚±‚ÅUŒ‚”»’è‚ª”­“®‚µ‚½uŠÔ‚ğæ‚Á‚Ä‚«‚Ä‚é
 
 					// U‚èƒGƒtƒFƒNƒg”­“®i‰¼jI
-					AddEffectAction(m_pos + Vector3(0, 5, -3), m_ActionDatas[(int)m_ActionState].pAttackData->WhiffEffectType);
+					AddEffectAction(m_vPos + Vector3(0, 5, -3), m_ActionDatas[(int)m_ActionState].pAttackData->WhiffEffectType);
 
 					LPCSTR SE_ID = m_ActionDatas[(int)m_ActionState].pAttackData->WhiffSE;
 					// ‹óU‚èSE“ü‚Á‚Ä‚½‚ç
@@ -515,10 +527,10 @@ void BasePlayer::UpdateDrive()
 			}
 
 			// ƒ‚[ƒVƒ‡ƒ“‚ÌƒtƒŒ[ƒ€‚ğXVI
-			m_CurrentActionFrame++;
+			m_iCurrentActionFrame++;
 
 			// ƒtƒŒ[ƒ€ÅŒã‚Ü‚ÅÄ¶‚µ‚½‚ç
-			if (m_ActionFrameList[(int)m_ActionState][m_CurrentActionFrame] == FRAME_STATE::END)
+			if (m_ActionFrameList[(int)m_ActionState][m_iCurrentActionFrame] == FRAME_STATE::END)
 			{
 				// šƒAƒNƒVƒ‡ƒ“ƒXƒe[ƒg‰ğœ
 				m_ActionState = BASE_ACTION_STATE::NO_ACTION;
@@ -530,18 +542,18 @@ void BasePlayer::UpdateDrive()
 
 		// “®‚«‚Ì§Œä
 		//Move();
-		m_move.Set(0, 0, 0);
+		m_vMove.Set(0, 0, 0);
 
 		// ƒƒbƒVƒ…‚ÌXV
 		m_pObj->Animation();
-		m_pObj->SetAngle(m_angleY);	// (TODO)¡‚ÍŒÅ’è
-		m_pObj->SetPos(m_pos);	// Œ´“_ŒÅ’è
+		m_pObj->SetAngle(m_fAngleY);	// (TODO)¡‚ÍŒÅ’è
+		m_pObj->SetPos(m_vPos);	// Œ´“_ŒÅ’è
 		m_pObj->Update();
 	}
 
 	// ƒGƒtƒFƒNƒgƒ}ƒl[ƒWƒƒ[XV (ƒqƒbƒgƒXƒgƒbƒv–³‹)
-	m_PanelEffectMGR->Update();
-	m_UVEffectMGR->Update();
+	m_pPanelEffectMGR->Update();
+	m_pUVEffectMGR->Update();
 
 	// ƒRƒ“ƒ{UI
 	//m_pComboUI->Update();
@@ -552,24 +564,24 @@ void BasePlayer::MoveUpdate()
 {
 	if (m_bAerialDash)
 	{
-		m_move.y *= .8f;
+		m_vMove.y *= .8f;
 		if (m_iAerialDashFrame-- > 0)
 		{
 			//// ˆÚ“®
 			//if (m_dir == DIR::RIGHT)
 			//{
 			//	// ‚í‚Á‚µ‚å‚¢
-			//	m_move.Set(1.5f, 0, 0);
+			//	m_vMove.Set(1.5f, 0, 0);
 			//}
 			//else
 			//{
 			//	// ‚í‚Á‚µ‚å‚¢
-			//	m_move.Set(-1.5f, 0, 0);
+			//	m_vMove.Set(-1.5f, 0, 0);
 			//}
 		}
 		else m_bAerialDash = false;
 
-		//m_move *= 0.8f;	// Œ¸‘¬(A—ñÔ:‚±‚Ì’l‚ÍƒLƒƒƒ‰ŒÅ—L‚Ì’l)
+		//m_vMove *= 0.8f;	// Œ¸‘¬(A—ñÔ:‚±‚Ì’l‚ÍƒLƒƒƒ‰ŒÅ—L‚Ì’l)
 
 		return;
 	}
@@ -579,32 +591,32 @@ void BasePlayer::MoveUpdate()
 		m_bMoveUpdate
 		)
 	{	// ƒyƒ‹ƒ\ƒi”­“®’†‚¶‚á‚È‚©‚Á‚½‚çˆÚ“®
-		m_move.y -= c_GRAVITY;
-		//if (m_move.y <= -3.0f) { m_move.y = -3.0f; } // —‚¿‚é‘¬“x‚ğ—}§
-		m_move.y = max(-2.75f, m_move.y);// —‚¿‚é‘¬“x‚ğ—}§
+		m_vMove.y -= c_GRAVITY;
+		//if (m_vMove.y <= -3.0f) { m_vMove.y = -3.0f; } // —‚¿‚é‘¬“x‚ğ—}§
+		m_vMove.y = max(-2.75f, m_vMove.y);// —‚¿‚é‘¬“x‚ğ—}§
 
 		// ‹ó‹C’ïR(x‚Ì’l‚ğ™X‚ÉŒ¸‚ç‚µ‚Ä‚¢‚­)
 		if (m_bLand)
 		{
-			//if (m_move.x > 0)		m_move.x = max(m_move.x - .055f, 0);
-			//else if (m_move.x < 0)	m_move.x = min(m_move.x + .055f, 0);
-			m_move.x *= 0.92f;	// Œ¸‘¬(A—ñÔ:‚±‚Ì’l‚ÍƒLƒƒƒ‰ŒÅ—L‚Ì’l)
+			//if (m_vMove.x > 0)		m_vMove.x = max(m_vMove.x - .055f, 0);
+			//else if (m_vMove.x < 0)	m_vMove.x = min(m_vMove.x + .055f, 0);
+			m_vMove.x *= 0.92f;	// Œ¸‘¬(A—ñÔ:‚±‚Ì’l‚ÍƒLƒƒƒ‰ŒÅ—L‚Ì’l)
 		}
 		else
 		{
-			//if (m_move.x > 0)		m_move.x = max(m_move.x - .035f, 0);
-			//else if (m_move.x < 0)	m_move.x = min(m_move.x + .035f, 0);
-			//m_move.x *= 0.98f;	// Œ¸‘¬(A—ñÔ:‚±‚Ì’l‚ÍƒLƒƒƒ‰ŒÅ—L‚Ì’l)
+			//if (m_vMove.x > 0)		m_vMove.x = max(m_vMove.x - .035f, 0);
+			//else if (m_vMove.x < 0)	m_vMove.x = min(m_vMove.x + .035f, 0);
+			//m_vMove.x *= 0.98f;	// Œ¸‘¬(A—ñÔ:‚±‚Ì’l‚ÍƒLƒƒƒ‰ŒÅ—L‚Ì’l)
 		}
 
 		// ¶‰E‚ÌMove’l
-		//m_move.x = Math::Clamp(m_move.x, -m_maxSpeed, m_maxSpeed);
+		//m_vMove.x = Math::Clamp(m_vMove.x, -m_maxSpeed, m_maxSpeed);
 	}
 
 	// ƒyƒ‹ƒ\ƒi”­“®’†ˆÚ“®
 	else
 	{
-		m_move *= 0.8f;	// Œ¸‘¬(A—ñÔ:‚±‚Ì’l‚ÍƒLƒƒƒ‰ŒÅ—L‚Ì’l)
+		m_vMove *= 0.8f;	// Œ¸‘¬(A—ñÔ:‚±‚Ì’l‚ÍƒLƒƒƒ‰ŒÅ—L‚Ì’l)
 	}
 
 }
@@ -619,17 +631,17 @@ void BasePlayer::InvincibleUpdate()
 	};
 
 	// –³“GŠÔ‚ÌXV
-	if (m_InvincibleTime > 0)
+	if (m_iInvincibleTime > 0)
 	{
 		//m_InvincibleLV = (--m_InvincibleTime <= 0) ? 0 : m_InvincibleLV;
-		m_InvincibleTime--;
+		m_iInvincibleTime--;
 
 		
-		m_InvincibleColRateFlame++;
-		m_InvincibleColRateFlame = m_InvincibleColRateFlame % FLASH_SPEED;
+		m_iInvincibleColRateFlame++;
+		m_iInvincibleColRateFlame = m_iInvincibleColRateFlame % FLASH_SPEED;
 		
 		// ã‚°‰º‚°‚Ìƒtƒ‰ƒOØ‚è‘Ö‚¦
-		if (m_InvincibleColRateFlame == 0)
+		if (m_iInvincibleColRateFlame == 0)
 		{
 			m_bInvincibleColRateUpFlag = (m_bInvincibleColRateUpFlag == false) ? true : false;
 		}
@@ -637,27 +649,27 @@ void BasePlayer::InvincibleUpdate()
 		// ã‚°ƒtƒ‰ƒO‚ªON‚È‚ç‚¾‚ñ‚¾‚ñ”’‚­
 		if (m_bInvincibleColRateUpFlag == false)
 		{
-			m_InvincibleColRate = ((float)(m_InvincibleColRateFlame) / FLASH_SPEED);
+			m_fInvincibleColRate = ((float)(m_iInvincibleColRateFlame) / FLASH_SPEED);
 		}
 		else
 		{
-			m_InvincibleColRate = 1.0f - ((float)(m_InvincibleColRateFlame) / FLASH_SPEED);
+			m_fInvincibleColRate = 1.0f - ((float)(m_iInvincibleColRateFlame) / FLASH_SPEED);
 		}
 	
 
 		// š@F‚Ì’²® (‚±‚±‚ÍƒZƒ“ƒX‚Ì–â‘è)
-		m_InvincibleColRate *= 0.25f;	// ‚¿‚å‚Á‚Æ”–‚­
-		m_InvincibleColRate += 0.1f;    // ‚¯‚Ç“_–Å‚ª‚È‚¢ó‘Ô‚Å‚à”’‚Á‚Û‚¢
+		m_fInvincibleColRate *= 0.25f;	// ‚¿‚å‚Á‚Æ”–‚­
+		m_fInvincibleColRate += 0.1f;    // ‚¯‚Ç“_–Å‚ª‚È‚¢ó‘Ô‚Å‚à”’‚Á‚Û‚¢
 
 	}
 	else
 	{
 		// ƒ^ƒCƒ€‚ª0ˆÈ‰º‚É’B‚µ‚½‚ç‚¨‚µ‚Ü‚¢@‰Šú‰»
-		m_InvincibleLV = 0;
-		m_InvincibleTime = 0;
+		m_iInvincibleLV = 0;
+		m_iInvincibleTime = 0;
 
-		m_InvincibleColRate = 0.0f;
-		m_InvincibleColRateFlame = 0;
+		m_fInvincibleColRate = 0.0f;
+		m_iInvincibleColRateFlame = 0;
 		m_bInvincibleColRateUpFlag = false;
 		
 	}
@@ -741,22 +753,22 @@ void BasePlayer::Control()
 	// 0ƒtƒŒ[ƒ€–Ú‚ÉƒRƒ}ƒ“ƒhƒtƒ‰ƒO‚ğ“ü‚ê‚é‚Ì‚ÅA‚»‚ê‚Ì‘O‚ÉƒRƒ}ƒ“ƒhƒrƒbƒgƒŠƒXƒg‚ğã‚É‰Ÿ‚µã‚°‚é
 
 	// ‚Ü‚¸A“ü‚ê‚é‘O‚Ì‚â‚Â‚ğ•Û‘¶
-	WORD temp(m_CommandHistory[0]);
+	WORD temp(m_wCommandHistory[0]);
 
 	for (int i = 1; i < c_COMMAND_FRAME_MAX; i++)
 	{
 		// ŒJ‚è‰º‚°ˆ—
 		//for (int i2 = i + 1; i2 < c_COMMAND_FRAME_MAX; i2++)
 		{
-			WORD save(m_CommandHistory[i]);
-			m_CommandHistory[i] = temp;
+			WORD save(m_wCommandHistory[i]);
+			m_wCommandHistory[i] = temp;
 
 			temp = save;
 		}
 	}
 
 	// Å‰neutral‚É–ß‚·(š0ƒtƒŒ[ƒ€–Ú‚©‚ç)
-	m_CommandHistory[0] &= 0;
+	m_wCommandHistory[0] &= 0;
 
 
 	// ƒL[ƒ{[ƒh•\
@@ -804,35 +816,35 @@ void BasePlayer::Control()
 	// ‰Ÿ‚µ‚½ƒL[”»’è
 	for (int i = 0; i < (int)PLAYER_INPUT::MAX; i++)
 	{
-		m_InputList[i] = tdnInput::KeyGet(KeyCodeList[i], m_deviceID);
+		m_iInputList[i] = tdnInput::KeyGet(KeyCodeList[i], m_iDeviceID);
 
 		// ‰Ÿ‚µ‚Ä‚½‚çI
-		if (m_InputList[i] & 0x01)
+		if (m_iInputList[i] & 0x01)
 		{
-			m_CommandHistory[0] |= (int)BitList[i];
+			m_wCommandHistory[0] |= (int)BitList[i];
 		}
 	}
 
 	// ƒXƒeƒBƒbƒN‚Ìæ“¾
 	float x, y;
-	tdnInput::GetAxisXYf(&x, &y, m_deviceID);
+	tdnInput::GetAxisXYf(&x, &y, m_iDeviceID);
 	
 	static const float gosa(.2f);
 	if (x > .5f - gosa)
 	{
-		m_CommandHistory[0] |= (int)PLAYER_COMMAND_BIT::RIGHT;
+		m_wCommandHistory[0] |= (int)PLAYER_COMMAND_BIT::RIGHT;
 	}
 	else if (x < -.5f + gosa)
 	{
-		m_CommandHistory[0] |= (int)PLAYER_COMMAND_BIT::LEFT;
+		m_wCommandHistory[0] |= (int)PLAYER_COMMAND_BIT::LEFT;
 	}
 	if (y > .5f - gosa)
 	{
-		m_CommandHistory[0] |= (int)PLAYER_COMMAND_BIT::DOWN;
+		m_wCommandHistory[0] |= (int)PLAYER_COMMAND_BIT::DOWN;
 	}
 	else if (y < -.5f + gosa)
 	{
-		m_CommandHistory[0] |= (int)PLAYER_COMMAND_BIT::UP;
+		m_wCommandHistory[0] |= (int)PLAYER_COMMAND_BIT::UP;
 	}
 }
 
@@ -864,12 +876,12 @@ void BasePlayer::AIControl()
 void BasePlayer::UpdatePos()
 {
 	// (TODO)ƒqƒbƒgƒXƒgƒbƒv‚µ‚Ä‚È‚©‚Á‚½‚ç
-	if (m_HitStopFrame <= 0)
+	if (m_iHitStopFrame <= 0)
 	{
 		//if (m_pStateMachine->isInState(*BasePlayerState::StandAction::GetInstance()) == false)// ƒyƒ‹ƒ\ƒi”­“®’†‚¶‚á‚È‚©‚Á‚½‚çˆÚ“®
 		{
 			// À•WXV
-			m_pos += m_move;
+			m_vPos += m_vMove;
 		}
 	}
 }
@@ -881,7 +893,7 @@ void BasePlayer::Render()
 	m_pStand->Render(shaderM, "Persona");
 
 	// –³“G‚Ì”’Fƒ`ƒJƒ`ƒJƒŒ[ƒg‚ğ‘—‚é
-	shaderM->SetValue("g_InvincibleColRate", m_InvincibleColRate);
+	shaderM->SetValue("g_InvincibleColRate", m_fInvincibleColRate);
 
 	// –³“G‹Z‚ÌƒIƒŒƒ“ƒWF‚ğ‘—‚é
 	shaderM->SetValue("g_OrangeColRate", m_fOrangeColRate);
@@ -900,10 +912,10 @@ void BasePlayer::Render()
 	m_pObj->Render(shaderM, "PlayerToon");
 
 	// –³“G‚È‚ç‰ÁZ‚Åd‚Ë‚Ä•`‰æ
-	if (m_InvincibleTime > 0) m_pObj->Render(RS::ADD);
+	if (m_iInvincibleTime > 0) m_pObj->Render(RS::ADD);
 
 	// ‚±‚±‚ÅŒ»İ‚ÌƒXƒe[ƒgƒ}ƒVƒ“‚Ìó‘Ô‚ğŠm”F
-	if (m_deviceID == 0)
+	if (m_iDeviceID == 0)
 	{
 		//tdnText::Draw(30, 320, 0xffffffff, "ƒtƒŒ[ƒ€:%d", m_CurrentActionFrame);
 		//m_pStateMachine->Render();// ƒXƒe[ƒgƒ}ƒVƒ“‚Å‚Ì•`‰æ
@@ -916,13 +928,13 @@ void BasePlayer::Render()
 
 
 	// ƒGƒtƒFƒNƒgƒ}ƒl[ƒWƒƒ[•`‰æ
-	m_PanelEffectMGR->Render3D();
-	m_UVEffectMGR->Render();
-	m_PanelEffectMGR->Render();
+	m_pPanelEffectMGR->Render3D();
+	m_pUVEffectMGR->Render();
+	m_pPanelEffectMGR->Render();
 
 #ifdef _DEBUG
 	// ‚±‚±‚ÅŒ»İ‚ÌƒXƒe[ƒgƒ}ƒVƒ“‚Ìó‘Ô‚ğŠm”F
-	if (m_deviceID == 0)
+	if (m_iDeviceID == 0)
 	{
 		m_pStateMachine->Render();// ƒXƒe[ƒgƒ}ƒVƒ“‚Å‚Ì•`‰æ
 
@@ -938,55 +950,55 @@ void BasePlayer::Render()
 		char *c	= "";
 
 
-		if (m_CommandHistory[i] & (int)PLAYER_COMMAND_BIT::LEFT)
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::LEFT)
 		{
 			c = "©";
 		}
-		if (m_CommandHistory[i] & (int)PLAYER_COMMAND_BIT::RIGHT)
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::RIGHT)
 		{
 			c = "¨";
 		}
-		if (m_CommandHistory[i] & (int)PLAYER_COMMAND_BIT::UP)
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::UP)
 		{
 			c = "ª";
 		}
-		if (m_CommandHistory[i] & (int)PLAYER_COMMAND_BIT::DOWN)
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::DOWN)
 		{
 			c = "«";
 		}
-		if (m_CommandHistory[i] & ((int)PLAYER_COMMAND_BIT::LEFT) &&
-			m_CommandHistory[i] & ((int)PLAYER_COMMAND_BIT::UP))
+		if (m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::LEFT) &&
+			m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::UP))
 		{
 			c = "„¬";
 		}
-		if (m_CommandHistory[i] & ((int)PLAYER_COMMAND_BIT::RIGHT) &&
-			m_CommandHistory[i] & ((int)PLAYER_COMMAND_BIT::UP))
+		if (m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::RIGHT) &&
+			m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::UP))
 		{
 			c = "„­";
 		}
-		if (m_CommandHistory[i] & ((int)PLAYER_COMMAND_BIT::LEFT) &&
-			m_CommandHistory[i] & ((int)PLAYER_COMMAND_BIT::DOWN))
+		if (m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::LEFT) &&
+			m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::DOWN))
 		{
 			c = "„¯";
 		}
-		if (m_CommandHistory[i] & ((int)PLAYER_COMMAND_BIT::RIGHT) &&
-			m_CommandHistory[i] & ((int)PLAYER_COMMAND_BIT::DOWN))
+		if (m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::RIGHT) &&
+			m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::DOWN))
 		{
 			c = "„®";
 		}
-		if (m_CommandHistory[i] & (int)PLAYER_COMMAND_BIT::A)
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::A)
 		{
 			c = "~";
 		}
-		if (m_CommandHistory[i] & (int)PLAYER_COMMAND_BIT::B)
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::B)
 		{
 			c = "›";
 		}
-		if (m_CommandHistory[i] & (int)PLAYER_COMMAND_BIT::C)
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::C)
 		{
 			c = " ";
 		}
-		if (m_CommandHistory[i] & (int)PLAYER_COMMAND_BIT::D)
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::D)
 		{
 			c = "¢";
 		}
@@ -1063,7 +1075,7 @@ void BasePlayer::Render()
 	CollisionShape::Square square;
 
 	memcpy_s(&square, sizeof(CollisionShape::Square), m_pHitSquare, sizeof(CollisionShape::Square));
-	square.pos += m_pos;
+	square.pos += m_vPos;
 
 	Vector3 wv[3];	// ƒ[ƒ‹ƒhƒo[ƒeƒbƒNƒX
 	wv[0].Set(square.pos.x - square.width, square.pos.y + square.height, 0);
@@ -1082,7 +1094,7 @@ void BasePlayer::Render()
 		{
 			memcpy_s(&square, sizeof(CollisionShape::Square), GetAttackData()->pCollisionShape, sizeof(CollisionShape::Square));
 			if (m_dir == DIR::LEFT) square.pos.x *= -1;	// ‚±‚Ìpos‚Íâ‘Î+(‰E)‚È‚Ì‚ÅA¶Œü‚«‚È‚ç‹t‚É‚·‚é
-			square.pos += m_pos;
+			square.pos += m_vPos;
 
 			wv[0].Set(square.pos.x - square.width, square.pos.y + square.height, 0);
 			wv[1].Set(square.pos.x + square.width, square.pos.y + square.height, 0);
@@ -1107,7 +1119,7 @@ void BasePlayer::Render()
 	//tdnText::Draw(32 + m_deviceID * 250, 460, 0xffff8000, "ODc‚èŠÔ: %d", m_OverDriveFrame);
 
 
-	Vector2 pos2d = Math::WorldToScreen(m_pos);
+	Vector2 pos2d = Math::WorldToScreen(m_vPos);
 	
 	//if (m_deviceID == 1 || m_deviceID == 2)
 	{
@@ -1131,9 +1143,9 @@ void BasePlayer::Render(tdnShader* shader, char* name)
 
 	m_pObj->Render(shader, name);
 	// –³“G‚È‚ç‰ÁZ‚Åd‚Ë‚Ä•`‰æ
-	if (m_InvincibleTime > 0) m_pObj->Render(RS::ADD);
+	if (m_iInvincibleTime > 0) m_pObj->Render(RS::ADD);
 
-	if (m_deviceID == 3)
+	if (m_iDeviceID == 3)
 	{
 		m_pStateMachine->Render();// ƒXƒe[ƒgƒ}ƒVƒ“‚Å‚Ì•`‰æ
 		m_pAI->GetFSM()->Render();// AIƒXƒe[ƒgƒ}ƒVƒ“‚Å‚Ì•`‰æ
@@ -1141,15 +1153,15 @@ void BasePlayer::Render(tdnShader* shader, char* name)
 	
 
 	// ƒGƒtƒFƒNƒgƒ}ƒl[ƒWƒƒ[•`‰æ
-	m_PanelEffectMGR->Render3D();
-	m_UVEffectMGR->Render();
+	m_pPanelEffectMGR->Render3D();
+	m_pUVEffectMGR->Render();
 
 #ifdef _DEBUG
 	// ”»’è‚Ì•`‰æ
 	CollisionShape::Square square;
 
 	memcpy_s(&square, sizeof(CollisionShape::Square), m_pHitSquare, sizeof(CollisionShape::Square));
-	square.pos += m_pos;
+	square.pos += m_vPos;
 
 	Vector3 wv[3];	// ƒ[ƒ‹ƒhƒo[ƒeƒbƒNƒX
 	wv[0].Set(square.pos.x - square.width, square.pos.y + square.height, 0);
@@ -1168,7 +1180,7 @@ void BasePlayer::Render(tdnShader* shader, char* name)
 		{
 			memcpy_s(&square, sizeof(CollisionShape::Square), GetAttackData()->pCollisionShape, sizeof(CollisionShape::Square));
 			if (m_dir == DIR::LEFT) square.pos.x *= -1;	// ‚±‚Ìpos‚Íâ‘Î+(‰E)‚È‚Ì‚ÅA¶Œü‚«‚È‚ç‹t‚É‚·‚é
-			square.pos += m_pos;
+			square.pos += m_vPos;
 
 			wv[0].Set(square.pos.x - square.width, square.pos.y + square.height, 0);
 			wv[1].Set(square.pos.x + square.width, square.pos.y + square.height, 0);
@@ -1202,8 +1214,8 @@ void BasePlayer::RenderDrive()
 	m_pObj->Render();
 
 	// ƒGƒtƒFƒNƒgƒ}ƒl[ƒWƒƒ[•`‰æ
-	m_PanelEffectMGR->Render3D();
-	m_UVEffectMGR->Render();
+	m_pPanelEffectMGR->Render3D();
+	m_pUVEffectMGR->Render();
 
 	// ƒXƒs[ƒhƒ‰ƒCƒ“‚Ì•`‰æ
 	m_pSpeedLine->Render();
@@ -1253,29 +1265,29 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 	case EFFECT_TYPE::DAMAGE:
 	{
 		//m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::BURN);
-		m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::HIT);
-		m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::DAMAGE);
+		m_pPanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::HIT);
+		m_pPanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::DAMAGE);
 
 		// ‘Šè‚ÌMove’ll—¶
-		float z = atan2(-m_move.x, m_move.y);
+		float z = atan2(-m_vMove.x, m_vMove.y);
 		//m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::WAVE, 1, 1, Vector3(0, supportAngleY, z), Vector3(0, supportAngleY, z));
 
 		// ŠÑ’Ê”g
-		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::HIT_IMPACT,
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::HIT_IMPACT,
 			1, 2, Vector3(0, 0, z), Vector3(0, 0, z));
 
 		// ƒqƒbƒgƒŠƒ“ƒO
-		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::HIT_RING, 2, 3, Vector3(0, supportAngleY, z), Vector3(0, supportAngleY, z));
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::HIT_RING, 2, 3, Vector3(0, supportAngleY, z), Vector3(0, supportAngleY, z));
 
 		// 
 		PointLightMgr->AddPointLight(pos + Vector3(0, 5, 0), Vector3(1.4f, 0.8f, 0.0f), 20, 4, 20, 4, 15);// ƒ|ƒCƒ“ƒgƒ‰ƒCƒgƒGƒtƒFƒNƒgI
-		Vector3 FlyVector(m_move);
+		Vector3 FlyVector(m_vMove);
 		FlyVector.Normalize();
 		ParticleManager::EffectHit(pos, FlyVector);
 
 		
 		// ƒuƒ‰\ƒGƒtƒFƒNƒg
-		DeferredManagerEx.SetRadialBlur(m_pos, 3.25f);
+		DeferredManagerEx.SetRadialBlur(m_vPos, 3.25f);
 
 	}
 		break;
@@ -1295,27 +1307,27 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 
 	}	break;
 	case EFFECT_TYPE::RECOVERY:
-		m_PanelEffectMGR->AddEffect(pos + Vector3(0, 5, 0), PANEL_EFFECT_TYPE::ClEAR);
+		m_pPanelEffectMGR->AddEffect(pos + Vector3(0, 5, 0), PANEL_EFFECT_TYPE::ClEAR);
 
 
 		break;
 	case EFFECT_TYPE::PERSONA:
-		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::PERSONA,
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::PERSONA,
 			1, 2.0f, Vector3(0, diaAngle, 0), Vector3(0, diaAngle, 0));
 		ParticleManager::EffectPersonaTrigger(pos);
 		PointLightMgr->AddPointLight(pos + Vector3(0, 3, 0), Vector3(0, .4f, 2.0f), 50, 4, 40, 10, 30);// ƒ|ƒCƒ“ƒgƒ‰ƒCƒgƒGƒtƒFƒNƒgI
 
 		break;
 	case EFFECT_TYPE::DROP_IMPACT:
-		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::IMPACT,
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::IMPACT,
 			1.0f, 1.35f, Vector3(0, 0, 0), Vector3(0, 0, 0));
 
-		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::SHOCK_WAVE,
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::SHOCK_WAVE,
 			1.0f, 1.55f, Vector3(0, 0, 0), Vector3(0, 0, 0));
 
 		break;
 	case EFFECT_TYPE::UPPER:
-		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::UPPER,
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::UPPER,
 			1.0f, 1.0f, Vector3(0, diaAngle, 0), Vector3(0, diaAngle, 0));
 
 		break;
@@ -1325,89 +1337,89 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 
 		break;
 	case EFFECT_TYPE::BURST:
-		m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::BURST);
+		m_pPanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::BURST);
 
 		break;
 	case EFFECT_TYPE::ONEMORE_BURST:
-		m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::ONEMORE_BURST);
+		m_pPanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::ONEMORE_BURST);
 
 		break;
 	case EFFECT_TYPE::ONEMORE_BURST_START:
 
-		m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::BURST_PREV);
+		m_pPanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::BURST_PREV);
 
 		//m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::BURST_BALL, 0.9, 0.75
 		//		, Vector3(0, 0, 0), Vector3(0, 0, 0));
 
-		m_UVEffectMGR->AddEffect(pos + convAddPos, UV_EFFECT_TYPE::CONV, 1.5f, 1.5f
+		m_pUVEffectMGR->AddEffect(pos + convAddPos, UV_EFFECT_TYPE::CONV, 1.5f, 1.5f
 			, Vector3(0, 0, 0), Vector3(0, 0, 0));
-		m_UVEffectMGR->AddEffect(pos + convAddPos + Vector3(0, -5, 0), UV_EFFECT_TYPE::CONV2, 1.5f, 1.5f
+		m_pUVEffectMGR->AddEffect(pos + convAddPos + Vector3(0, -5, 0), UV_EFFECT_TYPE::CONV2, 1.5f, 1.5f
 			, Vector3(0, 0, 0), Vector3(0, 0, 0), 4);
-		m_UVEffectMGR->AddEffect(pos + convAddPos + Vector3(-0.5, -7, 0), UV_EFFECT_TYPE::CONV3, 1.5f, 1.5f
+		m_pUVEffectMGR->AddEffect(pos + convAddPos + Vector3(-0.5, -7, 0), UV_EFFECT_TYPE::CONV3, 1.5f, 1.5f
 			, Vector3(0, 0, 0), Vector3(0, 0, 0), 8);
-		m_UVEffectMGR->AddEffect(pos + convAddPos, UV_EFFECT_TYPE::CONV4, 1.5f, 1.5f
+		m_pUVEffectMGR->AddEffect(pos + convAddPos, UV_EFFECT_TYPE::CONV4, 1.5f, 1.5f
 			, Vector3(0, 0, 0), Vector3(0, 0, 0), 12);
 		break;
 	case EFFECT_TYPE::RUN:
-		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::RUN,
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::RUN,
 			0.8f, 1.0f, Vector3(0, diaAngle, 0), Vector3(0, diaAngle, 0));
-		ParticleManager::EffectRunSmoke(m_pos, (m_dir != DIR::LEFT));
+		ParticleManager::EffectRunSmoke(m_vPos, (m_dir != DIR::LEFT));
 
 		break;
 	case EFFECT_TYPE::GUARD_BREAK:
-		m_PanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::GLASS);
+		m_pPanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::GLASS);
 
 		break;
 	case EFFECT_TYPE::AIROU_DRILL:
 	{
 									 int delayTimer = 15;// `•b’x‰„
-									 m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::AIROU_DRILL,
+									 m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::AIROU_DRILL,
 										 1.0f, 1.0f, Vector3(0, diaAngle, 0), Vector3(0, diaAngle, 0), delayTimer);
 
 	}	break;
 	case EFFECT_TYPE::AIROU_CIRCLE:
 	{
 									  int delayTimer = 0;// `•b’x‰„
-									  m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::AIROU_CIRCLE,
+									  m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::AIROU_CIRCLE,
 										  3.0f, 5.0f, Vector3(0, diaAngle, 0), Vector3(0, diaAngle, -3), delayTimer);
 
 	}	break;
 	case EFFECT_TYPE::GUARD_WAVE:
 	{
 									// ‘Šè‚ÌMove’ll—¶
-									float z = atan2(-m_move.x, m_move.y);
+									float z = atan2(-m_vMove.x, m_vMove.y);
 
 									// ƒK[ƒhƒEƒF\ƒu
-									m_UVEffectMGR->AddMultipleEffect(pos, UV_EFFECT_MULTIPLE_TYPE::GUARD_WAVE, 0.5f, 0.5f, Vector3(0, -supportAngleY*1.5f, z), Vector3(0, -supportAngleY*1.5f, z));
-									m_UVEffectMGR->AddMultipleEffect(pos, UV_EFFECT_MULTIPLE_TYPE::GUARD_GRID, 0.2f, 0.5f, Vector3(0, -supportAngleY*1.5f, z), Vector3(0, -supportAngleY*1.5f, z));
+									m_pUVEffectMGR->AddMultipleEffect(pos, UV_EFFECT_MULTIPLE_TYPE::GUARD_WAVE, 0.5f, 0.5f, Vector3(0, -supportAngleY*1.5f, z), Vector3(0, -supportAngleY*1.5f, z));
+									m_pUVEffectMGR->AddMultipleEffect(pos, UV_EFFECT_MULTIPLE_TYPE::GUARD_GRID, 0.2f, 0.5f, Vector3(0, -supportAngleY*1.5f, z), Vector3(0, -supportAngleY*1.5f, z));
 
 	}	break;
 	case EFFECT_TYPE::MULTIPLE_HIT:
 	{
 		// ƒqƒbƒgƒŠƒbƒv
 		float ram = tdnRandom::Get(-1.57f, 1.57f);
-		m_UVEffectMGR->AddMultipleEffect(pos, UV_EFFECT_MULTIPLE_TYPE::HIT_RIP, 1.0f, 2.0f, Vector3(ram, -supportAngleY*1.5f, 0), Vector3(ram, -supportAngleY*1.5f, 0));
+		m_pUVEffectMGR->AddMultipleEffect(pos, UV_EFFECT_MULTIPLE_TYPE::HIT_RIP, 1.0f, 2.0f, Vector3(ram, -supportAngleY*1.5f, 0), Vector3(ram, -supportAngleY*1.5f, 0));
 		
 		float slashRam = tdnRandom::Get(-3.14f, 3.14f);
-		m_UVEffectMGR->AddMultipleEffect(pos + Vector3(0, 0, -5) , UV_EFFECT_MULTIPLE_TYPE::HIT_SLASH, 2.0f, 4.0f, Vector3(0, 0, slashRam), Vector3(0, 0, slashRam));
+		m_pUVEffectMGR->AddMultipleEffect(pos + Vector3(0, 0, -5) , UV_EFFECT_MULTIPLE_TYPE::HIT_SLASH, 2.0f, 4.0f, Vector3(0, 0, slashRam), Vector3(0, 0, slashRam));
 
 		// ƒuƒ‰\ƒGƒtƒFƒNƒg
-		DeferredManagerEx.SetRadialBlur(m_pos, 2.55f);
+		DeferredManagerEx.SetRadialBlur(m_vPos, 2.55f);
 
 	}	break;
 	case EFFECT_TYPE::OVER_DRIVE_ACTION:
 	{
 
-		m_PanelEffectMGR->AddEffect
+		m_pPanelEffectMGR->AddEffect
 			(pos, PANEL_EFFECT_TYPE::OVER_DRIVE_START);
 
 		// OVER_DRIVE_RING
-		m_PanelEffectMGR->AddEffect
+		m_pPanelEffectMGR->AddEffect
 			(pos, PANEL_EFFECT_TYPE::OVER_DRIVE, 7);
 
 		// OVER_DRIVE_RING
 		float ram = tdnRandom::Get(-1.57f, 1.57f);
-		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::OVER_DRIVE_RING, 0.5f, 3.5f,
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::OVER_DRIVE_RING, 0.5f, 3.5f,
 			Vector3(ram, -supportAngleY*1.5f, 0),
 			Vector3(ram, -supportAngleY*1.5f, 0), 7);
 
@@ -1415,40 +1427,40 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 	case EFFECT_TYPE::JUMP:
 	{
 		// ƒWƒƒƒ“ƒvƒGƒtƒFƒNƒg
-		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::JUMP_WAVE, 0.25f, 0.5f, Vector3(0, 0, 0), Vector3(0, 0, 0));
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::JUMP_WAVE, 0.25f, 0.5f, Vector3(0, 0, 0), Vector3(0, 0, 0));
 		// ƒWƒƒƒ“ƒvƒGƒtƒFƒNƒgü
 		// ‘Šè‚ÌMove’ll—¶
-		float z = atan2(-m_move.x, m_move.y);
-		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::JUMP_SPEED_LINE, 0.5f, 0.35f, Vector3(0, 0, z), Vector3(0, 0, z));
+		float z = atan2(-m_vMove.x, m_vMove.y);
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::JUMP_SPEED_LINE, 0.5f, 0.35f, Vector3(0, 0, z), Vector3(0, 0, z));
 
 
 	}	break;
 	case EFFECT_TYPE::AERIAL_JUMP:
 	{
 
-		float diaAngle = (m_move.x >= 0) ? PI / 2 : -PI / 2;
+		float diaAngle = (m_vMove.x >= 0) ? PI / 2 : -PI / 2;
 
 		// ƒWƒƒƒ“ƒvƒGƒtƒFƒNƒg
-		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::JUMP_WAVE, 0.25f, 0.5f, Vector3(0, 0, diaAngle), Vector3(0, 0, diaAngle));
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::JUMP_WAVE, 0.25f, 0.5f, Vector3(0, 0, diaAngle), Vector3(0, 0, diaAngle));
 		// ƒWƒƒƒ“ƒvƒGƒtƒFƒNƒgü
 		// ‘Šè‚ÌMove’ll—¶
-		//float z = atan2(-m_move.x, m_move.y);
-		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::JUMP_SPEED_LINE, 0.5f, 0.35f, Vector3(0, 0, diaAngle), Vector3(0, 0, diaAngle));
+		//float z = atan2(-m_vMove.x, m_vMove.y);
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::JUMP_SPEED_LINE, 0.5f, 0.35f, Vector3(0, 0, diaAngle), Vector3(0, 0, diaAngle));
 
 
 	}	break;
 	case EFFECT_TYPE::INVINCIBLE_ATTACK:
 	{
 		// ƒvƒŒƒbƒVƒƒ[
-		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::PRESSURE, 0.5f, 1.0f, Vector3(0, 0, 0), Vector3(0, 0, 0));
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::PRESSURE, 0.5f, 1.0f, Vector3(0, 0, 0), Vector3(0, 0, 0));
 	
 		// ƒIƒŒƒ“ƒW‚ÌŒõ
-		m_PanelEffectMGR->AddEffect
+		m_pPanelEffectMGR->AddEffect
 			(pos + Vector3(0, 10, -4) , PANEL_EFFECT_TYPE::ORANGE_LOGHT, 0);
 
 		// ƒIƒŒƒ“ƒW‚ÌƒŠƒ“ƒO
 		float ram = tdnRandom::Get(-1.57f, 1.57f);
-		m_UVEffectMGR->AddEffect(pos + Vector3(0, 10, -2), UV_EFFECT_TYPE::ORANGE_BURST, 0.1f, 1.75f,
+		m_pUVEffectMGR->AddEffect(pos + Vector3(0, 10, -2), UV_EFFECT_TYPE::ORANGE_BURST, 0.1f, 1.75f,
 			Vector3(ram, -supportAngleY*1.5f, 0),
 			Vector3(ram, -supportAngleY*1.5f, 0), 0);
 
@@ -1458,10 +1470,10 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 	case EFFECT_TYPE::DOKKOI:
 	{
 		// ƒvƒŒƒbƒVƒƒ[
-		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::PRESSURE, 0.5f, 1.0f, Vector3(0, 0, 0), Vector3(0, 0, 0));
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::PRESSURE, 0.5f, 1.0f, Vector3(0, 0, 0), Vector3(0, 0, 0));
 
 		// ‚Ç‚Á‚±‚¢‚ÌŒõ
-		m_PanelEffectMGR->AddEffect
+		m_pPanelEffectMGR->AddEffect
 			(pos + Vector3(0, 8, -2), PANEL_EFFECT_TYPE::DOKKOI, 0);
 
 		// ƒLƒƒƒ‰ƒNƒ^[©‘Ì‚ğƒ}ƒ[ƒ“ƒ^‚É
@@ -1471,7 +1483,7 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 	case EFFECT_TYPE::MUZZLE_FLASH:
 	{
 		// ƒ}ƒYƒ‹ƒtƒ‰ƒbƒVƒ…
-		m_UVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::MUZZLE_FLASH, 0.90f, 1.0f, Vector3(0, 0, zAngle), Vector3(0, 0, zAngle));
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::MUZZLE_FLASH, 0.90f, 1.0f, Vector3(0, 0, zAngle), Vector3(0, 0, zAngle));
 
 		// ”ò‚ÑU‚éŒõ
 		//m_PanelEffectMGR->AddEffect
@@ -1489,21 +1501,21 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 void BasePlayer::GuardEffectAction()
 {
 	// ƒK[ƒhƒGƒtƒFƒNƒg”­“®
-	m_UVEffectMGR->AddEffectRoop(GetCenterPos(), UV_EFFECT_TYPE::GUARD);
+	m_pUVEffectMGR->AddEffectRoop(GetCenterPos(), UV_EFFECT_TYPE::GUARD);
 
-	m_PanelEffectMGR->AddEffect(GetCenterPos()+Vector3(0,0,-5), PANEL_EFFECT_TYPE::GUARD);
+	m_pPanelEffectMGR->AddEffect(GetCenterPos()+Vector3(0,0,-5), PANEL_EFFECT_TYPE::GUARD);
 
 }
 
 void BasePlayer::GuardEffectStop()
 {
 	// ƒK[ƒhƒGƒtƒFƒNƒgI—¹
-	m_UVEffectMGR->StopEffectRoop(UV_EFFECT_TYPE::GUARD);
+	m_pUVEffectMGR->StopEffectRoop(UV_EFFECT_TYPE::GUARD);
 }
 
 void BasePlayer::GuardEffectUpdate()
 {
 	// ƒLƒƒƒ‰ƒNƒ^[‚É’Ç]
 	// ƒK[ƒhƒGƒtƒFƒNƒgXV
-	m_UVEffectMGR->GetBaseUVEffect(UV_EFFECT_TYPE::GUARD)->SetPos(GetCenterPos());
+	m_pUVEffectMGR->GetBaseUVEffect(UV_EFFECT_TYPE::GUARD)->SetPos(GetCenterPos());
 }

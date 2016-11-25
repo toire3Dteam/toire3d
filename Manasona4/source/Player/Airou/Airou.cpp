@@ -40,7 +40,7 @@ Airou::Airou(SIDE side, const SideData &data) :BasePlayer(side, data)
 	// アイルーメッシュ
 	//m_pDefaultObj = new iex3DObj((side == SIDE::LEFT) ? "DATA/CHR/Airou/airou.IEM" : "DATA/CHR/Teki/teki.IEM");
 	m_pDefaultObj = new iex3DObj("DATA/CHR/Airou/airou.IEM");
-	m_pDefaultObj->SetPos(m_pos);
+	m_pDefaultObj->SetPos(m_vPos);
 	m_pDefaultObj->Update();
 
 	m_pHHDOFObj = new iex3DObj("DATA/CHR/Airou/airou_hissatsu.IEM");	// 必殺用のメッシュ初期化
@@ -88,8 +88,8 @@ void Airou::Reset()
 	m_pHitSquare->width = 1.5f;
 	m_pHitSquare->height = 4;
 	m_pHitSquare->pos.Set(.0f, 4.0f, .0f);
-	m_maxSpeed = 1.15f;
-	m_MaxHP = m_HP = 10000;	// キャラごとのHP
+	m_fMaxSpeed = 1.15f;
+	m_iMaxHP = m_iHP = 10000;	// キャラごとのHP
 }
 
 void Airou::InitActionDatas()
@@ -120,6 +120,7 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->ShakeCameraInfo.Set(0, 0);
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->GuardRecoveryFrame = 20;
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->attribute = ATTACK_ATTRIBUTE::BULLET;
+	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->fComboRate = 1.0f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
@@ -152,6 +153,7 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->ShakeCameraInfo.Set(0, 0);
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->GuardRecoveryFrame = 20;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->fGuardKnockBackPower = .1f;
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->fComboRate = .5f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
@@ -185,6 +187,7 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->ShakeCameraInfo.Set(0, 0);
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->GuardRecoveryFrame = 25;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->fGuardKnockBackPower = .1f;
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->fComboRate = .5f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
@@ -219,6 +222,7 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->ShakeCameraInfo.Set(.1f, 2);
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->GuardRecoveryFrame = 20;
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->fGuardKnockBackPower = .1f;
+	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->fComboRate = .5f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
@@ -252,6 +256,7 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->ShakeCameraInfo.Set(.1f, 2);
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->GuardRecoveryFrame = 20;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->fGuardKnockBackPower = .25f;
+	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->fComboRate = .5f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
@@ -286,6 +291,7 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->ShakeCameraInfo.Set(.1f, 2);
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->GuardRecoveryFrame = 20;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->fGuardKnockBackPower = .1f;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->fComboRate = .5f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
@@ -321,6 +327,7 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].pAttackData->ShakeCameraInfo.Set(.1f, 2);
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].pAttackData->GuardRecoveryFrame = 20;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].pAttackData->fGuardKnockBackPower = .1f;
+	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].pAttackData->fComboRate = .5f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
@@ -354,6 +361,7 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->AntiGuard = ANTIGUARD_ATTACK::UP_ATTACK;		// ★しゃがみガードをつぶす
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->ShakeCameraInfo.Set(.1f, 3);
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->GuardRecoveryFrame = 20;
+	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->fComboRate = .5f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
@@ -386,6 +394,7 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->AntiGuard = ANTIGUARD_ATTACK::UP_ATTACK;		// ★しゃがみガードをつぶす
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->ShakeCameraInfo.Set(.3f, 3);
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->GuardRecoveryFrame = 25;
+	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->fComboRate = .5f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
@@ -418,6 +427,7 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->AntiGuard = ANTIGUARD_ATTACK::NONE;
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->ShakeCameraInfo.Set(1.0f, 20);
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->GuardRecoveryFrame = 25;
+	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->fComboRate = .5f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = true;
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = true;
@@ -450,6 +460,7 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->AntiGuard = ANTIGUARD_ATTACK::NONE;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->ShakeCameraInfo.Set(.1f, 2);
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->GuardRecoveryFrame = 15;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->fComboRate = .5f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
@@ -483,6 +494,7 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->AntiGuard = ANTIGUARD_ATTACK::NONE;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->ShakeCameraInfo.Set(.2f, 3);
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->GuardRecoveryFrame = 18;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->fComboRate = .5f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	// [メモ] アイル―は最後吹き飛ばす　棒人間は三段目ものけぞりで隙が短い
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
@@ -516,6 +528,7 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->AntiGuard = ANTIGUARD_ATTACK::UP_ATTACK;	// ★しゃがみガードをつぶす
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->ShakeCameraInfo.Set(.3f, 3);
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->GuardRecoveryFrame = 25;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->fComboRate = .5f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
@@ -576,6 +589,7 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::THROW_SUCCESS].pAttackData->AntiGuard = ANTIGUARD_ATTACK::NONE;
 	m_ActionDatas[(int)BASE_ACTION_STATE::THROW_SUCCESS].pAttackData->ShakeCameraInfo.Set(.1f, 2);
 	m_ActionDatas[(int)BASE_ACTION_STATE::THROW_SUCCESS].pAttackData->GuardRecoveryFrame = 0;
+	m_ActionDatas[(int)BASE_ACTION_STATE::THROW_SUCCESS].pAttackData->fComboRate = .5f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::THROW_SUCCESS].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::THROW_SUCCESS].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
@@ -610,6 +624,7 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->AntiGuard = ANTIGUARD_ATTACK::NONE;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->ShakeCameraInfo.Set(1.0f, 20);
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->GuardRecoveryFrame = 18;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->fComboRate = .5f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = true;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = true;
@@ -642,6 +657,7 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->AntiGuard = ANTIGUARD_ATTACK::NONE;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->ShakeCameraInfo.Set(0, 0);
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->GuardRecoveryFrame = 18;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->fComboRate = .5f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = true;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = true;
@@ -727,53 +743,53 @@ void Airou::RenderDrive()
 
 void Airou::InitMotionDatas()
 {
-	m_MotionNumbers[(int)MOTION_TYPE::WAIT] = 0;
-	m_MotionNumbers[(int)MOTION_TYPE::WALK] = 1;
-	m_MotionNumbers[(int)MOTION_TYPE::RUN] = 2;
-	m_MotionNumbers[(int)MOTION_TYPE::BACK_WALK] = 3;
-	m_MotionNumbers[(int)MOTION_TYPE::BACK_STEP] = 4;
-	m_MotionNumbers[(int)MOTION_TYPE::RUSH_ATTACK1] = 5;
-	m_MotionNumbers[(int)MOTION_TYPE::RUSH_ATTACK2] = 6;
-	//m_MotionNumbers[(int)MOTION_TYPE::RUSH_ATTACK3] = 7;
-	m_MotionNumbers[(int)MOTION_TYPE::FINISH_ATTACK] = 8;
-	m_MotionNumbers[(int)MOTION_TYPE::SQUAT] = 9;
-	m_MotionNumbers[(int)MOTION_TYPE::ANTI_AIR_ATTACK] = 10;
-	m_MotionNumbers[(int)MOTION_TYPE::DOKKOI_ATTACK] = 11;
-	m_MotionNumbers[(int)MOTION_TYPE::SQUAT_ATTACK] = 12;
-	m_MotionNumbers[(int)MOTION_TYPE::DOWN_ATTACK] = 13;
-	m_MotionNumbers[(int)MOTION_TYPE::JUMP] = 14;
-	m_MotionNumbers[(int)MOTION_TYPE::FALL] = 15;
-	m_MotionNumbers[(int)MOTION_TYPE::RAND] = 16;
-	m_MotionNumbers[(int)MOTION_TYPE::AERIAL_ATTACK] = 17;
-	m_MotionNumbers[(int)MOTION_TYPE::AERIAL_DASH] = 18;
-	m_MotionNumbers[(int)MOTION_TYPE::PERSONA] = 19;
-	m_MotionNumbers[(int)MOTION_TYPE::CHARA_ATTACK_LAND] = 20;
-	m_MotionNumbers[(int)MOTION_TYPE::CHARA_ATTACK_SQUAT] = 7;
-	m_MotionNumbers[(int)MOTION_TYPE::CHARA_ATTACK_AERIAL] = 21;
-	m_MotionNumbers[(int)MOTION_TYPE::CHARA_ATTACK_AERIALDROP] = 22;
-	m_MotionNumbers[(int)MOTION_TYPE::HEAVEHO_DRIVE] = 23;
-	m_MotionNumbers[(int)MOTION_TYPE::HEAVEHO_DRIVE_OVERFLOW] = 25;
-	m_MotionNumbers[(int)MOTION_TYPE::THROW] = 26;
-	m_MotionNumbers[(int)MOTION_TYPE::THROW_SUCCESS] = 27;
-	m_MotionNumbers[(int)MOTION_TYPE::THROW_DRAW] = 28;
-	m_MotionNumbers[(int)MOTION_TYPE::UP_GUARD] = 29;
-	m_MotionNumbers[(int)MOTION_TYPE::DOWN_GUARD] = 30;
-	m_MotionNumbers[(int)MOTION_TYPE::ESCAPE] = 31;
-	m_MotionNumbers[(int)MOTION_TYPE::KNOCKBACK] = 32;
-	m_MotionNumbers[(int)MOTION_TYPE::KNOCKDOWN] = 33;
-	m_MotionNumbers[(int)MOTION_TYPE::KNOCKDOWN_DOWN] = 34;
-	m_MotionNumbers[(int)MOTION_TYPE::REVERSAL] = 35;
-	//m_MotionNumbers[(int)MOTION_TYPE::DIE] = 35;
-	m_MotionNumbers[(int)MOTION_TYPE::APPEAR] = 36;
-	m_MotionNumbers[(int)MOTION_TYPE::WIN] = 37;
-	m_MotionNumbers[(int)MOTION_TYPE::BURST] = 38;
+	m_iMotionNumbers[(int)MOTION_TYPE::WAIT] = 0;
+	m_iMotionNumbers[(int)MOTION_TYPE::WALK] = 1;
+	m_iMotionNumbers[(int)MOTION_TYPE::RUN] = 2;
+	m_iMotionNumbers[(int)MOTION_TYPE::BACK_WALK] = 3;
+	m_iMotionNumbers[(int)MOTION_TYPE::BACK_STEP] = 4;
+	m_iMotionNumbers[(int)MOTION_TYPE::RUSH_ATTACK1] = 5;
+	m_iMotionNumbers[(int)MOTION_TYPE::RUSH_ATTACK2] = 6;
+	m_iMotionNumbers[(int)MOTION_TYPE::RUSH_ATTACK3] = 7;
+	m_iMotionNumbers[(int)MOTION_TYPE::FINISH_ATTACK] = 8;
+	m_iMotionNumbers[(int)MOTION_TYPE::SQUAT] = 9;
+	m_iMotionNumbers[(int)MOTION_TYPE::ANTI_AIR_ATTACK] = 10;
+	m_iMotionNumbers[(int)MOTION_TYPE::DOKKOI_ATTACK] = 11;
+	m_iMotionNumbers[(int)MOTION_TYPE::SQUAT_ATTACK] = 12;
+	m_iMotionNumbers[(int)MOTION_TYPE::DOWN_ATTACK] = 13;
+	m_iMotionNumbers[(int)MOTION_TYPE::JUMP] = 14;
+	m_iMotionNumbers[(int)MOTION_TYPE::FALL] = 15;
+	m_iMotionNumbers[(int)MOTION_TYPE::RAND] = 16;
+	m_iMotionNumbers[(int)MOTION_TYPE::AERIAL_ATTACK] = 17;
+	m_iMotionNumbers[(int)MOTION_TYPE::AERIAL_DASH] = 18;
+	m_iMotionNumbers[(int)MOTION_TYPE::PERSONA] = 19;
+	m_iMotionNumbers[(int)MOTION_TYPE::CHARA_ATTACK_LAND] = 20;
+	m_iMotionNumbers[(int)MOTION_TYPE::CHARA_ATTACK_SQUAT] = 7;
+	m_iMotionNumbers[(int)MOTION_TYPE::CHARA_ATTACK_AERIAL] = 21;
+	m_iMotionNumbers[(int)MOTION_TYPE::CHARA_ATTACK_AERIALDROP] = 22;
+	m_iMotionNumbers[(int)MOTION_TYPE::HEAVEHO_DRIVE] = 23;
+	m_iMotionNumbers[(int)MOTION_TYPE::HEAVEHO_DRIVE_OVERFLOW] = 25;
+	m_iMotionNumbers[(int)MOTION_TYPE::THROW] = 26;
+	m_iMotionNumbers[(int)MOTION_TYPE::THROW_SUCCESS] = 27;
+	m_iMotionNumbers[(int)MOTION_TYPE::THROW_DRAW] = 28;
+	m_iMotionNumbers[(int)MOTION_TYPE::UP_GUARD] = 29;
+	m_iMotionNumbers[(int)MOTION_TYPE::DOWN_GUARD] = 30;
+	m_iMotionNumbers[(int)MOTION_TYPE::ESCAPE] = 31;
+	m_iMotionNumbers[(int)MOTION_TYPE::KNOCKBACK] = 32;
+	m_iMotionNumbers[(int)MOTION_TYPE::KNOCKDOWN] = 33;
+	m_iMotionNumbers[(int)MOTION_TYPE::KNOCKDOWN_DOWN] = 34;
+	m_iMotionNumbers[(int)MOTION_TYPE::REVERSAL] = 35;
+	//m_iMotionNumbers[(int)MOTION_TYPE::DIE] = 35;
+	m_iMotionNumbers[(int)MOTION_TYPE::APPEAR] = 36;
+	m_iMotionNumbers[(int)MOTION_TYPE::WIN] = 37;
+	m_iMotionNumbers[(int)MOTION_TYPE::BURST] = 38;
 }
 
 
 void Airou::KakeaiInit()
 {
-	m_pAirouEntryEffect->Action(m_pos + Vector3(0, 1, 0));
-	m_pAirouEntryCircleEffect->Action(m_pos);
+	m_pAirouEntryEffect->Action(m_vPos + Vector3(0, 1, 0));
+	m_pAirouEntryCircleEffect->Action(m_vPos);
 }
 
 void Airou::KakeaiUpdate()
@@ -792,49 +808,25 @@ void Airou::KakeaiExit()
 
 void Airou::ThirdRushInit()
 {
-	m_pSkillActions[(int)SKILL_ACTION_TYPE::SQUAT]->Enter();
+	m_pSkillActions[(int)SKILL_ACTION_TYPE::LAND]->Enter();
 }
 
 void Airou::ThirdRushUpdate()
 {
 	if (!isAttackState()) return;
 
+	m_pSkillActions[(int)SKILL_ACTION_TYPE::LAND]->Execute();
+
 	// ヒットしてる状態
 	if (GetAttackData()->bHit)
 	{
-		/* キャンセルルート */
-		//////////////////////////////////////////////
-		//	スキルキャンセル
-		//============================================
-		//if (SkillCancel(pPerson)) return;
-
-		//////////////////////////////////////////////
-		//	スタンドキャンセル
-		//============================================
-		if (StandCancel(this)) return;
-
-		//////////////////////////////////////////////
-		//	しゃがみ攻撃キャンセル
-		//============================================
-		//if (SquatAttackCancel(pPerson)) return;
-
-		//////////////////////////////////////////////
-		//	ヒーホードライブキャンセル
-		//============================================
-		if (HeaveHoCancel(this)) return;
-
-		//////////////////////////////////////////////
-		//	ヒーホードライブオーバーフローキャンセル
-		//============================================
-		if (HeaveHoOverFlowCancel(this)) return;
-
-		// 攻撃ボタン押したら(押しっぱなし込み)
-		if (isPushInputTRG(PLAYER_COMMAND_BIT::C, true) && GetActionFrame() == FRAME_STATE::ACTIVE)
+		// 攻撃ボタン押したら
+		if (isPushInputTRG(PLAYER_COMMAND_BIT::C, true))
 		{
 			// 先行入力リセット
 			AheadCommandReset();
 			// ゲージ50%以上で必殺技にキャンセルする
-			if (GetActionFrame() == FRAME_STATE::FOLLOW)
+			//if (GetActionFrame() == FRAME_STATE::FOLLOW)
 			{
 				// オーバードライブ中ならゲージなしで打てる
 				if (isOverDrive())
@@ -856,7 +848,7 @@ void Airou::ThirdRushUpdate()
 
 void Airou::ThirdRushExit()
 {
-	m_pSkillActions[(int)SKILL_ACTION_TYPE::SQUAT]->Exit();
+	m_pSkillActions[(int)SKILL_ACTION_TYPE::LAND]->Exit();
 }
 
 
@@ -883,6 +875,7 @@ Airou::SkillAction::Base::Base(Airou *pAirou, BASE_ACTION_STATE state) :m_pAirou
 	memcpy_s(&m_OrgHitSquare, sizeof(CollisionShape::Square), pAirou->m_ActionDatas[(int)state].pAttackData->pCollisionShape, sizeof(CollisionShape::Square));
 
 	m_OrgDamage = pAirou->m_ActionDatas[(int)state].pAttackData->damage;
+	m_fOrgComboRate = pAirou->m_ActionDatas[(int)state].pAttackData->fComboRate;
 	m_OrgFlyVector[(int)AttackData::HIT_PLACE::LAND] = pAirou->m_ActionDatas[(int)state].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector;
 	m_OrgFlyVector[(int)AttackData::HIT_PLACE::AERIAL] = pAirou->m_ActionDatas[(int)state].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector;
 }
@@ -904,7 +897,7 @@ void Airou::SkillAction::Land::Enter()
 	m_pAirou->m_pHitSquare->width = 5.5f;
 
 	// アイル―ドリルエフェクト発動！
-	m_pAirou->AddEffectAction(m_pAirou->m_pos, EFFECT_TYPE::AIROU_DRILL);
+	m_pAirou->AddEffectAction(m_pAirou->m_vPos, EFFECT_TYPE::AIROU_DRILL);
 
 	// アイルー正面向きながらドリル防止
 	m_pAirou->SetDirAngle();
@@ -922,7 +915,7 @@ bool Airou::SkillAction::Land::Execute()
 		return true;
 	}
 	
-	if (m_pAirou->GetActionFrame() == FRAME_STATE::FOLLOW) 	m_pAirou->m_UVEffectMGR->StopEffect(UV_EFFECT_TYPE::AIROU_DRILL);// ドリルエフェクトおしまい
+	if (m_pAirou->GetActionFrame() == FRAME_STATE::FOLLOW) 	m_pAirou->m_pUVEffectMGR->StopEffect(UV_EFFECT_TYPE::AIROU_DRILL);// ドリルエフェクトおしまい
 
 	if (m_pAirou->GetAttackData()->bHit)
 	{
@@ -937,13 +930,14 @@ bool Airou::SkillAction::Land::Execute()
 		// 必殺技キャンセル
 		if (HeaveHoCancel(m_pAirou)) return false;
 
+		m_pAirou->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->fComboRate = 1;
 	}
 
 	// xフレーム後に移動
 	if (m_DrillFrame > 8)
 	{
 		const float speed((m_pAirou->GetActionFrame() == FRAME_STATE::FOLLOW) ? .75f : 1.75f);
-		m_pAirou->m_move.x = (m_pAirou->m_dir == DIR::RIGHT) ? speed : -speed;
+		m_pAirou->m_vMove.x = (m_pAirou->m_dir == DIR::RIGHT) ? speed : -speed;
 	}
 
 
@@ -966,15 +960,18 @@ bool Airou::SkillAction::Land::Execute()
 	}
 
 	// エフェクト
-	m_pAirou->m_UVEffectMGR->SetPos(m_pAirou->m_pos, UV_EFFECT_TYPE::AIROU_DRILL);// ドリルの場所をキャラに追従
+	m_pAirou->m_pUVEffectMGR->SetPos(m_pAirou->m_vPos, UV_EFFECT_TYPE::AIROU_DRILL);// ドリルの場所をキャラに追従
 
 	return false;
 }
 
 void Airou::SkillAction::Land::Exit()
 {
+	// 移動更新無効を解除しておく
+	m_pAirou->SetMoveUpdate(true);
+
 	m_pAirou->m_pHitSquare->width = 1.5f;
-	m_pAirou->m_UVEffectMGR->StopEffect(UV_EFFECT_TYPE::AIROU_DRILL);// ドリルエフェクトおしまい
+	m_pAirou->m_pUVEffectMGR->StopEffect(UV_EFFECT_TYPE::AIROU_DRILL);// ドリルエフェクトおしまい
 
 	// 攻撃情報を元に戻す
 	m_pAirou->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->damage = m_OrgDamage;
@@ -982,6 +979,7 @@ void Airou::SkillAction::Land::Exit()
 	m_pAirou->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector = m_OrgFlyVector[(int)AttackData::HIT_PLACE::AERIAL];
 	m_pAirou->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame = 2;
 	m_pAirou->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].hitStopFlame = 2;
+	m_pAirou->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->fComboRate = m_fOrgComboRate;
 
 	// 先行入力リセット
 	m_pAirou->AheadCommandReset();
@@ -1051,7 +1049,7 @@ bool Airou::SkillAction::AerialDrop::Execute()
 	if (m_pAirou->GetActionFrame() == FRAME_STATE::ACTIVE)
 	{
 		// ヒットストップ中は無視
-		if (m_pAirou->m_HitStopFrame > 0)return false;
+		if (m_pAirou->m_iHitStopFrame > 0)return false;
 
 		static const int SECOND_ATTACK_FRAME(SKILL_AERIALDROP_FIRST);
 		// 初段
@@ -1071,6 +1069,7 @@ bool Airou::SkillAction::AerialDrop::Execute()
 			m_pAirou->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(1.5f, -2.5f);
 			m_pAirou->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame = 6;
 			m_pAirou->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].hitStopFlame = 12;
+			m_pAirou->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->fComboRate = 1;
 
 			//m_pAirou->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->pCollisionShape->width = 12;
 			//m_pAirou->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->pCollisionShape->height = 11;
@@ -1102,6 +1101,7 @@ void Airou::SkillAction::AerialDrop::Exit()
 	m_pAirou->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector=m_OrgFlyVector[(int)AttackData::HIT_PLACE::AERIAL];
 	m_pAirou->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame = 4;
 	m_pAirou->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].hitStopFlame = 8;
+	m_pAirou->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->fComboRate = m_fOrgComboRate;
 }
 
 
@@ -1127,7 +1127,7 @@ void Airou::HeavehoDriveInit()
 	// ヒットフラグ
 	m_bHeavehoHit = false;
 
-	m_HeavehoStopTimer = 85;
+	m_iHeavehoStopTimer = 85;
 }
 
 bool Airou::HeavehoDriveUpdate()
@@ -1141,7 +1141,7 @@ bool Airou::HeavehoDriveUpdate()
 			if (m_pOshiokiMgr->isAction())
 			{
 				// こっちみんな
-				m_angleY = PI;
+				m_fAngleY = PI;
 
 				m_pOshiokiMgr->Update();
 				return false;
@@ -1152,7 +1152,7 @@ bool Airou::HeavehoDriveUpdate()
 		// 攻撃が当たってたら
 		else if (m_bHeavehoHit)
 		{
-			SetMotion(m_MotionNumbers[(int)MOTION_TYPE::HEAVEHO_DRIVE] + 1);
+			SetMotion(m_iMotionNumbers[(int)MOTION_TYPE::HEAVEHO_DRIVE] + 1);
 			m_pOshiokiMgr = new OshiokiManager::OverDrive(this, m_pTargetPlayer);
 			m_pOshiokiMgr->Action();
 			return false;
@@ -1163,7 +1163,7 @@ bool Airou::HeavehoDriveUpdate()
 	}
 
 	// ヒーホーストップ時間計測
-	if (m_HeavehoStopTimer > 0) if (--m_HeavehoStopTimer == 0)	SetGameTimerStopFlag(false);
+	if (m_iHeavehoStopTimer > 0) if (--m_iHeavehoStopTimer == 0)	SetGameTimerStopFlag(false);
 
 	return false;
 }
@@ -1190,7 +1190,7 @@ void Airou::HeavehoDriveOverFlowInit()
 	// ストップタイマー
 	SetGameTimerStopFlag(true);
 
-	m_HeavehoStopTimer = 100;
+	m_iHeavehoStopTimer = 100;
 }
 void Airou::HeavehoDriveOverFlowExit()
 {
@@ -1200,7 +1200,7 @@ void Airou::HeavehoDriveOverFlowUpdate()
 {
 	/* 実質、必殺がヒットするまでの間 */
 	// ヒーホーストップ時間計測
-	if (m_HeavehoStopTimer > 0) if (--m_HeavehoStopTimer == 0)	SetGameTimerStopFlag(false);
+	if (m_iHeavehoStopTimer > 0) if (--m_iHeavehoStopTimer == 0)	SetGameTimerStopFlag(false);
 }
 void Airou::HeavehoDriveOverFlowSuccessInit()
 {
@@ -1256,10 +1256,10 @@ void Airou::HeavehoDriveOverFlowSuccessUpdate()
 	// コンボ
 	COMBO_DESK comboDesk;
 
-	switch (m_HeaveHoDriveOverFlowFrame++)
+	switch (m_iHeaveHoDriveOverFlowFrame++)
 	{
 	case 60:	// 打ち上げ
-		m_move.Set(0, .5f, -.5f);
+		m_vMove.Set(0, .5f, -.5f);
 		BasePlayer::AddEffectAction(Vector3(0, 7, -15), EFFECT_TYPE::DAMAGE);
 		se->Play("フィニッシュ小");
 		se->Play("通常3段ヒット");
@@ -1274,7 +1274,7 @@ void Airou::HeavehoDriveOverFlowSuccessUpdate()
 		break;
 
 	case 170:	// 叩きおとし
-		m_move.Set(0, -1.0f, 0);
+		m_vMove.Set(0, -1.0f, 0);
 		BasePlayer::AddEffectAction(Vector3(0, 51, -68), EFFECT_TYPE::DAMAGE);
 		DeferredManagerEx.SetRadialBlur(Vector2(0, 0), 9);
 		se->Play("フィニッシュ小");
@@ -1289,7 +1289,7 @@ void Airou::HeavehoDriveOverFlowSuccessUpdate()
 		break;
 
 	case 195:	// 相手が地面にたたき落ちる
-		m_move.Set(0, 1.0f, 0);
+		m_vMove.Set(0, 1.0f, 0);
 		BasePlayer::AddEffectAction(Vector3(0, 10, -68), EFFECT_TYPE::DAMAGE);
 		DeferredManagerEx.SetRadialBlur(Vector2(0, 0), 7);
 		se->Play("撃ち落とし");

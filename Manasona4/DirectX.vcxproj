@@ -191,8 +191,9 @@
     <ClCompile Include="source\UI\RoundIcon.cpp" />
     <ClCompile Include="source\UI\SPGage.cpp" />
     <ClCompile Include="source\Window\BaseWindow.cpp" />
-    <ClCompile Include="source\Window\PoseWindow.cpp" />
+    <ClCompile Include="source\Window\BattleWindow.cpp" />
     <ClCompile Include="source\Window\OptionWindow.cpp" />
+    <ClCompile Include="source\Window\PoseWindow.cpp" />
     <ClCompile Include="TDN\DirectShow\baseclasses\amfilter.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClCompile>
@@ -328,8 +329,9 @@
     <ClInclude Include="source\UI\RoundIcon.h" />
     <ClInclude Include="source\UI\SpGage.h" />
     <ClInclude Include="source\Window\BaseWindow.h" />
-    <ClInclude Include="source\Window\PoseWindow.h" />
+    <ClInclude Include="source\Window\BattleWindow.h" />
     <ClInclude Include="source\Window\OptionWindow.h" />
+    <ClInclude Include="source\Window\PoseWindow.h" />
     <ClInclude Include="TDN\DirectShow\baseclasses\amextra.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClInclude>

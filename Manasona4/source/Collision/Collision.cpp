@@ -231,6 +231,7 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 				(*OutDamageInfo)->bFinishOK = pAttackData->bFinish;
 				(*OutDamageInfo)->fGuardKnockBackPower = pAttackData->fGuardKnockBackPower;
 				(*OutDamageInfo)->DamageMotion = pAttackData->places[iHitPlace].DamageMotion;
+				(*OutDamageInfo)->fComboRate = pAttackData->fComboRate;
 
 				// ★コンボUI エフェクト(カウント)発動
 				// ★★プレイヤーのグローバルステートのダメージのところに移しました

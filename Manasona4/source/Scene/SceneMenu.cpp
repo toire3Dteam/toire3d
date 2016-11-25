@@ -65,7 +65,7 @@ bool sceneMenu::Initialize()
 	m_pStateMachine->SetCurrentState(SceneMenuState::Intro::GetInstance());	// ステートの設定
 
 	// BGMをストリーミング再生
-	bgm->PlayStreamIn("DATA/Sound/BGM/System/CharaSelect.ogg");
+	bgm->PlayStreamIn("DATA/Sound/BGM/System/ModeSelect.ogg");
 
 	return true;
 }

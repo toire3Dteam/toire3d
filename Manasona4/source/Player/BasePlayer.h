@@ -97,7 +97,8 @@ enum class FRAME_STATE
 	START,	// 発生
 	ACTIVE,	// 持続(この間に攻撃判定)
 	FOLLOW,	// 硬直(後隙)
-	END	// 終了(このフレームに来たら攻撃終了)
+	END,	// 終了(このフレームに来たら攻撃終了)
+	RECOVERY_HIT,	// bHitが復活するフレーム
 };
 static const int FRAME_MAX = 256; // 攻撃のフレームの最大値(これより超えることはないだろう)
 
@@ -112,7 +113,7 @@ enum class BASE_ACTION_STATE
 	OVERDRIVE_BURST,	// バースト覚醒
 	RUSH1,				// 通常1段目
 	RUSH2,				// 通常2段目
-	//RUSH3,				// 通常3段目
+	RUSH3,				// 通常3段目
 	ANTI_AIR,				// 対空攻撃
 	DOKKOI_ATTACK,		// 中段攻撃
 	SQUAT_ATTACK,		// しゃがみ攻撃
@@ -153,7 +154,7 @@ enum class MOTION_TYPE
 	//U_TURN,				// Uターン
 	RUSH_ATTACK1,			// ラッシュ1
 	RUSH_ATTACK2,			// ラッシュ2
-	//RUSH_ATTACK3,			// ラッシュ最後
+	RUSH_ATTACK3,			// ラッシュ最後
 	FINISH_ATTACK,			// フィニッシュアーツ
 	SQUAT,					// しゃがみ
 	SQUAT_ATTACK,		// しゃがみ攻撃
@@ -306,12 +307,6 @@ enum class OVERDRIVE_TYPE
 class BasePlayer : public BaseGameEntity
 {
 protected:
-	//------------------------------------------------------
-	//	コマンドに関係する変数
-	//------------------------------------------------------
-	static const int c_COMMAND_FRAME_MAX = 30;
-	WORD m_CommandHistory[c_COMMAND_FRAME_MAX];
-	WORD m_AheadCommand;	// 先行入力用
 
 	//------------------------------------------------------
 	//	ジャンプ用に使う構造体
@@ -333,21 +328,6 @@ protected:
 	Jump m_jump;
 
 	//------------------------------------------------------
-	//	ラッシュ攻撃のステップ
-	//------------------------------------------------------
-	struct RushAttack
-	{
-		int step;	// 0,1,2で進める
-		//bool bNextOK;	// これがtrueの時にボタンを押すと次の攻撃に行く
-		void Clear()
-		{
-			step = 0;
-			//bNextOK = false;
-		}
-	};
-	RushAttack m_RushAttack;
-
-	//------------------------------------------------------
 	//	キャラが持つアクションデータ
 	//------------------------------------------------------
 	class ActionData
@@ -364,7 +344,7 @@ protected:
 			// isAttackDataでtrueが返るようになる
 			if (!pAttackData) pAttackData = new AttackData;
 		}
-	}m_ActionDatas[(int)BASE_ACTION_STATE::END];
+	};
 
 public:
 	//------------------------------------------------------
@@ -499,14 +479,14 @@ public:
 	//------------------------------------------------------
 	//	位置・移動量
 	//------------------------------------------------------
-	Vector3 &GetMove() { return m_move; }
-	Vector3 *GetMoveAddress(){ return &m_move; }
-	Vector3 &GetPos() { return m_pos; }
-	Vector3 *GetPosAddress() { return &m_pos; }
-	void AddMove(const Vector3 &v){ m_move += v; }
-	void SetMove(const Vector3 &v){ m_move.Set(v.x, v.y, v.z); }
-	void SetPos(const Vector3 &v) { m_pos.Set(v.x, v.y, v.z); }
-	void MoveClampX(float val) { m_move.x = Math::Clamp(m_move.x, -val, val); }
+	Vector3 &GetMove() { return m_vMove; }
+	Vector3 *GetMoveAddress(){ return &m_vMove; }
+	Vector3 &GetPos() { return m_vPos; }
+	Vector3 *GetPosAddress() { return &m_vPos; }
+	void AddMove(const Vector3 &v){ m_vMove += v; }
+	void SetMove(const Vector3 &v){ m_vMove.Set(v.x, v.y, v.z); }
+	void SetPos(const Vector3 &v) { m_vPos.Set(v.x, v.y, v.z); }
+	void MoveClampX(float val) { m_vMove.x = Math::Clamp(m_vMove.x, -val, val); }
 	void SetMoveUpdate(bool bMove){ m_bMoveUpdate = bMove; }
 
 
@@ -518,8 +498,8 @@ public:
 	void ReverseDir(){ m_dir = (m_dir == DIR::LEFT) ? DIR::RIGHT : DIR::LEFT; }
 	DIR GetTargetDir(){ return m_TargetDir; }
 	void SetTargetDir(DIR dir){ m_TargetDir = dir; }
-	void SetAngleY(float a){ m_angleY = a; }
-	void SetDirAngle(){ m_angleY = DIR_ANGLE[(int)m_dir]; }
+	void SetAngleY(float a){ m_fAngleY = a; }
+	void SetDirAngle(){ m_fAngleY = DIR_ANGLE[(int)m_dir]; }
 	void TurnOverDir(){ m_dir = (m_dir == DIR::LEFT) ? DIR::RIGHT : DIR::LEFT; }
 
 
@@ -544,12 +524,12 @@ public:
 	bool isActiveFrame()
 	{
 		if (!isFrameAction()) return false;
-		return (m_ActionFrameList[(int)m_ActionState][m_CurrentActionFrame] == FRAME_STATE::ACTIVE);
+		return (m_ActionFrameList[(int)m_ActionState][m_iCurrentActionFrame] == FRAME_STATE::ACTIVE);
 	}
 	FRAME_STATE GetActionFrame()
 	{
 		if (!isFrameAction()) return FRAME_STATE::END;
-		return m_ActionFrameList[(int)m_ActionState][m_CurrentActionFrame];
+		return m_ActionFrameList[(int)m_ActionState][m_iCurrentActionFrame];
 	}
 	void SetActionState(BASE_ACTION_STATE state)
 	{
@@ -558,7 +538,7 @@ public:
 		// NO_ACTIONじゃなかったら
 		if (isFrameAction())
 		{
-			m_CurrentActionFrame = 0;				// フレーム0にセット
+			m_iCurrentActionFrame = 0;				// フレーム0にセット
 
 			// 攻撃だったら
 			// ★↓でHITフラグを消している
@@ -569,8 +549,10 @@ public:
 			}
 		}
 	}
-	int GetCurrentFrame(){ return m_CurrentActionFrame; }
-	RushAttack *GetRushAttack() { return &m_RushAttack; }
+	int GetCurrentFrame(){ return m_iCurrentActionFrame; }
+	int GetRushStep(){ return m_iRushStep; }
+	void AddRushStep(){ m_iRushStep++; }
+	void RushStepReset(){ m_iRushStep = 0; }
 	void SetSkillActionType(SKILL_ACTION_TYPE type){ m_SkillActionType = type; }
 	bool isDownState(){ return (m_pStateMachine->isInState(*BasePlayerState::KnockDown::GetInstance())); }
 
@@ -593,10 +575,10 @@ public:
 	//------------------------------------------------------
 	//	攻撃のヒットストップ・硬直
 	//------------------------------------------------------
-	int GetRecoveryFrame() { return m_RecoveryFlame; }
-	int GetHitStopFrame(){ return m_HitStopFrame; }
-	void SetHitStopFrame(int frame) { m_HitStopFrame = frame; }
-	void SetRecoveryFrame(int frame) { m_RecoveryFlame = frame; }
+	int GetRecoveryFrame() { return m_iRecoveryFrame; }
+	int GetHitStopFrame(){ return m_iHitStopFrame; }
+	void SetHitStopFrame(int frame) { m_iHitStopFrame = frame; }
+	void SetRecoveryFrame(int frame) { m_iRecoveryFrame = frame; }
 	std::list<BASE_ACTION_STATE> *GetRecoveryDamageCount(){ return &m_RecoveryDamageCount; }
 
 	//------------------------------------------------------
@@ -609,13 +591,13 @@ public:
 	//------------------------------------------------------
 	//	無敵関連
 	//------------------------------------------------------
-	int GetInvincibleLV(){ return m_InvincibleLV; }
-	int GetInvincibleTime(){ return m_InvincibleTime; }
-	bool isInvincible(){ return  (m_InvincibleLV >= 1) ? true : false; }
-	void SetInvincible(int time, int lv){ m_InvincibleTime = time; m_InvincibleLV = lv; }
-	void SetInvincibleLV(int lv = 1){ m_InvincibleLV = lv; }
-	void SetInvincibleTime(int time){ m_InvincibleTime = time; }
-	void InvincibleOff(){ m_InvincibleLV = 0; m_InvincibleTime = 0; }
+	int GetInvincibleLV(){ return m_iInvincibleLV; }
+	int GetInvincibleTime(){ return m_iInvincibleTime; }
+	bool isInvincible(){ return  (m_iInvincibleLV >= 1) ? true : false; }
+	void SetInvincible(int time, int lv){ m_iInvincibleTime = time; m_iInvincibleLV = lv; }
+	void SetInvincibleLV(int lv = 1){ m_iInvincibleLV = lv; }
+	void SetInvincibleTime(int time){ m_iInvincibleTime = time; }
+	void InvincibleOff(){ m_iInvincibleLV = 0; m_iInvincibleTime = 0; }
 	bool isEscape() { return m_bEscape; }
 	void SetEscapeFlag(bool bEscape) { m_bEscape = bEscape; }
 
@@ -623,34 +605,36 @@ public:
 	//------------------------------------------------------
 	//	モーション
 	//------------------------------------------------------
-	void SetMotion(MOTION_TYPE type){ if (m_pObj) m_pObj->SetMotion(m_MotionNumbers[(int)type]); }
+	void SetMotion(MOTION_TYPE type){ if (m_pObj) m_pObj->SetMotion(m_iMotionNumbers[(int)type]); }
 	void SetMotion(int MotionNo) { if (m_pObj) { if (m_pObj->GetMotion() != MotionNo)m_pObj->SetMotion(MotionNo); } }
 
 
 	//------------------------------------------------------
-	//	HP
+	//	HP・ダメージ
 	//------------------------------------------------------
-	int GetMaxHP() { return m_MaxHP; }
-	int GetHP() { return m_HP; }
-	void SetHP(int hp) { m_HP = hp; }
-
+	int GetMaxHP() { return m_iMaxHP; }
+	int GetHP() { return m_iHP; }
+	void SetHP(int hp) { m_iHP = hp; }
+	float GetDamageRate(){ return m_fDamageRate; }
+	void MultDamageRate(float rate){ m_fDamageRate *= rate; }	// 乗算
+	void ResetDamageRate(){ m_fDamageRate = 1.0f; }
 
 	//------------------------------------------------------
 	//	スコア
 	//------------------------------------------------------
-	int GetCollectScore(){ return m_CollectScore; }
-	void AddCollectScore(int score) { m_CollectScore += score; }
-	void ConversionScore(){ m_score += m_CollectScore; m_CollectScore = 0; }
-	int GetScore(){ return m_score; }
+	int GetCollectScore(){ return m_iCollectScore; }
+	void AddCollectScore(int score) { m_iCollectScore += score; }
+	void ConversionScore(){ m_iScore += m_iCollectScore; m_iCollectScore = 0; }
+	int GetScore(){ return m_iScore; }
 
 
 	//------------------------------------------------------
 	//	インプット・コマンド
 	//------------------------------------------------------
-	int GetInputList(PLAYER_INPUT input) { return m_InputList[(int)input]; }
-	void SetInputList(PLAYER_INPUT inputNo, int inputFlag){ m_InputList[(int)inputNo] = inputFlag; }
-	bool isAnyPushKey(){ return (m_InputList[(int)PLAYER_INPUT::A] == 3 || m_InputList[(int)PLAYER_INPUT::B] == 3 || m_InputList[(int)PLAYER_INPUT::C] == 3 || m_InputList[(int)PLAYER_INPUT::D] == 3); }
-	bool isPushInput(PLAYER_COMMAND_BIT CommandBit, bool bAhead = false) { if (bAhead){ if ((int)CommandBit & (int)m_AheadCommand) return true; } return (m_CommandHistory[0] & (int)CommandBit) ? true : false; }
+	int GetInputList(PLAYER_INPUT input) { return m_iInputList[(int)input]; }
+	void SetInputList(PLAYER_INPUT inputNo, int inputFlag){ m_iInputList[(int)inputNo] = inputFlag; }
+	bool isAnyPushKey(){ return (m_iInputList[(int)PLAYER_INPUT::A] == 3 || m_iInputList[(int)PLAYER_INPUT::B] == 3 || m_iInputList[(int)PLAYER_INPUT::C] == 3 || m_iInputList[(int)PLAYER_INPUT::D] == 3); }
+	bool isPushInput(PLAYER_COMMAND_BIT CommandBit, bool bAhead = false) { if (bAhead){ if ((int)CommandBit & (int)m_wAheadCommand) return true; } return (m_wCommandHistory[0] & (int)CommandBit) ? true : false; }
 	PLAYER_COMMAND_BIT GetInputCommandBit(PLAYER_INPUT input)
 	{
 		PLAYER_COMMAND_BIT bit(PLAYER_COMMAND_BIT::NEUTRAL);
@@ -704,35 +688,35 @@ public:
 	bool isPushInputTRG(PLAYER_COMMAND_BIT CommandBit, bool bAhead = false)
 	{
 		// 先行入力フラグだったら先行入力も返す
-		if (bAhead) if ((int)CommandBit & (int)m_AheadCommand) return true;
+		if (bAhead) if ((int)CommandBit & (int)m_wAheadCommand) return true;
 
 		// まず、押した瞬間かどうかを確認
-		if ((m_CommandHistory[0] & (int)CommandBit) == 0) return false;
+		if ((m_wCommandHistory[0] & (int)CommandBit) == 0) return false;
 
 		// 押したかどうかは分かったので、押しっぱなしでないことを確認する
-		if ((m_CommandHistory[1] & (int)CommandBit)) return false;		// 押しっぱなしやんけ！
+		if ((m_wCommandHistory[1] & (int)CommandBit)) return false;		// 押しっぱなしやんけ！
 
 		return true;
 	}
-	WORD GetCommandHistory(int no = 0) { return m_CommandHistory[no]; }
-	WORD GetAheadCommand(){ return m_AheadCommand; }
+	WORD GetCommandHistory(int no = 0) { return m_wCommandHistory[no]; }
+	WORD GetAheadCommand(){ return m_wAheadCommand; }
 	void AheadCommandUpdate()
 	{
 		FOR((int)PLAYER_INPUT::MAX)
 		{
 			const PLAYER_COMMAND_BIT bit(GetInputCommandBit((PLAYER_INPUT)i));
-			if (isPushInputTRG(bit)) m_AheadCommand |= (int)bit;
+			if (isPushInputTRG(bit)) m_wAheadCommand |= (int)bit;
 		}
 	}
-	void AheadCommandReset(){ m_AheadCommand &= 0; }
-	void AheadCommandReset(PLAYER_COMMAND_BIT ResetBit){ m_AheadCommand &= ((int)ResetBit ^ 0xffff); }
+	void AheadCommandReset(){ m_wAheadCommand &= 0; }
+	void AheadCommandReset(PLAYER_COMMAND_BIT ResetBit){ m_wAheadCommand &= ((int)ResetBit ^ 0xffff); }
 	bool isDoublePush(PLAYER_COMMAND_BIT InputBit, int JudgeFrame = c_COMMAND_FRAME_MAX)
 	{
 		// 押した瞬間かどうかを確認
 		if (!isPushInputTRG(InputBit)) return false;
 
 		// 2個前に押してたらOK！！
-		for (int i = 2; i < JudgeFrame; i++) if ((m_CommandHistory[i] & (int)InputBit)) return true;
+		for (int i = 2; i < JudgeFrame; i++) if ((m_wCommandHistory[i] & (int)InputBit)) return true;
 		return false;
 	}
 
@@ -745,18 +729,15 @@ public:
 	//------------------------------------------------------
 	//	対戦相手のポインタ
 	//------------------------------------------------------
-	void SetTargetPlayer(BasePlayer *pPlayer){
-
-		m_pTargetPlayer = pPlayer; 
-	}
+	void SetTargetPlayer(BasePlayer *pPlayer){ m_pTargetPlayer = pPlayer; }
 	BasePlayer *GetTargetPlayer(){ return m_pTargetPlayer; }
 
 
 	//------------------------------------------------------
 	//	エフェクト
 	//------------------------------------------------------
-	PanelEffectManager* GetPanelEffectManager() { return m_PanelEffectMGR; }
-	UVEffectManager* GetUVEffectManager() { return m_UVEffectMGR; }
+	PanelEffectManager *GetPanelEffectManager() { return m_pPanelEffectMGR; }
+	UVEffectManager *GetUVEffectManager() { return m_pUVEffectMGR; }
 	void AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 AttackVec = VECTOR_ZERO);
 	void GuardEffectAction();
 	void GuardEffectStop();
@@ -779,9 +760,9 @@ public:
 	//------------------------------------------------------
 	//	その他
 	//------------------------------------------------------
-	int GetDeviceID() { return m_deviceID; }
-	bool isMaxSpeed() { return (abs(m_move.x) >= m_maxSpeed); }
-	float GetMaxSpeed() { return m_maxSpeed; }
+	int GetDeviceID() { return m_iDeviceID; }
+	//bool isMaxSpeed() { return (abs(m_move.x) >= m_maxSpeed); }
+	float GetMaxSpeed() { return m_fMaxSpeed; }
 	SIDE GetSide(){ return m_side; }
 	CollisionShape::Square *GetHitSquare() { return m_pHitSquare; }	// ステージのあたり判定用
 
@@ -803,8 +784,8 @@ public:
 	}
 
 	// 勝利数
-	int GetWinNum() { return m_WinNum; }
-	void AddWinNum(int add) { m_WinNum += add; }
+	int GetWinNum() { return m_iWinNum; }
+	void AddWinNum(int add) { m_iWinNum += add; }
 
 	// 顔グラ
 	tdn2DAnim* GetFacePic() { return m_pFacePic; }
@@ -828,84 +809,160 @@ public:
 	static const int	c_THROW_RELEASE_FRAME;	// 投げ抜けで、パシンてなってる間のフレーム(これも全キャラ共通だろう)
 	static const int	c_WINNER_TIME;			// 勝ちモーション再生時間
 	static const float	c_GUARD_DISTANCE;		// ガードが発動する距離
+	static const int	c_FIRST_HIT_ADD_DAMAGE;	// 初段ヒット加算ダメージ
 
 protected:
-	const int m_deviceID;		// 自分のコントローラーの番号(実質、スマブラのxPに値する)
-	SIDE m_side;			// このキャラクターの所属してるチーム
+	//------------------------------------------------------
+	//	位置・移動量
+	//------------------------------------------------------
+	Vector3 m_vPos;		// 座標
+	Vector3 m_vMove;	// 移動値
+	bool m_bMoveUpdate;	// これがtrueなら、重力とか空気抵抗とかを受ける(アイルードリルとかペルソナとかでfalseにする)
 
-	iex3DObj *m_pDefaultObj, *m_pHHDOFObj;	// メッシュ実体
-	iex3DObj *m_pObj;				// 参照するだけのメッシュ実体
-	BaseUVEffect *m_pSpeedLine;		// 超必殺技のスピードライン
-	tdn2DAnim* m_pFacePic;			// 顔グラ				
-	Vector3 m_pos;	// 座標
-	Vector3 m_move;	// 移動値
-	CollisionShape::Square *m_pHitSquare;	// 四角判定(ステージ衝突で使う)
+
+	//------------------------------------------------------
+	//	向き・アングル
+	//------------------------------------------------------
+	float m_fAngleY;		// Yの回転角度
 	DIR m_dir;				// 左右のフラグ
 	DIR m_TargetDir;		// 相手に対する左右のフラグ
-	//float m_Gravity;		// 重力値
-	float m_maxSpeed;		// キャラクターの最大スピード 
-	float m_angleY;
+
+
+	//------------------------------------------------------
+	//	プレイヤーアクション・攻撃アクション・ステート
+	//------------------------------------------------------
+	FRAME_STATE m_ActionFrameList[(int)BASE_ACTION_STATE::END][FRAME_MAX];
+	ActionData m_ActionDatas[(int)BASE_ACTION_STATE::END];
+	BASE_ACTION_STATE m_ActionState;
+	int m_iCurrentActionFrame;				// 攻撃フレームリストの中を再生しているフレーム
+	int m_iRushStep;						// ラッシュアタックのステップ
+	SKILL_ACTION_TYPE m_SkillActionType;	// スキルアクション
+
+
+	//------------------------------------------------------
+	//	地上・空中
+	//------------------------------------------------------
 	bool m_bLand;			// 着地フラグ
 	bool m_bSquat;			// しゃがみフラグ
 	bool m_bAerialJump;		// 空中ジャンプのフラグ
 	bool m_bAerialDash;		// 空中ダッシュのフラグ
 	int m_iAerialDashFrame;	// 空中ダッシュの時間
-	int m_InputList[(int)PLAYER_INPUT::MAX]; 	// 押しているキーを格納
-	StateMachine<BasePlayer>* m_pStateMachine; // ★ステートマシン
-	AI*						  m_pAI;			// ★AI
-	int m_InvincibleLV;			// 無敵かどうか
-	int m_InvincibleTime;		// 無敵時間		無敵時は0以上の値が入り、0になるまでデクリメントされる
-	float m_InvincibleColRate;	// 無敵時間の点滅のレート
-	int m_InvincibleColRateFlame;		// 無敵点滅のフレーム(速さ）
-	bool m_bInvincibleColRateUpFlag;		// 無敵点滅の上げ下げフラグ
-	int m_CurrentActionFrame;	// 攻撃フレームリストの中を再生しているフレーム
-	int m_HitStopFrame;			// 1以上なら0になるまでストップ
-	int m_RecoveryFlame;		// 1以上なら0になるまで操作を受け付けない
-	bool m_bEscape;				// エスケープ判定の時に立つフラグ
-	bool m_bAI;					// AIかどうか
-	int m_score;				// 実体後の本当のスコア
-	int m_CollectScore;			// 実体前の貯めているスコア
-	bool m_bMoveUpdate;			// これがtrueなら、重力とか空気抵抗とかを受ける(アイルードリルとかペルソナとかでfalseにする)
-	// ガードに必要なやつ
+
+	//------------------------------------------------------
+	//	攻撃のヒットストップ・硬直
+	//------------------------------------------------------
+	std::list<BASE_ACTION_STATE> m_RecoveryDamageCount;	//「喰らい中」に攻撃をくらってるカウント
+	int m_iRecoveryFrame;								// 1以上なら0になるまで操作を受け付けない
+	int m_iHitStopFrame;									// 1以上なら0になるまでストップ
+
+	//------------------------------------------------------
+	//	ガード
+	//------------------------------------------------------
 	GUARD_STATE m_GuardState;
-	// HP
-	int m_MaxHP;
-	int m_HP;
-	// ヒーホー用の変数
-	int m_HeavehoStopTimer;			// ヒーホードライブ発動のザワールドの時間
-	int m_HeaveHoDriveOverFlowFrame;	// ヒーホーの必殺のSEとかエフェクト用に作る
-	BasePlayer *m_pTargetPlayer;		// ひーほーくらったプレイヤーのポインタを持つ(好き勝手にいじる)
-	float m_fOrangeColRate;	// 無敵技のオレンジの光レート
-	float m_fMagentaColRate;	// 中段技のマゼンタの光レート
-
-	// ガード
 
 
-	// ストップフラグ
-	bool m_bGameTimerStopFlag;
+	//------------------------------------------------------
+	//	無敵関連
+	//------------------------------------------------------
+	int m_iInvincibleLV;			// 無敵かどうか
+	int m_iInvincibleTime;		// 無敵時間		無敵時は0以上の値が入り、0になるまでデクリメントされる
+	float m_fInvincibleColRate;	// 無敵時間の点滅のレート
+	int m_iInvincibleColRateFlame;		// 無敵点滅のフレーム(速さ）
+	bool m_bInvincibleColRateUpFlag;		// 無敵点滅の上げ下げフラグ
+	bool m_bEscape;				// エスケープ判定の時に立つフラグ
 
-	// モーション
-	int m_MotionNumbers[(int)MOTION_TYPE::MAX];
 
-	// 覚醒
+	//------------------------------------------------------
+	//	モーション
+	//------------------------------------------------------
+	int m_iMotionNumbers[(int)MOTION_TYPE::MAX];
+
+
+	//------------------------------------------------------
+	//	HP・ダメージ
+	//------------------------------------------------------
+	int m_iMaxHP;
+	int m_iHP;
+	float m_fDamageRate;				// 自分にダメージのかかる補正
+
+
+	//------------------------------------------------------
+	//	スコア
+	//------------------------------------------------------
+	int m_iScore;				// 実体後の本当のスコア
+	int m_iCollectScore;			// 実体前の貯めているスコア
+
+
+	//------------------------------------------------------
+	//	インプット・コマンド
+	//------------------------------------------------------
+	static const int c_COMMAND_FRAME_MAX = 30;
+	int m_iInputList[(int)PLAYER_INPUT::MAX]; 	// 押しているキーを格納
+	WORD m_wCommandHistory[c_COMMAND_FRAME_MAX];
+	WORD m_wAheadCommand;	// 先行入力用
+
+	//------------------------------------------------------
+	//	スタンド
+	//------------------------------------------------------
+	Stand::Base *m_pStand;		// スタンドの基底クラスの実体
+
+
+	//------------------------------------------------------
+	//	対戦相手のポインタ
+	//------------------------------------------------------
+	BasePlayer *m_pTargetPlayer;		// 相手プレイヤーのポインタを持つ(好き勝手にいじる)
+
+	//------------------------------------------------------
+	//	オブジェクトの実体
+	//------------------------------------------------------
+	iex3DObj *m_pDefaultObj, *m_pHHDOFObj;	// メッシュ実体
+	iex3DObj *m_pObj;				// 参照するだけのメッシュ実体
+	BaseUVEffect *m_pSpeedLine;		// 超必殺技のスピードライン
+	tdn2DAnim* m_pFacePic;			// 顔グラ
+
+
+	//------------------------------------------------------
+	//	エフェクト
+	//------------------------------------------------------
+	PanelEffectManager* m_pPanelEffectMGR;	// パラパラアニメエフェクト 
+	UVEffectManager* m_pUVEffectMGR;			// UVエフェクト
+
+
+	//------------------------------------------------------
+	//	覚醒
+	//------------------------------------------------------
 	int m_OverDriveGage;			// 覚醒ゲージ
 	bool m_bOverDrive;				// 覚醒してるか
 	int m_OverDriveFrame;			// 覚醒時間
 	OVERDRIVE_TYPE m_OverDriveType;	// 覚醒の種類
 
+
+	//------------------------------------------------------
+	//	その他
+	//------------------------------------------------------
+	const int m_iDeviceID;		// 自分のコントローラーの番号(実質、スマブラのxPに値する)
+	float m_fMaxSpeed;		// キャラクターの最大スピード 
+	SIDE m_side;			// このキャラクターの所属してるチーム		
+	CollisionShape::Square *m_pHitSquare;	// 四角判定(ステージ衝突で使う)
+	StateMachine<BasePlayer>* m_pStateMachine; // ★ステートマシン
+	AI*						  m_pAI;			// ★AI
+	bool m_bAI;					// AIかどうか
+
+
+	// ヒーホー用の変数
+	int m_iHeavehoStopTimer;			// ヒーホードライブ発動のザワールドの時間
+	int m_iHeaveHoDriveOverFlowFrame;	// ヒーホーの必殺のSEとかエフェクト用に作る
+
+	float m_fOrangeColRate;	// 無敵技のオレンジの光レート
+	float m_fMagentaColRate;	// 中段技のマゼンタの光レート
+
+
+	// ストップフラグ
+	bool m_bGameTimerStopFlag;
+
 	// ラウンド獲得数
-	int m_WinNum;
+	int m_iWinNum;
 
-	// スキルアクション
-	SKILL_ACTION_TYPE m_SkillActionType;
-
-	// 「喰らい中」に攻撃をくらってるカウント
-	std::list<BASE_ACTION_STATE> m_RecoveryDamageCount;
-
-	Stand::Base *m_pStand;		// スタンドの基底クラスの実体
-
-	FRAME_STATE m_ActionFrameList[(int)BASE_ACTION_STATE::END][FRAME_MAX];
-	BASE_ACTION_STATE m_ActionState;
 
 	// (A列車)　//////////////////////////////////////////////////////////
 	// エフェクトマネージャーを一人ずつ持たせた理由は
@@ -914,9 +971,6 @@ protected:
 	// そもそもダメージエフェクトなどキャラクターに一つあればいいと思った
 	//	4人対戦で5つもヒットエフェクトがでることはないので　
 	// 初期ロードは重くなるがゲーム中おもくなるよりマシ。
-
-	PanelEffectManager* m_PanelEffectMGR;	// パラパラアニメエフェクト 
-	UVEffectManager* m_UVEffectMGR;			// UVエフェクト
 
 	// 継承してるやつに強制的に呼ばせる
 	void LoadAttackFrameList(char *filename);
