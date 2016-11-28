@@ -34,6 +34,7 @@ public:
 	void Render();			// 描画
 	void Render_ADD();			// 乗算描画
 	void Render_Guard();			// ガード用描画
+	void Render_AreaWall();			// エリアの壁用
 
 	// スケール・アニメーション　最初から　最後まで　の大きさを書く　変化させたくなければ　どっちも同じ値を入れる
 	void ScaleAnimation(float StartScale, float EndScale);

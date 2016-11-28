@@ -2,6 +2,7 @@
 
 #include "Data/SelectData.h"
 #include "../Camera/camera.h"
+#include "Effect\UVEffect\BaseUVEffect.h"
 
 // 前方宣言ｎ
 
@@ -22,6 +23,9 @@ namespace Stage
 		virtual void Render(tdnShader* shader,char* name);
 		virtual void RenderDeferred();
 		virtual void RenderShadow();
+
+		void ActionWall();
+		void StopWall();
 
 		//virtual void Render_ShadowBuf() = 0;
 
@@ -46,10 +50,11 @@ namespace Stage
 		float GetWidth(){ return m_fWidth; }
 
 	protected:
-		iexMesh *m_pObj;	// メッシュの実体
-		iexMesh *m_pBack;	// スカイドームとか、背景で使う
-		float m_fWidth;		// ステージの幅
-		float m_fBottom;	// Y座標
+		iexMesh *m_pObj;			// メッシュの実体
+		iexMesh *m_pBack;			// スカイドームとか、背景で使う
+		BaseUVEffect *m_pAreWall;	// エリアウォール
+		float m_fWidth;				// ステージの幅
+		float m_fBottom;			// Y座標
 	};
 
 

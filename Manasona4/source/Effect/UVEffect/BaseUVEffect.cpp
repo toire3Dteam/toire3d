@@ -41,6 +41,13 @@ void BaseUVEffect::RenderGuard()
 	m_pic->Render_Guard();
 }
 
+void BaseUVEffect::RenderAreaWall()
+{
+	// ƒGƒŠƒA‚Ì•Ç—p•`‰æ
+	m_pic->Render_AreaWall();
+
+}
+
 void BaseUVEffect::Action(Vector3 pos, 
     float startScale, float endScale,
     Vector3 startAngle , Vector3 endAngle)

@@ -2140,3 +2140,103 @@ technique uvAnime_guard
 		PixelShader = compile ps_3_0 PS_UvAnime_Guard();
 	}
 }
+
+
+//------------------------------------------------------
+//	エリアのマスク用の頂点構造体
+//------------------------------------------------------
+struct VS_OUTPUT_UV_WALL
+{
+	float4 Pos		: POSITION;
+	float4 Color	: COLOR0;
+	float2 Tex		: TEXCOORD0;
+	float4 wvpPos	: TEXCOORD1;
+	float2 MaskTex	: TEXCOORD3;
+	float3 Normal	: NORMAL;
+};
+
+//------------------------------------------------------
+//	エリアのマスク
+//------------------------------------------------------
+texture AreaWallTex;
+sampler AreaWallSamp = sampler_state
+{
+	Texture = <AreaWallTex>;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+	MipFilter = NONE;
+
+	AddressU = Wrap;// 繰り返す
+	AddressV = Wrap;
+};
+
+
+//------------------------------------------------------
+///		エリアの壁用頂点シェーダー	
+//------------------------------------------------------
+VS_OUTPUT_UV_WALL VS_UvAnime_AreaWall(VS_INPUT_UV In)
+{
+	VS_OUTPUT_UV_WALL Out = (VS_OUTPUT_UV_WALL)0;
+
+	Out.Pos = mul(In.Pos, WVPMatrix);
+	Out.wvpPos = Out.Pos;
+	Out.Normal = In.Normal;
+	Out.Color = In.Color;// 頂点カラー取得
+	Out.Tex = In.Tex + float2(tuAnime, tvAnime);//座標
+	Out.MaskTex = In.Tex;
+	Out.Color.rgb = 1.0f;
+	Out.Color.a *= alphaUV; //　透明度
+
+	return Out;
+}
+
+//------------------------------------------------------
+///		エリアの壁用ピクセルシェーダー	
+//------------------------------------------------------
+PS_TONEMAP PS_UvAnime_AreaWall(VS_OUTPUT_UV_WALL In) : COLOR
+{
+	PS_TONEMAP	OUT = (PS_TONEMAP)0;
+
+	//	ピクセル色決定
+	OUT.color = In.Color * tex2D(DecaleSampUV, In.Tex);
+
+	// マスクマップ取得
+	float rate = tex2D(AreaWallSamp, In.MaskTex).r;
+
+	// デカールと掛け合わす
+	OUT.color.rgb *= rate;
+
+	// ヘキサが映っていないときでも少し色を乗せる
+	//OUT.color.a += 0.2f;
+	OUT.color.g += 0.1f;
+	OUT.color.b += 0.2f;
+
+	//トーンマッピング
+	//OUT.color.rgb *= exp2(exposure); 今は考慮はなしで
+
+	// 高輝度抽出
+	OUT.high.rgb = max(OUT.color.rgb - 0.45f, 0.0f);
+	OUT.high.a = OUT.color.a;
+
+	return OUT;
+}
+
+//------------------------------------------------------
+///		エリアの壁用テクニック
+//------------------------------------------------------
+technique uvAnime_areaWall
+{
+	pass P0
+	{
+		AlphaBlendEnable = true;
+		BlendOp = Add;
+		SrcBlend = SrcAlpha;
+		DestBlend = One;
+		CullMode = CCW;
+		ZEnable = true;			// このオブジェクトはZバッファを考慮する
+		ZWriteEnable = false;	// このオブジェクトをZバッファに書き込まない
+
+		VertexShader = compile vs_3_0 VS_UvAnime_AreaWall();
+		PixelShader = compile ps_3_0 PS_UvAnime_AreaWall();
+	}
+}

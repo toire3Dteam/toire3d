@@ -6,20 +6,25 @@
 
 Stage::Base::Base() : m_pObj(nullptr), m_pBack(nullptr), m_fBottom(0), m_fWidth(200)
 {
-
+	// 壁
+	m_pAreWall = new AreaWallEffect();
+	m_pAreWall->ActionRoop();
 }
 
 Stage::Base::~Base()
 {
 	SAFE_DELETE(m_pObj);
 	SAFE_DELETE(m_pBack);
+	SAFE_DELETE(m_pAreWall);
 }
 
 
 
 void Stage::Base::Update()
 {
-
+	// 壁
+	//m_pAreWall->GetUV()->ScaleAnimation(m_fWidth, m_fWidth);
+	m_pAreWall->Update();
 }
 
 void Stage::Base::Render()
@@ -31,6 +36,7 @@ void Stage::Base::Render(tdnShader* shader, char* name)
 {
 	if (m_pBack) m_pBack->Render(shaderM,"sky");
 	m_pObj->Render(shader, name);
+	m_pAreWall->RenderAreaWall();// 壁
 }
 void Stage::Base::RenderDeferred()
 {
@@ -39,6 +45,14 @@ void Stage::Base::RenderDeferred()
 void Stage::Base::RenderShadow()
 {
 	m_pObj->Render(shaderM, "ShadowBuf");
+}
+void Stage::Base::ActionWall()
+{
+	m_pAreWall->ActionRoop();
+}
+void Stage::Base::StopWall()
+{
+	m_pAreWall->Stop();
 }
 void Stage::Base::CreateStage(Stage::Base**p,STAGE id, Camera *pCamera)
 {
@@ -111,7 +125,7 @@ void Stage::Sea::Initialize(Camera *pCamera)
 	m_pBack->SetScale(3.5f);
 	m_pBack->Update();
 	m_fBottom = 0;
-	m_fWidth = 200;
+	m_fWidth = 150;
 
 	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
 	pCamera->SetStageCameraInfo("DATA/Stage/Sister/camera.txt");

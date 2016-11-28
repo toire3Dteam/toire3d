@@ -315,6 +315,21 @@ void AnimationUV::Render_Guard()
 
 }
 
+// エリアの壁用
+void AnimationUV::Render_AreaWall()
+{
+	if (isAction == false)return;//実行されてないなら出てけ！！
+
+	 // 描画の前に情報を送る
+	 //　シェーダーに描画毎UV座標を送る
+	shaderM->SetValue("tuAnime", tu);
+	shaderM->SetValue("tvAnime", tv);
+	shaderM->SetValue("alphaUV", alpha);// 透明度
+
+										// 描画
+	obj->Render(shaderM, "uvAnime_areaWall");
+}
+
 
 // 拡大アニメ
 void AnimationUV::ScaleAnimation(float StartScale, float EndScale)

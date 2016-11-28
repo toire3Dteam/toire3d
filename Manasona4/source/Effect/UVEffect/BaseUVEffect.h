@@ -10,12 +10,13 @@ class BaseUVEffect
 {
 public:
 	BaseUVEffect();
-	~BaseUVEffect();
+	virtual ~BaseUVEffect();
 
 	virtual void Update();
 	virtual void Render();
 	virtual void RenderADD();
 	virtual void RenderGuard();
+	virtual void RenderAreaWall();// 壁
 
     virtual void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f,
         Vector3 startAngle = VECTOR_ZERO, Vector3 endAngle = VECTOR_ZERO);
@@ -796,7 +797,7 @@ private:
 };
 
 /**********************************/
-//	WillPowerオーラ
+//	根性値オーラ
 /**********************************/
 class WillPowerAuraEffect :public BaseUVEffect
 {
@@ -812,4 +813,32 @@ public:
 	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
 
 private:
+};
+
+/**********************************/
+//	エリアウォール
+/**********************************/
+class AreaWallEffect :public BaseUVEffect
+{
+public:
+	AreaWallEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/AreaWall/AreaWall.IMO", 0.0f, 0.003f, 18, true, 1, 12);
+		m_pMaskPic = new tdn2DObj("Data/UVeffect/AreaWall/HexagonMask.png");
+		shaderM->SetValue("AreaWallTex", m_pMaskPic);
+	};
+	~AreaWallEffect() 
+	{
+		SAFE_DELETE(m_pMaskPic);
+	};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderAreaWall(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+	// 壁用のマスク（ヘキサ）
+	tdn2DObj* m_pMaskPic;
+
+
 };
