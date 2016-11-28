@@ -964,6 +964,10 @@ void BasePlayerState::Wait::Enter(BasePlayer * pPerson)
 
 	//	アングル補間
 	pPerson->SetDirAngle();
+
+	// ダウンフラグを解除
+	pPerson->SetDown(false);
+
 }
 
 void BasePlayerState::Wait::Execute(BasePlayer * pPerson)
@@ -2684,6 +2688,7 @@ void BasePlayerState::KnockBack::Enter(BasePlayer * pPerson)
 {
 	// ダメージモーションに変える
 	pPerson->SetMotion(MOTION_TYPE::KNOCKBACK);
+
 }
 
 void BasePlayerState::KnockBack::Execute(BasePlayer * pPerson)
@@ -2742,12 +2747,21 @@ void BasePlayerState::DownFall::Enter(BasePlayer * pPerson)
 	// 足払いくらいモーションに変える
 	pPerson->SetMotion(MOTION_TYPE::KNOCKDOWN_DOWN);
 
+	// ダウンフラグを立てる
+	pPerson->SetDown(true);
 }
 
 void BasePlayerState::DownFall::Execute(BasePlayer * pPerson)
 {
-	// 硬直が0以下なら硬直終了
-	//if (pPerson->GetRecoveryFrame() <= 0)
+	// 硬直が0以下ならダメージ補正解除
+	if (pPerson->GetRecoveryFrame() <= 0)
+	{
+		// ダメージ補正リセット
+		pPerson->ResetDamageRate();
+		// コンボ補正リセット
+		pPerson->GetRecoveryDamageCount()->clear();
+	}
+
 	{
 		// 硬直が0になったら　なおかついずれかのボタンを押していたら復帰ステートへ
 		if (pPerson->isPushInput(PLAYER_COMMAND_BIT::A)||
@@ -2756,6 +2770,15 @@ void BasePlayerState::DownFall::Execute(BasePlayer * pPerson)
 			pPerson->isPushInput(PLAYER_COMMAND_BIT::D)||
 			pPerson->isPushInput(PLAYER_COMMAND_BIT::R1))
 		{
+
+			// ダウンフラグを解除
+			pPerson->SetDown(false);
+			// 喰らったカウントリセット
+			pPerson->GetRecoveryDamageCount()->clear();
+			// 先行入力リセット
+			pPerson->AheadCommandReset();
+			// ダメージ補正リセット
+			pPerson->ResetDamageRate();
 
 			// 地上オア空中
 			if (pPerson->isLand() == true)
@@ -2769,12 +2792,7 @@ void BasePlayerState::DownFall::Execute(BasePlayer * pPerson)
 			//	pPerson->GetFSM()->ChangeState(BasePlayerState::AerialRecovery::GetInstance());
 			//}
 
-			// 喰らったカウントリセット
-			pPerson->GetRecoveryDamageCount()->clear();
-			// 先行入力リセット
-			pPerson->AheadCommandReset();
-			// ダメージ補正リセット
-			pPerson->ResetDamageRate();
+
 		}
 	}
 }
@@ -2821,6 +2839,9 @@ void BasePlayerState::KnockDown::Enter(BasePlayer * pPerson)
 	// ノックダウンモーションに変える
 	pPerson->SetMotion((MoveLen > 1) ? MOTION_TYPE::KNOCKDOWN : MOTION_TYPE::KNOCKDOWN_DOWN);
 
+	// ダウンフラグを立てる
+	pPerson->SetDown(true);
+
 	//むてきつくった
 	// ★やっぱりここで無敵時間設定(GlobalのMessageで書きます)
 	//pPerson->SetInvincible(90,1);
@@ -2842,6 +2863,11 @@ void BasePlayerState::KnockDown::Execute(BasePlayer * pPerson)
 	// 硬直が0以下なら硬直終了
 	if (pPerson->GetRecoveryFrame() <= 0)
 	{
+		// 喰らったカウントリセット
+		pPerson->GetRecoveryDamageCount()->clear();
+		// ダメージ補正リセット
+		pPerson->ResetDamageRate();
+
 		//pPerson->SetInvincible(60, 1);
 
 		if (pPerson->isPushInput(PLAYER_COMMAND_BIT::A) ||
@@ -2850,24 +2876,27 @@ void BasePlayerState::KnockDown::Execute(BasePlayer * pPerson)
 			pPerson->isPushInput(PLAYER_COMMAND_BIT::D) ||
 			pPerson->isPushInput(PLAYER_COMMAND_BIT::R1)  )
 		{
+			// ダウンフラグを解除
+			pPerson->SetDown(false);
+
+			// 先行入力リセット
+			pPerson->AheadCommandReset();
+
 			// 地上オア空中
 			if (pPerson->isLand() == true)
 			{
 				// 地上リカバリーステートへ！
 				pPerson->GetFSM()->ChangeState(BasePlayerState::LandRecovery::GetInstance());
+				return;
 			}
 			else
 			{
 				// 空中リカバリーステートへ！
 				pPerson->GetFSM()->ChangeState(BasePlayerState::AerialRecovery::GetInstance());
+				return;	
 			}
 
-			// 喰らったカウントリセット
-			pPerson->GetRecoveryDamageCount()->clear();
-			// 先行入力リセット
-			pPerson->AheadCommandReset();
-			// ダメージ補正リセット
-			pPerson->ResetDamageRate();
+
 		}
 
 	}

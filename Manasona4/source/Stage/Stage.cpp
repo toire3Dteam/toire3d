@@ -96,7 +96,7 @@ void Stage::Sand::Initialize(Camera *pCamera)
 	//m_pBack->SetScale(5.5f);
 	m_pBack->Update();
 	m_fBottom = 0;
-	m_fWidth = 150;
+	m_fWidth = 200;
 
 	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
 	pCamera->SetStageCameraInfo("DATA/Stage/Stage/camera.txt");
@@ -111,7 +111,7 @@ void Stage::Sea::Initialize(Camera *pCamera)
 	m_pBack->SetScale(3.5f);
 	m_pBack->Update();
 	m_fBottom = 0;
-	m_fWidth = 150;
+	m_fWidth = 200;
 
 	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
 	pCamera->SetStageCameraInfo("DATA/Stage/Sister/camera.txt");
@@ -124,7 +124,7 @@ void Stage::Syuten::Initialize(Camera *pCamera)
 	m_pBack->SetPos(Vector3(0, -50, 0));
 	m_pBack->Update();
 	m_fBottom = 0;
-	m_fWidth = 150;
+	m_fWidth = 200;
 
 	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
 	pCamera->SetStageCameraInfo("DATA/Stage/Syuten/camera.txt");

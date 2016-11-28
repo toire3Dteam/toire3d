@@ -130,12 +130,12 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 	// 攻撃系のステートじゃないよ！
 	if (!my->isAttackState()) return;
 
-	// 相手がエスケープ中だよ！
-	if (you->isEscape()) return;
-
 	// すでに当たってたら
 	AttackData *pAttackData(my->GetAttackData());
 	if (pAttackData->bHit) return;
+
+	// 相手がエスケープ中だよ！
+	if (you->isEscape() && pAttackData->attribute != ATTACK_ATTRIBUTE::THROW) return;
 
 	if (!my->isActiveFrame()) return; // 攻撃フレーム中じゃない
 	// 渾身の対空の処理
@@ -182,7 +182,7 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 				you->SetHitStopFrame(pAttackData->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame);
 
 				// 掴まれたメッセージ
-				MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, you->GetID(), MESSAGE_TYPE::BE_THROWN, nullptr);
+				MsgMgr->Dispatch(0, my->GetID(), you->GetID(), MESSAGE_TYPE::BE_THROWN, nullptr);
 			}
 
 			else

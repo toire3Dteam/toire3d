@@ -76,7 +76,7 @@ m_iWinNum(0), m_GuardState(GUARD_STATE::NO_GUARD),
 m_pFacePic(nullptr), m_pTargetPlayer(nullptr), m_pSpeedLine(nullptr), m_SkillActionType(SKILL_ACTION_TYPE::MAX),
 m_fOrangeColRate(0), m_fMagentaColRate(0),
 m_pCutinPic(nullptr), m_pName("None"), m_iRushStep(0), m_pThrowMark(nullptr),
-m_bWillPower(false)
+m_bWillPower(false), m_bDown(false)
 {
 	// スタンド
 	switch (data.partner)
@@ -197,6 +197,7 @@ void BasePlayer::Reset()
 	m_bLand=
 	m_bSquat=
 	m_bWillPower=
+	m_bDown=
 	false;
 
 
@@ -204,7 +205,8 @@ void BasePlayer::Reset()
 	//m_pTargetPlayer = nullptr;
 	m_pObj = m_pDefaultObj;
 	if (m_pObj) m_pObj->SetMotion(m_iMotionNumbers[(int)MOTION_TYPE::WAIT]);
-	m_pStateMachine->SetCurrentState(BasePlayerState::Wait::GetInstance());
+	//m_pStateMachine->SetCurrentState(BasePlayerState::Wait::GetInstance()); 
+	m_pStateMachine->ChangeState(BasePlayerState::Wait::GetInstance());			// [11/28] リセット時はもうステートが設定されているのチェンジで
 	m_pStateMachine->SetPreviousState(BasePlayerState::Wait::GetInstance());
 
 	/* [列挙型]の初期化 */
@@ -226,6 +228,8 @@ void BasePlayer::Reset()
 		break;
 	}
 
+	// コンボ補正初期化
+	m_RecoveryDamageCount.clear();
 
 	m_vMove.Set(0, 0, 0);
 
@@ -288,7 +292,7 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 	if (GetFSM()->isInState(*BasePlayerState::OverDrive_OneMore::GetInstance()) == false)
 	{
 		// スタンド更新
-		m_pStand->Update((flag != PLAYER_UPDATE::CONTROL_NO));
+		m_pStand->Update((flag == PLAYER_UPDATE::CONTROL_OK));
 	}
 
 	// 無敵時間の更新
@@ -1617,8 +1621,9 @@ void BasePlayer::WillPowerUpdate()
 	{
 		if (HpRate <= 0.35f)
 		{
-			// リカバリーフレームが切れ動けるようになった瞬間がトリガー
-			if (m_iRecoveryFrame <= 0)
+			// リカバリーフレームが切れ動けるようになった瞬間+
+			// ダウンフラグFalseの時がトリガー
+			if (m_iRecoveryFrame <= 0 && m_bDown == false)
 			{
 				// 根性発動
 				m_bWillPower = true;
@@ -1628,6 +1633,9 @@ void BasePlayer::WillPowerUpdate()
 
 				// 演出
 				AddEffectAction(m_vPos, EFFECT_TYPE::WILL_POWER);
+				
+				// オーラ発動
+				m_pUVEffectMGR->AddEffectRoop(GetCenterPos(), UV_EFFECT_TYPE::WILL_POWER_AURA);
 
 			}
 
@@ -1640,8 +1648,14 @@ void BasePlayer::WillPowerUpdate()
 		{
 			m_bWillPower = false;
 		}
-
+		// オーラ終了
+		m_pUVEffectMGR->StopEffectRoop(UV_EFFECT_TYPE::WILL_POWER_AURA);
+	
 	}
+
+	// キャラクターに追従
+	// オーラエフェクト更新
+	m_pUVEffectMGR->GetBaseUVEffect(UV_EFFECT_TYPE::WILL_POWER_AURA)->SetPos(GetCenterPos());
 
 	//throw gcnew System::NotImplementedException();
 

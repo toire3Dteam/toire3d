@@ -582,6 +582,8 @@ public:
 	void SetHitStopFrame(int frame) { m_iHitStopFrame = frame; }
 	void SetRecoveryFrame(int frame) { m_iRecoveryFrame = frame; }
 	std::list<BASE_ACTION_STATE> *GetRecoveryDamageCount(){ return &m_RecoveryDamageCount; }
+	bool isDown() { return m_bDown; }
+	void SetDown(bool down) { m_bDown = down; }
 
 	//------------------------------------------------------
 	//	ガード
@@ -861,6 +863,7 @@ protected:
 	std::list<BASE_ACTION_STATE> m_RecoveryDamageCount;	//「喰らい中」に攻撃をくらってるカウント
 	int m_iRecoveryFrame;								// 1以上なら0になるまで操作を受け付けない
 	int m_iHitStopFrame;									// 1以上なら0になるまでストップ
+	bool m_bDown;										// ダウン状態
 
 	//------------------------------------------------------
 	//	ガード

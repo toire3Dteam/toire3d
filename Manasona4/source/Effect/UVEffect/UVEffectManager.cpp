@@ -94,6 +94,9 @@ UVEffectManager::UVEffectManager()
 		case UV_EFFECT_TYPE::RED_WAVE:
 			m_baseUVEffect[i] = new RedWaveEffect();
 			break;
+		case UV_EFFECT_TYPE::WILL_POWER_AURA:
+			m_baseUVEffect[i] = new WillPowerAuraEffect();
+			break;
 		default:
 			assert(0);	// "そんなエフェクトはない"
 			break;

@@ -794,3 +794,22 @@ public:
 
 private:
 };
+
+/**********************************/
+//	WillPowerÉIÅ[Éâ
+/**********************************/
+class WillPowerAuraEffect :public BaseUVEffect
+{
+public:
+	WillPowerAuraEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/WillPower/WillPowerAura.IMO", 0.0f, 0.015f, 18, true, 1, 12);
+	};
+	~WillPowerAuraEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
