@@ -155,8 +155,6 @@ void MenuUIManager::Render()
 	// Â‚¢ü
 	m_pblueLine->Render(0, m_iBlueLineY);
 
-
-
 	// à–¾‚Ì•£
 	m_pInfo->Render(0, m_iInfoY);
 

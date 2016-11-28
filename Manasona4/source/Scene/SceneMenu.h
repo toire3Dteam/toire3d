@@ -66,6 +66,9 @@ public:
 	void AddSelectNo(int add) { m_iSelectNo += add; }
 	void SetSelectNo(int set) { m_iSelectNo = set; }
 
+	int GetCtrlDevice() { return m_iCtrlDevice; }
+	void SetCtrlDevice(int set) { m_iCtrlDevice = set; }
+
 	ControllerSelectUI* GetCtrlSelectUI() { return m_pCtrlSelectUI; }
 
 	TipsCard* GetTips(TIPS_TYPE type) { return m_pTips[(int)type]; }
@@ -76,6 +79,7 @@ private:
 	// メニューUI
 	MenuUIManager*	m_pMenuUIMgr;
 	static int m_iSelectNo;
+	static int m_iCtrlDevice;
 
 	// コントローラーセレクト用
 	ControllerSelectUI* m_pCtrlSelectUI;

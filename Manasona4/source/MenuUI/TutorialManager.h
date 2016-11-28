@@ -42,7 +42,7 @@ public:
 	}
 
 	// ‰Šú‰»
-	void Init(TUTORIAL_TYPE type);
+	void Init(TUTORIAL_TYPE type,int DeviceID);
 
 	void Update();
 	void TaskUpdate(BasePlayer* pPerson);

@@ -55,7 +55,7 @@ void TipsCard::Update(int DeviceID)
 		m_pCardPic->SetAlpha(255);
 		break;
 	case TipsCard::EXECUTE:
-
+	{
 		m_iAlpha += (255 / 7);
 		if (m_iAlpha >= 255)
 		{
@@ -69,71 +69,91 @@ void TipsCard::Update(int DeviceID)
 		// コントロール
 		/*****************/
 
-		// 選択肢があれば
-		if (m_bChoice)
-		{
-			if (tdnInput::KeyGet(KEYCODE::KEY_UP, DeviceID) == 3)
-			{
-				if (m_bOK == true)
-				{
-					m_pChoiceCancelPic->Action();
-					m_bOK = false;
-				}
-				else
-				{
-					m_pChoiceOKPic->Action();
-					m_bOK = true;
-				}
+		//// パッドの数
+		//int NumDevice(tdnInputManager::GetNumDevice());
 
-			}
-			if (tdnInput::KeyGet(KEYCODE::KEY_DOWN, DeviceID) == 3)
-			{
-				if (m_bOK == true)
-				{
-					m_pChoiceCancelPic->Action();
-					m_bOK = false;
-				}
-				else
-				{
-					m_pChoiceOKPic->Action();
-					m_bOK = true;
-				}
+		//int count = NumDevice;
 
-			}
-		}
+		//// パッド何もささってないときは１に
+		//if (NumDevice == 0)	count = 1;
 
-		// 決定
-		if (tdnInput::KeyGet(KEYCODE::KEY_B, DeviceID) == 3)
-		{
-			if (m_bOK == true)
-			{
-				m_eSelectState = SELECT_STATE::OK;
-			}
-			else
-			{
-				m_eSelectState = SELECT_STATE::CANCEL;
-			}
+		//for (int i = 0; i < count; i++)
+		//{
 
-			End();
-		}
-
-		// ×
-		if (tdnInput::KeyGet(KEYCODE::KEY_A, DeviceID) == 3)
-		{
+			// 選択肢があれば
 			if (m_bChoice)
 			{
-				m_eSelectState = SELECT_STATE::CANCEL;
+
+
+				if (tdnInput::KeyGet(KEYCODE::KEY_UP, DeviceID) == 3)
+				{
+					if (m_bOK == true)
+					{
+						m_pChoiceCancelPic->Action();
+						m_bOK = false;
+					}
+					else
+					{
+						m_pChoiceOKPic->Action();
+						m_bOK = true;
+					}
+
+					return;
+				}
+				if (tdnInput::KeyGet(KEYCODE::KEY_DOWN, DeviceID) == 3)
+				{
+					if (m_bOK == true)
+					{
+						m_pChoiceCancelPic->Action();
+						m_bOK = false;
+					}
+					else
+					{
+						m_pChoiceOKPic->Action();
+						m_bOK = true;
+					}
+
+					return;
+				}
 			}
-			else
+
+			// 決定
+			if (tdnInput::KeyGet(KEYCODE::KEY_B, DeviceID) == 3)
 			{
-				m_eSelectState = SELECT_STATE::OK;
+				if (m_bOK == true)
+				{
+					m_eSelectState = SELECT_STATE::OK;
+				}
+				else
+				{
+					m_eSelectState = SELECT_STATE::CANCEL;
+				}
+
+				End();
+
+				return;
 			}
 
-			End();
-		}
-		
+			// ×
+			if (tdnInput::KeyGet(KEYCODE::KEY_A, DeviceID) == 3)
+			{
+				if (m_bChoice)
+				{
+					m_eSelectState = SELECT_STATE::CANCEL;
+				}
+				else
+				{
+					m_eSelectState = SELECT_STATE::OK;
+				}
 
-		break;
+				End();
+
+				return;
+			}
+
+		//}// NumDevice分回るFor文
+
+	}	break;
 	case TipsCard::END:
 		m_iAlpha -= (255 / 6);
 		if (m_iAlpha <= 0)

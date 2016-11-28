@@ -351,11 +351,14 @@ PanelEffectManager::PanelEffectManager()
 		case PANEL_EFFECT_TYPE::OVER_DRIVE_START:
 			m_basePanelEffect[i] = new OverDriveStartEffect();
 			break;
-		case PANEL_EFFECT_TYPE::ORANGE_LOGHT:
+		case PANEL_EFFECT_TYPE::ORANGE_LIGHT:
 			m_basePanelEffect[i] = new OrangeLightEffect();
 			break;
 		case PANEL_EFFECT_TYPE::DOKKOI:
 			m_basePanelEffect[i] = new DokkoiEffect();
+			break;
+		case PANEL_EFFECT_TYPE::RED_RIGHT:
+			m_basePanelEffect[i] = new RedLightEffect();
 			break;
 		default:
 			assert(0);		// "そんなエフェクトはない"

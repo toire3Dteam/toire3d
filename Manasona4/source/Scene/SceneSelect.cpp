@@ -63,6 +63,8 @@ bool sceneSelect::Initialize()
 
 	//m_pCtrlSelectUI = new ControllerSelectUI();
 
+	m_iSenderDeviceID = 0;
+
 	// Stage&BGM
 	m_tagSecondSelect.bBGMSelect = false;
 	m_tagSecondSelect.iX = 293;
@@ -151,8 +153,7 @@ void sceneSelect::Update()
 
 	// ヒントカード
 	m_pBackMenuTips->Update(m_iSenderDeviceID);
-	m_iSenderDeviceID = 0;
-
+	
 	{
 		// ★ステートマシン更新(何故ここに書くかというと、中でシーンチェンジの処理を行っているため)
 		m_pStateMachine->Update();

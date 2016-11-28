@@ -208,30 +208,35 @@ void HpGage::UseMaskScreen()
 				(int)(m_iGageWidth*m_fDamageRate), m_iGageHeight);
 
 			// HPによって色を変える
-			if (m_fRate >= 1.0f)
+			// 覚醒してるか
+			if (m_pPlayerReferences->isWillPower())
 			{
-				m_pGage->Render((int)m_vPos.x + (m_iGageWidth - (int)(m_iGageWidth * m_fRate)), (int)m_vPos.y,
-					(int)(m_iGageWidth*m_fRate), m_iGageHeight,
-					m_iGageWidth - (int)(m_iGageWidth  * m_fRate), 0,
-					(int)(m_iGageWidth*m_fRate), m_iGageHeight);
-			}
-			else if (m_fRate >= 0.35f)// 普通位
-			{
-				m_pGageUsually->Render((int)m_vPos.x + (m_iGageWidth - (int)(m_iGageWidth * m_fRate)), (int)m_vPos.y,
-					(int)(m_iGageWidth*m_fRate), m_iGageHeight,
-					m_iGageWidth - (int)(m_iGageWidth  * m_fRate), 0,
-					(int)(m_iGageWidth*m_fRate), m_iGageHeight);
-
-			}
-			else // ピンチ
-			{
+				// 覚醒時は黄色
 				m_pGagePinch->Render((int)m_vPos.x + (m_iGageWidth - (int)(m_iGageWidth * m_fRate)), (int)m_vPos.y,
 					(int)(m_iGageWidth*m_fRate), m_iGageHeight,
 					m_iGageWidth - (int)(m_iGageWidth  * m_fRate), 0,
 					(int)(m_iGageWidth*m_fRate), m_iGageHeight);
 			}
+			else
+			{
+				if (m_fRate >= 1.0f)
+				{
+					m_pGage->Render((int)m_vPos.x + (m_iGageWidth - (int)(m_iGageWidth * m_fRate)), (int)m_vPos.y,
+						(int)(m_iGageWidth*m_fRate), m_iGageHeight,
+						m_iGageWidth - (int)(m_iGageWidth  * m_fRate), 0,
+						(int)(m_iGageWidth*m_fRate), m_iGageHeight);
+				}
+				else /*if (m_fRate >= 0.35f)*/// 普通位
+				{
+					m_pGageUsually->Render((int)m_vPos.x + (m_iGageWidth - (int)(m_iGageWidth * m_fRate)), (int)m_vPos.y,
+						(int)(m_iGageWidth*m_fRate), m_iGageHeight,
+						m_iGageWidth - (int)(m_iGageWidth  * m_fRate), 0,
+						(int)(m_iGageWidth*m_fRate), m_iGageHeight);
 
-			
+				}
+			}
+
+
 			m_pWave->Render((int)m_vPos.x + (m_iGageWidth - (int)(m_iGageWidth * m_fRate)), (int)m_vPos.y,
 				(int)(m_iGageWidth), m_iGageHeight,
 				m_iGageWidth - (int)(m_iGageWidth  * m_fRate)+ (int)m_fWaveUV, 0,
@@ -270,30 +275,37 @@ void HpGage::UseMaskScreen()
 				(int)(m_iGageWidth*m_fDamageRate), m_iGageHeight,
 				0, 0,
 				(int)(m_iGageWidth*m_fDamageRate), m_iGageHeight);
-
-			if (m_fRate >= 1.0f)
+			
+			
+			// HPによって色を変える
+			// 覚醒してるか
+			if (m_pPlayerReferences->isWillPower())
 			{
-				m_pGage->Render((int)m_vPos.x, (int)m_vPos.y,
-					(int)(m_iGageWidth*m_fRate), m_iGageHeight,
-					0, 0,
-					(int)(m_iGageWidth*m_fRate), m_iGageHeight);
-
-			}
-			else if (m_fRate >= 0.35f)// 普通位
-			{
-				m_pGageUsually->Render((int)m_vPos.x, (int)m_vPos.y,
-					(int)(m_iGageWidth*m_fRate), m_iGageHeight,
-					0, 0,
-					(int)(m_iGageWidth*m_fRate), m_iGageHeight);
-
-			}
-			else // ピンチ
-			{
+				// 覚醒時は黄色
 				m_pGagePinch->Render((int)m_vPos.x, (int)m_vPos.y,
 					(int)(m_iGageWidth*m_fRate), m_iGageHeight,
 					0, 0,
 					(int)(m_iGageWidth*m_fRate), m_iGageHeight);
+			}
+			else
+			{
 
+				if (m_fRate >= 1.0f)
+				{
+					m_pGage->Render((int)m_vPos.x, (int)m_vPos.y,
+						(int)(m_iGageWidth*m_fRate), m_iGageHeight,
+						0, 0,
+						(int)(m_iGageWidth*m_fRate), m_iGageHeight);
+
+				}
+				else /*if (m_fRate >= 0.35f)*/// 普通位
+				{
+					m_pGageUsually->Render((int)m_vPos.x, (int)m_vPos.y,
+						(int)(m_iGageWidth*m_fRate), m_iGageHeight,
+						0, 0,
+						(int)(m_iGageWidth*m_fRate), m_iGageHeight);
+
+				}
 			}
 
 

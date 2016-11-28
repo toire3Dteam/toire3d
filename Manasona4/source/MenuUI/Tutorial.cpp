@@ -35,7 +35,7 @@ BaseTutorial::BaseTutorial()
 	m_pClearPicRip = new tdn2DAnim("Data/UI/Tutorial/Clear.png");
 	m_pClearPicRip->OrderRipple(14, 1, 0.025f);
 
-
+	m_iDeviceID = 0;
 }
 
 BaseTutorial::~BaseTutorial()
@@ -49,7 +49,7 @@ BaseTutorial::~BaseTutorial()
 	m_aTask.clear();	
 }
 
-void BaseTutorial::Init()
+void BaseTutorial::Init(int iDeviceID)
 {
 	m_iWaitFrame = m_iWaitFrameMAX;
 	m_bClearFlag = false;
@@ -62,6 +62,8 @@ void BaseTutorial::Init()
 	}
 
 	m_iSelectTask = 0;
+
+	m_iDeviceID = iDeviceID;
 }
 
 void BaseTutorial::Update()
@@ -100,8 +102,8 @@ void BaseTutorial::Update()
 
 	
 	// Tips
-	m_pIntroTips->Update();
-	m_pClearTips->Update();
+	m_pIntroTips->Update(m_iDeviceID);
+	m_pClearTips->Update(m_iDeviceID);
 
 	// クリア演出用
 	m_pClearPic->Update();
@@ -266,10 +268,10 @@ WalkTutorial::WalkTutorial()
 	Init();
 }
 
-void WalkTutorial::Init()
+void WalkTutorial::Init(int iDeviceID)
 {
 	// ★共通
-	BaseTutorial::Init();
+	BaseTutorial::Init(iDeviceID);
 
 	m_iWalkFrame = 0;
 	m_iBackFrame = 0;
@@ -368,10 +370,10 @@ SquatTutorial::SquatTutorial()
 	Init();
 }
 
-void SquatTutorial::Init()
+void SquatTutorial::Init(int iDeviceID)
 {
 	// ★共通
-	BaseTutorial::Init();
+	BaseTutorial::Init(iDeviceID);
 
 	m_iSquatFrame = 0;
 }
@@ -439,10 +441,10 @@ JumpTutorial::JumpTutorial()
 	Init();
 }
 
-void JumpTutorial::Init()
+void JumpTutorial::Init(int iDeviceID)
 {
 	// ★共通
-	BaseTutorial::Init();
+	BaseTutorial::Init(iDeviceID);
 
 }
 
@@ -509,10 +511,10 @@ AttackTutorial::AttackTutorial()
 	Init();
 }
 
-void AttackTutorial::Init()
+void AttackTutorial::Init(int iDeviceID)
 {
 	// ★共通
-	BaseTutorial::Init();
+	BaseTutorial::Init(iDeviceID);
 
 }
 
@@ -597,10 +599,10 @@ SkillTutorial::SkillTutorial()
 	Init();
 }
 
-void SkillTutorial::Init()
+void SkillTutorial::Init(int iDeviceID)
 {
 	// ★共通
-	BaseTutorial::Init();
+	BaseTutorial::Init(iDeviceID);
 
 }
 
@@ -660,10 +662,10 @@ OverDriveTutorial::OverDriveTutorial()
 	Init();
 }
 
-void OverDriveTutorial::Init()
+void OverDriveTutorial::Init(int iDeviceID)
 {
 	// ★共通
-	BaseTutorial::Init();
+	BaseTutorial::Init(iDeviceID);
 
 }
 

@@ -10,7 +10,8 @@
 #include "MenuUI\TutorialManager.h"
 
 // ポーズウィンドウ
-#include "Window\PoseWindow.h"
+#include "Window\PauseWindow.h"
+#include "Window\TutorialPauseWindow.h"
 
 // 前方宣言
 class ShotManager;
@@ -27,7 +28,8 @@ namespace Stage{		// ○
 // バトルのウィンドウの種類
 enum class BATTLE_WINDOW_TYPE
 {
-	POSE, // ポーズ
+	PAUSE, // ポーズ
+	TUTORIAL_PAUSE, // チュートリアルポーズ
 
 	ARRAY_END	// 配列終了
 
@@ -77,6 +79,8 @@ public:
 
 	void SetPose(bool flag) { m_bPose = flag; }
 
+	bool GetTutorialFlag() { return m_bTutorialFlag; }
+
 private:
 	int m_iRoundNum;				// ラウンド数
 
@@ -105,7 +109,7 @@ private:
 	//★必殺の時だけ呼ぶようにおなシャス
 	OverDriveStage* m_pOverDriveStage;		// 必殺用の背景	
 
-	// （仮）チュートリアルかどうか
+	// チュートリアルかどうか
 	bool m_bTutorialFlag;
 	TUTORIAL_TYPE m_eSelectTutorial;		// 選択してるチュートリアル
 

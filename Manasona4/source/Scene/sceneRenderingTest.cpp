@@ -20,16 +20,20 @@
 #include "Effect\LocusEffect.h"
 
 #include "UI\HeaveHoFinish\HeaveHoFinish.h"
+#include "ResultPerformance\ScoreUI\ScoreUI.h"
 
 
-//さっそくためしてみるか！
+// 実験の為に作られた場所
+// 確認さえできればいいので適当
+
 //******************************************************************
 //		初期化・解放
 //******************************************************************
 
+ScoreUI* g_scoreUI;
+
 iexMesh* g_stage;
 iexMesh* g_sky;
-iexMesh* g_test;
 
 tdn3DObj* g_airou;
 
@@ -63,9 +67,10 @@ BasePanelEffect* m_pPanel;
 
 bool sceneRenderingTest::Initialize()
 {
-	m_pPanel = new AirouWindEffect();
+	g_scoreUI = new ScoreUI();
 
-	g_test = new iexMesh("Data/test.imo");
+
+	m_pPanel = new AirouWindEffect();
 
 	m_pSpeedLine = new SpeedLineGreenEffect();
 	m_pSpeedLine->ActionRoop(Vector3(0, 0, 0), 0.5f, 0.5f);
@@ -164,6 +169,7 @@ sceneRenderingTest::~sceneRenderingTest()
 	delete m_pWave;
 	delete m_pWind;
 	delete g_DamageEF;
+	delete g_scoreUI;
 #endif
 }
 
@@ -173,6 +179,13 @@ sceneRenderingTest::~sceneRenderingTest()
 
 void sceneRenderingTest::Update()
 {
+	if (KeyBoardTRG(KB_7)) 
+	{
+		g_scoreUI->Action();
+	}
+
+	g_scoreUI->Update();
+
 	// カメラ
 	static float cameraAngle = 0;
 	static float cameraRange= 100;
@@ -389,7 +402,6 @@ void sceneRenderingTest::Render()
 		// ステージ描画
 		g_stage->Render(shaderM, "G_Buffer");
 
-		g_test->Render(shaderM, "G_Buffer");
 
 		// シェーダ終わり
 		DeferredManagerEx.G_End();
@@ -424,7 +436,6 @@ void sceneRenderingTest::Render()
 
 			m_pPanel->Render3D();
 
-			g_test->Render(shaderM, "DefaultLighting");
 
 			HeaveHoFinishUI->Render();
 
@@ -501,9 +512,10 @@ void sceneRenderingTest::Render()
 	}
 	else
 	{
-		g_test->Render();
 
 	}
+
+	g_scoreUI->Render();
 
 	//if (KeyBoardTRG(KB_6))
 	//{

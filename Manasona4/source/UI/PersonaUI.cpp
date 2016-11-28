@@ -61,6 +61,8 @@ PersonaUI::PersonaUI(BasePlayer* pPlayer)
 	m_iFlashRate = 0;
 	m_bFlashFlag = false;
 
+	m_iGageAlpha = 0;
+	m_bGageAlphaFlag = false;
 	//m_pTriggerGage->OrderMoveAppeared(8, (int)m_vTriggerPos.x, (int)m_vTriggerPos.y - 40);
 
 	//******************************
@@ -169,6 +171,16 @@ void PersonaUI::Update()
 		m_pTriggerGage->Set_percent((float)MyPersona->GetStandGage() / (float)MyPersona->GetStandGageMAX());
 	}
 
+	//　アルファを徐々に上げる
+	if (m_bGageAlphaFlag == true)
+	{
+		m_iGageAlpha += 4;
+		if (m_iGageAlpha >= 255)
+		{
+			m_iGageAlpha = 255;
+		}
+	}
+
 	//m_pTriggerGage->Update();
 
 	//for (int i = 0; i < (int)m_sCards.size(); i++)
@@ -196,7 +208,8 @@ void PersonaUI::Render()
 	m_pTrigger->Render((int)m_vTriggerPos.x, (int)m_vTriggerPos.y);
 
 	// 一回転式のゲージ
-	m_pTriggerGage->Render((int)m_vTriggerPos.x, (int)m_vTriggerPos.y, 64, 64, 0, 0, 64, 64);
+	DWORD col = ARGB(m_iGageAlpha, 255, 255, 255);
+	m_pTriggerGage->Render((int)m_vTriggerPos.x, (int)m_vTriggerPos.y, 64, 64, 0, 0, 64, 64, RS::COPY, col);
 	m_pTriggerGageRip->Render((int)m_vTriggerPos.x, (int)m_vTriggerPos.y, RS::ADD);
 
 	//for (int i = 0; i < (int)m_sCards.size(); i++)
@@ -223,6 +236,9 @@ void PersonaUI::Action(int waitFrame)
 	MyPersona->GetIcon()->Action(waitFrame);
 	
 	m_pTrigger->Action(waitFrame);
+	m_iGageAlpha = 0;
+	m_bGageAlphaFlag = true;
+
 	//m_pTriggerGage->Action(waitFrame);
 	//for (int i = 0; i < (int)m_sCards.size(); i++)
 	//{

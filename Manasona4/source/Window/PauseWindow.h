@@ -6,11 +6,11 @@
 //+------------------------
 
 
-class PoseWindow: public BaseWindow
+class PauseWindow: public BaseWindow
 {
 public:
-	PoseWindow(Vector2 vPos);
-	~PoseWindow();
+	PauseWindow(Vector2 vPos);
+	~PauseWindow();
 
 	bool Update();	// 戻り値で起動しているか確認　他の制御を止める為に使います
 	void Redner();	// 描画

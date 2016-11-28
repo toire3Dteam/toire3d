@@ -1,24 +1,22 @@
-#include "PoseWindow.h"
+#include "ResultWindow.h"
 
-//+------------------------
-//  ポーズウィンドウ
-//+------------------------
 
-PoseWindow::PoseWindow(Vector2 vPos) :BaseWindow(vPos)
+//+-------------------------------
+// リザルトウィンドウ
+//+-------------------------------
+
+
+ResultWindow::ResultWindow(Vector2 vPos) :BaseWindow(vPos)
 {
-	m_pWindow = new tdn2DObj("Data/UI/Window/PoseWindow.png");
-	//m_pTop =    new tdn2DAnim("Data/UI/Window/PoseWindow.png");
-	//m_pMiddle = new tdn2DAnim("");
-	//m_pBottom = new tdn2DAnim("");
-	//m_pSelect = new tdn2DAnim("");
-					
+	m_pWindow = new tdn2DObj("Data/UI/Window/PauseWindow.png");
+
 	//選択アイコンの長さ
 	m_iSelectLength = 34;
 
-	// ポーズウィンドウに存在するアイコンを詰めていく
-	AddIconData("キャラクターに戻る", "キャラクター画面に戻ります。");
+	// ウィンドウに存在するアイコンを詰めていく
+	AddIconData("再戦", "このままもう一度戦闘を続けます。");
+	AddIconData("キャラクターを変える", "キャラクターセレクト画面に戻ります。");
 	AddIconData("メニューに戻る", "メニュー画面に戻ります。");
-	AddIconData("戻る", "このウィンドウを閉じます。");
 
 	// 演出
 	m_iAlpha = 0;
@@ -26,13 +24,13 @@ PoseWindow::PoseWindow(Vector2 vPos) :BaseWindow(vPos)
 	m_iAddY = 0;
 }
 
-PoseWindow::~PoseWindow()
+ResultWindow::~ResultWindow()
 {
 
 }
 
 
-bool PoseWindow::Update()
+bool ResultWindow::Update()
 {
 	// 起動していなかったらハジく
 	if (m_bActive == false)return false;
@@ -41,9 +39,9 @@ bool PoseWindow::Update()
 	// 操作できないようにする。
 
 	m_pSelect->Update();
-	
+
 	// 透明度更新
-	m_iAlpha += 255 / 4;
+	m_iAlpha += 255 / 8;
 	m_iAlpha = min(255, m_iAlpha);
 
 	m_pWindow->SetAlpha(m_iAlpha);			// 透明度更新							 // 透明度更新
@@ -54,7 +52,7 @@ bool PoseWindow::Update()
 	return true;// 起動中
 }
 
-void PoseWindow::Redner()
+void ResultWindow::Redner()
 {
 	// 起動していなかったらハジく
 	if (m_bActive == false)return;
@@ -104,12 +102,12 @@ void PoseWindow::Redner()
 		// 枠
 		for (int j = 0; j < m_aIconData[i].iStringLength; j++)
 		{
-			m_pFontBox->Render(x + (j * 11) - 4, y, 32, 32, 0, 0, 32, 32);
+			m_pFontBox->Render(x + (j * 12) - 3, y, 32, 32, 0, 0, 32, 32);
 
 			// 選択しているタスクなら
 			if (m_iSelectNo == i)
 			{
-				m_pFontBox->Render(x + (j * 11) - 4, y,
+				m_pFontBox->Render(x + (j * 12) - 3, y,
 					32, 32, 0, 32, 32, 32);
 			}
 
@@ -134,53 +132,41 @@ void PoseWindow::Redner()
 }
 
 // 操作
-bool  PoseWindow::Ctrl(int DeviceID)
+bool  ResultWindow::Ctrl(int DeviceID)
 {
 	// 起動していなかったらハジく
 	if (m_bActive == false)return false;
 
 
 	// 決定
-	if ((BATTLE_STATE)m_iSelectNo== BATTLE_STATE::BACK)
+	if (tdnInput::KeyGet(KEYCODE::KEY_B, DeviceID) == 3)
 	{
-		// ゲームに戻る動作は離して進む
-		if (tdnInput::KeyGet(KEYCODE::KEY_B, DeviceID) == 2)
-		{
-			// 選択した番号格納！
-			m_iChoiceState = (BATTLE_STATE)m_iSelectNo;
-			return true;
-		}
+		// 選択した番号格納！
+		m_iChoiceState = (RESULT_STATE)m_iSelectNo;
+		return true;
 	}
-	else
-	{
-		if (tdnInput::KeyGet(KEYCODE::KEY_B, DeviceID) == 3)
-		{
-			// 選択した番号格納！
-			m_iChoiceState = (BATTLE_STATE)m_iSelectNo;
-			return true;
-		}
-	}
+	
 
-	// キャンセル
-	// ゲームに戻る動作は離して進む
-	if (tdnInput::KeyGet(KEYCODE::KEY_A, DeviceID) == 2)
-	{
-		// 選択した番号格納！
-		m_iChoiceState = (BATTLE_STATE::BACK);
-		return true;
-	}
-	if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, DeviceID) == 3)
-	{
-		// 選択した番号格納！
-		m_iChoiceState = (BATTLE_STATE::BACK);
-		return true;
-	}
+	// ★キャンセルは存在しない
+	//// ゲームに戻る動作は離して進む
+	//if (tdnInput::KeyGet(KEYCODE::KEY_A, DeviceID) == 2)
+	//{
+	//	// 選択した番号格納！
+	//	m_iChoiceState = (TUTORIAL_POSE_STATE::BACK);
+	//	return true;
+	//}
+	//if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, DeviceID) == 3)
+	//{
+	//	// 選択した番号格納！
+	//	m_iChoiceState = (TUTORIAL_POSE_STATE::BACK);
+	//	return true;
+	//}
 
 
 	// 決定を押してない時
 	if (tdnInput::KeyGet(KEYCODE::KEY_B, DeviceID) == 0)
 	{
-		
+
 		// 選択切り替え
 		if (tdnInput::KeyGet(KEYCODE::KEY_UP, DeviceID) == 3)
 		{
@@ -212,7 +198,7 @@ bool  PoseWindow::Ctrl(int DeviceID)
 
 }
 
-void PoseWindow::Action()
+void ResultWindow::Action()
 {
 	BaseWindow::Action();
 
@@ -223,7 +209,7 @@ void PoseWindow::Action()
 	m_pSelect->SetAlpha(m_iAlpha);			// 透明度更新
 }
 
-void PoseWindow::Stop()
+void ResultWindow::Stop()
 {
 	BaseWindow::Stop();
 

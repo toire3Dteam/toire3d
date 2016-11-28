@@ -53,7 +53,7 @@ public:
 	BaseTutorial();
 	virtual ~BaseTutorial();
 
-	virtual void Init() = 0;// 最初に毎回初期化
+	virtual void Init(int iDeviceID = 0) = 0;// 最初に毎回初期化
 	virtual void Update();
 	virtual void Render();
 
@@ -89,6 +89,8 @@ protected:
 	int m_iWaitFrame;// クリアからどれくらいでエンドTipsへ移行するか
 	int m_iWaitFrameMAX;// 最大ウェイト数
 	bool m_bClearFlag;	//	
+
+	int m_iDeviceID;   // 操作しているデバイス
 
 	// 最初のTips・最後のTips TODO羊のTipsみたいなペッちゃんこになる演出
 	TipsCard* m_pIntroTips;
@@ -126,7 +128,7 @@ public:
 	WalkTutorial();
 	~WalkTutorial() {};
 
-	void Init();
+	void Init(int iDeviceID = 0);
 
 	// それぞれのタスクをここで作る
 	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
@@ -147,7 +149,7 @@ public:
 	SquatTutorial();
 	~SquatTutorial() {};
 
-	void Init();
+	void Init(int iDeviceID = 0);
 
 	// それぞれのタスクをここで作る
 	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
@@ -166,7 +168,7 @@ public:
 	JumpTutorial();
 	~JumpTutorial() {};
 
-	void Init();
+	void Init(int iDeviceID = 0);
 
 	// それぞれのタスクをここで作る
 	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
@@ -185,7 +187,7 @@ public:
 	AttackTutorial();
 	~AttackTutorial() {};
 
-	void Init();
+	void Init(int iDeviceID = 0);
 
 	// それぞれのタスクをここで作る
 	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
@@ -203,7 +205,7 @@ public:
 	SkillTutorial();
 	~SkillTutorial() {};
 
-	void Init();
+	void Init(int iDeviceID = 0);
 
 	// それぞれのタスクをここで作る
 	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
@@ -222,7 +224,7 @@ public:
 	OverDriveTutorial();
 	~OverDriveTutorial() {};
 
-	void Init();
+	void Init(int iDeviceID = 0);
 
 	// それぞれのタスクをここで作る
 	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく

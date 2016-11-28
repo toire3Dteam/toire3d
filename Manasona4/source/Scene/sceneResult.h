@@ -9,6 +9,8 @@ class BaseResultPerformance;
 class SceneSwitch;
 class UVEffectManager;
 class EffectCamera;
+class ScoreUI;
+class ResultWindow;
 
 //class Stage::Base;	// ×
 namespace Stage{		// ○
@@ -105,6 +107,22 @@ private:
 	// カメラ用
 	ViewData m_ViewData;
 	EffectCamera *m_pEffectCamera;
+
+	// スコア用UI
+	ScoreUI* m_pScoreUI;
+
+	// Info
+	tdn2DAnim* m_pInfoPlate;
+
+	// リザルトウィンドウ
+	ResultWindow* m_pResultWindow;
+
+	// 簡易ステートマシン
+	enum STEP
+	{
+		INTRO, SCORE, WINDOW_SELECT, END
+	};
+	STEP m_eStep;
 
 	// ★★★シームレスに読み込むので、イニシャライズで初期化すると都合が悪い(例えばストリーミングBGMとか)やつをUpdateで1回だけ呼び出したいときに使う
 	bool m_bFirstUpdate;

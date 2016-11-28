@@ -1,36 +1,36 @@
 #include "ComboUI.h"
 
-ComboUI::ComboUI()
-{
-	m_num = new Number("DATA/UI/Combo/Number.png", 128, Number::NUM_KIND::COMBO);
-	m_damageNum = new Number("DATA/UI/Combo/damageNumber.png", 32, Number::NUM_KIND::NORMAL);
-	//m_num->SetCol(Number::RGB(,255,255,255));
-
-	// コンボ
-	m_iCount = 0;
-	m_iMaxCount = 0;
-
-	m_iDamage = 0;
-	m_iMaxDamage = 0;
-
-	// 
-	m_frontPic = new tdn2DObj("DATA/UI/Combo/front.png");
-	m_backPic = new tdn2DObj("DATA/UI/Combo/back.png");
-
-	m_gageFramePic = new tdn2DObj("DATA/UI/Combo/comboGageFrame.png");
-	m_gageBackPic = new tdn2DObj("DATA/UI/Combo/comboGageFrameBack.png");
-	m_gagePic = new tdn2DObj("DATA/UI/Combo/comboGage.png");
-
-	m_pPlayerData = nullptr;
-	m_iRecoveryFrame = 0;
-	m_iMaxRecoveryFrame = 100;
-
-	// カウンター
-	m_pCounterPic = new tdn2DAnim("Data/UI/Combo/Counter.png");
-	m_pCounterPic->OrderAlphaMove(120, 2, 120 - 8);
-	
-
-}
+//ComboUI::ComboUI()
+//{
+//	m_num = new Number("DATA/UI/Combo/Number.png", 128, Number::NUM_KIND::COMBO);
+//	m_damageNum = new Number("DATA/UI/Combo/damageNumber.png", 32, Number::NUM_KIND::NORMAL);
+//	//m_num->SetCol(Number::RGB(,255,255,255));
+//
+//	// コンボ
+//	m_iCount = 0;
+//	m_iMaxCount = 0;
+//
+//	m_iDamage = 0;
+//	m_iMaxDamage = 0;
+//
+//	// 
+//	m_frontPic = new tdn2DObj("DATA/UI/Combo/front.png");
+//	m_backPic = new tdn2DObj("DATA/UI/Combo/back.png");
+//
+//	m_gageFramePic = new tdn2DObj("DATA/UI/Combo/comboGageFrame.png");
+//	m_gageBackPic = new tdn2DObj("DATA/UI/Combo/comboGageFrameBack.png");
+//	m_gagePic = new tdn2DObj("DATA/UI/Combo/comboGage.png");
+//
+//	m_pPlayerData = nullptr;
+//	m_iRecoveryFrame = 0;
+//	m_iMaxRecoveryFrame = 100;
+//
+//	// カウンター
+//	m_tagCounter.pPic = new tdn2DAnim("Data/UI/Combo/Counter.png");
+//	m_tagCounter.pPic->OrderAlphaMove(120, 2, 120 - 8);
+//	
+//
+//}
 
 ComboUI::ComboUI(BasePlayer* PlayerData)
 {
@@ -62,9 +62,20 @@ ComboUI::ComboUI(BasePlayer* PlayerData)
 	m_bGuardFlag = false;
 
 	// カウンター
-	m_pCounterPic = new tdn2DAnim("Data/UI/Combo/Counter.png");
-	m_pCounterPic->OrderAlphaMove(120, 2, 120 - 8);
-	m_pCounterPic->Action();
+	m_tagCounter.pPic = new tdn2DAnim("Data/UI/Combo/Counter.png");
+	m_tagCounter.pPic->OrderAlphaMove(90, 4, 90 - 8);
+	
+	m_eSide = m_pPlayerData->GetSide();
+	if (m_eSide == SIDE::LEFT)
+	{
+		m_vPos.x = (int)100;
+		m_vPos.y = (int)200;
+	}else
+	{
+		m_vPos.x = (int)1050;
+		m_vPos.y = (int)200;
+	}
+	m_tagCounter.iAddX = 0;
 
 }
 
@@ -80,7 +91,7 @@ ComboUI::~ComboUI()
 	SAFE_DELETE(m_gageBackPic);
 	SAFE_DELETE(m_gagePic);
 
-	SAFE_DELETE(m_pCounterPic);
+	SAFE_DELETE(m_tagCounter.pPic);
 
 }
 
@@ -113,34 +124,51 @@ void ComboUI::Update()
 	}
 
 	// 更新
-	m_pCounterPic->Update();
+	m_tagCounter.pPic->Update();
+	// カウンターの動き
+	if (m_eSide == SIDE::LEFT)
+	{
+		m_tagCounter.iAddX += 256 / 8;
+		if (m_tagCounter.iAddX >= 0)
+		{
+			m_tagCounter.iAddX = 0;
+		}
+	}
+	else
+	{
+		m_tagCounter.iAddX -= 256 / 8;
+		
+		if (m_tagCounter.iAddX <= 0)
+		{
+			m_tagCounter.iAddX = 0;
+		}
+	}
 
 }
 
-void ComboUI::Render(int x, int y)
+void ComboUI::Render()
 {
 	if (m_bRenderFlag == false)return;// 描画させない
 	
-	m_backPic->Render(x, y, RS::COPY_NOZ);
-	m_num->Render(x , y-14, m_iCount, Number::NUM_KIND::COMBO);// 数値
-	m_frontPic->Render(x, y, RS::COPY_NOZ);
+	m_backPic->Render((int)m_vPos.x, (int)m_vPos.y, RS::COPY_NOZ);
+	m_num->Render((int)m_vPos.x, (int)m_vPos.y -14, m_iCount, Number::NUM_KIND::COMBO);// 数値
+	m_frontPic->Render((int)m_vPos.x, (int)m_vPos.y, RS::COPY_NOZ);
 
 	int gageX, gageY;
 	gageX = 16;
 	gageY = 144;
 
 	// ゲージ類
-	m_gageBackPic->Render(x + gageX, y + gageY,RS::COPY_NOZ);
+	m_gageBackPic->Render((int)m_vPos.x + gageX, (int)m_vPos.y + gageY,RS::COPY_NOZ);
 	float rate = float(m_pPlayerData->GetRecoveryFrame()) / float(m_iMaxRecoveryFrame);
 	if (m_bGuardFlag == true)rate = 0.0f;
-	m_gagePic->Render(x + gageX, y + gageY, int(128 * rate), 64, 0, 0, int(128 * rate), 64, RS::COPY_NOZ);
-	m_gageFramePic->Render(x + gageX, y + gageY,RS::COPY_NOZ);
+	m_gagePic->Render((int)m_vPos.x + gageX, (int)m_vPos.y + gageY, int(128 * rate), 64, 0, 0, int(128 * rate), 64, RS::COPY_NOZ);
+	m_gageFramePic->Render((int)m_vPos.x + gageX, (int)m_vPos.y + gageY,RS::COPY_NOZ);
 
-	m_damageNum->Render(x + gageX + 64, y + gageY - 30, m_iDamage, Number::NUM_KIND::DAMAGE_SCORE);// 数値
-
+	m_damageNum->Render((int)m_vPos.x + gageX + 64, (int)m_vPos.y + gageY - 30, m_iDamage, Number::NUM_KIND::DAMAGE_SCORE);// 数値
 
 	// カウンター
-	m_pCounterPic->Render(gageX + x,  y);
+	m_tagCounter.pPic->Render((int)m_vPos.x + m_tagCounter.iAddX , (int)m_vPos.y);
 
 }
 
@@ -158,7 +186,7 @@ void ComboUI::GageUpdate()
 	}
 }
 
-void ComboUI::Count(int damage, int maxRecovery)
+void ComboUI::Count(int damage, int maxRecovery, bool bCounterHit)
 {
 	MyAssert(maxRecovery != 0, "最大値が0だと0で割ることになる");
 
@@ -191,8 +219,21 @@ void ComboUI::Count(int damage, int maxRecovery)
 
 	m_iMaxRecoveryFrame = maxRecovery;
 
-	// 仮
-	m_pCounterPic->Action();
+	// カウンターヒットならばカウンターの演出追加
+	if (bCounterHit)
+	{
+		// カウンター
+		m_tagCounter.pPic->Action();
+		if (m_eSide == SIDE::LEFT)
+		{
+			m_tagCounter.iAddX = -256;
+		}
+		else
+		{
+			m_tagCounter.iAddX = +256;
+		}
+	}
+
 }
 
 //void ComboUI::Count(int damage, int maxRecovery,int* recovery)

@@ -74,6 +74,7 @@ public:
 	static void EffectPersonaTrigger(const Vector3 &pos);	// ペルソナ発動した瞬間
 	static void EffectPersonaAura(const Vector3 &pos);		// ペルソナ持続オーラ
 	static void EffectOverDrive(const Vector3 &pos);		// オーバードライブ持続オーラ
+	static void EffectOverDriveBurst(const Vector3 &pos);		// オーバードライブ(バースト)持続オーラ
 	static void EffectFinish(const Vector3 &pos);		// フィニッシュアーツヒット
 	static void EffectFlySmoke(const Vector3 &pos);		// 吹っ飛び煙
 	static void EffectRunSmoke(const Vector3 &pos, bool bLeft);		// 走りはじめの煙

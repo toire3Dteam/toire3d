@@ -224,6 +224,26 @@ void Number::Render(int x, int y, int num, NUM_KIND kind)
 			if (number <= 0)break;// êîílÇ™ÇOà»â∫Ç…Ç»Ç¡ÇΩÇÁÇ≥ÇÊÇ»ÇÁ
 		}
 		break;
+	case Number::NUM_KIND::PARSENT:
+	{
+		m_pic->SetAngle(0.0f);
+		int count = 0;
+
+		m_pic->Render(x + (((m_picSize / 2))*m_picScale)+4, y, m_picSize*m_picScale, m_picSize*m_picScale, (15 * m_picSize) , 0, m_picSize, m_picSize);// %
+
+		for (;; ++count)
+		{
+			int digitNum = number % 10;	// àÍî‘è¨Ç≥Ç¢åÖÇì¸éË
+			number = (int)(number / 10);// êîílÇÃàÍî‘è¨Ç≥Ç¢åÖÇè¡Ç∑
+
+			m_pic->Render(x - ((count * (m_picSize / 2))*m_picScale), y, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize);// êîéöï`âÊ
+
+			if (number <= 0)break;// êîílÇ™ÇOà»â∫Ç…Ç»Ç¡ÇΩÇÁÇ≥ÇÊÇ»ÇÁ
+		}
+
+	
+
+	}	break;
 	default:
 		//for (int count = 0;; ++count)
 		//{

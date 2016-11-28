@@ -143,7 +143,7 @@ public:
 		m_picSize = 256;
 		m_pic = new AnimationPanel("Data/Effect/in2.png", 256, 256, 15, 1, 4, false);
 		
-		m_pic3DScale = 100.0f;
+		m_pic3DScale = 75.0f;
 		//state = RS::COPY;
 	};
 	~InEffectMini() {};
@@ -615,6 +615,25 @@ public:
 		m_pic3DScale = 50;//3Dのスケール
 	};
 	~DokkoiEffect() {};
+
+	void Update() { BasePanelEffect::Update(); };
+	void Render() { BasePanelEffect::Render(); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
+
+private:
+};
+
+class RedLightEffect :public BasePanelEffect
+{
+public:
+	RedLightEffect()
+	{
+		m_picSize = 256;
+		m_pic = new AnimationPanel("Data/Effect/RedLight.png", 256, 256, 15, 2, 4, false);
+		state = RS::ADD_NOZ;
+		m_pic3DScale = 50;//3Dのスケール
+	};
+	~RedLightEffect() {};
 
 	void Update() { BasePanelEffect::Update(); };
 	void Render() { BasePanelEffect::Render(); };

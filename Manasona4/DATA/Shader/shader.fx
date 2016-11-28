@@ -1555,9 +1555,8 @@ technique Stage
 /*************************************/
 // アウトラインに必要な変数
 /*************************************/
-
 float    g_OutlineSize = 0.005f;
-
+float3   g_EdgeColor = float3(0.0f, 0.0f, 0.0f);
 //------------------------------------------------------
 //		頂点フォーマット
 //------------------------------------------------------
@@ -1596,7 +1595,9 @@ PS_TONEMAP PS_OutLine(VS_OUTPUT_OUTLINE In)
 
 	float4 col = tex2D(DecaleSamp, In.Tex); //そのキャラクターのエッジ付近の色に
 
-	OUT.color.rgb = col.rgb - float3(0.25,0.5,0.5);// ふちは少し暗く
+	OUT.color.rgb = col.rgb - float3(0.25,0.5,0.5);// ふちは少し暗く	
+	// [11/27] 操作しているキャラクターを見失うとの意見が少しあったので淵の色を変える工夫をしてみます。
+	OUT.color.rgb = g_EdgeColor;
 	OUT.color.a = 1.0f;
 
 	OUT.high = col - 1;
@@ -1629,10 +1630,11 @@ technique OutLine
 //------------------------------------------------------
 //		プレイヤー用のグローバルエリア
 //------------------------------------------------------
-float g_InvincibleColRate = 0.0f;//Flash そのキャラクターダウン後の点滅のレート　ちか
+float g_InvincibleColRate = 0.0f;//Flash そのキャラクターダウン後の点滅のレート
 float g_OrangeColRate = 0.0f;//　オレンジの光
 float g_MagentaColRate = 0.0f;//　マゼンタの光
 float g_OverDriveColRate = 0.0f;//
+float g_WillPowerRate = 0.0f;//  根性値
 
 
 //------------------------------------------------------
@@ -1739,9 +1741,11 @@ PS_TONEMAP PS_ToonPlayer(VS_OUTPUT_FINAL In) : COLOR
 
 	// オーバードライブ用
 	//float RimPower2 = pow(1.0f - max(0.0f, dot(-E, Normal)), 1.0f);
-	OUT.high.rgb += float3(0.0, 0.2, 0.4)*g_OverDriveColRate;
+	OUT.high.rgb += float3(0.0, 0.1, 0.4)*g_OverDriveColRate;
 	OUT.high.rgb += float3(0.8, 0.5, 0.0)*g_OrangeColRate;
 	OUT.high.rgb += float3(0.7, 0.0, 0.4)*g_MagentaColRate;
+	OUT.high.rgb += float3(0.25f, 0.0, 0.0)*g_WillPowerRate;
+
 	//高輝度抽出後にしないとHDRで光ってしまうので最後に
 	OUT.color.rgb += g_InvincibleColRate;
 

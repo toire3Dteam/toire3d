@@ -57,11 +57,11 @@ TutorialManager::~TutorialManager()
 }
 
 // 初期化
-void TutorialManager::Init(TUTORIAL_TYPE type)
+void TutorialManager::Init(TUTORIAL_TYPE type, int DeviceID)
 {
 	m_eType = type;// チュートリアルのタイプ変更
 
-	m_pTutorial[m_eType]->Init();
+	m_pTutorial[m_eType]->Init(DeviceID);// 操作するデバイス設定
 
 }
 

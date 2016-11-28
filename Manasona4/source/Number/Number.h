@@ -21,7 +21,7 @@ public:
 	// 数字の色のタイプ
 	enum class NUM_KIND
 	{
-		NORMAL, HEAL, COMBO, TIMER, BIG, DAMAGE_SCORE
+		NORMAL, HEAL, COMBO, TIMER, BIG, DAMAGE_SCORE,PARSENT
 	};
 
 	// 実体

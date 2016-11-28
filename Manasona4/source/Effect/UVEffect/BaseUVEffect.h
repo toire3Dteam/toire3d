@@ -755,3 +755,42 @@ public:
 
 private:
 };
+
+
+/*************************/
+//	赤バーストエフェクト
+/*************************/
+class RedBurstEffect :public BaseUVEffect
+{
+public:
+	RedBurstEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/WillPower/Burst.IMO", 0.0f, 0.0f, 14, false, 1, 8);
+	};
+	~RedBurstEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/*****************/
+//	赤い波紋ウェーブ
+/*****************/
+class RedWaveEffect :public BaseUVEffect
+{
+public:
+	RedWaveEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/WillPower/wave.imo", 0.0f, 0.01f, 18, false, 1, 12);
+	};
+	~RedWaveEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};

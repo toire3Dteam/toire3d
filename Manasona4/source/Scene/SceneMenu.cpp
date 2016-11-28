@@ -13,6 +13,7 @@
 //	シーンメニュー
 //+------------------------
 int sceneMenu::m_iSelectNo(0);	// セレクトナンバー(staticにすることによって、前回選択したモードに合わせたままメニューシーンが始まる)
+int sceneMenu::m_iCtrlDevice(0);// 操作していたデバイス
 
 //******************************************************************
 //		初期化・解放
@@ -98,7 +99,7 @@ void sceneMenu::Update()
 	// ヒントカード覧
 	for (int i = 0; i < (int)TIPS_TYPE::ARRAY_END; i++)
 	{
-		m_pTips[i]->Update();
+		m_pTips[i]->Update(m_iCtrlDevice);
 	}
 
 	// ウィンドウ覧

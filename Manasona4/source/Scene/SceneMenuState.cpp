@@ -139,6 +139,7 @@ bool SceneMenuState::FirstStep::PadUpdate(sceneMenu *pMain, int DeviceID)
 		{
 		case MENU_ICON_TYPE::TUTORIAL:
 			pMain->GetFSM()->ChangeState(TutorialSelectStep::GetInstance());
+			pMain->SetCtrlDevice(DeviceID); // ★チュートリアルを選択したデバイスを保存
 			bChangedState = true;	// ★関数分けしたので、これをtrueにしたらreturnするようにした
 			break;
 		case MENU_ICON_TYPE::BATTLE:
@@ -364,6 +365,7 @@ void SceneMenuState::TutorialSelectStep::Enter(sceneMenu *pMain)
 	pMain->GetTips(TIPS_TYPE::TUTORIAL)->Action();
 
 	
+
 }
 
 void SceneMenuState::TutorialSelectStep::Execute(sceneMenu *pMain)
@@ -396,6 +398,11 @@ void SceneMenuState::TutorialSelectStep::Execute(sceneMenu *pMain)
 		// その前に自分・相手・ステージ・チュートリアルフラグをここで変えてやりましょう
 		SelectDataMgr->Get()->bTutorial = true;
 		SelectDataMgr->Get()->iWinRound = 0;
+		// 
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = false;
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = true;
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = pMain->GetCtrlDevice();
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = pMain->GetCtrlDevice();
 
 		MainFrameEx->ChangeScene(new sceneMain());
 		return;

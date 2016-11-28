@@ -208,8 +208,8 @@ void GameUIManager::RenderBack()
 	m_pOverDriveCutin2P->Render();
 
 	// コンボ
-	m_pCombo1P->Render(100, 200);
-	m_pCombo2P->Render(1050, 200);
+	m_pCombo1P->Render();
+	m_pCombo2P->Render();
 
 	tdnSystem::GetDevice()->SetDepthStencilSurface(saveZ); //ステンシルバッファの復元
 

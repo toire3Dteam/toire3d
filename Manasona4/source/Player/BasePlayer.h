@@ -212,11 +212,13 @@ enum class EFFECT_TYPE
 	GUARD_WAVE,			// ガードウェーブ
 	MULTIPLE_HIT,		// 多段ヒット
 	OVER_DRIVE_ACTION,	// 必殺技アクション
-	JUMP,			// 飛ぶときのエフェクト
-	AERIAL_JUMP,		//空中ジャンプのエフェクト
-	INVINCIBLE_ATTACK, // 逆切れ（無敵技）
-	DOKKOI,				//	中段
+	JUMP,				// 飛ぶときのエフェクト
+	AERIAL_JUMP,		// 空中ジャンプのエフェクト
+	INVINCIBLE_ATTACK,	// 逆切れ（無敵技）
+	DOKKOI,				// 中段
 	MUZZLE_FLASH,		// マズルフラッシュ
+	THROW,				// 投げ
+	WILL_POWER,			// 根性
 };
 
 // ガードの種類
@@ -742,7 +744,7 @@ public:
 	void GuardEffectAction();
 	void GuardEffectStop();
 	void GuardEffectUpdate();
-
+	tdn2DAnim* GetThrowMark() { return m_pThrowMark; }
 
 	//------------------------------------------------------
 	//	覚醒
@@ -756,6 +758,11 @@ public:
 	OVERDRIVE_TYPE GetOverDriveType(){ return m_OverDriveType; }	// 覚醒の種類
 	void ActionOverDrive(OVERDRIVE_TYPE type);
 
+	//------------------------------------------------------
+	//	根性
+	//------------------------------------------------------
+	bool isWillPower() { return m_bWillPower; }
+	void WillPowerUpdate();
 
 	//------------------------------------------------------
 	//	その他
@@ -926,7 +933,7 @@ protected:
 	//------------------------------------------------------
 	PanelEffectManager* m_pPanelEffectMGR;	// パラパラアニメエフェクト 
 	UVEffectManager* m_pUVEffectMGR;			// UVエフェクト
-
+	tdn2DAnim*		m_pThrowMark;			//	投げマーク
 
 	//------------------------------------------------------
 	//	覚醒
@@ -935,6 +942,11 @@ protected:
 	bool m_bOverDrive;				// 覚醒してるか
 	int m_OverDriveFrame;			// 覚醒時間
 	OVERDRIVE_TYPE m_OverDriveType;	// 覚醒の種類
+
+	//------------------------------------------------------
+	//	根性
+	//------------------------------------------------------
+	bool m_bWillPower;				// 根性値フラグ
 
 
 	//------------------------------------------------------
@@ -964,7 +976,7 @@ protected:
 	int m_iWinNum;
 
 
-	// (A列車)　//////////////////////////////////////////////////////////
+	// (メモ)　//////////////////////////////////////////////////////////
 	// エフェクトマネージャーを一人ずつ持たせた理由は
 	// 一つのマネージャーで追加していく形だと　可変長配列で増やしていくが
 	// ゲーム中にnew Deleteはとても重かった

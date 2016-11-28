@@ -19,7 +19,12 @@
 
 #include "../ResultPerformance/BaseResultPerformance.h"
 #include "SceneMenu.h"
+#include "SceneSelect.h"
 #include "../SceneSwitch/SceneSwitch.h"
+#include "ResultPerformance\ScoreUI\ScoreUI.h"
+#include "Window\ResultWindow.h"
+
+#include "Fade\Fade.h"
 
 #define USE_EFFECT_CAMERA
 
@@ -144,8 +149,15 @@ bool sceneResult::Initialize()
 	m_sceneSwitch = new SceneSwitch();
 	m_sceneSwitch->Action();
 	
-	//
-	m_winnerPic = new tdn2DAnim("Data/Result/winner1.png");
+	// 勝利した側の絵に
+	if (m_WinnerSide == SIDE::LEFT)
+	{
+		m_winnerPic = new tdn2DAnim("Data/Result/winner1.png");
+	}
+	else
+	{
+		m_winnerPic = new tdn2DAnim("Data/Result/winner2.png");
+	}
 	m_winnerPic->OrderMoveAppeared(12, -600, 600);
 	m_iWinnerPicX = 0.0f;
 
@@ -156,7 +168,20 @@ bool sceneResult::Initialize()
 	m_waveScreen = new tdn2DObj(1280, 720, TDN2D::RENDERTARGET);
 	m_waveTU = 0.0f;
 
+	// スコア表示のUI
+	m_pScoreUI = new ScoreUI();
+	
+	m_pInfoPlate = new tdn2DAnim("Data/UI/Menu/Information.png");
+	m_pInfoPlate->OrderMoveAppeared(12,0, 592 + 128);
+
+	m_pResultWindow = new ResultWindow(Vector2(600, 200));
+
+	m_eStep = STEP::INTRO;
+
+
+	// ★
 	m_bFirstUpdate = true;
+
 
 	return true;
 }
@@ -178,16 +203,14 @@ sceneResult::~sceneResult()
 	SAFE_DELETE(m_AllScreen);
 
 	SAFE_DELETE(m_sceneSwitch);
-
 	SAFE_DELETE(m_ResultPerformance);
-
 	SAFE_DELETE(m_winnerPic);
-
 	SAFE_DELETE(m_UVEffectMgr);
-
 	SAFE_DELETE(m_wavePic);
-
 	SAFE_DELETE(m_waveScreen);
+	SAFE_DELETE(m_pScoreUI);
+	SAFE_DELETE(m_pInfoPlate);
+	SAFE_DELETE(m_pResultWindow);
 }
 
 //******************************************************************
@@ -288,6 +311,9 @@ void sceneResult::Update()
 			m_bEndFlag = true;
 			shader2D->SetValue("chroma", 0.0f);
 			shader2D->SetValue("ScreenColor", Vector3(0.5f, 0.5f, 0.5f));
+			m_pScoreUI->Action();// スコア表示の演出開始！
+			m_pInfoPlate->Action();// インフォメーションのプレートの演出開始
+			m_eStep = STEP::SCORE;
 		}
 
 
@@ -314,14 +340,88 @@ void sceneResult::Update()
 
 	m_UVEffectMgr->Update();
 
-	if (m_bEndFlag)
+	m_pScoreUI->Update();
+	m_pInfoPlate->Update();
+
+	m_pResultWindow->Update();
+
+	// 状況に応じてステートを変更
+	switch (m_eStep)
 	{
-		FOR(4) if (KEY(KEY_A, i) == 3 || KEY(KEY_B, i) == 3 || KEY(KEY_C, i) == 3 || KEY(KEY_D, i) == 3)
+	case sceneResult::INTRO:
+
+
+		break;
+	case sceneResult::SCORE:
+		// エンドフラグ 
+		if (m_pScoreUI->GetEnd())
 		{
-			MainFrameEx->ChangeScene(new sceneMenu());
+			m_eStep = sceneResult::WINDOW_SELECT;
+			m_pResultWindow->Action();
+		}
+
+
+		break;
+	case sceneResult::WINDOW_SELECT:
+	{
+		//+--------------------------------------------
+		//	ポーズメニューの操作
+		//+--------------------------------------------
+		// パッド分更新
+		int NumDevice(tdnInputManager::GetNumDevice());
+		// パッド何もささってないとき用
+		if (NumDevice == 0)NumDevice = 1;// PCで操作できるように仮想で1に		
+		for (int i = 0; i < NumDevice; i++)
+		{
+			// ウィンドウの操作
+			m_pResultWindow->Ctrl(i);
+		}
+
+		
+		// 選択したらフェード
+		enum { HOLD = -1 };
+		if (m_pResultWindow->GetChoiceState() != HOLD)
+		{
+			// フェードアウト
+			Fade::Set(Fade::FLAG::FADE_OUT, 8, 0x00000000);
+			
+			m_eStep = END;
 			return;
 		}
+
+
+	}break;
+	case sceneResult::END:
+
+		// フェードアウト完了後
+		if (Fade::isFadeOutCompletion())
+		{
+			// ここで選択したアイコンにより飛ぶ場所が変わる
+			if (m_pResultWindow->GetChoiceState() == ResultWindow::AGAIN)
+			{
+				MainFrameEx->ChangeScene(new sceneMain(), true);
+				return;
+			}
+			else if (m_pResultWindow->GetChoiceState() == ResultWindow::BACK_CHARA)
+			{
+				MainFrameEx->ChangeScene(new sceneSelect());
+				return;
+			}
+			else if (m_pResultWindow->GetChoiceState() == ResultWindow::BACK_MENU)
+			{
+				MainFrameEx->ChangeScene(new sceneMenu());
+				return;
+			}
+		}
+
+		break;
+	default:
+		break;
 	}
+
+	// フェード
+	Fade::Update();
+
 }
 
 //******************************************************************
@@ -356,12 +456,22 @@ void sceneResult::Render()
 		AllRender();
 	}
 
-
 	if (m_bEndFlag == false)m_AllScreen->Render(0,0,shader2D,"Mastering");// 最終結果
 	else m_AllScreen->Render(0, 0, shader2D, "Mastering_Wave");// 波うち描画
 
+	// スコア表示
+	m_pScoreUI->Render();
+
+	// インフォメーション用
+	m_pInfoPlate->Render(0, 592);
+
+	// リザルトの描画
+	m_pResultWindow->Redner();
+
 	m_sceneSwitch->Render();
 
+	// フェード
+	Fade::Render();
 	//m_waveScreen->Render(0, 0, 1280/4, 720/4, 0, 0, 1280, 720);
 
 	//m_move->Render(0, 0);

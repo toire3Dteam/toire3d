@@ -22,7 +22,7 @@ const float BasePlayer::c_MAX_JUMP = 1.9f;
 const int BasePlayer::c_RECOVERY_FLAME = 32;			// リカバリーステートにいる時間
 
 const int BasePlayer::c_OVERDRIVE_MAX_GAGE = 100;	// 覚醒ゲージの最大値
-const int BasePlayer::c_OVERDRIVE_MAX_TIME = 420;	// 覚醒が切れるまでの時間
+const int BasePlayer::c_OVERDRIVE_MAX_TIME = 480;	// 覚醒が切れるまでの時間
 
 const int BasePlayer::c_THROW_ESCAPE_FRAME = 8;	// 投げぬけの猶予フレーム
 const int BasePlayer::c_THROW_MISS_FRAME = 30;	// 投げ外しロスのフレーム(全キャラ共通だろうという考え)
@@ -64,7 +64,7 @@ void BasePlayer::LoadAttackFrameList(char *filename)
 BasePlayer::BasePlayer(SIDE side, const SideData &data) :m_bAI(data.bAI), m_iDeviceID(data.iDeviceID), m_side(side), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + (int)side)),
 m_fMaxSpeed(1.0f), m_dir(DIR::LEFT), m_pHitSquare(new CollisionShape::Square), m_pDefaultObj(nullptr),
 m_pObj(nullptr),
-m_vMove(0,0,0), m_bLand(false),m_bSquat(false), m_bAerialJump(true), m_bAerialDash(false),m_iAerialDashFrame(0), m_ActionState(BASE_ACTION_STATE::NO_ACTION),
+m_vMove(0, 0, 0), m_bLand(false), m_bSquat(false), m_bAerialJump(true), m_bAerialDash(false), m_iAerialDashFrame(0), m_ActionState(BASE_ACTION_STATE::NO_ACTION),
 m_iInvincibleLV(0), m_iInvincibleTime(0), m_iCurrentActionFrame(0), m_iRecoveryFrame(0), m_bEscape(false), m_iScore(0), m_iCollectScore(0), m_pAI(nullptr),
 m_iHitStopFrame(0),// ★★★バグの原因　ひっとすトップ初期化のし忘れ。
 m_fInvincibleColRate(0), m_iInvincibleColRateFlame(0), m_bInvincibleColRateUpFlag(false),
@@ -75,7 +75,8 @@ m_bGameTimerStopFlag(false), m_iHeavehoStopTimer(0), m_iHeaveHoDriveOverFlowFram
 m_iWinNum(0), m_GuardState(GUARD_STATE::NO_GUARD),
 m_pFacePic(nullptr), m_pTargetPlayer(nullptr), m_pSpeedLine(nullptr), m_SkillActionType(SKILL_ACTION_TYPE::MAX),
 m_fOrangeColRate(0), m_fMagentaColRate(0),
-m_pCutinPic(nullptr), m_pName("None"), m_iRushStep(0)
+m_pCutinPic(nullptr), m_pName("None"), m_iRushStep(0), m_pThrowMark(nullptr),
+m_bWillPower(false)
 {
 	// スタンド
 	switch (data.partner)
@@ -100,6 +101,8 @@ m_pCutinPic(nullptr), m_pName("None"), m_iRushStep(0)
 	// エフェクトマネージャー
 	m_pPanelEffectMGR = new PanelEffectManager();
 	m_pUVEffectMGR	 = new UVEffectManager();
+	m_pThrowMark = new tdn2DAnim("Data/Effect/ThrowMark.png");
+	m_pThrowMark->OrderShrink(6, 1.0f, 2.5f);
 
 	// 初期化
 	memset(m_iInputList, 0, sizeof(m_iInputList));
@@ -193,6 +196,7 @@ void BasePlayer::Reset()
 	m_bAerialDash =
 	m_bLand=
 	m_bSquat=
+	m_bWillPower=
 	false;
 
 
@@ -243,6 +247,7 @@ BasePlayer::~BasePlayer()
 	SAFE_DELETE(m_pStand);
 	SAFE_DELETE(m_pPanelEffectMGR);
 	SAFE_DELETE(m_pUVEffectMGR);
+	SAFE_DELETE(m_pThrowMark);
 	SAFE_DELETE(m_pAI);
 	//SAFE_DELETE(m_pComboUI);
 	SAFE_DELETE(m_pHHDOFObj);
@@ -255,14 +260,19 @@ BasePlayer::~BasePlayer()
 void BasePlayer::Update(PLAYER_UPDATE flag)
 {
 	// デバッグ
-	if (KeyBoardTRG(KB_G))
+	if (KeyBoardTRG(KB_8))
 	{
 		// 50回復
 		m_OverDriveGage += 50;
+		AddEffectAction(m_vPos, EFFECT_TYPE::WILL_POWER);
 	}
-	if (KeyBoardTRG(KB_J))
+	if (KeyBoardTRG(KB_9))
 	{
 		m_iHP = m_iMaxHP;
+	}
+	if (KeyBoardTRG(KB_0))
+	{
+		m_iHP = 3600;
 	}
 
 	// 覚醒の更新
@@ -270,6 +280,9 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 
 	// ガードエフェクト更新
 	GuardEffectUpdate();
+
+	// 根性値発動用の更新
+	WillPowerUpdate();
 
 	// 1more覚醒していたらスタンドの動きを止める
 	if (GetFSM()->isInState(*BasePlayerState::OverDrive_OneMore::GetInstance()) == false)
@@ -455,7 +468,10 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 	// エフェクトマネージャー更新 (ヒットストップ無視)
 	m_pPanelEffectMGR->Update();
 	m_pUVEffectMGR->Update();
-	
+	m_pThrowMark->Update();
+
+
+
 	// コンボUI
 	//m_pComboUI->Update();
 
@@ -698,11 +714,13 @@ void BasePlayer::OverDriveUpdate()
 		{
 		case OVERDRIVE_TYPE::ONEMORE:
 
-			// オーラのパーティクル
+			// 青いオーラのパーティクル
 			ParticleManager::EffectOverDrive(Vector3(GetPos().x, GetPos().y, -0.5f));	// 若干手前
 
 			break;
 		case OVERDRIVE_TYPE::BURST:
+			// 黄色いオーラのパーティクル
+			ParticleManager::EffectOverDriveBurst(Vector3(GetPos().x, GetPos().y, -0.5f));	// 若干手前
 
 			break;
 		default:
@@ -713,6 +731,12 @@ void BasePlayer::OverDriveUpdate()
 		m_OverDriveGage = 0;
 
 		m_OverDriveFrame--;
+		// 守りのバーストならゲージが早く減る
+		if (m_OverDriveType== OVERDRIVE_TYPE::BURST)
+		{
+			m_OverDriveFrame -= 1;
+		}
+
 		if (m_OverDriveFrame <= 0) // 覚醒時間が0になったら覚醒終わり
 		{
 			m_OverDriveFrame = 0;
@@ -903,13 +927,41 @@ void BasePlayer::Render()
 	shaderM->SetValue("g_MagentaColRate", m_fMagentaColRate);
 	
 	// 覚醒しているか// 覚醒時のカラー
-	if (m_bOverDrive == true||
-		m_pStateMachine->isInState(*BasePlayerState::HeavehoDrive::GetInstance())||
+	if (m_bOverDrive == true ||
+		m_pStateMachine->isInState(*BasePlayerState::HeavehoDrive::GetInstance()) ||
 		m_pStateMachine->isInState(*BasePlayerState::HeavehoDriveOverFlow::GetInstance())
 		)
+	{
 		shaderM->SetValue("g_OverDriveColRate", 1.0f);
-	else shaderM->SetValue("g_OverDriveColRate", 0.0f);
+		shaderM->SetValue("g_WillPowerRate", 0.0f);
+	}
+	else
+	{
+		shaderM->SetValue("g_OverDriveColRate", 0.0f);
+
+		// 根性状態か
+		if (m_bWillPower == true)
+		{
+			shaderM->SetValue("g_WillPowerRate", 1.0f);
+		}else 
+		{
+			shaderM->SetValue("g_WillPowerRate", 0.0f);
+		}
+
+	}
 		
+
+	// サイドに応じて縁取りの色を変える。
+	Vector3 vEdgeCol = VECTOR_ZERO;
+	if (m_side == SIDE::LEFT)
+	{
+		vEdgeCol = Vector3(0.95f, 0.1f, 0.0f);
+	}else
+	{
+		vEdgeCol = Vector3(0.0f, 0.65f, 1.0f);
+	}
+	shaderM->SetValue("g_EdgeColor", vEdgeCol);
+
 	m_pObj->Render(shaderM, "PlayerToon");
 
 	// 無敵なら加算で重ねて描画
@@ -931,7 +983,9 @@ void BasePlayer::Render()
 	// エフェクトマネージャー描画
 	m_pPanelEffectMGR->Render3D();
 	m_pUVEffectMGR->Render();
-	m_pPanelEffectMGR->Render();
+	m_pPanelEffectMGR->Render();	
+	Vector2 vScreenPos = Math::WorldToScreen(m_vPos);// (TODO)頭のポジションの座標を使う
+	m_pThrowMark->Render((int)vScreenPos.x - 56, (int)vScreenPos.y - 324, RS::COPY_NOZ);
 
 #ifdef _DEBUG
 	// ここで現在のステートマシンの状態を確認
@@ -967,25 +1021,25 @@ void BasePlayer::Render()
 		{
 			c = "↓";
 		}
-		if (m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::LEFT) &&
-			m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::UP))
-		{
-			c = "┏";
-		}
-		if (m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::RIGHT) &&
-			m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::UP))
-		{
-			c = "┓";
-		}
+		//if (m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::LEFT) &&
+		//	m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::UP))
+		//{
+		//	c = "┏";
+		//}
+		//if (m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::RIGHT) &&
+		//	m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::UP))
+		//{
+		//	c = "┓";
+		//}
 		if (m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::LEFT) &&
 			m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::DOWN))
 		{
-			c = "┗";
+			c = "／";
 		}
 		if (m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::RIGHT) &&
 			m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::DOWN))
 		{
-			c = "┛";
+			c = "＼";
 		}
 		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::A)
 		{
@@ -1387,12 +1441,18 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 	}	break;
 	case EFFECT_TYPE::GUARD_WAVE:
 	{
-									// 相手のMove値考慮
-									float z = atan2(-m_vMove.x, m_vMove.y);
+		Vector3 l_Pos = pos;
+		l_Pos = pos;
+		if (AttackVec.y >= 0.1f)// ↑向きのベクトルなら
+		{
+			l_Pos.y += 5; //　ガードエフェクトを↑に上げる
+		}
+		// 相手のMove値考慮
+		float z = atan2(-AttackVec.x, AttackVec.y);
 
-									// ガードウェ―ブ
-									m_pUVEffectMGR->AddMultipleEffect(pos, UV_EFFECT_MULTIPLE_TYPE::GUARD_WAVE, 0.5f, 0.5f, Vector3(0, -supportAngleY*1.5f, z), Vector3(0, -supportAngleY*1.5f, z));
-									m_pUVEffectMGR->AddMultipleEffect(pos, UV_EFFECT_MULTIPLE_TYPE::GUARD_GRID, 0.2f, 0.5f, Vector3(0, -supportAngleY*1.5f, z), Vector3(0, -supportAngleY*1.5f, z));
+		// ガードウェ―ブ
+		m_pUVEffectMGR->AddMultipleEffect(l_Pos, UV_EFFECT_MULTIPLE_TYPE::GUARD_WAVE, 0.5f, 0.5f, Vector3(0, -supportAngleY*1.5f, z), Vector3(0, -supportAngleY*1.5f, z));
+		m_pUVEffectMGR->AddMultipleEffect(l_Pos, UV_EFFECT_MULTIPLE_TYPE::GUARD_GRID, 0.2f, 0.5f, Vector3(0, -supportAngleY*1.5f, z), Vector3(0, -supportAngleY*1.5f, z));
 
 	}	break;
 	case EFFECT_TYPE::MULTIPLE_HIT:
@@ -1457,7 +1517,7 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 	
 		// オレンジの光
 		m_pPanelEffectMGR->AddEffect
-			(pos + Vector3(0, 10, -4) , PANEL_EFFECT_TYPE::ORANGE_LOGHT, 0);
+			(pos + Vector3(0, 10, -4) , PANEL_EFFECT_TYPE::ORANGE_LIGHT, 0);
 
 		// オレンジのリング
 		float ram = tdnRandom::Get(-1.57f, 1.57f);
@@ -1491,6 +1551,32 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 		//	(pos + Vector3(0, 8, -2), PANEL_EFFECT_TYPE::DOKKOI, 0);
 
 	}	break;
+	case EFFECT_TYPE::THROW:
+	{
+		// 投げの光
+		m_pPanelEffectMGR->AddEffect
+			(pos + Vector3(0, 8, -4), PANEL_EFFECT_TYPE::INEFFECT_MINI, 0);
+
+	}	break;
+	case EFFECT_TYPE::WILL_POWER:
+	{
+		// プレッシャー
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::PRESSURE, 0.5f, 1.0f, Vector3(0, 0, 0), Vector3(0, 0, 0));
+
+		// 赤い光
+		m_pPanelEffectMGR->AddEffect
+			(pos + Vector3(0, 10, -4), PANEL_EFFECT_TYPE::RED_RIGHT, 0);
+
+		// 赤のリング
+		float ram = tdnRandom::Get(-1.57f, 1.57f);
+		m_pUVEffectMGR->AddEffect(pos + Vector3(0, 10, -2), UV_EFFECT_TYPE::RED_BURST, 0.1f, 1.85f,
+			Vector3(ram, -supportAngleY*1.5f, 0),
+			Vector3(ram, -supportAngleY*1.5f, 0), 0);
+
+		// 赤い波紋
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::RED_WAVE, 0.75f, 1.0f, Vector3(0, 0, 0), Vector3(0, 0, 0));
+
+	}	break;
 	default:
 		MyAssert(0,"そんなエフェクトは存在しない ");	// そんなエフェクトは存在しない AddEffectAction()
 		break;
@@ -1519,4 +1605,44 @@ void BasePlayer::GuardEffectUpdate()
 	// キャラクターに追従
 	// ガードエフェクト更新
 	m_pUVEffectMGR->GetBaseUVEffect(UV_EFFECT_TYPE::GUARD)->SetPos(GetCenterPos());
+}
+
+void BasePlayer::WillPowerUpdate()
+{	
+	// HPのレートを計算
+	float HpRate = (float)m_iHP/ (float)m_iMaxHP;
+
+	// 体力が35%以下になれば根性発動
+	if (m_bWillPower == false)
+	{
+		if (HpRate <= 0.35f)
+		{
+			// リカバリーフレームが切れ動けるようになった瞬間がトリガー
+			if (m_iRecoveryFrame <= 0)
+			{
+				// 根性発動
+				m_bWillPower = true;
+
+				// SPが25回復
+				m_OverDriveGage += 25;
+
+				// 演出
+				AddEffectAction(m_vPos, EFFECT_TYPE::WILL_POWER);
+
+			}
+
+		}
+	}
+	else
+	{
+		// HPが増えると根性がなくなる
+		if (HpRate > 0.35f)
+		{
+			m_bWillPower = false;
+		}
+
+	}
+
+	//throw gcnew System::NotImplementedException();
+
 }

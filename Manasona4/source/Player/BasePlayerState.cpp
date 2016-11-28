@@ -239,7 +239,7 @@ bool OverDriveCancel(BasePlayer *pPerson)
 	if ((pPerson->GetFSM()->isInState(*BasePlayerState::Throw::GetInstance()) == true && pPerson->GetActionFrame() != FRAME_STATE::FOLLOW) ||
 		pPerson->GetFSM()->isInState(*BasePlayerState::ThrowSuccess::GetInstance()) == true ||
 		pPerson->GetFSM()->isInState(*BasePlayerState::ThrowBind::GetInstance()) == true ||// 投げてるときは勘弁
-		pPerson->GetFSM()->isInState(*BasePlayerState::HeavehoDrive::GetInstance()))
+		pPerson->GetFSM()->isInState(*BasePlayerState::HeavehoDrive::GetInstance()) == true)
 		return false;
 
 
@@ -376,7 +376,8 @@ bool HeaveHoOverFlowCancel(BasePlayer * pPerson)
 			pPerson->GetFSM()->isInState(*BasePlayerState::DownFall::GetInstance()) == true||
 			pPerson->GetFSM()->isInState(*BasePlayerState::OverDrive_OneMore::GetInstance()) == true ||
 			pPerson->GetFSM()->isInState(*BasePlayerState::HeavehoDriveOverFlow::GetInstance()) == true||
-			pPerson->GetFSM()->isInState(*BasePlayerState::HeavehoDrive::GetInstance()) == true
+			pPerson->GetFSM()->isInState(*BasePlayerState::HeavehoDrive::GetInstance()) == true||
+			pPerson->GetFSM()->isInState(*BasePlayerState::OverDrive_Burst::GetInstance()) == true// バースト中も勘弁
 			)// 投げてるときは勘弁
 			return false;
 
@@ -2512,7 +2513,11 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 				//============================================
 				if (SquatAttackCancel(pPerson)) return;
 
-
+				//////////////////////////////////////////////
+				//	ジャンプキャンセル
+				//============================================
+				if (JumpCancel(pPerson)) return;
+				
 
 				//////////////////////////////////////////////
 				//	ヒーホードライブオーバーフローキャンセル
@@ -2591,7 +2596,12 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 				//////////////////////////////////////////////
 				//	しゃがみ攻撃キャンセル
 				//============================================
-				//if (SquatAttackCancel(pPerson)) return;
+				if (SquatAttackCancel(pPerson)) return;
+
+				//////////////////////////////////////////////
+				//	ジャンプキャンセル
+				//============================================
+				if (JumpCancel(pPerson)) return;
 
 				//////////////////////////////////////////////
 				//	ヒーホードライブオーバーフローキャンセル
@@ -3617,6 +3627,22 @@ void BasePlayerState::AerialAttack::Execute(BasePlayer * pPerson)
 		//============================================
 		if (StandCancel(pPerson)) return;
 
+		//////////////////////////////////////////////
+		//	スキルキャンセル
+		//============================================
+		if (SkillCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	ヒーホードライブボタン
+		//============================================
+		if (HeaveHoCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	フィニッシュ攻撃ボタン
+		//============================================
+		if (InvincibleAttackCancel(pPerson)) return;
+
+
 		//============================================
 		//	空中ジャンプキャンセルボタン
 		//============================================
@@ -4627,8 +4653,10 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 									 //	 RecoveryFrame = 18 * 2;
 									 // }
 
-									 // (追加)ガードエフェクト発動! 
-									 pPerson->AddEffectAction(pPerson->GetFlontPos(), EFFECT_TYPE::GUARD_WAVE);
+									 // (追加)ガードエフェクト発動!  自分と相手の場所のベクトルを渡す
+									 Vector3 vVec= pPerson->GetTargetPlayer()->GetPos() - pPerson->GetPos();
+									 vVec.Normalize();
+									 pPerson->AddEffectAction(pPerson->GetFlontPos(), EFFECT_TYPE::GUARD_WAVE, vVec);
 
 									 // 技の攻撃に依存　(スマブラ式)
 									 //int RecoveryFrame2 = (int)(HitDamageInfo->recoveryFlame *0.3f)+2;
@@ -4843,6 +4871,10 @@ void BasePlayerState::ThrowBind::Enter(BasePlayer * pPerson)
 
 	// 掴みSEをここで再生
 	se->Play("掴み成功");
+
+	// 投げられた時のエフェクト
+	pPerson->GetThrowMark()->Action();
+	pPerson->AddEffectAction(pPerson->GetPos() , EFFECT_TYPE::THROW);
 }
 
 void BasePlayerState::ThrowBind::Execute(BasePlayer * pPerson)
@@ -4862,6 +4894,8 @@ void BasePlayerState::ThrowBind::Exit(BasePlayer * pPerson)
 	// 重力とかの移動量を有効化する
 	pPerson->SetMoveUpdate(true);
 
+	// 投げ抜け猶予エフェクト（ビックリマーク）を止める
+	pPerson->GetThrowMark()->Stop();
 }
 
 void BasePlayerState::ThrowBind::Render(BasePlayer * pPerson)

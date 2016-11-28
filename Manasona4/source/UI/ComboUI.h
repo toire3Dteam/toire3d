@@ -6,23 +6,25 @@
 class ComboUI
 {
 public:
-	ComboUI();
+	//ComboUI();
 	ComboUI(BasePlayer* PlayerData);
 	~ComboUI();
 
 	void Update();
-	void Render(int x, int y);
+	void Render();
 
 	void GageUpdate();
 
 	void SetRecoveryFrame(int recovery){ m_iRecoveryFrame = recovery; }
 
 	// カウント
-	void Count(int damage,int maxRecovery);
+	void Count(int damage, int maxRecovery, bool bCounterHit = false);
 	//void Count(int damage, int maxRecovery,int* recovery);
 	void Guard();
 
 private:
+	SIDE m_eSide;
+	Vector2 m_vPos;
 	BasePlayer* m_pPlayerData;
 
 	Number* m_num;
@@ -50,5 +52,10 @@ private:
 	bool m_bGuardFlag;
 
 	// カウンター
-	tdn2DAnim* m_pCounterPic;
+	struct Counter
+	{
+		tdn2DAnim* pPic;
+		int iAddX;
+	};
+	Counter m_tagCounter;
 };

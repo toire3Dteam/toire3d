@@ -59,4 +59,8 @@ private:
 	int m_iFlashRate;
 	bool m_bFlashFlag;
 
+	// ƒAƒ‹ƒtƒ@
+	int m_iGageAlpha;
+	bool m_bGageAlphaFlag;
+
 };

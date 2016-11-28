@@ -85,6 +85,35 @@ void ParticleManager::EffectOverDrive(const Vector3 &pos)
 }
 
 //*****************************************************************************
+//	オーバードライブ（バースト）持続オーラ
+//*****************************************************************************
+void ParticleManager::EffectOverDriveBurst(const Vector3 &pos)
+{
+	Vector3 Pos, Move, Power;
+
+	for (int i = 0; i < 3; i++)
+	{
+		Pos.x = pos.x + rand() % 9 - 4.0f;
+		Pos.y = pos.y + (float)(rand() % 7 + 2);
+		Pos.z = pos.z + rand() % 9 - 4.0f;
+		const int M = 2;
+		Move.x = (rand() % M - (M / 2))*0.091f;
+		Move.y = (rand() % 2 + 2) * 0.05f;
+		Move.z = (rand() % M - (M / 2))*0.091f;
+		Power.x = 0;
+		Power.y = 0.0f;
+		Power.z = 0;
+
+		const int type = (rand() % 2) ? 2 : 2;
+
+		// パーティクルセット
+		Set2(type, 0, .1f, 20, .0f, 10, .4f, Pos, Move, Power, .75f, .75f, .75f, (rand() % 3 - 1) * 0.025f, rand() % 314 * 0.01f, 1.0f, rand() % 3 + 2.0f, RS::ADD);
+
+	}
+}
+
+
+//*****************************************************************************
 //	フィニッシュヒット
 //*****************************************************************************
 void ParticleManager::EffectFinish(const Vector3 &pos)

@@ -88,6 +88,12 @@ UVEffectManager::UVEffectManager()
 		case UV_EFFECT_TYPE::MUZZLE_FLASH:
 			m_baseUVEffect[i] = new MuzzleFlashEffect();
 			break;
+		case UV_EFFECT_TYPE::RED_BURST:
+			m_baseUVEffect[i] = new RedBurstEffect();
+			break;
+		case UV_EFFECT_TYPE::RED_WAVE:
+			m_baseUVEffect[i] = new RedWaveEffect();
+			break;
 		default:
 			assert(0);	// "そんなエフェクトはない"
 			break;

@@ -50,7 +50,7 @@ BOOL InitApp(HINSTANCE hInstance, int nCmdShow)									// ƒQ[ƒ€‹N“®Žž‚ÌÅ‰‚Ì
 	//MainFrameEx = new Framework();			 // ƒƒCƒ“ƒtƒŒ[ƒ€ƒ[ƒN¶¬
 	//MainFrameEx->ChangeScene(new sceneMain, true); // ‰ŠúƒV[ƒ“
 	//MainFrameEx->ChangeScene(new sceneRenderingTest); // •`‰æƒeƒXƒgƒV[ƒ“
-	//MainFrameEx->ChangeScene(new sceneResult); // ƒŠƒUƒ‹ƒgƒV[ƒ“
+	//MainFrameEx->ChangeScene(new sceneResult(SIDE::RIGHT)); // ƒŠƒUƒ‹ƒgƒV[ƒ“
 	//MainFrameEx->ChangeScene(new sceneEffectTool); // 
 	//MainFrameEx->ChangeScene(new sceneTitle);
 	MainFrameEx->ChangeScene(new sceneMenu);

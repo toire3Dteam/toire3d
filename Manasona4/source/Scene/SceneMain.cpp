@@ -193,8 +193,11 @@ bool sceneMain::Initialize()
 	{
 		switch ((BATTLE_WINDOW_TYPE)i)
 		{
-		case BATTLE_WINDOW_TYPE::POSE:
-			m_pWindow[i] = new PoseWindow(Vector2(424, 128));
+		case BATTLE_WINDOW_TYPE::PAUSE:
+			m_pWindow[i] = new PauseWindow(Vector2(424, 128));
+			break;
+		case BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE:
+			m_pWindow[i] = new TutorialPauseWindow(Vector2(424, 128));
 			break;
 		default:
 			MyAssert(0, "そんなウィンドウはない");
