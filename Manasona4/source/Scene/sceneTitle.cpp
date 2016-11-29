@@ -32,6 +32,9 @@ sceneTitle::~sceneTitle()
 //		更			新
 void sceneTitle::Update()
 {
+	// テアリング防止の苦肉の策
+	m_pMovie->Update();
+
 	// エンターキーでスタート
 	FOR(4)
 	{
@@ -55,6 +58,20 @@ void sceneTitle::Render()
 
 	// 動画画像
 	m_pImages[IMAGE::BACK]->Render(0,0);
+
+	//int work;
+	//m_pMovie->GetTextureRenderer()->get_AvgFrameRate(&work);
+	//tdnText::Draw(0, 30, 0xffffffff, "平均フレームレート          :%d", work);
+	//m_pMovie->GetTextureRenderer()->get_AvgSyncOffset(&work);
+	//tdnText::Draw(0, 60, 0xffffffff, "平均予定時間差(ミリ秒)　    :%d", work);
+	//m_pMovie->GetTextureRenderer()->get_DevSyncOffset(&work);
+	//tdnText::Draw(0, 90, 0xffffffff, "時間の間の標準偏差(ミリ秒)  :%d", work);
+	//m_pMovie->GetTextureRenderer()->get_FramesDrawn(&work);
+	//tdnText::Draw(0, 120, 0xffffffff, "描画フレーム数             :%d", work);
+	//m_pMovie->GetTextureRenderer()->get_FramesDroppedInRenderer(&work);
+	//tdnText::Draw(0, 150, 0xffffffff, "ドロップフレーム数         :%d", work);
+	//m_pMovie->GetTextureRenderer()->get_Jitter(&work);
+	//tdnText::Draw(0, 180, 0xffffffff, "次のフレーム標準偏差       :%d", work);
 }
 //
 //=============================================================================================

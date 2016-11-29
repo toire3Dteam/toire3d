@@ -117,7 +117,7 @@ MenuUIManager::~MenuUIManager()
 void MenuUIManager::Update()
 {
 	// 動画のループ更新
-	m_pMoveMgr->LoopUpdate();
+	m_pMoveMgr->Update();
 
 	for (int i = 0; i < (int)MENU_ICON_TYPE::ARRAY_END; i++)
 	{

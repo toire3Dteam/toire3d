@@ -322,11 +322,19 @@ void SceneSelectState::End::Execute(sceneSelect *pMain)
 	{
 		// (TODO) ↑で選択したキャラクター・パートナー・ステージ・BGMを設定する
 		
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].character
+			= pMain->GetSelectUIMgr()->GetSelectCharacter(SIDE::LEFT);
+
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].character
+			= pMain->GetSelectUIMgr()->GetSelectCharacter(SIDE::RIGHT);				
+
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].partner
 			= pMain->GetSelectUIMgr()->GetSelectPartner(SIDE::LEFT);
 
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].partner
 			= pMain->GetSelectUIMgr()->GetSelectPartner(SIDE::RIGHT);
+
+		SelectDataMgr->Get()->iBattleMusicID=pMain->m_iSelectBGMNo;
 
 		MainFrameEx->ChangeScene(new sceneMain());
 		return;

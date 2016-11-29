@@ -533,6 +533,10 @@ public:
 		if (!isFrameAction()) return FRAME_STATE::END;
 		return m_ActionFrameList[(int)m_ActionState][m_iCurrentActionFrame];
 	}
+	FRAME_STATE GetActionFrame(BASE_ACTION_STATE state, int frame)
+	{
+		return m_ActionFrameList[(int)state][frame];
+	}
 	void SetActionState(BASE_ACTION_STATE state)
 	{
 		m_ActionState = state;

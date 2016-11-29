@@ -3125,6 +3125,13 @@ public:
 		*plVidHeight = m_lVidHeight;
 		*plVidPitch = m_lVidPitch;
 	};
+
+	void Update()
+	{
+		// これを毎フレーム呼び出すとテアリングが解消される
+		// よくわかってないのが本音だが、とりあえずこれで。
+		CAutoLock cVideoLock(&m_InterfaceLock);
+	}
 };
 
 /**
@@ -3143,10 +3150,19 @@ public:
 		return m_pTexture;
 	}
 
+	TextureRenderer *GetTextureRenderer(){ return m_pTextureRenderer; }
+
 	void Play();	// 再生
 	void Stop();	// 停止
 
-	void LoopUpdate(){ if (m_bLoop && isEndPos())SetTime(0.0); }	// ループ再生する更新
+	void Update()
+	{
+		// ★テアリング防止の更新(ロックしてる)
+		m_pTextureRenderer->Update();
+
+		// ループ再生する更新
+		if (m_bLoop && isEndPos())SetTime(0.0);
+	}	
 
 	// ゲッター
 	double GetStopTime(){ double ret; m_pMediaPosition->get_StopTime(&ret); return ret; };				// 終了時間の取得

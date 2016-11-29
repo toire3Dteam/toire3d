@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BaseEntity\Message\Message.h"
+#include "../BaseEntity/Message/Message.h"
 
 //*****************************************************************************
 //

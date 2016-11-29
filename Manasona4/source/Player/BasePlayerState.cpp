@@ -480,9 +480,8 @@ bool AerialDashCancel(BasePlayer *pPerson)
 
 bool AerialAttackCancel(BasePlayer *pPerson)
 {
-	// 攻撃ボタンと崩しボタン入力で空中攻撃
-	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::A) ||
-		pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::C))
+	// 攻撃ボタン入力で空中攻撃
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::C))
 	{
 		// 空下封印
 		//if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN) == true)
@@ -5131,7 +5130,7 @@ void BasePlayerState::SuccessThrowRelease::Enter(BasePlayer * pPerson)
 	pPerson->SetActionState(BASE_ACTION_STATE::FRAMECOUNT);
 
 	// 初速度の設定
-	static const float pow(1.0f);	// 横移動量の力
+	static const float pow(2.0f);	// 横移動量の力
 	pPerson->SetMove(Vector3((pPerson->GetDir() == DIR::LEFT) ? pow : -pow, 0, 0));	// 向いてる方と反対方向に移動する
 }
 

@@ -51,15 +51,15 @@ void tdnMovieManager::Release()
 tdnMovie::tdnMovie(char *cFilename, bool bSound, bool bLoop) :m_pGraphBuilder(nullptr), m_pMediaControl(nullptr), m_pMediaEvent(nullptr), m_pMediaPosition(nullptr),
 m_state(FILTER_STATE::State_Stopped), m_bLoop(bLoop)
 {
-	IBaseFilter	*pSourceFilter(nullptr);	// ソースフィルター
-	IPin *pFSrcPinOut(nullptr);				// ソースフィルターのOUTピン
+	IBaseFilter	*pSourceFilter{};	// ソースフィルター
+	IPin *pFSrcPinOut{};				// ソースフィルターのOUTピン
 
 	// FilterGraphインターフェース生成
 	MyAssert(!FAILED(CoCreateInstance(CLSID_FilterGraph, nullptr, CLSCTX_INPROC_SERVER, IID_IGraphBuilder, (LPVOID*)&m_pGraphBuilder)), "エラー: tdnMovieのFilterGraphインターフェース生成");
 
 	// テクスチャレンダラ―初期化
 	HRESULT hr;
-	TextureRenderer *pRenderer = new TextureRenderer(nullptr, &hr); // リーク
+	TextureRenderer *pRenderer{ new TextureRenderer(nullptr, &hr) }; // リーク
 	pRenderer->SetDevice(tdnSystem::GetDevice());
 	MyAssert(!FAILED(hr) && pRenderer, "エラー: テクスチャレンダラ―の初期化");
 
@@ -88,10 +88,9 @@ m_state(FILTER_STATE::State_Stopped), m_bLoop(bLoop)
 
 	// ソースフィルター生成・追加
 	// char → BSTR
-	LPSTR lstr = cFilename;
-	int blen = (int)MultiByteToWideChar(CP_ACP, 0, lstr, strlen(lstr), nullptr, 0);
-	BSTR bFilename;
-	bFilename = SysAllocStringLen(nullptr, blen);
+	LPSTR lstr{ cFilename };
+	int blen{ (int)MultiByteToWideChar(CP_ACP, 0, lstr, strlen(lstr), nullptr, 0) };
+	BSTR bFilename{ SysAllocStringLen(nullptr, blen) };
 	MultiByteToWideChar(CP_ACP, 0, lstr, strlen(lstr), bFilename, blen);
 	MyAssert(!FAILED(m_pGraphBuilder->AddSourceFilter(bFilename, L"SourceFilter", &pSourceFilter)), "エラー: tdnMovieのソースフィルター生成");
 
@@ -123,7 +122,7 @@ m_state(FILTER_STATE::State_Stopped), m_bLoop(bLoop)
 	/* WMVとかMPEG2とか */
 	else
 	{
-		IBasicAudio *pAudio;
+		IBasicAudio *pAudio{};
 		MyAssert(!FAILED(m_pGraphBuilder->QueryInterface(IID_IBasicAudio,(LPVOID*)&pAudio)), "エラー: tdnMovieのオーディオインターフェース");
 		MyAssert(!FAILED(m_pGraphBuilder->RenderFile(bFilename, nullptr)), "エラー: tdnMovieのレンダーファイル");
 
@@ -170,7 +169,7 @@ m_state(FILTER_STATE::State_Stopped), m_bLoop(bLoop)
 	/* ※ */
 	m_pTextureRenderer->GetVideoDesc(&m_lWidth, &m_lHeight, &m_lPitch);
 
-	D3DSURFACE_DESC desc;
+	D3DSURFACE_DESC desc{};
 	/* ※ 落ちた */
 	m_pTexture->GetLevelDesc(0, &desc);
 
@@ -268,49 +267,47 @@ TextureRenderer::~TextureRenderer()
 //-----------------------------------------------------------------------------
 HRESULT TextureRenderer::CheckMediaType(const CMediaType *pmt)
 {
-	HRESULT   hr = E_FAIL;
-	VIDEOINFO *pvi = 0;
+	//VIDEOINFO *pvi = 0;
 
 	CheckPointer(pmt, E_POINTER);
 
-	// Reject the connection if this is not a video type
-	if (*pmt->FormatType() != FORMAT_VideoInfo) {
-		return E_INVALIDARG;
-	}
-
-	// Only accept RGB24 video
-	pvi = (VIDEOINFO *)pmt->Format();
-
-	if (IsEqualGUID(*pmt->Type(), MEDIATYPE_Video) &&
-		IsEqualGUID(*pmt->Subtype(), MEDIASUBTYPE_RGB24))
+	// このフォーマットが動画系じゃなかったらテクスチャとして描画できないので出ていけぇ！！
+	if (*pmt->FormatType() != FORMAT_VideoInfo)
 	{
-		hr = S_OK;
+		return E_INVALIDARG;	// 引数が正しくないよ！
 	}
 
-	return hr;
+	//pvi = (VIDEOINFO *)pmt->Format();
+
+	// RGB24の動画のみ受け付ける
+	if (IsEqualGUID(*pmt->Type(), MEDIATYPE_Video) && IsEqualGUID(*pmt->Subtype(), MEDIASUBTYPE_RGB24))
+	{
+		return S_OK;
+	}
+
+	return E_FAIL;
 }
 
 //-----------------------------------------------------------------------------
-// SetMediaType: Graph connection has been made. 
+//		グラフ接続
 //-----------------------------------------------------------------------------
 HRESULT TextureRenderer::SetMediaType(const CMediaType *pmt)
 {
 	HRESULT hr;
 
-	UINT uintWidth = 2;
-	UINT uintHeight = 2;
+	UINT uintWidth{ 2 };
+	UINT uintHeight{ 2 };
 
-	// Retrive the size of this media type
-	D3DCAPS9 caps;
-	VIDEOINFO *pviBmp;                      // Bitmap info header
-	pviBmp = (VIDEOINFO *)pmt->Format();
+	// 動画のサイズを取得する
+	D3DCAPS9 caps{};
+	VIDEOINFO *pviBmp{ (VIDEOINFO *)pmt->Format() };	// ビットマップの情報を格納
 
+	// 縦幅、横幅、の取得
 	m_lVidWidth = pviBmp->bmiHeader.biWidth;
 	m_lVidHeight = abs(pviBmp->bmiHeader.biHeight);
-	m_lVidPitch = (m_lVidWidth * 3 + 3) & ~(3); // We are forcing RGB24
+	m_lVidPitch = (m_lVidWidth * 3 + 3) & ~(3); // 24ビットのRGBサーフェイス
 
-	// here let's check if we can use dynamic textures
-	ZeroMemory(&caps, sizeof(D3DCAPS9));
+	// 動的テクスチャを使えるかチェックする
 	hr = m_pd3dDevice->GetDeviceCaps(&caps);
 	if (caps.Caps2 & D3DCAPS2_DYNAMICTEXTURES)
 	{
@@ -336,7 +333,7 @@ HRESULT TextureRenderer::SetMediaType(const CMediaType *pmt)
 		m_bUseDynamicTextures = FALSE;
 	}
 
-	// Create the texture that maps to this media type
+	// 再生する動画に沿った大きさとかの情報を使ってテクスチャを作る
 	hr = E_UNEXPECTED;
 	if (m_bUseDynamicTextures)
 	{
@@ -361,28 +358,27 @@ HRESULT TextureRenderer::SetMediaType(const CMediaType *pmt)
 		return hr;
 	}
 
-	// CreateTexture can silently change the parameters on us
-	D3DSURFACE_DESC ddsd;
-	ZeroMemory(&ddsd, sizeof(ddsd));
-
-	if (FAILED(hr = m_pTexture->GetLevelDesc(0, &ddsd))) {
+	// 読み込んだテクスチャからサイズを保存
+	D3DSURFACE_DESC ddsd{};
+	if (FAILED(hr = m_pTexture->GetLevelDesc(0, &ddsd)))
+	{
 		return hr;
 	}
 
-
-	IDirect3DSurface9 *pSurf;
-
+	// メインサーフェイスの取得(保存)
+	IDirect3DSurface9 *pSurf{};
 	if (SUCCEEDED(hr = m_pTexture->GetSurfaceLevel(0, &pSurf)))
 	{
 		pSurf->GetDesc(&ddsd);
 	}
 
-	// Save format info
+	// フォーマット情報保存
 	m_TextureFormat = ddsd.Format;
 
 	if (m_TextureFormat != D3DFMT_X8R8G8B8/*D3DFMT_A8R8G8B8*/ &&
-		m_TextureFormat != D3DFMT_A1R5G5B5) {
-		return VFW_E_TYPE_NOT_ACCEPTED;
+		m_TextureFormat != D3DFMT_A1R5G5B5)
+	{
+		return VFW_E_TYPE_NOT_ACCEPTED;	// サポートされていないメディアタイプだよ！
 	}
 
 	return S_OK;
@@ -390,26 +386,21 @@ HRESULT TextureRenderer::SetMediaType(const CMediaType *pmt)
 
 
 //-----------------------------------------------------------------------------
-// DoRenderSample: A sample has been delivered. Copy it to the texture.
+//		動画のビットマップをテクスチャに焼きこむ
 //-----------------------------------------------------------------------------
 HRESULT TextureRenderer::DoRenderSample(IMediaSample * pSample)
 {
-	BYTE  *pBmpBuffer, *pTxtBuffer; // Bitmap buffer, texture buffer
-	LONG  lTxtPitch;                // Pitch of bitmap, texture
-
-	BYTE  * pbS = NULL;
-	DWORD * pdwS = NULL;
-	DWORD * pdwD = NULL;
-	UINT row, col, dwordWidth;
+	BYTE  *pBmpBuffer{}, *pTxtBuffer{}; // ビットマップバッファとテクスチャバッファ
+	LONG  lTxtPitch{};                // ビットマップとテクスチャのピッチ
 
 	CheckPointer(pSample, E_POINTER);
 	CheckPointer(m_pTexture, E_UNEXPECTED);
 
-	// Get the video bitmap buffer
+	// ビットマップの先頭アドレスを取得
 	pSample->GetPointer(&pBmpBuffer);
 
-	// Lock the Texture
-	D3DLOCKED_RECT d3dlr;
+	// テクスチャをロックして焼きこむ
+	D3DLOCKED_RECT d3dlr{};
 	if (m_bUseDynamicTextures)
 	{
 		if (FAILED(m_pTexture->LockRect(0, &d3dlr, 0, D3DLOCK_DISCARD)))
@@ -420,12 +411,12 @@ HRESULT TextureRenderer::DoRenderSample(IMediaSample * pSample)
 		if (FAILED(m_pTexture->LockRect(0, &d3dlr, 0, 0)))
 			return E_FAIL;
 	}
-	// Get the texture buffer & pitch
+	// テクスチャのバッファとピッチを取得する
 	pTxtBuffer = static_cast<byte *>(d3dlr.pBits);
 	lTxtPitch = d3dlr.Pitch;
 
 
-	// Copy the bits
+	// ビットをコピー
 	pTxtBuffer += lTxtPitch*(m_lVidHeight - 1);
 
 	if (m_TextureFormat == D3DFMT_X8R8G8B8/*D3DFMT_A8R8G8B8*/)
@@ -440,15 +431,15 @@ HRESULT TextureRenderer::DoRenderSample(IMediaSample * pSample)
 		// We want to transform it to [ff r0 g0 b0][ff r1 g1 b1][ff r2 g2 b2][ff r3 b3 g3]
 		// below, bitwise operations do exactly this.
 
-		dwordWidth = m_lVidWidth / 4; // aligned width of the row, in DWORDS
+		DWORD dwWidth=m_lVidWidth / 4; // aligned width of the row, in DWORDS
 		// (pixel by 3 bytes over sizeof(DWORD))
 
-		for (row = 0; row< (UINT)m_lVidHeight; row++)
+		for (UINT row=0; row< (UINT)m_lVidHeight; row++)
 		{
-			pdwS = (DWORD*)pBmpBuffer;
-			pdwD = (DWORD*)pTxtBuffer;
+			DWORD *pdwS{ (DWORD*)pBmpBuffer };
+			DWORD *pdwD{ (DWORD*)pTxtBuffer };
 
-			for (col = 0; col < dwordWidth; col++)
+			for (UINT col=0; col < dwWidth; col++)
 			{
 				pdwD[0] = pdwS[0] | 0xFF000000;
 				pdwD[1] = ((pdwS[1] << 8) | 0xFF000000) | (pdwS[0] >> 24);
@@ -459,8 +450,8 @@ HRESULT TextureRenderer::DoRenderSample(IMediaSample * pSample)
 			}
 
 			// we might have remaining (misaligned) bytes here
-			pbS = (BYTE*)pdwS;
-			for (col = 0; col < (UINT)m_lVidWidth % 4; col++)
+			BYTE *pbS{ (BYTE*)pdwS };
+			for (UINT col=0; col < (UINT)m_lVidWidth % 4; col++)
 			{
 				*pdwD = 0xFF000000 |
 					(pbS[2] << 16) |
@@ -477,12 +468,12 @@ HRESULT TextureRenderer::DoRenderSample(IMediaSample * pSample)
 
 	if (m_TextureFormat == D3DFMT_A1R5G5B5)
 	{
-		for (int y = 0; y < m_lVidHeight; y++)
+		for (int y=0; y < m_lVidHeight; y++)
 		{
-			BYTE *pBmpBufferOld = pBmpBuffer;
-			BYTE *pTxtBufferOld = pTxtBuffer;
+			BYTE *pBmpBufferOld{ pBmpBuffer };
+			BYTE *pTxtBufferOld{ pTxtBuffer };
 
-			for (int x = 0; x < m_lVidWidth; x++)
+			for (int x=0; x < m_lVidWidth; x++)
 			{
 				*(WORD *)pTxtBuffer = (WORD)
 					(0x8000 +
@@ -499,7 +490,7 @@ HRESULT TextureRenderer::DoRenderSample(IMediaSample * pSample)
 		}
 	}
 
-	// Unlock the Texture
+	// ロックを解除
 	if (FAILED(m_pTexture->UnlockRect(0)))
 		return E_FAIL;
 

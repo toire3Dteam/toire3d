@@ -150,6 +150,7 @@
     <ClCompile Include="source\particle_2d\particle_2d.cpp" />
     <ClCompile Include="source\pie_graph\pie_graph.cpp" />
     <ClCompile Include="source\Player\BasePlayerState.cpp" />
+    <ClCompile Include="source\Player\Nazenara\Nazenara.cpp" />
     <ClCompile Include="source\Player\PlayerManager.cpp" />
     <ClCompile Include="source\PointLight\PointLight.cpp" />
     <ClCompile Include="source\PostEffect\PostEffect.cpp" />
@@ -289,6 +290,7 @@
     <ClInclude Include="source\particle_2d\particle_2d.h" />
     <ClInclude Include="source\pie_graph\pie_graph.h" />
     <ClInclude Include="source\Player\BasePlayerState.h" />
+    <ClInclude Include="source\Player\Nazenara\Nazenara.h" />
     <ClInclude Include="source\Player\PlayerManager.h" />
     <ClInclude Include="source\PointLight\PointLight.h" />
     <ClInclude Include="source\PostEffect\PostEffect.h" />

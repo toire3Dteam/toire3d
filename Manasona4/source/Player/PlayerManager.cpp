@@ -1,6 +1,7 @@
 #include "PlayerManager.h"
-#include "Airou\Airou.h"
-#include "Stage\Stage.h"
+#include "Airou/Airou.h"
+#include "Nazenara/Nazenara.h"
+#include "Stage/Stage.h"
 #include "../Sound/SoundManager.h"
 #include "../BaseEntity/Message/MessageDispatcher.h"
 #include "../Stand/Stand.h"
@@ -48,8 +49,15 @@ void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage, SideData Side
 		case CHARACTER::AIROU:
 			m_pPlayers[i] = new Airou(side, SideDatas[(int)side]);
 			break;
+		//case CHARACTER::TEKI:
+		//	m_pPlayers[i] = new Teki(side, SideDatas[(int)side]);
+		//	break;
+		case CHARACTER::NAZENARA:
+			m_pPlayers[i] = new Nazenara(side, SideDatas[(int)side]);
+			break;
 		default:
-			MyAssert(false,"そんなキャラクターはいない")
+			m_pPlayers[i] = new Airou(side, SideDatas[(int)side]);
+			//MyAssert(false,"そんなキャラクターはいない")
 			break;
 		}
 		m_pPlayers[i]->InitActionDatas();		// ★攻撃情報を各キャラに初期化させる

@@ -34,7 +34,7 @@ tdnSoundBuffer::tdnSoundBuffer(LPDIRECTSOUND8 lpDS, char* filename, bool b3D)
 
 void tdnSoundBuffer::Initialize(LPDIRECTSOUND8 lpDS, unsigned char* data, DWORD size, LPWAVEFORMATEX fmt, bool b3D)
 {
-	DSBUFFERDESC	dsbd;
+	DSBUFFERDESC	dsbd{};
 	LPVOID			lpbuf1, lpbuf2;
 	DWORD			dwbuf1, dwbuf2;
 
@@ -46,7 +46,6 @@ void tdnSoundBuffer::Initialize(LPDIRECTSOUND8 lpDS, unsigned char* data, DWORD 
 	lpBuf = nullptr;
 
 	/* 二次バッファ作成	*/
-	ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
 	dsbd.dwSize = sizeof(DSBUFFERDESC);
 	if (b3D) dsbd.dwFlags = DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRL3D | DSBCAPS_CTRLFX;	// CTRL_FX等、サウンド制御に必要なフラグをONにする(CTRL3DをONにするとCTRLPANを使えない)
 	else dsbd.dwFlags = DSBCAPS_CTRLPAN | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFX;
@@ -94,7 +93,7 @@ void tdnSoundBuffer::Initialize(LPDIRECTSOUND8 lpDS, unsigned char* data, DWORD 
 
 void tdnSoundBuffer::Create_and_copy(LPDIRECTSOUND8 lpDS, char* filename, bool b3D, tdnSoundBuffer **buffers, int dst, int count)
 {
-	DSBUFFERDESC	dsbd;
+	DSBUFFERDESC	dsbd{};
 	LPVOID			lpbuf1, lpbuf2;
 	DWORD			dwbuf1, dwbuf2;
 
@@ -112,7 +111,6 @@ void tdnSoundBuffer::Create_and_copy(LPDIRECTSOUND8 lpDS, char* filename, bool b
 	sprintf_s(buffers[dst]->wav_file_path, sizeof(buffers[dst]->wav_file_path), "%s", filename);
 
 	/* 二次バッファ作成	*/
-	ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
 	dsbd.dwSize = sizeof(DSBUFFERDESC);
 	if (b3D) dsbd.dwFlags = DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRL3D | DSBCAPS_CTRLFX;
 	else dsbd.dwFlags = DSBCAPS_CTRLPAN | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFX;
@@ -161,7 +159,7 @@ void tdnSoundBuffer::Create_and_copy(LPDIRECTSOUND8 lpDS, char* filename, bool b
 	for (int no = dst + 1; no < dst + count; no++)
 	{
 
-		DSBUFFERDESC	dsbd;
+		DSBUFFERDESC	dsbd2{};
 		LPVOID			lpbuf1 = nullptr, lpbuf2 = nullptr;
 		DWORD			dwbuf1 = 0, dwbuf2 = 0;
 
@@ -169,15 +167,14 @@ void tdnSoundBuffer::Create_and_copy(LPDIRECTSOUND8 lpDS, char* filename, bool b
 		buffers[no]->lpBuf = nullptr;
 
 		/* 二次バッファ作成	*/
-		ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
-		dsbd.dwSize = sizeof(DSBUFFERDESC);
-		if (b3D == true) dsbd.dwFlags = DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRL3D | DSBCAPS_CTRLFX;
-		else dsbd.dwFlags = DSBCAPS_CTRLPAN | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFX;
-		dsbd.dwBufferBytes = buffers[dst]->size;
-		dsbd.lpwfxFormat = &buffers[dst]->wfx;
+		dsbd2.dwSize = sizeof(DSBUFFERDESC);
+		if (b3D == true) dsbd2.dwFlags = DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRL3D | DSBCAPS_CTRLFX;
+		else dsbd2.dwFlags = DSBCAPS_CTRLPAN | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFX;
+		dsbd2.dwBufferBytes = buffers[dst]->size;
+		dsbd2.lpwfxFormat = &buffers[dst]->wfx;
 
 		LPDIRECTSOUNDBUFFER lpWork2;
-		result_sound = lpDS->CreateSoundBuffer(&dsbd, &lpWork2, nullptr);
+		result_sound = lpDS->CreateSoundBuffer(&dsbd2, &lpWork2, nullptr);
 
 		if (result_sound == E_OUTOFMEMORY)
 		{
@@ -242,7 +239,7 @@ LPBYTE tdnSoundBuffer::LoadWAV(LPSTR fname, LPDWORD size, LPWAVEFORMATEX wfx)
 
 	char chunkID[4];
 	int ChunkSize;
-	BYTE *buf = nullptr;
+	BYTE *buf{};
 
 	/* RIFFチャンク侵入 */
 	infs.read(chunkID, 4);
