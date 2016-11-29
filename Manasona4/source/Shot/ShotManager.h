@@ -40,7 +40,14 @@ public:
 	//	ショットリスト追加
 	//------------------------------------------------------
 	void AddShot(SIDE side, Shot::Base *pNewShot){ m_list[(int)side].push_back(pNewShot); }
-
+	void Reset()
+	{
+		FOR((int)SIDE::ARRAY_MAX) for (auto it = m_list[i].begin(); it != m_list[i].end();)
+		{
+			delete (*it);
+			it = m_list[i].erase(it);
+		}
+	}
 
 	//------------------------------------------------------
 	//	ゲッター

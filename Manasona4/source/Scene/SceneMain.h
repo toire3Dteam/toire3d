@@ -49,6 +49,8 @@ public:
 	void Render();
 	void RenderShadow();
 	void SurfaceRender();
+
+	void Reset();
 	
 	// ステートマシン取得
 	StateMachine<sceneMain> *GetFSM(){ return m_pStateMachine; }

@@ -296,10 +296,10 @@ bool GameUIManager::HandleMessage(const Message& msg)
 
 		if (side == SIDE::LEFT)
 		{
-			m_pCombo1P->Count(data->damage, data->recoveryFrame);
+			m_pCombo1P->Count(data->damage, data->recoveryFrame, data->bCounter);
 		}else
 		{
-			m_pCombo2P->Count(data->damage, data->recoveryFrame);
+			m_pCombo2P->Count(data->damage, data->recoveryFrame, data->bCounter);
 		}
 
 		return true;

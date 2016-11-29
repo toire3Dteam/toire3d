@@ -751,9 +751,9 @@ public:
 	//------------------------------------------------------
 	//	覚醒
 	//------------------------------------------------------
-	int GetOverDriveGage(){ return m_OverDriveGage; } // 覚醒ゲージ
-	void AddOverDriveGage(int add){ m_OverDriveGage = min(m_OverDriveGage + add, 100); }
-	void SetOverDriveGage(int set) { m_OverDriveGage = set; }
+	float GetOverDriveGage(){ return m_OverDriveGage; } // 覚醒ゲージ
+	void AddOverDriveGage(float add) { m_OverDriveGage = max(0, min(m_OverDriveGage + add, 100)); }
+	void SetOverDriveGage(float set) { m_OverDriveGage = set; }
 	bool isOverDrive(){ return m_bOverDrive; } // 覚醒してるか
 	int GetOverDriveFrame(){ return m_OverDriveFrame; } // 覚醒時間
 	void SetOverDriveFrame(int frame) { m_OverDriveFrame = frame; } // 覚醒時間
@@ -777,6 +777,11 @@ public:
 
 	// UI
 	//ComboUI* GetComboUI(){ return m_pComboUI; }
+
+	// 最低ダッシュフレーム
+	void AddDushFrame(int add) { m_iDashFrame += add; }
+	void SetDushFrame(int set) { m_iDashFrame = set; }
+	int  GetDushFrame() { return m_iDashFrame; }
 
 	// 
 	bool isGameTimerStopFlag() { return m_bGameTimerStopFlag; }
@@ -941,7 +946,7 @@ protected:
 	//------------------------------------------------------
 	//	覚醒
 	//------------------------------------------------------
-	int m_OverDriveGage;			// 覚醒ゲージ
+	float m_OverDriveGage;			// 覚醒ゲージ
 	bool m_bOverDrive;				// 覚醒してるか
 	int m_OverDriveFrame;			// 覚醒時間
 	OVERDRIVE_TYPE m_OverDriveType;	// 覚醒の種類
@@ -963,6 +968,7 @@ protected:
 	AI*						  m_pAI;			// ★AI
 	bool m_bAI;					// AIかどうか
 
+	int m_iDashFrame;			//  ダッシュの最低時間
 
 	// ヒーホー用の変数
 	int m_iHeavehoStopTimer;			// ヒーホードライブ発動のザワールドの時間

@@ -672,3 +672,12 @@ void sceneMain::OverDriveEnd()
 {
 	m_bOverDriveStageFlag = false;
 }
+
+void sceneMain::Reset()
+{
+	m_bOverDriveStageFlag = false;
+	PlayerMgr->Reset();
+	CameraMgr->SetPlayersPos();
+	m_pShotMgr->Reset();
+	ParticleManager::Reset();
+}

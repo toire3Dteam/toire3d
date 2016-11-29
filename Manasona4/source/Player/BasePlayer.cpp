@@ -24,7 +24,7 @@ const int BasePlayer::c_RECOVERY_FLAME = 32;			// リカバリーステートにいる時間
 const int BasePlayer::c_OVERDRIVE_MAX_GAGE = 100;	// 覚醒ゲージの最大値
 const int BasePlayer::c_OVERDRIVE_MAX_TIME = 480;	// 覚醒が切れるまでの時間
 
-const int BasePlayer::c_THROW_ESCAPE_FRAME = 8;	// 投げぬけの猶予フレーム
+const int BasePlayer::c_THROW_ESCAPE_FRAME = 12;	// 投げぬけの猶予フレーム
 const int BasePlayer::c_THROW_MISS_FRAME = 30;	// 投げ外しロスのフレーム(全キャラ共通だろうという考え)
 const int BasePlayer::c_THROW_RELEASE_FRAME = 15;	// 投げ抜けで、パシンてなってる間のフレーム(これも全キャラ共通だろう)
 const int BasePlayer::c_WINNER_TIME = 180;
@@ -76,7 +76,7 @@ m_iWinNum(0), m_GuardState(GUARD_STATE::NO_GUARD),
 m_pFacePic(nullptr), m_pTargetPlayer(nullptr), m_pSpeedLine(nullptr), m_SkillActionType(SKILL_ACTION_TYPE::MAX),
 m_fOrangeColRate(0), m_fMagentaColRate(0),
 m_pCutinPic(nullptr), m_pName("None"), m_iRushStep(0), m_pThrowMark(nullptr),
-m_bWillPower(false), m_bDown(false)
+m_bWillPower(false), m_bDown(false), m_iDashFrame(0)
 {
 	// スタンド
 	switch (data.partner)
@@ -166,6 +166,7 @@ void BasePlayer::Reset()
 	m_iAerialDashFrame =
 	m_iRushStep = 
 	m_wAheadCommand =
+	m_iDashFrame=
 	0;
 
 	/* [float型]の初期化 */
@@ -416,6 +417,8 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 		// ★自分の向きを設定
 		// このif文に入ってるやつ以外だったら振り向く
 		if (!m_pStateMachine->isInState(*BasePlayerState::Skill::GetInstance()) &&
+			!m_pStateMachine->isInState(*BasePlayerState::SquatAttack::GetInstance()) &&
+			!m_pStateMachine->isInState(*BasePlayerState::DownAttack::GetInstance()) &&
 			!m_pStateMachine->isInState(*BasePlayerState::KnockDown::GetInstance()) &&
 			!m_pStateMachine->isInState(*BasePlayerState::Run::GetInstance()) &&
 			!m_pStateMachine->isInState(*BasePlayerState::DownFall::GetInstance()) &&

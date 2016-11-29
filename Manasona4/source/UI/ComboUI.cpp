@@ -104,22 +104,23 @@ void ComboUI::Update()
 
 	float rate = float(m_pPlayerData->GetRecoveryFrame()) / float(m_iMaxRecoveryFrame);
 
-	if (rate > 0.0f)
-	{
-		m_bRenderFlag = true;
-		m_iRenderFlagWaitFrame = 0;
-	}
-	else
+	// 0以上 ガードしてたら初期化しない
+	if (rate <= 0.0f || m_bGuardFlag == true)
 	{
 		// レートが0ならば2秒後UIを消す
-
 		m_iRenderFlagWaitFrame++;
 		if (m_iRenderFlagWaitFrame > 120)
 		{
 			m_bRenderFlag = false;
 			m_iCount = 0;
 			m_iDamage = 0;
-		}	
+		}
+
+	}
+	else
+	{
+		m_bRenderFlag = true;
+		m_iRenderFlagWaitFrame = 0;
 
 	}
 
@@ -148,8 +149,9 @@ void ComboUI::Update()
 
 void ComboUI::Render()
 {
-	if (m_bRenderFlag == false)return;// 描画させない
-	
+	if (m_bRenderFlag == false)return;	// 描画させない	
+	if (m_iCount == 0)return;			// コンボが0なら描画させない
+
 	m_backPic->Render((int)m_vPos.x, (int)m_vPos.y, RS::COPY_NOZ);
 	m_num->Render((int)m_vPos.x, (int)m_vPos.y -14, m_iCount, Number::NUM_KIND::COMBO);// 数値
 	m_frontPic->Render((int)m_vPos.x, (int)m_vPos.y, RS::COPY_NOZ);

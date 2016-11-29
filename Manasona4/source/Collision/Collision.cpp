@@ -178,8 +178,8 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 				pAttackData->bHit = true;
 
 				// ★ごり押しでヒットストップをかける
-				my->SetHitStopFrame(pAttackData->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame);
-				you->SetHitStopFrame(pAttackData->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame);
+				//my->SetHitStopFrame(pAttackData->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame);
+				//you->SetHitStopFrame(pAttackData->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame);
 
 				// 掴まれたメッセージ
 				MsgMgr->Dispatch(0, my->GetID(), you->GetID(), MESSAGE_TYPE::BE_THROWN, nullptr);

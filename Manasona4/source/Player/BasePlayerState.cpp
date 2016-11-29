@@ -56,6 +56,38 @@ bool JumpCancel(BasePlayer * pPerson)
 	return false;
 }
 
+bool isDamageCounterState(BasePlayer *pPerson)
+{
+	return (
+		pPerson->GetFSM()->isInState(*BasePlayerState::RushAttack::GetInstance()) ||
+		pPerson->GetFSM()->isInState(*BasePlayerState::Escape::GetInstance()) ||
+		pPerson->GetFSM()->isInState(*BasePlayerState::DokkoiAttack::GetInstance()) ||
+		pPerson->GetFSM()->isInState(*BasePlayerState::DownAttack::GetInstance()) ||
+		pPerson->GetFSM()->isInState(*BasePlayerState::AerialAttack::GetInstance()) ||
+		pPerson->GetFSM()->isInState(*BasePlayerState::Skill::GetInstance()) ||
+		pPerson->GetFSM()->isInState(*BasePlayerState::AntiAirAttack::GetInstance()) ||
+		pPerson->GetFSM()->isInState(*BasePlayerState::FinishAttack::GetInstance()) ||
+		pPerson->GetFSM()->isInState(*BasePlayerState::HeavehoDrive::GetInstance()) ||
+		pPerson->GetFSM()->isInState(*BasePlayerState::SquatAttack::GetInstance())
+		);
+}
+
+bool isDamageCounterStatePrev(BasePlayer *pPerson)
+{
+	return (
+		pPerson->GetFSM()->isPrevState(*BasePlayerState::RushAttack::GetInstance()) ||
+		pPerson->GetFSM()->isPrevState(*BasePlayerState::Escape::GetInstance()) ||
+		pPerson->GetFSM()->isPrevState(*BasePlayerState::DokkoiAttack::GetInstance()) ||
+		pPerson->GetFSM()->isPrevState(*BasePlayerState::DownAttack::GetInstance()) ||
+		pPerson->GetFSM()->isPrevState(*BasePlayerState::AerialAttack::GetInstance()) ||
+		pPerson->GetFSM()->isPrevState(*BasePlayerState::Skill::GetInstance()) ||
+		pPerson->GetFSM()->isPrevState(*BasePlayerState::AntiAirAttack::GetInstance()) ||
+		pPerson->GetFSM()->isPrevState(*BasePlayerState::FinishAttack::GetInstance()) ||
+		pPerson->GetFSM()->isPrevState(*BasePlayerState::HeavehoDrive::GetInstance()) ||
+		pPerson->GetFSM()->isPrevState(*BasePlayerState::SquatAttack::GetInstance())
+		);
+}
+
 bool isThrownState(BasePlayer *pPerson)
 {
 	return (
@@ -770,7 +802,6 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 
 									 // ダメージ
 									 int damage((int)(HitDamageInfo->damage * pPerson->GetDamageRate()));							// ★自分のダメージレートにかけ合わせる
-									 if (pPerson->GetRecoveryDamageCount()->empty()) damage += BasePlayer::c_FIRST_HIT_ADD_DAMAGE;	// 初段だけダメージを増やす
 
 									 // ★必殺技中は同技補正を無視(アイルーのやつとかひどいことになるから)
 									 if (!HitDamageInfo->bOverDrive)
@@ -788,6 +819,14 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 
 									 // ★コンボUI エフェクト(カウント)発動
 									 COMBO_DESK comboDesk;
+
+									 // ★初段のみ入るところ
+									 if (pPerson->GetRecoveryDamageCount()->empty())
+									 {
+										 if (isDamageCounterState(pPerson)) comboDesk.bCounter = true;
+											 damage += BasePlayer::c_FIRST_HIT_ADD_DAMAGE;	// 初段だけダメージを増やす
+									 }
+
 									 comboDesk.side = pPerson->GetSide();
 									 comboDesk.damage = damage;
 									 comboDesk.recoveryFrame = RecoveryFrame;
@@ -797,7 +836,7 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 pPerson->GetRecoveryDamageCount()->push_back((BASE_ACTION_STATE)HitDamageInfo->iAttackType);
 
 									 // (追加)ヒットエフェクト発動! 
-									 // (A列車)エフェクトを今は自分のポジションにおいてる！！！　後でヒットポジションとかいるかも
+									 // (TODO)エフェクトを今は自分のポジションにおいてる！！！　後でヒットポジションとかいるかも
 									 pPerson->AddEffectAction(pPerson->GetCenterPos() + Vector3(0, 4, 0), (EFFECT_TYPE)HitDamageInfo->HitEffectType);
 
 									 // 空中ジャンプの権利復活
@@ -819,7 +858,7 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 pPerson->SetHP(DamagedHP);
 									 if (DamagedHP == 0)
 									 {
-										 // フィニッシュフラグのある攻撃なら
+										 // フィニッシュフラグのある攻撃なら(必殺の途中で死なない為のフラグ)
 										 if (HitDamageInfo->bFinishOK)
 										 {
 											 // ★KOのメッセージを送る
@@ -837,6 +876,31 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 
 									 else
 									 {
+
+										 // 受けたダメージでもSPゲージ少し上昇
+										 if (damage <= 50)
+										 {
+											// なし
+										 }
+										 else if (damage <= 200)
+										 {
+											 pPerson->AddOverDriveGage(0.5f);
+										 }
+										 else if (damage <= 500)
+										 {
+											 pPerson->AddOverDriveGage(1);
+
+										 }
+										 else if (damage <= 900)
+										 {
+											 pPerson->AddOverDriveGage(1.5f);
+
+										 }
+										 else 
+										 {
+											 pPerson->AddOverDriveGage(2.5f);
+										 }
+
 										 // 吹っ飛び距離	に　応じて	ダメージステートを変える
 										 //const float len = HitDamageInfo->FlyVector.Length();
 										 //if (len < HUTTOBI_LINE)
@@ -1434,6 +1498,8 @@ void BasePlayerState::Run::Enter(BasePlayer * pPerson)
 	// 走るエフェクト発動！
 	pPerson->AddEffectAction(pPerson->GetPos(), EFFECT_TYPE::RUN);
 
+	pPerson->SetDirAngle();
+
 	// 初速度の設定
 	Vector3 move = pPerson->GetMove();
 	switch (pPerson->GetDir())
@@ -1453,6 +1519,8 @@ void BasePlayerState::Run::Enter(BasePlayer * pPerson)
 
 	// SE再生
 	se->Play("ダッシュ");
+
+	pPerson->SetDushFrame(0);
 }
 
 void BasePlayerState::Run::Execute(BasePlayer * pPerson)
@@ -1512,26 +1580,28 @@ void BasePlayerState::Run::Execute(BasePlayer * pPerson)
 	//============================================
 	//if (GuardCancel(pPerson)) return;
 
+	pPerson->AddDushFrame(1);
+
 	//////////////////////////////////////////////
 	//	左
 	//============================================
 	// 押した瞬間
-	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::LEFT))
-	{
-		// 相手に対して反対方向
-		if (pPerson->GetTargetDir() == DIR::RIGHT)
-		{
-			// 後ろ歩きステートへ
-			pPerson->GetFSM()->ChangeState(BasePlayerState::BackWalk::GetInstance());
-		}
-		else
-		{
-			// 前歩きステートへ
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Walk::GetInstance());
-		}
-	}
+	//if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::LEFT))
+	//{
+	//	// 相手に対して反対方向
+	//	if (pPerson->GetTargetDir() == DIR::RIGHT)
+	//	{
+	//		// 後ろ歩きステートへ
+	//		pPerson->GetFSM()->ChangeState(BasePlayerState::BackWalk::GetInstance());
+	//	}
+	//	else
+	//	{
+	//		// 前歩きステートへ
+	//		pPerson->GetFSM()->ChangeState(BasePlayerState::Walk::GetInstance());
+	//	}
+	//}
 	// 押してる間
-	else if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
+	if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
 	{
 		pPerson->AddMove(Vector3(-0.1f, 0.0f, 0.0f));
 		//pPerson->SetDir(DIR::LEFT);
@@ -1565,9 +1635,10 @@ void BasePlayerState::Run::Execute(BasePlayer * pPerson)
 
 	else // ニュートラル
 	{
-		Vector3 move = pPerson->GetMove();
+		//Vector3 move = pPerson->GetMove();
 		// ある程度減速したら、前ブレーキステートに移行(減速自体はBaseのアップデートでやってる)
 		//if (abs(move.x) < BasePlayer::c_FRONT_BRAKE_LINE)
+		if(pPerson->GetDushFrame() >= 12)
 		{
 			//// 前のステートがUターンブレーキだったら、「待機」ステートに戻る(ターンブレーキの後にフロントブレーキが発生してしまうから)
 			//if (pPerson->GetFSM()->isPrevState(*BasePlayerState::TurnOverBrake::GetInstance()))
@@ -3175,6 +3246,11 @@ void BasePlayerState::Squat::Execute(BasePlayer * pPerson)
 	if (HeaveHoCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
+	//	投げキャンセル
+	//============================================
+	if (ThrowCancel(pPerson)) return;
+
+	//////////////////////////////////////////////
 	//	逆切れキャンセル
 	//============================================
 	if (InvincibleAttackCancel(pPerson)) return;
@@ -3217,6 +3293,8 @@ void BasePlayerState::SquatAttack::Enter(BasePlayer * pPerson)
 
 	// ★攻撃ステートを2段目に設定する　↓でHITフラグを消している
 	pPerson->SetActionState(BASE_ACTION_STATE::SQUAT_ATTACK);
+
+	pPerson->SetDirAngle();
 }
 
 void BasePlayerState::SquatAttack::Execute(BasePlayer * pPerson)
@@ -3326,6 +3404,8 @@ void BasePlayerState::AntiAirAttack::Enter(BasePlayer * pPerson)
 
 	// 慣性を消す
 	pPerson->SetMove(Vector3(0,0,0));
+
+	pPerson->SetDirAngle();
 }
 
 void BasePlayerState::AntiAirAttack::Execute(BasePlayer * pPerson)
@@ -3432,6 +3512,8 @@ void BasePlayerState::DownAttack::Enter(BasePlayer * pPerson)
 
 	// ★攻撃ステートを2段目に設定する　↓でHITフラグを消している
 	pPerson->SetActionState(BASE_ACTION_STATE::DOWN_ATTACK);
+
+	pPerson->SetDirAngle();
 }
 
 void BasePlayerState::DownAttack::Execute(BasePlayer * pPerson)
@@ -3509,6 +3591,8 @@ void BasePlayerState::DokkoiAttack::Enter(BasePlayer * pPerson)
 
 	// 仮
 	pPerson->AddEffectAction(pPerson->GetPos(), EFFECT_TYPE::DOKKOI);
+
+	pPerson->SetDirAngle();
 }
 
 void BasePlayerState::DokkoiAttack::Execute(BasePlayer * pPerson)
@@ -3865,6 +3949,8 @@ void BasePlayerState::Escape::Enter(BasePlayer * pPerson)
 	// 逆の向きを向く
 	//pPerson->TurnOverDir();
 
+	pPerson->SetDirAngle();
+
 	// SE再生
 	se->Play("エスケープ");
 }
@@ -3988,6 +4074,8 @@ void BasePlayerState::StandAction::Enter(BasePlayer * pPerson)
 	// ペルソナ発動エフェクト！
 	pPerson->AddEffectAction(pPerson->GetPos(),EFFECT_TYPE::PERSONA);
 
+	pPerson->SetDirAngle();
+
 	// 前回移動量保存
 	//pPerson->SetStandSaveMove(pPerson->GetMove());
 }
@@ -4110,6 +4198,8 @@ void BasePlayerState::FinishAttack::Enter(BasePlayer * pPerson)
 	// 始動エフェクト
 	pPerson->AddEffectAction(pPerson->GetPos() , EFFECT_TYPE::INVINCIBLE_ATTACK);
 
+	pPerson->SetDirAngle();
+
 	// SE再生
 	//se->Play("ペルソナ召喚");
 }
@@ -4211,6 +4301,8 @@ void BasePlayerState::Skill::Exit(BasePlayer * pPerson)
 
 	// 先行入力リセット
 	pPerson->AheadCommandReset();
+
+	pPerson->SetDirAngle();
 }
 
 void BasePlayerState::Skill::Render(BasePlayer * pPerson)
@@ -4618,12 +4710,22 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 										 {
 										 case 0:
 											 seID = "ガード小";
+											 // ガードでゲージ回復（小）
+											 pPerson->AddOverDriveGage(0.25f);
+											 // 攻撃した相手側は防御側よりも多く獲得
+											 pPerson->GetTargetPlayer()->AddOverDriveGage(0.5f);
 											 break;
 										 case 1:
 											 seID = "ガード中";
+											 // ガードでゲージ回復（中）
+											 pPerson->AddOverDriveGage(0.5f);
+											 // 攻撃した相手側は防御側よりも多く獲得
+											 pPerson->GetTargetPlayer()->AddOverDriveGage(0.5f);
 											 break;
 										 case 2:
 											 seID = "ガード強";
+											 // ガードでゲージ回復（強）
+											 pPerson->AddOverDriveGage(1.0f);
 											 break;
 
 										 }
@@ -4644,7 +4746,8 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 											 }
 										 }
 
-										 // コンボ用
+
+										 // コンボ用 ガードしたのを送る
 										 COMBO_DESK comboDesk;
 										 comboDesk.side = pPerson->GetSide();
 										 comboDesk.damage = HitDamageInfo->damage;
@@ -4655,7 +4758,9 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 									 else
 									 {
 										 // ウィークエフェクト発生！
-										 pPerson->GetPanelEffectManager()->AddEffect(pPerson->GetCenterPos(), PANEL_EFFECT_TYPE::WEAK);
+										 Vector2 screenPos;
+										 screenPos = Math::WorldToScreen(pPerson->GetCenterPos());
+										 pPerson->GetPanelEffectManager()->AddEffect((int)screenPos.x, (int)screenPos.y - 128, PANEL_EFFECT_TYPE::WEAK);
 
 										 return false;	// ダメージ喰らってどうぞ
 									 }
@@ -4734,12 +4839,7 @@ void BasePlayerState::Throw::Execute(BasePlayer * pPerson)
 	// 掴んでたら
 	if (pPerson->GetAttackData()->bHit)
 	{
-		// 投げ猶予終了
-		if (pPerson->GetHitStopFrame() == 0)
-		{
-			pPerson->GetFSM()->ChangeState(BasePlayerState::ThrowSuccess::GetInstance());
-			return;
-		}
+		pPerson->GetFSM()->ChangeState(BasePlayerState::ThrowHold::GetInstance());
 	}
 }
 
@@ -4754,25 +4854,87 @@ void BasePlayerState::Throw::Render(BasePlayer * pPerson)
 bool BasePlayerState::Throw::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
 	// メッセージタイプ
-	switch (msg.Msg)
-	{
-	//case MESSAGE_TYPE::THROW_SUCCESS:	// 相手をつかんだよというメッセージ(同時に掴まれた相手にもメッセージが送られている)
-	//	pPerson->SetThrowSuccess(true);	// 掴み成功フラグON！
+	//switch (msg.Msg)
+	//{
+	////case MESSAGE_TYPE::THROW_SUCCESS:	// 相手をつかんだよというメッセージ(同時に掴まれた相手にもメッセージが送られている)
+	////	pPerson->SetThrowSuccess(true);	// 掴み成功フラグON！
+	////	return true;
+	////	break;
+	//case MESSAGE_TYPE::CAN_THROW_RELEASE:	// 掴んでる人から、投げ抜けしてぇと送られてくるメッセージ
+	//	// 猶予フレーム中だったら解除
+	//	// ★★★★★★★★★片方が投げ抜けできて片方が投げ抜けできない。DeviceID関連かな
+	//	//if (pPerson->GetHitStopFrame() > 0)// ※ここは数値をじかにかいたほうがいいかと
+	//	{
+	//		MsgMgr->Dispatch(0, pPerson->GetID(), msg.Sender, MESSAGE_TYPE::THROW_RELEASE, nullptr);	// 送り主に投げ抜けOKと送り返す
+
+	//		// ★★★(A列車)今は仮で自分も投げ抜け成功ステートに行く
+	//		pPerson->GetFSM()->ChangeState(SuccessThrowRelease::GetInstance());
+	//	}
 	//	return true;
 	//	break;
-	case MESSAGE_TYPE::CAN_THROW_RELEASE:	// 掴んでる人から、投げ抜けしてぇと送られてくるメッセージ
-		// 猶予フレーム中だったら解除
-		// ★★★★★★★★★片方が投げ抜けできて片方が投げ抜けできない。DeviceID関連かな
-		//if (pPerson->GetHitStopFrame() > 0)// ※ここは数値をじかにかいたほうがいいかと
-		{
-			MsgMgr->Dispatch(0, pPerson->GetID(), msg.Sender, MESSAGE_TYPE::THROW_RELEASE, nullptr);	// 送り主に投げ抜けOKと送り返す
+	//	// 攻撃くらったよメッセージ
+	////case MESSAGE_TYPE::HIT_DAMAGE:
+	////	if(pPerson->GetAttackData) return true;	// ダメージメッセージガン無視
+	////	break;
+	//}
 
-			// ★★★(A列車)今は仮で自分も投げ抜け成功ステートに行く
-			pPerson->GetFSM()->ChangeState(SuccessThrowRelease::GetInstance());
-		}
-		return true;
-		break;
-		// 攻撃くらったよメッセージ
+	return false;
+}
+
+
+/*******************************************************/
+//					投げホールドステート
+/*******************************************************/
+
+void BasePlayerState::ThrowHold::Enter(BasePlayer * pPerson)
+{
+	pPerson->GetTargetPlayer()->GetThrowMark()->Action();
+
+	pPerson->SetActionState(BASE_ACTION_STATE::FRAMECOUNT);
+}
+
+void BasePlayerState::ThrowHold::Execute(BasePlayer * pPerson)
+{
+	// 投げ猶予終了
+	if (pPerson->GetCurrentFrame() > BasePlayer::c_THROW_ESCAPE_FRAME)
+	{
+		pPerson->GetFSM()->ChangeState(BasePlayerState::ThrowSuccess::GetInstance());
+		return;
+	}
+}
+
+void BasePlayerState::ThrowHold::Exit(BasePlayer * pPerson)
+{
+	pPerson->GetTargetPlayer()->GetThrowMark()->Stop();
+}
+
+void BasePlayerState::ThrowHold::Render(BasePlayer * pPerson)
+{
+	tdnText::Draw(20, 690, 0xffffffff, "ThrowHoldState");
+}
+
+bool BasePlayerState::ThrowHold::OnMessage(BasePlayer * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	switch (msg.Msg)
+	{
+		//case MESSAGE_TYPE::THROW_SUCCESS:	// 相手をつかんだよというメッセージ(同時に掴まれた相手にもメッセージが送られている)
+		//	pPerson->SetThrowSuccess(true);	// 掴み成功フラグON！
+		//	return true;
+		//	break;
+	case MESSAGE_TYPE::CAN_THROW_RELEASE:	// 掴んでる人から、投げ抜けしてぇと送られてくるメッセージ
+											// 猶予フレーム中だったら解除
+											// ★★★★★★★★★片方が投げ抜けできて片方が投げ抜けできない。DeviceID関連かな
+											//if (pPerson->GetHitStopFrame() > 0)// ※ここは数値をじかにかいたほうがいいかと
+	{
+		MsgMgr->Dispatch(0, pPerson->GetID(), msg.Sender, MESSAGE_TYPE::THROW_RELEASE, nullptr);	// 送り主に投げ抜けOKと送り返す
+
+																									// ★★★(A列車)今は仮で自分も投げ抜け成功ステートに行く
+		pPerson->GetFSM()->ChangeState(SuccessThrowRelease::GetInstance());
+	}
+	return true;
+	break;
+	// 攻撃くらったよメッセージ
 	//case MESSAGE_TYPE::HIT_DAMAGE:
 	//	if(pPerson->GetAttackData) return true;	// ダメージメッセージガン無視
 	//	break;
@@ -4780,7 +4942,6 @@ bool BasePlayerState::Throw::OnMessage(BasePlayer * pPerson, const Message & msg
 
 	return false;
 }
-
 
 
 /*******************************************************/
@@ -4796,31 +4957,32 @@ void BasePlayerState::ThrowSuccess::Enter(BasePlayer * pPerson)
 	pPerson->SetActionState(BASE_ACTION_STATE::THROW_SUCCESS);
 
 	BasePlayer *you(pPerson->GetTargetPlayer());
+
 	// ★ここでつかまれた相手の座標をつかんだ相手の掴み座標に移動(普通に代入すると壁抜けするので、壁判定もろもろここでやってしまおうという事)
 	if (pPerson->GetDir() == DIR::LEFT  && pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT) ||
 		pPerson->GetDir() == DIR::RIGHT && pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
 	{
 		// 向きを逆にする
 		pPerson->ReverseDir();
-	
+
 		// 相手の座標と自分の座標を入れ替える
 		Vector3 temp(pPerson->GetPos());
 		pPerson->SetPos(you->GetPos());
 		you->SetPos(temp);
 	}
-	
-	const Vector3 p(pPerson->GetPos());
-	Vector3 v(pPerson->GetFlontPos() - p);
-	v.y = 0;
-	Vector3 v2(v);
-	
-	// ステージとの判定で、move値をどうこういじった後に
-	if (Collision::CheckMove(pPerson, v) - v.x == 0)
-	{
-		pPerson->GetPosAddress()->x -= v2.x;
-		you->SetPos(pPerson->GetPos() + v2);
-	}
-	else you->SetPos(p + v);
+
+	//const Vector3 p(pPerson->GetPos());
+	//Vector3 v(pPerson->GetFlontPos() - p);
+	//v.y = 0;
+	//Vector3 v2(v);
+	//
+	//// ステージとの判定で、move値をどうこういじった後に
+	//if (Collision::CheckMove(pPerson, v) - v.x == 0)
+	//{
+	//	pPerson->GetPosAddress()->x -= v2.x;
+	//	you->SetPos(pPerson->GetPos() + v2);
+	//}
+	//else you->SetPos(p + v);
 }
 
 void BasePlayerState::ThrowSuccess::Execute(BasePlayer * pPerson)
@@ -4902,8 +5064,14 @@ void BasePlayerState::ThrowBind::Enter(BasePlayer * pPerson)
 	se->Play("掴み成功");
 
 	// 投げられた時のエフェクト
-	pPerson->GetThrowMark()->Action();
+	//pPerson->GetThrowMark()->Action();
 	pPerson->AddEffectAction(pPerson->GetPos() , EFFECT_TYPE::THROW);
+
+	COMBO_DESK comboDesk;
+	comboDesk.side = pPerson->GetSide();
+	comboDesk.damage = 0;
+	comboDesk.recoveryFrame = BasePlayer::c_THROW_ESCAPE_FRAME;
+	comboDesk.bCounter = isDamageCounterStatePrev(pPerson);		// 掴まれる
 }
 
 void BasePlayerState::ThrowBind::Execute(BasePlayer * pPerson)
@@ -4911,10 +5079,10 @@ void BasePlayerState::ThrowBind::Execute(BasePlayer * pPerson)
 	// 相手依存なので自分からかえることはできない。多分ダメージステートに行くと信じて
 
 	// 投げ抜けボタン
-	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::A, true))
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::A))
 	{
 		// 掴んでるやつに対して投げ抜けしたいとメッセージを送る(猶予フレーム内なら抜けていいよをメッセージを送り返してくれる)
-		MsgMgr->Dispatch(0, pPerson->GetID(), pPerson->GetTargetPlayer()->GetID(), MESSAGE_TYPE::CAN_THROW_RELEASE, nullptr);
+		if(!isDamageCounterStatePrev(pPerson)) MsgMgr->Dispatch(0, pPerson->GetID(), pPerson->GetTargetPlayer()->GetID(), MESSAGE_TYPE::CAN_THROW_RELEASE, nullptr);
 	}
 }
 
@@ -4924,7 +5092,7 @@ void BasePlayerState::ThrowBind::Exit(BasePlayer * pPerson)
 	pPerson->SetMoveUpdate(true);
 
 	// 投げ抜け猶予エフェクト（ビックリマーク）を止める
-	pPerson->GetThrowMark()->Stop();
+	//pPerson->GetThrowMark()->Stop();
 }
 
 void BasePlayerState::ThrowBind::Render(BasePlayer * pPerson)

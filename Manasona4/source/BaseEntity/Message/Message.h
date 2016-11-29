@@ -50,6 +50,8 @@ struct COMBO_DESK
 	SIDE side;
 	int damage;
 	int recoveryFrame;
+	bool bCounter;
+	COMBO_DESK() :side(SIDE::LEFT), damage(0), recoveryFrame(0), bCounter(false) {}
 };
 
 // KO‚Ìƒ^ƒCƒv

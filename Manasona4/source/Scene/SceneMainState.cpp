@@ -405,9 +405,7 @@ void SceneMainState::Finish::Execute(sceneMain *pMain)
 				//else
 				{
 					// 情報初期化
-					PlayerMgr->Reset();
-					CameraMgr->SetPlayersPos();
-					ParticleManager::Reset();
+					pMain->Reset();
 
 					pMain->GetFSM()->ChangeState(Round::GetInstance());
 				}
@@ -567,10 +565,7 @@ void SceneMainState::TutorialIntro::Enter(sceneMain *pMain)
 
 
 	// 情報初期化
-	PlayerMgr->Reset();
-	CameraMgr->SetPlayersPos();
-	ParticleManager::Reset();
-
+	pMain->Reset();
 
 	//  チュートリアル毎に必要な設定をここでしてあげる
 	if (pMain->GetSelectTutorial() == TUTORIAL_TYPE::OVER_DRIVE)
