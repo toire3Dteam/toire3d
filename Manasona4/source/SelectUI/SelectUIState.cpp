@@ -124,7 +124,7 @@ void SelectUIState::FirstStep::Execute(SelectUI *pMain)
 			if (tdnInput::KeyGet(KEYCODE::KEY_A, pMain->m_iDeviceID) == 3)
 			{
 				// 逆サイドに送り　一つ前に戻らす処理をする
-				ENTITY_ID id;
+				//ENTITY_ID id;
 				if (pMain->GetID() == ENTITY_ID::SELECT_UI_LEFT)
 				{
 					// 左なら右へ

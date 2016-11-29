@@ -43,3 +43,12 @@ bool ShotManager::HandleMessage(const Message &msg)
 
 	return false;
 }
+
+void ShotManager::Reset()
+{
+	FOR((int)SIDE::ARRAY_MAX) for (auto it = m_list[i].begin(); it != m_list[i].end();)
+	{
+		delete (*it);
+		it = m_list[i].erase(it);
+	}
+}
