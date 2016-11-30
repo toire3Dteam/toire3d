@@ -206,7 +206,7 @@ bool sceneMain::Initialize()
 	}
 
 	// ポーズしてるか
-	m_bPose = false;
+	m_bPause = false;
 
 	// オレ曲初期化
 	//m_pMyMusicMgr = new MyMusicManager(MY_MUSIC_ID::SENJO);
@@ -259,7 +259,7 @@ void sceneMain::Update()
 	if (HeaveHoFinishUI->IsAction() == true)return ;
 	
 	// ポーズ中は更新しない
-	if (m_bPose == false)
+	if (m_bPause == false)
 	{
 
 		//	com->Update();

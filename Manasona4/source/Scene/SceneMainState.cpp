@@ -275,7 +275,7 @@ void SceneMainState::Main::Execute(sceneMain *pMain)
 		// メニュー切り替え
 		if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, 0) == 3)
 		{
-			pMain->GetFSM()->ChangeState(PoseMenu::GetInstance());
+			pMain->GetFSM()->ChangeState(PauseMenu::GetInstance());
 			return;
 		}
 
@@ -286,7 +286,7 @@ void SceneMainState::Main::Execute(sceneMain *pMain)
 			// メニュー切り替え
 			if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, i) == 3)
 			{
-				pMain->GetFSM()->ChangeState(PoseMenu::GetInstance());
+				pMain->GetFSM()->ChangeState(PauseMenu::GetInstance());
 				return;
 			}
 		}
@@ -691,7 +691,7 @@ void SceneMainState::TutorialMain::Execute(sceneMain *pMain)
 		// ポーズでチュートリアル専用のポーズメニューへ
 		if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID) == 3)
 		{
-			pMain->GetFSM()->ChangeState(TutorialPoseMenu::GetInstance());
+			pMain->GetFSM()->ChangeState(TutorialPauseMenu::GetInstance());
 			return;
 		}
 
@@ -870,16 +870,16 @@ bool SceneMainState::TutorialClear::OnMessage(sceneMain *pMain, const Message & 
 //			ポーズメニューステート
 /*******************************************************/
 
-void SceneMainState::PoseMenu::Enter(sceneMain *pMain)
+void SceneMainState::PauseMenu::Enter(sceneMain *pMain)
 {	
 	// ポーズウィンドウ起動 
 	pMain->GetWindow(BATTLE_WINDOW_TYPE::PAUSE)->Action();
-	pMain->SetPose(true);
+	pMain->SetPause(true);
 
 }
 
 // 更新
-void SceneMainState::PoseMenu::Execute(sceneMain *pMain)
+void SceneMainState::PauseMenu::Execute(sceneMain *pMain)
 {
 
 	//+--------------------------------------------
@@ -955,17 +955,17 @@ void SceneMainState::PoseMenu::Execute(sceneMain *pMain)
 
 }
 
-void SceneMainState::PoseMenu::Exit(sceneMain *pMain)
+void SceneMainState::PauseMenu::Exit(sceneMain *pMain)
 {
-	pMain->SetPose(false);
+	pMain->SetPause(false);
 }
 
-void SceneMainState::PoseMenu::Render(sceneMain *pMain)
+void SceneMainState::PauseMenu::Render(sceneMain *pMain)
 {
 
 }
 
-bool SceneMainState::PoseMenu::OnMessage(sceneMain *pMain, const Message & msg)
+bool SceneMainState::PauseMenu::OnMessage(sceneMain *pMain, const Message & msg)
 {
 	// メッセージタイプ
 	//switch (msg.Msg)
@@ -984,16 +984,16 @@ bool SceneMainState::PoseMenu::OnMessage(sceneMain *pMain, const Message & msg)
 //			チュートリアルポーズメニューステート
 /*******************************************************/
 
-void SceneMainState::TutorialPoseMenu::Enter(sceneMain *pMain)
+void SceneMainState::TutorialPauseMenu::Enter(sceneMain *pMain)
 {
 	// チュートリアルポーズウィンドウ起動 
 	pMain->GetWindow(BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE)->Action();
-	pMain->SetPose(true);
+	pMain->SetPause(true);
 
 }
 
 // 更新
-void SceneMainState::TutorialPoseMenu::Execute(sceneMain *pMain)
+void SceneMainState::TutorialPauseMenu::Execute(sceneMain *pMain)
 {
 
 	//+--------------------------------------------
@@ -1025,6 +1025,16 @@ void SceneMainState::TutorialPoseMenu::Execute(sceneMain *pMain)
 	// カメラ更新
 	//CameraMgr->Update();
 
+	// 一つ前のチュートリアルへ戻るボタンを押したら
+	//if (pMain->GetWindow(BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE)->GetChoiceState() == TutorialPauseWindow::TUTORIAL_PAUSE_STATE::BACK_PREV_TUTORIAL)
+	//{
+	//	// ポーズウィンドウ止める
+	//	pMain->GetWindow(BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE)->Stop();
+
+	//	pMain->GetFSM()->ChangeState(TutorialIntro::GetInstance());	
+
+	//}
+
 	// 戻るボタンを押したら
 	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE)->GetChoiceState() == TutorialPauseWindow::TUTORIAL_PAUSE_STATE::BACK)
 	{
@@ -1046,17 +1056,17 @@ void SceneMainState::TutorialPoseMenu::Execute(sceneMain *pMain)
 	
 }
 
-void SceneMainState::TutorialPoseMenu::Exit(sceneMain *pMain)
+void SceneMainState::TutorialPauseMenu::Exit(sceneMain *pMain)
 {
-	pMain->SetPose(false);
+	pMain->SetPause(false);
 }
 
-void SceneMainState::TutorialPoseMenu::Render(sceneMain *pMain)
+void SceneMainState::TutorialPauseMenu::Render(sceneMain *pMain)
 {
 
 }
 
-bool SceneMainState::TutorialPoseMenu::OnMessage(sceneMain *pMain, const Message & msg)
+bool SceneMainState::TutorialPauseMenu::OnMessage(sceneMain *pMain, const Message & msg)
 {
 	// メッセージタイプ
 	//switch (msg.Msg)

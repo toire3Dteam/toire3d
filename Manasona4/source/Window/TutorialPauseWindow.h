@@ -1,5 +1,6 @@
 #pragma once
 #include "BaseWindow.h"
+#include "MenuUI\InformationPlate\InformationPlate.h"
 
 //+-------------------------------
 // チュートリアルポーズウィンドウ
@@ -23,6 +24,7 @@ public:
 	// チュートリアル用選択状態
 	enum TUTORIAL_PAUSE_STATE
 	{
+		//BACK_PREV_TUTORIAL,
 		BACK_MENU_SELECT,
 		BACK
 	};
@@ -35,5 +37,8 @@ private:
 	int m_iAlpha;
 	int m_iAddX;
 	int m_iAddY;
+
+	// 説明のプレート
+	InformationPlate* m_pInfoPlate;
 
 };

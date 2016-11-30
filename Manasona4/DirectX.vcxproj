@@ -137,6 +137,7 @@
     <ClCompile Include="source\Fade\Fade.cpp" />
     <ClCompile Include="source\MenuUI\CoinUI.cpp" />
     <ClCompile Include="source\MenuUI\ControllerSelectUI.cpp" />
+    <ClCompile Include="source\MenuUI\InformationPlate\InformationPlate.cpp" />
     <ClCompile Include="source\MenuUI\MenuIcon.cpp" />
     <ClCompile Include="source\MenuUI\MenuUIManager.cpp" />
     <ClCompile Include="source\MenuUI\TipsCard.cpp" />
@@ -276,6 +277,7 @@
     <ClInclude Include="source\Fade\Fade.h" />
     <ClInclude Include="source\MenuUI\CoinUI.h" />
     <ClInclude Include="source\MenuUI\ControllerSelectUI.h" />
+    <ClInclude Include="source\MenuUI\InformationPlate\InformationPlate.h" />
     <ClInclude Include="source\MenuUI\MenuIcon.h" />
     <ClInclude Include="source\MenuUI\MenuUIManager.h" />
     <ClInclude Include="source\MenuUI\TipsCard.h" />

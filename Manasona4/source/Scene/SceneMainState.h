@@ -298,11 +298,11 @@ namespace SceneMainState
 
 
 	//--------------------ポーズメニューステート
-	class PoseMenu : public State<sceneMain>
+	class PauseMenu : public State<sceneMain>
 	{
 	public:
 		// this is a シングルトン
-		static PoseMenu* GetInstance() { static PoseMenu state; return &state; }
+		static PauseMenu* GetInstance() { static PauseMenu state; return &state; }
 
 		// 入る
 		virtual void Enter(sceneMain* pMain);
@@ -321,19 +321,19 @@ namespace SceneMainState
 
 
 	private:
-		PoseMenu() {};
-		~PoseMenu() {};
+		PauseMenu() {};
+		~PauseMenu() {};
 
-		PoseMenu(const PoseMenu&) {}
-		PoseMenu& operator=(const PoseMenu&) {}
+		PauseMenu(const PauseMenu&) {}
+		PauseMenu& operator=(const PauseMenu&) {}
 	};
 
 	//--------------------チュートリアルポーズメニューステート
-	class TutorialPoseMenu : public State<sceneMain>
+	class TutorialPauseMenu : public State<sceneMain>
 	{
 	public:
 		// this is a シングルトン
-		static TutorialPoseMenu* GetInstance() { static TutorialPoseMenu state; return &state; }
+		static TutorialPauseMenu* GetInstance() { static TutorialPauseMenu state; return &state; }
 
 		// 入る
 		virtual void Enter(sceneMain* pMain);
@@ -352,11 +352,11 @@ namespace SceneMainState
 
 
 	private:
-		TutorialPoseMenu() {};
-		~TutorialPoseMenu() {};
+		TutorialPauseMenu() {};
+		~TutorialPauseMenu() {};
 
-		TutorialPoseMenu(const TutorialPoseMenu&) {}
-		TutorialPoseMenu& operator=(const TutorialPoseMenu&) {}
+		TutorialPauseMenu(const TutorialPauseMenu&) {}
+		TutorialPauseMenu& operator=(const TutorialPauseMenu&) {}
 	};
 
 }

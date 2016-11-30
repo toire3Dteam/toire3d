@@ -1600,7 +1600,7 @@ void BasePlayerState::Run::Execute(BasePlayer * pPerson)
 	//	}
 	//}
 	// ‰Ÿ‚µ‚Ä‚éŠÔ
-	if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT))
+	if (pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT) && pPerson->GetDir() == DIR::LEFT)
 	{
 		pPerson->AddMove(Vector3(-0.1f, 0.0f, 0.0f));
 		//pPerson->SetDir(DIR::LEFT);
@@ -1625,7 +1625,7 @@ void BasePlayerState::Run::Execute(BasePlayer * pPerson)
 	//	}
 	//}
 	// ‰Ÿ‚µ‚Ä‚éŠÔ
-	else if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
+	else if (pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT) && pPerson->GetDir() == DIR::RIGHT)
 	{
 		pPerson->AddMove(Vector3(0.1f, 0.0f, 0.0f));
 		//pPerson->SetDir(DIR::RIGHT);

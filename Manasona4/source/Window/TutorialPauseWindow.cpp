@@ -18,6 +18,7 @@ TutorialPauseWindow::TutorialPauseWindow(Vector2 vPos) :BaseWindow(vPos)
 	m_iSelectLength = 34;
 
 	// ポーズウィンドウに存在するアイコンを詰めていく
+	//AddIconData("前のチュートリアルへ", "一つ前のチュートリアルに戻ります。");
 	AddIconData("メニューに戻る", "メニュー画面に戻ります。");
 	AddIconData("戻る", "このウィンドウを閉じます。");
 
@@ -25,16 +26,23 @@ TutorialPauseWindow::TutorialPauseWindow(Vector2 vPos) :BaseWindow(vPos)
 	m_iAlpha = 0;
 	m_iAddX = 0;
 	m_iAddY = 0;
+
+	m_pInfoPlate = new InformationPlate();
+
 }
 
 TutorialPauseWindow::~TutorialPauseWindow()
 {
+	SAFE_DELETE(m_pInfoPlate);
 
 }
 
 
 bool TutorialPauseWindow::Update()
 {
+	// 説明の下に乗せる板
+	m_pInfoPlate->Update();
+
 	// 起動していなかったらハジく
 	if (m_bActive == false)return false;
 
@@ -57,6 +65,9 @@ bool TutorialPauseWindow::Update()
 
 void TutorialPauseWindow::Redner()
 {
+	// 説明の下に乗せる板
+	m_pInfoPlate->Render();
+
 	// 起動していなかったらハジく
 	if (m_bActive == false)return;
 
@@ -222,10 +233,13 @@ void TutorialPauseWindow::Action()
 	m_pWindow->SetAlpha(m_iAlpha);			// 透明度更新
 	m_pFontBox->SetAlpha(m_iAlpha);			// 透明度更新
 	m_pSelect->SetAlpha(m_iAlpha);			// 透明度更新
+
+	m_pInfoPlate->Action();// (TODO) ベースで
 }
 
 void TutorialPauseWindow::Stop()
 {
 	BaseWindow::Stop();
 
+	m_pInfoPlate->Stop();
 }

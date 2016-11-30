@@ -79,7 +79,7 @@ public:
 
 	BaseWindow* GetWindow(BATTLE_WINDOW_TYPE type) { return m_pWindow[(int)type]; }
 
-	void SetPose(bool flag) { m_bPose = flag; }
+	void SetPause(bool flag) { m_bPause = flag; }
 
 	bool GetTutorialFlag() { return m_bTutorialFlag; }
 
@@ -117,6 +117,6 @@ private:
 
 	// Window—Þ
 	BaseWindow* m_pWindow[(int)BATTLE_WINDOW_TYPE::ARRAY_END];
-	bool m_bPose;
+	bool m_bPause;
 
 };

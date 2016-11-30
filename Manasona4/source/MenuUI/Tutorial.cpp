@@ -498,14 +498,15 @@ AttackTutorial::AttackTutorial()
 	m_pTaskTitle.iStingLength = addByte;
 
 	// Tips
-	m_pIntroTips = new TipsCard("‚³‚ A¡“x‚ÍŠî–{‚ÌUŒ‚•û–@‚ðŠw‚Ñ‚Ü‚µ‚å‚¤B\n‚»‚Ìê‚Å A‚µ‚á‚ª‚ñ‚Å AƒWƒƒƒ“ƒv’†‚É A\n‘ŠŽè‚Æ‹t•ûŒü‚Å ‚ð‰Ÿ‚µ‚Ä‚Ý‚Ü‚µ‚å‚¤B");
+	//m_pIntroTips = new TipsCard("‚³‚ A¡“x‚ÍŠî–{‚ÌUŒ‚•û–@‚ðŠw‚Ñ‚Ü‚µ‚å‚¤B\n‚»‚Ìê‚Å A‚µ‚á‚ª‚ñ‚Å AƒWƒƒƒ“ƒv’†‚É A\n‘ŠŽè‚Æ‹t•ûŒü‚Å ‚ð‰Ÿ‚µ‚Ä‚Ý‚Ü‚µ‚å‚¤B");
+	m_pIntroTips = new TipsCard("‚³‚ A¡“x‚ÍŠî–{‚ÌUŒ‚•û–@‚ðŠw‚Ñ‚Ü‚µ‚å‚¤B\n‚»‚Ìê‚Å ‚ð‰Ÿ‚µ‚Ä‚Ý‚Ü‚µ‚å‚¤B");
 	m_pClearTips = new TipsCard("‚æ‚­‚Å‚«‚Ü‚µ‚½I\n•ûŒüƒL[‚Æ‚Ì‘g‚Ý‡‚í‚¹‚Å—lX‚ÈUŒ‚‚ªŒJ‚èo‚¹‚Ü‚·B\nu‘Î‹óUŒ‚v‚Í‹ó’†‚©‚ç‚ÌUŒ‚‚É‘Î‚µ‚Äy–³“Gz‚Å‚·B");
 
 	// ƒ^ƒXƒNƒZƒbƒg
 	AddTaskData("UŒ‚| ");
-	AddTaskData("‚µ‚á‚ª‚ÝUŒ‚|«{ ");
-	AddTaskData("ƒWƒƒƒ“ƒvUŒ‚|‹ó’†‚Å ");
-	AddTaskData("‘Î‹óUŒ‚|©{ ");
+	//AddTaskData("‚µ‚á‚ª‚ÝUŒ‚|«{ ");
+	//AddTaskData("ƒWƒƒƒ“ƒvUŒ‚|‹ó’†‚Å ");
+	//AddTaskData("‘Î‹óUŒ‚|©{ ");
 
 
 	Init();
@@ -542,7 +543,8 @@ void AttackTutorial::TaskUpdate(BasePlayer * pPerson)
 	{
 		//if (pPerson->isHitAttack() == true)
 		{
-			TaskSuccess(SQUAT_ATTACK);
+			//TaskSuccess(SQUAT_ATTACK);
+			TaskSuccess(ATTACK);
 		}
 	}
 
@@ -551,7 +553,8 @@ void AttackTutorial::TaskUpdate(BasePlayer * pPerson)
 	{
 		//if (pPerson->isHitAttack() == true)
 		{
-			TaskSuccess(JUMP_ATTACK);
+			//TaskSuccess(JUMP_ATTACK);
+			TaskSuccess(ATTACK);
 		}
 	}
 
@@ -560,7 +563,8 @@ void AttackTutorial::TaskUpdate(BasePlayer * pPerson)
 	{
 		//if (pPerson->isHitAttack() == true)
 		{
-			TaskSuccess(ANTIAIR_ATTACK);
+			//TaskSuccess(ANTIAIR_ATTACK);
+			TaskSuccess(ATTACK);
 		}
 	}
 }
