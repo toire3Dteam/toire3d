@@ -657,7 +657,7 @@ OverDriveTutorial::OverDriveTutorial()
 	m_pTaskTitle.iStingLength = addByte;
 
 	// Tips
-	m_pIntroTips = new TipsCard("ゲージが50以上ある時に▽を押し込むと。\n「必殺技」を発動できます。");
+	m_pIntroTips = new TipsCard("ゲージが50以上ある時に㊨を押し込むと。\n「必殺技」を発動できます。");
 	m_pClearTips = new TipsCard("よくできました！\n「必殺技」はとても強力な技です。\nまた「攻撃」や「スキル」から繋げて発動できます。");
 
 	// タスクセット

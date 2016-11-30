@@ -3538,6 +3538,11 @@ void BasePlayerState::DownAttack::Execute(BasePlayer * pPerson)
 		//============================================
 		if (StandCancel(pPerson)) return;
 
+		//////////////////////////////////////////////
+		//	フィニッシュ攻撃ボタン
+		//============================================
+		if (InvincibleAttackCancel(pPerson)) return;
+
 
 		//////////////////////////////////////////////
 		//	ヒーホードライブキャンセル

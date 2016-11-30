@@ -626,6 +626,15 @@ public:
 	float GetDamageRate(){ return m_fDamageRate; }
 	void MultDamageRate(float rate){ m_fDamageRate *= rate; }	// 乗算
 	void ResetDamageRate(){ m_fDamageRate = 1.0f; }
+	// HPの割合
+	int  GetHPPercentage()
+	{
+		// HPのレートを計算
+		MyAssert((m_iMaxHP != 0), "最大HPが0だと0で割ることに");
+		float HpRate = (float)m_iHP / (float)m_iMaxHP;
+		HpRate *= 100;//　繰り上げる 
+		return (int)HpRate;
+	};
 
 	//------------------------------------------------------
 	//	スコア

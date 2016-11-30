@@ -42,7 +42,7 @@ bool PlayerDataManager::LoadPlayerData()
 	if (fopen_s(&fp, "DATA/Save/data.bin", "rb") != 0) return false;
 
 	// プレイヤー基本データ読み込み
-	fread_s((LPSTR)&m_PlayerInfo, sizeof(m_PlayerInfo), sizeof(PlayerData::Infomation), 1, fp);
+	fread_s((LPSTR)&m_PlayerInfo, sizeof(PlayerData::Infomation), sizeof(PlayerData::Infomation), 1, fp);
 	m_PlayerInfo.PlayCount++;
 	
 	// トロフィー読み込み

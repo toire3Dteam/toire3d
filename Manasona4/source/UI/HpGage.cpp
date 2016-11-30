@@ -109,6 +109,7 @@ void HpGage::Update()
 	m_fWaveUV -= 1.0f;
 
 	// HPのレートを計算
+	MyAssert((m_pPlayerReferences->GetMaxHP() != 0), "最大HPが0だと0で割ることに");
 	m_fRate= (float)m_pPlayerReferences->GetHP() / (float)m_pPlayerReferences->GetMaxHP();
 
 	// ダメージ赤バーのレートを計算 コンボが続いてたら更新しない

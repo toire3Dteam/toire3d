@@ -22,6 +22,7 @@
 #include "UI\HeaveHoFinish\HeaveHoFinish.h"
 #include "ResultPerformance\ScoreUI\ScoreUI.h"
 
+#include "Data\ResultData.h"
 
 // ÀŒ±‚Ìˆ×‚Éì‚ç‚ê‚½êŠ
 // Šm”F‚³‚¦‚Å‚«‚ê‚Î‚¢‚¢‚Ì‚Å“K“–
@@ -67,7 +68,8 @@ BasePanelEffect* m_pPanel;
 
 bool sceneRenderingTest::Initialize()
 {
-	g_scoreUI = new ScoreUI();
+	ResultData data;
+	g_scoreUI = new ScoreUI(data);
 
 
 	m_pPanel = new AirouWindEffect();

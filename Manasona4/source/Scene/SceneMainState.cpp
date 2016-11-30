@@ -296,6 +296,7 @@ void SceneMainState::Main::Execute(sceneMain *pMain)
 void SceneMainState::Main::Exit(sceneMain *pMain){}
 void SceneMainState::Main::Render(sceneMain *pMain){}
 
+
 bool SceneMainState::Main::OnMessage(sceneMain *pMain, const Message & msg)
 {
 	// メッセージタイプ
@@ -320,18 +321,31 @@ bool SceneMainState::Main::OnMessage(sceneMain *pMain, const Message & msg)
 		break;
 		// カットイン終わったらって感じ
 	case MESSAGE_TYPE::HEAVE_HO_OVER_DRIVE_HIT:
+	{
 		pMain->GetFSM()->ChangeState(HeaveHoDriveOverFlowSuccess::GetInstance());
 		// シームレススレッド発動
-		LoadSceneThreadMgr->Initialize(new sceneResult(PlayerMgr->GetPlayerByDeviceID((int)msg.Sender - (int)ENTITY_ID::ID_PLAYER_FIRST)->GetSide()));
+		ResultData data;// リザルトに必要なデータをここで詰める
+		data.eWinnerSide = PlayerMgr->GetPlayer(msg.Sender)->GetSide();
+		data.iMaxDamage = 10000;
+		data.iRemainingHP= PlayerMgr->GetPlayer(msg.Sender)->GetHPPercentage();
+
+		LoadSceneThreadMgr->Initialize(new sceneResult(data));
 		return true;
-		break;
+	}	break;
 	case MESSAGE_TYPE::KO:	// 誰かのHPが0になったら切り替え
 	{
 		KO_INFO *KOInfo = (KO_INFO*)msg.ExtraInfo;
+
+		// シームレススレッド発動
+		ResultData data;// リザルトに必要なデータをここで詰める
+		data.eWinnerSide = KOInfo->WinnerSide;
+		data.iMaxDamage = GameUIMgr->GetComboUI(KOInfo->WinnerSide)->GetMaxDamage();
+		data.iRemainingHP = PlayerMgr->GetPlayer(msg.Sender)->GetHPPercentage();
+
 		// ラウンド全部取って勝利確定だったら、フィニッシュの段階でリザルトシーンを読み込む
 		if (KOInfo->iNumWinnerRound == pMain->GetRoundNum() - 1)
 		{
-			LoadSceneThreadMgr->Initialize(new sceneResult(KOInfo->WinnerSide)); 
+			LoadSceneThreadMgr->Initialize(new sceneResult(data));
 		}
 
 		pMain->GetFSM()->ChangeState(Finish::GetInstance());
@@ -571,7 +585,7 @@ void SceneMainState::TutorialIntro::Enter(sceneMain *pMain)
 	if (pMain->GetSelectTutorial() == TUTORIAL_TYPE::OVER_DRIVE)
 	{
 		PlayerMgr->GetPlayerByDeviceID
-			(SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID)->SetOverDriveGage(50);
+			(SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID)->SetOverDriveGage(100);
 	}
 }
 

@@ -33,7 +33,7 @@
 //******************************************************************
 //		初期化・解放
 //******************************************************************
-sceneResult::sceneResult(SIDE WinnerSide) :m_WinnerSide(WinnerSide){}
+sceneResult::sceneResult(const ResultData &data) :m_tagResultData(data){}
 
 bool sceneResult::Initialize()
 {
@@ -78,7 +78,7 @@ bool sceneResult::Initialize()
 	m_AllScreen = new tdn2DObj(tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom, TDN2D::RENDERTARGET);
 
 	// 勝者
-	switch ((SelectDataMgr->Get()->tagSideDatas[(int)m_WinnerSide].character))
+	switch ((SelectDataMgr->Get()->tagSideDatas[(int)m_tagResultData.eWinnerSide].character))
 	{
 	case CHARACTER::AIROU:
 		m_WinPlayer = new iex3DObj("DATA/CHR/Airou/result.IEM");
@@ -106,7 +106,7 @@ bool sceneResult::Initialize()
 	m_winPos = Vector3(0, 0, 0);
 
 	// 敗者
-	const SIDE LoserSide(m_WinnerSide == SIDE::LEFT ? SIDE::RIGHT : SIDE::LEFT);
+	const SIDE LoserSide(m_tagResultData.eWinnerSide == SIDE::LEFT ? SIDE::RIGHT : SIDE::LEFT);
 	switch ((SelectDataMgr->Get()->tagSideDatas[(int)LoserSide].character))
 	{
 	case CHARACTER::AIROU:
@@ -160,7 +160,7 @@ bool sceneResult::Initialize()
 	m_sceneSwitch->Action();
 	
 	// 勝利した側の絵に
-	if (m_WinnerSide == SIDE::LEFT)
+	if (m_tagResultData.eWinnerSide == SIDE::LEFT)
 	{
 		m_winnerPic = new tdn2DAnim("Data/Result/winner1.png");
 	}
@@ -179,7 +179,7 @@ bool sceneResult::Initialize()
 	m_waveTU = 0.0f;
 
 	// スコア表示のUI
-	m_pScoreUI = new ScoreUI();
+	m_pScoreUI = new ScoreUI(m_tagResultData);
 	
 	m_pInfoPlate = new tdn2DAnim("Data/UI/Menu/Information.png");
 	m_pInfoPlate->OrderMoveAppeared(12,0, 592 + 128);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../BaseEntity/Message/Message.h"
+#include "../Data/ResultData.h"
 
 // 前方宣言
 class MyMusicManager;
@@ -12,16 +13,19 @@ class EffectCamera;
 class ScoreUI;
 class ResultWindow;
 
+
 //class Stage::Base;	// ×
 namespace Stage{		// ○
 	class Base;
 }
 
+
+
 class sceneResult: public BaseScene
 {
 public:
 	//初期化・解放
-	sceneResult(SIDE WinnerSide);
+	sceneResult(const  ResultData& data);
 	bool Initialize();
 	~sceneResult();
 	//処理
@@ -40,9 +44,10 @@ private:
 	// ステージ
 	iexMesh* m_grand;
 
+	ResultData m_tagResultData;
 
 	// 勝者
-	SIDE m_WinnerSide;
+	//SIDE m_WinnerSide;
 	iex3DObj* m_WinPlayer;
 	Vector3 m_winPos;
 

@@ -13,6 +13,9 @@
 #include "Window\PauseWindow.h"
 #include "Window\TutorialPauseWindow.h"
 
+// リザルトデータ
+#include "Data\ResultData.h"
+
 // 前方宣言
 class ShotManager;
 class Camera;

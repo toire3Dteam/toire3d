@@ -6,6 +6,7 @@
 #include "../Fade/Fade.h"
 #include "../Sound/SoundManager.h"
 #include "Window\OptionWindow.h"	// 必要なウィンドウ
+#include "../Scene/sceneResult.h"
 
 //#include "sceneResult.h"
 //#include "SceneSwitch/SceneSwitch.h"
@@ -114,8 +115,30 @@ void sceneMenu::Update()
 	{
 		// ★ステートマシン更新(何故ここに書くかというと、中でシーンチェンジの処理を行っているため)
 		m_pStateMachine->Update();
+
+#ifdef DEBUG
+		// エンターでワープ
+		if (KeyBoardTRG(KB_ENTER) == 0)
+		{
+			ResultData data;
+			data.eWinnerSide = SIDE::RIGHT;
+			data.iMaxDamage = 114;
+			data.iRemainingHP = 514;
+			data.iElapsedTime = 81;
+
+			MainFrameEx->ChangeScene(new sceneResult(data));
+			return;
+		}
+
+#endif // DEBUG
+
 		return;
 	}
+
+
+
+
+
 }
 
 //******************************************************************

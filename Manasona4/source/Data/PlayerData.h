@@ -12,9 +12,9 @@ namespace PlayerData
 	// プレイ情報
 	struct Infomation
 	{
-		unsigned int PlayCount		: 16;	// 遊んだ回数(65535まで)
-		unsigned int PlayTime		: 32;	// プレイ時間(4294967295)
-		unsigned int coin			: 14;	// 真夏パチンココイン(16383まで)
+		unsigned int PlayCount	: 16;	// 遊んだ回数(65535まで)
+		unsigned int PlayTime	: 32;	// プレイ時間(4294967295)
+		unsigned int coin		: 20;	// 真夏パチンココイン(1048575まで)
 	};
 
 	// トロフィー

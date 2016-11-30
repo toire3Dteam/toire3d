@@ -22,6 +22,9 @@ public:
 	//void Count(int damage, int maxRecovery,int* recovery);
 	void Guard();
 
+	// Å‘åƒ_ƒ[ƒW
+	int GetMaxDamage() { return m_iMaxDamage; }
+
 private:
 	SIDE m_eSide;
 	Vector2 m_vPos;

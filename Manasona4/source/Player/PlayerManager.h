@@ -36,6 +36,12 @@ public:
 	BasePlayer *GetPlayer(int no) { return m_pPlayers[no]; }
 	BasePlayer *GetPlayer(ENTITY_ID id){ FOR(m_NumPlayer) { if (m_pPlayers[i]->GetID() == id) return m_pPlayers[i]; }return nullptr; }
 	BasePlayer *GetPlayerByDeviceID(int DeviceID){ FOR(m_NumPlayer) { if (m_pPlayers[i]->GetDeviceID() == DeviceID) return m_pPlayers[i]; }return nullptr; }	// デバイスIDから探す
+	BasePlayer *GetPlayer(SIDE side) 
+	{
+		// サイドが合ってたら
+		if (side == m_pPlayers[0]->GetSide())return m_pPlayers[0];	
+		else return m_pPlayers[1];
+	}
 
 	void CalcTeamPoint();
 	

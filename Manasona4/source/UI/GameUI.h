@@ -20,8 +20,8 @@ private:
 	GameUIManager();
 	~GameUIManager();
 	GameUIManager(const GameUIManager&);
-	GameUIManager &operator=(const GameUIManager&){}
-	
+	GameUIManager &operator=(const GameUIManager&) {}
+
 	// 1つしかない実体
 	static GameUIManager *pInstance;
 
@@ -32,22 +32,38 @@ public:
 		if (!pInstance) pInstance = new GameUIManager;
 		return pInstance;
 	}
-	static void Rerease(){
+	static void Rerease() {
 		SAFE_DELETE(pInstance);
 	}
 
 	// 参照させる
-	void InitData(BasePlayer* pLeftPlayer, BasePlayer* pRightPlayer,int iRoundNum);
+	void InitData(BasePlayer* pLeftPlayer, BasePlayer* pRightPlayer, int iRoundNum);
 
 	void Update();
 	void Render();
 	void RenderBack();
 
-
 	void Action();
 
 	// BaseGameEntiryサブクラスはメッセージを使って通信する
 	bool  HandleMessage(const Message& msg);
+
+	// アクセサー
+	ComboUI* GetComboUI(SIDE eSide)
+	{
+		switch (eSide)
+		{
+		case SIDE::LEFT:
+			return  m_pCombo1P;
+			break;
+		case SIDE::RIGHT:
+			return  m_pCombo2P;
+			break;
+		default:
+			MyAssert(0,"そのサイドはない");
+			break;
+		}
+	}
 
 private:
 

@@ -4,7 +4,7 @@
 //	スコア表示UI
 //+--------------------------
 
-ScoreUI::ScoreUI()
+ScoreUI::ScoreUI(ResultData data)
 {
 
 	// スコア初期化
@@ -14,7 +14,22 @@ ScoreUI::ScoreUI()
 		m_tagScore[i].x = 50;
 		m_tagScore[i].y = (i * 128) + 96;
 		m_tagScore[i].iAddNumX = 448;
-		m_tagScore[i].iPoint = 100;
+
+		// スコアを入れる
+		switch ((SCORE_TYPE)i)
+		{
+		case ScoreUI::DAMAGE:
+			m_tagScore[i].iPoint = data.iMaxDamage;
+			break;
+		case ScoreUI::HP:
+			m_tagScore[i].iPoint = data.iRemainingHP;
+			break;
+		case ScoreUI::TIME:
+			m_tagScore[i].iPoint = data.iElapsedTime;
+			break;
+		default:
+			break;
+		}
 
 
 		m_tagScore[i].pFont = new tdn2DAnim("Data/Result/Font.png");

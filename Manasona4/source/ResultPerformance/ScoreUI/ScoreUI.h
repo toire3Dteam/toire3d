@@ -2,6 +2,7 @@
 #include "TDNLIB.h"
 #include "Number\Number.h"
 #include "Effect\PanelEffect\PanelEffectManager.h"
+#include "Data\ResultData.h"
 
 //+--------------------------
 //	スコア表示UI
@@ -10,7 +11,7 @@
 class ScoreUI
 {
 public:
-	ScoreUI();
+	ScoreUI(ResultData data);
 	~ScoreUI();
 
 	void Update();

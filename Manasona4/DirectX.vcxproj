@@ -120,6 +120,7 @@
     <ClCompile Include="source\Collision\Collision.cpp" />
     <ClCompile Include="source\Cutin\CutIn.cpp" />
     <ClCompile Include="source\Data\PlayerData.cpp" />
+    <ClCompile Include="source\Data\ResultData.cpp" />
     <ClCompile Include="source\Data\SelectData.cpp" />
     <ClCompile Include="source\DeferredEx\DeferredEx.cpp" />
     <ClCompile Include="source\EffectTool\Effect2D.cpp" />
@@ -259,6 +260,7 @@
     <ClInclude Include="source\Collision\Collision.h" />
     <ClInclude Include="source\Cutin\CutIn.h" />
     <ClInclude Include="source\Data\PlayerData.h" />
+    <ClInclude Include="source\Data\ResultData.h" />
     <ClInclude Include="source\Data\SelectData.h" />
     <ClInclude Include="source\DeferredEx\DeferredEx.h" />
     <ClInclude Include="source\EffectTool\Effect2D.h" />

@@ -27,6 +27,17 @@ public:
 
 	void FirstAction(int waitFrame = 0);	// 最初の一回
 
+	// HPの割合
+	int  GetHPPercentage() 
+	{
+		// HPのレートを計算
+		MyAssert((m_pPlayerReferences->GetMaxHP() != 0), "最大HPが0だと0で割ることに");
+		float HpRate = (float)m_pPlayerReferences->GetHP() / (float)m_pPlayerReferences->GetMaxHP();
+		HpRate *= 100;//　繰り上げる 
+		return (int)HpRate;
+	};
+
+
 private:
 	tdn2DObj* m_pGage;	
 	int m_iGageWidth;
