@@ -8,5 +8,5 @@ SelectData::SelectData():stage(STAGE::SEA), bTutorial(false), iWinRound(2), iBat
 	tagSideDatas[(int)SIDE::RIGHT].iDeviceID = 1;
 
 	// 片方AI用
-	//tagSideDatas[(int)SIDE::LEFT].bAI = true;
+	tagSideDatas[(int)SIDE::RIGHT].bAI = true;
 }

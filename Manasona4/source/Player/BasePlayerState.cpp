@@ -3301,8 +3301,11 @@ void BasePlayerState::SquatAttack::Execute(BasePlayer * pPerson)
 	// 攻撃終了してたら
 	if (!pPerson->isAttackState())
 	{
+		// しゃがみに戻る
+		if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN)) pPerson->GetFSM()->ChangeState(Squat::GetInstance());
+
 		// 待機モーションに戻る
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		else pPerson->GetFSM()->ChangeState(Wait::GetInstance());
 		return;
 	}
 
@@ -3520,8 +3523,11 @@ void BasePlayerState::DownAttack::Execute(BasePlayer * pPerson)
 	// 攻撃終了してたら
 	if (!pPerson->isAttackState())
 	{
+		// しゃがみに戻る
+		if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN)) pPerson->GetFSM()->ChangeState(Squat::GetInstance());
+
 		// 待機モーションに戻る
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		else pPerson->GetFSM()->ChangeState(Wait::GetInstance());
 		return;
 	}
 
@@ -3542,7 +3548,6 @@ void BasePlayerState::DownAttack::Execute(BasePlayer * pPerson)
 		//	フィニッシュ攻撃ボタン
 		//============================================
 		if (InvincibleAttackCancel(pPerson)) return;
-
 
 		//////////////////////////////////////////////
 		//	ヒーホードライブキャンセル
