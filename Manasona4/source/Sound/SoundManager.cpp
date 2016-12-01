@@ -61,8 +61,12 @@ const SE_Manager::DATA all_dataS[]
 	{ "リザルト2",			"DATA/Sound/SE/Result/result2.wav", 1, false },
 	{ "リザルト3",			"DATA/Sound/SE/Result/result3.wav", 1, false },
 
-	{ "カーソル1",	"DATA/Sound/SE/P4U2/cursor.wav", 2, false },
-	{ "決定1",		"DATA/Sound/SE/P4U2/decide.wav", 2, false },
+	{ "カーソル1",			"DATA/Sound/SE/P4U2/cursor.wav", 2, false },
+	{ "カーソル2",			"DATA/Sound/SE/P4U2/cursor2.wav", 2, false },
+	{ "決定1",				"DATA/Sound/SE/P4U2/decide.wav", 2, false },
+	{ "キャンセル1",		"DATA/Sound/SE/P4U2/cancel.wav", 2, false },
+	{ "ステップクリア",		"DATA/Sound/SE/P4U2/gagin.wav", 3, false },
+	{ "オールクリア",		"DATA/Sound/SE/P4U2/clear.wav", 1, false },
 
 	{ "フェイトイズターニング",	"DATA/Sound/SE/BlazBlue/voice/the_wheel.wav",	1, false },
 	{ "リベル",					"DATA/Sound/SE/BlazBlue/voice/revel.wav",		1, false },

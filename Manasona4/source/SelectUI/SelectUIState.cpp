@@ -78,6 +78,8 @@ void SelectUIState::FirstStep::Execute(SelectUI *pMain)
 		// 演出
 		pMain->ActionChara();
 
+		// SEの再生
+		se->Play("カーソル2");
 	}
 	if (tdnInput::KeyGet(KEYCODE::KEY_RIGHT, pMain->m_iDeviceID) == 3)
 	{
@@ -92,6 +94,8 @@ void SelectUIState::FirstStep::Execute(SelectUI *pMain)
 		// 演出
 		pMain->ActionChara();
 
+		// SEの再生
+		se->Play("カーソル2");
 	}
 	/**********************************************************/
 	
@@ -101,6 +105,9 @@ void SelectUIState::FirstStep::Execute(SelectUI *pMain)
 		// キャラ決定
 		if (tdnInput::KeyGet(KEYCODE::KEY_B, pMain->m_iDeviceID) == 3)
 		{
+			// SEの再生
+			se->Play("決定1");
+
 			pMain->GetFSM()->ChangeState(MiddleStep::GetInstance());
 			return;
 		}
@@ -115,6 +122,9 @@ void SelectUIState::FirstStep::Execute(SelectUI *pMain)
 			// 【×押して】でメニューに戻る
 			if (tdnInput::KeyGet(KEYCODE::KEY_A, pMain->m_iDeviceID) == 3)
 			{
+				// SEの再生
+				se->Play("キャンセル1");
+
 				MsgMgr->Dispatch(0, pMain->GetID(), ENTITY_ID::SCENE_SELECT, MESSAGE_TYPE::BACK_MENU, &senderID);
 			}
 		}
@@ -123,6 +133,9 @@ void SelectUIState::FirstStep::Execute(SelectUI *pMain)
 			// 【×離し】て自分の操作するプレイヤーへ戻る
 			if (tdnInput::KeyGet(KEYCODE::KEY_A, pMain->m_iDeviceID) == 3)
 			{
+				// SEの再生
+				se->Play("キャンセル1");
+
 				// 逆サイドに送り　一つ前に戻らす処理をする
 				//ENTITY_ID id;
 				if (pMain->GetID() == ENTITY_ID::SELECT_UI_LEFT)
@@ -233,6 +246,9 @@ void SelectUIState::SecondStep::Execute(SelectUI *pMain)
 	// ペルソナセレクトの操作
 	if (tdnInput::KeyGet(KEYCODE::KEY_LEFT, pMain->m_iDeviceID) == 3)
 	{
+		// SEの再生
+		se->Play("カーソル2");
+
 		pMain->m_iSelectPartnerNo--;
 
 
@@ -248,6 +264,9 @@ void SelectUIState::SecondStep::Execute(SelectUI *pMain)
 	}
 	if (tdnInput::KeyGet(KEYCODE::KEY_RIGHT, pMain->m_iDeviceID) == 3)
 	{
+		// SEの再生
+		se->Play("カーソル2");
+
 		pMain->m_iSelectPartnerNo++;
 
 		// 一周回る処理
@@ -265,6 +284,8 @@ void SelectUIState::SecondStep::Execute(SelectUI *pMain)
 	// キャラ決定
 	if (tdnInput::KeyGet(KEYCODE::KEY_B, pMain->m_iDeviceID) == 3)
 	{
+		// SEの再生
+		se->Play("決定1");
 
 		pMain->GetFSM()->ChangeState(SecondToOKStep::GetInstance());
 		return;
@@ -273,6 +294,9 @@ void SelectUIState::SecondStep::Execute(SelectUI *pMain)
 	// 戻る
 	if (tdnInput::KeyGet(KEYCODE::KEY_A, pMain->m_iDeviceID) == 3)
 	{
+		// SEの再生
+		se->Play("キャンセル1");
+
 		pMain->BackSecondStep();
 		pMain->GetFSM()->ChangeState(FirstStep::GetInstance());
 		return;
