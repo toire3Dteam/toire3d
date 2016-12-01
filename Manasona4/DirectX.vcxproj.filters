@@ -797,6 +797,9 @@
     <ClInclude Include="source\MenuUI\InformationPlate\InformationPlate.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="source\Data\ResultData.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="TDN\ogg\ogg_static.lib" />

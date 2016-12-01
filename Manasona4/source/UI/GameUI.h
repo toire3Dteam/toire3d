@@ -11,7 +11,7 @@
 #include "FacePic.h"
 #include "OverDriveCutin\OverDriveCutin.h"
 #include "ComboUI.h"
-
+#include "Timer\Timer.h"
 
 class GameUIManager :public BaseGameEntity
 {
@@ -44,6 +44,12 @@ public:
 	void RenderBack();
 
 	void Action();
+	
+	// タイマー関連
+	void TimerReset();
+	void TimerStart();
+	void TimerStop();
+	bool isTimerUp();
 
 	// BaseGameEntiryサブクラスはメッセージを使って通信する
 	bool  HandleMessage(const Message& msg);
@@ -63,6 +69,30 @@ public:
 			MyAssert(0,"そのサイドはない");
 			break;
 		}
+		return m_pCombo1P;
+	}
+	
+	HpGage* GetHpGage(SIDE eSide)
+	{
+		switch (eSide)
+		{
+		case SIDE::LEFT:
+			return  m_pHpGage1P;
+			break;
+		case SIDE::RIGHT:
+			return  m_pHpGage2P;
+			break;
+		default:
+			MyAssert(0, "そのサイドはない");
+			break;
+		}
+		return m_pHpGage1P;
+	}
+
+	// 時間
+	Timer* GetTimer()
+	{
+		return m_pTimer;
 	}
 
 private:
@@ -99,6 +129,9 @@ private:
 	// UI
 	ComboUI*  m_pCombo1P;
 	ComboUI*  m_pCombo2P;
+
+	// タイマー
+	Timer* m_pTimer;
 
 	// 奥行
 	Surface* m_pStencilSurface;

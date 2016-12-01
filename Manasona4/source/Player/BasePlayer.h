@@ -561,6 +561,7 @@ public:
 	void RushStepReset(){ m_iRushStep = 0; }
 	void SetSkillActionType(SKILL_ACTION_TYPE type){ m_SkillActionType = type; }
 	bool isDownState(){ return (m_pStateMachine->isInState(*BasePlayerState::KnockDown::GetInstance())); }
+	bool isHeavehoDriveState() { return (m_pStateMachine->isInState(*BasePlayerState::HeavehoDrive::GetInstance())); }
 
 
 	//------------------------------------------------------

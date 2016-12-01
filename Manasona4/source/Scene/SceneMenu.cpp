@@ -118,13 +118,13 @@ void sceneMenu::Update()
 
 #ifdef DEBUG
 		// エンターでワープ
-		if (KeyBoardTRG(KB_ENTER) == 0)
+		if (KeyBoard(KB_ENTER) == 2)
 		{
 			ResultData data;
 			data.eWinnerSide = SIDE::RIGHT;
-			data.iMaxDamage = 114;
-			data.iRemainingHP = 514;
-			data.iElapsedTime = 81;
+			data.iMaxDamage = 2500;
+			data.iRemainingHP = 80;
+			data.iElapsedTime = 35;
 
 			MainFrameEx->ChangeScene(new sceneResult(data));
 			return;

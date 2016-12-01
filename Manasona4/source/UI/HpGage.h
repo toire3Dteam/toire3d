@@ -32,7 +32,7 @@ public:
 	{
 		// HPのレートを計算
 		MyAssert((m_pPlayerReferences->GetMaxHP() != 0), "最大HPが0だと0で割ることに");
-		float HpRate = (float)m_pPlayerReferences->GetHP() / (float)m_pPlayerReferences->GetMaxHP();
+		float HpRate = (float)m_iRemainingHP / (float)m_pPlayerReferences->GetMaxHP();
 		HpRate *= 100;//　繰り上げる 
 		return (int)HpRate;
 	};
@@ -60,6 +60,8 @@ private:
 	// HPパラメーター用
 	int m_iMaxHP;
 	int m_iHP;
+
+	int m_iRemainingHP;		// 一試合の最低HP
 	Vector2 m_vPos;
 
 	SIDE m_sSideFlag;

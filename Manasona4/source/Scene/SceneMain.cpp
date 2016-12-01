@@ -139,8 +139,8 @@ bool sceneMain::Initialize()
 
 	m_pShotMgr = new ShotManager;
 
-	TimeMgr->Init();
-	TimeMgr->Reset(60);
+	//TimeMgr->Init();
+	//TimeMgr->Reset(60);
 
 	m_fLoadPercentage = .8f;	// ƒ[ƒhŠ„‡
 
@@ -236,7 +236,7 @@ sceneMain::~sceneMain()
 	delete m_pShotMgr;
 	NumberEffect.Release();
 	GameUIMgr->Rerease();
-	TimeMgr->Release();
+	//TimeMgr->Release();
 	CutInMgr->Rerease();
 	SAFE_DELETE(m_pRoundCallMgr);
 	SAFE_DELETE(m_pMaskScreen);
@@ -386,6 +386,7 @@ void sceneMain::Update()
 			OverDriveEnd();
 		}
 
+		// UI
 		GameUIMgr->Update();
 
 		//g_eff->Update();
@@ -506,7 +507,7 @@ void sceneMain::Render()
 		if (m_pStateMachine->isInState(*SceneMainState::HeaveHoDriveOverFlowSuccess::GetInstance()) == false)
 		{
 			GameUIMgr->Render();
-			TimeMgr->Render();
+			//TimeMgr->Render();
 		}
 		
 		HeaveHoFinishUI->Render();
@@ -680,4 +681,5 @@ void sceneMain::Reset()
 	CameraMgr->SetPlayersPos();
 	m_pShotMgr->Reset();
 	ParticleManager::Reset();
+	GameUIMgr->TimerReset();
 }

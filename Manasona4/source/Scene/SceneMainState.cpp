@@ -240,9 +240,32 @@ bool SceneMainState::Round::OnMessage(sceneMain *pMain, const Message & msg)
 //					メインステート
 /*******************************************************/
 
-void SceneMainState::Main::Enter(sceneMain *pMain){}
+void SceneMainState::Main::Enter(sceneMain *pMain)
+{
+	// タイマー始動
+	GameUIMgr->TimerStart();
+}
+
 void SceneMainState::Main::Execute(sceneMain *pMain)
 {
+	// (TODO) 0秒になったらタイムアップ！！
+	if (GameUIMgr->isTimerUp())
+	{
+
+		//return;
+	}
+
+	// 必殺ステートに誰かが入ったら止める (TODO) KOフラグとかあればifで囲みたい
+	if (PlayerMgr->GetPlayer(SIDE::LEFT)->isHeavehoDriveState() ||
+		PlayerMgr->GetPlayer(SIDE::RIGHT)->isHeavehoDriveState())
+	{
+		GameUIMgr->TimerStop();
+	}
+	else
+	{
+		GameUIMgr->TimerStart();
+	}
+
 	// プレイヤー更新
 	PlayerMgr->Update(PLAYER_UPDATE::CONTROL_OK);
 
@@ -252,15 +275,16 @@ void SceneMainState::Main::Execute(sceneMain *pMain)
 	// プレイヤー位置確定
 	PlayerMgr->UpdatePos();
 
-
 	// カメラ更新
 	CameraMgr->Update();
 
+
+
 	// タイマー更新&タイマーが終了なら終了ステートに行く
-	if (TimeMgr->Update())
-	{
-		//pMain->GetFSM()->ChangeState(Finish::GetInstance());
-	}
+	//if (TimeMgr->Update())
+	//{
+	//	//pMain->GetFSM()->ChangeState(Finish::GetInstance());
+	//}
 
 	//+--------------------------------------------
 	//	ポーズメニューの操作
@@ -293,7 +317,12 @@ void SceneMainState::Main::Execute(sceneMain *pMain)
 	}
 
 }
-void SceneMainState::Main::Exit(sceneMain *pMain){}
+void SceneMainState::Main::Exit(sceneMain *pMain)
+{
+	// タイマーストップ
+	GameUIMgr->TimerStop();
+
+}
 void SceneMainState::Main::Render(sceneMain *pMain){}
 
 
@@ -328,6 +357,7 @@ bool SceneMainState::Main::OnMessage(sceneMain *pMain, const Message & msg)
 		data.eWinnerSide = PlayerMgr->GetPlayer(msg.Sender)->GetSide();
 		data.iMaxDamage = 10000;
 		data.iRemainingHP= PlayerMgr->GetPlayer(msg.Sender)->GetHPPercentage();
+		data.iElapsedTime = GameUIMgr->GetTimer()->GetElapsedTime();
 
 		LoadSceneThreadMgr->Initialize(new sceneResult(data));
 		return true;
@@ -339,8 +369,9 @@ bool SceneMainState::Main::OnMessage(sceneMain *pMain, const Message & msg)
 		// シームレススレッド発動
 		ResultData data;// リザルトに必要なデータをここで詰める
 		data.eWinnerSide = KOInfo->WinnerSide;
-		data.iMaxDamage = GameUIMgr->GetComboUI(KOInfo->WinnerSide)->GetMaxDamage();
-		data.iRemainingHP = PlayerMgr->GetPlayer(msg.Sender)->GetHPPercentage();
+		data.iMaxDamage = GameUIMgr->GetComboUI(KOInfo->LoseSide)->GetMaxDamage();		
+		data.iRemainingHP =GameUIMgr->GetHpGage(KOInfo->WinnerSide)->GetHPPercentage();
+		data.iElapsedTime = GameUIMgr->GetTimer()->GetElapsedTime();
 
 		// ラウンド全部取って勝利確定だったら、フィニッシュの段階でリザルトシーンを読み込む
 		if (KOInfo->iNumWinnerRound == pMain->GetRoundNum() - 1)

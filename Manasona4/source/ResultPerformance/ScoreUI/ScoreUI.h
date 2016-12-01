@@ -62,5 +62,9 @@ private:
 	bool m_bActive;
 	int m_iFrame;
 
+private:
+
+	int CalcRankScore();// ƒ‰ƒ“ƒNŒvZ
+
 };
 

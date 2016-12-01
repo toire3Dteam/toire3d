@@ -259,6 +259,7 @@
     <ClInclude Include="source\Collision\Collision.h" />
     <ClInclude Include="source\Cutin\CutIn.h" />
     <ClInclude Include="source\Data\PlayerData.h" />
+    <ClInclude Include="source\Data\ResultData.h" />
     <ClInclude Include="source\Data\SelectData.h" />
     <ClInclude Include="source\DeferredEx\DeferredEx.h" />
     <ClInclude Include="source\EffectTool\Effect2D.h" />

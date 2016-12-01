@@ -33,10 +33,11 @@ struct SelectData
 	STAGE stage;			// 選んでるステージ
 	bool bTutorial;			// チュートリアルフラグ
 	int iWinRound;			// 勝利ラウンド数
+	int iRoundTime;			// 一試合時間
 	int iBattleMusicID;		// 戦闘曲の番号
 
 	SelectData();
-	SelectData &operator=(const SelectData &data) { tagSideDatas[(int)SIDE::LEFT] = data.tagSideDatas[(int)SIDE::LEFT], tagSideDatas[(int)SIDE::RIGHT] = data.tagSideDatas[(int)SIDE::RIGHT], stage = data.stage, bTutorial = data.bTutorial, iWinRound = data.iWinRound, iBattleMusicID = data.iBattleMusicID; return *this; }
+	//SelectData &operator=(const SelectData &data) { tagSideDatas[(int)SIDE::LEFT] = data.tagSideDatas[(int)SIDE::LEFT], tagSideDatas[(int)SIDE::RIGHT] = data.tagSideDatas[(int)SIDE::RIGHT], stage = data.stage, bTutorial = data.bTutorial, iWinRound = data.iWinRound, iBattleMusicID = data.iBattleMusicID; return *this; }
 };
 
 class SelectDataManager

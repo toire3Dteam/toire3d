@@ -864,7 +864,8 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 											 KO_INFO KOInfo;
 											 KOInfo.FinishType = HitDamageInfo->bOverDrive ? FINISH_TYPE::OVER_DRIVE : FINISH_TYPE::NORMAL;
 											 KOInfo.iNumWinnerRound = pPerson->GetTargetPlayer()->GetWinNum();	// 倒したやつの勝った数;
-											 KOInfo.WinnerSide = pPerson->GetSide();
+											 KOInfo.WinnerSide = pPerson->GetTargetPlayer()->GetSide();
+											 KOInfo.LoseSide = pPerson->GetSide();
 											 // 
 											 MsgMgr->Dispatch(0, pPerson->GetTargetPlayer()->GetID(), ENTITY_ID::SCENE_MAIN, MESSAGE_TYPE::KO, &KOInfo);
 
@@ -4865,26 +4866,10 @@ bool BasePlayerState::Throw::OnMessage(BasePlayer * pPerson, const Message & msg
 	// メッセージタイプ
 	//switch (msg.Msg)
 	//{
-	////case MESSAGE_TYPE::THROW_SUCCESS:	// 相手をつかんだよというメッセージ(同時に掴まれた相手にもメッセージが送られている)
-	////	pPerson->SetThrowSuccess(true);	// 掴み成功フラグON！
-	////	return true;
-	////	break;
-	//case MESSAGE_TYPE::CAN_THROW_RELEASE:	// 掴んでる人から、投げ抜けしてぇと送られてくるメッセージ
-	//	// 猶予フレーム中だったら解除
-	//	// ★★★★★★★★★片方が投げ抜けできて片方が投げ抜けできない。DeviceID関連かな
-	//	//if (pPerson->GetHitStopFrame() > 0)// ※ここは数値をじかにかいたほうがいいかと
-	//	{
-	//		MsgMgr->Dispatch(0, pPerson->GetID(), msg.Sender, MESSAGE_TYPE::THROW_RELEASE, nullptr);	// 送り主に投げ抜けOKと送り返す
-
-	//		// ★★★(A列車)今は仮で自分も投げ抜け成功ステートに行く
-	//		pPerson->GetFSM()->ChangeState(SuccessThrowRelease::GetInstance());
-	//	}
-	//	return true;
-	//	break;
 	//	// 攻撃くらったよメッセージ
-	////case MESSAGE_TYPE::HIT_DAMAGE:
-	////	if(pPerson->GetAttackData) return true;	// ダメージメッセージガン無視
-	////	break;
+	//case MESSAGE_TYPE::HIT_DAMAGE:
+	//	if(pPerson->isActiveFrame()) return true;	// ダメージメッセージガン無視
+	//	break;
 	//}
 
 	return false;

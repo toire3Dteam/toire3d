@@ -58,22 +58,72 @@ void Collision::PlayerCollision(PlayerManager *pPlayerMgr, ShotManager *pShotMgr
 
 	// プレイヤーVSプレイヤー攻撃結果確定
 
-	// 当たってたら
-	if (pHitDamageInfo[0])
+	// ごりくｎ
+	if (pHitDamageInfo[0] && pHitDamageInfo[1])
 	{
-		// メッセージを送信
-		SendHitMessage(pPlayer2, pPlayer1, pHitDamageInfo[0]);
+		if (pHitDamageInfo[0]->iAttribute == (int)ATTACK_ATTRIBUTE::THROW)
+		{
+			// 打撃と投げなら投げが勝つ
+			if (pHitDamageInfo[1]->iAttribute == (int)ATTACK_ATTRIBUTE::STRIKE)
+			{
+				// 2重ヒット防止用のフラグをONにする
+				if (pPlayer2->isAttackState())pPlayer2->GetAttackData()->bHit = true;
+			}
 
-		// 2重ヒット防止用のフラグをONにする
-		if (pPlayer2->isAttackState())pPlayer2->GetAttackData()->bHit = true;
+		}
+		else
+		{
+			// メッセージを送信
+			SendHitMessage(pPlayer2, pPlayer1, pHitDamageInfo[0]);
+
+			// 2重ヒット防止用のフラグをONにする
+			if (pPlayer2->isAttackState())pPlayer2->GetAttackData()->bHit = true;
+		}
+
+		if (pHitDamageInfo[1]->iAttribute == (int)ATTACK_ATTRIBUTE::THROW)
+		{
+			// 打撃と投げなら投げが勝つ
+			if (pHitDamageInfo[0]->iAttribute == (int)ATTACK_ATTRIBUTE::STRIKE)
+			{
+				// 2重ヒット防止用のフラグをONにする
+				if (pPlayer1->isAttackState())pPlayer1->GetAttackData()->bHit = true;
+			}
+
+		}
+		else
+		{
+			// メッセージを送信
+			SendHitMessage(pPlayer1, pPlayer2, pHitDamageInfo[1]);
+
+			// 2重ヒット防止用のフラグをONにする
+			if (pPlayer1->isAttackState())pPlayer1->GetAttackData()->bHit = true;
+		}
 	}
-	if (pHitDamageInfo[1])
-	{
-		// メッセージを送信
-		SendHitMessage(pPlayer1, pPlayer2, pHitDamageInfo[1]);
 
-		// 2重ヒット防止用のフラグをONにする
-		if (pPlayer1->isAttackState())pPlayer1->GetAttackData()->bHit = true;
+	else
+	{
+		// 当たってたら
+		if (pHitDamageInfo[0])
+		{
+			if (pHitDamageInfo[0]->iAttribute != (int)ATTACK_ATTRIBUTE::THROW)
+			{
+				// メッセージを送信
+				SendHitMessage(pPlayer2, pPlayer1, pHitDamageInfo[0]);
+			}
+
+			// 2重ヒット防止用のフラグをONにする
+			if (pPlayer2->isAttackState())pPlayer2->GetAttackData()->bHit = true;
+		}
+		if (pHitDamageInfo[1])
+		{
+			if (pHitDamageInfo[1]->iAttribute != (int)ATTACK_ATTRIBUTE::THROW)
+			{
+				// メッセージを送信
+				SendHitMessage(pPlayer1, pPlayer2, pHitDamageInfo[1]);
+			}
+			// 2重ヒット防止用のフラグをONにする
+			if (pPlayer1->isAttackState())pPlayer1->GetAttackData()->bHit = true;
+		}
 	}
 
 	/* 玉VS判定 */
@@ -174,8 +224,11 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 				// 相手が投げられる系のステートじゃなかったらつかめない
 				if (!isThrownState(you)) return;
 
+				*OutDamageInfo = new HIT_DAMAGE_INFO;
+				(*OutDamageInfo)->iAttribute = (int)pAttackData->attribute;
+
 				// bHit更新
-				pAttackData->bHit = true;
+				//pAttackData->bHit = true;
 
 				// ★ごり押しでヒットストップをかける
 				//my->SetHitStopFrame(pAttackData->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame);

@@ -67,6 +67,7 @@ struct KO_INFO
 	FINISH_TYPE FinishType;		// KOのタイプ
 	int iNumWinnerRound;		// KOしたやつの勝った数(ラウンド設定した分を取ったらリザルトに行く)
 	SIDE WinnerSide;			// KOしたやつのサイド
+	SIDE LoseSide;				// KOされたやつのサイド
 };
 
 enum class DAMAGE_MOTION

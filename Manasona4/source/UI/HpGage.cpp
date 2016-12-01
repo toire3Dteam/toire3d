@@ -22,7 +22,8 @@ HpGage::HpGage(BasePlayer* pPlayer)
 
 	m_iMaxHP = m_pPlayerReferences->GetMaxHP();
 	m_iHP = m_pPlayerReferences->GetHP();
-	
+	m_iRemainingHP = m_pPlayerReferences->GetMaxHP();// 一試合の最低HP
+
 	m_pDamageGage = new tdn2DObj("Data/UI/Game/HPGage_Damage.png");
 	m_iDamagePoint = m_pPlayerReferences->GetHP();
 		
@@ -111,6 +112,12 @@ void HpGage::Update()
 	// HPのレートを計算
 	MyAssert((m_pPlayerReferences->GetMaxHP() != 0), "最大HPが0だと0で割ることに");
 	m_fRate= (float)m_pPlayerReferences->GetHP() / (float)m_pPlayerReferences->GetMaxHP();
+
+	// 最低HPを保存
+	if (m_iRemainingHP > m_pPlayerReferences->GetHP())
+	{
+		m_iRemainingHP = m_pPlayerReferences->GetHP();
+	}
 
 	// ダメージ赤バーのレートを計算 コンボが続いてたら更新しない
 	if (m_pPlayerReferences->GetRecoveryFrame() <= 0)

@@ -67,7 +67,32 @@ ScoreUI::ScoreUI(ResultData data)
 	m_tagRank.pLight->GetPanel()->GetPic()->SetScale(3.0f);
 	m_tagRank.x = 1280 - 306;
 	m_tagRank.y = 720 - 320;
-	m_tagRank.iType = RANK_TYPE::SS;
+
+	// ランクのタイプ
+	int score = CalcRankScore();
+	if (score >= 14)
+	{
+		m_tagRank.iType = RANK_TYPE::SS;
+	}
+	else if (score >= 11)
+	{
+		m_tagRank.iType = RANK_TYPE::S;
+	}
+	else if (score >= 9)
+	{
+		m_tagRank.iType = RANK_TYPE::A;
+	}
+	else if (score >= 6)
+	{
+		m_tagRank.iType = RANK_TYPE::B;
+	}
+	else 
+	{
+		m_tagRank.iType = RANK_TYPE::C;
+	}
+	
+
+	
 
 	// 演出完了フラグ
 	m_bEnd = false;
@@ -141,8 +166,8 @@ void ScoreUI::Render()
 	}
 
 	// ランク描画
-	m_tagRank.pRank->Render(m_tagRank.x, m_tagRank.y, 256, 256, 0, 0, 256, 256);
-	m_tagRank.pRankRip->Render(m_tagRank.x, m_tagRank.y, 256, 256, 0, 0, 256, 256, RS::ADD);
+	m_tagRank.pRank->Render(m_tagRank.x, m_tagRank.y, 256, 256, m_tagRank.iType * 256 , 0, 256, 256);
+	m_tagRank.pRankRip->Render(m_tagRank.x, m_tagRank.y, 256, 256, m_tagRank.iType * 256, 0, 256, 256, RS::ADD);
 	m_tagRank.pLight->Render();
 }
 
@@ -165,4 +190,91 @@ void ScoreUI::Action()
 	m_iFrame = 0;
 
 	//m_bActive = true;
+}
+
+// ランク計算
+int ScoreUI::CalcRankScore()
+{
+	int ScorePoint = 0;
+
+	//+---------------------------------
+	//	ダメージでのスコア
+	//+---------------------------------
+	if (m_tagScore[SCORE_TYPE::DAMAGE].iPoint >= 4000)
+	{
+		ScorePoint += 5;
+	}
+	else if (m_tagScore[SCORE_TYPE::DAMAGE].iPoint >= 3000)
+	{
+		ScorePoint += 4;
+	}
+	else if (m_tagScore[SCORE_TYPE::DAMAGE].iPoint >= 2500)
+	{
+		ScorePoint += 3;
+	}
+	else if (m_tagScore[SCORE_TYPE::DAMAGE].iPoint >= 1000)
+	{
+		ScorePoint += 2;
+	}
+	else
+	{
+		ScorePoint += 1;
+	}
+
+
+	//+---------------------------------
+	//	 残りHPでポイント変換
+	//+---------------------------------
+	if (m_tagScore[SCORE_TYPE::HP].iPoint >= 100)
+	{
+		ScorePoint += 5;
+	}
+	else if (m_tagScore[SCORE_TYPE::HP].iPoint >= 70)
+	{
+		ScorePoint += 4;
+	}
+	else if (m_tagScore[SCORE_TYPE::HP].iPoint >= 50)
+	{
+		ScorePoint += 3;
+	}
+	else if (m_tagScore[SCORE_TYPE::HP].iPoint >= 25)
+	{
+		ScorePoint += 2;
+	}
+	else
+	{
+		ScorePoint += 1;
+	}
+
+	//+---------------------------------
+	//	 経過時間でポイント変換
+	//+---------------------------------
+	if (m_tagScore[SCORE_TYPE::TIME].iPoint <= 30)
+	{
+		// 経過時間が30秒内で倒せたら
+		ScorePoint += 5;	
+	}
+	else if (m_tagScore[SCORE_TYPE::TIME].iPoint <= 50)
+	{
+		// 経過時間が45秒内で倒せたら
+		ScorePoint += 4;		
+	}
+	else if (m_tagScore[SCORE_TYPE::TIME].iPoint <= 70)
+	{
+		// 経過時間が60秒内で倒せたら
+		ScorePoint += 3;		
+	}
+	else  if (m_tagScore[SCORE_TYPE::TIME].iPoint <= 85)
+	{
+		// 経過時間が75秒内で倒せたら
+		ScorePoint += 2;		
+	}
+	else
+	{
+		ScorePoint += 1;
+	}
+
+	// [メモ]　14以上SS	11以上S 9以上A 6以上B 以下C
+
+	return ScorePoint;
 }

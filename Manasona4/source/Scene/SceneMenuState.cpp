@@ -312,8 +312,8 @@ bool SceneMenuState::BattleControllerSelectStep::PadUpdate(sceneMenu *pMain, int
 			// チュートリアルではない
 			SelectDataMgr->Get()->bTutorial = false;
 			
-			// (TODO) ラウンド数設定
-			SelectDataMgr->Get()->iWinRound = 2;
+			// (TODO) ラウンド数設定 [12/1] ここでラウンドの設定はしない
+			//SelectDataMgr->Get()->iWinRound = 2;
 
 			MainFrameEx->ChangeScene(new sceneSelect, true);
 			bChangedState = true;
