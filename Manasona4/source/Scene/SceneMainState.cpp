@@ -352,6 +352,10 @@ bool SceneMainState::Main::OnMessage(sceneMain *pMain, const Message & msg)
 	case MESSAGE_TYPE::HEAVE_HO_OVER_DRIVE_HIT:
 	{
 		pMain->GetFSM()->ChangeState(HeaveHoDriveOverFlowSuccess::GetInstance());
+		
+		// 最低HP保存
+		GameUIMgr->GetHpGage((SIDE)msg.Sender)->JudeRemainingHP();
+
 		// シームレススレッド発動
 		ResultData data;// リザルトに必要なデータをここで詰める
 		data.eWinnerSide = PlayerMgr->GetPlayer(msg.Sender)->GetSide();
@@ -365,6 +369,9 @@ bool SceneMainState::Main::OnMessage(sceneMain *pMain, const Message & msg)
 	case MESSAGE_TYPE::KO:	// 誰かのHPが0になったら切り替え
 	{
 		KO_INFO *KOInfo = (KO_INFO*)msg.ExtraInfo;
+
+		// 最低HP保存
+		GameUIMgr->GetHpGage(KOInfo->WinnerSide)->JudeRemainingHP();
 
 		// シームレススレッド発動
 		ResultData data;// リザルトに必要なデータをここで詰める

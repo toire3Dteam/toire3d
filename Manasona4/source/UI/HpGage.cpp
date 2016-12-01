@@ -113,11 +113,6 @@ void HpGage::Update()
 	MyAssert((m_pPlayerReferences->GetMaxHP() != 0), "最大HPが0だと0で割ることに");
 	m_fRate= (float)m_pPlayerReferences->GetHP() / (float)m_pPlayerReferences->GetMaxHP();
 
-	// 最低HPを保存
-	if (m_iRemainingHP > m_pPlayerReferences->GetHP())
-	{
-		m_iRemainingHP = m_pPlayerReferences->GetHP();
-	}
 
 	// ダメージ赤バーのレートを計算 コンボが続いてたら更新しない
 	if (m_pPlayerReferences->GetRecoveryFrame() <= 0)
@@ -390,5 +385,15 @@ void HpGage::FirstAction(int waitFrame)
 	// 初期設定
 	m_fMaskPicScare = 1.0f;
 
+
+}
+
+void HpGage::JudeRemainingHP()
+{
+	// 最低HPを保存
+	if (m_iRemainingHP > m_pPlayerReferences->GetHP())
+	{
+		m_iRemainingHP = m_pPlayerReferences->GetHP();
+	}
 
 }

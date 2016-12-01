@@ -27,6 +27,8 @@ public:
 
 	void FirstAction(int waitFrame = 0);	// Å‰‚Ìˆê‰ñ
 
+	void JudeRemainingHP();
+
 	// HP‚ÌŠ„‡
 	int  GetHPPercentage() 
 	{
