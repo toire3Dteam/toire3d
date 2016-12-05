@@ -53,9 +53,15 @@ private:
 	tdn2DAnim* m_pSpGettingRip;
 	int m_iSpGettingFrame;		// SPが回復していく頻度 
 	bool m_bSpGetting;			// SPが徐々に増えてくフラグ
+
+	// ゲージ使用不可のアイコン
+	bool m_bSpPenalty;		
+	tdn2DAnim*		m_pNotOverDriveMark;	// オーバードライブ使用不可マーク
+
+
 private:
 
 	void SpGettingUpdate();
 
-
+	void SpPenaltyUpdate();
 };

@@ -76,7 +76,8 @@ m_iWinNum(0), m_GuardState(GUARD_STATE::NO_GUARD),
 m_pFacePic(nullptr), m_pTargetPlayer(nullptr), m_pSpeedLine(nullptr), m_SkillActionType(SKILL_ACTION_TYPE::MAX),
 m_fOrangeColRate(0), m_fMagentaColRate(0),
 m_pCutinPic(nullptr), m_pName("None"), m_iRushStep(0), m_pThrowMark(nullptr),
-m_bWillPower(false), m_bDown(false), m_iDashFrame(0)
+m_bWillPower(false), m_bDown(false), m_iDashFrame(0),
+m_bNotOverDrive(false)
 {
 	// スタンド
 	switch (data.partner)
@@ -103,6 +104,7 @@ m_bWillPower(false), m_bDown(false), m_iDashFrame(0)
 	m_pUVEffectMGR	 = new UVEffectManager();
 	m_pThrowMark = new tdn2DAnim("Data/Effect/ThrowMark.png");
 	m_pThrowMark->OrderShrink(6, 1.0f, 2.5f);
+
 
 	// 初期化
 	memset(m_iInputList, 0, sizeof(m_iInputList));
@@ -199,6 +201,7 @@ void BasePlayer::Reset()
 	m_bSquat=
 	m_bWillPower=
 	m_bDown=
+	m_bNotOverDrive=
 	false;
 
 
@@ -289,6 +292,9 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 	// 根性値発動用の更新
 	WillPowerUpdate();
 
+	// オーバードライブ使用不可マークの更新
+	//NotOverDriveMarkUpdate();
+
 	// 1more覚醒していたらスタンドの動きを止める
 	if (GetFSM()->isInState(*BasePlayerState::OverDrive_OneMore::GetInstance()) == false)
 	{
@@ -355,13 +361,13 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 						// ディレイフレーム経過したら再生
 						se->Play((LPSTR)SE_ID);
 					}
+				}
 
-					// 判定復活フレーム
-					if (m_ActionFrameList[(int)m_ActionState][m_iCurrentActionFrame] == FRAME_STATE::RECOVERY_HIT)
-					{
-						// 判定リセット
-						GetAttackData()->bHit = GetAttackData()->bHitSuccess = false;
-					}
+				// 判定復活フレーム
+				if (m_ActionFrameList[(int)m_ActionState][m_iCurrentActionFrame] == FRAME_STATE::RECOVERY_HIT)
+				{
+					// 判定リセット
+					GetAttackData()->bHit = GetAttackData()->bHitSuccess = false;
 				}
 
 
@@ -780,6 +786,11 @@ void BasePlayer::ColorUpdate()
 
 }
 
+// オーバードライブ使用不可マークの更新
+//void BasePlayer::NotOverDriveMarkUpdate()
+//{
+//}
+
 void BasePlayer::Control()
 {
 	// 0フレーム目にコマンドフラグを入れるので、それの前にコマンドビットリストを上に押し上げる
@@ -993,6 +1004,9 @@ void BasePlayer::Render()
 	m_pPanelEffectMGR->Render();	
 	Vector2 vScreenPos = Math::WorldToScreen(m_vPos);// (TODO)頭のポジションの座標を使う
 	m_pThrowMark->Render((int)vScreenPos.x - 56, (int)vScreenPos.y - 324, RS::COPY_NOZ);
+
+
+
 
 #ifdef _DEBUG
 	// ここで現在のステートマシンの状態を確認

@@ -59,6 +59,8 @@ BaseUVEffect* m_pSpeedLine;
 BaseUVEffect* m_pWave;
 
 BaseUVEffect* m_pWind;
+BaseUVEffect* m_pWind2;
+BaseUVEffect* m_pGodHand;
 
 BasePanelEffect* m_pPanel;
 
@@ -93,6 +95,13 @@ bool sceneRenderingTest::Initialize()
 
 	m_pWind = new CycloneEffect();
 	m_pWind->Action();
+
+	m_pWind2 = new CycloneEffect();
+	m_pWind2->Action();
+
+	m_pGodHand = new GodHandEffect();
+	m_pGodHand->Action();
+
 
 	g_fram = 0;
 
@@ -170,6 +179,8 @@ sceneRenderingTest::~sceneRenderingTest()
 	delete m_pLocus;
 	delete m_pWave;
 	delete m_pWind;
+	delete m_pWind2;
+	delete m_pGodHand;
 	delete g_DamageEF;
 	delete g_scoreUI;
 #endif
@@ -266,6 +277,8 @@ void sceneRenderingTest::Update()
 	m_pWave->Update();
 
 	m_pWind->Update();
+	m_pWind2->Update();
+	m_pGodHand->Update();
 
 	m_pSpeedLine->Update();
 
@@ -334,7 +347,13 @@ void sceneRenderingTest::Update()
 	// ƒTƒCƒNƒƒ“
 	if (KeyBoardTRG(KB_R) == 1)
 	{
-		m_pWind->Action();
+		m_pWind->Action(Vector3(0, 0, 0), 2, 6);
+		//m_pWind2->Action(Vector3(0, -10, 0), 1.75, 3.75, Vector3(0, 1.57f, 0), Vector3(0, 1.57f, 0));
+		m_pGodHand->Action(Vector3(0, 0, 0), 12, 12);
+
+		//m_pAIROU_EF_IMP->Action(Vector3(0, 0, 0));
+		m_pWave->Action(Vector3(0, 0, 0));
+
 	}
 
 	//
@@ -436,6 +455,8 @@ void sceneRenderingTest::Render()
 			m_pWave->Render();
 
 			m_pWind->Render();
+			m_pWind2->Render();
+			m_pGodHand->Render();
 
 			m_pLocus->Render();
 

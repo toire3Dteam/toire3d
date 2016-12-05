@@ -274,6 +274,9 @@ bool OverDriveCancel(BasePlayer *pPerson)
 		pPerson->GetFSM()->isInState(*BasePlayerState::HeavehoDrive::GetInstance()) == true)
 		return false;
 
+	// [1205] 掴まれたり・必殺技を受けてるときは反応しない
+	if (pPerson->isNotOverDrive() == true)return false;
+
 
 	// 覚醒（バースト）キャンセル
 	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R3, true))
@@ -5074,6 +5077,9 @@ void BasePlayerState::ThrowBind::Enter(BasePlayer * pPerson)
 	// 掴みSEをここで再生
 	se->Play("掴み成功");
 
+	// バースト使用不可に
+	pPerson->GetTargetPlayer()->ActionNotOverDrive();
+
 	// 投げられた時のエフェクト
 	//pPerson->GetThrowMark()->Action();
 	pPerson->AddEffectAction(pPerson->GetPos() , EFFECT_TYPE::THROW);
@@ -5101,6 +5107,9 @@ void BasePlayerState::ThrowBind::Exit(BasePlayer * pPerson)
 {
 	// 重力とかの移動量を有効化する
 	pPerson->SetMoveUpdate(true);
+
+	// バースト使用可能に
+	pPerson->GetTargetPlayer()->StopNotOverDrive();
 
 	// 投げ抜け猶予エフェクト（ビックリマーク）を止める
 	//pPerson->GetThrowMark()->Stop();
@@ -5208,6 +5217,9 @@ void BasePlayerState::HeavehoDrive::Exit(BasePlayer * pPerson)
 {
 	// ヒーホーの終わり
 	pPerson->HeavehoDriveExit();
+
+	// 相手のバースト使用可能に
+	pPerson->GetTargetPlayer()->StopNotOverDrive();
 
 	// 背景変更
 	bool bDriveStage(false);

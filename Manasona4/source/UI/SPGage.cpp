@@ -31,6 +31,12 @@ SpGage::SpGage(BasePlayer * pPlayer)
 	m_iSpGettingFrame = 0;
 	m_bSpGetting = false;
 
+	// ペナルティ
+	m_bSpPenalty = false;
+	m_pNotOverDriveMark = new tdn2DAnim("Data/UI/GAME/SpPenalty.png");
+	m_pNotOverDriveMark->OrderShrink(6, 1.0f, 2.5f);
+
+
 	if (m_sSideFlag == SIDE::LEFT)
 	{
 		m_vPos.x = 63+32;
@@ -58,6 +64,7 @@ SpGage::~SpGage()
 	SAFE_DELETE(m_pGageFlash);
 	SAFE_DELETE(m_pSpGetting);
 	SAFE_DELETE(m_pSpGettingRip);
+	SAFE_DELETE(m_pNotOverDriveMark);
 }
 
 void SpGage::Update()
@@ -124,6 +131,8 @@ void SpGage::Update()
 	// SPが徐々に増える処理
 	SpGettingUpdate();
 
+	// Sp×の更新
+	SpPenaltyUpdate();
 
 	// 更新
 	if (m_bAlphaReturnFlag == false)
@@ -223,6 +232,12 @@ void SpGage::Render()
 		//---------------------------
 		m_pSpGetting->Render((int)m_vPos.x, (int)m_vPos.y - 64, 64, 64, m_bSpGetting * 64, 0, 64, 64);
 		m_pSpGettingRip->Render((int)m_vPos.x, (int)m_vPos.y - 64, 64, 64, m_bSpGetting * 64, 0, 64, 64, RS::ADD);
+	
+
+		//---------------------------
+		// [バースト不可状態]	
+		//---------------------------
+		m_pNotOverDriveMark->Render(71, 612);
 	}
 	else
 	{
@@ -286,6 +301,12 @@ void SpGage::Render()
 		m_pSpGetting->Render((int)m_vPos.x + (310 - 64), (int)m_vPos.y - 64, 64, 64, m_bSpGetting * 64, 0, 64, 64);
 		m_pSpGettingRip->Render((int)m_vPos.x + (310 - 64), (int)m_vPos.y - 64, 64, 64, m_bSpGetting * 64, 0, 64, 64, RS::ADD);
 	
+
+		//---------------------------
+		// [バースト不可状態]	
+		//---------------------------
+		m_pNotOverDriveMark->Render(847, 612);
+
 	}
 
 }
@@ -337,4 +358,31 @@ void SpGage::SpGettingUpdate()
 
 
 	m_pSpGettingRip->Update();
+}
+
+// SPペナルティ
+void SpGage::SpPenaltyUpdate()
+{
+	// ペナルティが発動してたら
+	if (m_bSpPenalty == true)
+	{
+		// ペナルティが無くなったら
+		if (m_pPlayerReferences->isNotOverDrive() == false)
+		{
+			m_bSpPenalty = false;
+			m_pNotOverDriveMark->Stop();// ×を止める
+		}
+	}else
+	{
+		// ペナルティが発動したら
+		if (m_pPlayerReferences->isNotOverDrive() == true)
+		{
+			m_bSpPenalty = true;
+			m_pNotOverDriveMark->Action();// ×をだす
+		}
+
+	}
+
+
+	m_pNotOverDriveMark->Update();
 }

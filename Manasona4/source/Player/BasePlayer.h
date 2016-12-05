@@ -372,6 +372,7 @@ public:
 	void InvincibleUpdate();	 // 無敵の制御
 	void OverDriveUpdate();		// 覚醒の制御
 	void ColorUpdate(); // 光色の制御
+	//void NotOverDriveMarkUpdate();	// オーバードライブ使用不可マークの更新
 
 	//------------------------------------------------------
 	//	コントロール制御
@@ -434,7 +435,12 @@ public:
 	virtual void HeavehoDriveInit() = 0;		// スキル発動時に呼び出す
 	virtual void HeavehoDriveExit() = 0;
 	virtual bool HeavehoDriveUpdate() = 0;
-	virtual void HeavehoDriveHitEvent(){}		// 最初の一撃が当たったときに呼び出される関数
+	virtual void HeavehoDriveHitEvent()		// 最初の一撃が当たったときに呼び出される関数
+	{
+		// 相手のバースト使用不可に
+		GetTargetPlayer()->ActionNotOverDrive();
+		// m_bNotOverDrive = true; 
+	}		
 
 	/****************************/
 	//	ヒーホードライブ_オーバーフロー
@@ -824,6 +830,12 @@ public:
 	tdn2DAnim* GetCutinPic() { return m_pCutinPic; };
 	char* GetName() { return m_pName; };
 
+	// オーバードライブゲージが使えない
+	bool isNotOverDrive() { return m_bNotOverDrive; }
+	void SetNotOverDrive(bool flag) { m_bNotOverDrive = flag; }
+	void ActionNotOverDrive() { m_bNotOverDrive = true; /*m_pNotOverDriveMark->Action(); */}
+	void StopNotOverDrive() {	m_bNotOverDrive = false;/* m_pNotOverDriveMark->Stop();*/}
+
 	//_/_/_/_/_/_/__/_/__/_/__/_/__
 	// 定数
 	//_/_/_/_/__/_/__/_/__/_/__/_/_
@@ -990,15 +1002,17 @@ protected:
 	int m_iHeavehoStopTimer;			// ヒーホードライブ発動のザワールドの時間
 	int m_iHeaveHoDriveOverFlowFrame;	// ヒーホーの必殺のSEとかエフェクト用に作る
 
-	float m_fOrangeColRate;	// 無敵技のオレンジの光レート
+	float m_fOrangeColRate;		// 無敵技のオレンジの光レート
 	float m_fMagentaColRate;	// 中段技のマゼンタの光レート
-
 
 	// ストップフラグ
 	bool m_bGameTimerStopFlag;
 
 	// ラウンド獲得数
 	int m_iWinNum;
+
+	// オーバードライブゲージが使えない
+	bool m_bNotOverDrive;		 
 
 
 	// (メモ)　//////////////////////////////////////////////////////////

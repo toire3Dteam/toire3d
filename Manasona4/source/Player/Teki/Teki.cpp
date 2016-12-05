@@ -17,14 +17,11 @@ Teki::Teki(SIDE side, const SideData &data) :BasePlayer(side, data)
 	// フレーム読み込み
 	BasePlayer::LoadAttackFrameList("DATA/CHR/Teki/FrameList.txt");
 	// ★フレーム独自改造
-	//{
-	//	int StartActiveFrame(0);
-	//	// アクティブフレームまでフレームを加算する
-	//	for (; m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL_AERIALDROP][StartActiveFrame] != FRAME_STATE::ACTIVE; StartActiveFrame++);
-	//
-	//	// 中間の判定のない空間を作る
-	//	FOR(SKILL_AERIALDROP_MIDDLE) m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL_AERIALDROP][StartActiveFrame + SKILL_AERIALDROP_FIRST + i] = FRAME_STATE::FOLLOW;
-	//}
+	{
+		m_ActionFrameList[(int)BASE_ACTION_STATE::RUSH2][13] = FRAME_STATE::RECOVERY_HIT;
+		m_ActionFrameList[(int)BASE_ACTION_STATE::RUSH2][14] = FRAME_STATE::ACTIVE;
+		m_ActionFrameList[(int)BASE_ACTION_STATE::RUSH2][15] = FRAME_STATE::ACTIVE;
+	}
 	// ∵メッシュ
 	//m_pDefaultObj = new iex3DObj((side == SIDE::LEFT) ? "DATA/CHR/Airou/airou.IEM" : "DATA/CHR/Teki/teki.IEM");
 	m_pDefaultObj = new iex3DObj("DATA/CHR/Teki/Teki.IEM");
@@ -1160,6 +1157,9 @@ void Teki::HeavehoDriveExit()
 
 void Teki::HeavehoDriveHitEvent()
 {
+	// 基底クラスを呼んであげる
+	BasePlayer::HeavehoDriveHitEvent();
+
 }
 
 

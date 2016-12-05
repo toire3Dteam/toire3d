@@ -1182,6 +1182,9 @@ void Airou::HeavehoDriveExit()
 
 void Airou::HeavehoDriveHitEvent()
 {
+	// Šî’êƒNƒ‰ƒX‚ðŒÄ‚ñ‚Å‚ ‚°‚é
+	BasePlayer::HeavehoDriveHitEvent();
+
 	// 
 	m_bHeavehoHit = true;
 }

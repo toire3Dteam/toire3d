@@ -1181,6 +1181,9 @@ void Nazenara::HeavehoDriveExit()
 
 void Nazenara::HeavehoDriveHitEvent()
 {
+	// Šî’êƒNƒ‰ƒX‚ğŒÄ‚ñ‚Å‚ ‚°‚é
+	BasePlayer::HeavehoDriveHitEvent();
+
 }
 
 
