@@ -842,3 +842,23 @@ private:
 
 
 };
+
+
+/**************************/
+//	ÉTÉCÉNÉçÉì
+/**************************/
+class CycloneEffect :public BaseUVEffect
+{
+public:
+	CycloneEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Teki/Cyclone.imo", 0.04f, -0.015f, 28, false, 2, 24);
+	};
+	~CycloneEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};

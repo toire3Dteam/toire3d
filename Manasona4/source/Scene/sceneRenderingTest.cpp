@@ -91,7 +91,7 @@ bool sceneRenderingTest::Initialize()
 	m_pWave = new FireRingEffect();
 	m_pWave->Action();
 
-	m_pWind = new WaveEffect();
+	m_pWind = new CycloneEffect();
 	m_pWind->Action();
 
 	g_fram = 0;
@@ -318,12 +318,12 @@ void sceneRenderingTest::Update()
 		DeferredManagerEx.SetRadialBlur(Vector2(0, 0), 5);
 
 
-		for (int i = 0; i < 8; i++)
-		{
-			PointLightManager::GetInstance()->AddPointLight(Vector3(i * 30.0f ,5, 0), Vector3(1, 0.5f, 0), 65, 2, 180, 2, 170);
-			PointLightManager::GetInstance()->AddPointLight(Vector3(i * 30.0f, 5, 40), Vector3(0, 1.0f, .7f), 65, 3, 180, 2, 170);
+		//for (int i = 0; i < 8; i++)
+		//{
+		//	PointLightManager::GetInstance()->AddPointLight(Vector3(i * 30.0f ,5, 0), Vector3(1, 0.5f, 0), 65, 2, 180, 2, 170);
+		//	PointLightManager::GetInstance()->AddPointLight(Vector3(i * 30.0f, 5, 40), Vector3(0, 1.0f, .7f), 65, 3, 180, 2, 170);
 
-		}
+		//}
 	}
 
 	if (KeyBoardTRG(KB_J) == 1)
@@ -331,6 +331,11 @@ void sceneRenderingTest::Update()
 		m_pPanel->Action(Vector3(0, 10, 0));
 	}
 
+	// ƒTƒCƒNƒƒ“
+	if (KeyBoardTRG(KB_R) == 1)
+	{
+		m_pWind->Action();
+	}
 
 	//
 	//if (KeyBoard(KB_8) == 1)

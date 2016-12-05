@@ -272,7 +272,7 @@ void ParticleManager::EffectGuard(const Vector3 & pos, const Vector3 & v)
 			Move = VECTOR_ZERO,
 			Power = VECTOR_ZERO;
 
-	FOR(10)
+	FOR(5)
 	{
 		// èâä˙à íu
 		Pos.x = pos.x + rand() % 6 - 3.0f;
@@ -321,7 +321,9 @@ void ParticleManager::EffectGuard(const Vector3 & pos, const Vector3 & v)
 		Power.y = -0.005f;
 		Power.z = tdnRandom::Get(-0.0015f, 0.0015f);
 
+		// ê®Ç¢ÇÊÇ≠îÚÇ—éUÇÈ
 		Set(6, 0, 1.0f, 12, .0f, 7, 1.0f, Pos, Move*0.6f, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, tdnRandom::Get(0.25, 1.0f), RS::ADD);
+		// à–óÕé„Çﬂ
 		Set(6, 0, 1.0f, 16, .0f, 10, 1.0f, Pos, Move*0.25f , Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, tdnRandom::Get(0.25, 1.0f), RS::ADD);
 
 		//Power.x = 0;

@@ -2258,6 +2258,12 @@ void BasePlayerState::AerialJump::Execute(BasePlayer * pPerson)
 	// 移動地制御
 	pPerson->MoveClampX(pPerson->GetMaxSpeed() * 0.5f);
 
+	// Yの移動量が-になったら落下ステートへ
+	if (pPerson->GetMove().y < 0)
+	{
+		pPerson->GetFSM()->ChangeState(Fall::GetInstance());
+		return;
+	}
 
 	// 地上フラグtrue(着地したら)
 	if (pPerson->isLand())
