@@ -23,6 +23,14 @@ SpGage::SpGage(BasePlayer * pPlayer)
 	m_bAlphaReturnFlag = false;
 	m_iAlphaPow = 0;
 
+	// 根性値発動時
+	m_pSpGetting = new tdn2DAnim("Data/UI/Game/SPGetting.png");
+	m_pSpGetting->OrderShrink(12, 1, 1.1f);
+	m_pSpGettingRip = new tdn2DAnim("Data/UI/Game/SPGetting.png");
+	m_pSpGettingRip->OrderRipple(18, 1, 0.02f);
+	m_iSpGettingFrame = 0;
+	m_bSpGetting = false;
+
 	if (m_sSideFlag == SIDE::LEFT)
 	{
 		m_vPos.x = 63+32;
@@ -48,6 +56,8 @@ SpGage::~SpGage()
 	SAFE_DELETE(m_pGageRip);
 	SAFE_DELETE(m_pSpNum);
 	SAFE_DELETE(m_pGageFlash);
+	SAFE_DELETE(m_pSpGetting);
+	SAFE_DELETE(m_pSpGettingRip);
 }
 
 void SpGage::Update()
@@ -108,14 +118,18 @@ void SpGage::Update()
 	// 更新
 	m_pGage->Update();
 	m_pGageRip->Update();
-
 	m_pSpNum->Update();
+	m_pSpGetting->Update();
+	
+	// SPが徐々に増える処理
+	SpGettingUpdate();
+
 
 	// 更新
 	if (m_bAlphaReturnFlag == false)
 	{
 		m_iAlpha += m_iAlphaPow;
-		if (m_iAlpha>=255)
+		if (m_iAlpha >= 255)
 		{
 			m_bAlphaReturnFlag = true;
 		}
@@ -202,6 +216,13 @@ void SpGage::Render()
 
 
 		}
+
+
+		//---------------------------
+		// [根性状態]	SP徐々に回復
+		//---------------------------
+		m_pSpGetting->Render((int)m_vPos.x, (int)m_vPos.y - 64, 64, 64, m_bSpGetting * 64, 0, 64, 64);
+		m_pSpGettingRip->Render((int)m_vPos.x, (int)m_vPos.y - 64, 64, 64, m_bSpGetting * 64, 0, 64, 64, RS::ADD);
 	}
 	else
 	{
@@ -259,6 +280,12 @@ void SpGage::Render()
 			}
 		}
 
+		//---------------------------
+		// [根性状態]	SP徐々に回復
+		//---------------------------
+		m_pSpGetting->Render((int)m_vPos.x + (310 - 64), (int)m_vPos.y - 64, 64, 64, m_bSpGetting * 64, 0, 64, 64);
+		m_pSpGettingRip->Render((int)m_vPos.x + (310 - 64), (int)m_vPos.y - 64, 64, 64, m_bSpGetting * 64, 0, 64, 64, RS::ADD);
+	
 	}
 
 }
@@ -269,7 +296,45 @@ void SpGage::Action(int delayTimer)
 	m_pGage->Action(delayTimer);
 	//m_pGageFlash->Action(delayTimer);
 	m_pSpNum->Action(delayTimer);
-
+	m_pSpGetting->Action(delayTimer);
 	m_iAlpha = 0;
 	m_bAlphaReturnFlag = false;
+
+	m_bSpGetting = false;
+	m_iSpGettingFrame = 0;
+}
+
+void SpGage::SpGettingUpdate()
+{
+	// 根性値が発動してたら
+	if (m_bSpGetting == true)
+	{
+		m_iSpGettingFrame++;
+		if (m_iSpGettingFrame >= 30)//1202
+		{
+			m_iSpGettingFrame = 0;
+			m_pPlayerReferences->AddOverDriveGage(1);// SPゲージを足す
+			
+		}
+
+		// 根性値が無くなったら
+		if (m_pPlayerReferences->isWillPower() == false)
+		{
+			m_bSpGetting = false;
+		}
+	}
+	else
+	{
+		// 根性値が発動したら
+		if (m_pPlayerReferences->isWillPower() == true)
+		{
+			m_bSpGetting = true;
+			m_pSpGettingRip->Action();// 点灯エフェクトをだす
+		}
+		
+
+	}
+
+
+	m_pSpGettingRip->Update();
 }

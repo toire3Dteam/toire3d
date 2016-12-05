@@ -802,6 +802,14 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 // ダメージ
 									 int damage((int)(HitDamageInfo->damage * pPerson->GetDamageRate()));							// ★自分のダメージレートにかけ合わせる
 
+									 // 根性値が発動してるなら
+									 if (pPerson->isWillPower())
+									 {
+										 // 防御力を上げる
+										 damage = (int)((float)damage* 0.7f);
+									 }
+									 
+
 									 // ★必殺技中は同技補正を無視(アイルーのやつとかひどいことになるから)
 									 if (!HitDamageInfo->bOverDrive)
 									 {
@@ -1701,7 +1709,7 @@ void BasePlayerState::BackStep::Enter(BasePlayer * pPerson)
 	pPerson->SetActionState(BASE_ACTION_STATE::BACKSTEP);
 
 	// 走るエフェクト発動！
-	pPerson->AddEffectAction(pPerson->GetPos(), EFFECT_TYPE::RUN);
+	pPerson->AddEffectAction(pPerson->GetPos(), EFFECT_TYPE::BACK_STEP);
 
 	// 初速度の設定
 	Vector3 move = pPerson->GetMove();
@@ -3960,6 +3968,9 @@ void BasePlayerState::Escape::Enter(BasePlayer * pPerson)
 	//pPerson->TurnOverDir();
 
 	pPerson->SetDirAngle();
+
+	// 回避エフェクト発動！
+	pPerson->AddEffectAction(pPerson->GetCenterPos(), EFFECT_TYPE::ESCAPE);
 
 	// SE再生
 	se->Play("エスケープ");

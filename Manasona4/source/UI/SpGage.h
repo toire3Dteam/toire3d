@@ -48,4 +48,14 @@ private:
 	// プレイヤーを参照用
 	BasePlayer* m_pPlayerReferences;
 
+	// 根性値によるSP徐々に回復
+	tdn2DAnim* m_pSpGetting;
+	tdn2DAnim* m_pSpGettingRip;
+	int m_iSpGettingFrame;		// SPが回復していく頻度 
+	bool m_bSpGetting;			// SPが徐々に増えてくフラグ
+private:
+
+	void SpGettingUpdate();
+
+
 };

@@ -174,19 +174,19 @@ void ComboUI::Render()
 
 }
 
-void ComboUI::GageUpdate()
-{
-	float rate = float(m_pPlayerData->GetRecoveryFrame()) / float(m_iMaxRecoveryFrame);
-	
-	if (rate > 0.0f)
-	{
-		m_bRenderFlag = true;
-	}
-	else
-	{
-		m_bRenderFlag = false;
-	}
-}
+//void ComboUI::GageUpdate()
+//{
+//	float rate = float(m_pPlayerData->GetRecoveryFrame()) / float(m_iMaxRecoveryFrame);
+//	
+//	if (rate > 0.0f)
+//	{
+//		m_bRenderFlag = true;
+//	}
+//	else
+//	{
+//		m_bRenderFlag = false;
+//	}
+//}
 
 void ComboUI::Count(int damage, int maxRecovery, bool bCounterHit)
 {

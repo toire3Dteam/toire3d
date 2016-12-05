@@ -397,7 +397,7 @@ void SceneMenuState::TutorialSelectStep::Execute(sceneMenu *pMain)
 		// ★(TODO)ここでチュートリアルに移動します
 		// その前に自分・相手・ステージ・チュートリアルフラグをここで変えてやりましょう
 		SelectDataMgr->Get()->bTutorial = true;
-		SelectDataMgr->Get()->iWinRound = 0;
+		//SelectDataMgr->Get()->iWinRound = 0;
 		// 
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = false;
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = true;

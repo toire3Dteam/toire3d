@@ -1,4 +1,5 @@
 #include "TipsCard.h"
+#include "Sound\SoundManager.h"
 
 TipsCard::TipsCard(LPSTR string, bool bChoice, bool bOK)
 {
@@ -98,6 +99,9 @@ void TipsCard::Update(int DeviceID)
 						m_bOK = true;
 					}
 
+					// SE
+					se->Play("カーソル1");
+
 					return;
 				}
 				if (tdnInput::KeyGet(KEYCODE::KEY_DOWN, DeviceID) == 3)
@@ -113,6 +117,9 @@ void TipsCard::Update(int DeviceID)
 						m_bOK = true;
 					}
 
+					// SE
+					se->Play("カーソル1");
+					
 					return;
 				}
 			}
@@ -123,11 +130,19 @@ void TipsCard::Update(int DeviceID)
 				if (m_bOK == true)
 				{
 					m_eSelectState = SELECT_STATE::OK;
+					
+					// SE
+					se->Play("決定1");
 				}
 				else
 				{
 					m_eSelectState = SELECT_STATE::CANCEL;
+					
+					// SE
+					se->Play("キャンセル1");
 				}
+
+
 
 				End();
 
@@ -145,6 +160,9 @@ void TipsCard::Update(int DeviceID)
 				{
 					m_eSelectState = SELECT_STATE::OK;
 				}
+
+				// SE
+				se->Play("キャンセル1");
 
 				End();
 

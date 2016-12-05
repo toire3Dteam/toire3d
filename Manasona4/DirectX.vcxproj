@@ -153,6 +153,7 @@
     <ClCompile Include="source\Player\BasePlayerState.cpp" />
     <ClCompile Include="source\Player\Nazenara\Nazenara.cpp" />
     <ClCompile Include="source\Player\PlayerManager.cpp" />
+    <ClCompile Include="source\Player\Teki\Teki.cpp" />
     <ClCompile Include="source\PointLight\PointLight.cpp" />
     <ClCompile Include="source\PostEffect\PostEffect.cpp" />
     <ClCompile Include="source\ResultPerformance\BaseResultPerformance.cpp" />
@@ -295,6 +296,7 @@
     <ClInclude Include="source\Player\BasePlayerState.h" />
     <ClInclude Include="source\Player\Nazenara\Nazenara.h" />
     <ClInclude Include="source\Player\PlayerManager.h" />
+    <ClInclude Include="source\Player\Teki\Teki.h" />
     <ClInclude Include="source\PointLight\PointLight.h" />
     <ClInclude Include="source\PostEffect\PostEffect.h" />
     <ClInclude Include="source\resource.h" />

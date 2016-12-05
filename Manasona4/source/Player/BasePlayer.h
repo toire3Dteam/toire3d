@@ -206,6 +206,7 @@ enum class EFFECT_TYPE
 	ONEMORE_BURST,		// ワンモアバースト
 	ONEMORE_BURST_START,// ワンモアバーストの前
 	RUN,				// 走る瞬間
+	BACK_STEP,			// バックステップ
 	GUARD_BREAK,		// ガードブレイク
 	AIROU_DRILL,		// アイルードリル
 	AIROU_CIRCLE,		// アイルーサークル
@@ -214,6 +215,7 @@ enum class EFFECT_TYPE
 	OVER_DRIVE_ACTION,	// 必殺技アクション
 	JUMP,				// 飛ぶときのエフェクト
 	AERIAL_JUMP,		// 空中ジャンプのエフェクト
+	ESCAPE,				// 回避
 	INVINCIBLE_ATTACK,	// 逆切れ（無敵技）
 	DOKKOI,				// 中段
 	MUZZLE_FLASH,		// マズルフラッシュ

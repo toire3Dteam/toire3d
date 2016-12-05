@@ -87,6 +87,9 @@ MenuUIManager::MenuUIManager(int iSelectNo)
 	// 仮
 	pExp = new tdn2DObj("Data/UI/Menu/exp.png");
 
+	// タイトル
+	m_pTitle = new tdn2DObj("Data/UI/Menu/title.png");
+
 	// 動画
 	m_pMoveMgr = new tdnMovie("DATA/UI/Menu/Menu2.wmv");
 	m_pMove = new tdn2DObj(m_pMoveMgr->GetTexture());
@@ -108,6 +111,7 @@ MenuUIManager::~MenuUIManager()
 	SAFE_DELETE(m_pInfo);
 
 	SAFE_DELETE(pExp);
+	SAFE_DELETE(m_pTitle);
 
 	SAFE_DELETE(m_pMoveMgr);
 	SAFE_DELETE(m_pMove);
@@ -173,6 +177,9 @@ void MenuUIManager::Render()
 		//}
 	
 	}
+
+	// タイトル
+	//m_pTitle->Render(0, 0);
 
 	tdnText::Draw(100, 100, 0xffffffff, "%dセレクト番号", m_iSelectNo);
 }

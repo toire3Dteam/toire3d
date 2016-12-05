@@ -1428,6 +1428,15 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 		ParticleManager::EffectRunSmoke(m_vPos, (m_dir != DIR::LEFT));
 
 		break;
+	case EFFECT_TYPE::BACK_STEP:
+	{
+		float l_fAngle = (m_dir == DIR::LEFT) ? 0.0f : PI;
+
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::RUN,
+			0.8f, 1.0f, Vector3(0, l_fAngle, 0), Vector3(0, l_fAngle, 0));
+		ParticleManager::EffectRunSmoke(m_vPos, (m_dir == DIR::LEFT));
+
+	}	break;
 	case EFFECT_TYPE::GUARD_BREAK:
 		m_pPanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::GLASS);
 
@@ -1454,12 +1463,23 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 		{
 			l_Pos.y += 5; //　ガードエフェクトを↑に上げる
 		}
-		// 相手のMove値考慮
+		// 相手と自分のベクトル値を考慮
 		float z = atan2(-AttackVec.x, AttackVec.y);
+
+		// [12/04] のけぞり後の離されないためにMove値考慮
+		l_Pos.x += (m_vMove.x * 7.0f);
 
 		// ガードウェ―ブ
 		m_pUVEffectMGR->AddMultipleEffect(l_Pos, UV_EFFECT_MULTIPLE_TYPE::GUARD_WAVE, 0.5f, 0.5f, Vector3(0, -supportAngleY*1.5f, z), Vector3(0, -supportAngleY*1.5f, z));
 		m_pUVEffectMGR->AddMultipleEffect(l_Pos, UV_EFFECT_MULTIPLE_TYPE::GUARD_GRID, 0.2f, 0.5f, Vector3(0, -supportAngleY*1.5f, z), Vector3(0, -supportAngleY*1.5f, z));
+
+		// 青い光
+		PointLightMgr->AddPointLight(l_Pos + Vector3(0, 2, 0), Vector3(0, 0.35f, 0.65f), 18, 8, 12, 3, 6);// ポイントライトエフェクト！
+
+		// 飛び散るパーティクル
+		ParticleManager::EffectGuard(l_Pos, AttackVec);
+
+		// [1204] ガードエフェクトブラッシュアップ完成 
 
 	}	break;
 	case EFFECT_TYPE::MULTIPLE_HIT:
@@ -1515,6 +1535,23 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 		//float z = atan2(-m_vMove.x, m_vMove.y);
 		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::JUMP_SPEED_LINE, 0.5f, 0.35f, Vector3(0, 0, diaAngle), Vector3(0, 0, diaAngle));
 
+
+	}	break;
+	case EFFECT_TYPE::ESCAPE:
+	{
+		float ecpAngle = (m_dir == DIR::RIGHT) ? PI / 2 : -PI / 2;
+
+		// ジャンプエフェクト
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::JUMP_WAVE, 0.25f, 0.5f, Vector3(0, 0, ecpAngle), Vector3(0, 0, ecpAngle));
+		// ジャンプエフェクト線
+		// 相手のMove値考慮
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::JUMP_SPEED_LINE, 0.5f, 0.35f, Vector3(0, 0, ecpAngle), Vector3(0, 0, ecpAngle));
+
+
+		// 煙
+		m_pUVEffectMGR->AddEffect(m_vPos, UV_EFFECT_TYPE::RUN,
+			0.8f, 1.0f, Vector3(0, diaAngle, 0), Vector3(0, diaAngle, 0));
+		ParticleManager::EffectRunSmoke(m_vPos, (m_dir != DIR::LEFT));
 
 	}	break;
 	case EFFECT_TYPE::INVINCIBLE_ATTACK:
@@ -1622,7 +1659,12 @@ void BasePlayer::WillPowerUpdate()
 	// 体力が35%以下になれば根性発動
 	if (m_bWillPower == false)
 	{
-		if (HpRate <= 0.35f)
+		/*******************/
+		//	 根性値発動前
+		/*******************/
+
+		// 死んでない状態でかつHPが35%以上なら
+		if (HpRate <= 0.35f && GetFSM()->isInState(*BasePlayerState::Die::GetInstance()) == false)
 		{
 			// リカバリーフレームが切れ動けるようになった瞬間+
 			// ダウンフラグFalseの時がトリガー
@@ -1646,8 +1688,12 @@ void BasePlayer::WillPowerUpdate()
 	}
 	else
 	{
-		// HPが増えると根性がなくなる
-		if (HpRate > 0.35f)
+		/*******************/
+		//	 根性値発動中
+		/*******************/
+
+		// HPが増えると根性がなくなる　または　死んだら切れる
+		if (HpRate > 0.35f || GetFSM()->isInState(*BasePlayerState::Die::GetInstance()) == true)
 		{
 			m_bWillPower = false;
 		}

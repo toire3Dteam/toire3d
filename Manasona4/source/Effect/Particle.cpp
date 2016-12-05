@@ -239,7 +239,7 @@ void ParticleManager::EffectHit(const Vector3 &pos, const Vector3 &v)
 		Power.x = 0;
 		Power.y = (v.y < 0) ? -.0001f : -0.015f;
 		Power.z = 0;
-		Set(7, 0, 1.0f, 90, .0f, 30, .9f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, rand() % 1 + 1.0f, RS::COPY);
+		Set(7, 0, 1.0f, 90, .0f, 30, .9f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, tdnRandom::Get(0.25, 1.0f), RS::ADD);
 
 		Power.x = 0;
 		Power.y = -0.01f;
@@ -256,13 +256,96 @@ void ParticleManager::EffectHit(const Vector3 &pos, const Vector3 &v)
 			Move.x = (rand() % M2 - (M2 / 2))*0.05f;
 			Move.y = (rand() % 3 + 7) * 0.1f;
 			Move.z = (rand() % M2 - (M2 / 2))*0.05f;
-			Set(7, 0, 1.0f, 40, .0f, 20, .9f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, rand() % 1 + .5f, RS::COPY);
+			Set(6, 0, 1.0f, 40, .0f, 20, .9f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, tdnRandom::Get(0.5f, 1.0f), RS::ADD);
 
 			//Move.x = (rand() % 30 - 16.0f) * 0.25f;
 			//Move.y = rand() % 9 - 4.0f;
 			//Move.z = (rand() % 30 -16.0f) * 0.001f;
 			//Set(7, 0, 1.0f, 16, .0f, 6, .75f, pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, rand() % 1 + 1.0f, RS::ADD);
 		}
+	}
+}
+
+void ParticleManager::EffectGuard(const Vector3 & pos, const Vector3 & v)
+{
+	Vector3 Pos = VECTOR_ZERO,
+			Move = VECTOR_ZERO,
+			Power = VECTOR_ZERO;
+
+	FOR(10)
+	{
+		// ‰ŠúˆÊ’u
+		Pos.x = pos.x + rand() % 6 - 3.0f;
+		Pos.y = pos.y + rand() % 6 - 3.0f;
+		Pos.z = pos.z + rand() % 6 - 3.0f;
+		
+
+		// ˆÚ“®’n
+		// ”ò‚Ô•ûŒü‚ÌƒxƒNƒgƒ‹‚ð‚»‚Ì‚Ü‚ÜŽg‚¢@‘¬“x‚ð’²®‚·‚é‚¾‚¯
+		// ‹t•ûŒü‚É”ò‚ÑŽU‚ç‚È‚¢‚Ì‚ª—˜“_
+		Move = v;
+		Move.Normalize();	
+		
+		if (abs(Move.x) <= 0.5f) 
+		{
+			Move.x = (tdnRandom::Get(-1.1f, 1.1f));
+		}else
+		{
+			Move.x = v.x * (tdnRandom::Get(0.25f, 1.85f) + 0.5f);
+		}
+		
+		if (abs(Move.y) <= 0.5f)
+		{
+			Move.y = (tdnRandom::Get(-1.1f, 1.1f));
+		}else
+		{
+			Move.y = v.y * (tdnRandom::Get(0.25f, 0.85f) + 0.5f);
+		}
+
+		//Move.y = v.y * (tdnRandom::Get(0.0f, 0.5f) + 0.5f);
+		//Move.z = v.z * (tdnRandom::Get(0.0f, 0.5f) + 0.5f);
+		Move.z = (tdnRandom::Get(-1.5f, 1.75f));
+		
+		//const int M = 32;	
+		//Move.x = (rand() % M - (M / 2))*0.05f;
+		//if (v.x != 0)Move.x = (v.x < 0) ? -abs(Move.x) : abs(Move.x);
+		//Move.y = (rand() % 6 - 3) * 0.1f;	
+		//Move.y = (v.y < 0) ? -Move.y : Move.y;
+		//Move.z = (rand() % M - (M / 2))*0.05f;
+
+		// d—Í
+		//Power.x = 0;
+		//Power.y = (v.y < 0) ? -.0001f : -0.015f;
+		//Power.z = 0;
+		Power.x = tdnRandom::Get(-0.0025f, 0.0025f);
+		Power.y = -0.005f;
+		Power.z = tdnRandom::Get(-0.0015f, 0.0015f);
+
+		Set(6, 0, 1.0f, 12, .0f, 7, 1.0f, Pos, Move*0.6f, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, tdnRandom::Get(0.25, 1.0f), RS::ADD);
+		Set(6, 0, 1.0f, 16, .0f, 10, 1.0f, Pos, Move*0.25f , Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, tdnRandom::Get(0.25, 1.0f), RS::ADD);
+
+		//Power.x = 0;
+		//Power.y = -0.01f;
+		//Power.z = 0;
+
+		//// —±
+		////for (int j = 0; j < 1; j++)
+		//{
+		//	Pos.x = pos.x + rand() % 5 - 2.0f;
+		//	Pos.y = pos.y + (float)(rand() % 3);
+		//	Pos.z = pos.z + rand() % 5 - 2.0f;
+		//	Pos = pos;
+		//	const int M2 = 16;
+		//	Move.x = (rand() % M2 - (M2 / 2))*0.05f;
+		//	Move.y = (rand() % 3 + 7) * 0.1f;
+		//	Move.z = (rand() % M2 - (M2 / 2))*0.05f;
+		//	Set(7, 0, 1.0f, 40, .0f, 20, .9f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, rand() % 1 + .5f, RS::COPY);
+
+		//	//Move.x = (rand() % 30 - 16.0f) * 0.25f;
+		//	//Move.y = rand() % 9 - 4.0f;
+		//	//Move.z = (rand() % 30 -16.0f) * 0.001f;
+		//	//Set(7, 0, 1.0f, 16, .0f, 6, .75f, pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, rand() % 1 + 1.0f, RS::ADD);
+		//}
 	}
 }
 
@@ -699,6 +782,16 @@ void ParticleData::Render()
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);			// Œã‚É•`‚¢‚Ä‚¢‚é•¨‘Ì‚à‘S—Í•`‰æ
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
+	}
+	else if (pdata.flag == RS::ADD_NOZ)
+	{
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);			// Œã‚É•`‚¢‚Ä‚¢‚é•¨‘Ì‚à‘S—Í•`‰æ
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZENABLE, FALSE);
 	}
 	// COPY
 	else
@@ -706,6 +799,8 @@ void ParticleData::Render()
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);			// Œ‹‰Ê = “]‘—Œ³ + “]‘—æ
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);		// ¡‘‚¢‚Ä‚¢‚é‚à‚Ì‚ð‚Ç‚ê‚­‚ç‚¢æ‚Á‚¯‚é‚©
 		tdnSystem::GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);	// Œã‚É•`‚¢‚Ä‚¢‚½•¨‘Ì‚ðª‚Ì”½‘Î•ª”–‚ß‚Ä•`‰æ
+		//tdnSystem::GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);				// [“xƒoƒbƒtƒ@‚Ö‚Ì‘‚«ž‚Ý‚ð—LŒø‚É‚·‚é
+		tdnSystem::GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
 	}
 	//	ƒŒƒ“ƒ_ƒŠƒ“ƒO
 	tdnSystem::GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, v, sizeof(TLVERTEX));

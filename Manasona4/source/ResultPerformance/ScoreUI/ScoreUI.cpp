@@ -1,5 +1,6 @@
 #include "ScoreUI.h"
-
+#include "Data\SelectData.h"
+#include "Data\PlayerData.h"
 //+--------------------------
 //	スコア表示UI
 //+--------------------------
@@ -92,7 +93,8 @@ ScoreUI::ScoreUI(ResultData data)
 	}
 	
 
-	
+	// お金の計算
+	PlayerDataMgr->m_PlayerInfo.coin += CalcCoin();
 
 	// 演出完了フラグ
 	m_bEnd = false;
@@ -202,19 +204,19 @@ int ScoreUI::CalcRankScore()
 	//+---------------------------------
 	if (m_tagScore[SCORE_TYPE::DAMAGE].iPoint >= 4000)
 	{
-		ScorePoint += 5;
+		ScorePoint += 5+1;
 	}
 	else if (m_tagScore[SCORE_TYPE::DAMAGE].iPoint >= 3000)
 	{
-		ScorePoint += 4;
+		ScorePoint += 4+1;
 	}
 	else if (m_tagScore[SCORE_TYPE::DAMAGE].iPoint >= 2500)
 	{
-		ScorePoint += 3;
+		ScorePoint += 3+1;
 	}
 	else if (m_tagScore[SCORE_TYPE::DAMAGE].iPoint >= 1000)
 	{
-		ScorePoint += 2;
+		ScorePoint += 2+1;
 	}
 	else
 	{
@@ -277,4 +279,42 @@ int ScoreUI::CalcRankScore()
 	// [メモ]　14以上SS	11以上S 9以上A 6以上B 以下C
 
 	return ScorePoint;
+}
+
+// お金
+int ScoreUI::CalcCoin()
+{
+	int addCoin = 0;
+
+	addCoin += (m_tagScore[SCORE_TYPE::DAMAGE].iPoint / 10);
+	addCoin += m_tagScore[SCORE_TYPE::HP].iPoint;
+	//+---------------------------------
+	//	 経過時間でポイント変換
+	//+---------------------------------
+	if (m_tagScore[SCORE_TYPE::TIME].iPoint <= 30)
+	{
+		// 経過時間が30秒内で倒せたら
+		addCoin += 100;
+	}
+	else if (m_tagScore[SCORE_TYPE::TIME].iPoint <= 50)
+	{
+		// 経過時間が45秒内で倒せたら
+		addCoin += 50;
+	}
+	else if (m_tagScore[SCORE_TYPE::TIME].iPoint <= 70)
+	{
+		// 経過時間が60秒内で倒せたら
+		addCoin += 25;
+	}
+	else  if (m_tagScore[SCORE_TYPE::TIME].iPoint <= 85)
+	{
+		// 経過時間が75秒内で倒せたら
+		addCoin += 5;
+	}
+	else
+	{
+		addCoin += 1;
+	}
+
+	return addCoin;
 }

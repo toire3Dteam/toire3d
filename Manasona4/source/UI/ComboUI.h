@@ -13,7 +13,7 @@ public:
 	void Update();
 	void Render();
 
-	void GageUpdate();
+	//void GageUpdate();
 
 	void SetRecoveryFrame(int recovery){ m_iRecoveryFrame = recovery; }
 

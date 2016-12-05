@@ -47,6 +47,9 @@ private:
 	
 	tdn2DObj* m_pGageUsually;	// 普通位の色
 	tdn2DObj* m_pGagePinch;		// ピンチの色
+	
+	tdn2DAnim* m_pGagePinchRip;	// ピンチの色の波紋
+	int m_iGagePinchRipFrame;		// ピンチの色の波紋の周期
 
 	tdn2DObj* m_pDamageGage;
 	int m_iDamagePoint;

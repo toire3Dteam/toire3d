@@ -64,7 +64,8 @@ private:
 
 private:
 
-	int CalcRankScore();// ランク計算
+	int CalcRankScore();	// ランク計算
+	int CalcCoin();	// お金
 
 };
 

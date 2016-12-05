@@ -46,7 +46,15 @@ bool sceneMain::Initialize()
 	// ラウンド数
 	// (TODO)[11/4]ラウンド数が0の時はラウンドコールを抜く処理がしたい
 	// トレーニングやチュートリアルのため
-	m_iRoundNum = SelectDataMgr->Get()->iWinRound;
+	if (SelectDataMgr->Get()->bTutorial == false)
+	{
+		m_iRoundNum = SelectDataMgr->Get()->iWinRound;
+	}
+	else
+	{
+		m_iRoundNum = 0;
+	}
+	
 
 	//com = new Combo();
 

@@ -1,4 +1,5 @@
 #include "Tutorial.h"
+#include "Sound\SoundManager.h"
 
 //+-----------------------------
 //	ベース
@@ -179,6 +180,9 @@ void BaseTutorial::ActionClear()
 	// ↓でクリア演出
 	m_pClearPic->Action();
 	m_pClearPicRip->Action();
+
+	// SE
+	se->Play("オールクリア");
 }
 
 
@@ -230,6 +234,9 @@ void BaseTutorial::TaskSuccess(int select)
 
 		m_aTask[m_iSelectTask].bClear = true;
 		m_iSelectTask++;
+
+		// SE
+		se->Play("ステップクリア");
 	}
 }
 

@@ -48,8 +48,8 @@ SelectUI::SelectUI(SIDE side, ENTITY_ID id, int DeviceID, bool bAI) :BaseGameEnt
 		case CHARACTER::NAZENARA:
 			m_tagCharaPic[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Character/teki.png");
 			m_tagCharaPicRip[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Character/teki.png");
-			m_tagCharaInfo[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Info/teki.png");
-			m_tagCharaName[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/name/teki.png");
+			m_tagCharaInfo[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Info/nazenaraba.png");
+			m_tagCharaName[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/name/nazenaraba.png");
 			m_pCharaIconRip[i] = new tdn2DAnim("Data/UI/CharacterSelect/icon/teki.png");
 
 			break;

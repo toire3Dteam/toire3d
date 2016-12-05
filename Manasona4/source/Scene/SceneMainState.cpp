@@ -460,6 +460,7 @@ void SceneMainState::Finish::Execute(sceneMain *pMain)
 					pMain->Reset();
 
 					pMain->GetFSM()->ChangeState(Round::GetInstance());
+					return;
 				}
 			}
 		}
@@ -468,6 +469,7 @@ void SceneMainState::Finish::Execute(sceneMain *pMain)
 			// ここに来たということは、たぶんトレーニングで敵を倒した場合
 			if (Fade::isFadeOutCompletion())
 			{
+				//チュートリアル途中でやめてゲームしたらバグる
 				// チュートリアルで殺してしまった
 				if(pMain->GetFSM()->isPrevState(*SceneMainState::TutorialMain::GetInstance()))
 					pMain->GetFSM()->ChangeState(SceneMainState::TutorialIntro::GetInstance());

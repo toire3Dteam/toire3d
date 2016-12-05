@@ -84,7 +84,10 @@ bool sceneResult::Initialize()
 		m_WinPlayer = new iex3DObj("DATA/CHR/Airou/result.IEM");
 		m_ResultPerformance = new AirouResultPerformance();
 		break;
-
+	case CHARACTER::TEKI:
+		m_WinPlayer = new iex3DObj("DATA/CHR/Airou/result.IEM");
+		m_ResultPerformance = new AirouResultPerformance();
+		break;
 	case CHARACTER::NAZENARA:
 		m_WinPlayer = new iex3DObj("DATA/CHR/Airou/result.IEM");
 		m_ResultPerformance = new AirouResultPerformance();
@@ -110,6 +113,11 @@ bool sceneResult::Initialize()
 	switch ((SelectDataMgr->Get()->tagSideDatas[(int)LoserSide].character))
 	{
 	case CHARACTER::AIROU:
+		m_LosePlayer = new iex3DObj("DATA/CHR/Airou/airou.IEM");
+		m_iLoseMotion = 34;
+		break;
+
+	case CHARACTER::TEKI:
 		m_LosePlayer = new iex3DObj("DATA/CHR/Airou/airou.IEM");
 		m_iLoseMotion = 34;
 		break;

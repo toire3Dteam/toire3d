@@ -73,6 +73,9 @@ private:
 	// ‰¼
 	tdn2DObj* pExp;
 
+	// ƒ^ƒCƒgƒ‹
+	tdn2DObj* m_pTitle;
+
 	// ‚¨‹à
 	CoinUI* m_pCoinUI;
 

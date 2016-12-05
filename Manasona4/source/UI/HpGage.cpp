@@ -15,6 +15,12 @@ HpGage::HpGage(BasePlayer* pPlayer)
 	m_pGageUsually = new tdn2DObj("Data/UI/Game/HPGageUsually.png");
 	m_pGagePinch = new tdn2DObj("Data/UI/Game/HPGagePinch.png");
 
+	m_pGagePinchRip = new tdn2DAnim("Data/UI/Game/HPGagePinchRip.png");
+	m_pGagePinchRip->OrderRipple(16, 1.0f, 0.025f);
+	//m_pGagePinchRip->OrderAlphaMove(15, 7, 8);
+	m_iGagePinchRipFrame = 0;
+
+
 	m_pWave = new tdn2DObj("Data/UI/Game/HPGage_Wave.png");
 	m_fWaveUV = 0.0f;
 
@@ -81,6 +87,7 @@ HpGage::~HpGage()
 	SAFE_DELETE(m_pGage);
 	SAFE_DELETE(m_pGageUsually);
 	SAFE_DELETE(m_pGagePinch);
+	SAFE_DELETE(m_pGagePinchRip);
 	SAFE_DELETE(m_pWave);
 	SAFE_DELETE(m_pDamageGage);
 
@@ -128,6 +135,20 @@ void HpGage::Update()
 	}
 
 	m_fDamageRate = (float)m_iDamagePoint / (float)m_pPlayerReferences->GetMaxHP();
+
+	// ŠoÁHP”g–ä
+	m_iGagePinchRipFrame++;
+	if (m_iGagePinchRipFrame >= 40)
+	{
+		m_iGagePinchRipFrame = 0;
+		if (m_pPlayerReferences->isWillPower())
+		{
+			m_pGagePinchRip->Action();
+		}
+	}
+	
+	m_pGagePinchRip->Update();
+
 
 	// SPƒŒ[ƒg
 	//if (m_pPlayerReferences->isOverDrive())
@@ -219,6 +240,11 @@ void HpGage::UseMaskScreen()
 					(int)(m_iGageWidth*m_fRate), m_iGageHeight,
 					m_iGageWidth - (int)(m_iGageWidth  * m_fRate), 0,
 					(int)(m_iGageWidth*m_fRate), m_iGageHeight);
+				// ”g–ä
+				m_pGagePinchRip->Render((int)m_vPos.x + (m_iGageWidth - (int)(m_iGageWidth * m_fRate)), (int)m_vPos.y,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight,
+					m_iGageWidth - (int)(m_iGageWidth  * m_fRate), 0,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight, RS::ADD);
 			}
 			else
 			{
@@ -289,6 +315,12 @@ void HpGage::UseMaskScreen()
 					(int)(m_iGageWidth*m_fRate), m_iGageHeight,
 					0, 0,
 					(int)(m_iGageWidth*m_fRate), m_iGageHeight);
+
+				// ”g–ä
+				m_pGagePinchRip->Render((int)m_vPos.x, (int)m_vPos.y,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight,
+					0, 0,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight, RS::ADD);
 			}
 			else
 			{
