@@ -93,6 +93,9 @@ void Airou::Reset()
 	m_pHitSquare->pos.Set(.0f, 4.0f, .0f);
 	m_fMaxSpeed = 1.15f;
 	m_iMaxHP = m_iHP = 10000;	// キャラごとのHP
+
+	// エフェクトカメラID
+	m_eHeaveHoOverFlowCameraID = EFFECT_CAMERA_ID::AIROU_OVERFLOW;
 }
 
 void Airou::InitActionDatas()

@@ -21,6 +21,17 @@ bool isNeutralPOV(BasePlayer *pPerson)
 {
 	return (!pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT) && !pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT) && !pPerson->isPushInput(PLAYER_COMMAND_BIT::UP) && !pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN));
 }
+
+void ChangeWaitState(BasePlayer *pPerson)
+{
+	// 下キーを押しているなら、待機ステートではなく、しゃがみステートに行く
+	if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN))
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Squat::GetInstance());
+
+	// それ以外なら待機ステートに戻る
+	else pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+}
+
 bool JumpCancel(BasePlayer * pPerson)
 {
 	//////////////////////////////////////////////
@@ -3319,11 +3330,8 @@ void BasePlayerState::SquatAttack::Execute(BasePlayer * pPerson)
 	// 攻撃終了してたら
 	if (!pPerson->isAttackState())
 	{
-		// しゃがみに戻る
-		if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN)) pPerson->GetFSM()->ChangeState(Squat::GetInstance());
-
 		// 待機モーションに戻る
-		else pPerson->GetFSM()->ChangeState(Wait::GetInstance());
+		ChangeWaitState(pPerson);
 		return;
 	}
 
@@ -3541,11 +3549,8 @@ void BasePlayerState::DownAttack::Execute(BasePlayer * pPerson)
 	// 攻撃終了してたら
 	if (!pPerson->isAttackState())
 	{
-		// しゃがみに戻る
-		if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN)) pPerson->GetFSM()->ChangeState(Squat::GetInstance());
-
 		// 待機モーションに戻る
-		else pPerson->GetFSM()->ChangeState(Wait::GetInstance());
+		ChangeWaitState(pPerson);
 		return;
 	}
 
@@ -4306,7 +4311,7 @@ void BasePlayerState::Skill::Execute(BasePlayer * pPerson)
 	if (bEnd)
 	{
 		// 待機ステートに(さすがにキャンセルはやめておこう)
-		if(pPerson->isLand())pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		if (pPerson->isLand()) ChangeWaitState(pPerson);
 		else pPerson->GetFSM()->ChangeState(BasePlayerState::Fall::GetInstance());
 		return;
 	}
@@ -4667,6 +4672,7 @@ void BasePlayerState::Guard::Execute(BasePlayer * pPerson)
 
 					// ガードステートを設定する
 					pPerson->SetGuardState(GUARD_STATE::DOWN_GUARD);
+					return;
 				}
 
 				/* 立ちガード */
@@ -4676,19 +4682,47 @@ void BasePlayerState::Guard::Execute(BasePlayer * pPerson)
 
 					// ガードステートを設定する
 					pPerson->SetGuardState(GUARD_STATE::UP_GUARD);
+					return;
 				}
 			}
 		}
-		else
-		{
-			// 相手が攻撃ステートじゃなかったら
-			//if (!pPerson->GetTargetPlayer()->isAttackState() && !(pPerson->GetTargetPlayer()->GetStand()->isActive() && pPerson->GetTargetPlayer()->GetStand()->GetAttackData()))
-			{
-				//pPerson->GuardEffectStop();
-				//pPerson->SetGuard(false);// ガード状態解除へ
-				pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
-			}
-		}
+		// 待機モーションに戻る
+		ChangeWaitState(pPerson);
+
+		//// 相手キャラが攻撃ステートなら
+		//if (pPerson->GetTargetPlayer()->isAttackState() || (pPerson->GetTargetPlayer()->GetStand()->isActive() && pPerson->GetTargetPlayer()->GetStand()->GetAttackData()))
+		//{
+		//	if (isInputGuardCommand(pPerson))
+		//	{
+		//		/* しゃがみガード */
+		//		if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN))
+		//		{
+		//			pPerson->SetMotion(MOTION_TYPE::DOWN_GUARD);
+
+		//			// ガードステートを設定する
+		//			pPerson->SetGuardState(GUARD_STATE::DOWN_GUARD);
+		//		}
+
+		//		/* 立ちガード */
+		//		else
+		//		{
+		//			pPerson->SetMotion(MOTION_TYPE::UP_GUARD);
+
+		//			// ガードステートを設定する
+		//			pPerson->SetGuardState(GUARD_STATE::UP_GUARD);
+		//		}
+		//	}
+		//}
+		//else
+		//{
+		//	// 相手が攻撃ステートじゃなかったら
+		//	//if (!pPerson->GetTargetPlayer()->isAttackState() && !(pPerson->GetTargetPlayer()->GetStand()->isActive() && pPerson->GetTargetPlayer()->GetStand()->GetAttackData()))
+		//	{
+		//		//pPerson->GuardEffectStop();
+		//		//pPerson->SetGuard(false);// ガード状態解除へ
+		//		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		//	}
+		//}
 	}
 }
 
@@ -5108,9 +5142,6 @@ void BasePlayerState::ThrowBind::Exit(BasePlayer * pPerson)
 	// 重力とかの移動量を有効化する
 	pPerson->SetMoveUpdate(true);
 
-	// バースト使用可能に
-	pPerson->GetTargetPlayer()->StopNotOverDrive();
-
 	// 投げ抜け猶予エフェクト（ビックリマーク）を止める
 	//pPerson->GetThrowMark()->Stop();
 }
@@ -5198,6 +5229,8 @@ void BasePlayerState::HeavehoDrive::Enter(BasePlayer * pPerson)
 	// 必殺始動エフェクト
 	pPerson->AddEffectAction(pPerson->GetCenterPos(),EFFECT_TYPE::OVER_DRIVE_ACTION);
 
+	// ★必殺はフォローまで無敵
+	pPerson->SetInvincible(114514, 1);
 }
 
 void BasePlayerState::HeavehoDrive::Execute(BasePlayer * pPerson)
@@ -5210,11 +5243,18 @@ void BasePlayerState::HeavehoDrive::Execute(BasePlayer * pPerson)
 	{
 		// 待機ステートに(さすがにキャンセルはやめておこう)
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		return;
 	}
+
+	// フォローになったら無敵解除
+	if (pPerson->GetActionFrame() == FRAME_STATE::FOLLOW) pPerson->InvincibleOff();
 }
 
 void BasePlayerState::HeavehoDrive::Exit(BasePlayer * pPerson)
 {
+	// 一応無敵を解除する
+    pPerson->InvincibleOff();
+
 	// ヒーホーの終わり
 	pPerson->HeavehoDriveExit();
 
@@ -5344,7 +5384,7 @@ void BasePlayerState::HeavehoDriveOverFlow_Success::Enter(BasePlayer * pPerson)
 
 	// カメラにエフェクトカメラの発動をお願いする
 	EFFECT_CAMERA_INFO EffectCameraInfo;
-	EffectCameraInfo.scriptID = (int)EFFECT_CAMERA_ID::AIROU_OVERFLOW;	// 仮
+	EffectCameraInfo.scriptID = (int)pPerson->GetOverFlowCameraID();
 	MsgMgr->Dispatch(0, pPerson->GetID(), ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::EFFECT_CAMERA, &EffectCameraInfo);
 
 	// オブジェクト変更

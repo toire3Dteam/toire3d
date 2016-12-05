@@ -292,9 +292,6 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 	// 根性値発動用の更新
 	WillPowerUpdate();
 
-	// オーバードライブ使用不可マークの更新
-	//NotOverDriveMarkUpdate();
-
 	// 1more覚醒していたらスタンドの動きを止める
 	if (GetFSM()->isInState(*BasePlayerState::OverDrive_OneMore::GetInstance()) == false)
 	{
@@ -786,11 +783,6 @@ void BasePlayer::ColorUpdate()
 
 }
 
-// オーバードライブ使用不可マークの更新
-//void BasePlayer::NotOverDriveMarkUpdate()
-//{
-//}
-
 void BasePlayer::Control()
 {
 	// 0フレーム目にコマンドフラグを入れるので、それの前にコマンドビットリストを上に押し上げる
@@ -1004,9 +996,6 @@ void BasePlayer::Render()
 	m_pPanelEffectMGR->Render();	
 	Vector2 vScreenPos = Math::WorldToScreen(m_vPos);// (TODO)頭のポジションの座標を使う
 	m_pThrowMark->Render((int)vScreenPos.x - 56, (int)vScreenPos.y - 324, RS::COPY_NOZ);
-
-
-
 
 #ifdef _DEBUG
 	// ここで現在のステートマシンの状態を確認

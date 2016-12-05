@@ -23,7 +23,7 @@ struct SideData
 	PARTNER partner;
 	int iDeviceID;	// コントローラーデバイスのID
 	bool bAI;		// AIフラグ
-	SideData() :character(CHARACTER::AIROU), partner(PARTNER::MAYA), iDeviceID(0), bAI(false) {}
+	SideData() :character(CHARACTER::NAZENARA), partner(PARTNER::MAYA), iDeviceID(0), bAI(false) {}
 	SideData &operator=(const SideData &data) { character = data.character, partner = data.partner, iDeviceID = data.iDeviceID, bAI = data.bAI; return *this; }
 };
 

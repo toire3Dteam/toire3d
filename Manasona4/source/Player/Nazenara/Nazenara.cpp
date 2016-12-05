@@ -3,8 +3,9 @@
 #include "UI/HeaveHoFinish/HeaveHoFinish.h"
 #include "../../DeferredEx/DeferredEx.h"
 #include "../../BaseEntity/Message/MessageDispatcher.h"
+#include "OverFlow.h"
 
-Nazenara::Nazenara(SIDE side, const SideData &data) :BasePlayer(side, data)
+Nazenara::Nazenara(SIDE side, const SideData &data) :BasePlayer(side, data), m_pOverFlow(nullptr)
 {
 	Reset();
 
@@ -75,6 +76,8 @@ void Nazenara::Reset()
 	// 必ず書く
 	BasePlayer::Reset();
 
+	SAFE_DELETE(m_pOverFlow);
+
 	m_bArm = false;
 
 	m_pHitSquare->width = 1.75f;
@@ -82,6 +85,9 @@ void Nazenara::Reset()
 	m_pHitSquare->pos.Set(.0f, 4.0f, .0f);
 	m_fMaxSpeed = 1.15f;
 	m_iMaxHP = m_iHP = 9000;	// キャラごとのHP
+
+	// エフェクトカメラID
+	m_eHeaveHoOverFlowCameraID = EFFECT_CAMERA_ID::NAZENARA_OVERFLOW;
 }
 
 void Nazenara::InitActionDatas()
@@ -771,6 +777,7 @@ void Nazenara::InitActionDatas()
 Nazenara::~Nazenara()
 {
 	SAFE_DELETE(m_pArm);
+	SAFE_DELETE(m_pOverFlow);
 	FOR((int)SKILL_ACTION_TYPE::MAX) SAFE_DELETE(m_pSkillActions[i])
 }
 
@@ -802,6 +809,9 @@ void Nazenara::RenderDrive()
 {
 	// 基底クラスの更新
 	BasePlayer::RenderDrive();
+
+	// 一撃必殺描画
+	if (m_pOverFlow) m_pOverFlow->Render();
 }
 
 void Nazenara::InitMotionDatas()
@@ -1211,9 +1221,18 @@ void Nazenara::HeavehoDriveOverFlowSuccessInit()
 {
 	// スピードラインON
 	m_pSpeedLine->ActionRoop(Vector3(0, 0, 0), 1, 1, Vector3(0, 0, 0), Vector3(0, 0, 0));
+
+	// オーバーフロー用の委譲クラスを生成
+	m_pOverFlow = new OverFlow(this);
 }
 void Nazenara::HeavehoDriveOverFlowSuccessUpdate()
 {
+	// 一撃必殺更新
+	if (m_pOverFlow)
+	{
+		m_pOverFlow->Update();
+	}
+
 	/* 必殺ヒットして演出中 */
 	// ボーン追従
 	{

@@ -295,6 +295,7 @@
     <ClInclude Include="source\pie_graph\pie_graph.h" />
     <ClInclude Include="source\Player\BasePlayerState.h" />
     <ClInclude Include="source\Player\Nazenara\Nazenara.h" />
+    <ClInclude Include="source\Player\Nazenara\OverFlow.h" />
     <ClInclude Include="source\Player\PlayerManager.h" />
     <ClInclude Include="source\Player\Teki\Teki.h" />
     <ClInclude Include="source\PointLight\PointLight.h" />

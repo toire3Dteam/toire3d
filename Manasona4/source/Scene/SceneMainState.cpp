@@ -242,6 +242,9 @@ bool SceneMainState::Round::OnMessage(sceneMain *pMain, const Message & msg)
 
 void SceneMainState::Main::Enter(sceneMain *pMain)
 {
+	// フェード初期化
+	if (Fade::m_alpha >= 128) Fade::Set(Fade::FLAG::FADE_IN, 8, 0x00000000);
+
 	// タイマー始動
 	GameUIMgr->TimerStart();
 }
@@ -354,7 +357,7 @@ bool SceneMainState::Main::OnMessage(sceneMain *pMain, const Message & msg)
 		pMain->GetFSM()->ChangeState(HeaveHoDriveOverFlowSuccess::GetInstance());
 		
 		// 最低HP保存
-		GameUIMgr->GetHpGage((SIDE)msg.Sender)->JudeRemainingHP();
+		GameUIMgr->GetHpGage((SIDE)((int)msg.Sender - (int)ENTITY_ID::ID_PLAYER_FIRST))->JudeRemainingHP();
 
 		// シームレススレッド発動
 		ResultData data;// リザルトに必要なデータをここで詰める

@@ -244,7 +244,7 @@ void sceneResult::Update()
 		se->Play("リザルト1");
 
 		// ストリーミング初期化
-		m_pStream = bgm->PlayStream("DATA/Sound/BGM/Result/Period.ogg");
+		m_pStream = bgm->PlayStream("DATA/Sound/BGM/System/Result.ogg");
 		m_pStream->SetVolume(0.4f);
 
 		m_bFirstUpdate = false;

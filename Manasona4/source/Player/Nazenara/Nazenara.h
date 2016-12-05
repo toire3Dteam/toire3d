@@ -2,6 +2,8 @@
 #include "../AI\AI.h"
 #include "../BasePlayer.h"
 
+// 前方宣言
+class OverFlow;
 
 class Nazenara : public BasePlayer
 {
@@ -151,5 +153,8 @@ private:
 	// 下固有の腕単体
 	iex3DObj *m_pArm;
 	bool m_bArm;	// うでフラグ(trueなら更新して描画する)
+
+	// 一撃必殺
+	OverFlow *m_pOverFlow;
 };
 

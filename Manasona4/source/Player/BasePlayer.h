@@ -16,6 +16,9 @@
 // UI
 #include "../UI/ComboUI.h"
 
+// カメラ
+#include "../Camera/camera.h"
+
 
 // 前方宣言
 class AI;
@@ -372,7 +375,6 @@ public:
 	void InvincibleUpdate();	 // 無敵の制御
 	void OverDriveUpdate();		// 覚醒の制御
 	void ColorUpdate(); // 光色の制御
-	//void NotOverDriveMarkUpdate();	// オーバードライブ使用不可マークの更新
 
 	//------------------------------------------------------
 	//	コントロール制御
@@ -809,6 +811,10 @@ public:
 	bool isGameTimerStopFlag() { return m_bGameTimerStopFlag; }
 	void SetGameTimerStopFlag(bool flag) { m_bGameTimerStopFlag = flag; }
 
+	// ひーほー
+	EFFECT_CAMERA_ID GetOverFlowCameraID(){ return m_eHeaveHoOverFlowCameraID; }
+
+	iex3DObj *GetDefaultObj(){ return m_pDefaultObj; }
 	iex3DObj *GetObj(){ return m_pObj; }
 
 	// オブジェ切り替え
@@ -1001,6 +1007,7 @@ protected:
 	// ヒーホー用の変数
 	int m_iHeavehoStopTimer;			// ヒーホードライブ発動のザワールドの時間
 	int m_iHeaveHoDriveOverFlowFrame;	// ヒーホーの必殺のSEとかエフェクト用に作る
+	EFFECT_CAMERA_ID m_eHeaveHoOverFlowCameraID;		// 一撃必殺カメラのID
 
 	float m_fOrangeColRate;		// 無敵技のオレンジの光レート
 	float m_fMagentaColRate;	// 中段技のマゼンタの光レート
