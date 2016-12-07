@@ -261,7 +261,6 @@ public:
 
 	// ここにあるエリアは地上ヒットと空中ヒットとか関係なく共通の情報
 	CollisionShape::Square *pCollisionShape;	// ★あたり判定形状(四角にする)
-	int HitScore;				// 加算されるスコア
 	int damage;					// 与えるダメージ
 	bool bHit;					// 当たったかどうか(★多段ヒット防止用)多段ヒットしてほしい攻撃だと、また考える必要がある
 	bool bHitSuccess;			// 攻撃がガードされずに当たったかどうか
@@ -292,7 +291,7 @@ public:
 		int HitRecoveryFrame;		// 攻撃がヒットした際に「相手に与える」硬直の時間
 		DAMAGE_MOTION DamageMotion;	// 喰らった時のモーション
 	}places[(int)HIT_PLACE::MAX];
-	AttackData() :fComboRate(1), attribute(ATTACK_ATTRIBUTE::STRIKE), HitSE(nullptr), WhiffSE(nullptr), bHit(false), bHitSuccess(false), HitScore(0), damage(0), WhiffDelayFrame(0), pierceLV(0), bAntiAir(false), bFinish(true), AntiGuard(ANTIGUARD_ATTACK::NONE), pCollisionShape(new CollisionShape::Square),fGuardKnockBackPower(0){}
+	AttackData() :fComboRate(1), attribute(ATTACK_ATTRIBUTE::STRIKE), HitSE(nullptr), WhiffSE(nullptr), bHit(false), bHitSuccess(false), damage(0), WhiffDelayFrame(0), pierceLV(0), bAntiAir(false), bFinish(true), AntiGuard(ANTIGUARD_ATTACK::NONE), pCollisionShape(new CollisionShape::Square),fGuardKnockBackPower(0){}
 	~AttackData(){ SAFE_DELETE(pCollisionShape); }
 };
 
@@ -1031,7 +1030,8 @@ protected:
 	// 初期ロードは重くなるがゲーム中おもくなるよりマシ。
 
 	// 継承してるやつに強制的に呼ばせる
-	void LoadAttackFrameList(char *filename);
+	void LoadAttackFrameList(LPSTR filename);
+	void LoadAttackDatas(LPSTR filename);
 
 	// UI
 	//ComboUI* m_pComboUI;

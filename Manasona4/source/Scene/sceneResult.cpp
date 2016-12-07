@@ -89,7 +89,7 @@ bool sceneResult::Initialize()
 		m_ResultPerformance = new AirouResultPerformance();
 		break;
 	case CHARACTER::NAZENARA:
-		m_WinPlayer = new iex3DObj("DATA/CHR/Airou/result.IEM");
+		m_WinPlayer = new iex3DObj("DATA/CHR/Nazenara/result.IEM");
 		m_ResultPerformance = new AirouResultPerformance();
 		break;
 

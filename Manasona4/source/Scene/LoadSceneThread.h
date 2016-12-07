@@ -1,8 +1,5 @@
 #pragma once
 
-// C++11で追加されたスレッドライブラリ
-#include<thread>
-
 class LoadSceneThreadManager
 {
 public:

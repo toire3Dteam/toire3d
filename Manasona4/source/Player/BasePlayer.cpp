@@ -32,7 +32,7 @@ const float BasePlayer::c_GUARD_DISTANCE = 32.0f;
 const int BasePlayer::c_FIRST_HIT_ADD_DAMAGE = 300;	// 初段ヒット加算ダメージ
 
 // アクションフレーム情報読み込み
-void BasePlayer::LoadAttackFrameList(char *filename)
+void BasePlayer::LoadAttackFrameList(LPSTR filename)
 {
 	std::ifstream ifs(filename);
 	MyAssert(ifs, "アタックフレームのテキスト入ってない");
@@ -58,6 +58,73 @@ void BasePlayer::LoadAttackFrameList(char *filename)
 		}
 		// 終端
 		m_ActionFrameList[i][count] = FRAME_STATE::END;
+	}
+}
+
+void BasePlayer::LoadAttackDatas(LPSTR filename)
+{
+	std::ifstream ifs(filename);
+	MyAssert(ifs, "攻撃データのテキスト入ってない");
+
+	static const std::map<LPSTR, BASE_ACTION_STATE> IDList
+	{
+		{ "[[通常攻撃1段目]]",				BASE_ACTION_STATE::RUSH1 },
+		{ "[[通常攻撃2段目]]",				BASE_ACTION_STATE::RUSH2 },
+		{ "[[通常攻撃3段目]]",				BASE_ACTION_STATE::RUSH3 },
+		{ "[[対空攻撃]]",					BASE_ACTION_STATE::ANTI_AIR },
+		{ "[[中断攻撃]]",					BASE_ACTION_STATE::DOKKOI_ATTACK },
+		{ "[[しゃがみ下段攻撃]]",			BASE_ACTION_STATE::SQUAT_ATTACK },
+		{ "[[あしばらい攻撃]]",				BASE_ACTION_STATE::DOWN_ATTACK },
+		{ "[[空中攻撃]]",					BASE_ACTION_STATE::AERIAL },
+		{ "[[空中下攻撃]]",					BASE_ACTION_STATE::AERIALDROP },
+		{ "[[逆切れ攻撃]]",					BASE_ACTION_STATE::INVINCIBLE_ATTACK },
+		{ "[[キャラ固有地上ニュートラル]]", BASE_ACTION_STATE::SKILL },
+		{ "[[キャラ固有地上しゃがみ]]",		BASE_ACTION_STATE::SKILL_SQUAT },
+		{ "[[キャラ固有空中ニュートラル]]", BASE_ACTION_STATE::SKILL_AERIAL },
+		{ "[[キャラ固有空中下]]",			BASE_ACTION_STATE::SKILL_AERIALDROP },
+		{ "[[掴み]]",						BASE_ACTION_STATE::THROW },
+		{ "[[投げ成功]]",					BASE_ACTION_STATE::THROW_SUCCESS },
+		{ "[[必殺技]]",						BASE_ACTION_STATE::HEAVEHO_DRIVE },
+		{ "[[超必殺技]]",					BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW }
+	};
+
+	while (!ifs.eof())
+	{
+		// 読み飛ばし用変数
+		char skip[128];
+
+		// ID読み込み
+		{
+			char ID[64];
+			ifs >> ID;	// 読み飛ばし用だけど再利用
+
+			// エラーチェック
+			MyAssert(ID[0] == '[', "攻撃データのテキストがずれてる");
+			MyAssert(IDList.count(ID) != 0, "攻撃データのIDが間違えている可能性\n%s", ID);
+		}
+
+		// ここにあるエリアは地上ヒットと空中ヒットとか関係なく共通の情報
+		//int HitScore;				// 加算されるスコア
+		//int damage;					// 与えるダメージ
+		//bool bHit;					// 当たったかどうか(★多段ヒット防止用)多段ヒットしてほしい攻撃だと、また考える必要がある
+		//bool bHitSuccess;			// 攻撃がガードされずに当たったかどうか
+		//int WhiffDelayFrame;		// 何フレーム後に空振りのSEを再生するか(WhiffSEを使わない(nullptr)なら別に設定しなくてもいい)
+		//EFFECT_TYPE HitEffectType;	// エフェクトのタイプ
+		//LPCSTR HitSE;				// 当たったときに鳴らすSE
+		//LPCSTR WhiffSE;				// 空振りSE
+		//EFFECT_TYPE WhiffEffectType;	// 振りエフェクト
+		//int pierceLV;				// 貫通レベル
+		//bool bAntiAir;				// 対空攻撃かどうか　(追加)
+		//bool bFinish;				// フィニッシュになる攻撃かどうか
+		//ANTIGUARD_ATTACK AntiGuard;	// ガードを突き破る攻撃のタイプ
+		//ATTACK_ATTRIBUTE attribute;	// 攻撃の属性(弾、投げ、打撃)
+		//SHAKE_CAMERA_INFO ShakeCameraInfo;	// カメラ振動用構造体
+		//int GuardRecoveryFrame;		// ガードされたときに「ガードしている相手に与える」硬直時間
+		//float fGuardKnockBackPower;	// ガードさせたときのけぞり力
+		//float fComboRate;			// コンボ補正(0.8なら次の攻撃に0.8倍の補正がかかる、補正は掛け合わされる)
+		//
+		//
+		//CollisionShape::Square *pCollisionShape;	// ★あたり判定形状(四角にする)
 	}
 }
 

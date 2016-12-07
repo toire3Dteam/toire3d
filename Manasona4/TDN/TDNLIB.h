@@ -35,7 +35,8 @@
 #include	<tchar.h>		// 
 #include	<mbstring.h>
 #include	<chrono>		// 時間計測などを扱うためのヘッダー
-
+#include	<memory>		// スマートポインタを扱うためのヘッダー
+#include	<thread>		// C++11にて追加されたstd::threadを扱うためのヘッダー
 
 #include "system\ItDebug.h" // 自動メモリリーク建築
 

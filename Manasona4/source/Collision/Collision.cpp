@@ -252,7 +252,6 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 				// フィニッシュアーツかどうか
 				bool bOverDrive(my->GetActionState() == BASE_ACTION_STATE::HEAVEHO_DRIVE);
 
-				int hitScore(pAttackData->HitScore);
 				//if (you->isGuard()) // 相手がガード中なら
 				//{
 				//	hitScore = (int)(hitScore * 0.25f);// スコア半減

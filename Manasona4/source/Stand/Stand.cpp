@@ -214,7 +214,6 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 	//	地上ニュートラル
 	// 地上ヒットも空中ヒットも共通の情報
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND] = new AttackData;
-	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->HitScore = 360;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->damage = 360;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pierceLV = 0;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->HitSE = "ヒット6";
@@ -248,7 +247,6 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 	//	しゃがみ
 	// 地上ヒットも空中ヒットも共通の情報
 	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT] = new AttackData;
-	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->HitScore = 360;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->damage = 360;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->pierceLV = 0;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->HitSE = "ヒット6";
@@ -282,7 +280,6 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 	//	空中ニュートラル
 	// 地上ヒットも空中ヒットも共通の情報
 	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL] = new AttackData;
-	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->HitScore = 360;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->damage = 360;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->pierceLV = 0;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->HitSE = "ヒット6";
@@ -316,7 +313,6 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 	//	空中下
 	// 地上ヒットも空中ヒットも共通の情報
 	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP] = new AttackData;
-	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->HitScore = 360;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->damage = 360;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->pierceLV = 0;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->HitSE = "ヒット6";
@@ -405,7 +401,6 @@ Stand::Maya::Maya(BasePlayer *pPlayer) :Base(pPlayer)
 	//	地上ニュートラル
 	// 地上ヒットも空中ヒットも共通の情報
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND] = new AttackData;
-	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->HitScore = 800;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->damage = 800;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pierceLV = 0;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->HitSE = "ヒット6";
@@ -440,7 +435,6 @@ Stand::Maya::Maya(BasePlayer *pPlayer) :Base(pPlayer)
 	//	しゃがみ
 	// 地上ヒットも空中ヒットも共通の情報
 	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT] = new AttackData;
-	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->HitScore = 800;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->damage = 800;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->pierceLV = 0;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->HitSE = "ヒット6";
@@ -475,7 +469,6 @@ Stand::Maya::Maya(BasePlayer *pPlayer) :Base(pPlayer)
 	//	空中ニュートラル
 	// 地上ヒットも空中ヒットも共通の情報
 	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL] = new AttackData;
-	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->HitScore = 800;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->damage = 800;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->pierceLV = 0;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIAL]->HitSE = "ヒット6";
@@ -510,7 +503,6 @@ Stand::Maya::Maya(BasePlayer *pPlayer) :Base(pPlayer)
 	//	空中下
 	// 地上ヒットも空中ヒットも共通の情報
 	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP] = new AttackData;
-	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->HitScore = 800;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->damage = 800;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->pierceLV = 0;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->HitSE = "ヒット6";

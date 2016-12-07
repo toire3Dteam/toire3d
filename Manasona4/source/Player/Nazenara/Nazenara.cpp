@@ -33,7 +33,7 @@ Nazenara::Nazenara(SIDE side, const SideData &data) :BasePlayer(side, data), m_p
 
 	m_pArm = new iex3DObj("DATA/CHR/Nazenara/nazenaraba_hand.IEM");
 
-	m_pHHDOFObj = new iex3DObj("DATA/CHR/Airou/airou_hissatsu.IEM");	// 必殺用のメッシュ初期化
+	m_pHHDOFObj = new iex3DObj("DATA/CHR/Nazenara/naze_hissatsu.IEM");	// 必殺用のメッシュ初期化
 	m_pHHDOFObj->SetAngle(PI);
 	m_pHHDOFObj->Update();
 
@@ -54,6 +54,7 @@ Nazenara::Nazenara(SIDE side, const SideData &data) :BasePlayer(side, data), m_p
 	{
 		m_pObj->SetTexture(tdnTexture::Load("DATA/CHR/Nazenara/tex_nazenaraba4.png"), 0);
 		m_pArm->SetTexture(tdnTexture::Load("DATA/CHR/Nazenara/tex_nazenaraba4.png"), 0);
+		m_pHHDOFObj->SetTexture(tdnTexture::Load("DATA/CHR/Nazenara/tex_nazenaraba4.png"), 0);
 	}
 	else
 	{
@@ -95,7 +96,6 @@ void Nazenara::InitActionDatas()
 	//	バースト　（吹っ飛ばすために攻撃系アクションデータに）
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->HitScore = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->damage = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->HitSE = "ヒット6";
@@ -128,7 +128,6 @@ void Nazenara::InitActionDatas()
 	//	通常1段
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->HitScore = 240;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->damage = 240;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->HitSE = "ヒット4";
@@ -162,7 +161,6 @@ void Nazenara::InitActionDatas()
 	//	通常2段
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->HitScore = 360;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->damage = 360;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->HitSE = "ヒット5";
@@ -196,7 +194,6 @@ void Nazenara::InitActionDatas()
 	//	通常3段目
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH3].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH3].pAttackData->HitScore = 500;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH3].pAttackData->damage = 500;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH3].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH3].pAttackData->HitSE = "ヒット6";
@@ -232,7 +229,6 @@ void Nazenara::InitActionDatas()
 	//	対空攻撃
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->HitScore = 300;
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->damage = 300;
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->HitSE = "ヒット6";
@@ -266,7 +262,6 @@ void Nazenara::InitActionDatas()
 	//	中断攻撃(どっこいアタック)
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->HitScore = 700;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->damage = 700;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->HitSE = "ヒット4";
@@ -301,7 +296,6 @@ void Nazenara::InitActionDatas()
 	//	しゃがみ下段攻撃
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->HitScore = 300;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->damage = 300;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->HitSE = "ヒット4";
@@ -337,7 +331,6 @@ void Nazenara::InitActionDatas()
 	//	足払い攻撃
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].pAttackData->HitScore = 300;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].pAttackData->damage = 300;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].pAttackData->HitSE = "ヒット4";
@@ -372,7 +365,6 @@ void Nazenara::InitActionDatas()
 	//	空中攻撃
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->HitScore = 300;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->damage = 300;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->HitSE = "ヒット5";
@@ -406,7 +398,6 @@ void Nazenara::InitActionDatas()
 	//	空中下攻撃
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->HitScore = 360;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->damage = 360;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIALDROP].pAttackData->HitSE = "ヒット5";
@@ -439,7 +430,6 @@ void Nazenara::InitActionDatas()
 	//	逆切れ攻撃
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->HitScore = 114;
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->damage = 514;
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->HitSE = "フィニッシュ小";
@@ -472,7 +462,6 @@ void Nazenara::InitActionDatas()
 	//	キャラクター固有スキル
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->HitScore = 400;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->damage = 400;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->HitSE = "ヒット5";
@@ -506,7 +495,6 @@ void Nazenara::InitActionDatas()
 	//	キャラクター固有下攻撃
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->HitScore = 900;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->damage = 900;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->HitSE = "ヒット6";
@@ -542,7 +530,6 @@ void Nazenara::InitActionDatas()
 	//	キャラクター固有空中攻撃
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->HitScore = 400;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->damage = 400;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->HitSE = "ヒット5";
@@ -560,8 +547,8 @@ void Nazenara::InitActionDatas()
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(-2.1f, 1.5f);
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(-2.1f, 2.5f);
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(-.9f, 1.7f);
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(-.9f, 1.7f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame = 12;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].hitStopFlame = 14;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 80;
@@ -579,7 +566,6 @@ void Nazenara::InitActionDatas()
 	//	キャラクター固有空中下攻撃
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->HitScore = 700;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->damage = 700;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->HitSE = "ヒット4";
@@ -598,7 +584,7 @@ void Nazenara::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(1.0f, .0f);
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(1.5f, -2.5f);
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(2.0f, -2.5f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame = 6;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].hitStopFlame = 12;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIALDROP].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 65;
@@ -614,7 +600,6 @@ void Nazenara::InitActionDatas()
 	//	掴み
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::THROW].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::THROW].pAttackData->HitScore = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::THROW].pAttackData->damage = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::THROW].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::THROW].pAttackData->HitSE = "掴み成功";
@@ -642,7 +627,6 @@ void Nazenara::InitActionDatas()
 	//	投げ成功
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::THROW_SUCCESS].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::THROW_SUCCESS].pAttackData->HitScore = 1200;
 	m_ActionDatas[(int)BASE_ACTION_STATE::THROW_SUCCESS].pAttackData->damage = 1200;
 	m_ActionDatas[(int)BASE_ACTION_STATE::THROW_SUCCESS].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::THROW_SUCCESS].pAttackData->HitSE = "ヒット3";
@@ -677,7 +661,6 @@ void Nazenara::InitActionDatas()
 	//	ヒーホードライブ
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->HitScore = 2000;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->damage = 2000;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->HitSE = "フィニッシュ大";
@@ -711,7 +694,6 @@ void Nazenara::InitActionDatas()
 	//	ヒーホードライブ_オーバーフロー
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->HitScore = 114;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->damage = 514;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->HitSE = "フィニッシュ大";
@@ -736,9 +718,9 @@ void Nazenara::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_BACK;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_BACK;
 	// 判定形状
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->pCollisionShape->width = 12;
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->pCollisionShape->height = 12;
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->pCollisionShape->pos.Set(0, 0, 0);
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->pCollisionShape->width = 16;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->pCollisionShape->height = 16;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->pCollisionShape->pos.Set(0, 8, 0);
 
 	//==============================================================================================================
 	//	全共通
@@ -1229,6 +1211,10 @@ void Nazenara::HeavehoDriveOverFlowExit()
 void Nazenara::HeavehoDriveOverFlowUpdate()
 {
 	/* 実質、必殺がヒットするまでの間 */
+
+	// こっちみんな
+	m_fAngleY = PI;
+
 	// ヒーホーストップ時間計測
 	if (m_iHeavehoStopTimer > 0) if (--m_iHeavehoStopTimer == 0)	SetGameTimerStopFlag(false);
 }
@@ -1254,7 +1240,7 @@ void Nazenara::HeavehoDriveOverFlowSuccessUpdate()
 		// ローカルマトリックスにモデルのトランスマトリックスを掛けて
 		// ローカルからワールド座標へ返還する
 		// マトリックスに代入したらアングルとか行けそう
-		D3DXMATRIX WorldMat = *m_pObj->GetBone(19) * m_pObj->TransMatrix;
+		D3DXMATRIX WorldMat = *m_pObj->GetBone(0) * m_pObj->TransMatrix;
 
 		// マトリックスから位置の部分のみをベクトルとして設定する
 		m_pTargetPlayer->SetPos(Vector3(WorldMat._41, WorldMat._42, WorldMat._43));
@@ -1283,9 +1269,67 @@ void Nazenara::HeavehoDriveOverFlowSuccessUpdate()
 	// コンボ
 	//COMBO_DESK comboDesk;
 
-	//switch (m_iHeaveHoDriveOverFlowFrame++)
-	//{
-	//}
+	switch (m_iHeaveHoDriveOverFlowFrame++)
+	{
+	case 30:	// 相手のモーションを変える(足払いくらい)
+		m_pTargetPlayer->SetMotion(MOTION_TYPE::KNOCKDOWN_DOWN);
+		break;
+	case 300:	// ∵がだんだん出てくる
+	{
+					Vector3 vPositions[]
+					{
+						{ 50, 1, 50 },
+						{ 0, 1, 40 }
+					};
+					m_pOverFlow->Set(vPositions, _countof(vPositions));
+	}
+		break;
+	case 360:	// ∵がだんだん出てくる
+	{
+					Vector3 vPositions[]
+					{
+						{ 50, 1, 0 },
+						{ -20, 1, -30 }
+					};
+					m_pOverFlow->Set(vPositions, _countof(vPositions));
+	}
+		break;
+	case 420:	// ∵がだんだん出てくる
+	{
+					Vector3 vPositions[]
+					{
+						{ -20, 1, 40 },
+						{ 40, 1, -20 }
+					};
+					m_pOverFlow->Set(vPositions, _countof(vPositions));
+	}
+		break;
+	case 520:	// 固定カメラ1
+	{
+					Vector3 vPositions[]
+					{
+						{ -36, 1, -5 },
+						{ -36, 1, 4 },
+						{ -30, 1, 21 },
+						{ -24, 1, 30 }
+					};
+					m_pOverFlow->Set(vPositions, _countof(vPositions));
+	}
+		break;
+
+	case 635:	// 固定カメラ2
+	{
+					Vector3 vPositions[]
+					{
+						{ -40, 1, -40 },
+						{ -20, 1, -40 },
+						{ 40, 1, -40 },
+						{ 50, 1, -40 }
+					};
+					m_pOverFlow->Set(vPositions, _countof(vPositions));
+	}
+		break;
+	}
 
 }
 

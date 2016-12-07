@@ -53,30 +53,20 @@ bool sceneMain::Initialize()
 	{
 		m_iRoundNum = 0;
 	}
-	
-
-	//com = new Combo();
 
 	m_dirLight = Vector3(1, -1, 1);
 
-	//g_eff = new HitEffect();
-
 #ifdef _DEBUG
-	sprintf_s(m_LoadComment, 256, "パネルエフェクト初期化");
+	sprintf_s(m_LoadComment, 256, "パネルエフェクト初期化待ち");
 #endif
 	m_panel = new PanelEffectManager();
-	m_fLoadPercentage = .05f;	// ロード割合
+
 
 #ifdef _DEBUG
 	sprintf_s(m_LoadComment, 256, "UVエフェクト初期化");
 #endif
 	g_uvEffect = new UVEffectManager();
-	m_fLoadPercentage = .1f;	// ロード割合
 
-	// カメラ初期化
-	//CameraMgr = new Camera();
-
-	m_fLoadPercentage = .25f;	// ロード割合
 
 #ifdef _DEBUG
 	sprintf_s(m_LoadComment, 256, "ステージ初期化");
@@ -86,25 +76,24 @@ bool sceneMain::Initialize()
 	Stage::Base::CreateStage(&m_pStage, SelectDataMgr->Get()->stage, CameraMgr);	// 関数の中で作ってもらう
 	Collision::SetStage(m_pStage);
 
-	m_fLoadPercentage = .3f;	// ロード割合
-
+	//std::unique_ptr<std::thread> PlayerLoadThread(new std::thread([&](){
 #ifdef _DEBUG
 	sprintf_s(m_LoadComment, 256, "プレイヤー初期化");
 #endif
-
-	// プレイヤー初期化
-	//m_pPlayerMgr = new PlayerManager(4, m_pStage);
 	PlayerMgr->Initialize(2, m_pStage, SelectDataMgr->Get()->tagSideDatas);
-
-	m_fLoadPercentage = .5f;	// ロード割合
 
 	// プレイヤーの座標のアドレスをカメラに渡してあげる(いじることは絶対に無く、ただ参照するだけ)
 	CameraMgr->SetPlayersPos();
 
-	// パーティクル初期化
-	//ParticleManager::Initialize("DATA/Effect/particle.png", 2048);
+#ifdef _DEBUG
+	sprintf_s(m_LoadComment, 256, "ゲームUI初期化");
+#endif
+	BasePlayer* p1 = PlayerMgr->GetPlayer_TeamInSearch(SIDE::LEFT);
+	BasePlayer* p2 = PlayerMgr->GetPlayer_TeamInSearch(SIDE::RIGHT);
+	GameUIMgr;
+	GameUIMgr->InitData(p1, p2, m_iRoundNum);
+	//}));
 
-	m_fLoadPercentage = .55f;	// ロード割合
 
 #ifdef _DEBUG
 	sprintf_s(m_LoadComment, 256, "ディファード初期化");
@@ -124,20 +113,6 @@ bool sceneMain::Initialize()
 
 	NumberEffect;
 
-	m_fLoadPercentage = .65f;	// ロード割合
-
-#ifdef _DEBUG
-	sprintf_s(m_LoadComment, 256, "ゲームUI初期化");
-#endif
-
-	BasePlayer* p1 = PlayerMgr->GetPlayer_TeamInSearch(SIDE::LEFT);
-	BasePlayer* p2 = PlayerMgr->GetPlayer_TeamInSearch(SIDE::RIGHT);
-	GameUIMgr;
-	GameUIMgr->InitData(p1, p2, m_iRoundNum);
-	//GameUIMgr->Action();
-
-	m_fLoadPercentage = .7f;	// ロード割合
-
 	m_stageScreen = new tdn2DObj(tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom, TDN2D::HDR);
 
 #ifdef _DEBUG
@@ -145,9 +120,6 @@ bool sceneMain::Initialize()
 #endif
 
 	m_pShotMgr = new ShotManager;
-
-	//TimeMgr->Init();
-	//TimeMgr->Reset(60);
 
 	m_fLoadPercentage = .8f;	// ロード割合
 
@@ -167,15 +139,13 @@ bool sceneMain::Initialize()
 	/* ステートマシン初期化 */
 	m_pStateMachine = new StateMachine<sceneMain>(this);
 
-
-
 	//（TODO）チュートリアル・トレーニングだったら分岐
 	m_bTutorialFlag = SelectDataMgr->Get()->bTutorial;
 	m_eSelectTutorial = (TUTORIAL_TYPE)0;// (TODO)選んだチュートリアルを設定してあげる 					 
 
 
 	if (m_bTutorialFlag == true)
-	{	
+	{
 		// UIを最初の一回だけ起動
 		GameUIMgr->Action();
 		// チュートリアル用の対戦
@@ -217,10 +187,11 @@ bool sceneMain::Initialize()
 
 	// ステージ影焼き込み
 	m_bBakeStageShadow = true;
-	
-	// オレ曲初期化
-	//m_pMyMusicMgr = new MyMusicManager(MY_MUSIC_ID::SENJO);
-	//m_pMyMusicMgr->Play();
+
+	// プレイヤーの読み込みが終わるまで待機
+	//PlayerLoadThread->join();
+
+	// BGM流す
 	bgm->PlayStreamIn((LPSTR)BattleMusicMgr->GetMusicFilePath(SelectDataMgr->Get()->iBattleMusicID).c_str());
 
 	return true;
