@@ -360,7 +360,7 @@ struct PS_G_BUFFER
 
 
 //*****************************************
-//		G_Buffer
+//		G_Buffer [1206] 最適化ずみ
 //*****************************************
 
 VS_DEFERRED VS_G_Buffer(VS_INPUT In)
@@ -370,7 +370,6 @@ VS_DEFERRED VS_G_Buffer(VS_INPUT In)
 	Out.Pos = mul(In.Pos, WVPMatrix);
 	Out.Tex = In.Tex;
 	Out.Color = In.Color;
-	Out.Color.a = 1.0f;
 
 	// スクリーン座標での深度値保存
 	Out.Depth = Out.Pos;
@@ -428,6 +427,8 @@ PS_G_BUFFER PS_G_Buffer(VS_DEFERRED In)
 
 
 	{
+		// [1206] 接空間は頂点で正規化してるのでPixel側では正規化しない
+		
 		// 	接空間からビュー空間へ持っていくビュー回転行列を作成
 		// ↓★これは（接→Viewの[変換行列]）
 		float3x3 ts;								//法線から求めた軸
@@ -781,12 +782,14 @@ PS_LIGHT PS_DirLightShadow(float2 Tex:TEXCOORD0)
 		
 		ShadowValue = 1; // 何も起こらなければ1で普通に描画
 
-		if (depth.r < fragDepth - 0.001f)
+		//if (depth.r < fragDepth - 0.001f)
 		{
 			const float variance = depth.g - depth.r * depth.r;
 			ShadowValue = variance / (variance + (fragDepth - depth.r) * (fragDepth - depth.r));
 		}
 
+		//ShadowValue = tex2D(ShadowSamp, ShadowTex.xy).r;
+		
 		OUT.color.rgb *= ShadowValue;
 		OUT.spec.rgb *= ShadowValue;
 	}
@@ -853,6 +856,125 @@ technique HemiLight
 	}
 }
 
+
+
+/***********************************/
+//	平行光(影)+環境光
+PS_LIGHT PS_AllLight(float2 Tex:TEXCOORD0)
+{
+	PS_LIGHT OUT;
+
+	// 必要な情報を取得
+	const float4 NormalDepth = tex2D(NormalDepthSamp, Tex);
+	const float3 Normal = CalcNormal(NormalDepth.xy*2.0f - 1.0f);
+	const float3 Pos = CalcViewPosition(Tex, NormalDepth.zw);
+	const float2 RoughnessLightMap = tex2D(RoughnessLightMapSamp, Tex).rg;
+
+	// ライト率(ハーフランバート)
+	float rate = (dot(Normal, -ViewLightVec));
+	float3 HalfLambert = pow((rate + 1.0f)*0.5f, 2);	// HalfLambert
+														//float3 Lambert = max(0, rate);				// Lambert
+
+														// ピクセルの色
+	OUT.color.rgb = (HalfLambert * LightColor);
+	OUT.color.a = 1.0f;
+
+	//　スペキュラレート取得
+	float specRate = CalcSpecular(Pos, Normal, ViewLightVec, RoughnessLightMap.g * 255);
+	// スペキュラの色をどれくらい乗せるか
+	OUT.spec.rgb = (specRate*LightColor)*RoughnessLightMap.r;
+	OUT.spec.a = 1.0f;
+
+	float4 ShadowTex;
+	float ShadowValue = 0.0f;
+	float2 depth;		//	バリアンスシャドウマップ
+
+	{
+		// 太陽視点から見たプロジェクション座標のオブジェ
+		ShadowTex = mul(mul(float4(Pos, 1), InvVMatrix), ShadowProjection);
+		ShadowTex.xy = ShadowTex.xy / ShadowTex.w;
+		ShadowTex.y = -ShadowTex.y;
+		ShadowTex.xy = 0.5f * ShadowTex.xy + 0.5f;
+
+		depth.r = tex2D(ShadowSamp, ShadowTex.xy).r;
+		depth.g = depth.r*depth.r;// ヴァリアンスは二乗した値が必要
+	}
+
+	{
+		//ブラー処理
+		float2 otherDepth = float2(0, 0);
+		float temp = 0;
+
+		float2 GaussShadowSamples[] =
+		{
+			{ -(1.0f / 1280.0f), (1.0f / 720.0f) },
+			{ 0, (1.0f / 720.0f) },
+			{ (1.0f / 1280.0f), (1.0f / 720.0f) },
+
+			{ -(1.0f / 1280.0f), 0 },
+			{ (1.0f / 1280.0f), 0 },
+
+			{ -(1.0f / 1280.0f), -(1.0f / 720.0f) },
+			{ 0, -(1.0f / 720.0f) },
+			{ (1.0f / 1280.0f), -(1.0f / 720.0f) },
+		};
+		// ↑のサンプル回数分　Forで回る
+		for (uint i = 0; i < 8; ++i)
+		{
+			temp = tex2D(ShadowSamp, ShadowTex.xy + GaussShadowSamples[i]).r;
+			otherDepth.x += temp;
+			otherDepth.y += temp*temp;
+		}
+		// 普通の影と　もうひとつの影を足したものを入れる
+		depth = depth*0.2f + otherDepth*0.1f;
+	}
+
+	{
+		const float fragDepth = ShadowTex.z / ShadowTex.w; // 太陽からのオブジェの奥行き
+
+		ShadowValue = 1; // 何も起こらなければ1で普通に描画
+
+						 //if (depth.r < fragDepth - 0.001f)
+		{
+			const float variance = depth.g - depth.r * depth.r;
+			ShadowValue = variance / (variance + (fragDepth - depth.r) * (fragDepth - depth.r));
+		}
+
+		//ShadowValue = tex2D(ShadowSamp, ShadowTex.xy).r;
+
+		OUT.color.rgb *= ShadowValue;
+		OUT.spec.rgb *= ShadowValue;
+	}
+
+
+	//半球処理
+	float HemiRate = Normal.y * 0.5f + 0.5f;
+	OUT.color.rgb += SkyColor * HemiRate;
+	OUT.color.rgb += GroundColor * (1.0f - HemiRate);
+
+	//if (tex2D(ShadowSamp, ShadowTex.xy).r < ShadowTex.z - 0.005f)
+	//{
+	//	OUT.color.rgb = 0;
+	//	OUT.spec.rgb = 0;
+	//}
+
+	return OUT;
+
+}
+
+technique AllLight
+{
+	pass P0
+	{
+		AlphaBlendEnable = true;
+		BlendOp = Add;
+		SrcBlend = SrcAlpha;
+		DestBlend = One; // 重ねて描画していく
+		ZEnable = False;
+
+		PixelShader = compile ps_3_0 PS_AllLight();
+	}
+}
 
 
 //**********************************
@@ -1435,11 +1557,11 @@ VS_OUTPUT_FINAL VS_DefaultLighting(VS_INPUT In)
 	//TransMatrixとPosを合成してwPosの情報生成
 	Out.wPos = mul(In.Pos, WMatrix);
 
-	Out.Pos = mul(In.Pos, WVPMatrix);
+	Out.wvpPos = Out.Pos = mul(In.Pos, WVPMatrix);
 	Out.Tex = In.Tex;
 	Out.Color = 1.0f;
 
-	Out.wvpPos = Out.Pos;
+	//Out.wvpPos = Out.Pos;
 
 	return Out;
 }
@@ -1552,6 +1674,20 @@ technique Stage
 }
 
 
+
+//------------------------------------------------------
+//		プレイヤー用のグローバルエリア
+//------------------------------------------------------
+float g_InvincibleColRate = 0.0f;//Flash そのキャラクターダウン後の点滅のレート
+float g_OrangeColRate = 0.0f;//　オレンジの光
+float g_MagentaColRate = 0.0f;//　マゼンタの光
+float g_OverDriveColRate = 0.0f;//
+float g_WillPowerRate = 0.0f;//  根性値
+
+// [1206] 最適化のためレートの送る回数を減らすため仕方なく固めることに
+float3 g_PlayerColDesc;		//	赤->点滅 青->オレンジ 緑->マゼンタ
+float3 g_PlayerColDesc2;	//  赤->オーバードライブ時　青->覚醒 　緑->エッジが赤か青か
+
 /*************************************/
 // アウトラインに必要な変数
 /*************************************/
@@ -1595,9 +1731,11 @@ PS_TONEMAP PS_OutLine(VS_OUTPUT_OUTLINE In)
 
 	float4 col = tex2D(DecaleSamp, In.Tex); //そのキャラクターのエッジ付近の色に
 
-	OUT.color.rgb = col.rgb - float3(0.25,0.5,0.5);// ふちは少し暗く	
+	//OUT.color.rgb = col.rgb - float3(0.25,0.5,0.5);// ふちは少し暗く	
 	// [11/27] 操作しているキャラクターを見失うとの意見が少しあったので淵の色を変える工夫をしてみます。
-	OUT.color.rgb = g_EdgeColor;
+	//OUT.color.rgb = g_EdgeColor;
+	OUT.color.rgb = float3(0.95f, 0.1f, 0.0f)*g_PlayerColDesc2.b;
+	OUT.color.rgb += float3(0.0f, 0.65f, 1.0f)*(1.0f - g_PlayerColDesc2.b);
 	OUT.color.a = 1.0f;
 
 	OUT.high = col - 1;
@@ -1627,14 +1765,7 @@ technique OutLine
 	}
 }
 
-//------------------------------------------------------
-//		プレイヤー用のグローバルエリア
-//------------------------------------------------------
-float g_InvincibleColRate = 0.0f;//Flash そのキャラクターダウン後の点滅のレート
-float g_OrangeColRate = 0.0f;//　オレンジの光
-float g_MagentaColRate = 0.0f;//　マゼンタの光
-float g_OverDriveColRate = 0.0f;//
-float g_WillPowerRate = 0.0f;//  根性値
+
 
 
 //------------------------------------------------------
@@ -1742,13 +1873,13 @@ PS_TONEMAP PS_ToonPlayer(VS_OUTPUT_FINAL In) : COLOR
 
 	// オーバードライブ用
 	//float RimPower2 = pow(1.0f - max(0.0f, dot(-E, Normal)), 1.0f);
-	OUT.high.rgb += float3(0.0, 0.1, 0.4)*g_OverDriveColRate;
-	OUT.high.rgb += float3(0.8, 0.5, 0.0)*g_OrangeColRate;
-	OUT.high.rgb += float3(0.7, 0.0, 0.4)*g_MagentaColRate;
-	OUT.high.rgb += float3(0.25f, 0.0, 0.0)*g_WillPowerRate;
+	OUT.high.rgb += float3(0.8, 0.5, 0.0)*g_PlayerColDesc.g/*g_OrangeColRate*/;
+	OUT.high.rgb += float3(0.7, 0.0, 0.4)*g_PlayerColDesc.b/*g_MagentaColRate*/;
+	OUT.high.rgb += float3(0.0, 0.1, 0.4)*g_PlayerColDesc2.r/*g_OverDriveColRate*/;
+	OUT.high.rgb += float3(0.25f, 0.0, 0.0)*g_PlayerColDesc2.g/*g_WillPowerRate*/;
 
 	//高輝度抽出後にしないとHDRで光ってしまうので最後に
-	OUT.color.rgb += g_InvincibleColRate;
+	OUT.color.rgb += g_PlayerColDesc.r/*g_InvincibleColRate*/;
 
 	return OUT;
 }
@@ -1924,15 +2055,6 @@ PS_TONEMAP PS_Sky(VS_OUTPUT_FINAL In) : COLOR
 
 	//	ピクセル色決定
 	OUT.color = In.Color * tex2D(DecaleSamp, In.Tex);
-
-	//float4 lightCol = tex2D(LightSamp, ScreenTex);
-	//	lightCol += tex2D(PLSSamp, ScreenTex);
-	//OUT.color.rgb *= lightCol;
-	//OUT.color.rgb += tex2D(SpecSamp, ScreenTex);
-	////OUT.color.rgb += tex2D(PLSSamp, ScreenTex);
-
-	//OUT.color.g += 0.5;
-
 
 	// 必殺暗転の値
 	OUT.color.rgb *= g_OverDriveDim;

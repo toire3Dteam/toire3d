@@ -10,6 +10,17 @@ class BasePlayer;
 
 namespace Stage
 {
+	// [1206]
+	// ステージ毎にシェーダに渡すパラメーター
+	struct ShaderParam
+	{
+		Vector3 vDirLightVec;	// 太陽の向き
+		Vector3 vDirLightColor;	// 太陽の光の色
+
+		Vector3 vSkyColor;		// 環境光(空)
+		Vector3 vGroundColor;	// 環境光(地面)
+	};
+
 	// ステージの基底クラス
 	class Base
 	{
@@ -49,12 +60,18 @@ namespace Stage
 		float GetBottom(){ return m_fBottom; }
 		float GetWidth(){ return m_fWidth; }
 
+		// このステージで使用するシェーダの情報
+		ShaderParam GetShaderParam() { return  m_tagShaderParam; };
+
 	protected:
-		iexMesh *m_pObj;			// メッシュの実体
-		iexMesh *m_pBack;			// スカイドームとか、背景で使う
-		BaseUVEffect *m_pAreWall;	// エリアウォール
-		float m_fWidth;				// ステージの幅
-		float m_fBottom;			// Y座標
+		iexMesh *m_pObj;				// メッシュの実体
+		iexMesh *m_pBack;				// スカイドームとか、背景で使う
+		BaseUVEffect *m_pAreWall;		// エリアウォール
+		float m_fWidth;					// ステージの幅
+		float m_fBottom;				// Y座標
+
+		ShaderParam m_tagShaderParam;	// シェーダの情報
+
 	};
 
 

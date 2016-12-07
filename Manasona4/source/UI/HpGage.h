@@ -25,6 +25,8 @@ public:
 	void MaskUpdate();
 	void MaskScreen();
 
+	void NotMaskRender();// マスクを使わない
+
 	void FirstAction(int waitFrame = 0);	// 最初の一回
 
 	void JudeRemainingHP();
@@ -85,7 +87,7 @@ private:
 
 	// 
 	bool m_bFirstActionFlag;
-
+	bool m_bUseMask;			// マスク使用フラグ
 
 	//// SPゲージ
 	//tdn2DObj* m_pSpGage;

@@ -42,18 +42,18 @@ BOOL InitApp(HINSTANCE hInstance, int nCmdShow)									// ƒQ[ƒ€‹N“®Žž‚ÌÅ‰‚Ì
 	tdnInput::Initialize();
 	SoundManager::Initialize();
 	tdnMovieManager::Initialize();
-	ParticleManager::Initialize("DATA/Effect/particle.png", 2048);	// ƒp[ƒeƒBƒNƒ‹‰Šú‰»(š‚È‚º‚±‚±‚É‘‚­‚©‚Æ‚¢‚¤‚ÆAƒV[ƒ€ƒŒƒXƒV[ƒ“‚É‚ÄA‰Šú‰»¨‰Šú‰»¨‰ð•ú‚É‚È‚Á‚Ä‚µ‚Ü‚¤‚½‚ß)
+	ParticleManager::Initialize("DATA/Effect/particle.png", 1024);	// ƒp[ƒeƒBƒNƒ‹‰Šú‰»(š‚È‚º‚±‚±‚É‘‚­‚©‚Æ‚¢‚¤‚ÆAƒV[ƒ€ƒŒƒXƒV[ƒ“‚É‚ÄA‰Šú‰»¨‰Šú‰»¨‰ð•ú‚É‚È‚Á‚Ä‚µ‚Ü‚¤‚½‚ß)
 
 	//IEX‚ÌƒVƒXƒeƒ€ŠÖ”‚ðˆêŽž“IÌ—pA˜b‚µ‡‚¢‚ÅSystem.h‚ð–•Á‚·‚é‚©Œˆ‚ß‚é
 	SYSTEM_Initialize();
 
 	//MainFrameEx = new Framework();			 // ƒƒCƒ“ƒtƒŒ[ƒ€ƒ[ƒN¶¬
-	//MainFrameEx->ChangeScene(new sceneMain, true); // ‰ŠúƒV[ƒ“
+	MainFrameEx->ChangeScene(new sceneMain, false); // ‰ŠúƒV[ƒ“
 	//MainFrameEx->ChangeScene(new sceneRenderingTest); // •`‰æƒeƒXƒgƒV[ƒ“
 	//MainFrameEx->ChangeScene(new sceneResult(SIDE::RIGHT)); // ƒŠƒUƒ‹ƒgƒV[ƒ“
 	//MainFrameEx->ChangeScene(new sceneEffectTool); // 
 	//MainFrameEx->ChangeScene(new sceneTitle);
-	MainFrameEx->ChangeScene(new sceneMenu);
+	//MainFrameEx->ChangeScene(new sceneMenu);
 	//MainFrameEx->ChangeScene(new sceneCollect);
 	//MainFrameEx->ChangeScene(new sceneSelect);
 	

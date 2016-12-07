@@ -44,7 +44,9 @@ public:
 	void DirLight(const Vector3 dir, const Vector3 color);
 	// 半球ライティング
 	void HemiLight(const Vector3 SkyColor, const Vector3 GroundColor);
-
+	// 平行光＋半球ライティング
+	void AllLight(const Vector3 dir, const Vector3 color, const Vector3 SkyColor, const Vector3 GroundColor);
+	
 	//****************************
 	//		FORWARD
 	//****************************

@@ -98,6 +98,7 @@ private:
 
 	Vector3 m_dirLight;// ライト方向ﾆｷ
 	bool m_bShaderFlag;
+	bool m_bBakeStageShadow;		//	ステージの影を焼きこむフラグ
 
 	StateMachine<sceneMain> *m_pStateMachine;	// ステートマシン
 

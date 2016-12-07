@@ -144,8 +144,11 @@ void PlayerManager::Render()
 	// ƒvƒŒƒCƒ„[‚½‚¿•`‰æ
 	FOR(m_NumPlayer)
 	{
-		if(m_bHeaveHoDriveOverFlow)m_pPlayers[i]->RenderDrive();
-		else m_pPlayers[i]->Render();
+		if(m_bHeaveHoDriveOverFlow)
+			m_pPlayers[i]->RenderDrive();
+		else 
+			m_pPlayers[i]->Render();
+
 	}
 }
 

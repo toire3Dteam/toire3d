@@ -98,6 +98,7 @@
       </SDLCheck>
       <AdditionalIncludeDirectories>./TDN/;./SOURCE/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -236,6 +237,7 @@
     <ClCompile Include="TDN\TDN_RenderState.cpp" />
     <ClCompile Include="TDN\TDN_Shader.cpp" />
     <ClCompile Include="TDN\TDN_SkinMesh.cpp" />
+    <ClCompile Include="TDN\TDN_StopWatch.cpp" />
     <ClCompile Include="TDN\TDN_System.cpp" />
     <ClCompile Include="TDN\TDN_Text.cpp" />
     <ClCompile Include="TDN\TDN_Texture.cpp" />

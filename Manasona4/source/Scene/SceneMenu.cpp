@@ -150,7 +150,6 @@ void sceneMenu::Render()
 	tdnView::Activate();
 	tdnView::Clear();
 
-	
 	// ★ここにステートマシン描画(多分2D関係が多いんじゃないかと)
 	m_pStateMachine->Render();
 
@@ -166,6 +165,15 @@ void sceneMenu::Render()
 		m_pTips[i]->Render();
 	}
 	
+
+	// 処理不可実験
+	//std::vector<int> v;
+	//int N = 1000 * 100;
+	//for (int i = 0; i < N; i++)
+	//{
+	//	v.push_back(i);
+	//}
+
 
 	// フェード
 	Fade::Render();

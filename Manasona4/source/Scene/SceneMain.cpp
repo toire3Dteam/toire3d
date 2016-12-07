@@ -29,7 +29,6 @@
 
 
 
-
 //BaseEffect* g_eff;
 //EffectManager;
 PanelEffectManager* m_panel;
@@ -216,6 +215,9 @@ bool sceneMain::Initialize()
 	// ポーズしてるか
 	m_bPause = false;
 
+	// ステージ影焼き込み
+	m_bBakeStageShadow = true;
+	
 	// オレ曲初期化
 	//m_pMyMusicMgr = new MyMusicManager(MY_MUSIC_ID::SENJO);
 	//m_pMyMusicMgr->Play();
@@ -427,12 +429,14 @@ void sceneMain::Update()
 
 void sceneMain::Render()
 {
+	tdnStopWatch::Start();
 	// カメラ
 	CameraMgr->Activate();
 
 	if (m_bShaderFlag)
 	{
-		// G_Bufferクリア
+
+		// G_Bufferクリア (最適化)　20
 		DeferredManagerEx.ClearLightSurface();
 		DeferredManagerEx.ClearBloom();
 		DeferredManagerEx.ClearGpuPointLight();
@@ -441,121 +445,164 @@ void sceneMain::Render()
 		// シェーダ更新
 		DeferredManagerEx.G_Update(CameraMgr->m_ViewData.pos);
 
-		// 影
+		
+		// [1206](最適化)　500前後
+
+		// 影 (最適化) 200
 		RenderShadow();
 
-		// シェーダ
+
+
+		// シェーダ  (最適化)　85 ステージによって様々だがこれは仕方がない
 		DeferredManagerEx.G_Begin();
-		// ステージ描画
-		m_pStage->RenderDeferred();
-		// プレイヤー
-		PlayerMgr->RenderDeferred();
-
-
+		{
+			// ステージ描画
+			m_pStage->RenderDeferred();
+			// プレイヤー
+			PlayerMgr->RenderDeferred();
+		}
 		// シェーダ終わり
 		DeferredManagerEx.G_End();
 
 
-		DeferredManagerEx.DirLight(m_dirLight, Vector3(0.8f, 0.72f, 0.72f));
-		DeferredManagerEx.HemiLight(Vector3(0.6f, 0.5f, 0.5f), Vector3(0.45f, 0.43f, 0.43f));
+		// 平行光と環境光　(最適化) 50->38コストへ
+		//DeferredManagerEx.DirLight(m_pStage->GetShaderParam().vDirLightVec, m_pStage->GetShaderParam().vDirLightColor);
+		//DeferredManagerEx.HemiLight(m_pStage->GetShaderParam().vSkyColor, m_pStage->GetShaderParam().vGroundColor);
+		DeferredManagerEx.AllLight(m_pStage->GetShaderParam().vDirLightVec, m_pStage->GetShaderParam().vDirLightColor,
+			m_pStage->GetShaderParam().vSkyColor, m_pStage->GetShaderParam().vGroundColor);
 
 		// ポイントライト描画
 		DeferredManagerEx.GpuPointLightRender();
-		
+
+
 		// ★必殺用のステージが描画されるなら描画しない
 		if (m_bOverDriveStageFlag == false)
-		{
+		{		
+			// (最適化)　120 これもこれ以上は仕方がない
 			RenderStage();// ここでステージだけをまとめて描画
-		}
-		else
+		}else
 		{
 			m_pOverDriveStage->Render();// 必殺背景
 		}
 
 
-		// 最後の処理
+		// 最後の処理  　[1206](最適化)　700前後
 		{
+
+
+
 			DeferredManagerEx.FinalBegin();
+
 
 			//int dim= PlayerMgr->GetOverDriveDim();
 			//m_stageScreen->SetARGB(255, dim, dim, dim);
-			shader2D->SetValue("MaskTex", m_pMaskScreen);
-			shader2D->SetValue("g_fMaskEdgeRate", m_fMaskRate);
-			m_pOverDriveStage->GetScreen()->Render(0, 0,RS::COPY_NOZ);
-			m_stageScreen->Render(0, 0, shader2D,"MaskEdge");// ※Z値考慮させてない理由は↓の絵を描画するため
-		
+			
+			// 　[1206](最適化)　40->10
+			// 必殺発動して切り替える演出まではふつうに描画
+			if (m_bOverDriveStageFlag == false)
+			{
+
+				m_stageScreen->Render(0, 0, RS::COPY_NOZ);// ※Z値考慮させてない理由は↓の絵を描画するため
+			
+			}else
+			{
+				shader2D->SetValue("MaskTex", m_pMaskScreen);			// 斜めブラインドの画像
+				shader2D->SetValue("g_fMaskEdgeRate", m_fMaskRate);		// 斜めブラインドの画像を弄るレート
+				m_pOverDriveStage->GetScreen()->Render(0, 0, RS::COPY_NOZ);// コスト10		
+				m_stageScreen->Render(0, 0, shader2D, "MaskEdge");// ※Z値考慮させてない理由は↓の絵を描画するため
+			}
+
 			// キャラクターより下に描画するUI
 			GameUIMgr->RenderBack();
 
-
-			// プレイヤー
+			// ストップウォッチ開始
+	
+			// プレイヤー　[1206](最適化)　400~500->   何としても最適化したい	
 			PlayerMgr->Render();
-
+			
 			// ショット
 			m_pShotMgr->Render();
 
-			// パーティクル
+
+
+
+			// パーティクル (最適化) 50~90->30
 			ParticleManager::Render();
 
-			m_panel->Render();
-			m_panel->Render3D();
-			g_uvEffect->Render();
-
+	
+			
+			// UV・パネル　(最適化) コスト6　全然問題なし 
+			//m_panel->Render();
+			//m_panel->Render3D();
+			//g_uvEffect->Render();
 			DeferredManagerEx.FinalEnd();
 		}
 
-		// ブルーム
+
+
+		// ブルーム (最適化) 80~90-> 40 半分コストダウン
 		DeferredManagerEx.BloomRender();
 		
+	
 
-
-		// UI
-		NumberEffect.Render();
-		PlayerMgr->RenderUI();
-		if (m_pStateMachine->isInState(*SceneMainState::HeaveHoDriveOverFlowSuccess::GetInstance()) == false)
-		{
-			GameUIMgr->Render();
-			//TimeMgr->Render();
-		}
 		
-		HeaveHoFinishUI->Render();
-		
-		// ここでウィンドウ覧を描画するかステートマシンで個別で描画するかは後で判断
-		for (int i = 0; i < (int)BATTLE_WINDOW_TYPE::ARRAY_END; i++)
-		{
-			m_pWindow[i]->Redner();
-		}
 
-		// ★ここにステートマシン描画(多分2D関係が多いんじゃないかと)
-		m_pStateMachine->Render();
-
-		if (KeyBoard(KB_J))
-		{
-			SurfaceRender();
-		}
-
-		// ラウンドコール
-		m_pRoundCallMgr->Render();
-
-		// フェード描画
-		Fade::Render();
-
-		// シーンスイッチ
-		prevEF->Render();
 	}
 	else
 	{
+
+		// キャラクターより下に描画するUI
+		GameUIMgr->RenderBack();
 
 		// ステージ描画
 		m_pStage->Render(shader, "copy");
 		// プレイヤー
 		PlayerMgr->Render(shader, "copy");
 
-		m_panel->Render();
-		m_panel->Render3D();
-		g_uvEffect->Render();
 
 	}
+
+	//+---------------------------
+	// 手前のUI （約200->150）
+	//+---------------------------
+
+
+	NumberEffect.Render();
+	// PlayerMgr->RenderUI();		// (1206) コンボで使っていたが全てゲームUIで表示させたのでコメントアウト
+	if (m_pStateMachine->isInState(*SceneMainState::HeaveHoDriveOverFlowSuccess::GetInstance()) == false)
+	{
+		GameUIMgr->Render();
+	}
+
+	HeaveHoFinishUI->Render();
+
+
+	//+----------------------------------
+	// ウィンドウ・シーン移動・フェード類
+	//+----------------------------------
+
+	// ここでウィンドウ覧を描画するかステートマシンで個別で描画するかは後で判断
+	for (int i = 0; i < (int)BATTLE_WINDOW_TYPE::ARRAY_END; i++)
+	{
+		m_pWindow[i]->Redner();
+	}
+
+	// ★ここにステートマシン描画(多分2D関係が多いんじゃないかと)
+	m_pStateMachine->Render();
+
+	if (KeyBoard(KB_J))
+	{
+		SurfaceRender();
+	}
+
+	// ラウンドコール
+	m_pRoundCallMgr->Render();
+
+	// フェード描画
+	Fade::Render();
+
+	// シーンスイッチ
+	prevEF->Render();
 
 	//DeferredManagerEx.GetTex(SURFACE_NAME_EX::BLOOM_SEED)->Render(0, 0, 1280 / 4, 720 / 4, 0, 0, 1280, 720);
 
@@ -566,6 +613,15 @@ void sceneMain::Render()
 	//tdnText::Draw(0, 30, 0xffffffff, "CameraPos    : %.8f %.8f %.8f", CameraMgr->m_ViewData.pos.x, CameraMgr->m_ViewData.pos.y, CameraMgr->m_ViewData.pos.z);
 	//tdnText::Draw(0, 60, 0xffffffff, "CameraTarget : %.8f %.8f %.8f", CameraMgr->m_ViewData.target.x, CameraMgr->m_ViewData.target.y, CameraMgr->m_ViewData.target.z);
 	//tdnText::Draw(0, 90, 0xffffffff, "CameraEvent  : %d", CameraMgr->GetEventFrame());
+
+	// 処理不可実験
+	//std::vector<int> v;
+	//int N = 500 * 100;
+	//for (int i = 0; i < N; i++)
+	//{
+	//	v.push_back(i);
+	//}
+	tdnStopWatch::End();
 }
 
 void sceneMain::RenderStage()
@@ -588,22 +644,32 @@ void sceneMain::RenderStage()
 	tdnSystem::GetDevice()->SetRenderTarget(1, nullptr);
 }
 
+// [1206] (最適化) 200  (TODO)一回焼きこんで消すか？
 void sceneMain::RenderShadow()
 {
 	if (DeferredManagerEx.GetShadowFlag() == false)return;
 
-	DeferredManagerEx.CreateShadowMatrix
-		(m_dirLight, Vector3(0, 0, 0), Vector3(0, 0, 1), 400);
-
+	// フラグが立ってる時のみ描画  [1206] 一応用意しといた
+	if (m_bBakeStageShadow == true)
 	{
-		DeferredManagerEx.ShadowBegin();
+		DeferredManagerEx.CreateShadowMatrix
+			(m_pStage->GetShaderParam().vDirLightVec, Vector3(0, 0, 0), Vector3(0, 0, 1), 400);
 
-		m_pStage->RenderShadow();
+		{
+			DeferredManagerEx.ShadowBegin();
 
-		// プレイヤー
-		PlayerMgr->RenderShadow();
 
-		DeferredManagerEx.ShadowEnd();
+			m_pStage->RenderShadow();
+
+
+			// プレイヤー
+			//PlayerMgr->RenderShadow();
+
+			DeferredManagerEx.ShadowEnd();
+		}
+
+		m_bBakeStageShadow = false;		// 一度だけ影を焼きこむ
+
 	}
 }
 

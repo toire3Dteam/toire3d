@@ -30,7 +30,7 @@ protected:
 	RS state;
 
 	int m_iDelayFrame;
-
+	bool m_b3D;
 };
 
 

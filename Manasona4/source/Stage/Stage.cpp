@@ -9,6 +9,15 @@ Stage::Base::Base() : m_pObj(nullptr), m_pBack(nullptr), m_fBottom(0), m_fWidth(
 	// 壁
 	m_pAreWall = new AreaWallEffect();
 	m_pAreWall->ActionRoop();
+
+	// ステージ毎にシェーダに渡すパラメーター
+	// デフォルト
+	m_tagShaderParam.vDirLightVec = Vector3(0.84f, -0.99f, -0.53f);
+	m_tagShaderParam.vDirLightColor = Vector3(0.8f, 0.72f, 0.72f);
+
+	m_tagShaderParam.vSkyColor = Vector3(0.6f, 0.5f, 0.5f);
+	m_tagShaderParam.vGroundColor= Vector3(0.45f, 0.43f, 0.43f);
+
 }
 
 Stage::Base::~Base()
@@ -126,6 +135,12 @@ void Stage::Sea::Initialize(Camera *pCamera)
 	m_pBack->Update();
 	m_fBottom = 0;
 	m_fWidth = 150;
+
+	// ステージ毎にシェーダに渡すパラメーター
+	m_tagShaderParam.vDirLightVec = Vector3(0.84f, -0.99f, -0.53f);
+	m_tagShaderParam.vDirLightColor = Vector3(0.8f, 0.72f, 0.72f);
+	m_tagShaderParam.vSkyColor = Vector3(0.6f, 0.5f, 0.5f);
+	m_tagShaderParam.vGroundColor = Vector3(0.45f, 0.43f, 0.43f);
 
 	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
 	pCamera->SetStageCameraInfo("DATA/Stage/Sister/camera.txt");

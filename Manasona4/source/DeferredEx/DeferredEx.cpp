@@ -287,6 +287,49 @@ void DeferredEx::HemiLight(const Vector3 SkyColor, const Vector3 GroundColor)
 	tdnSystem::GetDevice()->SetRenderTarget(0, now);
 }
 
+void DeferredEx::AllLight(const Vector3 dir, const Vector3 color, const Vector3 SkyColor, const Vector3 GroundColor)
+{
+	Matrix matV = matView;
+
+	Vector3 LightDir;
+	// ワールドの平行光を渡す
+	Vector3 wLightDir = dir;
+	wLightDir.Normalize();
+	//shader->SetValue("wLightVec", wLightDir);
+
+	//ビュー座標系に変換
+	LightDir.x = dir.x * matV._11 + dir.y * matV._21 + dir.z * matV._31;
+	LightDir.y = dir.x * matV._12 + dir.y * matV._22 + dir.z * matV._32;
+	LightDir.z = dir.x * matV._13 + dir.y * matV._23 + dir.z * matV._33;
+
+
+	LightDir.Normalize();
+
+	//	シェーダー設定 
+	shaderM->SetValue("ViewLightVec", LightDir);
+	shaderM->SetValue("LightColor", (Vector3)color);
+	shaderM->SetValue("SkyColor", (Vector3)SkyColor);
+	shaderM->SetValue("GroundColor", (Vector3)GroundColor);
+
+	//現在のレンダーターゲットを一時的に確保
+	Surface* now = nullptr;
+	tdnSystem::GetDevice()->GetRenderTarget(0, &now);
+
+	//レンダーターゲットの切替え
+	m_pSurface[(int)SURFACE_NAME_EX::LIGHT]->RenderTarget();
+	m_pSurface[(int)SURFACE_NAME_EX::SPEC]->RenderTarget(1);
+
+	//	レンダリング
+	m_pSurface[(int)SURFACE_NAME_EX::NORMAL_DEPTH]->Render(0, 0, shaderM, "AllLight");
+
+	//レンダーターゲットの復元
+	tdnSystem::GetDevice()->SetRenderTarget(0, now);
+	tdnSystem::GetDevice()->SetRenderTarget(1, nullptr);
+
+
+
+}
+
 
 //****************************
 //	FORWARD
@@ -375,8 +418,8 @@ void DeferredEx::BloomRender()
 		Render(0, 0, MiniSizeX, MiniSizeY, 0, 0,
 		tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom);
 
-	//ボケ度　回数が少ないほどボケない
-	for (int i = 0; i < 4; i++)
+	//ボケ度　回数が少ないほどボケない が処理は軽くなる
+	for (int i = 0; i < 2; i++)
 	{
 		m_pSurface[(int)SURFACE_NAME_EX::BLOOM]->Render(0, 0, MiniSizeX, MiniSizeY,
 			0, 0, MiniSizeX, MiniSizeY, shaderM, "gaussZ");//奥行を禁止

@@ -93,8 +93,8 @@ bool FrameworkEx::Update()
 	}
 
 	// 一回の更新に2FPS以上かかってしまった場合 描画を止めて更新だけする
-	//if (intervalTime > FPS_1 * 2) m_bRenderFlag = false;
-	//else m_bRenderFlag = true;
+	if (intervalTime > FPS_1 * 2) m_bRenderFlag = false;
+	else m_bRenderFlag = true;
 	m_bRenderFlag = true;
 
 	// 新たに1FPSを加算
@@ -144,14 +144,23 @@ void FrameworkEx::Render()
 	//【描画開始】
 	tdnSystem::BeginScene();
 
+
+
 	//	シーン描画
 	if (m_scene != NULL) m_scene->Render();
+	
+
 
 #ifdef _DEBUG
+
+
+
 	//	フレーム表示
 	tdnText::Draw(tdnSystem::GetScreenSize().right - 128, tdnSystem::GetScreenSize().bottom-36, 0xff00ffff, "FPS %d/%d", m_iFPS, m_iRenderFPS);
-#endif
 
+#endif
+	// ストップウォッチの描画
+	tdnStopWatch::DrawResult(300, 0);
 	//【描画終了】
 	tdnSystem::EndScene();
 

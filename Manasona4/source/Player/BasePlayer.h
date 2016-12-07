@@ -391,7 +391,7 @@ public:
 	virtual void RenderDrive();
 	virtual void RenderDeferred();
 	virtual void RenderUI();
-
+	virtual void ShaderSendParam();
 
 	//------------------------------------------------------
 	//	Œp³‚µ‚Ä‚é‚â‚Â‚É‹­§“I‚ÉŒÄ‚Î‚¹‚éŒn

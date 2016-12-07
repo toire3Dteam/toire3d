@@ -34,6 +34,7 @@
 #include	<string>		// std::string型を扱うために必要なヘッダー
 #include	<tchar.h>		// 
 #include	<mbstring.h>
+#include	<chrono>		// 時間計測などを扱うためのヘッダー
 
 
 #include "system\ItDebug.h" // 自動メモリリーク建築
@@ -3277,6 +3278,24 @@ private:
 
 };
 
+//+----------------------
+//	ストップウォッチ
+//+----------------------
+
+class tdnStopWatch
+{
+public:
+	static void Start();
+	static void End();
+
+	static void DrawResult(int x,int y);
+private:
+	//static double m_dStart;
+	//static double m_dEnd;
+	static LARGE_INTEGER m_dStart;
+	static LARGE_INTEGER m_dEnd;
+	//static LARGE_INTEGER m_dFrep;
+};
 
 
 

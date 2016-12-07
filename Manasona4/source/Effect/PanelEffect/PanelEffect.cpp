@@ -19,6 +19,8 @@ BasePanelEffect::BasePanelEffect()
 	state = RS::ADD;
 
 	m_iDelayFrame = 0;
+
+	m_b3D = false;		// 3D空間で描画するか
 }
 
 BasePanelEffect::~BasePanelEffect()
@@ -42,6 +44,7 @@ void BasePanelEffect::Update()
 void BasePanelEffect::Render()
 {
 	if (m_iDelayFrame > 0)	return;
+	if (m_b3D == true)	return;
 	
 	m_pic->Render((int)m_pos.x - (m_picSize / 2), (int)m_pos.y - (m_picSize / 2), state);
 
@@ -50,6 +53,7 @@ void BasePanelEffect::Render()
 void BasePanelEffect::Render3D()
 {
 	if (m_iDelayFrame > 0)	return;
+	if (m_b3D == false)	return;
 
 	//tdnRenderState::Filter(FALSE);
 	m_pic->GetPic()->SetScale(m_pic3DScale);// 各自所有しているスケールに設定
@@ -67,6 +71,8 @@ void BasePanelEffect::Action(int x , int y, int delayFrame)
 	m_pos.y = (float)y;
 
 	m_iDelayFrame = delayFrame;
+
+	m_b3D = false;	// 2D描画
 }
 
 void BasePanelEffect::Action(Vector3 pos, int delayFrame)
@@ -77,6 +83,8 @@ void BasePanelEffect::Action(Vector3 pos, int delayFrame)
 	m_pos = pos;
 
 	m_iDelayFrame = delayFrame;
+
+	m_b3D = true;	// 3D描画
 }
 
 void BasePanelEffect::Stop()

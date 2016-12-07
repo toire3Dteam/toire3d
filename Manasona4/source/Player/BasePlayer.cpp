@@ -927,56 +927,16 @@ void BasePlayer::Render()
 	// スタンド描画
 	m_pStand->Render(shaderM, "Persona");
 
-	// 無敵の白色チカチカレートを送る
-	shaderM->SetValue("g_InvincibleColRate", m_fInvincibleColRate);
+	// シェーダへ送るデータ
+	ShaderSendParam();
 
-	// 無敵技のオレンジ色を送る
-	shaderM->SetValue("g_OrangeColRate", m_fOrangeColRate);
-		
-	// 無敵技のマゼンタ色を送る
-	shaderM->SetValue("g_MagentaColRate", m_fMagentaColRate);
-	
-	// 覚醒しているか// 覚醒時のカラー
-	if (m_bOverDrive == true ||
-		m_pStateMachine->isInState(*BasePlayerState::HeavehoDrive::GetInstance()) ||
-		m_pStateMachine->isInState(*BasePlayerState::HeavehoDriveOverFlow::GetInstance())
-		)
-	{
-		shaderM->SetValue("g_OverDriveColRate", 1.0f);
-		shaderM->SetValue("g_WillPowerRate", 0.0f);
-	}
-	else
-	{
-		shaderM->SetValue("g_OverDriveColRate", 0.0f);
 
-		// 根性状態か
-		if (m_bWillPower == true)
-		{
-			shaderM->SetValue("g_WillPowerRate", 1.0f);
-		}else 
-		{
-			shaderM->SetValue("g_WillPowerRate", 0.0f);
-		}
-
-	}
-		
-
-	// サイドに応じて縁取りの色を変える。
-	Vector3 vEdgeCol = VECTOR_ZERO;
-	if (m_side == SIDE::LEFT)
-	{
-		vEdgeCol = Vector3(0.95f, 0.1f, 0.0f);
-	}else
-	{
-		vEdgeCol = Vector3(0.0f, 0.65f, 1.0f);
-	}
-	shaderM->SetValue("g_EdgeColor", vEdgeCol);
-
+	// ∵だと30コスト
 	m_pObj->Render(shaderM, "PlayerToon");
-
+	
 	// 無敵なら加算で重ねて描画
-	if (m_iInvincibleTime > 0) m_pObj->Render(RS::ADD);
-
+	//if (m_iInvincibleTime > 0) m_pObj->Render(RS::ADD);
+	
 	// ここで現在のステートマシンの状態を確認
 	if (m_iDeviceID == 0)
 	{
@@ -990,12 +950,15 @@ void BasePlayer::Render()
 	}
 
 
+
 	// エフェクトマネージャー描画
 	m_pPanelEffectMGR->Render3D();
 	m_pUVEffectMGR->Render();
 	m_pPanelEffectMGR->Render();	
 	Vector2 vScreenPos = Math::WorldToScreen(m_vPos);// (TODO)頭のポジションの座標を使う
 	m_pThrowMark->Render((int)vScreenPos.x - 56, (int)vScreenPos.y - 324, RS::COPY_NOZ);
+
+	
 
 #ifdef _DEBUG
 	// ここで現在のステートマシンの状態を確認
@@ -1298,6 +1261,78 @@ void BasePlayer::RenderUI()
 {
 	// コンボUI
 	//m_pComboUI->Render(100 + (m_deviceID * 950), 200);
+
+}
+
+// シェーダに送るデータ
+void BasePlayer::ShaderSendParam()
+{
+	// [1206] (最適化)　10->5
+	// [1206] 最適化のためレートの送る回数を減らすためまとめて送ることに
+	// 他の人が見て何やってるのかわからないと思うので処理が安定したらもどします。
+	Vector3 l_vColDesc = VECTOR_ZERO;
+	Vector3 l_vColDesc2 = VECTOR_ZERO;
+
+	// 無敵の白色チカチカレートを送る
+	//shaderM->SetValue("g_InvincibleColRate", m_fInvincibleColRate);
+	l_vColDesc.x = m_fInvincibleColRate;
+
+	// 無敵技のオレンジ色を送る
+	//shaderM->SetValue("g_OrangeColRate", m_fOrangeColRate);
+	l_vColDesc.y = m_fOrangeColRate;
+
+	// 無敵技のマゼンタ色を送る
+	//shaderM->SetValue("g_MagentaColRate", m_fMagentaColRate);
+	l_vColDesc.z = m_fMagentaColRate;
+
+
+	// 覚醒しているか// 覚醒時のカラー
+	if (m_bOverDrive == true ||
+		m_pStateMachine->isInState(*BasePlayerState::HeavehoDrive::GetInstance()) ||
+		m_pStateMachine->isInState(*BasePlayerState::HeavehoDriveOverFlow::GetInstance())
+		)
+	{
+		//shaderM->SetValue("g_OverDriveColRate", 1.0f);
+		//shaderM->SetValue("g_WillPowerRate", 0.0f);
+		l_vColDesc2.x = 1.0f;
+		l_vColDesc2.y = 0.0f;
+	}
+	else
+	{
+		shaderM->SetValue("g_OverDriveColRate", 0.0f);
+		l_vColDesc2.x = 0.0f;
+
+		// 根性状態か
+		if (m_bWillPower == true)
+		{
+			//shaderM->SetValue("g_WillPowerRate", 1.0f);
+			l_vColDesc2.y = 1.0f;
+		}
+		else
+		{
+			//shaderM->SetValue("g_WillPowerRate", 0.0f);
+			l_vColDesc2.y = 0.0f;
+		}
+
+	}
+
+	// サイドに応じて縁取りの色を変える。
+	//Vector3 vEdgeCol = VECTOR_ZERO;
+	if (m_side == SIDE::LEFT)
+	{
+		//vEdgeCol = Vector3(0.95f, 0.1f, 0.0f);
+		l_vColDesc2.z = 1.0f;
+	}
+	else
+	{
+		//vEdgeCol = Vector3(0.0f, 0.65f, 1.0f);
+		l_vColDesc2.z = 0.0f;
+	}
+	//shaderM->SetValue("g_EdgeColor", vEdgeCol);
+
+	// まとめてシェーダへ
+	shaderM->SetValue("g_PlayerColDesc", l_vColDesc);
+	shaderM->SetValue("g_PlayerColDesc2", l_vColDesc2);
 
 }
 

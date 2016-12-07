@@ -4,7 +4,7 @@
 //		HPゲージ
 //+-----------------------------
 
-
+// [1206](最適化) 100->20
 
 HpGage::HpGage(BasePlayer* pPlayer)
 {
@@ -52,14 +52,16 @@ HpGage::HpGage(BasePlayer* pPlayer)
 	}
 
 	// マスク
-	m_pMaskScreen = new tdn2DObj(tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom, TDN2D::RENDERTARGET);
-	m_pUseMaskScreen = new tdn2DObj(tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom, TDN2D::USEALPHA);
+	m_pMaskScreen = new tdn2DObj(tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom / 3, TDN2D::RENDERTARGET);
+	m_pUseMaskScreen = new tdn2DObj(tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom / 3 , TDN2D::USEALPHA);
 
 	m_pMaskPic = new tdn2DObj("Data/UI/Game/HPGage_Mask.png");
 	m_fMaskPicScare = 1.0f;
 
 	m_bFirstActionFlag = false;
 	m_iWaitFrame = 0;
+
+	m_bUseMask = true;
 
 	//// SPゲージ
 	//m_pSpGage = new tdn2DObj("Data/UI/Game/SPGage.png");
@@ -161,8 +163,12 @@ void HpGage::Update()
 	//}
 
 
-	// マスク
-	if(m_bFirstActionFlag) MaskUpdate();
+	// マスク更新
+	if (m_bFirstActionFlag == true &&
+		m_bUseMask == true)
+	{
+		MaskUpdate();
+	}
 
 }
 
@@ -174,6 +180,7 @@ void HpGage::MaskUpdate()
 	if (m_fMaskPicScare >= 18.0f)
 	{
 		m_fMaskPicScare = 18.0f;
+		m_bUseMask = false;		// マスク描画解除
 	}
 
 	// マスク
@@ -184,19 +191,27 @@ void HpGage::Render()
 {
 	if (m_iWaitFrame > 0) return;
 
-	// マスクスクリーン
-	MaskScreen();
+	// マスクを使用してる時で描画を分ける
+	if (m_bUseMask == true)
+	{
+		// マスクスクリーン
+		MaskScreen();
 
-	// マスク適用スクリーン
-	UseMaskScreen();
-	
+		// マスク適用スクリーン
+		UseMaskScreen();
 
-	//
-	//m_pMaskScreen->Render(0, 0, 1280/4, 720/4, 0, 0, 1280, 720);
+		m_pUseMaskScreen->Render(0, 0, shader2D, "Mask");
+	}
+	else
+	{
+		// レンダーターゲットを使わない描画
+		//NotMaskRender();
+		UseMaskScreen();
+		m_pUseMaskScreen->Render(0, 0);
 
+	}
 
-	m_pUseMaskScreen->Render(0, 0, shader2D, "Mask");
-
+	//m_pUseMaskScreen->Render(0, 0);
 
 	//if (m_sSideFlag == UI_SIDE::LEFT)
 	//{
@@ -218,7 +233,7 @@ void HpGage::UseMaskScreen()
 	// マスクに切り替え
 	m_pUseMaskScreen->RenderTarget(0);
 	{
-		// 画面クリア
+		// 画面クリア もちろんHPが無くなったとこの描画が大変なことになるので
 		tdnView::Clear();
 
 
@@ -375,10 +390,10 @@ void HpGage::UseMaskScreen()
 
 			//}
 
-		}
+		} // m_sSideFlag
 
 
-	}
+	}// RenderTarget
 
 	tdnSystem::GetDevice()->SetRenderTarget(0, saveSurface);//レンダーターゲットの復元
 
@@ -396,8 +411,9 @@ void HpGage::MaskScreen()
 	m_pMaskScreen->RenderTarget(0);
 	{
 		// 画面クリア
-		tdnView::Clear();
+		//tdnView::Clear();
 
+		// 初期の真ん中から広がり描画される演出のためのマスク
 		m_pMaskPic->Render((tdnSystem::GetScreenSize().right / 2) - 128 , 0);
 
 	}
@@ -405,6 +421,119 @@ void HpGage::MaskScreen()
 
 	// ↑で得られた情報をマスクとして送る
 	shader2D->SetMaskScreen(m_pMaskScreen);
+
+}
+
+// マスクを使用しない描画
+void HpGage::NotMaskRender()
+{
+	// ゲージの描画
+	if (m_sSideFlag == SIDE::LEFT)
+	{
+		// 赤ダメージゲージ
+		m_pDamageGage->Render((int)m_vPos.x + (m_iGageWidth - (int)(m_iGageWidth * m_fDamageRate)), (int)m_vPos.y,
+			(int)(m_iGageWidth*m_fDamageRate), m_iGageHeight,
+			m_iGageWidth - (int)(m_iGageWidth  * m_fDamageRate), 0,
+			(int)(m_iGageWidth*m_fDamageRate), m_iGageHeight);
+
+		// HPによって色を変える
+		// 覚醒してるか
+		if (m_pPlayerReferences->isWillPower())
+		{
+			// 覚醒時は黄色
+			m_pGagePinch->Render((int)m_vPos.x + (m_iGageWidth - (int)(m_iGageWidth * m_fRate)), (int)m_vPos.y,
+				(int)(m_iGageWidth*m_fRate), m_iGageHeight,
+				m_iGageWidth - (int)(m_iGageWidth  * m_fRate), 0,
+				(int)(m_iGageWidth*m_fRate), m_iGageHeight);
+			// 波紋
+			m_pGagePinchRip->Render((int)m_vPos.x + (m_iGageWidth - (int)(m_iGageWidth * m_fRate)), (int)m_vPos.y,
+				(int)(m_iGageWidth*m_fRate), m_iGageHeight,
+				m_iGageWidth - (int)(m_iGageWidth  * m_fRate), 0,
+				(int)(m_iGageWidth*m_fRate), m_iGageHeight, RS::ADD);
+		}
+		else
+		{
+			if (m_fRate >= 1.0f)
+			{
+				m_pGage->Render((int)m_vPos.x + (m_iGageWidth - (int)(m_iGageWidth * m_fRate)), (int)m_vPos.y,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight,
+					m_iGageWidth - (int)(m_iGageWidth  * m_fRate), 0,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight);
+			}
+			else /*if (m_fRate >= 0.35f)*/// 普通位
+			{
+				m_pGageUsually->Render((int)m_vPos.x + (m_iGageWidth - (int)(m_iGageWidth * m_fRate)), (int)m_vPos.y,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight,
+					m_iGageWidth - (int)(m_iGageWidth  * m_fRate), 0,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight);
+
+			}
+		}
+
+
+		m_pWave->Render((int)m_vPos.x /*+ (m_iGageWidth - (int)(m_iGageWidth * m_fRate))*/, (int)m_vPos.y,
+			(int)(m_iGageWidth), m_iGageHeight,
+			/*m_iGageWidth - (int)(m_iGageWidth  * m_fRate) +*/ (int)m_fWaveUV, 0,
+			(int)(m_iGageWidth), m_iGageHeight, RS::ADD);
+
+
+
+
+	}
+	else
+	{
+		// 赤ダメージゲージ
+		m_pDamageGage->Render((int)m_vPos.x, (int)m_vPos.y,
+			(int)(m_iGageWidth*m_fDamageRate), m_iGageHeight,
+			0, 0,
+			(int)(m_iGageWidth*m_fDamageRate), m_iGageHeight);
+
+
+		// HPによって色を変える
+		// 覚醒してるか
+		if (m_pPlayerReferences->isWillPower())
+		{
+			// 覚醒時は黄色
+			m_pGagePinch->Render((int)m_vPos.x, (int)m_vPos.y,
+				(int)(m_iGageWidth*m_fRate), m_iGageHeight,
+				0, 0,
+				(int)(m_iGageWidth*m_fRate), m_iGageHeight);
+
+			// 波紋
+			m_pGagePinchRip->Render((int)m_vPos.x, (int)m_vPos.y,
+				(int)(m_iGageWidth*m_fRate), m_iGageHeight,
+				0, 0,
+				(int)(m_iGageWidth*m_fRate), m_iGageHeight, RS::ADD);
+		}
+		else
+		{
+
+			if (m_fRate >= 1.0f)
+			{
+				m_pGage->Render((int)m_vPos.x, (int)m_vPos.y,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight,
+					0, 0,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight);
+
+			}
+			else /*if (m_fRate >= 0.35f)*/// 普通位
+			{
+				m_pGageUsually->Render((int)m_vPos.x, (int)m_vPos.y,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight,
+					0, 0,
+					(int)(m_iGageWidth*m_fRate), m_iGageHeight);
+
+			}
+		}
+
+
+		// TODO
+		m_pWave->Render((int)m_vPos.x, (int)m_vPos.y,
+			m_iGageWidth, m_iGageHeight,
+			(int)m_fWaveUV, 0,
+			m_iGageWidth, m_iGageHeight, RS::ADD);
+
+	}
 
 }
 
@@ -417,7 +546,7 @@ void HpGage::FirstAction(int waitFrame)
 	// 初期設定
 	m_fMaskPicScare = 1.0f;
 
-
+	m_bUseMask = true;// マスクフラグ立てる
 }
 
 void HpGage::JudeRemainingHP()
