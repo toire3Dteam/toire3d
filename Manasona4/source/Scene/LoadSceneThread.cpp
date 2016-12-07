@@ -3,42 +3,54 @@
 #include	"LoadSceneThread.h"
 
 //=============================================================================================
-//		グ	ロ	ー	バ	ル	領	域
-bool LoadSceneThreadManager::LoadSceneThread::bThread(false);
+//		コンストラクタ
+LoadSceneThreadManager::LoadSceneThread::LoadSceneThread(BaseScene *pNewScene) :
 
+//次のシーンのポインタは後で使うのでnewSceneに保存しておく。
+m_pNewScene(pNewScene),
 
-//=============================================================================================
-//		初	期	化	と	開	放
-LoadSceneThreadManager::LoadSceneThread::LoadSceneThread(BaseScene *pNewScene) : m_pNewScene(pNewScene)
+// ★コンストラクタでスレッドを生成 ※メンバ関数を指定する場合は、第二引数にthisを入れること。
+m_thread(&LoadSceneThreadManager::LoadSceneThread::ThreadFunction, this, pNewScene),
+
+// スレッドフラグ
+m_bThread(true)
 {
-	// シーン読み込みスレッド作成
-	_beginthread(ThreadFunc, 0, (void*)m_pNewScene);
-	bThread = true;
+
 }
 
+//=============================================================================================
+
+//=============================================================================================
+//		デストラクタ
 LoadSceneThreadManager::LoadSceneThread::~LoadSceneThread()
 {
-	if (bThread)
+	// ロード中に消してしまったら、全部読み込むまで待機(落ちるの防止)
+	if (m_bThread)
 	{
-		_endthread();
-		bThread = false;
+		//MessageBoxA(0, "スレッド読み込み中にプログラムが停止しました。スレッドが終わるまで待機します。", "意図せぬ終了", MB_OK);
+		m_thread.join();
+		//MessageBoxA(0, "待機終了。プログラムは正常に解放されます。多分", "アイルーは神", MB_OK);
 	}
+	else m_thread.join();	// 読み込みスレッド自体は完了しているので、detach(普通にスレッド落とす)でもいいけど、念のためにjoin(スレッドが完全に終了するまで待機してから落とす)にする
 }
 //=============================================================================================
 
 
 //=============================================================================================
-//		ス	レ	ッ	ド	処	理
-void LoadSceneThreadManager::LoadSceneThread::ThreadFunc(void *arg)
+//		スレッド処理
+void LoadSceneThreadManager::LoadSceneThread::ThreadFunction(void *arg)
 {
 	BaseScene* scene = (BaseScene*)arg;
 
-	scene->Initialize();	// ★ここで本体のsceneが必要な時間をかかる初期化を行う
-	scene->m_bLoad = true;	// この時点でロードフラグをON。シーンを切り替える際の読み込みをしないようにする
+	// ★ここで本体のsceneが必要な時間をかかる初期化を行う
+	scene->Initialize();
+
+	// この時点でロードフラグをON。シーンを切り替える際の読み込みをしないようにする
+	scene->m_bLoad = true;
 
 	//	スレッド終了処理
-	bThread = false;
-	_endthread();
+	m_bThread = false;
+	//_endthread();
 }
 
 

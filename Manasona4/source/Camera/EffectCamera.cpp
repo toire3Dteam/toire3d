@@ -21,7 +21,12 @@ EffectCamera::EffectCamera(ViewData *pViewData, LPCSTR filename, const Vector3 &
 	{
 		TimeLineCamera *set = new TimeLineCamera;
 
+
 		char skip[128];	// 読み飛ばし用変数
+		// スクリプト名読み飛ばし
+		ifs >> skip;
+
+		MyAssert(skip[0] == '[', "カメラスクリプトのテキストがずれてる\n%d番目付近が怪しいかも？", m_list.size());
 
 		// スクリプトID取得
 		ifs >> skip;

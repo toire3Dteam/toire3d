@@ -11,7 +11,6 @@ public:
 	virtual ~BaseScene(){ }
 	//	初期化
 	virtual bool Initialize(){ return true; }
-	virtual bool Initialize(BaseScene *newScene){ return true; }	// ★sceneLoading専用
 	//	更新・描画
 	virtual void Update(){}
 	virtual void Render(){}

@@ -3,10 +3,10 @@
 class sceneLoading : public BaseScene
 {
 private:
-	BaseScene*	m_newScene;
+	BaseScene		*m_pNewScene;			// スレッドで読み込む新しいシーン
 
 	//------------------------------------------------------
-	//	ロードの炎
+	//	ロードの情報
 	//------------------------------------------------------
 	int			m_AnimeCount;
 	int			m_AnimeFrame;
@@ -16,16 +16,10 @@ private:
 public:
 
 	//------------------------------------------------------
-	//	スレッド関係
-	//------------------------------------------------------
-	static void Thread_funk(void *arg);
-	static bool isThread;
-
-
-	//------------------------------------------------------
 	//	初期化と開放
 	//------------------------------------------------------
-	bool Initialize(BaseScene *newScene);
+	sceneLoading(BaseScene *newScene);
+	bool Initialize();
 	~sceneLoading();
 
 

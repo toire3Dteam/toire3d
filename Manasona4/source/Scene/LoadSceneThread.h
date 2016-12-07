@@ -1,5 +1,8 @@
 #pragma once
 
+// C++11で追加されたスレッドライブラリ
+#include<thread>
+
 class LoadSceneThreadManager
 {
 public:
@@ -27,6 +30,10 @@ public:
 	bool isAction(){ return m_bAction; }
 
 private:
+
+	//-------------------------------------------------------------------------------
+	//	スレッドを読み込む内部クラス(読み込むスレッドを持っているのはこのクラス)
+	//-------------------------------------------------------------------------------
 	class LoadSceneThread
 	{
 	public:
@@ -34,8 +41,8 @@ private:
 		//------------------------------------------------------
 		//	スレッド関係
 		//------------------------------------------------------
-		static void ThreadFunc(void *arg);
-		static bool bThread;
+		void ThreadFunction(void *arg);
+		bool m_bThread;
 
 		//------------------------------------------------------
 		//	初期化と開放
@@ -47,10 +54,18 @@ private:
 		//	ゲッター
 		//------------------------------------------------------
 		BaseScene *GetNewScene(){ return m_pNewScene; }
-		bool isInitializeEnd(){ return !bThread; }
+		bool isInitializeEnd(){ return !m_bThread; }
 
 	private:
+		//------------------------------------------------------
+		//	スレッドで読み込む新しいシーン
+		//------------------------------------------------------
 		BaseScene*	m_pNewScene;
+
+		//------------------------------------------------------
+		//	スレッド処理くん
+		//------------------------------------------------------
+		std::thread m_thread;
 	};
 
 	LoadSceneThread *m_pLoadSceneThread;

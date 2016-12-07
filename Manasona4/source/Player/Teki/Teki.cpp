@@ -24,7 +24,7 @@ Teki::Teki(SIDE side, const SideData &data) :BasePlayer(side, data)
 	}
 	// æƒƒbƒVƒ…
 	//m_pDefaultObj = new iex3DObj((side == SIDE::LEFT) ? "DATA/CHR/Airou/airou.IEM" : "DATA/CHR/Teki/teki.IEM");
-	m_pDefaultObj = new iex3DObj("DATA/CHR/Teki/Teki.IEM");
+	m_pDefaultObj = new iex3DObj("DATA/CHR/Teki/teki.IEM");
 	m_pDefaultObj->SetPos(m_vPos);
 	m_pDefaultObj->Update();
 

@@ -587,8 +587,7 @@ LPBYTE tdnSoundBuffer::LoadMP3(LPSTR fname, LPDWORD size, LPWAVEFORMATEX wfx)
 		ACM_STREAMSIZEF_SOURCE);
 
 	// ACMSTREAMHEADER構造体を準備する。
-	ACMSTREAMHEADER ash;
-	ZeroMemory(&ash, sizeof(ACMSTREAMHEADER));
+	ACMSTREAMHEADER ash{};
 	ash.cbStruct = sizeof(ACMSTREAMHEADER);
 
 	acmStreamPrepareHeader(
@@ -837,8 +836,7 @@ void tdnSoundBuffer::SetMove(const Vector3 &move)
 }
 void tdnSoundBuffer::SetAll3D(float max_dist, float min_dist, const Vector3 &pos, const Vector3 &front, int degreeIn, int out_vol, const Vector3 &move)
 {
-	DS3DBUFFER set;
-	ZeroMemory(&set, sizeof(DS3DBUFFER));
+	DS3DBUFFER set{};
 	set.dwSize = sizeof(DS3DBUFFER);
 
 	/*
@@ -880,8 +878,7 @@ void tdnSoundBuffer::SetFX(DXA_FX flag)
 	}
 
 	// エフェクト構造体設定
-	DSEFFECTDESC ed;
-	ZeroMemory(&ed, sizeof(ed));
+	DSEFFECTDESC ed{};
 	ed.dwSize = sizeof(DSEFFECTDESC);
 
 	switch (flag)
@@ -1113,14 +1110,10 @@ BOOL	tdnStreamSound::SetBlockWAV(int block)
 //**************************************************************************************************************
 void tdnStreamSound::Initialize(LPDIRECTSOUND lpDS, int rate)
 {
-	DSBUFFERDESC	dsbd;
-	WAVEFORMATEX	wfx;
-
-
 	/*	初期化チェック	*/
 	if (lpDS == nullptr) return;
 	/*	ＷＡＶＥフォーマット初期化	*/
-	ZeroMemory(&wfx, sizeof(WAVEFORMATEX));
+	WAVEFORMATEX wfx{};
 	wfx.wFormatTag = WAVE_FORMAT_PCM;
 	wfx.nChannels = 2;			/*	stereo	*/
 	wfx.nSamplesPerSec = rate;
@@ -1128,7 +1121,7 @@ void tdnStreamSound::Initialize(LPDIRECTSOUND lpDS, int rate)
 	wfx.nBlockAlign = 4;
 	wfx.nAvgBytesPerSec = rate * 4;
 	/* 二次バッファの初期化	*/
-	ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
+	DSBUFFERDESC dsbd{};
 	dsbd.dwSize = sizeof(DSBUFFERDESC);
 	dsbd.dwFlags = DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLPOSITIONNOTIFY | DSBCAPS_LOCSOFTWARE;
 	dsbd.dwBufferBytes = rate * 4 * STRSECOND * 2;
@@ -1287,8 +1280,7 @@ tdnSoundBase::tdnSoundBase()
 	lpDS->SetCooperativeLevel(hWndWAV, DSSCL_PRIORITY);
 
 	lpPrimary = nullptr;
-	DSBUFFERDESC	dsbd;
-	ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
+	DSBUFFERDESC dsbd{};
 	dsbd.dwSize = sizeof(DSBUFFERDESC);
 	dsbd.dwFlags = DSBCAPS_CTRL3D | DSBCAPS_PRIMARYBUFFER;
 	lpDS->CreateSoundBuffer(&dsbd, &lpPrimary, nullptr);
@@ -1305,8 +1297,7 @@ tdnSoundBase::tdnSoundBase()
 	this->SetListenerAll(Vector3(0, 0, 0), Vector3(0, 0, 1), Vector3(0, 1, 0), Vector3(0, 0, 0));
 	this->UpdateListener();
 
-	WAVEFORMATEX   wfx;
-	ZeroMemory(&wfx, sizeof(WAVEFORMATEX));
+	WAVEFORMATEX wfx{};
 	wfx.wFormatTag = WAVE_FORMAT_PCM;
 	wfx.nChannels = 1;
 	wfx.nSamplesPerSec = 22050;
@@ -1621,8 +1612,7 @@ void tdnSoundBase::SetListenerMove(const Vector3 &move)
 }
 void tdnSoundBase::SetListenerAll(const Vector3 &pos, const Vector3 &front, const Vector3 &up, const Vector3 &velocity)
 {
-	DS3DLISTENER set;
-	ZeroMemory(&set, sizeof(DS3DLISTENER));
+	DS3DLISTENER set{};
 	set.dwSize = sizeof(DS3DLISTENER);
 
 	// リスナー情報設定

@@ -150,6 +150,10 @@ private:
 	void InitActionDatas();
 	void InitMotionDatas();
 
+	// エフェクト
+	float m_fGodHandShiftY;		// ゴッドハンドのY
+	BaseUVEffect *m_pGodHand;	// ゴッドハンド
+
 	// 下固有の腕単体
 	iex3DObj *m_pArm;
 	bool m_bArm;	// うでフラグ(trueなら更新して描画する)

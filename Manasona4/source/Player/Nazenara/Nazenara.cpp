@@ -47,18 +47,8 @@ Nazenara::Nazenara(SIDE side, const SideData &data) :BasePlayer(side, data), m_p
 	// スピードライン
 	m_pSpeedLine = new SpeedLineGreenEffect;
 
-	//switch (deviceID)
-	//{
-	//case 1:
-	//	m_pObj->SetTexture(tdnTexture::Load("DATA/CHR/Airou/tex_airou2.png"), 0);
-	//	break;
-	//case 2:
-	//	m_pObj->SetTexture(tdnTexture::Load("DATA/CHR/Airou/tex_airou3.png"), 0);
-	//	break;
-	//case 3:
-	//	m_pObj->SetTexture(tdnTexture::Load("DATA/CHR/Airou/tex_airou4.png"), 0);
-	//	break;
-	//}
+	// ゴッドハンド
+	m_pGodHand = new GodHandEffect;
 
 	if (SIDE::LEFT == m_side)
 	{
@@ -713,9 +703,9 @@ void Nazenara::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	// 判定形状
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->width = 8;
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->height = 16;
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->pos.Set(0, 0, 0);
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->width = 14;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->height = 30;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->pos.Set(16, 18, 0);
 
 	//==============================================================================================================
 	//	ヒーホードライブ_オーバーフロー
@@ -778,6 +768,7 @@ Nazenara::~Nazenara()
 {
 	SAFE_DELETE(m_pArm);
 	SAFE_DELETE(m_pOverFlow);
+	SAFE_DELETE(m_pGodHand);
 	FOR((int)SKILL_ACTION_TYPE::MAX) SAFE_DELETE(m_pSkillActions[i])
 }
 
@@ -786,6 +777,7 @@ void Nazenara::Update(PLAYER_UPDATE flag)
 	// 基底クラスの更新
 	BasePlayer::Update(flag);
 
+	// 下から生えてくる腕
 	if (m_bArm)
 	{
 		m_pArm->Animation();
@@ -794,6 +786,9 @@ void Nazenara::Update(PLAYER_UPDATE flag)
 		m_pArm->SetPos(m_vPos + vArmPos);
 		m_pArm->Update();
 	}
+
+	// ゴッドハンド更新
+	m_pGodHand->Update();
 }
 
 void Nazenara::Render()
@@ -803,6 +798,9 @@ void Nazenara::Render()
 
 	// 腕描画
 	if (m_bArm) m_pArm->Render();
+
+	// ゴッドハンド描画
+	m_pGodHand->Render();
 }
 
 void Nazenara::RenderDrive()
@@ -1159,12 +1157,14 @@ void Nazenara::HeavehoDriveInit()
 
 	// ストップタイマー
 	SetGameTimerStopFlag(true);
+	m_iHeavehoStopTimer = 54;
 
-	m_iHeavehoStopTimer = 85;
+	// ゴッドハンドのY移動
+	m_fGodHandShiftY = 36;
 
 	// ここで相手をサーチする
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->pos.x = fabsf(m_pTargetPlayer->GetPos().x - m_vPos.x);	// 要は自分と相手の距離
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->pos.y = m_pTargetPlayer->GetPos().y - m_vPos.y;
+	//m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->pos.x = fabsf(m_pTargetPlayer->GetPos().x - m_vPos.x);	// 要は自分と相手の距離
+	//m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->pos.y = m_pTargetPlayer->GetPos().y - m_vPos.y;
 }
 
 bool Nazenara::HeavehoDriveUpdate()
@@ -1174,6 +1174,21 @@ bool Nazenara::HeavehoDriveUpdate()
 	{
 		// ここに来たら終わり
 		return true;
+	}
+
+	if (m_iCurrentActionFrame == 42)
+	{
+		float AddX(m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->pos.x);
+		if (m_dir == DIR::LEFT)AddX *= -1;
+		m_pGodHand->Action(m_vPos + Vector3(AddX, m_fGodHandShiftY, 0), 8, 8);
+	}
+	else if (m_iCurrentActionFrame > 50)
+	{
+		// 上から落ちてくる
+		m_fGodHandShiftY = max(m_fGodHandShiftY - 8.5f, -8);
+		float AddX(m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->pos.x);
+		if (m_dir == DIR::LEFT)AddX *= -1;
+		m_pGodHand->SetPos(m_vPos + Vector3(AddX, m_fGodHandShiftY, 0));
 	}
 
 	// ヒーホーストップ時間計測

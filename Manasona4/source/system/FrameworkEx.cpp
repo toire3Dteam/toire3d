@@ -215,8 +215,8 @@ void FrameworkEx::ChangeScene(BaseScene* newScene, bool bLoadingScene)
 	// ローディング画面あり
 	if (bLoadingScene)
 	{
-		m_scene = new sceneLoading;
-		m_scene->Initialize(newScene);	// ここで、遷移先のInitializeを呼んでいる。
+		m_scene = new sceneLoading(newScene);
+		m_scene->Initialize();	// ここで、遷移先のInitializeを呼んでいる。
 	}
 
 	// ローディング画面なし

@@ -38,20 +38,32 @@ public:
 	}
 	void Render(){ for (auto it : m_NazeList) it->Render(); }
 
+	void Set(const Vector3 positions[], int num)
+	{
+		// 引数の座標に∵をセット
+		FOR(num)m_NazeList.push_back(new Naze(positions[i], m_pObj));
+	}
+
 private:
 
 	class Naze
 	{
 	private:
 		Vector3 vPos;			// 座標
+		float fAlpha;			// アルファの値
 		const float fAngleY;	// Yアングル
 		iex3DObj *pObj;			// 参照するだけメッシュ
 		const float c_SPEED = .1f;
 
 	public:
-		Naze(const Vector3 &pos, iex3DObj *obj) :vPos(pos), pObj(obj), fAngleY(atan2f(-vPos.x, -vPos.z)){}
+		Naze(const Vector3 &pos, iex3DObj *obj) :vPos(pos), pObj(obj), fAngleY(atan2f(-vPos.x, -vPos.z)), fAlpha{}{}
 		void Update()
 		{
+			if (fAlpha < 1)
+			{
+				fAlpha = min(1, fAlpha + .05f);
+			}
+
 			if (vPos.x * vPos.x + vPos.z * vPos.z > 16)
 			{
 				// 原点に向けて徐々に進んでいく
@@ -64,7 +76,7 @@ private:
 			pObj->SetPos(vPos);
 			pObj->SetAngle(fAngleY);
 			pObj->Update();
-			pObj->Render();
+			pObj->Render(RS::COPY, fAlpha);
 		}
 	};
 

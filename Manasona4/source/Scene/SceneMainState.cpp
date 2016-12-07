@@ -431,7 +431,7 @@ void SceneMainState::Finish::Execute(sceneMain *pMain)
 			// すでに読み込んだリザルトシーンに行く
 			MainFrameEx->ChangeScene(LoadSceneThreadMgr->GetNewScene());
 
-			// シングルトンだからシーン変わってもデリートとか大丈夫のはず
+			// スレッドの開放 シングルトンだからシーン変わってもデリートとか大丈夫のはず
 			LoadSceneThreadMgr->Release();
 		}
 	}

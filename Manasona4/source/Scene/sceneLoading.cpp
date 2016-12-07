@@ -1,15 +1,28 @@
-#include	"TDNLIB.h"
-#include	"system/FrameworkEx.h"
-#include	"sceneLoading.h"
-
-//=============================================================================================
-//		グ	ロ	ー	バ	ル	領	域
-bool sceneLoading::isThread;
-
+#include "TDNLIB.h"
+#include "system/FrameworkEx.h"
+#include "sceneLoading.h"
+#include "LoadSceneThread.h"
 
 //=============================================================================================
 //		初	期	化	と	開	放
-bool sceneLoading::Initialize(BaseScene *newScene)
+sceneLoading::sceneLoading(BaseScene *newScene) :BaseScene(),m_pNewScene(newScene),
+
+// スレッド関連初期化ゾーン
+//m_thread(&sceneLoading::ThreadFunction, this, newScene),	// コンストラクタでスレッドを生成 ※メンバ関数を指定する場合は、第二引数にthisを入れること。
+//m_bThread(true),											// スレッドフラグ
+
+// 0初期化ゾーン
+m_pImage{},
+m_pGauge{},
+m_AnimeCount{},
+m_AnimeFrame{},
+m_fLoadGaugePercent{},
+m_fLoadAngle{}
+{
+
+}
+
+bool sceneLoading::Initialize()
 {
 	m_pImage = new tdn2DObj("DATA/UI/Loading/loadPic.png");
 	m_pGauge = new tdn2DObj("DATA/UI/Loading/loading_gauge.png");
@@ -17,40 +30,23 @@ bool sceneLoading::Initialize(BaseScene *newScene)
 	m_fLoadGaugePercent = 0;
 	m_fLoadAngle = 0.0f;
 
-	//	別スレッド作成
-	//次のシーンのポインタは後で使うのでnewSceneに保存しておく。
-	m_newScene = newScene;
+	// ★スレッド生成
+	LoadSceneThreadMgr->Initialize(m_pNewScene);
 
-	isThread = true;
-	_beginthread(Thread_funk, 0, (void*)m_newScene);
+	//bThread = true;
+	//_beginthread(ThreadFunction, 0, (void*)m_newScene);
 
 	return true;
 }
 
 sceneLoading::~sceneLoading()
 {
-	delete m_pImage;
-	delete m_pGauge;
+	// ★スレッド解放
+	LoadSceneThreadMgr->Release();
+
+	SAFE_DELETE(m_pImage);
+	SAFE_DELETE(m_pGauge);
 }
-//=============================================================================================
-
-
-//=============================================================================================
-//		ス	レ	ッ	ド	処	理
-void sceneLoading::Thread_funk(void *arg)
-{
-	BaseScene* scene = (BaseScene*)arg;
-
-	scene->Initialize();	// ★ここで本体のsceneが必要な時間をかかる初期化を行う
-	scene->m_bLoad = true;	// この時点でロードフラグをON。シーンを切り替える際の読み込みをしないようにする
-
-	//	スレッド終了処理
-	isThread = false;
-	_endthread();
-}
-
-
-//
 //=============================================================================================
 
 //=============================================================================================
@@ -69,15 +65,15 @@ void sceneLoading::Update()
 	m_pImage->SetAngle(m_fLoadAngle);
 
 	// ロード割合補間処理
-	m_fLoadGaugePercent = m_fLoadGaugePercent*.5f + m_newScene->m_fLoadPercentage*.5f;
+	m_fLoadGaugePercent = m_fLoadGaugePercent*.5f + m_pNewScene->m_fLoadPercentage*.5f;
 
 	// ロードのコメント
-	strcpy_s(m_LoadComment, 256, m_newScene->m_LoadComment);
+	strcpy_s(m_LoadComment, 256, m_pNewScene->m_LoadComment);
 
-	//ロードが終わったら、シーンをチェンジ
-	if (!isThread)
+	// ★ロードが終わったら、シーンをチェンジ
+	if (LoadSceneThreadMgr->isInitializeEnd())
 	{
-		MainFrameEx->ChangeScene(m_newScene);
+		MainFrameEx->ChangeScene(m_pNewScene);
 	}
 }
 //
@@ -88,10 +84,9 @@ void sceneLoading::Update()
 //		描			画
 void sceneLoading::Render()
 {
-	tdnView::Activate();
 	tdnView::Clear();
 
-	tdnPolygon::Rect(0, 0, tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom , RS::COPY, 0xff000000);
+	//tdnPolygon::Rect(0, 0, tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom , RS::COPY, 0xff000000);
 	//m_pImage->Render(720, 540, 512, 64, 0, m_AnimeCount * 64, 512, 64);
 	
 	m_pImage->Render(1280 - 256 + 32, 720 - 256 + 32);

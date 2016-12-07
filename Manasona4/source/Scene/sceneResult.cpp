@@ -118,13 +118,13 @@ bool sceneResult::Initialize()
 		break;
 
 	case CHARACTER::TEKI:
-		m_LosePlayer = new iex3DObj("DATA/CHR/Airou/airou.IEM");
-		m_iLoseMotion = 34;
+		m_LosePlayer = new iex3DObj("DATA/CHR/Teki/teki.IEM");
+		m_iLoseMotion = 31;
 		break;
 
 	case CHARACTER::NAZENARA:
-		m_LosePlayer = new iex3DObj("DATA/CHR/Airou/airou.IEM");
-		m_iLoseMotion = 34;
+		m_LosePlayer = new iex3DObj("DATA/CHR/Nazenara/nazenaraba.IEM");
+		m_iLoseMotion = 35;
 		break;
 
 	case CHARACTER::END:
@@ -245,7 +245,7 @@ void sceneResult::Update()
 
 		// ストリーミング初期化
 		m_pStream = bgm->PlayStream("DATA/Sound/BGM/System/Result.ogg");
-		m_pStream->SetVolume(0.4f);
+		m_pStream->SetVolume(0.6f);
 
 		m_bFirstUpdate = false;
 	}
