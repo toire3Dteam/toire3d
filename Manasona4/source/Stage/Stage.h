@@ -91,12 +91,21 @@ namespace Stage
 
 	// 海ステージ
 	class Sea : public Base
-{
-public:
-Sea() :Base(){}
-void Initialize(Camera *pCamera);
-		EFFECT_CAMERA_ID GetIntroCameraScriptID(){ return EFFECT_CAMERA_ID::SEA_STAGE_INTRO; }
-};
+	{
+	public:
+		Sea() :Base() {}
+		void Initialize(Camera *pCamera);
+		EFFECT_CAMERA_ID GetIntroCameraScriptID() { return EFFECT_CAMERA_ID::SEA_STAGE_INTRO; }
+	};
+
+	// 庭ステージ
+	class Garden : public Base
+	{
+	public:
+		Garden() :Base() {}
+		void Initialize(Camera *pCamera);
+		EFFECT_CAMERA_ID GetIntroCameraScriptID() { return EFFECT_CAMERA_ID::SEA_STAGE_INTRO; }
+	};
 
 	// 終点ステージ
 	class Syuten : public Base

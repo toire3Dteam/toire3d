@@ -2,7 +2,7 @@
 #include "SelectData.h"
 #include "../Sound/BattleMusic.h"
 
-SelectData::SelectData():stage(STAGE::SEA),
+SelectData::SelectData():stage(STAGE::GARDEN),
 bTutorial(false),
 iWinRound(2),	// ラウンド数
 iBattleMusicID(BattleMusicManager::RANDOM),

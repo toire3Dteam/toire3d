@@ -15,7 +15,7 @@ enum class CHARACTER { AIROU, TEKI, NAZENARA, END };
 enum class PARTNER { MOKOI, MAYA, END };
 
 // ステージのタイプ
-enum class STAGE { SAND, SEA, SYUTEN, A, HEAVE_HO, MAX };
+enum class STAGE { SAND, SEA, GARDEN, SYUTEN, A, HEAVE_HO, MAX };
 
 struct SideData
 {

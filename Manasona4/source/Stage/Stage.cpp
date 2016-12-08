@@ -73,6 +73,9 @@ void Stage::Base::CreateStage(Stage::Base**p,STAGE id, Camera *pCamera)
 	case STAGE::SEA:
 		*p = new Stage::Sea;
 		break;
+	case STAGE::GARDEN:
+		*p = new Stage::Garden;
+		break;
 	case STAGE::SYUTEN:
 		*p = new Stage::Syuten;
 		break;
@@ -138,6 +141,27 @@ void Stage::Sea::Initialize(Camera *pCamera)
 
 	// ステージ毎にシェーダに渡すパラメーター
 	m_tagShaderParam.vDirLightVec = Vector3(0.84f, -0.99f, -0.53f);
+	m_tagShaderParam.vDirLightColor = Vector3(0.8f, 0.72f, 0.72f);
+	m_tagShaderParam.vSkyColor = Vector3(0.6f, 0.5f, 0.5f);
+	m_tagShaderParam.vGroundColor = Vector3(0.45f, 0.43f, 0.43f);
+
+	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
+	pCamera->SetStageCameraInfo("DATA/Stage/Sister/camera.txt");
+}
+
+void Stage::Garden::Initialize(Camera *pCamera)
+{
+	m_pObj = new iexMesh("DATA/Stage/Garden/Garden.IMO");
+
+	m_pBack = new iexMesh("DATA/Stage/Senjo/Skydome.IMO");
+	m_pBack->SetPos(Vector3(0, 0, 300));
+	m_pBack->SetScale(3.5f);
+	m_pBack->Update();
+	m_fBottom = 0;
+	m_fWidth = 150;
+
+	// ステージ毎にシェーダに渡すパラメーター
+	m_tagShaderParam.vDirLightVec = Vector3(-0.84f, -0.99f, -0.53f);
 	m_tagShaderParam.vDirLightColor = Vector3(0.8f, 0.72f, 0.72f);
 	m_tagShaderParam.vSkyColor = Vector3(0.6f, 0.5f, 0.5f);
 	m_tagShaderParam.vGroundColor = Vector3(0.45f, 0.43f, 0.43f);

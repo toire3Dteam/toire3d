@@ -170,6 +170,7 @@
     <ClCompile Include="source\Scene\SceneMenu.cpp" />
     <ClCompile Include="source\Scene\SceneMenuState.cpp" />
     <ClCompile Include="source\Scene\sceneRenderingTest.cpp" />
+    <ClCompile Include="source\Scene\SceneRenderingTest2.cpp" />
     <ClCompile Include="source\Scene\sceneResult.cpp" />
     <ClCompile Include="source\Scene\SceneSelect.cpp" />
     <ClCompile Include="source\Scene\SceneSelectState.cpp" />
@@ -316,6 +317,7 @@
     <ClInclude Include="source\Scene\SceneMenu.h" />
     <ClInclude Include="source\Scene\SceneMenuState.h" />
     <ClInclude Include="source\Scene\sceneRenderingTest.h" />
+    <ClInclude Include="source\Scene\SceneRenderingTest2.h" />
     <ClInclude Include="source\Scene\sceneResult.h" />
     <ClInclude Include="source\Scene\SceneSelect.h" />
     <ClInclude Include="source\Scene\SceneSelectState.h" />

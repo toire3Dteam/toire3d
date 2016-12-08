@@ -234,9 +234,9 @@ void DeferredEx::DirLight(const Vector3 dir, const Vector3 color)
 
 	Vector3 LightDir;
 	// ワールドの平行光を渡す
-	Vector3 wLightDir = dir;
-	wLightDir.Normalize();
-	//shader->SetValue("wLightVec", wLightDir);
+	Vector3 vWLightDir = dir;
+	vWLightDir.Normalize();
+	shaderM->SetValue("g_vWLightVec", vWLightDir);
 
 	//ビュー座標系に変換
 	LightDir.x = dir.x * matV._11 + dir.y * matV._21 + dir.z * matV._31;

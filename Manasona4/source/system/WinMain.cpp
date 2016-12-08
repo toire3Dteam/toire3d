@@ -2,6 +2,7 @@
 #include	"FrameworkEx.h"
 #include	"../Scene/sceneMain.h"
 #include	"../Scene/sceneRenderingTest.h"
+#include	"../Scene/sceneRenderingTest2.h"
 #include	"../Scene/sceneResult.h"
 #include	"../Scene/sceneTitle.h"
 #include	"../Scene/SceneMenu.h"
@@ -50,6 +51,7 @@ BOOL InitApp(HINSTANCE hInstance, int nCmdShow)									// ƒQ[ƒ€‹N“®Žž‚ÌÅ‰‚Ì
 	//MainFrameEx = new Framework();			 // ƒƒCƒ“ƒtƒŒ[ƒ€ƒ[ƒN¶¬
 	MainFrameEx->ChangeScene(new sceneMain); // ‰ŠúƒV[ƒ“
 	//MainFrameEx->ChangeScene(new sceneRenderingTest); // •`‰æƒeƒXƒgƒV[ƒ“
+	//MainFrameEx->ChangeScene(new sceneRenderingTest2); // •`‰æƒeƒXƒgƒV[ƒ“
 	//MainFrameEx->ChangeScene(new sceneResult(SIDE::RIGHT)); // ƒŠƒUƒ‹ƒgƒV[ƒ“
 	//MainFrameEx->ChangeScene(new sceneEffectTool); // 
 	//MainFrameEx->ChangeScene(new sceneTitle);

@@ -19,6 +19,8 @@ float4x4 ShadowProjection; // 影
 //------------------------------------------------------
 float3	ViewPos;		// ワールド座標の目のポジション
 
+float3 g_vWLightVec = { 1.0f, -1.0f, 1.0f };// ワールド空間での平行光の向き
+
 float3 LightVec;		// 平行光の向き
 float3 ViewLightVec;	// ビュー座標での光りの向き
 float3 LightColor = { 1.0f, 1.0f, 1.0f };
@@ -542,6 +544,7 @@ float3 CalcViewPosition(float2 UV, float2 zw)
 	return viewPos.xyz;
 }
 
+
 // オブジェの場所と法線、光の向き　光の絞る率　でスペキュラレートを返す
 float CalcSpecular(float3 pos, float3 normal, float3 lightVec, float power)
 {
@@ -934,7 +937,8 @@ PS_LIGHT PS_AllLight(float2 Tex:TEXCOORD0)
 
 		ShadowValue = 1; // 何も起こらなければ1で普通に描画
 
-						 //if (depth.r < fragDepth - 0.001f)
+		// 砂利じゃり防止
+		if (depth.r < fragDepth - 0.001f)
 		{
 			const float variance = depth.g - depth.r * depth.r;
 			ShadowValue = variance / (variance + (fragDepth - depth.r) * (fragDepth - depth.r));
@@ -1170,6 +1174,21 @@ sampler PLSSamp = sampler_state
 	AddressV = CLAMP;
 };
 
+//------------------------------------------------------
+///		環境用スクリーン	主にフォアード空間で使用
+//------------------------------------------------------
+texture EnvFullBuf;	//	EnvFullBuf
+sampler EnvFullBufSamp = sampler_state
+{
+	Texture = <EnvFullBuf>;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+	MipFilter = NONE;
+
+	// 横だけミラーにしてごまかす
+	AddressU = MIRROR;//MIRROR
+	AddressV = WRAP;//MIRROR
+};
 
 /***************************************/
 /*ぼかし用サンプラー*/
@@ -2363,3 +2382,435 @@ technique uvAnime_areaWall
 		PixelShader = compile ps_3_0 PS_UvAnime_AreaWall();
 	}
 }
+
+
+//------------------------------------------------------
+//		水に移りこむ世界
+//------------------------------------------------------
+struct VS_INPUT_WATER_REFLECT
+{
+	float4 Pos    : POSITION;
+	float3 Normal : NORMAL;
+	float4 Color  : COLOR0;
+	float2 Tex	  : TEXCOORD0;
+};
+
+struct VS_OUTPUT_WATER_REFLECT
+{
+	float4 Pos		: POSITION;
+	float4 Color	: COLOR0;
+	float2 Tex		: TEXCOORD0;
+
+	float4 wPos		: TEXCOORD1;//　ピクセルに送る情報にワールドからのポジション追加
+	float4 wvpPos	: TEXCOORD2;//　ピクセルに送る情報にゲーム画面ラストのポジション追加
+
+	float3 vLight	: TEXCOORD4;
+	float3 vE		: TEXCOORD5;
+
+	float3 Normal	: COLOR1;
+
+};
+
+//------------------------------------------------------
+///		水に移りこむ世界に必要なパラメーター
+//------------------------------------------------------
+float g_fWaterHeight = 0.0f;		//	水の高さ
+
+
+//------------------------------------------------------
+//		頂点シェーダー	
+//------------------------------------------------------
+VS_OUTPUT_WATER_REFLECT VS_WATER_REFLECT(VS_INPUT_WATER_REFLECT In)
+{
+	VS_OUTPUT_WATER_REFLECT Out = (VS_OUTPUT_WATER_REFLECT)0;
+
+	//ローカルの状態でモデルのY軸反転
+	In.Pos.y *= -1.0f;
+
+	//TransMatrixとPosを合成してwPosの情報生成
+	Out.wPos = mul(In.Pos, WMatrix);
+
+	// ここで水の高さを考慮した座標の反転を行う
+	//Out.wPos.y = g_fWaterHeight - (Out.wPos.y - g_fWaterHeight);
+
+	Out.wPos.y += 1;
+
+	Out.Pos = mul(Out.wPos, VPMatrix);
+
+	Out.Tex = In.Tex;
+	Out.Color = 1.0f;
+
+	Out.wvpPos = Out.Pos;
+
+	return Out;
+}
+
+//------------------------------------------------------
+//		ピクセルシェーダー	 後でPS_TONE_MAP でやるかも
+//------------------------------------------------------
+float4 PS_WATER_REFLECT(VS_OUTPUT_WATER_REFLECT In) : COLOR
+{
+	float4	OUT = (float4)0;
+
+	// 水より上に画像があれば破棄
+	clip(g_fWaterHeight - In.wPos.y);
+
+	//	ピクセル色決定
+	OUT = In.Color * tex2D(DecaleSamp, In.Tex);
+
+	// 必殺暗転の値
+	//OUT.color.rgb *= g_OverDriveDim;
+
+	//トーンマッピング
+	//OUT.color.rgb *= exp2(exposure);
+	//OUT.color.rgb -= float3(0.05f, 0.1f, 0.3f);
+	//OUT.high.rgb = float3(0.05f, 0.1f, 0.3f)*;// 必殺暗転の値
+	//OUT.high.a = 1.0f;
+
+	return OUT;
+}
+
+/* 水に移る反射マップ制作*/
+technique CrystalWaterReflect
+{
+	pass p0
+	{
+		AlphaBlendEnable = true;
+		BlendOp = Add;
+		SrcBlend = SrcAlpha;
+		DestBlend = InvSrcAlpha;
+		CullMode = CW;				// カリングを逆向きにして
+		ZEnable = true;
+		ZWriteEnable = true;
+
+		VertexShader = compile vs_3_0 VS_WATER_REFLECT();
+		PixelShader = compile ps_3_0 PS_WATER_REFLECT();
+	}
+
+}
+
+
+// UV値とZ値からワールド空間座標を算出
+float3 CalcWorldPosition(float2 UV, float2 zw)
+{
+	// UV空間
+	//      0.0 ---> 1.0
+	//	  y ↓				
+	//		1.0f
+
+	// NDC空間  UVではｙは↓を向いていたのでｙは反転する必要がある
+	//			1.0
+	//			↑
+	//  -1.0<--- 0.0 ---> 1.0
+	//	      y ↓				
+	//		   -1.0f
+
+	float4 proj;
+	proj.xy = (UV*float2(2.0f, -2.0f) + float2(-1.0f, 1.0f))* zw.y; //先生に聞こう
+																	//proj.xy = UV*2.0f - 1.0f;
+																	//proj.y *= -1.0f;
+	proj.zw = zw;	// ZとWはそのまま入れる
+
+					// プロジェクション逆行列でビュー座標系に変換　Proj->View
+	float4 worldPos = mul(proj, InvVPMatrix);
+	//worldPos.xyz /= worldPos.w;		// ワールド空間へはWで割る必要がある
+
+	return worldPos.xyz;
+}
+//------------------------------------------------------
+//		水頂点フォーマット
+//------------------------------------------------------
+
+struct VS_INPUT_WATER
+{
+	float4 Pos    : POSITION;
+	float3 Normal : NORMAL;
+	float4 Color  : COLOR0;
+	float2 Tex	  : TEXCOORD0;
+};
+
+
+struct VS_OUTPUT_WATER
+{
+	float4 Pos		: POSITION;
+	float4 Color	: COLOR0;
+	float2 Tex1		: TEXCOORD0;
+	float2 Tex2		: TEXCOORD3;
+
+	float4 wPos		: TEXCOORD1;//　ピクセルに送る情報にワールドからのポジション追加
+	float4 wvpPos	: TEXCOORD2;//　ピクセルに送る情報にゲーム画面ラストのポジション追加
+
+	float3 vLight	: TEXCOORD4;
+	float3 vE		: TEXCOORD5;
+
+	float3 Normal	: COLOR1;
+	float4 vPos		: TEXCOORD6;//　ピクセルに送る情報にビューからのポジション追加
+
+};
+
+//------------------------------------------------------
+///		水のリフレクションマップ
+//------------------------------------------------------
+texture WaterReflectBuf;
+sampler WaterReflectSamp = sampler_state
+{
+	Texture = <WaterReflectBuf>;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+	MipFilter = NONE;
+
+	// 横だけミラーにしてごまかす
+	AddressU = MIRROR;//MIRROR
+	AddressV = WRAP;//MIRROR
+};
+
+
+// グローバルパラメーター
+float g_fUvWater = 0.0f;
+//float3 wLightVec = { 1.0f, -1.0f, 1.0f };// 
+
+//------------------------------------------------------
+//		水頂点シェーダー	
+//------------------------------------------------------
+VS_OUTPUT_WATER VS_WATER(VS_INPUT_WATER In)
+{
+	VS_OUTPUT_WATER Out = (VS_OUTPUT_WATER)0;
+	//WMatrixとPosを合成してwPosの情報生成
+	Out.wPos = mul(In.Pos, WMatrix);
+	Out.vPos = mul(In.Pos, VMatrix);
+	
+	//  プロジェクション空間の座標を渡します
+	Out.Pos = Out.wvpPos = mul(In.Pos, WVPMatrix);
+	//Out.wvpPos = Out.Pos;
+
+	// 水の波用に2つテクスチャー座標に
+	Out.Tex1 = In.Tex + float2(-g_fUvWater*1.5f, -g_fUvWater * 1.5f);
+	Out.Tex2 = In.Tex + float2(g_fUvWater, g_fUvWater*1.51f);
+
+	// 一応色も使える用にしとく　今は特に使わないので1
+	Out.Color = 1.0f;
+
+	//	法線変換	
+	float3x3 mat = WMatrix;			// ↓の演算をするため3x3に変更
+	float3 N = mul(In.Normal, mat);	//	ローカルの法線とワールド行列掛け合わせてワールド空間の法線作ります
+	Out.Normal = normalize(N);		// 正規化しときます。
+	
+
+	//	頂点ローカル座標系算出
+	float3	T;
+	float3	B = { .0f,1.0f,0.0001f};// ダミーでY軸のベクトルを作る
+	T = cross(B, N);				// まずN(z軸)と仮のY軸で外積しXを入手
+	T = normalize(T);				// Xの値をベクトルに変換
+	B = cross(T, N);				// N(z軸)と入手したX軸で外積してY軸を入手
+	B = normalize(B);				// Y軸の値をベクトルに
+
+	//　ワールドから接空間へもどす必要がある
+	//　ライトベクトルを接空間へ
+	//　回転軸だけの逆行列は転置するだけでいいので　内積に置く
+	Out.vLight.x = dot(T, g_vWLightVec);	// ワールド空間のベクトルをTと内積して　	接空間のＸ軸を作る
+	Out.vLight.y = dot(B, g_vWLightVec);	// ワールド空間のベクトルをBと内積して　	接空間のＹ軸を作る
+	Out.vLight.z = dot(N, g_vWLightVec);	// ワールド空間のベクトルをNと内積して　	接空間のＺ軸を作る
+	Out.vLight = normalize(Out.vLight); // 最後に正規化してベクトルへ
+
+
+										// 視線ベクトルを接空間へ
+	float3 E = Out.wPos - ViewPos;		// 視線ベクトル
+	Out.vE.x = dot(T, E);				// 同じく接空間のＸ軸を作る
+	Out.vE.y = dot(B, E);				// 同じく接空間のＹ軸を作る
+	Out.vE.z = dot(N, E);				// 同じく接空間のＺ軸を作る
+	Out.vE = normalize(Out.vE);			// 最後に正規化してベクトルへ
+
+	return Out;
+}
+//------------------------------------------------------
+//		水ピクセルシェーダー
+//------------------------------------------------------
+float4 PS_WATER(VS_OUTPUT_WATER In) : COLOR
+{
+	float4 OUT = (float4)0;
+
+	//UV２つ作成
+	float2 UV1 = In.Tex1;
+	float2 UV2 = In.Tex2;
+
+	//**********************************************************
+	// 視差マッピング
+	//**********************************************************  
+	// マルチマップのピクセルを今回は視差マップとして参照し、高さを取得する
+	float h = tex2D(MultiSamp, UV1).r - 0.5f;
+	h += tex2D(MultiSamp, UV2).r - 0.5f;
+	h *= 0.5;//　二つサンプリングしてるから平均を取ってくる
+
+	// テクセルを頂点座標系での視線ベクトル方向に重みをつけてずらす。
+	float3 E = normalize(In.vE);//目線のベクトル
+	UV1 -= 0.02f * h * E.xy /*+ uvSea*/;//あとで数値上げる
+	UV2 -= 0.02f * h * E.xy /*+ uvSea*/;
+
+	/*************************/
+	//	視差適用後に 法線取得
+	/*************************/
+
+	//法線マップを参照し、法線を視差分ずらし取得する
+	float3 NMap = (tex2D(NormalSamp, UV1).rgb - 0.5f)*2.0f;
+	NMap += (tex2D(NormalSamp, UV2).rgb - 0.5f)*2.0f;
+	NMap *= 0.5f;// ↑で2回足してるので半減させる
+
+	//	視線反射ベクトル
+	float3 R = reflect(-E, NMap);
+
+	//	ライト計算
+	//In.vLight = normalize(In.vLight);
+	float3 light;
+	float rate = max(0.0f, dot(-In.vLight, NMap));//　光の計算　内積で光の反射を求める
+	light = rate;//
+
+				 //	スペキュラ
+	float SpecPower = 1.0f;
+	float S = pow(max(0, dot(R, In.vLight)), 80) * (SpecPower);
+
+	// スペキュラ加算
+	OUT.rgb += S;
+
+	//******************************************************
+	/// G_Bufferを合わせ取得する
+	//******************************************************
+	float2 G_Fetch = (In.wvpPos.xy / In.wvpPos.w)*0.5f + 0.5f;
+	G_Fetch.y = -G_Fetch.y;
+
+
+
+	//******************************************************
+	/// Z値取得　水の
+	//******************************************************
+	////float fZ = tex2D(DepthBufSampWater, G_Fetch).r;	// 深度バッファから奥行取得
+	////float Z = 1 / fZ;
+	//
+	//// 必要な情報を取得
+	const float4 NormalDepth = tex2D(NormalDepthSamp, G_Fetch);
+	//const float3 Normal = CalcNormal(NormalDepth.xy*2.0f - 1.0f);
+	//const float3 envPos = CalcViewPosition(G_Fetch, NormalDepth.zw);
+	////float4 proj;
+	////proj.xy = (G_Fetch*float2(2.0f, -2.0f) + float2(-1.0f, 1.0f))* NormalDepth.zw.y;
+	////proj.zw = NormalDepth.zw;	// ZとWはそのまま入れる
+	//// プロジェクション逆行列でビュー座標系に変換　Proj->View
+	////float4 worldPos = mul(proj, InvVPMatrix);
+	////worldPos.xyz /= worldPos.w;		// ワールド空間へはWで割る必要がある
+
+
+	////ZPos.xyz /= ZPos.w;
+	//// PLのPosとこのピクセルの位置で←ポジション＆距離
+	////float3 ViewLightVec = PLSpos.xyz - (Pos.xyz);
+	////float dist = pow(max(0.0f, 1.0f - (length(ViewLightVec) / PLSrange)), 2);//←数値をいじり絞る
+
+	//// 高さのみ
+	//float waterLen = length(ViewPos.y - g_fWaterHeight);
+
+	//float vLen = length(envPos-In.vPos.xyz);
+
+	////
+	//float Zdist= length (waterLen - worldPos.y);
+	////  ベクトルの長さを三平方の定理から求め、求めたベクトルの長さを返す
+	////float Zdist = sqrt(Vec.x*Vec.x + Vec.y*Vec.y + Vec.z*Vec.z);
+	//
+
+	/**************************************/
+	//	取得した奥行でFOG
+	/**************************************/
+	// 深度が深ければ深いほど透明感をなくす
+
+	//float ZNear = 100.0f;
+	//float ZFar = 300.0f;
+	////float ZNear = 0.99f;
+	////float ZFar = 1.1f;
+	//float3 ZCol = { 0.0f, 1.0f, 0.0f };
+	//float ZRate = smoothstep(ZNear, ZFar, Zdist);
+
+	//// フォグの色をフォグの値を入れる 
+	//ZCol = ZCol * (ZRate);
+	//OUT.rgb += ZCol;
+
+	//******************************************************
+	/// 屈折の効果
+	//******************************************************
+
+	// 歪み度
+	float distortion = 0.02f;
+
+	// 環境度
+	float3 Env = tex2D(EnvFullBufSamp, G_Fetch + (float2(NMap.x, NMap.y)*distortion));
+	
+	//深度値を利用してマスクを作る
+	//float G_Depth = tex2D(DepthBufSampWater, G_Fetch + (float2(NMap.x, NMap.y)*distortion)).r;
+	float4 proj;
+	proj.xy = (G_Fetch*float2(2.0f, -2.0f) + float2(-1.0f, 1.0f))* NormalDepth.zw.y;
+	proj.zw = NormalDepth.zw;	// ZとWはそのまま入れる
+	// プロジェクション逆行列でビュー座標系に変換　Proj->View
+	float4 worldPos = mul(proj, InvVPMatrix);
+	worldPos.xyz /= worldPos.w;		// ワールド空間へはWで割る必要がある
+	float G_Depth = proj.z / proj.w;
+
+	float myDepth = In.wvpPos.z / In.wvpPos.w;			//wで割って-1~1に変換する
+	// (if文)手前のPixel情報なら手前のオブジェクトの情報をとってこない処理
+	if (myDepth > G_Depth)
+	{
+		Env.rgb = tex2D(EnvFullBufSamp, G_Fetch);
+	}
+
+	
+	Env *= 0.7f;// 色を暗くする度あい
+	OUT.rgb += Env;// lerp(Env, OUT.rgb, 0.3f);
+
+
+	//******************************************************
+	/// フレネル反射
+	//******************************************************
+
+	// 水の法線ベクトルと始点ベクトルで内積　
+	float fresnel = dot(normalize(ViewPos - In.wPos), In.Normal);
+
+	// 線形補間
+	//float3 RefCol = { -0.1f, -0.08f, -0.0f };
+	float3 RefCol = { 0.0f, 0.02f, 0.1f };
+	float3 SeaCol = { 0.0f, 0.0f, 0.0f };
+	float AbujustF = +0.05f;					// フレネル反射の調整パラメーター　上げると弱まるが上まで見下ろすと-の値貫通してが描画される[1207]maxminで解決
+
+	RefCol += tex2D(WaterReflectSamp, G_Fetch + (float2(NMap.x, NMap.y)*distortion));
+
+	// 描画
+	float3 fresnelCol;
+	fresnelCol = lerp(RefCol, SeaCol, max(0.0f, min(1.0f, fresnel + AbujustF)));
+	OUT.rgb += fresnelCol;
+
+	/**************************************/
+	//
+	/**************************************/
+
+	//OUT.rgb += ZCol;
+
+	OUT.a = 1.0f;
+	return OUT;
+}
+
+/* 水 */
+technique CrystalWater
+{
+	pass p0
+	{
+		AlphaBlendEnable = true;
+		BlendOp = Add;
+		SrcBlend = SrcAlpha;
+		DestBlend = InvSrcAlpha;
+		CullMode = CCW;
+		ZEnable = true;
+		ZWriteEnable = true;
+
+		VertexShader = compile vs_3_0 VS_WATER();
+		PixelShader = compile ps_3_0 PS_WATER();
+
+	}
+
+}
+
+
+
+

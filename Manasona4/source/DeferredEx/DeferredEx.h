@@ -102,6 +102,15 @@ public:
 	void FinalBegin();
 	void FinalEnd();
 
+	//****************************
+	//		ENVIRONMENT
+	//****************************
+	// 最終結果のスクリーンを環境マップとしてシェーダ側に送る 
+	void SendFinalScreenEnv() 
+	{
+		shaderM->SetValue("EnvFullBuf", m_pSurface[(int)SURFACE_NAME_EX::SCREEN]);
+	}
+
 	//　アクセサー
 	tdn2DObj* GetTex(const SURFACE_NAME_EX name); //テクスチャを取ってくる
 	bool  GetShadowFlag(){ return m_bShadowFlag; }

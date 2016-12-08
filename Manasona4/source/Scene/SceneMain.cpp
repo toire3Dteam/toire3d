@@ -621,7 +621,7 @@ void sceneMain::RenderShadow()
 	if (DeferredManagerEx.GetShadowFlag() == false)return;
 
 	// フラグが立ってる時のみ描画  [1206] 一応用意しといた
-	if (m_bBakeStageShadow == true)
+	//if (m_bBakeStageShadow == true)
 	{
 		DeferredManagerEx.CreateShadowMatrix
 			(m_pStage->GetShaderParam().vDirLightVec, Vector3(0, 0, 0), Vector3(0, 0, 1), 400);
@@ -634,7 +634,7 @@ void sceneMain::RenderShadow()
 
 
 			// プレイヤー
-			//PlayerMgr->RenderShadow();
+			PlayerMgr->RenderShadow();
 
 			DeferredManagerEx.ShadowEnd();
 		}
