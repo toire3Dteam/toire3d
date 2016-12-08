@@ -11,17 +11,14 @@ static const int SKILL_AERIALDROP_FINISH(3);	// とどめ
 Airou::Airou(SIDE side, const SideData &data) :BasePlayer(side, data)
 , m_pOshiokiMgr(nullptr), m_bHeavehoHit(false), m_pAirouEntryEffect(new AirouEntryEffect), m_pAirouEntryCircleEffect(new AirouEntrySircleEffect)
 {
-	//if (deviceID == 0)m_pOshiokiMgr = new OshiokiManager::OverFlow(this,nullptr);
+	// エフェクトカメラID
+	m_tagCharacterParam.eHeaveHoOverFlowCameraID = EFFECT_CAMERA_ID::AIROU_OVERFLOW;
 
-	// キャラ固有の情報の設定
-	//m_pHitSquare->width = 1.5f;
-	//m_pHitSquare->height = 4;
-	//m_pHitSquare->pos.Set(.0f, 4.0f, .0f);
-	//m_maxSpeed = 1.15f;
-	//m_MaxHP = m_HP = 10000;	// キャラごとのHP
 	Reset();
 
-	// キャラごとの設定
+	// キャラごとの設定を読み込む
+	BasePlayer::LoadCharacterParam("DATA/CHR/Airou/param.txt");
+
 	m_pName = "AIROU";
 	m_pCutinPic = new tdn2DAnim("DATA/UI/Game/OverDriveCutin/Airou.png");
 	m_pCutinPic->OrderMoveAppeared(8, -400, +200);
@@ -38,15 +35,6 @@ Airou::Airou(SIDE side, const SideData &data) :BasePlayer(side, data)
 		FOR(SKILL_AERIALDROP_MIDDLE) m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL_AERIALDROP][StartActiveFrame + SKILL_AERIALDROP_FIRST + i] = FRAME_STATE::FOLLOW;
 	}
 	// アイルーメッシュ
-	//m_pDefaultObj = new iex3DObj((side == SIDE::LEFT) ? "DATA/CHR/Airou/airou.IEM" : "DATA/CHR/Teki/teki.IEM");
-	m_pDefaultObj = new iex3DObj("DATA/CHR/Airou/airou.IEM");
-	m_pDefaultObj->SetPos(m_vPos);
-	m_pDefaultObj->Update();
-
-	m_pHHDOFObj = new iex3DObj("DATA/CHR/Airou/airou_hissatsu.IEM");	// 必殺用のメッシュ初期化
-	m_pHHDOFObj->SetAngle(PI);
-	m_pHHDOFObj->Update();
-
 	m_pObj = m_pDefaultObj;
 
 	// 顔グラ
@@ -56,28 +44,6 @@ Airou::Airou(SIDE side, const SideData &data) :BasePlayer(side, data)
 
 	// スピードライン
 	m_pSpeedLine = new SpeedLineGreenEffect;
-
-	//switch (deviceID)
-	//{
-	//case 1:
-	//	m_pObj->SetTexture(tdnTexture::Load("DATA/CHR/Airou/tex_airou2.png"), 0);
-	//	break;
-	//case 2:
-	//	m_pObj->SetTexture(tdnTexture::Load("DATA/CHR/Airou/tex_airou3.png"), 0);
-	//	break;
-	//case 3:
-	//	m_pObj->SetTexture(tdnTexture::Load("DATA/CHR/Airou/tex_airou4.png"), 0);
-	//	break;
-	//}
-
-	if (SIDE::LEFT == m_side)
-	{
-		m_pObj->SetTexture(tdnTexture::Load("DATA/CHR/Airou/tex_airou2.png"), 0);
-	}
-	else
-	{
-		//m_pObj->SetTexture(tdnTexture::Load("DATA/CHR/Airou/tex_airou3.png"), 0);
-	}
 }
 
 void Airou::Reset()
@@ -87,15 +53,6 @@ void Airou::Reset()
 
 	// おしおき出してリスタートすると残るので削除
 	SAFE_DELETE(m_pOshiokiMgr);
-
-	m_pHitSquare->width = 1.5f;
-	m_pHitSquare->height = 4;
-	m_pHitSquare->pos.Set(.0f, 4.0f, .0f);
-	m_fMaxSpeed = 1.15f;
-	m_iMaxHP = m_iHP = 10000;	// キャラごとのHP
-
-	// エフェクトカメラID
-	m_eHeaveHoOverFlowCameraID = EFFECT_CAMERA_ID::AIROU_OVERFLOW;
 }
 
 void Airou::InitActionDatas()
@@ -885,7 +842,8 @@ void Airou::SkillAction::Land::Enter()
 	// 重力の影響受けるな！
 	m_pAirou->SetMoveUpdate(false);
 
-	m_pAirou->m_pHitSquare->width = 5.5f;
+	// ★★★ここで終了するとやばい
+	m_pAirou->m_tagCharacterParam.HitSquare.width = 5.5f;
 
 	// アイル―ドリルエフェクト発動！
 	m_pAirou->AddEffectAction(m_pAirou->m_vPos, EFFECT_TYPE::AIROU_DRILL);
@@ -961,7 +919,7 @@ void Airou::SkillAction::Land::Exit()
 	// 移動更新無効を解除しておく
 	m_pAirou->SetMoveUpdate(true);
 
-	m_pAirou->m_pHitSquare->width = 1.5f;
+	m_pAirou->m_tagCharacterParam.HitSquare.width = 1.5f;
 	m_pAirou->m_pUVEffectMGR->StopEffect(UV_EFFECT_TYPE::AIROU_DRILL);// ドリルエフェクトおしまい
 
 	// 攻撃情報を元に戻す

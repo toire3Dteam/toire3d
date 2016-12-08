@@ -7,9 +7,14 @@
 
 Nazenara::Nazenara(SIDE side, const SideData &data) :BasePlayer(side, data), m_pOverFlow(nullptr)
 {
+	// エフェクトカメラID
+	m_tagCharacterParam.eHeaveHoOverFlowCameraID = EFFECT_CAMERA_ID::NAZENARA_OVERFLOW;
+
 	Reset();
 
-	// キャラごとの設定
+	// キャラごとの設定を読み込む
+	BasePlayer::LoadCharacterParam("DATA/CHR/Nazenara/param.txt");
+
 	m_pName = "∵";
 	m_pCutinPic = new tdn2DAnim("DATA/UI/Game/OverDriveCutin/Airou.png");
 	m_pCutinPic->OrderMoveAppeared(8, -400, +200);
@@ -26,17 +31,7 @@ Nazenara::Nazenara(SIDE side, const SideData &data) :BasePlayer(side, data), m_p
 	//	FOR(SKILL_AERIALDROP_MIDDLE) m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL_AERIALDROP][StartActiveFrame + SKILL_AERIALDROP_FIRST + i] = FRAME_STATE::FOLLOW;
 	//}
 	// ∵メッシュ
-	//m_pDefaultObj = new iex3DObj((side == SIDE::LEFT) ? "DATA/CHR/Airou/airou.IEM" : "DATA/CHR/Teki/teki.IEM");
-	m_pDefaultObj = new iex3DObj("DATA/CHR/Nazenara/nazenaraba.IEM");
-	m_pDefaultObj->SetPos(m_vPos);
-	m_pDefaultObj->Update();
-
 	m_pArm = new iex3DObj("DATA/CHR/Nazenara/nazenaraba_hand.IEM");
-
-	m_pHHDOFObj = new iex3DObj("DATA/CHR/Nazenara/naze_hissatsu.IEM");	// 必殺用のメッシュ初期化
-	m_pHHDOFObj->SetAngle(PI);
-	m_pHHDOFObj->Update();
-
 	m_pObj = m_pDefaultObj;
 
 	// 顔グラ
@@ -50,15 +45,9 @@ Nazenara::Nazenara(SIDE side, const SideData &data) :BasePlayer(side, data), m_p
 	// ゴッドハンド
 	m_pGodHand = new GodHandEffect;
 
-	if (SIDE::LEFT == m_side)
+	if (m_side == SIDE::RIGHT)
 	{
-		m_pObj->SetTexture(tdnTexture::Load("DATA/CHR/Nazenara/tex_nazenaraba4.png"), 0);
-		m_pArm->SetTexture(tdnTexture::Load("DATA/CHR/Nazenara/tex_nazenaraba4.png"), 0);
-		m_pHHDOFObj->SetTexture(tdnTexture::Load("DATA/CHR/Nazenara/tex_nazenaraba4.png"), 0);
-	}
-	else
-	{
-		//m_pObj->SetTexture(tdnTexture::Load("DATA/CHR/Airou/tex_airou3.png"), 0);
+		m_pArm->SetTexture(m_pObj->GetTexture(0), 0);
 	}
 }
 
@@ -70,15 +59,6 @@ void Nazenara::Reset()
 	SAFE_DELETE(m_pOverFlow);
 
 	m_bArm = false;
-
-	m_pHitSquare->width = 1.75f;
-	m_pHitSquare->height = 4;
-	m_pHitSquare->pos.Set(.0f, 4.0f, .0f);
-	m_fMaxSpeed = 1.15f;
-	m_iMaxHP = m_iHP = 9000;	// キャラごとのHP
-
-	// エフェクトカメラID
-	m_eHeaveHoOverFlowCameraID = EFFECT_CAMERA_ID::NAZENARA_OVERFLOW;
 }
 
 void Nazenara::InitActionDatas()
@@ -555,7 +535,7 @@ void Nazenara::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 80;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_BACK;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
-											   
+
 	// 判定形状								   
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->pCollisionShape->width = 8;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->pCollisionShape->height = 8;

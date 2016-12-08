@@ -581,6 +581,7 @@ public:
 	bool isAerialJump() { return m_bAerialJump; }
 	bool isAerialDash() { return m_bAerialDash; }
 	int  GetAerialDashFrame() { return m_iAerialDashFrame; }
+	float GetAerialDashSpeed(){ return m_tagCharacterParam.fAerialDashSpeed; }
 	Jump *GetJump() { return &m_jump; }
 	void SetLand(bool bLand) { m_bLand = bLand; }
 	void SetSquat(bool bSquat) { m_bSquat = bSquat; }
@@ -630,7 +631,7 @@ public:
 	//------------------------------------------------------
 	//	HP・ダメージ
 	//------------------------------------------------------
-	int GetMaxHP() { return m_iMaxHP; }
+	int GetMaxHP() { return m_tagCharacterParam.iMaxHP; }
 	int GetHP() { return m_iHP; }
 	void SetHP(int hp) { m_iHP = hp; }
 	float GetDamageRate(){ return m_fDamageRate; }
@@ -640,8 +641,8 @@ public:
 	int  GetHPPercentage()
 	{
 		// HPのレートを計算
-		MyAssert((m_iMaxHP != 0), "最大HPが0だと0で割ることに");
-		float HpRate = (float)m_iHP / (float)m_iMaxHP;
+		MyAssert((m_tagCharacterParam.iMaxHP != 0), "最大HPが0だと0で割ることに");
+		float HpRate = (float)m_iHP / (float)m_tagCharacterParam.iMaxHP;
 		HpRate *= 100;//　繰り上げる 
 		return (int)HpRate;
 	};
@@ -794,9 +795,9 @@ public:
 	//------------------------------------------------------
 	int GetDeviceID() { return m_iDeviceID; }
 	//bool isMaxSpeed() { return (abs(m_move.x) >= m_maxSpeed); }
-	float GetMaxSpeed() { return m_fMaxSpeed; }
+	float GetMaxSpeed() { return m_tagCharacterParam.fMaxSpeed; }
 	SIDE GetSide(){ return m_side; }
-	CollisionShape::Square *GetHitSquare() { return m_pHitSquare; }	// ステージのあたり判定用
+	CollisionShape::Square *GetHitSquare() { return &m_tagCharacterParam.HitSquare; }	// ステージのあたり判定用
 
 	// UI
 	//ComboUI* GetComboUI(){ return m_pComboUI; }
@@ -811,7 +812,7 @@ public:
 	void SetGameTimerStopFlag(bool flag) { m_bGameTimerStopFlag = flag; }
 
 	// ひーほー
-	EFFECT_CAMERA_ID GetOverFlowCameraID(){ return m_eHeaveHoOverFlowCameraID; }
+	EFFECT_CAMERA_ID GetOverFlowCameraID(){ return m_tagCharacterParam.eHeaveHoOverFlowCameraID; }
 
 	iex3DObj *GetDefaultObj(){ return m_pDefaultObj; }
 	iex3DObj *GetObj(){ return m_pObj; }
@@ -859,6 +860,18 @@ public:
 	static const int	c_FIRST_HIT_ADD_DAMAGE;	// 初段ヒット加算ダメージ
 
 protected:
+	//------------------------------------------------------
+	//	キャラが固有で持つ値
+	//------------------------------------------------------
+	struct CharacterParam
+	{
+		int iMaxHP;									// 最大HP
+		float fMaxSpeed;							// 最大スピード(実質走る速さ)
+		float fAerialDashSpeed;						// 空中ダッシュの速度
+		CollisionShape::Square HitSquare;			// 四角判定(ステージ衝突で使う)
+		EFFECT_CAMERA_ID eHeaveHoOverFlowCameraID;	// 一撃必殺カメラのID
+	}m_tagCharacterParam;
+	
 	//------------------------------------------------------
 	//	位置・移動量
 	//------------------------------------------------------
@@ -929,7 +942,6 @@ protected:
 	//------------------------------------------------------
 	//	HP・ダメージ
 	//------------------------------------------------------
-	int m_iMaxHP;
 	int m_iHP;
 	float m_fDamageRate;				// 自分にダメージのかかる補正
 
@@ -994,9 +1006,7 @@ protected:
 	//	その他
 	//------------------------------------------------------
 	const int m_iDeviceID;		// 自分のコントローラーの番号(実質、スマブラのxPに値する)
-	float m_fMaxSpeed;		// キャラクターの最大スピード 
 	SIDE m_side;			// このキャラクターの所属してるチーム		
-	CollisionShape::Square *m_pHitSquare;	// 四角判定(ステージ衝突で使う)
 	StateMachine<BasePlayer>* m_pStateMachine; // ★ステートマシン
 	AI*						  m_pAI;			// ★AI
 	bool m_bAI;					// AIかどうか
@@ -1006,7 +1016,6 @@ protected:
 	// ヒーホー用の変数
 	int m_iHeavehoStopTimer;			// ヒーホードライブ発動のザワールドの時間
 	int m_iHeaveHoDriveOverFlowFrame;	// ヒーホーの必殺のSEとかエフェクト用に作る
-	EFFECT_CAMERA_ID m_eHeaveHoOverFlowCameraID;		// 一撃必殺カメラのID
 
 	float m_fOrangeColRate;		// 無敵技のオレンジの光レート
 	float m_fMagentaColRate;	// 中段技のマゼンタの光レート
@@ -1030,6 +1039,7 @@ protected:
 	// 初期ロードは重くなるがゲーム中おもくなるよりマシ。
 
 	// 継承してるやつに強制的に呼ばせる
+	void LoadCharacterParam(LPSTR filename);
 	void LoadAttackFrameList(LPSTR filename);
 	void LoadAttackDatas(LPSTR filename);
 

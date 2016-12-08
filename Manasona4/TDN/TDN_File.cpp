@@ -89,6 +89,18 @@ std::string tdnFile::GetFileName(char *path, bool bExt)
 #endif
 }
 
+std::string tdnFile::GetDirectoryPath(char *path)
+{
+	sys::path p(path);
+
+	// trueなら拡張子付き、falseなら拡張子なしのファイル名を返す
+#ifdef TDNFILE_VC_2013
+	return p.parent_path();
+#else
+	return p.parent_path().string();
+#endif
+}
+
 std::string tdnFile::OpenFileDialog(char *filter)
 {
 	LPCTSTR str_filter = TEXT(filter);

@@ -7,9 +7,14 @@
 
 Teki::Teki(SIDE side, const SideData &data) :BasePlayer(side, data)
 {
+	// エフェクトカメラID
+	m_tagCharacterParam.eHeaveHoOverFlowCameraID = EFFECT_CAMERA_ID::OVERFLOW_TEST;
+
 	Reset();
 
-	// キャラごとの設定
+	// キャラごとの設定を読み込む
+	BasePlayer::LoadCharacterParam("DATA/CHR/Teki/param.txt");
+
 	m_pName = "Teki";
 	m_pCutinPic = new tdn2DAnim("DATA/UI/Game/OverDriveCutin/teki.png");
 	m_pCutinPic->OrderMoveAppeared(8, -400, +200);
@@ -22,17 +27,7 @@ Teki::Teki(SIDE side, const SideData &data) :BasePlayer(side, data)
 		m_ActionFrameList[(int)BASE_ACTION_STATE::RUSH2][14] = FRAME_STATE::ACTIVE;
 		m_ActionFrameList[(int)BASE_ACTION_STATE::RUSH2][15] = FRAME_STATE::ACTIVE;
 	}
-	// ∵メッシュ
-	//m_pDefaultObj = new iex3DObj((side == SIDE::LEFT) ? "DATA/CHR/Airou/airou.IEM" : "DATA/CHR/Teki/teki.IEM");
-	m_pDefaultObj = new iex3DObj("DATA/CHR/Teki/teki.IEM");
-	m_pDefaultObj->SetPos(m_vPos);
-	m_pDefaultObj->Update();
-
-	
-	m_pHHDOFObj = new iex3DObj("DATA/CHR/Airou/airou_hissatsu.IEM");	// 必殺用のメッシュ初期化
-	m_pHHDOFObj->SetAngle(PI);
-	m_pHHDOFObj->Update();
-
+	// てきメッシュ
 	m_pObj = m_pDefaultObj;
 
 	// 顔グラ
@@ -42,44 +37,12 @@ Teki::Teki(SIDE side, const SideData &data) :BasePlayer(side, data)
 
 	// スピードライン
 	m_pSpeedLine = new SpeedLineGreenEffect;
-
-	//switch (deviceID)
-	//{
-	//case 1:
-	//	m_pObj->SetTexture(tdnTexture::Load("DATA/CHR/Airou/tex_airou2.png"), 0);
-	//	break;
-	//case 2:
-	//	m_pObj->SetTexture(tdnTexture::Load("DATA/CHR/Airou/tex_airou3.png"), 0);
-	//	break;
-	//case 3:
-	//	m_pObj->SetTexture(tdnTexture::Load("DATA/CHR/Airou/tex_airou4.png"), 0);
-	//	break;
-	//}
-
-	if (SIDE::LEFT == m_side)
-	{
-	}
-	else
-	{
-		m_pObj->SetTexture(tdnTexture::Load("DATA/CHR/Teki/teki2.png"), 0);
-
-		//m_pObj->SetTexture(tdnTexture::Load("DATA/CHR/Airou/tex_airou3.png"), 0);
-	}
 }
 
 void Teki::Reset()
 {
 	// 必ず書く
 	BasePlayer::Reset();
-
-	m_pHitSquare->width = 1.75f;
-	m_pHitSquare->height = 4;
-	m_pHitSquare->pos.Set(.0f, 4.0f, .0f);
-	m_fMaxSpeed = 1.15f;
-	m_iMaxHP = m_iHP = 9000;	// キャラごとのHP
-
-	// エフェクトカメラID
-	m_eHeaveHoOverFlowCameraID = EFFECT_CAMERA_ID::OVERFLOW_TEST;
 }
 
 void Teki::InitActionDatas()

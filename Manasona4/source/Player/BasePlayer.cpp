@@ -31,6 +31,61 @@ const int BasePlayer::c_WINNER_TIME = 180;
 const float BasePlayer::c_GUARD_DISTANCE = 32.0f;
 const int BasePlayer::c_FIRST_HIT_ADD_DAMAGE = 300;	// 初段ヒット加算ダメージ
 
+// キャラクター基本情報読み込み
+void BasePlayer::LoadCharacterParam(LPSTR filename)
+{
+	std::ifstream ifs(filename);
+	MyAssert(ifs, "parameterのテキスト入ってない");
+
+	std::string sDirectory(tdnFile::GetDirectoryPath(filename));
+
+	char skip[64];	// 読み飛ばし用変数
+
+	// メッシュ
+	char path[MAX_PATH];
+	ifs >> skip;
+	ifs >> path;
+	if (!m_pDefaultObj) m_pDefaultObj = new iex3DObj((char*)(sDirectory + "/" + path).c_str());
+	m_pDefaultObj->SetPos(m_vPos);
+	m_pDefaultObj->Update();
+
+	// 必殺用メッシュ
+	ifs >> skip;
+	ifs >> path;
+	if (!m_pHHDOFObj) m_pHHDOFObj = new iex3DObj((char*)(sDirectory + "/" + path).c_str());
+	m_pHHDOFObj->SetAngle(PI);
+	m_pHHDOFObj->Update();
+
+
+	// 2Pカラーテクスチャ
+	ifs >> skip;
+	ifs >> path;
+	if (m_side == SIDE::RIGHT)
+	{
+		m_pDefaultObj->SetTexture(tdnTexture::Load((char*)(sDirectory + "/" + path).c_str()), 0);
+		m_pHHDOFObj->SetTexture(tdnTexture::Load((char*)(sDirectory + "/" + path).c_str()), 0);
+	}
+
+	// 本体の判定
+	ifs >> skip;
+	ifs >> m_tagCharacterParam.HitSquare.width;
+	ifs >> m_tagCharacterParam.HitSquare.height;
+	ifs >> m_tagCharacterParam.HitSquare.pos.y;
+
+	// 最大速度(ダッシュ速度
+	ifs >> skip;
+	ifs >> m_tagCharacterParam.fMaxSpeed;
+
+	// 空中ダッシュ速度
+	ifs >> skip;
+	ifs >> m_tagCharacterParam.fAerialDashSpeed;
+
+	// 最大HP
+	ifs >> skip;
+	ifs >> m_tagCharacterParam.iMaxHP;
+	m_iHP = m_tagCharacterParam.iMaxHP;
+}
+
 // アクションフレーム情報読み込み
 void BasePlayer::LoadAttackFrameList(LPSTR filename)
 {
@@ -91,7 +146,7 @@ void BasePlayer::LoadAttackDatas(LPSTR filename)
 	while (!ifs.eof())
 	{
 		// 読み飛ばし用変数
-		char skip[128];
+		//char skip[128];
 
 		// ID読み込み
 		{
@@ -129,7 +184,7 @@ void BasePlayer::LoadAttackDatas(LPSTR filename)
 }
 
 BasePlayer::BasePlayer(SIDE side, const SideData &data) :m_bAI(data.bAI), m_iDeviceID(data.iDeviceID), m_side(side), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + (int)side)),
-m_fMaxSpeed(1.0f), m_dir(DIR::LEFT), m_pHitSquare(new CollisionShape::Square), m_pDefaultObj(nullptr),
+m_dir(DIR::LEFT), m_pDefaultObj(nullptr), m_pHHDOFObj(nullptr),
 m_pObj(nullptr),
 m_vMove(0, 0, 0), m_bLand(false), m_bSquat(false), m_bAerialJump(true), m_bAerialDash(false), m_iAerialDashFrame(0), m_ActionState(BASE_ACTION_STATE::NO_ACTION),
 m_iInvincibleLV(0), m_iInvincibleTime(0), m_iCurrentActionFrame(0), m_iRecoveryFrame(0), m_bEscape(false), m_iScore(0), m_iCollectScore(0), m_pAI(nullptr),
@@ -137,14 +192,14 @@ m_iHitStopFrame(0),// ★★★バグの原因　ひっとすトップ初期化のし忘れ。
 m_fInvincibleColRate(0), m_iInvincibleColRateFlame(0), m_bInvincibleColRateUpFlag(false),
 m_OverDriveGage(0), m_bOverDrive(false), m_OverDriveFrame(0), m_OverDriveType(OVERDRIVE_TYPE::BURST),
 m_bMoveUpdate(true),
-m_iMaxHP(0), m_iHP(0),
+m_iHP(0),
 m_bGameTimerStopFlag(false), m_iHeavehoStopTimer(0), m_iHeaveHoDriveOverFlowFrame(0),
 m_iWinNum(0), m_GuardState(GUARD_STATE::NO_GUARD),
 m_pFacePic(nullptr), m_pTargetPlayer(nullptr), m_pSpeedLine(nullptr), m_SkillActionType(SKILL_ACTION_TYPE::MAX),
 m_fOrangeColRate(0), m_fMagentaColRate(0),
 m_pCutinPic(nullptr), m_pName("None"), m_iRushStep(0), m_pThrowMark(nullptr),
 m_bWillPower(false), m_bDown(false), m_iDashFrame(0),
-m_bNotOverDrive(false)
+m_bNotOverDrive(false), m_tagCharacterParam{}
 {
 	// スタンド
 	switch (data.partner)
@@ -159,12 +214,6 @@ m_bNotOverDrive(false)
 		assert(0);
 		break;
 	}
-
-
-	// デフォルト設定
-	m_pHitSquare->height = 4;
-	m_pHitSquare->width = 1;
-	m_pHitSquare->pos.Set(.0f, 4.0f, .0f);
 
 	// エフェクトマネージャー
 	m_pPanelEffectMGR = new PanelEffectManager();
@@ -229,7 +278,7 @@ void BasePlayer::Reset()
 	m_iInvincibleColRateFlame =
 	//m_OverDriveGage =			// ラウンド引継ぎ
 	m_OverDriveFrame =
-	m_iMaxHP = m_iHP =
+	m_iHP =
 	m_iHeavehoStopTimer =
 	m_iHeaveHoDriveOverFlowFrame =
 	m_iAerialDashFrame =
@@ -237,6 +286,8 @@ void BasePlayer::Reset()
 	m_wAheadCommand =
 	m_iDashFrame=
 	0;
+
+	m_iHP = m_tagCharacterParam.iMaxHP;	// キャラごとのHP
 
 	/* [float型]の初期化 */
 
@@ -329,7 +380,6 @@ BasePlayer::~BasePlayer()
 	SAFE_DELETE(m_pFacePic);
 	SAFE_DELETE(m_pSpeedLine);
 	SAFE_DELETE(m_pCutinPic);
-	delete m_pHitSquare;
 }
 
 void BasePlayer::Update(PLAYER_UPDATE flag)
@@ -343,7 +393,7 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 	}
 	if (KeyBoardTRG(KB_9))
 	{
-		m_iHP = m_iMaxHP;
+		m_iHP = m_tagCharacterParam.iMaxHP;
 	}
 	if (KeyBoardTRG(KB_0))
 	{
@@ -1169,7 +1219,7 @@ void BasePlayer::Render()
 	// 判定の描画
 	CollisionShape::Square square;
 
-	memcpy_s(&square, sizeof(CollisionShape::Square), m_pHitSquare, sizeof(CollisionShape::Square));
+	memcpy_s(&square, sizeof(CollisionShape::Square), &m_tagCharacterParam.HitSquare, sizeof(CollisionShape::Square));
 	square.pos += m_vPos;
 
 	Vector3 wv[3];	// ワールドバーテックス
@@ -1255,7 +1305,7 @@ void BasePlayer::Render(tdnShader* shader, char* name)
 	// 判定の描画
 	CollisionShape::Square square;
 
-	memcpy_s(&square, sizeof(CollisionShape::Square), m_pHitSquare, sizeof(CollisionShape::Square));
+	memcpy_s(&square, sizeof(CollisionShape::Square), &m_tagCharacterParam.HitSquare, sizeof(CollisionShape::Square));
 	square.pos += m_vPos;
 
 	Vector3 wv[3];	// ワールドバーテックス
@@ -1759,7 +1809,7 @@ void BasePlayer::GuardEffectUpdate()
 void BasePlayer::WillPowerUpdate()
 {	
 	// HPのレートを計算
-	float HpRate = (float)m_iHP/ (float)m_iMaxHP;
+	float HpRate = (float)m_iHP/ m_tagCharacterParam.iMaxHP;
 
 	// 体力が35%以下になれば根性発動
 	if (m_bWillPower == false)

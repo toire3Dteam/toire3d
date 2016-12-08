@@ -5491,21 +5491,22 @@ void BasePlayerState::AerialDash::Enter(BasePlayer * pPerson)
 	// タイマー
 	pPerson->SetAerialDashFrame(16);
 
-	const float MoveY(pPerson->GetMove().y);
+	const float fMoveY(pPerson->GetMove().y);
+	const float fDashSpeed(pPerson->GetAerialDashSpeed());
 
 	// 移動
 	if (pPerson->GetDir() == DIR::RIGHT)
 	{
 		// わっしょい
-		pPerson->SetMove(Vector3(1.35f, 0, 0));
+		pPerson->SetMove(Vector3(fDashSpeed, 0, 0));
 	}
 	else
 	{
 		// わっしょい
-		pPerson->SetMove(Vector3(-1.35f, 0, 0));
+		pPerson->SetMove(Vector3(-fDashSpeed, 0, 0));
 	}
 
-	if (MoveY > 0)pPerson->AddMove(Vector3(0, MoveY, 0));
+	if (fMoveY > 0)pPerson->AddMove(Vector3(0, fMoveY, 0));
 
 	// 空中ダッシュエフェクト
 	pPerson->AddEffectAction(pPerson->GetCenterPos(), EFFECT_TYPE::AERIAL_JUMP);

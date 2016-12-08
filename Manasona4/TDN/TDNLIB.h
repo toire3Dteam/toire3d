@@ -3061,6 +3061,12 @@ public:
 	static std::string GetFileName(char *path, bool bExt = true);
 
 	/**
+	*@brief					ファイルパスからそのファイルのあるディレクトリを返す("DATA/Text/tdn.txt"ならDATA/Textが返る)
+	*@param[in]		*path	ファイルパス
+	*/
+	static std::string GetDirectoryPath(char *path);
+
+	/**
 	*@brief					ファイルを開くダイアログを作成
 	*@param[in]		*filter	拡張子フィルター example:"TEXT DATA(*.txt)\0 *.txt\0\0"
 	*@return				成功したらダイアログで選択された絶対パスを返す、失敗したら""(空の文字列)
