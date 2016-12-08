@@ -16,7 +16,7 @@ Nazenara::Nazenara(SIDE side, const SideData &data) :BasePlayer(side, data), m_p
 	BasePlayer::LoadCharacterParam("DATA/CHR/Nazenara/param.txt");
 
 	m_pName = "∵";
-	m_pCutinPic = new tdn2DAnim("DATA/UI/Game/OverDriveCutin/Airou.png");
+	m_pCutinPic = new tdn2DAnim("DATA/UI/Game/OverDriveCutin/nazenaraba.png");
 	m_pCutinPic->OrderMoveAppeared(8, -400, +200);
 
 	// フレーム読み込み
@@ -44,6 +44,8 @@ Nazenara::Nazenara(SIDE side, const SideData &data) :BasePlayer(side, data), m_p
 
 	// ゴッドハンド
 	m_pGodHand = new GodHandEffect;
+	m_pGodHandWind = new CycloneEffect;
+	m_pGodHandImpact = new FireRingEffect;
 
 	if (m_side == SIDE::RIGHT)
 	{
@@ -731,6 +733,9 @@ Nazenara::~Nazenara()
 	SAFE_DELETE(m_pArm);
 	SAFE_DELETE(m_pOverFlow);
 	SAFE_DELETE(m_pGodHand);
+	SAFE_DELETE(m_pGodHandWind);
+	SAFE_DELETE(m_pGodHandImpact);
+
 	FOR((int)SKILL_ACTION_TYPE::MAX) SAFE_DELETE(m_pSkillActions[i])
 }
 
@@ -743,14 +748,12 @@ void Nazenara::Update(PLAYER_UPDATE flag)
 	if (m_bArm)
 	{
 		m_pArm->Animation();
-		Vector3 vArmPos(m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->pCollisionShape->pos);
-		if (m_dir == DIR::LEFT) vArmPos.x *= -1;
-		m_pArm->SetPos(m_vPos + vArmPos);
-		m_pArm->Update();
 	}
 
 	// ゴッドハンド更新
 	m_pGodHand->Update();
+	m_pGodHandWind->Update();
+	m_pGodHandImpact->Update();
 }
 
 void Nazenara::Render()
@@ -763,6 +766,8 @@ void Nazenara::Render()
 
 	// ゴッドハンド描画
 	m_pGodHand->Render();
+	m_pGodHandWind->Render();
+	m_pGodHandImpact->Render();
 }
 
 void Nazenara::RenderDrive()
@@ -970,6 +975,8 @@ void Nazenara::SkillAction::Squat::Enter()
 
 	// モーションセット
 	m_pNazenara->SetMotion(MOTION_TYPE::CHARA_ATTACK_SQUAT);
+
+
 }
 
 bool Nazenara::SkillAction::Squat::Execute()
@@ -983,8 +990,15 @@ bool Nazenara::SkillAction::Squat::Execute()
 	// このフレームで腕が出現する
 	if (m_pNazenara->m_iCurrentActionFrame == 25)
 	{
+		Vector3 vArmPos(m_pNazenara->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->pCollisionShape->pos);
+		if (m_pNazenara->m_dir == DIR::LEFT) vArmPos.x *= -1;
+		m_pNazenara->m_pArm->SetPos(m_pNazenara->m_vPos + vArmPos);
+		m_pNazenara->m_pArm->Update();
+
 		m_pNazenara->m_pArm->SetFrame(0);
 		m_pNazenara->m_bArm = true;
+
+		//m_pNazenara->m_pGodHandWind->Action(m_pNazenara->m_vPos + vArmPos, 0.5f, 0.5f);
 	}
 
 	// キャンセルルート
@@ -996,6 +1010,7 @@ bool Nazenara::SkillAction::Squat::Execute()
 		// 必殺技キャンセル
 		HeaveHoCancel(m_pNazenara);
 	}
+	
 
 	return false;
 }
@@ -1138,18 +1153,24 @@ bool Nazenara::HeavehoDriveUpdate()
 		return true;
 	}
 
+	float AddX(m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->pos.x);
+	if (m_dir == DIR::LEFT)AddX *= -1;
+
+	// 当たった瞬間
+	if (m_iCurrentActionFrame == 54) 
+	{
+		m_pGodHandWind->Action(m_vPos + Vector3(AddX, m_fGodHandShiftY  , 0), 1.5f, 4.5f);
+		m_pGodHandImpact->Action(m_vPos + Vector3(AddX, m_fGodHandShiftY, 0), 0.45f, 0.85f);
+	}
+
 	if (m_iCurrentActionFrame == 42)
 	{
-		float AddX(m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->pos.x);
-		if (m_dir == DIR::LEFT)AddX *= -1;
 		m_pGodHand->Action(m_vPos + Vector3(AddX, m_fGodHandShiftY, 0), 8, 8);
 	}
 	else if (m_iCurrentActionFrame > 50)
 	{
 		// 上から落ちてくる
 		m_fGodHandShiftY = max(m_fGodHandShiftY - 8.5f, -8);
-		float AddX(m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->pos.x);
-		if (m_dir == DIR::LEFT)AddX *= -1;
 		m_pGodHand->SetPos(m_vPos + Vector3(AddX, m_fGodHandShiftY, 0));
 	}
 

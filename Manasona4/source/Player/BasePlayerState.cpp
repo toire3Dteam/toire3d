@@ -5112,7 +5112,7 @@ void BasePlayerState::ThrowBind::Enter(BasePlayer * pPerson)
 	se->Play("掴み成功");
 
 	// バースト使用不可に
-	pPerson->GetTargetPlayer()->ActionNotOverDrive();
+	pPerson->ActionNotOverDrive();
 
 	// 投げられた時のエフェクト
 	//pPerson->GetThrowMark()->Action();
@@ -5141,6 +5141,9 @@ void BasePlayerState::ThrowBind::Exit(BasePlayer * pPerson)
 {
 	// 重力とかの移動量を有効化する
 	pPerson->SetMoveUpdate(true);
+
+	// バースト使用可能に
+	pPerson->StopNotOverDrive();
 
 	// 投げ抜け猶予エフェクト（ビックリマーク）を止める
 	//pPerson->GetThrowMark()->Stop();

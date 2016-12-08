@@ -852,7 +852,7 @@ class CycloneEffect :public BaseUVEffect
 public:
 	CycloneEffect()
 	{
-		m_pic = new AnimationUV("Data/UVeffect/Cyclone/Cyclone.imo", 0.065f, -0.01f, 32, false, 2, 20);
+		m_pic = new AnimationUV("Data/UVeffect/Cyclone/Cyclone.imo", 0.065f, -0.025f, 38, false, 4, 30);
 	};
 	~CycloneEffect() {};
 

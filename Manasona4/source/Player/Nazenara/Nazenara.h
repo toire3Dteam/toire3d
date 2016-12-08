@@ -151,8 +151,10 @@ private:
 	void InitMotionDatas();
 
 	// エフェクト
-	float m_fGodHandShiftY;		// ゴッドハンドのY
-	BaseUVEffect *m_pGodHand;	// ゴッドハンド
+	float m_fGodHandShiftY;			// ゴッドハンドのY
+	BaseUVEffect *m_pGodHand;		// ゴッドハンド
+	BaseUVEffect *m_pGodHandWind;	// ゴッドハンド出した後の風
+	BaseUVEffect *m_pGodHandImpact;	// 衝撃波
 
 	// 下固有の腕単体
 	iex3DObj *m_pArm;
