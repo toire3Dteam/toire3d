@@ -188,6 +188,7 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 	if (you->isEscape() && pAttackData->attribute != ATTACK_ATTRIBUTE::THROW) return;
 
 	if (!my->isActiveFrame()) return; // 攻撃フレーム中じゃない
+
 	// 渾身の対空の処理
 	/***************************************/
 	// 相手も攻撃中なら
@@ -240,6 +241,16 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 
 			else
 			{
+				// 渾身の遠距離ガード処理
+				if (pAttackData->attribute == ATTACK_ATTRIBUTE::BULLET)
+				{
+					if (isInputGuardCommand(you) && isPossibleGuardState(you))
+					{
+						you->GetFSM()->ChangeState(BasePlayerState::Guard::GetInstance());
+						return;
+					}
+				}
+
 				// ヒット時の処理
 				//pAttackData->bHit = true;	// 2重ヒット防止用のフラグをONにする
 

@@ -14,6 +14,8 @@ AI::AI(SIDE side,BasePlayer* myBasePlayer , AI_TYPE AIType)
 	m_iGuardFrame = 0;		// ガードしてる時間
 
 	m_iPracticeGuardFrame = 0;
+	m_iPracticeAttackIntervalFrame = 0;
+
 	m_bPracticeGuardFlag = false;
 
 	// [11/25] 親のターゲットと指定してるプレイヤーを指定
@@ -51,14 +53,14 @@ AI::AI(SIDE side,BasePlayer* myBasePlayer , AI_TYPE AIType)
 		// 空中に飛び続ける練習用ステートマシン
 		m_pStateMachine = new StateMachine<AI>(this);
 		m_pStateMachine->SetGlobalState(AIState::PracticeGlobal::GetInstance());// グローバル
-		m_pStateMachine->SetCurrentState(AIState::PracticeLand::GetInstance());
+		m_pStateMachine->SetCurrentState(AIState::PracticeJump::GetInstance());
 
 		break;
 	case AI_TYPE::PRACTICE_ATTACK:
 		// 攻撃を振り続ける練習用ステートマシン
 		m_pStateMachine = new StateMachine<AI>(this);
 		m_pStateMachine->SetGlobalState(AIState::PracticeGlobal::GetInstance());// グローバル
-		m_pStateMachine->SetCurrentState(AIState::PracticeLand::GetInstance());
+		m_pStateMachine->SetCurrentState(AIState::PracticeAttack::GetInstance());
 
 		break;
 	default:
@@ -138,14 +140,14 @@ void AI::ChangeAIType(AI_TYPE type)
 		// 空中に飛び続ける練習用ステートマシン
 		m_pStateMachine = new StateMachine<AI>(this);
 		m_pStateMachine->SetGlobalState(AIState::PracticeGlobal::GetInstance());// グローバル
-		m_pStateMachine->SetCurrentState(AIState::PracticeLand::GetInstance());
+		m_pStateMachine->SetCurrentState(AIState::PracticeJump::GetInstance());
 
 		break;
 	case AI_TYPE::PRACTICE_ATTACK:
 		// 攻撃を振り続ける練習用ステートマシン
 		m_pStateMachine = new StateMachine<AI>(this);
 		m_pStateMachine->SetGlobalState(AIState::PracticeGlobal::GetInstance());// グローバル
-		m_pStateMachine->SetCurrentState(AIState::PracticeLand::GetInstance());
+		m_pStateMachine->SetCurrentState(AIState::PracticeAttack::GetInstance());
 
 		break;
 	default:

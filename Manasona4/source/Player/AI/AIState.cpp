@@ -235,11 +235,21 @@ void AIState::PracticeJump::Enter(AI * pPerson)
 
 void AIState::PracticeJump::Execute(AI * pPerson)
 {
-	// 
+	// ★何か攻撃を受けて倒れる最中ならば
+	if (
+		MyPlayer->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) == true ||
+		MyPlayer->GetFSM()->isInState(*BasePlayerState::DownFall::GetInstance()) == true
+		)
+	{
+		// 復帰ボタン
+		pPerson->PushInputList(PLAYER_INPUT::B);
+	}
+
+	// 地上に付いたらジャンプする
 	if (MyPlayer->isLand())
 	{
 		// ジャンプ
-		pPerson->PushInputList(PLAYER_INPUT::C);
+		pPerson->PushInputList(PLAYER_INPUT::UP);
 	}
 
 }
@@ -250,7 +260,13 @@ void AIState::PracticeJump::Exit(AI * pPerson)
 
 void AIState::PracticeJump::Render(AI * pPerson)
 {
-	tdnText::Draw(420, 610, 0xffffffff, "AIジャンプ");
+
+#ifdef _DEBUG
+
+	tdnText::Draw(1000, 580, 0xffffffff, "AIジャンプ");
+
+#endif // _DEBUG
+
 }
 
 bool AIState::PracticeJump::OnMessage(AI * pPerson, const Message & msg)
@@ -299,23 +315,30 @@ void AIState::PracticeLand::Execute(AI * pPerson)
 	{
 		// 復帰ボタン
 		pPerson->PushInputList(PLAYER_INPUT::B);
-		pPerson->SetPracticeGuardFrame(0);
-		pPerson->SetPracticeGuardFlag(false);
 	}
 
 	// 倒れないノックバック技を受けたなら
 	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::KnockBack::GetInstance()) == true)
 	{
 		pPerson->m_bPracticeGuardFlag = true;
+		pPerson->m_iPracticeGuardFrame = 0;
 	}
-
-	// 練習用ガードフラグが立ってたらかつ硬直フレームが0なら　
-	if (pPerson->m_bPracticeGuardFlag == true /*&& MyPlayer->GetRecoveryFrame() <= 0*/)
+	
+	// 練習用ガードフラグが立ってたら　
+	if (pPerson->m_bPracticeGuardFlag == true /*&& MyPlayer->GetRecoveryFrame() <= 0　ガード硬直も含むのでなし*/)
 	{
-		pPerson->m_iPracticeGuardFrame++;
+		pPerson->m_iPracticeGuardFrame++;	
 		
+		// ガードしたらガードし続けるフレームを下げる（相手が落ち着くまでガード）
+		if (MyPlayer->GetFSM()->isInState(*BasePlayerState::Guard::GetInstance()) == true)
+		{
+			// 相手の攻撃持続フレーム中のときリセット
+			// if (TargetPlayer->isActiveFrame() == true)
+			pPerson->m_iPracticeGuardFrame = 10;
+		}
+
 		// 一定フレーム守り続ける
-		if (pPerson->m_iPracticeGuardFrame >= 180)
+		if (pPerson->m_iPracticeGuardFrame >= 20) // 40フレーム落ち着かなずっとガードする
 		{
 			// 練習ガードフラグと練習ガードフレームを初期化
 			pPerson->m_bPracticeGuardFlag = false;
@@ -337,7 +360,7 @@ void AIState::PracticeLand::Execute(AI * pPerson)
 			}
 
 			// 下段なら
-			if (TargetPlayer->GetAttackData()->AntiGuard==ANTIGUARD_ATTACK::DOWN_ATTACK) 
+			if (TargetPlayer->GetAttackData()->AntiGuard == ANTIGUARD_ATTACK::DOWN_ATTACK)
 			{
 				pPerson->PushInputList(PLAYER_INPUT::DOWN);
 			}
@@ -346,29 +369,6 @@ void AIState::PracticeLand::Execute(AI * pPerson)
 
 	}
 
-	//  まだガードフラグがたっていなくリカバリー？できていたら
-	//if (pPerson->GetPracticeGuardFlag() == false)
-	//{
-	//	// ノックバック・空中リカバリー・地上リカバリーが前のステートになっていたらガードする
-	//	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::Wait::GetInstance()) == true ||
-	//		MyPlayer->GetFSM()->isPrevState(*BasePlayerState::AerialRecovery::GetInstance()) == true ||
-	//		MyPlayer->GetFSM()->isPrevState(*BasePlayerState::LandRecovery::GetInstance()) == true)
-	//	{
-	//		pPerson->PushInputList(PLAYER_INPUT::R1);// ガードする
-	//		pPerson->SetPracticeGuardFlag(true);
-	//	}
-	//}
-	//else
-	//{
-	//	pPerson->AddPracticeGuardFrame(1);
-	//	if (pPerson->GetPracticeGuardFrame() < 60)
-	//	{
-	//		pPerson->PushInputList(PLAYER_INPUT::R1);// ガードする
-	//		//pPerson->SetPracticeGuardFrame(0);
-	//		//pPerson->SetPracticeGuardFlag(false);
-	//	}
-
-	//}
 
 }
 
@@ -378,7 +378,12 @@ void AIState::PracticeLand::Exit(AI * pPerson)
 
 void AIState::PracticeLand::Render(AI * pPerson)
 {
+#ifdef _DEBUG
+
 	tdnText::Draw(420, 610, 0xffffffff, "AI地面");
+
+#endif // _DEBUG
+
 }
 
 bool AIState::PracticeLand::OnMessage(AI * pPerson, const Message & msg)
@@ -389,6 +394,126 @@ bool AIState::PracticeLand::OnMessage(AI * pPerson, const Message & msg)
 	//}
 	return false;
 }
+
+
+/*******************************************************/
+//				練習用攻撃ステート
+/*******************************************************/
+
+AIState::PracticeAttack* AIState::PracticeAttack::GetInstance()
+{
+	// ここに変数を作る
+	static AIState::PracticeAttack instance;
+	return &instance;
+}
+
+void AIState::PracticeAttack::Enter(AI * pPerson)
+{
+	//pPerson->SetPracticeGuardFrame(120);
+	//pPerson->SetPracticeGuardFlag(true);
+	pPerson->m_iPracticeAttackIntervalFrame = 0;
+
+}
+
+void AIState::PracticeAttack::Execute(AI * pPerson)
+{
+	// 一定時間がたったら攻撃
+	pPerson->m_iPracticeAttackIntervalFrame++;
+	if (pPerson->m_iPracticeAttackIntervalFrame >= 60)
+	{
+		pPerson->m_iPracticeAttackIntervalFrame = 0;
+		// 攻撃
+		pPerson->PushInputList(PLAYER_INPUT::C);
+
+	}
+	
+
+	// ★何か攻撃を受けて倒れる最中ならば
+	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) == true ||
+		MyPlayer->GetFSM()->isInState(*BasePlayerState::DownFall::GetInstance()) == true
+		)
+	{
+		// 復帰ボタン
+		pPerson->PushInputList(PLAYER_INPUT::B);
+	}
+
+	//// 倒れないノックバック技を受けたなら
+	//if (MyPlayer->GetFSM()->isInState(*BasePlayerState::KnockBack::GetInstance()) == true)
+	//{
+	//	pPerson->m_bPracticeGuardFlag = true;
+	//	pPerson->m_iPracticeGuardFrame = 0;
+	//}
+
+	//// 練習用ガードフラグが立ってたら　
+	//if (pPerson->m_bPracticeGuardFlag == true /*&& MyPlayer->GetRecoveryFrame() <= 0　ガード硬直も含むのでなし*/)
+	//{
+	//	pPerson->m_iPracticeGuardFrame++;
+
+	//	// ガードしたらガードし続けるフレームを下げる（相手が落ち着くまでガード）
+	//	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::Guard::GetInstance()) == true)
+	//	{
+	//		// 相手の攻撃持続フレーム中のときリセット
+	//		// if (TargetPlayer->isActiveFrame() == true)
+	//		pPerson->m_iPracticeGuardFrame = 10;
+	//	}
+
+	//	// 一定フレーム守り続ける
+	//	if (pPerson->m_iPracticeGuardFrame >= 20) // 40フレーム落ち着かなずっとガードする
+	//	{
+	//		// 練習ガードフラグと練習ガードフレームを初期化
+	//		pPerson->m_bPracticeGuardFlag = false;
+	//		pPerson->m_iPracticeGuardFrame = 0;
+	//	}
+
+	//	// 相手が攻撃振ったら
+	//	if (TargetPlayer->isAttackState() == true)
+	//	{
+
+	//		// 相手と逆方向レバーを押す
+	//		if (MyPlayer->GetDir() == DIR::LEFT)
+	//		{
+	//			pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+	//		}
+	//		else
+	//		{
+	//			pPerson->PushInputList(PLAYER_INPUT::LEFT);
+	//		}
+
+	//		// 下段なら
+	//		if (TargetPlayer->GetAttackData()->AntiGuard == ANTIGUARD_ATTACK::DOWN_ATTACK)
+	//		{
+	//			pPerson->PushInputList(PLAYER_INPUT::DOWN);
+	//		}
+
+	//	}
+
+	//}
+
+}
+
+void AIState::PracticeAttack::Exit(AI * pPerson)
+{
+}
+
+void AIState::PracticeAttack::Render(AI * pPerson)
+{
+#ifdef _DEBUG
+
+	tdnText::Draw(420, 610, 0xffffffff, "AI攻撃練習");
+
+#endif // _DEBUG
+
+}
+
+bool AIState::PracticeAttack::OnMessage(AI * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+	//}
+	return false;
+}
+
 
 /*******************************************************/
 //				待機ステート
@@ -568,7 +693,7 @@ AIState::SimpleJump * AIState::SimpleJump::GetInstance()
 void AIState::SimpleJump::Enter(AI * pPerson)
 {
 	// ジャンプボタン押す
-	pPerson->PushInputList(PLAYER_INPUT::C);
+	pPerson->PushInputList(PLAYER_INPUT::UP);
 }
 
 void AIState::SimpleJump::Execute(AI * pPerson)
@@ -621,8 +746,8 @@ void AIState::Escape::Enter(AI * pPerson)
 	// ガード＋移動で　回避発動させる
 	pPerson->PushInputList(PLAYER_INPUT::R1);
 	// 相手の場所に応じて
-	if (TargetPos.x < MyPos.x) pPerson->PushInputList(PLAYER_INPUT::LEFT);
-	else pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+	//if (TargetPos.x < MyPos.x) pPerson->PushInputList(PLAYER_INPUT::LEFT);
+	//else pPerson->PushInputList(PLAYER_INPUT::RIGHT);
 
 
 }
@@ -667,7 +792,7 @@ AIState::Guard * AIState::Guard::GetInstance()
 void AIState::Guard::Enter(AI * pPerson)
 {
 	// ガードボタン押す
-	pPerson->PushInputList(PLAYER_INPUT::R1);
+	//pPerson->PushInputList(PLAYER_INPUT::R1);
 }
 
 void AIState::Guard::Execute(AI * pPerson)

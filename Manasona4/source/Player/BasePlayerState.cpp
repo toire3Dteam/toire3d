@@ -4612,6 +4612,33 @@ void BasePlayerState::Guard::Enter(BasePlayer * pPerson)
 
 void BasePlayerState::Guard::Execute(BasePlayer * pPerson)
 {	
+	// 相手キャラが攻撃ステートなら
+	if (pPerson->GetTargetPlayer()->isAttackState() || (pPerson->GetTargetPlayer()->GetStand()->isActive() && pPerson->GetTargetPlayer()->GetStand()->GetAttackData()))
+	{
+		if (isInputGuardCommand(pPerson))
+		{
+			/* しゃがみガード */
+			if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN))
+			{
+				//pPerson->SetMotion(MOTION_TYPE::DOWN_GUARD);
+
+				// ガードステートを設定する
+				pPerson->SetGuardState(GUARD_STATE::DOWN_GUARD);
+				return;
+			}
+
+			/* 立ちガード */
+			else
+			{
+				//pPerson->SetMotion(MOTION_TYPE::UP_GUARD);
+
+				// ガードステートを設定する
+				pPerson->SetGuardState(GUARD_STATE::UP_GUARD);
+				return;
+			}
+		}
+	}
+
 	// ★硬直が0以下なら硬直終了
 	if (pPerson->GetRecoveryFrame() <= 0)
 	{
@@ -4660,32 +4687,6 @@ void BasePlayerState::Guard::Execute(BasePlayer * pPerson)
 		//============================================
 		if (DashCancel(pPerson))return;
 
-		// 相手キャラが攻撃ステートなら
-		if (pPerson->GetTargetPlayer()->isAttackState() || (pPerson->GetTargetPlayer()->GetStand()->isActive() && pPerson->GetTargetPlayer()->GetStand()->GetAttackData()))
-		{
-			if (isInputGuardCommand(pPerson))
-			{
-				/* しゃがみガード */
-				if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN))
-				{
-					pPerson->SetMotion(MOTION_TYPE::DOWN_GUARD);
-
-					// ガードステートを設定する
-					pPerson->SetGuardState(GUARD_STATE::DOWN_GUARD);
-					return;
-				}
-
-				/* 立ちガード */
-				else
-				{
-					pPerson->SetMotion(MOTION_TYPE::UP_GUARD);
-
-					// ガードステートを設定する
-					pPerson->SetGuardState(GUARD_STATE::UP_GUARD);
-					return;
-				}
-			}
-		}
 		// 待機モーションに戻る
 		ChangeWaitState(pPerson);
 
@@ -4768,6 +4769,18 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 									 // ★ガード成功してたら！！！
 									 if (bGuardSuccess)
 									 {
+										 // ガードした時にモーションをサッっと変える
+										 /* しゃがみガード */
+										 if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN))
+										 {
+											 pPerson->SetMotion(MOTION_TYPE::DOWN_GUARD);
+										 }
+										 /* 立ちガード */
+										 else
+										 {
+											 pPerson->SetMotion(MOTION_TYPE::UP_GUARD);
+										 }
+
 										 // (A列車)ここにガード成功時のSE、エフェクト
 										 char *seID;
 										 switch (rand() % 3)

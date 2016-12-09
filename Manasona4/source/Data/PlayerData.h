@@ -17,6 +17,18 @@ namespace PlayerData
 		unsigned int coin		: 20;	// 真夏パチンココイン(1048575まで)
 	};
 
+	// 設定の情報
+	struct Confing
+	{
+		unsigned int iDifficultyAI	: 4;	// AIの難易度(15まで)
+		unsigned int 空き枠1		: 32;
+		unsigned int 空き枠2		: 32;
+		unsigned int 空き枠3		: 32;
+		unsigned int 空き枠4		: 32;
+		unsigned int 空き枠5		: 32;
+		unsigned int 空き枠6		: 32;
+	};
+
 	// トロフィー
 	struct Trophy
 	{
@@ -64,6 +76,7 @@ public:
 	PlayerData::Infomation m_PlayerInfo;	// プレイ情報
 	PlayerData::Trophy m_TrophyData;			// トロフィー
 	PlayerData::Secret m_SecretData;			// 隠し要素
+	PlayerData::Confing m_ConfigData;		// プレイヤーの設定情報
 
 	// デストラクタ(ダブルポインタ関連をこの中で完結させてるので、使う人は気にしなくてOK)
 	~PlayerDataManager();

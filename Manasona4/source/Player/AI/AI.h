@@ -95,9 +95,11 @@ private:
 	int m_iPracticeGuardFrame;
 	bool m_bPracticeGuardFlag;
 
+	int m_iPracticeAttackIntervalFrame;	//	攻撃間隔フレーム
+
 
 	// ステートをフレンドクラスへ
 	friend class AIState::PracticeLand;
-
+	friend class AIState::PracticeAttack;
 
 };

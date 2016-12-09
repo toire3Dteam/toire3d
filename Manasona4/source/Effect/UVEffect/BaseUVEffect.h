@@ -871,7 +871,7 @@ class GodHandEffect :public BaseUVEffect
 public:
 	GodHandEffect()
 	{
-		m_pic = new AnimationUV("Data/UVeffect/nazenara/godhand.imo", 0.0f, 0.025f, 32, false, 4, 24);
+		m_pic = new AnimationUV("Data/UVeffect/nazenara/godhand.imo", 0.045f, 0.02f, 72, false, 4, 34);
 	};
 	~GodHandEffect() {};
 

@@ -272,7 +272,7 @@ void ParticleManager::EffectGuard(const Vector3 & pos, const Vector3 & v)
 			Move = VECTOR_ZERO,
 			Power = VECTOR_ZERO;
 
-	FOR(5)
+	FOR(3)
 	{
 		// 初期位置
 		Pos.x = pos.x + rand() % 6 - 3.0f;
@@ -325,6 +325,66 @@ void ParticleManager::EffectGuard(const Vector3 & pos, const Vector3 & v)
 		Set(6, 0, 1.0f, 12, .0f, 7, 1.0f, Pos, Move*0.6f, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, tdnRandom::Get(0.25, 1.0f), RS::ADD);
 		// 威力弱め
 		Set(6, 0, 1.0f, 16, .0f, 10, 1.0f, Pos, Move*0.25f , Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, tdnRandom::Get(0.25, 1.0f), RS::ADD);
+
+	}
+
+
+	// 攻撃した方向に飛ばす
+	FOR(25)
+	{
+		// 初期位置
+		Pos.x = pos.x + rand() % 6 - 3.0f;
+		Pos.y = pos.y + rand() % 6 - 3.0f;
+		Pos.z = pos.z + rand() % 6 - 3.0f;
+
+
+		// 移動地
+		// 飛ぶ方向のベクトルをそのまま使い　速度を調整するだけ
+		// 逆方向に飛び散らないのが利点
+		Vector3 vMoveVec = -v;
+		vMoveVec.Normalize();
+
+		if (abs(Move.x) <= 0.5f)
+		{
+			Move.x = (tdnRandom::Get(-1.1f, 1.1f));
+		}
+		else
+		{
+			Move.x = vMoveVec.x * (tdnRandom::Get(0.25f, 1.85f) + 0.5f);
+		}
+
+		if (abs(Move.y) <= 0.5f)
+		{
+			Move.y = (tdnRandom::Get(-1.1f, 1.1f));
+		}
+		else
+		{
+			Move.y = vMoveVec.y * (tdnRandom::Get(0.25f, 0.85f) + 0.5f);
+		}
+
+		//Move.y = v.y * (tdnRandom::Get(0.0f, 0.5f) + 0.5f);
+		//Move.z = v.z * (tdnRandom::Get(0.0f, 0.5f) + 0.5f);
+		Move.z = (tdnRandom::Get(-1.5f, 1.75f));
+
+		//const int M = 32;	
+		//Move.x = (rand() % M - (M / 2))*0.05f;
+		//if (v.x != 0)Move.x = (v.x < 0) ? -abs(Move.x) : abs(Move.x);
+		//Move.y = (rand() % 6 - 3) * 0.1f;	
+		//Move.y = (v.y < 0) ? -Move.y : Move.y;
+		//Move.z = (rand() % M - (M / 2))*0.05f;
+
+		// 重力
+		//Power.x = 0;
+		//Power.y = (v.y < 0) ? -.0001f : -0.015f;
+		//Power.z = 0;
+		Power.x = tdnRandom::Get(-0.0025f, 0.0025f);
+		Power.y = -0.005f;
+		Power.z = tdnRandom::Get(-0.0015f, 0.0015f);
+
+		// 勢いよく飛び散る
+		Set(6, 0, 1.0f, 12, .0f, 7, 1.0f, Pos, Move*0.9f, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, tdnRandom::Get(0.25, 1.0f), RS::ADD);
+		// 威力弱め
+		Set(6, 0, 1.0f, 16, .0f, 10, 1.0f, Pos, Move*0.45f, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, tdnRandom::Get(0.25, 1.0f), RS::ADD);
 
 		//Power.x = 0;
 		//Power.y = -0.01f;

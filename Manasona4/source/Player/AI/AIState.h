@@ -145,6 +145,40 @@ namespace AIState
 	};
 
 	/*******************************************************/
+	//					練習用攻撃ステート
+	/*******************************************************/
+	class PracticeAttack :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static PracticeAttack* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		PracticeAttack() {};
+		~PracticeAttack() {};
+
+		PracticeAttack(const PracticeAttack&) {}
+		PracticeAttack& operator=(const PracticeAttack&) {}
+	};
+
+	/*******************************************************/
 	//				待機ステート
 	/*******************************************************/
 	class Wait :public State<AI>
