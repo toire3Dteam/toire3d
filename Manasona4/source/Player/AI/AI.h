@@ -5,18 +5,44 @@
 // エンティティ関連のインクルード
 #include "../../BaseEntity/State/StateMachine.h"
 #include "../../BaseEntity/State/state.h"
+// ステート
+#include "AIState.h"
 
+
+// AIのタイプ
+enum class AI_TYPE
+{
+	CPU_EASY,			// 弱いAI
+	CPU_NORMAL,			// 普通のAI
+	CPU_HARD,			// 強いAI
+	CPU_YOKOE,			// 横江くん用に作られたマジキチなAI
+
+	PRACTICE_LAND,		//	[練習用]何も動かない
+	PRACTICE_JUMP,		//	[練習用]飛び続ける
+	PRACTICE_ATTACK,	//	[練習用]一定間隔で攻撃する
+};
+
+//+---------------------------------
+//	AI
+//+---------------------------------
 class AI : public BaseGameEntity
 {
 public:
-	AI(SIDE side, BasePlayer* myBasePlayer);
+	AI(SIDE side, BasePlayer* myBasePlayer, AI_TYPE AIType = AI_TYPE::PRACTICE_LAND);
 	~AI();
 
 	void Control();
 	void Update();
 
+	// AIの種類を変える
+	void ChangeAIType(AI_TYPE type);
+
 	bool HandleMessage(const Message & msg);
 
+
+	//+--------------------------------
+	//	アクセサ		
+	//+--------------------------------
 	StateMachine<AI>* GetFSM()const { return m_pStateMachine; }// ★ステートマシンのアクセサを作る
 	BasePlayer* GetBasePlayer(){ return m_pMyBasePlayer; }
 
@@ -49,6 +75,8 @@ public:
 	void AddGuardFrame(int add){ m_iGuardFrame += add; }
 	void AddPracticeGuardFrame(int add){ m_iPracticeGuardFrame += add; }
 
+	AI_TYPE GetAIType() { return m_eAIType; }
+
 private:
 	StateMachine<AI>* m_pStateMachine; // ★AIステートマシン
 	BasePlayer* m_pMyBasePlayer;
@@ -61,8 +89,15 @@ private:
 	int m_iWaitFrame;		// もじもじしてる時間
 	int m_iGuardFrame;		// 一度のガードしている時間
 
+	AI_TYPE m_eAIType;		// AIのタイプ
+
 	// 練習モードでガードしてる時間
 	int m_iPracticeGuardFrame;
 	bool m_bPracticeGuardFlag;
+
+
+	// ステートをフレンドクラスへ
+	friend class AIState::PracticeLand;
+
 
 };

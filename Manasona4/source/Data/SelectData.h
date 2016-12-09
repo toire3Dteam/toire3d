@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../BaseEntity/Message/Message.h"
+//#include "Player\AI\AI.h"		(TODO)AI‚Ìí—Ş‚Í‚Ç‚±‚Åİ’è‚µ‚æ‚¤‚©
 
 //*****************************************************************************
 //

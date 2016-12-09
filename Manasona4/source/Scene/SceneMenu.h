@@ -93,7 +93,7 @@ private:
 	StateMachine<sceneMenu> *m_pStateMachine;	// ステートマシン
 												
 
-	// 奇跡のフレンドクラスの使い道
+	// ステートをフレンドクラスへ
 	friend class SceneMenuState::FirstStep;	
 
 };

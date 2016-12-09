@@ -5,6 +5,7 @@
 #include "../BasePlayerState.h"
 
 #define MyPlayer (pPerson->GetBasePlayer())
+#define TargetPlayer (pPerson->GetTargetPlayer())
 
 //void PushButton(AI* pPerson, PLAYER_INPUT input)
 //{
@@ -275,12 +276,21 @@ AIState::PracticeLand * AIState::PracticeLand::GetInstance()
 
 void AIState::PracticeLand::Enter(AI * pPerson)
 {
-	pPerson->SetPracticeGuardFrame(120);
-	pPerson->SetPracticeGuardFlag(true);
+	//pPerson->SetPracticeGuardFrame(120);
+	//pPerson->SetPracticeGuardFlag(true);
+
 }
 
 void AIState::PracticeLand::Execute(AI * pPerson)
 {
+	//static int f = 0;
+	//f++;
+	//if (f >= 60)
+	//{
+	//	f = 0;
+	//	pPerson->PushInputList(PLAYER_INPUT::A);
+	//}
+
 	
 	// š‰½‚©UŒ‚‚ðŽó‚¯‚Ä“|‚ê‚éÅ’†‚È‚ç‚Î
 	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) == true ||
@@ -293,6 +303,48 @@ void AIState::PracticeLand::Execute(AI * pPerson)
 		pPerson->SetPracticeGuardFlag(false);
 	}
 
+	// “|‚ê‚È‚¢ƒmƒbƒNƒoƒbƒN‹Z‚ðŽó‚¯‚½‚È‚ç
+	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::KnockBack::GetInstance()) == true)
+	{
+		pPerson->m_bPracticeGuardFlag = true;
+	}
+
+	// —ûK—pƒK[ƒhƒtƒ‰ƒO‚ª—§‚Á‚Ä‚½‚ç‚©‚Âd’¼ƒtƒŒ[ƒ€‚ª0‚È‚ç@
+	if (pPerson->m_bPracticeGuardFlag == true /*&& MyPlayer->GetRecoveryFrame() <= 0*/)
+	{
+		pPerson->m_iPracticeGuardFrame++;
+		
+		// ˆê’èƒtƒŒ[ƒ€Žç‚è‘±‚¯‚é
+		if (pPerson->m_iPracticeGuardFrame >= 180)
+		{
+			// —ûKƒK[ƒhƒtƒ‰ƒO‚Æ—ûKƒK[ƒhƒtƒŒ[ƒ€‚ð‰Šú‰»
+			pPerson->m_bPracticeGuardFlag = false;
+			pPerson->m_iPracticeGuardFrame = 0;
+		}
+
+		// ‘ŠŽè‚ªUŒ‚U‚Á‚½‚ç
+		if (TargetPlayer->isAttackState() == true)
+		{
+
+			// ‘ŠŽè‚Æ‹t•ûŒüƒŒƒo[‚ð‰Ÿ‚·
+			if (MyPlayer->GetDir() == DIR::LEFT)
+			{
+				pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+			}
+			else
+			{
+				pPerson->PushInputList(PLAYER_INPUT::LEFT);
+			}
+
+			// ‰º’i‚È‚ç
+			if (TargetPlayer->GetAttackData()->AntiGuard==ANTIGUARD_ATTACK::DOWN_ATTACK) 
+			{
+				pPerson->PushInputList(PLAYER_INPUT::DOWN);
+			}
+
+		}
+
+	}
 
 	//  ‚Ü‚¾ƒK[ƒhƒtƒ‰ƒO‚ª‚½‚Á‚Ä‚¢‚È‚­ƒŠƒJƒoƒŠ[H‚Å‚«‚Ä‚¢‚½‚ç
 	//if (pPerson->GetPracticeGuardFlag() == false)
