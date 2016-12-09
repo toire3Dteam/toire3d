@@ -25,8 +25,10 @@ AI::AI(SIDE side,BasePlayer* myBasePlayer)
 
 	// ステートマシン　引数は自分自身のポインタ
 	m_pStateMachine = new StateMachine<AI>(this);
-	m_pStateMachine->SetGlobalState(AIState::Global::GetInstance());// グローバル
-	m_pStateMachine->SetCurrentState(AIState::Wait::GetInstance());
+	//m_pStateMachine->SetGlobalState(AIState::Global::GetInstance());// グローバル
+	//m_pStateMachine->SetCurrentState(AIState::Wait::GetInstance());
+	m_pStateMachine->SetGlobalState(AIState::PracticeGlobal::GetInstance());// グローバル
+	m_pStateMachine->SetCurrentState(AIState::PracticeLand::GetInstance());
 
 	// インプットフラグ初期化
 	memset(m_bPushFlag, false, sizeof(bool) * (int)PLAYER_INPUT::MAX);

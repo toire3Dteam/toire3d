@@ -429,6 +429,26 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 	// 入力受付
 	if (flag != PLAYER_UPDATE::CONTROL_NO)
 	{
+		// 0フレーム目にコマンドフラグを入れるので、それの前にコマンドビットリストを上に押し上げる
+
+		// まず、入れる前のやつを保存
+		WORD temp(m_wCommandHistory[0]);
+
+		for (int i = 1; i < c_COMMAND_FRAME_MAX; i++)
+		{
+			// 繰り下げ処理
+			//for (int i2 = i + 1; i2 < c_COMMAND_FRAME_MAX; i2++)
+			{
+				WORD save(m_wCommandHistory[i]);
+				m_wCommandHistory[i] = temp;
+
+				temp = save;
+			}
+		}
+
+		// 最初neutralに戻す(★0フレーム目から)
+		m_wCommandHistory[0] &= 0;
+
 		if (m_bAI)	AIControl();
 		else		Control();
 	}
@@ -902,27 +922,6 @@ void BasePlayer::ColorUpdate()
 
 void BasePlayer::Control()
 {
-	// 0フレーム目にコマンドフラグを入れるので、それの前にコマンドビットリストを上に押し上げる
-
-	// まず、入れる前のやつを保存
-	WORD temp(m_wCommandHistory[0]);
-
-	for (int i = 1; i < c_COMMAND_FRAME_MAX; i++)
-	{
-		// 繰り下げ処理
-		//for (int i2 = i + 1; i2 < c_COMMAND_FRAME_MAX; i2++)
-		{
-			WORD save(m_wCommandHistory[i]);
-			m_wCommandHistory[i] = temp;
-
-			temp = save;
-		}
-	}
-
-	// 最初neutralに戻す(★0フレーム目から)
-	m_wCommandHistory[0] &= 0;
-
-
 	// キーボード表
 	static const KEYCODE KeyCodeList[(int)PLAYER_INPUT::MAX] = {
 		KEY_A,
@@ -943,28 +942,6 @@ void BasePlayer::Control()
 		KEY_SELECT,
 	};
 
-	static const PLAYER_COMMAND_BIT BitList[(int)PLAYER_INPUT::MAX] = 
-	{
-		PLAYER_COMMAND_BIT::A,
-		PLAYER_COMMAND_BIT::B,
-		PLAYER_COMMAND_BIT::C,
-		PLAYER_COMMAND_BIT::D,
-		PLAYER_COMMAND_BIT::RIGHT,
-		PLAYER_COMMAND_BIT::LEFT,
-		PLAYER_COMMAND_BIT::UP,
-		PLAYER_COMMAND_BIT::DOWN,
-		PLAYER_COMMAND_BIT::R1,
-		PLAYER_COMMAND_BIT::R2,
-		PLAYER_COMMAND_BIT::R3,
-		PLAYER_COMMAND_BIT::L1,
-		PLAYER_COMMAND_BIT::L2,
-		PLAYER_COMMAND_BIT::L3,
-
-		// STARTとSELECT枠は無し
-		PLAYER_COMMAND_BIT::NEUTRAL,
-		PLAYER_COMMAND_BIT::NEUTRAL
-	};
-
 	// 押したキー判定
 	for (int i = 0; i < (int)PLAYER_INPUT::MAX; i++)
 	{
@@ -973,7 +950,7 @@ void BasePlayer::Control()
 		// 押してたら！
 		if (m_iInputList[i] & 0x01)
 		{
-			m_wCommandHistory[0] |= (int)BitList[i];
+			m_wCommandHistory[0] |= (int)c_BitList[i];
 		}
 	}
 
@@ -1147,6 +1124,28 @@ void BasePlayer::Render()
 		{
 			c = "△";
 		}
+		
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::L1)
+		{
+			c = "◇";
+		}
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::R1)
+		{
+			c = "▽";
+		}
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::L2)
+		{
+			c = "㊧";
+		}
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::R2)
+		{
+			c = "㊨";
+		}
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::R3)
+		{
+			c = "◎";
+		}
+
 		//if (m_CommandHistory[i] & (int)PLAYER_COMMAND_BIT::A)
 		//{
 		//
@@ -1212,7 +1211,7 @@ void BasePlayer::Render()
 		//}
 
 		//tdnText::Draw(10 + (i % 30) * 30, 640 + (i / 30 * 30), 0xffffffff, "%s", c);
-		tdnFont::RenderString(c, "メイリオ", 32, 10 + (i % 64) * 30, 640 + (i / 30 * 30), 0xffffffff, RS::COPY);
+		tdnFont::RenderString(c, "メイリオ", 32, 10 + (i % 64) * 36, 610 + (i / 32 * 32) + ((int)m_side * 32), 0xffffffff, RS::COPY);
 
 	}
 

@@ -87,7 +87,7 @@ void Camera::SetStageCameraInfo(char *path)
 	ifs >> m_GameCameraData.FullRange.x;
 	ifs >> m_GameCameraData.FullRange.y;
 
-	// YZの何ちゃら
+	// YZの何ちゃら(離れれば離れるほど、大きくなる値？)
 	ifs >> skip;
 	ifs >> m_GameCameraData.FullZ;
 	ifs >> skip;
@@ -372,6 +372,7 @@ void SumaburaCameraState::Execute(Camera *pCamera)
 	pCamera->m_ViewData.target = pCamera->m_ViewData.target * .95f + pCamera->m_itarget * .05f;
 
 	pCamera->m_ViewData.target.x = pCamera->m_ViewData.pos.x;
+	pCamera->m_ViewData.target.y = pCamera->m_ViewData.pos.y;
 }
 
 // 出口

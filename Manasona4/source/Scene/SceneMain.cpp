@@ -581,9 +581,12 @@ void sceneMain::Render()
 
 	//com->Render(400, 400);
 
-	//tdnText::Draw(0, 30, 0xffffffff, "CameraPos    : %.8f %.8f %.8f", CameraMgr->m_ViewData.pos.x, CameraMgr->m_ViewData.pos.y, CameraMgr->m_ViewData.pos.z);
-	//tdnText::Draw(0, 60, 0xffffffff, "CameraTarget : %.8f %.8f %.8f", CameraMgr->m_ViewData.target.x, CameraMgr->m_ViewData.target.y, CameraMgr->m_ViewData.target.z);
-	//tdnText::Draw(0, 90, 0xffffffff, "CameraEvent  : %d", CameraMgr->GetEventFrame());
+#ifdef _DEBUG
+	tdnText::Draw(0, 30, 0xffffffff, "CameraPos    : %.1f %.1f %.1f", CameraMgr->m_ViewData.pos.x, CameraMgr->m_ViewData.pos.y, CameraMgr->m_ViewData.pos.z);
+	tdnText::Draw(0, 60, 0xffffffff, "CameraTarget : %.1f %.1f %.1f", CameraMgr->m_ViewData.target.x, CameraMgr->m_ViewData.target.y, CameraMgr->m_ViewData.target.z);
+	tdnText::Draw(0, 90, 0xffffffff, "CameraEvent  : %d", CameraMgr->GetEventFrame());
+#endif
+
 
 	// ˆ—•s‰ÂÀŒ±
 	//std::vector<int> v;

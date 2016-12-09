@@ -282,42 +282,41 @@ void AIState::PracticeLand::Enter(AI * pPerson)
 void AIState::PracticeLand::Execute(AI * pPerson)
 {
 	
-	// ★何か攻撃を受けている最中ならば
-	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::KnockBack::GetInstance()) == true ||
-		MyPlayer->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) == true ||
+	// ★何か攻撃を受けて倒れる最中ならば
+	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) == true ||
 		MyPlayer->GetFSM()->isInState(*BasePlayerState::DownFall::GetInstance()) == true
 		)
 	{
 		// 復帰ボタン
-		pPerson->PushInputList(PLAYER_INPUT::A);
+		pPerson->PushInputList(PLAYER_INPUT::B);
 		pPerson->SetPracticeGuardFrame(0);
 		pPerson->SetPracticeGuardFlag(false);
 	}
 
 
 	//  まだガードフラグがたっていなくリカバリー？できていたら
-	if (pPerson->GetPracticeGuardFlag() == false)
-	{
-		// ノックバック・空中リカバリー・地上リカバリーが前のステートになっていたらガードする
-		if (MyPlayer->GetFSM()->isInState(*BasePlayerState::Wait::GetInstance()) == true ||
-			MyPlayer->GetFSM()->isPrevState(*BasePlayerState::AerialRecovery::GetInstance()) == true ||
-			MyPlayer->GetFSM()->isPrevState(*BasePlayerState::LandRecovery::GetInstance()) == true)
-		{
-			pPerson->PushInputList(PLAYER_INPUT::R1);// ガードする
-			pPerson->SetPracticeGuardFlag(true);
-		}
-	}
-	else
-	{
-		pPerson->AddPracticeGuardFrame(1);
-		if (pPerson->GetPracticeGuardFrame() < 60)
-		{
-			pPerson->PushInputList(PLAYER_INPUT::R1);// ガードする
-			//pPerson->SetPracticeGuardFrame(0);
-			//pPerson->SetPracticeGuardFlag(false);
-		}
+	//if (pPerson->GetPracticeGuardFlag() == false)
+	//{
+	//	// ノックバック・空中リカバリー・地上リカバリーが前のステートになっていたらガードする
+	//	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::Wait::GetInstance()) == true ||
+	//		MyPlayer->GetFSM()->isPrevState(*BasePlayerState::AerialRecovery::GetInstance()) == true ||
+	//		MyPlayer->GetFSM()->isPrevState(*BasePlayerState::LandRecovery::GetInstance()) == true)
+	//	{
+	//		pPerson->PushInputList(PLAYER_INPUT::R1);// ガードする
+	//		pPerson->SetPracticeGuardFlag(true);
+	//	}
+	//}
+	//else
+	//{
+	//	pPerson->AddPracticeGuardFrame(1);
+	//	if (pPerson->GetPracticeGuardFrame() < 60)
+	//	{
+	//		pPerson->PushInputList(PLAYER_INPUT::R1);// ガードする
+	//		//pPerson->SetPracticeGuardFrame(0);
+	//		//pPerson->SetPracticeGuardFlag(false);
+	//	}
 
-	}
+	//}
 
 }
 

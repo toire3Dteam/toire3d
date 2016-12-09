@@ -19,7 +19,6 @@
 // カメラ
 #include "../Camera/camera.h"
 
-
 // 前方宣言
 class AI;
 namespace Stand
@@ -71,6 +70,28 @@ enum class PLAYER_COMMAND_BIT
 	L1 = 1 << 12,
 	L2 = 1 << 13,
 	L3 = 1 << 14,
+};
+
+static const PLAYER_COMMAND_BIT c_BitList[(int)PLAYER_INPUT::MAX] =
+{
+	PLAYER_COMMAND_BIT::A,
+	PLAYER_COMMAND_BIT::B,
+	PLAYER_COMMAND_BIT::C,
+	PLAYER_COMMAND_BIT::D,
+	PLAYER_COMMAND_BIT::RIGHT,
+	PLAYER_COMMAND_BIT::LEFT,
+	PLAYER_COMMAND_BIT::UP,
+	PLAYER_COMMAND_BIT::DOWN,
+	PLAYER_COMMAND_BIT::R1,
+	PLAYER_COMMAND_BIT::R2,
+	PLAYER_COMMAND_BIT::R3,
+	PLAYER_COMMAND_BIT::L1,
+	PLAYER_COMMAND_BIT::L2,
+	PLAYER_COMMAND_BIT::L3,
+
+	// STARTとSELECT枠は無し
+	PLAYER_COMMAND_BIT::NEUTRAL,
+	PLAYER_COMMAND_BIT::NEUTRAL
 };
 
 enum class PLAYER_UPDATE
@@ -660,59 +681,64 @@ public:
 	//	インプット・コマンド
 	//------------------------------------------------------
 	int GetInputList(PLAYER_INPUT input) { return m_iInputList[(int)input]; }
-	void SetInputList(PLAYER_INPUT inputNo, int inputFlag){ m_iInputList[(int)inputNo] = inputFlag; }
+	void SetInputList(PLAYER_INPUT inputNo, int inputFlag)
+	{
+		m_iInputList[(int)inputNo] = inputFlag;
+		m_wCommandHistory[0] |= (inputFlag | m_iInputList[(int)inputNo] & 0x01) ? (int)c_BitList[(int)inputNo] : 0;
+	}
 	bool isAnyPushKey(){ return (m_iInputList[(int)PLAYER_INPUT::A] == 3 || m_iInputList[(int)PLAYER_INPUT::B] == 3 || m_iInputList[(int)PLAYER_INPUT::C] == 3 || m_iInputList[(int)PLAYER_INPUT::D] == 3); }
 	bool isPushInput(PLAYER_COMMAND_BIT CommandBit, bool bAhead = false) { if (bAhead){ if ((int)CommandBit & (int)m_wAheadCommand) return true; } return (m_wCommandHistory[0] & (int)CommandBit) ? true : false; }
-	PLAYER_COMMAND_BIT GetInputCommandBit(PLAYER_INPUT input)
-	{
-		PLAYER_COMMAND_BIT bit(PLAYER_COMMAND_BIT::NEUTRAL);
-		switch (input)
-		{
-		case PLAYER_INPUT::A:
-			bit = PLAYER_COMMAND_BIT::A;
-			break;
-		case PLAYER_INPUT::B:
-			bit = PLAYER_COMMAND_BIT::B;
-			break;
-		case PLAYER_INPUT::C:
-			bit = PLAYER_COMMAND_BIT::C;
-			break;
-		case PLAYER_INPUT::D:
-			bit = PLAYER_COMMAND_BIT::D;
-			break;
-		case PLAYER_INPUT::RIGHT:
-			bit = PLAYER_COMMAND_BIT::RIGHT;
-			break;
-		case PLAYER_INPUT::LEFT:
-			bit = PLAYER_COMMAND_BIT::LEFT;
-			break;
-		case PLAYER_INPUT::UP:
-			bit = PLAYER_COMMAND_BIT::UP;
-			break;
-		case PLAYER_INPUT::DOWN:
-			bit = PLAYER_COMMAND_BIT::DOWN;
-			break;
-		case PLAYER_INPUT::R1:
-			bit = PLAYER_COMMAND_BIT::R1;
-			break;
-		case PLAYER_INPUT::R2:
-			bit = PLAYER_COMMAND_BIT::R2;
-			break;
-		case PLAYER_INPUT::R3:
-			bit = PLAYER_COMMAND_BIT::R3;
-			break;
-		case PLAYER_INPUT::L1:
-			bit = PLAYER_COMMAND_BIT::L1;
-			break;
-		case PLAYER_INPUT::L2:
-			bit = PLAYER_COMMAND_BIT::L2;
-			break;
-		case PLAYER_INPUT::L3:
-			bit = PLAYER_COMMAND_BIT::L3;
-			break;
-		}
-		return bit;
-	}
+	//PLAYER_COMMAND_BIT GetInputCommandBit(PLAYER_INPUT input)
+	//{
+	//	PLAYER_COMMAND_BIT bit(PLAYER_COMMAND_BIT::NEUTRAL);
+
+	//	switch (input)
+	//	{
+	//	case PLAYER_INPUT::A:
+	//		bit = PLAYER_COMMAND_BIT::A;
+	//		break;
+	//	case PLAYER_INPUT::B:
+	//		bit = PLAYER_COMMAND_BIT::B;
+	//		break;
+	//	case PLAYER_INPUT::C:
+	//		bit = PLAYER_COMMAND_BIT::C;
+	//		break;
+	//	case PLAYER_INPUT::D:
+	//		bit = PLAYER_COMMAND_BIT::D;
+	//		break;
+	//	case PLAYER_INPUT::RIGHT:
+	//		bit = PLAYER_COMMAND_BIT::RIGHT;
+	//		break;
+	//	case PLAYER_INPUT::LEFT:
+	//		bit = PLAYER_COMMAND_BIT::LEFT;
+	//		break;
+	//	case PLAYER_INPUT::UP:
+	//		bit = PLAYER_COMMAND_BIT::UP;
+	//		break;
+	//	case PLAYER_INPUT::DOWN:
+	//		bit = PLAYER_COMMAND_BIT::DOWN;
+	//		break;
+	//	case PLAYER_INPUT::R1:
+	//		bit = PLAYER_COMMAND_BIT::R1;
+	//		break;
+	//	case PLAYER_INPUT::R2:
+	//		bit = PLAYER_COMMAND_BIT::R2;
+	//		break;
+	//	case PLAYER_INPUT::R3:
+	//		bit = PLAYER_COMMAND_BIT::R3;
+	//		break;
+	//	case PLAYER_INPUT::L1:
+	//		bit = PLAYER_COMMAND_BIT::L1;
+	//		break;
+	//	case PLAYER_INPUT::L2:
+	//		bit = PLAYER_COMMAND_BIT::L2;
+	//		break;
+	//	case PLAYER_INPUT::L3:
+	//		bit = PLAYER_COMMAND_BIT::L3;
+	//		break;
+	//	}
+	//	return bit;
+	//}
 	bool isPushInputTRG(PLAYER_COMMAND_BIT CommandBit, bool bAhead = false)
 	{
 		// 先行入力フラグだったら先行入力も返す
@@ -732,7 +758,7 @@ public:
 	{
 		FOR((int)PLAYER_INPUT::MAX)
 		{
-			const PLAYER_COMMAND_BIT bit(GetInputCommandBit((PLAYER_INPUT)i));
+			const PLAYER_COMMAND_BIT bit(c_BitList[i]);
 			if (isPushInputTRG(bit)) m_wAheadCommand |= (int)bit;
 		}
 	}

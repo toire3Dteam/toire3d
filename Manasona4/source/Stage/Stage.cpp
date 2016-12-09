@@ -137,7 +137,7 @@ void Stage::Sea::Initialize(Camera *pCamera)
 	m_pBack->SetScale(3.5f);
 	m_pBack->Update();
 	m_fBottom = 0;
-	m_fWidth = 150;
+	m_fWidth = 200;
 
 	// ステージ毎にシェーダに渡すパラメーター
 	m_tagShaderParam.vDirLightVec = Vector3(0.84f, -0.99f, -0.53f);
@@ -158,7 +158,7 @@ void Stage::Garden::Initialize(Camera *pCamera)
 	m_pBack->SetScale(3.5f);
 	m_pBack->Update();
 	m_fBottom = 0;
-	m_fWidth = 150;
+	m_fWidth = 200;
 
 	// ステージ毎にシェーダに渡すパラメーター
 	m_tagShaderParam.vDirLightVec = Vector3(-0.84f, -0.99f, -0.53f);

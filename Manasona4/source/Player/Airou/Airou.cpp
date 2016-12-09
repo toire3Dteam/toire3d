@@ -102,7 +102,7 @@ void Airou::InitActionDatas()
 	//	通常1段
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->damage = 340;
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->damage = 500;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->HitSE = "ヒット4";
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->WhiffSE = "空振り5";
@@ -135,7 +135,7 @@ void Airou::InitActionDatas()
 	//	通常2段
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->damage = 460;
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->damage = 500;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->HitSE = "ヒット5";
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->WhiffSE = "空振り5";
@@ -169,7 +169,7 @@ void Airou::InitActionDatas()
 	//	対空攻撃
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->damage = 360;
+	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->damage = 700;
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->HitSE = "ヒット6";
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->WhiffSE = "空振り5";
@@ -236,7 +236,7 @@ void Airou::InitActionDatas()
 	//	しゃがみ下段攻撃
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->damage = 360;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->damage = 500;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->HitSE = "ヒット4";
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->WhiffSE = "空振り5";
@@ -271,7 +271,7 @@ void Airou::InitActionDatas()
 	//	足払い攻撃
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].pAttackData->damage = 360;
+	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].pAttackData->damage = 460;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].pAttackData->HitSE = "ヒット4";
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].pAttackData->WhiffSE = "空振り5";
@@ -305,7 +305,7 @@ void Airou::InitActionDatas()
 	//	空中攻撃
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->damage = 360;
+	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->damage = 260;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->HitSE = "ヒット5";
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL].pAttackData->WhiffSE = "空振り5";
@@ -434,7 +434,7 @@ void Airou::InitActionDatas()
 	//	キャラクター固有下攻撃
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->damage = 700;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->damage = 1000;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->HitSE = "ヒット6";
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->WhiffSE = "空振り5";
