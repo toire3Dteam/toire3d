@@ -581,6 +581,14 @@ namespace Math
 	
 	/**
 	*@brief					距離計算
+	*@param[in]		xA		点A
+	*@param[in]		xB		点B
+	*@return	AとBの距離を返す
+	*/
+	float Length(float xA, float xB);
+
+	/**
+	*@brief					距離計算
 	*@param[in]		PosA	点Aの位置
 	*@param[in]		PosB	点Bの位置
 	*@return		AとBの距離を返す

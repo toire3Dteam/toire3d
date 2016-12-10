@@ -33,9 +33,13 @@ public:
 
 	void Control();
 	void Update();
+	void DoublePushUpdate();
 
 	// AIの種類を変える
 	void ChangeAIType(AI_TYPE type);
+
+	// 二回押し発動
+	void ActionDoublePush(PLAYER_INPUT inputNo);
 
 	bool HandleMessage(const Message & msg);
 
@@ -94,12 +98,15 @@ private:
 	// 練習モードでガードしてる時間
 	int m_iPracticeGuardFrame;
 	bool m_bPracticeGuardFlag;
-
 	int m_iPracticeAttackIntervalFrame;	//	攻撃間隔フレーム
 
+	// 二回押し用の変数
+	bool m_bDoublePush;					// 二回押し命令は他の二回押しが終わるまで受付できない。
+	int m_iDoublePushFrame;				// 
+	PLAYER_INPUT m_eDoublePushInput;	// 
 
 	// ステートをフレンドクラスへ
 	friend class AIState::PracticeLand;
 	friend class AIState::PracticeAttack;
-
+	friend class AIState::Chase;
 };

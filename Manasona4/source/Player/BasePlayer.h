@@ -541,7 +541,8 @@ public:
 	BASE_ACTION_STATE GetActionState(){ return m_ActionState; }
 	AttackData *GetAttackData(BASE_ACTION_STATE state)
 	{
-		assert(isAttackState());	// アタックデータがないステートでアタックデータを参照しようとしている}
+		// [12/10]
+		MyAssert(isAttackState(),"GetAttackDataでアタックデータがないことが判明");	// アタックデータがないステートでアタックデータを参照しようとしている}
 		return m_ActionDatas[(int)state].pAttackData;
 	}
 	AttackData *GetAttackData(){ return GetAttackData(m_ActionState);}// 自分の状態の攻撃データを渡す

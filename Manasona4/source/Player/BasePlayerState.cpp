@@ -40,9 +40,10 @@ bool JumpCancel(BasePlayer * pPerson)
 	// 地面についていたら
 	if (pPerson->isLand() == true)
 	{
-		// 押しっぱなしでキャンセル
+		// 押しっぱなしでキャンセル 
 		if (pPerson->isPushInput(PLAYER_COMMAND_BIT::UP))
 		{
+
 			// ジャンプステートに行く
 			pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
 			return true;
@@ -50,10 +51,17 @@ bool JumpCancel(BasePlayer * pPerson)
 	}
 	else if (pPerson->isAerialJump() == true)	// 空中で空中ジャンプの権利があれば
 	{
+		// (1201) (TODO) 最速で↑↑とかで速攻でここにける　
+		// AIの動きにより原因判明
+		// 攻撃中に始動からずっと↑を押していたら何も起こらないが
+		// Hit確認後（エフェクトが出た瞬間）↑を押しっぱなしにすると連続でここに通る
+		//　又は何か方向キーを押しっぱなしにするとこのバグは起こらない
+
 		// ★ジャンプ時のみトリガー
 		if (
 			//pPerson->GetInputList(PLAYER_COMMAND_BIT::C) == 3 ||	// ボタンでジャンプを封印
-			pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::UP, true))
+			pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::UP,true)
+			)// trueで色々不具合が起きてるとか？
 		{
 			// 先行入力リセット
 			pPerson->AheadCommandReset();
@@ -1987,6 +1995,9 @@ bool BasePlayerState::BackStep::OnMessage(BasePlayer * pPerson, const Message & 
 //					ジャンプステート
 /*******************************************************/
 
+// 後でけしてください
+int  g_iAerialJumpOKFrame = 0;
+
 void BasePlayerState::Jump::Enter(BasePlayer * pPerson)
 {
 	// ジャンプモーションに変える
@@ -1996,6 +2007,8 @@ void BasePlayerState::Jump::Enter(BasePlayer * pPerson)
 	pPerson->GetJump()->Clear();
 
 	pPerson->SetDirAngle();
+
+	g_iAerialJumpOKFrame = 0;
 }
 
 void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
@@ -2037,7 +2050,7 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 			// 移動地を足す！
 			if (pPerson->GetFSM()->isPrevState(*Run::GetInstance()))
 			{
-				add.x *= .25f;
+				add.x *= .22f;// [1210] AIとかめくりが強かったので少し下げました。この値でお願いしますorz
 				pPerson->AddMove(add);
 			}
 			else
@@ -2141,7 +2154,16 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 		//		pPerson->GetFSM()->ChangeState(BasePlayerState::AerialJump::GetInstance());
 		//	}
 		//}
-		if (JumpCancel(pPerson))return;
+
+		// メモ
+		// 
+		// 
+
+		g_iAerialJumpOKFrame++;
+		if (g_iAerialJumpOKFrame >= 12)
+		{
+			if (JumpCancel(pPerson))return;
+		}
 
 		//////////////////////////////////////////////
 		//	左入力
@@ -2638,6 +2660,7 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 					// 攻撃ステートを2段目に設定する
 					pPerson->SetActionState(BASE_ACTION_STATE::RUSH2);
 
+					// Switch文を次に進める
 					pPerson->AddRushStep();
 					//pPerson->GetRushAttack()->bNextOK = false;
 
@@ -3430,8 +3453,35 @@ void BasePlayerState::AntiAirAttack::Enter(BasePlayer * pPerson)
 	// 攻撃ステートを対空に
 	pPerson->SetActionState(BASE_ACTION_STATE::ANTI_AIR);
 
-	// 慣性を消す
-	pPerson->SetMove(Vector3(0,0,0));
+
+	// 後ろに下がる慣性を消す
+	if (pPerson->GetDir() == DIR::LEFT)
+	{
+		if (pPerson->GetMove().x > 0.0f)
+		{
+			// 慣性を消す
+			pPerson->SetMove(Vector3(0, 0, 0));
+		}
+		
+	}
+	else
+	{
+		if (pPerson->GetMove().x < 0.0f)
+		{
+			// 慣性を消す
+			pPerson->SetMove(Vector3(0, 0, 0));
+		}
+	}
+
+
+	// 走ってる時以外は慣性を消す
+	//if (pPerson->GetFSM()->isPrevState(*BasePlayerState::Run::GetInstance()) == false)
+	//{
+	//	// 慣性を消す
+	//	pPerson->SetMove(Vector3(0, 0, 0));
+	//}
+
+	
 
 	pPerson->SetDirAngle();
 }
@@ -3489,7 +3539,7 @@ void BasePlayerState::AntiAirAttack::Execute(BasePlayer * pPerson)
 
 		//	// ジャンプステートに行く
 		//	pPerson->GetFSM()->ChangeState(BasePlayerState::Jump::GetInstance());
-		//	return;
+		//	return;isAerialJump
 		//}
 
 		if (JumpCancel(pPerson))

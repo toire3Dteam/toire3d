@@ -142,8 +142,8 @@ public:
 	};
 
 	// AIの攻撃範囲
-	float AIAtackRange() { return 20; }
-	float AIRunAtackRange() { return 35; }
+	float AIAtackRange() { return 14; }
+	float AIRunAtackRange() { return 27; }
 
 private:
 	// 純粋仮想関数オーバーライド

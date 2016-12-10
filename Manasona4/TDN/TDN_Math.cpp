@@ -316,6 +316,12 @@ float Math::Length(float x1, float y1, float x2, float y2)
 	return sqrtf(x*x + y*y);
 }
 
+float Math::Length(float xA, float xB)
+{
+	return abs(xA - xB);
+}
+
+
 float Math::Length(const Vector2 &PosA, const Vector2 &PosB)
 {
 	const Vector2 v(PosA - PosB);

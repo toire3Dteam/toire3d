@@ -151,7 +151,9 @@ void Stage::Sea::Initialize(Camera *pCamera)
 
 void Stage::Garden::Initialize(Camera *pCamera)
 {
-	m_pObj = new iexMesh("DATA/Stage/Garden/Garden.IMO");
+	m_pObj = new iexMesh("DATA/Stage/Garden/Garden.IMO");// nanasato/stage
+	//m_pObj->SetAngle(3.14f);
+	m_pObj->Update();
 
 	m_pBack = new iexMesh("DATA/Stage/Senjo/Skydome.IMO");
 	m_pBack->SetPos(Vector3(0, 0, 300));

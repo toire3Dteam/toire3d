@@ -624,14 +624,14 @@ namespace AIState
 
 	
 	/*******************************************************/
-	//				空中下攻撃 ステート
+	//				空中崩し攻撃 ステート　（空中で地上の相手を崩すための攻撃）
 	/*******************************************************/
-	class AerialDropAtack :public State<AI>
+	class AerialDestructAtack :public State<AI>
 	{
 	public:
 
 		//this is a シングルトン
-		static AerialDropAtack* GetInstance();
+		static AerialDestructAtack* GetInstance();
 
 		// 入る
 		virtual void Enter(AI* pPerson);
@@ -650,11 +650,11 @@ namespace AIState
 
 
 	private:
-		AerialDropAtack() {};
-		~AerialDropAtack() {};
+		AerialDestructAtack() {};
+		~AerialDestructAtack() {};
 
-		AerialDropAtack(const AerialDropAtack&){}
-		AerialDropAtack& operator=(const AerialDropAtack&){}
+		AerialDestructAtack(const AerialDestructAtack&){}
+		AerialDestructAtack& operator=(const AerialDestructAtack&){}
 	};
 
 	/*******************************************************/
