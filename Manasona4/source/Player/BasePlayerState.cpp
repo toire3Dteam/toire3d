@@ -1995,9 +1995,6 @@ bool BasePlayerState::BackStep::OnMessage(BasePlayer * pPerson, const Message & 
 //					ジャンプステート
 /*******************************************************/
 
-// 後でけしてください
-int  g_iAerialJumpOKFrame = 0;
-
 void BasePlayerState::Jump::Enter(BasePlayer * pPerson)
 {
 	// ジャンプモーションに変える
@@ -2008,7 +2005,11 @@ void BasePlayerState::Jump::Enter(BasePlayer * pPerson)
 
 	pPerson->SetDirAngle();
 
-	g_iAerialJumpOKFrame = 0;
+	// ★(1210) 先行入力リセットの一文を追加。
+	// 恐らく対空のヒットストップ中に上を入力してここに入るのだが、
+	// 先行入力を消去し忘れたので、ジャンプ後に先行入力に引っかかってしまって入力してない空中ジャンプが出た？
+	//  (※先行入力はヒットストップ中に受け付けています)
+	pPerson->AheadCommandReset();
 }
 
 void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
@@ -2018,13 +2019,7 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 	//============================================
 	if (pPerson->GetJump()->bHold)
 	{
-		if (pPerson->isPushInput(PLAYER_COMMAND_BIT::C))
-		{
-			// プレイヤーが押してる時間計測
-			pPerson->GetJump()->PlayerHoldTimer++;
-		}
-
-		if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::B))
+		if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::C))
 			pPerson->GetJump()->bAttackPush = true;
 
 		if (++pPerson->GetJump()->HoldTimer > 2)
@@ -2154,16 +2149,7 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 		//		pPerson->GetFSM()->ChangeState(BasePlayerState::AerialJump::GetInstance());
 		//	}
 		//}
-
-		// メモ
-		// 
-		// 
-
-		g_iAerialJumpOKFrame++;
-		if (g_iAerialJumpOKFrame >= 12)
-		{
-			if (JumpCancel(pPerson))return;
-		}
+		if (JumpCancel(pPerson))return;
 
 		//////////////////////////////////////////////
 		//	左入力
@@ -4440,8 +4426,14 @@ void BasePlayerState::OverDrive_OneMore::Enter(BasePlayer * pPerson)
 	pPerson->SetGameTimerStopFlag(true);
 
 	// ★相手の同技補正を解除する
-	pPerson->GetTargetPlayer()->GetRecoveryDamageCount()->clear();
-	pPerson->GetTargetPlayer()->ResetDamageRate();
+
+	// (A列車)1だけ残して初段補正を回避というとんでもないコード
+	auto *TargetPlayerDamageCount(pPerson->GetTargetPlayer()->GetRecoveryDamageCount());
+	for (auto it = TargetPlayerDamageCount->begin(); TargetPlayerDamageCount->size() > 1;)
+		it = TargetPlayerDamageCount->erase(it);
+
+	// コンボ補正に0.5足す(1.0以上にはならない)
+	pPerson->GetTargetPlayer()->AddDamageRate(0.5f);
 }
 
 void BasePlayerState::OverDrive_OneMore::Execute(BasePlayer * pPerson)
