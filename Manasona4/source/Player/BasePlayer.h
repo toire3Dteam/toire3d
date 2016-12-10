@@ -343,13 +343,13 @@ protected:
 		bool bHold;	// しゃがんでる状態
 		bool bAttackPush;	// しゃがんでる最中に攻撃ボタンを押したか
 		int HoldTimer;		// しゃがんでる時間
-		int PlayerHoldTimer;	// しゃがんでる間にプレイヤーからジャンプボタンを受け付ける時間
+		int iAerialJumpCoolTime;	// 1フレーム空中ジャンプしないように、数フレームは待つ
 		int LandTimer;		// 着地の時間
 		void Clear()
 		{
 			bHold = true;
 			bAttackPush = false;
-			HoldTimer = PlayerHoldTimer = LandTimer = 0;
+			HoldTimer = iAerialJumpCoolTime = LandTimer = 0;
 		}
 	};
 	Jump m_jump;
@@ -657,7 +657,8 @@ public:
 	int GetHP() { return m_iHP; }
 	void SetHP(int hp) { m_iHP = hp; }
 	float GetDamageRate(){ return m_fDamageRate; }
-	void MultDamageRate(float rate){ m_fDamageRate *= rate; }	// 乗算
+	void AddDamageRate(float rate){ m_fDamageRate = min(m_fDamageRate + rate, 1);}		// 加算(1.0以上にならないようにする)
+	void MultDamageRate(float rate){ m_fDamageRate = max(m_fDamageRate * rate, 0.3f); }	// 乗算(0.3以下にはならないようにする)
 	void ResetDamageRate(){ m_fDamageRate = 1.0f; }
 	// HPの割合
 	int  GetHPPercentage()
@@ -771,8 +772,20 @@ public:
 		if (!isPushInputTRG(InputBit)) return false;
 
 		// 2個前に押してたらOK！！
-		for (int i = 2; i < JudgeFrame; i++) if ((m_wCommandHistory[i] & (int)InputBit)) return true;
-		return false;
+		int iCheckFrame(-1);
+		for (int i = 2; i < c_COMMAND_FRAME_MAX; i++)
+		{
+			if ((m_wCommandHistory[i] & (int)InputBit))
+			{
+				if (iCheckFrame == -1 && i > 12) break;
+				iCheckFrame++;
+			}
+			else
+			{
+				if (iCheckFrame >= 0) break;
+			}
+		}
+		return (iCheckFrame != -1 && iCheckFrame < JudgeFrame);
 	}
 
 	//------------------------------------------------------
