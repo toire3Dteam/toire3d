@@ -109,4 +109,7 @@ private:
 	friend class AIState::PracticeLand;
 	friend class AIState::PracticeAttack;
 	friend class AIState::Chase;
+	friend class AIState::Guard;
+
+
 };

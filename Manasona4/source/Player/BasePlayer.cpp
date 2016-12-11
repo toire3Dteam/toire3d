@@ -364,7 +364,7 @@ void BasePlayer::InitAI()
 	// AIフラグかつ、AIがnewされてなかったら
 	//if (m_pAI) return;
 	// 仮でAIの種類タイプ
-	if (m_bAI) m_pAI = new AI(m_side, this, AI_TYPE::CPU_EASY);
+	if (m_bAI) m_pAI = new AI(m_side, this, AI_TYPE::CPU_HARD);
 }
 
 BasePlayer::~BasePlayer()
@@ -1629,7 +1629,7 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 		m_pUVEffectMGR->AddMultipleEffect(l_Pos, UV_EFFECT_MULTIPLE_TYPE::GUARD_GRID, 0.2f, 0.5f, Vector3(0, -supportAngleY*1.5f, z), Vector3(0, -supportAngleY*1.5f, z));
 
 		// 青い光
-		PointLightMgr->AddPointLight(l_Pos + Vector3(0, 2, 0), Vector3(0, 0.35f, 0.65f), 18, 8, 12, 3, 6);// ポイントライトエフェクト！
+		PointLightMgr->AddPointLight(l_Pos + Vector3((m_vMove.x * 2.0f) , 1.5f, -1), Vector3(0, 0.35f, 0.65f), 18, 12, 12, 3, 6);// ポイントライトエフェクト！
 
 		// 飛び散るパーティクル
 		ParticleManager::EffectGuard(l_Pos, AttackVec);

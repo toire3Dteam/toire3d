@@ -1996,7 +1996,7 @@ bool BasePlayerState::BackStep::OnMessage(BasePlayer * pPerson, const Message & 
 /*******************************************************/
 
 // 後でけしてください
-int  g_iAerialJumpOKFrame = 0;
+//int  g_iAerialJumpOKFrame = 0;
 
 void BasePlayerState::Jump::Enter(BasePlayer * pPerson)
 {
@@ -2008,7 +2008,7 @@ void BasePlayerState::Jump::Enter(BasePlayer * pPerson)
 
 	pPerson->SetDirAngle();
 
-	g_iAerialJumpOKFrame = 0;
+	//g_iAerialJumpOKFrame = 0;
 
 	// ★(1210) 先行入力リセットの一文を追加。
 	// 恐らく対空のヒットストップ中に上を入力してここに入るのだが、
@@ -2165,8 +2165,8 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 		// 
 		// 
 
-		g_iAerialJumpOKFrame++;
-		if (g_iAerialJumpOKFrame >= 12)
+		//g_iAerialJumpOKFrame++;
+		//if (g_iAerialJumpOKFrame >= 12)
 		{
 			if (JumpCancel(pPerson))return;
 		}

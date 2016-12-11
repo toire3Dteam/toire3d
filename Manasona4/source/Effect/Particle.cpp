@@ -256,7 +256,7 @@ void ParticleManager::EffectHit(const Vector3 &pos, const Vector3 &v)
 			Move.x = (rand() % M2 - (M2 / 2))*0.05f;
 			Move.y = (rand() % 3 + 7) * 0.1f;
 			Move.z = (rand() % M2 - (M2 / 2))*0.05f;
-			Set(6, 0, 1.0f, 40, .0f, 20, .9f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, tdnRandom::Get(0.5f, 1.0f), RS::ADD);
+			Set(7, 0, 1.0f, 40, .0f, 20, .9f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, tdnRandom::Get(0.5f, 1.0f), RS::ADD);
 
 			//Move.x = (rand() % 30 - 16.0f) * 0.25f;
 			//Move.y = rand() % 9 - 4.0f;
@@ -306,6 +306,8 @@ void ParticleManager::EffectGuard(const Vector3 & pos, const Vector3 & v)
 		//Move.z = v.z * (tdnRandom::Get(0.0f, 0.5f) + 0.5f);
 		Move.z = (tdnRandom::Get(-1.5f, 1.75f));
 		
+
+
 		//const int M = 32;	
 		//Move.x = (rand() % M - (M / 2))*0.05f;
 		//if (v.x != 0)Move.x = (v.x < 0) ? -abs(Move.x) : abs(Move.x);
@@ -381,33 +383,61 @@ void ParticleManager::EffectGuard(const Vector3 & pos, const Vector3 & v)
 		Power.y = -0.005f;
 		Power.z = tdnRandom::Get(-0.0015f, 0.0015f);
 
+
 		// ¨‚¢‚æ‚­”ò‚ÑŽU‚é
-		Set(6, 0, 1.0f, 12, .0f, 7, 1.0f, Pos, Move*0.9f, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, tdnRandom::Get(0.25, 1.0f), RS::ADD);
+		Set(6, 0, 1.0f, 12, .0f, 7, 1.0f, Pos, Move*0.9f, Power, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, tdnRandom::Get(0.25, 1.0f), RS::ADD);
 		// ˆÐ—ÍŽã‚ß
 		Set(6, 0, 1.0f, 16, .0f, 10, 1.0f, Pos, Move*0.45f, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, tdnRandom::Get(0.25, 1.0f), RS::ADD);
 
-		//Power.x = 0;
-		//Power.y = -0.01f;
-		//Power.z = 0;
+	}
 
-		//// —±
-		////for (int j = 0; j < 1; j++)
-		//{
-		//	Pos.x = pos.x + rand() % 5 - 2.0f;
-		//	Pos.y = pos.y + (float)(rand() % 3);
-		//	Pos.z = pos.z + rand() % 5 - 2.0f;
-		//	Pos = pos;
-		//	const int M2 = 16;
-		//	Move.x = (rand() % M2 - (M2 / 2))*0.05f;
-		//	Move.y = (rand() % 3 + 7) * 0.1f;
-		//	Move.z = (rand() % M2 - (M2 / 2))*0.05f;
-		//	Set(7, 0, 1.0f, 40, .0f, 20, .9f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, rand() % 1 + .5f, RS::COPY);
+	// ü‚Â‚«
+	FOR(8)
+	{
+		// ‰ŠúˆÊ’u
+		Pos.x = pos.x + rand() % 3 - 1.5f;
+		Pos.y = pos.y + rand() % 1 - 0.5f;
+		Pos.z = pos.z + rand() % 4 - 2.0f;
 
-		//	//Move.x = (rand() % 30 - 16.0f) * 0.25f;
-		//	//Move.y = rand() % 9 - 4.0f;
-		//	//Move.z = (rand() % 30 -16.0f) * 0.001f;
-		//	//Set(7, 0, 1.0f, 16, .0f, 6, .75f, pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, rand() % 1 + 1.0f, RS::ADD);
-		//}
+
+		// ˆÚ“®’n
+		// ”ò‚Ô•ûŒü‚ÌƒxƒNƒgƒ‹‚ð‚»‚Ì‚Ü‚ÜŽg‚¢@‘¬“x‚ð’²®‚·‚é‚¾‚¯
+		// ‹t•ûŒü‚É”ò‚ÑŽU‚ç‚È‚¢‚Ì‚ª—˜“_
+		Vector3 vMoveVec = -v;
+		vMoveVec.Normalize();
+
+		if (abs(Move.x) <= 0.5f)
+		{
+			Move.x = (tdnRandom::Get(-0.8f, 0.8f));
+		}
+		else
+		{
+			Move.x = vMoveVec.x * (tdnRandom::Get(0.85f, 1.85f) + 0.5f);
+		}
+
+		if (abs(Move.y) <= 0.5f)
+		{
+			Move.y = (tdnRandom::Get(-0.8f, 0.8f));
+		}
+		else
+		{
+			Move.y = vMoveVec.y * (tdnRandom::Get(0.45f, 0.85f) + 0.5f);
+		}
+
+		Move.z = (tdnRandom::Get(-1.0f, 1.15f));
+
+		Power.x = tdnRandom::Get(-0.0002f, 0.0002f);
+		Power.y = -0.001f;
+		Power.z = tdnRandom::Get(-0.0002f, 0.0002f);
+
+		// UŒ‚‚·‚éŒü‚«‚©‚çŠp“x‚ð•Ï‚¦‚é
+		Vector3 vvv = Move;
+		vvv.Normalize();
+		float l_fAngle = atan2(vvv.x, vvv.y);
+
+		// ¨‚¢‚æ‚­”ò‚ÑŽU‚é
+		Set(3, 0, 1.0f, 12, .0f, 7, 1.0f, Pos, Move*0.9f, Power, 1.0f, 1.0f, 1.0f, 0.0f, l_fAngle, 1.0f, tdnRandom::Get(2.25, 2.8f), RS::ADD);
+
 	}
 }
 
@@ -576,6 +606,13 @@ void ParticleManager::Set(int type, int aFrame, COLOR aColor, int eFrame, COLOR 
 void	ParticleManager::Set(int type, int aFrame, float aAlpha, int eFrame, float eAlpha, int mFrame, float mAlpha, const Vector3 &Pos, const Vector3 &Move, const Vector3 &Power, float r, float g, float b, float rotate, float stretch, float scale, u8 flag)
 {
 	Set2(type, aFrame, aAlpha, eFrame, eAlpha, mFrame, mAlpha, Pos, Move, Power, r, g, b, rotate, .0f, stretch, scale, flag);
+}
+
+// ƒAƒ“ƒOƒ‹’Ç‰Á
+void ParticleManager::Set(int type, int aFrame, float aAlpha, int eFrame, float eAlpha, int mFrame, float mAlpha, const Vector3 & Pos, const Vector3 & Move, const Vector3 & Power, float r, float g, float b, float rotate, float angle, float stretch, float scale, u8 flag)
+{
+	Set2(type, aFrame, aAlpha, eFrame, eAlpha, mFrame, mAlpha, Pos, Move, Power, r, g, b, rotate, angle, stretch, scale, flag);
+
 }
 
 void	ParticleManager::Set2(int type, int aFrame, float aAlpha, int eFrame, float eAlpha, int mFrame, float mAlpha, const Vector3 &Pos, const Vector3 &Move, const Vector3 &Power, float r, float g, float b, float rotate, float angle, float stretch, float scale, u8 flag)

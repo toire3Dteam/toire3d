@@ -484,6 +484,108 @@ namespace AIState
 		Recovery& operator=(const Recovery&){}
 	};
 
+	/*******************************************************/
+	//				掴まれたステート
+	/*******************************************************/
+	class ThrowTech:public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static ThrowTech* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		ThrowTech() {};
+		~ThrowTech() {};
+
+		ThrowTech(const ThrowTech&) {}
+		ThrowTech& operator=(const ThrowTech&) {}
+	};
+
+
+	/*******************************************************/
+	//				投げ準備ステート
+	/*******************************************************/
+	class SetThrow :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static SetThrow* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		SetThrow() {};
+		~SetThrow() {};
+
+		SetThrow(const SetThrow&) {}
+		SetThrow& operator=(const SetThrow&) {}
+	};
+
+	/*******************************************************/
+	//				投げステート
+	/*******************************************************/
+	class Throw :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static Throw* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		Throw() {};
+		~Throw() {};
+
+		Throw(const Throw&) {}
+		Throw& operator=(const Throw&) {}
+	};
 
 	/*******************************************************/
 	//				対空準備ステート
@@ -658,14 +760,14 @@ namespace AIState
 	};
 
 	/*******************************************************/
-	//				フィニッシュ攻撃ステート
+	//				無敵攻撃ステート
 	/*******************************************************/
-	class FinishAtack :public State<AI>
+	class InvincibleAtack :public State<AI>
 	{
 	public:
 
 		//this is a シングルトン
-		static FinishAtack* GetInstance();
+		static InvincibleAtack* GetInstance();
 
 		// 入る
 		virtual void Enter(AI* pPerson);
@@ -684,11 +786,11 @@ namespace AIState
 
 
 	private:
-		FinishAtack() {};
-		~FinishAtack() {};
+		InvincibleAtack() {};
+		~InvincibleAtack() {};
 
-		FinishAtack(const FinishAtack&){}
-		FinishAtack& operator=(const FinishAtack&){}
+		InvincibleAtack(const InvincibleAtack&){}
+		InvincibleAtack& operator=(const InvincibleAtack&){}
 	};
 
 
