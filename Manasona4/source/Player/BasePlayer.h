@@ -834,7 +834,7 @@ public:
 	//	根性
 	//------------------------------------------------------
 	bool isWillPower() { return m_bWillPower; }
-	void WillPowerUpdate();
+	void WillPowerUpdate(PLAYER_UPDATE updateFlag);
 
 	//------------------------------------------------------
 	//	その他
@@ -1046,6 +1046,7 @@ protected:
 	//	根性
 	//------------------------------------------------------
 	bool m_bWillPower;				// 根性値フラグ
+	int m_iSpGettingFrame;			// SPが回復していく頻度 
 
 
 	//------------------------------------------------------

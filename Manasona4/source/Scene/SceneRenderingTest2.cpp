@@ -18,6 +18,12 @@
 
 #include "Effect\LocusEffect.h"
 
+#include "Window\BaseWindow.h"
+#include "Window\SoundWindow.h"
+
+SoundWindow* g_pSoundWindow;
+
+
 /*****************************/
 // 描画テスト用
 // ① 水を描画する				◎
@@ -63,7 +69,7 @@ bool sceneRenderingTest2::Initialize()
 	g_pSky =new iexMesh("Data/Stage/Sister/skydome.imo");
 	g_pSky->SetScale(3.0f);
 	g_pSky->Update();
-	g_pPlayer= new iexMesh("Data/Stage/Garden/Garden.imo");//Data/CHR/aramitama/aramitama_toire.IEM
+	g_pPlayer= new iexMesh("Data/Stage/nanasato/stage.imo");//Data/CHR/aramitama/aramitama_toire.IEM
 	g_vPlayerPos = VECTOR_ZERO;
 	g_vPlayerPos.y = 5;
 
@@ -71,6 +77,9 @@ bool sceneRenderingTest2::Initialize()
 	g_tagWater.pObj = new iexMesh("Data/Water/water.imo");
 	g_tagWater.vPos = VECTOR_ZERO;
 	g_tagWater.vPos.y = 10;
+
+	g_pSoundWindow = new SoundWindow(Vector2(500, 100));
+
 
 	// 奥行・スクリーン
 	if (FAILED(tdnSystem::GetDevice()->CreateDepthStencilSurface(1280, 720, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, FALSE, &m_pStencilSurface, NULL)))
@@ -97,6 +106,8 @@ sceneRenderingTest2::~sceneRenderingTest2()
 	SAFE_DELETE(m_pWaterEnvScreen);
 	SAFE_DELETE(g_pPlayer);
 
+	// ウィンドウ
+	SAFE_DELETE(g_pSoundWindow);
 }
 
 //******************************************************************
@@ -111,14 +122,14 @@ void sceneRenderingTest2::Update()
 	static float cameraRange = 100;
 
 	// アングル
-	if (KeyBoard(KB_A)) { cameraAngle -= 0.1f; }
-	if (KeyBoard(KB_D)) { cameraAngle += 0.1f; }
+	if (KeyBoard(KB_A)) { cameraAngle -= 0.05f; }
+	if (KeyBoard(KB_D)) { cameraAngle += 0.05f; }
 
 	if (KeyBoard(KB_W)) { cameraRange -= 1; }
 	if (KeyBoard(KB_S)) { cameraRange += 1; }
 
-	if (KeyBoard(KB_Q)) { m_camera.pos.y -= 1.0f; }
-	if (KeyBoard(KB_E)) { m_camera.pos.y += 1.0f; }
+	if (KeyBoard(KB_Q)) { m_camera.pos.y -= 0.5f; }
+	if (KeyBoard(KB_E)) { m_camera.pos.y += 0.5f; }
 
 	m_camera.pos.x = sinf(cameraAngle) * cameraRange;
 	m_camera.pos.z = cosf(cameraAngle) * cameraRange;
@@ -179,6 +190,20 @@ void sceneRenderingTest2::Update()
 	g_tagWater.pObj->SetPos(g_tagWater.vPos);
 	g_tagWater.pObj->Update();
 
+	// 他のウィンドウを触っているときに別ウィンドウを動かしたくないときは
+	// m_iChoiceStateをつかうといいかも
+
+	// ウィンドウ更新
+	g_pSoundWindow->Update();
+	
+	if (KeyBoardTRG(KB_0)) 
+	{ 
+		g_pSoundWindow->Action();
+	}
+
+
+	g_pSoundWindow->Ctrl(0);
+
 }
 
 //******************************************************************
@@ -202,8 +227,6 @@ void sceneRenderingTest2::Render()
 
 		// シェーダ更新
 		DeferredManagerEx.G_Update(m_camera.pos);
-
-
 
 		// 影
 		RenderShadow();
@@ -285,6 +308,9 @@ void sceneRenderingTest2::Render()
 
 	}
 
+	//  WindowUI
+	g_pSoundWindow->Redner();
+
 
 	tdnText::Draw(0, 30, 0xffffffff, "CameraPos    : %.1f %.1f %.1f", m_camera.pos.x, m_camera.pos.y, m_camera.pos.z);
 	tdnText::Draw(0, 60, 0xffffffff, "CameraTarget : %.1f %.1f %.1f", m_camera.target.x, m_camera.target.y, m_camera.target.z);
@@ -313,7 +339,7 @@ void sceneRenderingTest2::RenderShadow()
 void sceneRenderingTest2::SurfaceRender()
 {
 	enum {
-		X = 320/2, Y = 180/2
+		X = 320/*/2*/, Y = 180/*/2*/
 	};
 
 	int texX = 0;

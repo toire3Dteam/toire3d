@@ -28,7 +28,6 @@ SpGage::SpGage(BasePlayer * pPlayer)
 	m_pSpGetting->OrderShrink(12, 1, 1.1f);
 	m_pSpGettingRip = new tdn2DAnim("Data/UI/Game/SPGetting.png");
 	m_pSpGettingRip->OrderRipple(18, 1, 0.02f);
-	m_iSpGettingFrame = 0;
 	m_bSpGetting = false;
 
 	// ペナルティ
@@ -322,7 +321,6 @@ void SpGage::Action(int delayTimer)
 	m_bAlphaReturnFlag = false;
 
 	m_bSpGetting = false;
-	m_iSpGettingFrame = 0;
 }
 
 void SpGage::SpGettingUpdate()
@@ -330,14 +328,6 @@ void SpGage::SpGettingUpdate()
 	// 根性値が発動してたら
 	if (m_bSpGetting == true)
 	{
-		m_iSpGettingFrame++;
-		if (m_iSpGettingFrame >= 30)//1202
-		{
-			m_iSpGettingFrame = 0;
-			m_pPlayerReferences->AddOverDriveGage(1);// SPゲージを足す
-			
-		}
-
 		// 根性値が無くなったら
 		if (m_pPlayerReferences->isWillPower() == false)
 		{

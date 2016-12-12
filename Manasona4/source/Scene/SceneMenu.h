@@ -36,8 +36,8 @@ enum class TIPS_TYPE
 // メニューのウィンドウの種類
 enum class WINDOW_TYPE
 {
-	OPTION, // オプション
-
+	OPTION,		// オプション
+	SOUND,		// サウンド
 	ARRAY_END	// 配列終了
 
 };

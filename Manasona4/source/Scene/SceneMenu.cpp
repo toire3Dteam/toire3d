@@ -6,6 +6,7 @@
 #include "../Fade/Fade.h"
 #include "../Sound/SoundManager.h"
 #include "Window\OptionWindow.h"	// 必要なウィンドウ
+#include "Window\SoundWindow.h"	// 
 #include "../Scene/sceneResult.h"
 
 //#include "sceneResult.h"
@@ -54,6 +55,9 @@ bool sceneMenu::Initialize()
 		{
 		case WINDOW_TYPE::OPTION:
 			m_pWindow[i] = new OptionWindow(Vector2(500, 250));
+			break;
+		case WINDOW_TYPE::SOUND:
+			m_pWindow[i] = new SoundWindow(Vector2(800, 250));
 			break;
 		default:
 			MyAssert(0, "そんなウィンドウはない");

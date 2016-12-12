@@ -11,15 +11,13 @@
 class SoundManager
 {
 public:
-	// •Ï”
-	static float m_SEVolume;
-	static float m_BGMVolume;
-
 	// ŠÖ”
 	static void Initialize();
 	static void Release();
 	static void Update();
 	static void SetListenerPos(const Vector2 &pos);
+
+	static void SetBaseVolume(int BGMVol, int SEVol, int VoiceVol);
 };
 
 class iexSoundBase;

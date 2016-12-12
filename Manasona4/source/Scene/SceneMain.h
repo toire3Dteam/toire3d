@@ -12,6 +12,7 @@
 // ポーズウィンドウ
 #include "Window\PauseWindow.h"
 #include "Window\TutorialPauseWindow.h"
+#include "Window\SoundWindow.h"
 
 // リザルトデータ
 #include "Data\ResultData.h"
@@ -33,7 +34,7 @@ enum class BATTLE_WINDOW_TYPE
 {
 	PAUSE, // ポーズ
 	TUTORIAL_PAUSE, // チュートリアルポーズ
-
+	SOUND,			// サウンド
 	ARRAY_END	// 配列終了
 
 };

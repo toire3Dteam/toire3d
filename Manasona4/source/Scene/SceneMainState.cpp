@@ -1014,6 +1014,8 @@ void SceneMainState::PauseMenu::Execute(sceneMain *pMain)
 
 void SceneMainState::PauseMenu::Exit(sceneMain *pMain)
 {
+	// ★★★Exitではウィンドウは止めない
+
 	pMain->SetPause(false);
 }
 
@@ -1120,7 +1122,7 @@ void SceneMainState::TutorialPauseMenu::Exit(sceneMain *pMain)
 
 void SceneMainState::TutorialPauseMenu::Render(sceneMain *pMain)
 {
-
+	// ★★★Exitではウィンドウは止めない
 }
 
 bool SceneMainState::TutorialPauseMenu::OnMessage(sceneMain *pMain, const Message & msg)

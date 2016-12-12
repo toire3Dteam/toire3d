@@ -405,6 +405,9 @@ PS_G_BUFFER PS_G_Buffer(VS_DEFERRED In)
 {
 	PS_G_BUFFER OUT = (PS_G_BUFFER)0;
 
+	// (1212) アルファが少しでもなければ破棄 Decaleを吐き出さないようにしているので
+	clip((tex2D(DecaleSamp, In.Tex).a - 0.999f));
+
 	//float2 Tex = In.Tex;
 
 		//float3 E = normalize(In.vE);
@@ -1627,9 +1630,15 @@ technique DefaultLighting
 
 		AlphaBlendEnable = true;	// アルファブレンド考慮
 		BlendOp = Add;				// ブレンド仕様
-		SrcBlend = SrcAlpha;		// 現在描いてる方
-		DestBlend = InvSrcAlpha;	// 描かれている方
+		//SrcBlend = SrcAlpha;		// 現在描いてる方
+		//DestBlend = InvSrcAlpha;	// 描かれている方
+		SrcBlend = One;		//1,1,1,1
+		DestBlend = Zero;	//0,0,0,0
+
 		CullMode = CCW;				// カリングの仕様
+
+		AlphaRef = 0x00000080;
+		AlphaFunc = GREATEREQUAL;	// αがAlphaRef以上ならOK
 
 		VertexShader = compile vs_3_0 VS_DefaultLighting();
 		PixelShader = compile ps_3_0 PS_DefaultLighting();
@@ -1683,9 +1692,13 @@ technique Stage
 
 		AlphaBlendEnable = true;	// アルファブレンド考慮
 		BlendOp = Add;				// ブレンド仕様
-		SrcBlend = SrcAlpha;		// 現在描いてる方
-		DestBlend = InvSrcAlpha;	// 描かれている方
+		//SrcBlend = SrcAlpha;		// 現在描いてる方
+		//DestBlend = InvSrcAlpha;	// 描かれている方
+		SrcBlend = One;				//1,1,1,1
+		DestBlend = Zero;			//0,0,0,0
 		CullMode = CCW;				// カリングの仕様
+		AlphaRef = 0x00000080;
+		AlphaFunc = GREATEREQUAL;	// αがAlphaRef以上ならOK
 
 		VertexShader = compile vs_3_0 VS_DefaultLighting();
 		PixelShader = compile ps_3_0 PS_Stage();
@@ -1835,10 +1848,13 @@ technique Player
 
 		AlphaBlendEnable = true;	// アルファブレンド考慮
 		BlendOp = Add;				// ブレンド仕様
-		SrcBlend = SrcAlpha;		// 現在描いてる方
-		DestBlend = InvSrcAlpha;	// 描かれている方
+		//SrcBlend = SrcAlpha;		// 現在描いてる方
+		//DestBlend = InvSrcAlpha;	// 描かれている方
+		SrcBlend = One;				//1,1,1,1
+		DestBlend = Zero;			//0,0,0,0
 		CullMode = CCW;				// カリングの仕様
-
+		AlphaRef = 0x00000080;
+		AlphaFunc = GREATEREQUAL;	// αがAlphaRef以上ならOK
 		VertexShader = compile vs_3_0 VS_DefaultLighting();
 		PixelShader = compile ps_3_0 PS_Player();
 	}

@@ -62,7 +62,7 @@ const SE_Manager::DATA all_dataS[]
 	{ "リザルト3",					"DATA/Sound/SE/Result/result3.wav", 1, false },
 
 	{ "カーソル1",					"DATA/Sound/SE/P4U2/cursor.wav", 2, false },
-	{ "カーソル2",					"DATA/Sound/SE/P4U2/cursor2.wav", 2, false },
+	{ "カーソル2",					"DATA/Sound/SE/P4U2/cursor2.wav", 32, false },
 	{ "決定1",						"DATA/Sound/SE/P4U2/decide.wav", 2, false },
 	{ "キャンセル1",				"DATA/Sound/SE/P4U2/cancel.wav", 2, false },
 	{ "ステップクリア",				"DATA/Sound/SE/P4U2/gagin.wav", 3, false },
@@ -90,8 +90,6 @@ BGM_Manager::DATA all_dataB[]
 //		サウンド管理クラス(winmainとframeworkで使うだけ)
 //
 //**************************************************************************************************************
-float SoundManager::m_BGMVolume = 1;
-float SoundManager::m_SEVolume = 1;
 //=============================================================================================
 //		初	期	化
 void SoundManager::Initialize()
@@ -102,19 +100,15 @@ void SoundManager::Initialize()
 	bgm->Initialize();
 
 	// ボリュームの読み込み
-	std::ifstream ifs("DATA/Sound/volume.txt");
-	MyAssert(ifs, "エラー: ボリューム設定テキストが入ってない");
-
-	// ボリューム読み込み
-	char skip[8];	// 読み飛ばし用
-	ifs >> skip;
-	ifs >> m_SEVolume;
-	ifs >> skip;
-	ifs >> m_BGMVolume;
-
-	// 基本ボリューム設定
-	se->SetBaseVolume(m_SEVolume);
-	bgm->SetBaseVolume(m_BGMVolume);
+	//std::ifstream ifs("DATA/Sound/volume.txt");
+	//MyAssert(ifs, "エラー: ボリューム設定テキストが入ってない");
+	//
+	//// ボリューム読み込み
+	//char skip[8];	// 読み飛ばし用
+	//ifs >> skip;
+	//ifs >> m_SEVolume;
+	//ifs >> skip;
+	//ifs >> m_BGMVolume;
 }
 
 //=============================================================================================
@@ -139,6 +133,14 @@ void SoundManager::Update()
 void SoundManager::SetListenerPos(const Vector2 &pos)
 {
 	se->SetListener(pos);
+}
+
+void SoundManager::SetBaseVolume(int BGMVol, int SEVol, int VoiceVol)
+{
+	// 基本ボリューム設定
+	bgm->SetBaseVolume(BGMVol * .01f);
+	se->SetBaseVolume(SEVol * .01f);
+	// (TODO) ボイス
 }
 
 

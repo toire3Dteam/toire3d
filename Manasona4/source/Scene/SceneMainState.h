@@ -359,4 +359,35 @@ namespace SceneMainState
 		TutorialPauseMenu& operator=(const TutorialPauseMenu&) {}
 	};
 
+
+	//--------------------サウンドメニューステート
+	class SoundMenu : public State<sceneMain>
+	{
+	public:
+		// this is a シングルトン
+		static SoundMenu* GetInstance() { static SoundMenu state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMain* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMain* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMain* pMain);
+
+		// 描画
+		virtual void Render(sceneMain* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMain* pMain, const Message& msg);
+
+
+	private:
+		SoundMenu() {};
+		~SoundMenu() {};
+
+		SoundMenu(const SoundMenu&) {}
+		SoundMenu& operator=(const SoundMenu&) {}
+	};
 }

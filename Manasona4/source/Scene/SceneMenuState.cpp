@@ -481,8 +481,6 @@ void SceneMenuState::OptionStep::Enter(sceneMenu *pMain)
 
 void SceneMenuState::OptionStep::Execute(sceneMenu *pMain)
 {
-
-
 	// UI
 	M_UIMgr->Update();
 	
@@ -491,6 +489,15 @@ void SceneMenuState::OptionStep::Execute(sceneMenu *pMain)
 	{
 		pMain->GetWindow(WINDOW_TYPE::OPTION)->Stop();// ウィンドウを閉じる
 		pMain->GetFSM()->ChangeState(FirstStep::GetInstance());	// メニューへ戻る
+	}
+
+	// サウンドでボタンを押したら
+	if (pMain->GetWindow(WINDOW_TYPE::OPTION)->GetChoiceState()
+		== OptionWindow::OPTION_STATE::SOUND)
+	{
+		// サウンドメニューへ
+		pMain->GetFSM()->ChangeState(SoundWindowStep::GetInstance());
+		return;
 	}
 
 	//+----------------------------------
@@ -525,7 +532,7 @@ bool SceneMenuState::OptionStep::PadUpdate(sceneMenu *pMain, int DeviceID)
 
 void SceneMenuState::OptionStep::Exit(sceneMenu *pMain)
 {	
-	
+	// ★ウィンドウはExitで消してはいけない
 }
 
 void SceneMenuState::OptionStep::Render(sceneMenu *pMain)
@@ -541,6 +548,91 @@ void SceneMenuState::OptionStep::Render(sceneMenu *pMain)
 }
 
 bool SceneMenuState::OptionStep::OnMessage(sceneMenu *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+
+	//default:
+	//	break;
+	//}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
+
+
+
+/*******************************************************/
+//				サウンドウィンドウ選択
+/*******************************************************/
+
+void SceneMenuState::SoundWindowStep::Enter(sceneMenu *pMain)
+{
+	// サウンドウィンドウ起動
+	pMain->GetWindow(WINDOW_TYPE::SOUND)->Action();
+}
+
+void SceneMenuState::SoundWindowStep::Execute(sceneMenu *pMain)
+{
+	// UI
+	M_UIMgr->Update();
+
+	// 戻るボタンを押したら
+	if (pMain->GetWindow(WINDOW_TYPE::SOUND)->GetChoiceState()
+		== SoundWindow::SOUND_STATE::BACK)
+	{
+		pMain->GetWindow(WINDOW_TYPE::SOUND)->Stop();	// ウィンドウを閉じる
+		pMain->GetFSM()->RevertToPreviousState();		// 前のステートへ戻る
+		return;
+	}
+
+
+
+	//+----------------------------------
+	//	このステートでの操作
+	//+----------------------------------
+	// パッド分更新
+	const int NumDevice(tdnInputManager::GetNumDevice());
+
+	// パッド何もささってないとき用
+	if (NumDevice == 0)
+	{
+		if (PadUpdate(pMain, 0)) return;
+	}
+	else
+	{
+		for (int i = 0; i < NumDevice; i++)
+		{
+			if (PadUpdate(pMain, i)) return;
+		}
+	}
+}
+
+bool SceneMenuState::SoundWindowStep::PadUpdate(sceneMenu *pMain, int DeviceID)
+{
+	bool bChangedState(false);
+
+	// オプションウィンドウの操作
+	pMain->GetWindow(WINDOW_TYPE::SOUND)->Ctrl(DeviceID);
+
+	return bChangedState;
+}
+
+void SceneMenuState::SoundWindowStep::Exit(sceneMenu *pMain)
+{
+
+}
+
+void SceneMenuState::SoundWindowStep::Render(sceneMenu *pMain)
+{
+	// アイコンUI
+	M_UIMgr->Render();
+
+	tdnText::Draw(0, 0, 0xffffffff, "SoundWindowStep");
+}
+
+bool SceneMenuState::SoundWindowStep::OnMessage(sceneMenu *pMain, const Message & msg)
 {
 	// メッセージタイプ
 	//switch (msg.Msg)

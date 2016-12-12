@@ -36,12 +36,16 @@ BOOL InitApp(HINSTANCE hInstance, int nCmdShow)									// ƒQ[ƒ€‹N“®Žž‚ÌÅ‰‚Ì
 		MessageBox(0, "ƒEƒBƒ“ƒhƒE‰Šú‰»Ž¸”sB", "System", MB_OK);
 	}
 
+	// ƒZ[ƒuƒf[ƒ^“Ç‚Ýž‚Ý
+	PlayerDataMgr->Initialize();
+
 	tdnRandom::Initialize();
 	tdnRenderState::Initialize();
 	tdnTexture::Initialize();
 	tdnText::Init();
 	tdnInput::Initialize();
 	SoundManager::Initialize();
+	SoundManager::SetBaseVolume(PlayerDataMgr->m_ConfigData.iBGMVolume, PlayerDataMgr->m_ConfigData.iSEVolume, PlayerDataMgr->m_ConfigData.iVoiceVolume);
 	tdnMovieManager::Initialize();
 	ParticleManager::Initialize("DATA/Effect/particle.png", 1024);	// ƒp[ƒeƒBƒNƒ‹‰Šú‰»(š‚È‚º‚±‚±‚É‘‚­‚©‚Æ‚¢‚¤‚ÆAƒV[ƒ€ƒŒƒXƒV[ƒ“‚É‚ÄA‰Šú‰»¨‰Šú‰»¨‰ð•ú‚É‚È‚Á‚Ä‚µ‚Ü‚¤‚½‚ß)
 
@@ -59,8 +63,7 @@ BOOL InitApp(HINSTANCE hInstance, int nCmdShow)									// ƒQ[ƒ€‹N“®Žž‚ÌÅ‰‚Ì
 	//MainFrameEx->ChangeScene(new sceneCollect);
 	//MainFrameEx->ChangeScene(new sceneSelect);
 	
-	// ƒf[ƒ^
-	PlayerDataMgr->Initialize();
+
 
 	return TRUE;
 }

@@ -845,7 +845,7 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 if (pPerson->isWillPower())
 									 {
 										 // 防御力を上げる
-										 damage = (int)((float)damage* 0.7f);
+										 damage = (int)((float)damage* 0.65f);
 									 }
 									 
 
@@ -2922,7 +2922,14 @@ void BasePlayerState::DownFall::Execute(BasePlayer * pPerson)
 			pPerson->isPushInput(PLAYER_COMMAND_BIT::B)||
 			pPerson->isPushInput(PLAYER_COMMAND_BIT::C)||
 			pPerson->isPushInput(PLAYER_COMMAND_BIT::D)||
-			pPerson->isPushInput(PLAYER_COMMAND_BIT::R1))
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::R1)||
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::L1) ||
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::R2) ||
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::L2) ||
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::UP) ||
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN) || 
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT) || 
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT) )
 		{
 
 			// ダウンフラグを解除
@@ -3028,7 +3035,14 @@ void BasePlayerState::KnockDown::Execute(BasePlayer * pPerson)
 			pPerson->isPushInput(PLAYER_COMMAND_BIT::B) ||
 			pPerson->isPushInput(PLAYER_COMMAND_BIT::C) ||
 			pPerson->isPushInput(PLAYER_COMMAND_BIT::D) ||
-			pPerson->isPushInput(PLAYER_COMMAND_BIT::R1)  )
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::R1) ||
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::L1) ||
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::R2) ||
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::L2) ||
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::UP) ||
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN) ||
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT) ||
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
 		{
 			// ダウンフラグを解除
 			pPerson->SetDown(false);

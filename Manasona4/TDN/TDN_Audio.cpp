@@ -1419,7 +1419,7 @@ int tdnSoundSE::Play(int ID, bool loop)
 		// 再生してないからいつでも514状態の人を検索
 		if (!data[ID][play_no]->buffer->isPlay())
 		{	// 見つかった！
-			data[ID][play_no]->buffer->SetVolume((int)(m_fBaseVolume * 5000) - 5000);// ★基本ボリュームを設定
+			data[ID][play_no]->buffer->SetVolume((int)(m_fBaseVolume * 10000) - 10000);// ★基本ボリュームを設定
 			data[ID][play_no]->buffer->Play(loop);
 			return play_no;
 		}

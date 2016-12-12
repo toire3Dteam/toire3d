@@ -40,15 +40,17 @@ BaseWindow::~BaseWindow()
 
 void BaseWindow::Action()
 {
+	m_iChoiceState = CHOICE_STATE::HOLD;
 	// ウィンドウ起動
 	m_bActive = true;
-	m_iChoiceState = CHOICE_STATE::HOLD;
+
 }
 
 void BaseWindow::Stop()
 {
 	// ウィンドウ終了
 	m_bActive = false;
+	m_iChoiceState = CHOICE_STATE::HOLD;// (12/12) ここにもHOLDの処理
 }
 
 void BaseWindow::AddIconData(LPSTR string, LPSTR infoString)

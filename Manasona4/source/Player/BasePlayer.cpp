@@ -199,7 +199,7 @@ m_pFacePic(nullptr), m_pTargetPlayer(nullptr), m_pSpeedLine(nullptr), m_SkillAct
 m_fOrangeColRate(0), m_fMagentaColRate(0),
 m_pCutinPic(nullptr), m_pName("None"), m_iRushStep(0), m_pThrowMark(nullptr),
 m_bWillPower(false), m_bDown(false), m_iDashFrame(0),
-m_bNotOverDrive(false), m_tagCharacterParam{}
+m_bNotOverDrive(false), m_iSpGettingFrame(0), m_tagCharacterParam{}
 {
 	// スタンド
 	switch (data.partner)
@@ -285,6 +285,7 @@ void BasePlayer::Reset()
 	m_iRushStep = 
 	m_wAheadCommand =
 	m_iDashFrame=
+	m_iSpGettingFrame = 
 	0;
 
 	m_iHP = m_tagCharacterParam.iMaxHP;	// キャラごとのHP
@@ -364,7 +365,7 @@ void BasePlayer::InitAI()
 	// AIフラグかつ、AIがnewされてなかったら
 	//if (m_pAI) return;
 	// 仮でAIの種類タイプ
-	if (m_bAI) m_pAI = new AI(m_side, this, AI_TYPE::CPU_EASY);
+	if (m_bAI) m_pAI = new AI(m_side, this, AI_TYPE::CPU_HARD);
 }
 
 BasePlayer::~BasePlayer()
@@ -408,7 +409,7 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 	GuardEffectUpdate();
 
 	// 根性値発動用の更新
-	WillPowerUpdate();
+	WillPowerUpdate(flag);
 
 	// 1more覚醒していたらスタンドの動きを止める
 	if (GetFSM()->isInState(*BasePlayerState::OverDrive_OneMore::GetInstance()) == false)
@@ -1806,8 +1807,11 @@ void BasePlayer::GuardEffectUpdate()
 	m_pUVEffectMGR->GetBaseUVEffect(UV_EFFECT_TYPE::GUARD)->SetPos(GetCenterPos());
 }
 
-void BasePlayer::WillPowerUpdate()
+void BasePlayer::WillPowerUpdate(PLAYER_UPDATE updateFlag)
 {	
+	// 操作できる時ならば
+	if (updateFlag != PLAYER_UPDATE::CONTROL_OK) return;	
+	
 	// HPのレートを計算
 	float HpRate = (float)m_iHP/ m_tagCharacterParam.iMaxHP;
 
@@ -1819,7 +1823,9 @@ void BasePlayer::WillPowerUpdate()
 		/*******************/
 
 		// 死んでない状態でかつHPが35%以上なら
-		if (HpRate <= 0.35f && GetFSM()->isInState(*BasePlayerState::Die::GetInstance()) == false)
+		if (HpRate <= 0.35f &&
+			GetFSM()->isInState(*BasePlayerState::Die::GetInstance()) == false /*&& 
+			GetFSM()->isInState(*BasePlayerState::Die::GetInstance()) == false*/)
 		{
 			// リカバリーフレームが切れ動けるようになった瞬間+
 			// ダウンフラグFalseの時がトリガー
@@ -1834,6 +1840,9 @@ void BasePlayer::WillPowerUpdate()
 				// 演出
 				AddEffectAction(m_vPos, EFFECT_TYPE::WILL_POWER);
 				
+				// SPゲージ上昇フレーム初期化
+				m_iSpGettingFrame = 0;
+
 				// オーラ発動
 				m_pUVEffectMGR->AddEffectRoop(GetCenterPos(), UV_EFFECT_TYPE::WILL_POWER_AURA);
 
@@ -1855,6 +1864,13 @@ void BasePlayer::WillPowerUpdate()
 		// オーラ終了
 		m_pUVEffectMGR->StopEffectRoop(UV_EFFECT_TYPE::WILL_POWER_AURA);
 	
+		m_iSpGettingFrame++;
+		if (m_iSpGettingFrame >= 30)//1202
+		{
+			m_iSpGettingFrame = 0;
+			m_OverDriveGage += 1;// SPゲージを足す
+		}
+
 	}
 
 	// キャラクターに追従

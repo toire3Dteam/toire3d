@@ -107,6 +107,15 @@ namespace Stage
 		EFFECT_CAMERA_ID GetIntroCameraScriptID() { return EFFECT_CAMERA_ID::SEA_STAGE_INTRO; }
 	};
 
+	// 七里ステージ
+	class NanasatoSity : public Base
+	{
+	public:
+		NanasatoSity() :Base() {}
+		void Initialize(Camera *pCamera);
+		EFFECT_CAMERA_ID GetIntroCameraScriptID() { return EFFECT_CAMERA_ID::SEA_STAGE_INTRO; }
+	};
+
 	// 終点ステージ
 	class Syuten : public Base
 	{

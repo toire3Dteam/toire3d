@@ -21,7 +21,10 @@ namespace PlayerData
 	struct Confing
 	{
 		unsigned int iDifficultyAI	: 4;	// AI‚Ì“ïˆÕ“x(15‚Ü‚Å)
-		unsigned int ‹ó‚«˜g1		: 32;
+		signed int iBGMVolume		: 8;
+		signed int iSEVolume		: 8;
+		signed int iVoiceVolume		: 8;
+		unsigned int ‹ó‚«˜g1		: 8;
 		unsigned int ‹ó‚«˜g2		: 32;
 		unsigned int ‹ó‚«˜g3		: 32;
 		unsigned int ‹ó‚«˜g4		: 32;

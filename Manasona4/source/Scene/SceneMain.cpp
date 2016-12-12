@@ -176,6 +176,9 @@ bool sceneMain::Initialize()
 		case BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE:
 			m_pWindow[i] = new TutorialPauseWindow(Vector2(424, 128));
 			break;
+		case BATTLE_WINDOW_TYPE::SOUND:
+			m_pWindow[i] = new SoundWindow(Vector2(424, 128));
+			break;
 		default:
 			MyAssert(0, "そんなウィンドウはない");
 			break;

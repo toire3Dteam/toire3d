@@ -107,9 +107,9 @@ DeferredEx::DeferredEx()
 	// 初期化
 	m_pSaveBackBuffer = nullptr;
 	m_pSaveStencilSurface = nullptr;		// ステンシル保存用
-	m_pShadowStencilSurface = nullptr;	// シャドウ用ステンシル
+	m_pShadowStencilSurface = nullptr;		// シャドウ用ステンシル
 
-	m_iShadowSize = 0;			// シャドウマップのサイズ
+	m_iShadowSize = 0;				// シャドウマップのサイズ
 	m_fShadowRange = 0.0f;			// Shadowのカメラからの距離	
 	m_bShadowFlag = false;			// シャドウマップの使用フラグ
 
