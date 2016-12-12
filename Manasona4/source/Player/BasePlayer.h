@@ -146,7 +146,8 @@ enum class BASE_ACTION_STATE
 	AERIALDROP,			// 空中下攻撃
 	INVINCIBLE_ATTACK,	// フィニッシュアーツ→無敵技
 	SKILL,				// 地上キャラクター固有技
-	SKILL_SQUAT,		// 地上キャラクター固有技
+	SKILL2,				// 地上キャラクター固有技2
+	SKILL_SQUAT,		// しゃがみキャラクター固有技
 	SKILL_AERIAL,		// 空中下キャラクター固有技
 	SKILL_AERIALDROP,	// 空中下キャラクター固有技
 	THROW,				// 投げ
@@ -160,6 +161,7 @@ enum class BASE_ACTION_STATE
 enum class SKILL_ACTION_TYPE
 {
 	LAND,
+	LAND2,
 	SQUAT,
 	AERIAL,
 	AERIALDROP,
@@ -192,10 +194,11 @@ enum class MOTION_TYPE
 	//AERIALDROP_ATTACK,
 	AERIAL_DASH,			// 空中ダッシュ
 	PERSONA,				// ペルソナ発動
-	CHARA_ATTACK_LAND,		// キャラ固有地上
-	CHARA_ATTACK_SQUAT,		// キャラ固有しゃがみ
-	CHARA_ATTACK_AERIAL,	// キャラ固有空中
-	CHARA_ATTACK_AERIALDROP,// キャラ固有空中下
+	SKILL_LAND,		// キャラ固有地上
+	SKILL_SQUAT,	// キャラ固有しゃがみ
+	SKILL_AERIAL,	// キャラ固有空中
+	SKILL_AERIALDROP,// キャラ固有空中下
+	SKILL2,			// スキル枠2
 	HEAVEHO_DRIVE,			// DD
 	BURST,					// バースト
 	HEAVEHO_DRIVE_OVERFLOW,	// AH

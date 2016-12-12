@@ -95,14 +95,14 @@ void Nazenara::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->attribute = ATTACK_ATTRIBUTE::BULLET;
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->fComboRate = 1.0f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
-	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
-	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
+	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = true;
+	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = true;
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(3.25f, 3.0f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(3.25f, 3.0f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].hitStopFlame = 0;
-	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 18;
-	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 18;
+	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 60;
+	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 60;
 	// 判定形状
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->pCollisionShape->width = 18;
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->pCollisionShape->height = 17;
@@ -729,6 +729,7 @@ void Nazenara::InitActionDatas()
 
 	// スキルアクションの初期化(★★★ここに書くのは、この中でAttackDataを参照するから)
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::LAND] = new SkillAction::Land(this);
+	m_pSkillActions[(int)SKILL_ACTION_TYPE::LAND2] = nullptr;
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::SQUAT] = new SkillAction::Squat(this);
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::AERIAL] = new SkillAction::Aerial(this);
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::AERIALDROP] = new SkillAction::AerialDrop(this);
@@ -807,10 +808,10 @@ void Nazenara::InitMotionDatas()
 	m_iMotionNumbers[(int)MOTION_TYPE::AERIAL_ATTACK] = 17;
 	m_iMotionNumbers[(int)MOTION_TYPE::AERIAL_DASH] = 18;
 	m_iMotionNumbers[(int)MOTION_TYPE::PERSONA] = 19;
-	m_iMotionNumbers[(int)MOTION_TYPE::CHARA_ATTACK_LAND] = 20;
-	m_iMotionNumbers[(int)MOTION_TYPE::CHARA_ATTACK_SQUAT] = 21;
-	m_iMotionNumbers[(int)MOTION_TYPE::CHARA_ATTACK_AERIAL] = 22;
-	m_iMotionNumbers[(int)MOTION_TYPE::CHARA_ATTACK_AERIALDROP] = 23;
+	m_iMotionNumbers[(int)MOTION_TYPE::SKILL_LAND] = 20;
+	m_iMotionNumbers[(int)MOTION_TYPE::SKILL_SQUAT] = 21;
+	m_iMotionNumbers[(int)MOTION_TYPE::SKILL_AERIAL] = 22;
+	m_iMotionNumbers[(int)MOTION_TYPE::SKILL_AERIALDROP] = 23;
 	m_iMotionNumbers[(int)MOTION_TYPE::HEAVEHO_DRIVE] = 24;
 	m_iMotionNumbers[(int)MOTION_TYPE::BURST] = 25;
 	m_iMotionNumbers[(int)MOTION_TYPE::HEAVEHO_DRIVE_OVERFLOW] = 26;
@@ -929,7 +930,7 @@ Nazenara::SkillAction::Land::Land(Nazenara *pNazenara) :Base(pNazenara, BASE_ACT
 void Nazenara::SkillAction::Land::Enter()
 {
 	// モーションに変える
-	m_pNazenara->SetMotion(MOTION_TYPE::CHARA_ATTACK_LAND);
+	m_pNazenara->SetMotion(MOTION_TYPE::SKILL_LAND);
 
 	// アクションステート変更
 	m_pNazenara->SetActionState(BASE_ACTION_STATE::SKILL);
@@ -980,7 +981,7 @@ void Nazenara::SkillAction::Squat::Enter()
 	m_pNazenara->SetActionState(BASE_ACTION_STATE::SKILL_SQUAT);
 
 	// モーションセット
-	m_pNazenara->SetMotion(MOTION_TYPE::CHARA_ATTACK_SQUAT);
+	m_pNazenara->SetMotion(MOTION_TYPE::SKILL_SQUAT);
 
 
 }
@@ -1034,7 +1035,7 @@ Nazenara::SkillAction::Aerial::Aerial(Nazenara *pNazenara) :Base(pNazenara, BASE
 void Nazenara::SkillAction::Aerial::Enter()
 {
 	// モーションに変える
-	m_pNazenara->SetMotion(MOTION_TYPE::CHARA_ATTACK_AERIAL);
+	m_pNazenara->SetMotion(MOTION_TYPE::SKILL_AERIAL);
 
 	// アクションステート変更
 	m_pNazenara->SetActionState(BASE_ACTION_STATE::SKILL_AERIAL);
@@ -1075,7 +1076,7 @@ Nazenara::SkillAction::AerialDrop::AerialDrop(Nazenara *pNazenara) :Base(pNazena
 void Nazenara::SkillAction::AerialDrop::Enter()
 {
 	// モーションに変える
-	m_pNazenara->SetMotion(MOTION_TYPE::CHARA_ATTACK_AERIALDROP);
+	m_pNazenara->SetMotion(MOTION_TYPE::SKILL_AERIALDROP);
 
 	// アクションステート変更
 	m_pNazenara->SetActionState(BASE_ACTION_STATE::SKILL_AERIALDROP);

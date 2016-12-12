@@ -129,7 +129,15 @@ public:
 	void Cross_fade(LPSTR inID, LPSTR outID, float in_speed, float out_speed, bool loop);
 	bool isPlay(LPSTR _ID);
 	void SetSpeed(LPSTR _ID, float speed){ play_manager->SetSpeed(ID[_ID], speed); }
-	void SetBaseVolume(float volume){ play_manager->SetBaseVolume(volume); }
+	void SetBaseVolume(float volume)
+	{
+		play_manager->SetBaseVolume(volume); 
+
+		if (m_bPlayStream)
+		{
+			m_pStreamSound->SetVolume(volume);
+		}
+	}
 	void SetVolume(LPSTR _ID, float volume){ play_manager->SetVolume(ID[_ID], volume); }
 	void SetListener(const Vector2 &pos, const Vector2 &move);											// ƒŠƒXƒi[î•ñ
 	tdnStreamSound *PlayStream(LPSTR filename){ return play_manager->PlayStream(filename); }

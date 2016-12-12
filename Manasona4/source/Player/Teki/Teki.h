@@ -74,6 +74,8 @@ public:
 			void Enter();
 			bool Execute();
 			void Exit();
+		private:
+			int m_iHitCount;
 		};
 
 		class Squat :public Base
@@ -86,24 +88,14 @@ public:
 		private:
 		};
 
-		class Aerial :public Base
+		// コークスクリュー
+		class Land2 :public Base
 		{
 		public:
-			Aerial(Teki *pTeki);
+			Land2(Teki *pTeki);
 			void Enter();
 			bool Execute();
 			void Exit();
-		};
-
-		class AerialDrop :public Base
-		{
-		public:
-			AerialDrop(Teki *pTeki);
-			void Enter();
-			bool Execute();
-			void Exit();
-		private:
-			int m_ActiveFrame;	// 初段、二段と攻撃を分けるので、時間の計測で
 		};
 	};
 

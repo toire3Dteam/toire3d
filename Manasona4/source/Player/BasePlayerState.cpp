@@ -124,7 +124,7 @@ bool RunCancel(BasePlayer * pPerson)
 	//////////////////////////////////////////////
 	//	左右キーで走りキャンセル
 	//============================================
-	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::LEFT, true))
+	if (pPerson->isDoublePush(PLAYER_COMMAND_BIT::LEFT))
 	{
 		//pPerson->SetDir(DIR::LEFT);
 		if (pPerson->GetDir() == DIR::LEFT)
@@ -136,7 +136,7 @@ bool RunCancel(BasePlayer * pPerson)
 			return true;
 		}
 	}
-	else if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::RIGHT, true))
+	else if (pPerson->isDoublePush(PLAYER_COMMAND_BIT::RIGHT))
 	{
 		//pPerson->SetDir(DIR::RIGHT);
 		if (pPerson->GetDir() == DIR::RIGHT)
@@ -297,8 +297,8 @@ bool OverDriveCancel(BasePlayer *pPerson)
 	if (pPerson->isNotOverDrive() == true)return false;
 
 
-	// 覚醒（バースト）キャンセル
-	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R3, true))
+	// 覚醒（バースト）キャンセル(攻めの場合、先行入力可能)
+	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R3, (pPerson->GetRecoveryFrame() <= 0)))
 	{
 		// 先行入力リセット
 		pPerson->AheadCommandReset();
@@ -601,38 +601,22 @@ void GuardUpdate(BasePlayer *pPerson)
 	// ガードコマンドを入力してたら
 	if (isInputGuardCommand(pPerson))
 	{
-		// ★相手が何かしらの攻撃をしていたら、ガードステートに移行
-		if ((pPerson->GetTargetPlayer()->isAttackState() || (pPerson->GetTargetPlayer()->GetStand()->isActive() && pPerson->GetTargetPlayer()->GetStand()->GetAttackData())) &&															// 相手が攻撃状態
-			Math::Length(pPerson->GetPos(),pPerson->GetTargetPlayer()->GetPos()) < BasePlayer::c_GUARD_DISTANCE)	// ガード発動距離
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Guard::GetInstance());
+		BasePlayer *target(pPerson->GetTargetPlayer());
+		bool bAttackState(false);
+		// ★相手が何かしらの攻撃をしていたら、
+		if (target->isAttackState()) if (target->GetAttackData()->attribute != ATTACK_ATTRIBUTE::THROW) bAttackState=true;	
 
-		//// しゃがみガード
-		//if (pPerson->GetFSM()->isInState(*BasePlayerState::Squat::GetInstance()))
-		//{
-		//	// ガードステートを設定する
-		//	pPerson->SetGuardState(GUARD_STATE::DOWN_GUARD);
-		//
-		//	// 相手が何かしらの攻撃をしていたら、ガードモーションをとる
-		//	if (pPerson->GetTargetPlayer()->isAttackState())
-		//	{
-		//		// TODO:モーション戻す時どうする
-		//		pPerson->SetMotion(MOTION_TYPE::DOWN_GUARD);
-		//	}
-		//}
-		//
-		//// 立ちガード
-		//else
-		//{
-		//	// ガードステートを設定する
-		//	pPerson->SetGuardState(GUARD_STATE::UP_GUARD);
-		//
-		//	// 相手が何かしらの攻撃をしていたら、ガードモーションをとる
-		//	if (pPerson->GetTargetPlayer()->isAttackState())
-		//	{
-		//		// TODO:モーション戻す時どうする
-		//		pPerson->SetMotion(MOTION_TYPE::UP_GUARD);
-		//	}
-		//}
+		// スタンド
+		if (target->GetStand()->isActive() && target->GetStand()->GetAttackData()) bAttackState = true;
+
+		if (bAttackState)
+		{
+			// 距離
+			if (Math::Length(pPerson->GetPos(), target->GetPos()) > BasePlayer::c_GUARD_DISTANCE) return;	// ガード発動距離
+
+			// ガード条件を満たしたのでガード
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Guard::GetInstance());
+		}
 	}
 
 	// ガードコマンドを入力していないので、ガードしてないステートを設定
@@ -1548,14 +1532,14 @@ void BasePlayerState::Run::Enter(BasePlayer * pPerson)
 	pPerson->SetDirAngle();
 
 	// 初速度の設定
-	Vector3 move = pPerson->GetMove();
+	Vector3 move;// = pPerson->GetMove();
 	switch (pPerson->GetDir())
 	{
 	case DIR::LEFT:
-		move.x -= 1.0f;
+		move.x = -pPerson->GetMaxSpeed() * .75f;
 		break;
 	case DIR::RIGHT:
-		move.x += 1.0f;
+		move.x = pPerson->GetMaxSpeed() * .75f;
 		break;
 	default:
 		MyAssert(0, "ふぁっきゅー");
@@ -4354,6 +4338,8 @@ void BasePlayerState::FinishAttack::Exit(BasePlayer * pPerson)
 {
 	// 先行入力リセット
 	pPerson->AheadCommandReset();
+
+	pPerson->SetInvincible(0, 0);
 }
 
 void BasePlayerState::FinishAttack::Render(BasePlayer * pPerson)
@@ -4595,7 +4581,7 @@ bool BasePlayerState::OverDrive_OneMore::OnMessage(BasePlayer * pPerson, const M
 	{
 
 									 // アクションフレームが続いてたら
-									 if (pPerson->isFrameAction())
+									 //if (pPerson->isFrameAction())
 									 {
 										 // グローバルステートに行かないようにする！
 										 return true;
@@ -4672,7 +4658,7 @@ bool BasePlayerState::OverDrive_Burst::OnMessage(BasePlayer * pPerson, const Mes
 	{
 
 									 // アクションフレームが続いてたら
-									 if (pPerson->isFrameAction())
+									 //if (pPerson->isFrameAction())
 									 {
 										 // グローバルステートに行かないようにする！
 										 return true;

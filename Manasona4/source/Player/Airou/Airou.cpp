@@ -91,14 +91,14 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->attribute = ATTACK_ATTRIBUTE::BULLET;
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->fComboRate = 1.0f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
-	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
-	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
+	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = true;
+	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = true;
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(3.25f, 3.0f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(3.25f, 3.0f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].hitStopFlame = 0;
-	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 18;
-	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 18;
+	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 60;
+	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 60;
 	// 判定形状
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->pCollisionShape->width = 18;
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->pCollisionShape->height = 17;
@@ -646,6 +646,7 @@ void Airou::InitActionDatas()
 
 	// スキルアクションの初期化(★★★ここに書くのは、この中でAttackDataを参照するから)
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::LAND] = new SkillAction::Land(this);
+	m_pSkillActions[(int)SKILL_ACTION_TYPE::LAND2] = nullptr;
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::SQUAT] = new SkillAction::Squat(this);
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::AERIAL] = new SkillAction::Land(this);
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::AERIALDROP] = new SkillAction::AerialDrop(this);
@@ -716,10 +717,10 @@ void Airou::InitMotionDatas()
 	m_iMotionNumbers[(int)MOTION_TYPE::AERIAL_ATTACK] = 17;
 	m_iMotionNumbers[(int)MOTION_TYPE::AERIAL_DASH] = 18;
 	m_iMotionNumbers[(int)MOTION_TYPE::PERSONA] = 19;
-	m_iMotionNumbers[(int)MOTION_TYPE::CHARA_ATTACK_LAND] = 20;
-	m_iMotionNumbers[(int)MOTION_TYPE::CHARA_ATTACK_SQUAT] = 7;
-	m_iMotionNumbers[(int)MOTION_TYPE::CHARA_ATTACK_AERIAL] = 21;
-	m_iMotionNumbers[(int)MOTION_TYPE::CHARA_ATTACK_AERIALDROP] = 22;
+	m_iMotionNumbers[(int)MOTION_TYPE::SKILL_LAND] = 20;
+	m_iMotionNumbers[(int)MOTION_TYPE::SKILL_SQUAT] = 7;
+	m_iMotionNumbers[(int)MOTION_TYPE::SKILL_AERIAL] = 21;
+	m_iMotionNumbers[(int)MOTION_TYPE::SKILL_AERIALDROP] = 22;
 	m_iMotionNumbers[(int)MOTION_TYPE::HEAVEHO_DRIVE] = 23;
 	m_iMotionNumbers[(int)MOTION_TYPE::HEAVEHO_DRIVE_OVERFLOW] = 25;
 	m_iMotionNumbers[(int)MOTION_TYPE::THROW] = 26;
@@ -841,7 +842,7 @@ Airou::SkillAction::Land::Land(Airou *pAirou) :Base(pAirou, BASE_ACTION_STATE::S
 void Airou::SkillAction::Land::Enter()
 {
 	// モーションに変える
-	m_pAirou->SetMotion(MOTION_TYPE::CHARA_ATTACK_LAND);
+	m_pAirou->SetMotion(MOTION_TYPE::SKILL_LAND);
 
 	// アクションステート変更
 	m_pAirou->SetActionState(BASE_ACTION_STATE::SKILL);
@@ -951,7 +952,7 @@ void Airou::SkillAction::Squat::Enter()
 	m_pAirou->SetActionState(BASE_ACTION_STATE::SKILL_SQUAT);
 
 	// モーションセット
-	m_pAirou->SetMotion(MOTION_TYPE::CHARA_ATTACK_SQUAT);
+	m_pAirou->SetMotion(MOTION_TYPE::SKILL_SQUAT);
 }
 
 bool Airou::SkillAction::Squat::Execute()
@@ -973,7 +974,7 @@ Airou::SkillAction::AerialDrop::AerialDrop(Airou *pAirou) :Base(pAirou, BASE_ACT
 void Airou::SkillAction::AerialDrop::Enter()
 {
 	// モーションに変える
-	m_pAirou->SetMotion(MOTION_TYPE::CHARA_ATTACK_AERIALDROP);
+	m_pAirou->SetMotion(MOTION_TYPE::SKILL_AERIALDROP);
 
 	// アクションステート変更
 	m_pAirou->SetActionState(BASE_ACTION_STATE::SKILL_AERIALDROP);

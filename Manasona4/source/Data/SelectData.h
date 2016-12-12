@@ -16,7 +16,7 @@ enum class CHARACTER { AIROU, TEKI, NAZENARA, END };
 enum class PARTNER { MOKOI, MAYA, END };
 
 // ステージのタイプ
-enum class STAGE { SAND, SEA, GARDEN, SYUTEN, A,NANASATO_SITY, HEAVE_HO, MAX };
+enum class STAGE { SAND, SEA, GARDEN, SYUTEN, A, HEAVE_HO, MAX };
 
 struct SideData
 {
@@ -24,7 +24,7 @@ struct SideData
 	PARTNER partner;
 	int iDeviceID;	// コントローラーデバイスのID
 	bool bAI;		// AIフラグ
-	SideData() :character(CHARACTER::NAZENARA), partner(PARTNER::MAYA), iDeviceID(0), bAI(false) {}
+	SideData();
 	SideData &operator=(const SideData &data) { character = data.character, partner = data.partner, iDeviceID = data.iDeviceID, bAI = data.bAI; return *this; }
 };
 

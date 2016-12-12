@@ -62,7 +62,7 @@ const SE_Manager::DATA all_dataS[]
 	{ "リザルト3",					"DATA/Sound/SE/Result/result3.wav", 1, false },
 
 	{ "カーソル1",					"DATA/Sound/SE/P4U2/cursor.wav", 2, false },
-	{ "カーソル2",					"DATA/Sound/SE/P4U2/cursor2.wav", 32, false },
+	{ "カーソル2",					"DATA/Sound/SE/P4U2/cursor2.wav", 2, false },
 	{ "決定1",						"DATA/Sound/SE/P4U2/decide.wav", 2, false },
 	{ "キャンセル1",				"DATA/Sound/SE/P4U2/cancel.wav", 2, false },
 	{ "ステップクリア",				"DATA/Sound/SE/P4U2/gagin.wav", 3, false },

@@ -2,7 +2,14 @@
 #include "SelectData.h"
 #include "../Sound/BattleMusic.h"
 
-SelectData::SelectData():stage(STAGE::NANASATO_SITY),
+SideData::SideData() :
+character(CHARACTER::TEKI),		// 選択キャラクター
+partner(PARTNER::MAYA),			// 選択パートナー
+iDeviceID(0),					// 操作するデバイスID
+bAI(false)						// AI
+{}
+
+SelectData::SelectData():stage(STAGE::SEA),
 bTutorial(false),
 iWinRound(2),	// ラウンド数
 iBattleMusicID(BattleMusicManager::RANDOM),

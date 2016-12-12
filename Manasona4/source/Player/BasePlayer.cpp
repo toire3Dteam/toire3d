@@ -92,27 +92,69 @@ void BasePlayer::LoadAttackFrameList(LPSTR filename)
 	std::ifstream ifs(filename);
 	MyAssert(ifs, "アタックフレームのテキスト入ってない");
 
-	char skip[64];	// 読み飛ばし用変数
-
-	FOR((int)BASE_ACTION_STATE::END)
+	// ★ポインタ型の比較は「持っているアドレスが正しいかどうか」(★文字列自体の比較をしてくれない)で判断するので、意図した動作はしない
+	static const std::map<std::string, BASE_ACTION_STATE> IDList
 	{
-		ifs >> skip;
+		{ "[[エスケープ]]", BASE_ACTION_STATE::ESCAPE },
+		{ "[[バックステップ]]", BASE_ACTION_STATE::BACKSTEP },
+		{ "[[ワンモア覚醒]]", BASE_ACTION_STATE::OVERDRIVE_ONEMORE },
+		{ "[[スタンド発動]]", BASE_ACTION_STATE::STAND },
+		{ "[[バースト覚醒]]", BASE_ACTION_STATE::OVERDRIVE_BURST },
+		{ "[[通常攻撃1段目]]", BASE_ACTION_STATE::RUSH1 },
+		{ "[[通常攻撃2段目]]", BASE_ACTION_STATE::RUSH2 },
+		{ "[[通常攻撃3段目]]", BASE_ACTION_STATE::RUSH3 },
+		{ "[[対空攻撃]]", BASE_ACTION_STATE::ANTI_AIR },
+		{ "[[中段攻撃]]", BASE_ACTION_STATE::DOKKOI_ATTACK },
+		{ "[[しゃがみ下段攻撃]]", BASE_ACTION_STATE::SQUAT_ATTACK },
+		{ "[[あしばらい攻撃]]", BASE_ACTION_STATE::DOWN_ATTACK },
+		{ "[[空中攻撃]]", BASE_ACTION_STATE::AERIAL },
+		{ "[[空中下攻撃]]", BASE_ACTION_STATE::AERIALDROP },
+		{ "[[逆切れ攻撃]]", BASE_ACTION_STATE::INVINCIBLE_ATTACK },
+		{ "[[キャラ固有地上ニュートラル]]", BASE_ACTION_STATE::SKILL },
+		{ "[[キャラ固有2]]", BASE_ACTION_STATE::SKILL2 },
+		{ "[[キャラ固有地上しゃがみ]]", BASE_ACTION_STATE::SKILL_SQUAT },
+		{ "[[キャラ固有空中ニュートラル]]", BASE_ACTION_STATE::SKILL_AERIAL },
+		{ "[[キャラ固有空中下]]", BASE_ACTION_STATE::SKILL_AERIALDROP },
+		{ "[[掴み]]", BASE_ACTION_STATE::THROW },
+		{ "[[投げ成功]]", BASE_ACTION_STATE::THROW_SUCCESS },
+		{ "[[必殺技]]", BASE_ACTION_STATE::HEAVEHO_DRIVE },
+		{ "[[超必殺技]]", BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW }
+	};
+
+	while (!ifs.eof())
+	{
+		// ID読み込み
+		char read[64];
+		ifs >> read;
+
+		// エラーチェック
+		MyAssert(read[0] == '[', "攻撃データのテキストがずれてる");
+		//MyAssert(IDList.count(ID) != 0, "攻撃データのIDが間違えている可能性\n%s", ID);
+
+		std::string ID(read);
 
 		// 始動、持続、硬直フレームを読み込み
 		int count(0);
+		int iActionType((int)IDList.at(ID));
 
-		for (int j = 0; j < (int)FRAME_STATE::END; j++)
+		FOR((int)FRAME_STATE::END)
 		{
 			int frame;
 			ifs >> frame;
-			for (int k = 0; k < frame; k++)
+			for (int j = 0; j < frame; j++)
 			{
-				m_ActionFrameList[i][count++] = (FRAME_STATE)j;
+				m_ActionFrameList[iActionType][count++] = (FRAME_STATE)i;
 				MyAssert(count < 256, "アクションフレームの合計は255以下にしてください");
 			}
 		}
 		// 終端
-		m_ActionFrameList[i][count] = FRAME_STATE::END;
+		m_ActionFrameList[iActionType][count] = FRAME_STATE::END;
+	}
+
+	// フレームカウント
+	{
+		FOR(FRAME_MAX - 1) m_ActionFrameList[(int)BASE_ACTION_STATE::FRAMECOUNT][i] = FRAME_STATE::START;
+		m_ActionFrameList[(int)BASE_ACTION_STATE::FRAMECOUNT][FRAME_MAX - 1] = FRAME_STATE::END;
 	}
 }
 
@@ -127,7 +169,7 @@ void BasePlayer::LoadAttackDatas(LPSTR filename)
 		{ "[[通常攻撃2段目]]",				BASE_ACTION_STATE::RUSH2 },
 		{ "[[通常攻撃3段目]]",				BASE_ACTION_STATE::RUSH3 },
 		{ "[[対空攻撃]]",					BASE_ACTION_STATE::ANTI_AIR },
-		{ "[[中断攻撃]]",					BASE_ACTION_STATE::DOKKOI_ATTACK },
+		{ "[[中段攻撃]]",					BASE_ACTION_STATE::DOKKOI_ATTACK },
 		{ "[[しゃがみ下段攻撃]]",			BASE_ACTION_STATE::SQUAT_ATTACK },
 		{ "[[あしばらい攻撃]]",				BASE_ACTION_STATE::DOWN_ATTACK },
 		{ "[[空中攻撃]]",					BASE_ACTION_STATE::AERIAL },
@@ -506,43 +548,7 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 					GetAttackData()->bHit = GetAttackData()->bHitSuccess = false;
 				}
 
-
-				//// もし始動・持続の間にその攻撃が「対空」効果を持っていた場合
-				//// 対空フラグをONにするそれ以外はOFFに
-				//if ((m_ActionFrameList[m_ActionState][m_CurrentActionFrame] == FRAME_STATE::ACTIVE ||
-				//	m_ActionFrameList[m_ActionState][m_CurrentActionFrame] == FRAME_STATE::START)
-				//	&& m_ActionDatas[(int)m_ActionState].pAttackData->bAntiAir == true	)
-				//{
-				//	m_vMove.y += 0.35f;
-				//}
-				//else
-				//{
-
-				//}
-
 			}
-			//else
-			//{
-			//	// ようわからんのでこっちでも一応対空OFFにしとこ
-
-			//}
-
-			
-			// ActionFlameがフレームや
-			//if (m_ActionFrameList[m_ActionState][m_CurrentActionFrame] == FRAME_STATE::ACTIVE || 
-			//	m_ActionFrameList[m_ActionState][m_CurrentActionFrame] == FRAME_STATE::START)
-			//{
-			//	// 攻撃フレームなら(これがなかったら攻撃のデータがないものも見てしまう)
-			//	if (m_ActionDatas[(int)m_ActionState].isAttackData())
-			//	{
-			//		// 今どの業のステートかわかる
-			//		if (m_ActionDatas[(int)m_ActionState].pAttackData->bAntiAir == true)
-			//		{
-			//			m_vMove.y += 0.35f;
-			//		}
-			//	}
-			//	
-			//}
 
 			// モーションのフレームを更新！
 			m_iCurrentActionFrame++;
@@ -607,7 +613,8 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 		MoveUpdate();
 
 		// メッシュの更新
-		m_pObj->Animation();
+		if (!m_pStateMachine->isInState(*BasePlayerState::KnockBack::GetInstance()))m_pObj->Animation();
+		else if (m_iRecoveryFrame < 30)m_pObj->Animation();
 		m_pObj->SetAngle(m_fAngleY);	// 左右のアングルのセット
 		m_pObj->SetPos(m_vPos);
 		m_pObj->Update();
