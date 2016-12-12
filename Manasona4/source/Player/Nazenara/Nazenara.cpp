@@ -47,10 +47,13 @@ Nazenara::Nazenara(SIDE side, const SideData &data) :BasePlayer(side, data), m_p
 	m_pGodHandWind = new CycloneEffect;
 	m_pGodHandImpact = new FireRingEffect;
 
-	//if (m_side == SIDE::RIGHT)
-	//{
-	//	m_pArm->SetTexture(m_pObj->GetTexture(0), 0);
-	//}
+	if (m_side == SIDE::RIGHT)
+	{
+		LPSTR path = "DATA/CHR/Nazenara/tex_nazenaraba4.png";
+		m_pDefaultObj->SetTexture(tdnTexture::Load(path), 0);
+		m_pHHDOFObj->SetTexture(tdnTexture::Load(path), 0);
+		m_pArm->SetTexture(tdnTexture::Load(path), 0);
+	}
 }
 
 void Nazenara::Reset()
@@ -1244,7 +1247,7 @@ void Nazenara::HeavehoDriveOverFlowSuccessUpdate()
 		// ローカルマトリックスにモデルのトランスマトリックスを掛けて
 		// ローカルからワールド座標へ返還する
 		// マトリックスに代入したらアングルとか行けそう
-		D3DXMATRIX WorldMat = *m_pObj->GetBone(0) * m_pObj->TransMatrix;
+		D3DXMATRIX WorldMat = *m_pObj->GetBone(2) * m_pObj->TransMatrix;
 
 		// マトリックスから位置の部分のみをベクトルとして設定する
 		m_pTargetPlayer->SetPos(Vector3(WorldMat._41, WorldMat._42, WorldMat._43));
@@ -1312,10 +1315,10 @@ void Nazenara::HeavehoDriveOverFlowSuccessUpdate()
 	{
 					Vector3 vPositions[]
 					{
-						{ -36, 1, -5 },
-						{ -36, 1, 4 },
-						{ -30, 1, 21 },
-						{ -24, 1, 30 }
+						{ -46, 1, -5 },
+						{ -46, 1, 4 },
+						{ -40, 1, 21 },
+						{ -34, 1, 30 }
 					};
 					m_pOverFlow->Set(vPositions, _countof(vPositions));
 	}
@@ -1332,6 +1335,10 @@ void Nazenara::HeavehoDriveOverFlowSuccessUpdate()
 					};
 					m_pOverFlow->Set(vPositions, _countof(vPositions));
 	}
+		break;
+
+	case 950:
+		HeaveHoFinishUI->Action();	// ふぃにっしゅ”
 		break;
 	}
 

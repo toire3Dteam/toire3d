@@ -4,9 +4,6 @@ nazenaraba.IEM
 一撃必殺用:
 naze_hissatsu.IEM
 
-2Pカラーのテクスチャ:
-tex_nazenaraba4.png
-
 本体の判定の横幅・縦幅・高さ:
 1.75 4 4
 

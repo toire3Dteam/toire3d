@@ -57,14 +57,14 @@ void BasePlayer::LoadCharacterParam(LPSTR filename)
 	m_pHHDOFObj->Update();
 
 
-	// 2Pカラーテクスチャ
-	ifs >> skip;
-	ifs >> path;
-	if (m_side == SIDE::RIGHT)
-	{
-		m_pDefaultObj->SetTexture(tdnTexture::Load((char*)(sDirectory + "/" + path).c_str()), 0);
-		m_pHHDOFObj->SetTexture(tdnTexture::Load((char*)(sDirectory + "/" + path).c_str()), 0);
-	}
+	// 2Pカラーテクスチャ(ごみくそ)
+	//ifs >> skip;
+	//ifs >> path;
+	//if (m_side == SIDE::RIGHT)
+	//{
+	//	m_pDefaultObj->SetTexture(tdnTexture::Load((char*)(sDirectory + "/" + path).c_str()), 0);
+	//	m_pHHDOFObj->SetTexture(tdnTexture::Load((char*)(sDirectory + "/" + path).c_str()), 0);
+	//}
 
 	// 本体の判定
 	ifs >> skip;

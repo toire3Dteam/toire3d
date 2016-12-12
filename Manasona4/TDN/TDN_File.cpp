@@ -92,13 +92,27 @@ std::string tdnFile::GetFileName(char *path, bool bExt)
 std::string tdnFile::GetDirectoryPath(char *path)
 {
 	sys::path p(path);
+	std::string ret;
+
+	char work[MAX_PATH];
 
 	// trueなら拡張子付き、falseなら拡張子なしのファイル名を返す
 #ifdef TDNFILE_VC_2013
-	return p.parent_path();
+	ret = p.parent_path();
 #else
-	return p.parent_path().string();
+	ret = p.parent_path().string();
 #endif
+
+	strcpy_s(work, MAX_PATH, ret.c_str());
+
+	// \\ to /
+	for (int i = 0; work[i] != '\0'; i++)
+	{
+		if (work[i] == '\\') work[i] = '/';
+	}
+
+	ret = work;
+	return ret;
 }
 
 std::string tdnFile::OpenFileDialog(char *filter)

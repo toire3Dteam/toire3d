@@ -44,6 +44,13 @@ Airou::Airou(SIDE side, const SideData &data) :BasePlayer(side, data)
 
 	// スピードライン
 	m_pSpeedLine = new SpeedLineGreenEffect;
+
+	if (m_side == SIDE::RIGHT)
+	{
+		LPSTR path = "DATA/CHR/Airou/tex_airou2.png";
+		m_pDefaultObj->SetTexture(tdnTexture::Load(path), 0);
+		m_pHHDOFObj->SetTexture(tdnTexture::Load(path), 0);
+	}
 }
 
 void Airou::Reset()

@@ -4,9 +4,6 @@ airou.IEM
 一撃必殺用:
 airou_hissatsu.IEM
 
-2Pカラーのテクスチャ:
-tex_airou2.png
-
 本体の判定の横幅・縦幅・高さ:
 1.5 4 4
 
