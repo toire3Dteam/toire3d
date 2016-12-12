@@ -35,7 +35,7 @@ Nazenara::Nazenara(SIDE side, const SideData &data) :BasePlayer(side, data), m_p
 	m_pObj = m_pDefaultObj;
 
 	// ŠçƒOƒ‰
-	m_pFacePic = new tdn2DAnim("Data/UI/Game/CharaIcon/AirouIcon.png");
+	m_pFacePic = new tdn2DAnim("Data/UI/Game/CharaIcon/nazenarabaIcon.png");
 	//m_pFacePic->OrderNone();
 	m_pFacePic->OrderShrink(8, 1, 1.25f);
 
