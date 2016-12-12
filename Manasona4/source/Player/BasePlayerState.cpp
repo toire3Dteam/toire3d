@@ -468,6 +468,23 @@ bool DashCancel(BasePlayer * pPerson)
 	return false;
 }
 
+bool BackStepCancel(BasePlayer * pPerson)
+{
+	// バックステップキャンセル
+	if (pPerson->isDoublePush(PLAYER_COMMAND_BIT::RIGHT, 12))
+	{	
+		if (pPerson->GetDir() == DIR::LEFT) pPerson->GetFSM()->ChangeState(BasePlayerState::BackStep::GetInstance());
+		return true;
+	}
+	if (pPerson->isDoublePush(PLAYER_COMMAND_BIT::LEFT, 12))
+	{
+		if (pPerson->GetDir() == DIR::RIGHT) pPerson->GetFSM()->ChangeState(BasePlayerState::BackStep::GetInstance());
+		return true;
+	}
+
+	return false;
+}
+
 bool AerialDashCancel(BasePlayer *pPerson)
 {
 	// 空中ダッシュキャンセル
@@ -1730,7 +1747,7 @@ void BasePlayerState::BackStep::Enter(BasePlayer * pPerson)
 	// バクステアクションに変える
 	pPerson->SetActionState(BASE_ACTION_STATE::BACKSTEP);
 
-	// 走るエフェクト発動！
+	// エフェクト発動！
 	pPerson->AddEffectAction(pPerson->GetPos(), EFFECT_TYPE::BACK_STEP);
 
 	// 初速度の設定
@@ -2649,6 +2666,10 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 				//============================================
 				if (JumpCancel(pPerson)) return;
 				
+				//////////////////////////////////////////////
+				//	バックステップキャンセル
+				//============================================
+				if (BackStepCancel(pPerson)) return;
 
 				//////////////////////////////////////////////
 				//	ヒーホードライブオーバーフローキャンセル
@@ -2734,6 +2755,11 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 				//	ジャンプキャンセル
 				//============================================
 				if (JumpCancel(pPerson)) return;
+
+				//////////////////////////////////////////////
+				//	バックステップキャンセル
+				//============================================
+				if (BackStepCancel(pPerson)) return;
 
 				//////////////////////////////////////////////
 				//	ヒーホードライブオーバーフローキャンセル
@@ -4674,6 +4700,31 @@ void BasePlayerState::Guard::Enter(BasePlayer * pPerson)
 
 void BasePlayerState::Guard::Execute(BasePlayer * pPerson)
 {	
+
+	// (1211) ガード入れっぱなしでのキャンセルが出来なかったので戦闘にキャンセル作りました
+	// ★硬直が0以下なら硬直終了
+	if (pPerson->GetRecoveryFrame() <= 0)
+	{
+		//////////////////////////////////////////////
+		//	攻撃キャンセル
+		//============================================
+		if (AttackCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	投げキャンセル
+		//============================================
+		if (ThrowCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	逆切れキャンセル
+		//============================================
+		if (InvincibleAttackCancel(pPerson)) return;
+
+
+		// ジャンプはここでキャンセルしたら意地悪なのでなし（空中ガードない）
+		
+	}
+
 	// 相手キャラが攻撃ステートなら
 	if (pPerson->GetTargetPlayer()->isAttackState() || (pPerson->GetTargetPlayer()->GetStand()->isActive() && pPerson->GetTargetPlayer()->GetStand()->GetAttackData()))
 	{

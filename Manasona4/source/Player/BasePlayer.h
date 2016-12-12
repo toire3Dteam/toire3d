@@ -485,11 +485,17 @@ public:
 	// 
 
 	// それぞれのキャラクター毎のAIによる技のボタンを設定！
-	virtual void AIHighAtackButton() = 0;	// このキャラクターの〆技(強い技)
-	virtual void AIAtackSkillButton() = 0;	// このキャラクターのスキル攻撃(攻撃系スキル発動)
+	virtual void AIHighAttackButton() = 0;	// このキャラクターの〆技(強い技)
+	
+	virtual bool AINearSkill() = 0;			// 各キャラクターの近距離のスキル攻撃
+	virtual bool AIMiddleSkill() = 0;		// 各キャラクターの中距離のスキル攻撃
+	virtual bool AIFarSkill() = 0;			// 各キャラクターの遠距離のスキル攻撃
+	virtual bool AIAerialNearSkill() = 0;	// 各キャラクターの空中近距離のスキル攻撃
 
-	virtual float AIAtackRange() = 0;		// 攻撃範囲
-	virtual float AIRunAtackRange() = 0;	// 走ってるときの攻撃範囲
+	virtual void AIAttackSkillButton() = 0;	// このキャラクターのスキル攻撃(攻撃系スキル発動)
+
+	virtual float AIAttackRange() = 0;		// 攻撃範囲
+	virtual float AIRunAttackRange() = 0;	// 走ってるときの攻撃範囲
 
 	//void AI_Brain();	// ここで考え->行動の処理を行う
 	//void AI_Think();	// 考える関数

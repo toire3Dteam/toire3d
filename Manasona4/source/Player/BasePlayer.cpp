@@ -364,7 +364,7 @@ void BasePlayer::InitAI()
 	// AIフラグかつ、AIがnewされてなかったら
 	//if (m_pAI) return;
 	// 仮でAIの種類タイプ
-	if (m_bAI) m_pAI = new AI(m_side, this, AI_TYPE::CPU_HARD);
+	if (m_bAI) m_pAI = new AI(m_side, this, AI_TYPE::CPU_EASY);
 }
 
 BasePlayer::~BasePlayer()

@@ -137,7 +137,7 @@ void Nazenara::InitActionDatas()
 	// ”»’èŒ`ó
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pCollisionShape->width = 7;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pCollisionShape->height = 6;
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pCollisionShape->pos.Set(6, 10, 0);
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pCollisionShape->pos.Set(6, 6.5f, 0);
 
 	//==============================================================================================================
 	//	’Êí2’i
@@ -1338,7 +1338,7 @@ void Nazenara::HeavehoDriveOverFlowSuccessUpdate()
 }
 
 // AI
-//PLAYER_INPUT Nazenara::AIHighAtackButton()
+//PLAYER_INPUT Nazenara::AIHighAttackButton()
 //{
 //	m_pAI->Update();;
 //}

@@ -130,21 +130,49 @@ public:
 	//	AI
 	/****************************/
 	// それぞれのキャラクター毎のAIによる技のボタンを設定！
-	void AIHighAtackButton()
+	void AIHighAttackButton()
 	{
 		//m_pAI->PushInputList(PLAYER_INPUT::DOWN);
 		m_pAI->PushInputList(PLAYER_INPUT::D);
 		//return PLAYER_INPUT::D;
 	};
 	// 攻撃系スキル
-	void AIAtackSkillButton()
+	void AIAttackSkillButton()
 	{
 		m_pAI->PushInputList(PLAYER_INPUT::D);
 	};
 
+	// 近距離スキル
+	bool AINearSkill()
+	{
+		m_pAI->PushInputList(PLAYER_INPUT::D);
+		return true;
+	};
+
+	// 中距離スキル
+	bool AIMiddleSkill()
+	{
+		m_pAI->PushInputList(PLAYER_INPUT::D);
+		return true;
+	};
+
+	// 遠距離スキル
+	bool AIFarSkill()
+	{
+		return false;	// このキャラクターに遠距離技はない
+	};
+
+	// 空中近距離スキル
+	bool AIAerialNearSkill()
+	{
+		m_pAI->PushInputList(PLAYER_INPUT::DOWN);
+		m_pAI->PushInputList(PLAYER_INPUT::D);
+		return true;
+	};
+
 	// AIの攻撃範囲
-	float AIAtackRange() { return 20; }
-	float AIRunAtackRange() { return 35; }
+	float AIAttackRange() { return 20; }
+	float AIRunAttackRange() { return 35; }
 
 private:
 	// 純粋仮想関数オーバーライド

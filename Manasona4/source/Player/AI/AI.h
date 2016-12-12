@@ -93,6 +93,7 @@ private:
 	int m_iWaitFrame;		// もじもじしてる時間
 	int m_iGuardFrame;		// 一度のガードしている時間
 
+
 	AI_TYPE m_eAIType;		// AIのタイプ
 
 	// 練習モードでガードしてる時間
@@ -108,6 +109,7 @@ private:
 	// ステートをフレンドクラスへ
 	friend class AIState::PracticeLand;
 	friend class AIState::PracticeAttack;
+	friend class AIState::Wait;
 	friend class AIState::Chase;
 	friend class AIState::Guard;
 

@@ -1179,7 +1179,7 @@ void Teki::HeavehoDriveOverFlowSuccessUpdate()
 }
 
 // AI
-//PLAYER_INPUT Teki::AIHighAtackButton()
+//PLAYER_INPUT Teki::AIHighAttackButton()
 //{
 //	m_pAI->Update();;
 //}

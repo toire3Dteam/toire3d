@@ -419,12 +419,12 @@ namespace AIState
 	/*******************************************************/
 	//				ラッシュ攻撃ステート
 	/*******************************************************/
-	class RushAtack :public State<AI>
+	class RushAttack :public State<AI>
 	{
 	public:
 
 		//this is a シングルトン
-		static RushAtack* GetInstance();
+		static RushAttack* GetInstance();
 
 		// 入る
 		virtual void Enter(AI* pPerson);
@@ -443,11 +443,11 @@ namespace AIState
 
 
 	private:
-		RushAtack() {};
-		~RushAtack() {};
+		RushAttack() {};
+		~RushAttack() {};
 
-		RushAtack(const RushAtack&){}
-		RushAtack& operator=(const RushAtack&){}
+		RushAttack(const RushAttack&){}
+		RushAttack& operator=(const RushAttack&){}
 	};
 
 	/*******************************************************/
@@ -659,12 +659,12 @@ namespace AIState
 	/*******************************************************/
 	//				空中攻撃 準備ステート
 	/*******************************************************/
-	class SetAerialAtack :public State<AI>
+	class SetAerialAttack :public State<AI>
 	{
 	public:
 
 		//this is a シングルトン
-		static SetAerialAtack* GetInstance();
+		static SetAerialAttack* GetInstance();
 
 		// 入る
 		virtual void Enter(AI* pPerson);
@@ -683,22 +683,22 @@ namespace AIState
 
 
 	private:
-		SetAerialAtack() {};
-		~SetAerialAtack() {};
+		SetAerialAttack() {};
+		~SetAerialAttack() {};
 
-		SetAerialAtack(const SetAerialAtack&){}
-		SetAerialAtack& operator=(const SetAerialAtack&){}
+		SetAerialAttack(const SetAerialAttack&){}
+		SetAerialAttack& operator=(const SetAerialAttack&){}
 	};
 
 	/*******************************************************/
 	//				空中攻撃 ステート
 	/*******************************************************/
-	class AerialAtack :public State<AI>
+	class AerialAttack :public State<AI>
 	{
 	public:
 
 		//this is a シングルトン
-		static AerialAtack* GetInstance();
+		static AerialAttack* GetInstance();
 
 		// 入る
 		virtual void Enter(AI* pPerson);
@@ -717,23 +717,23 @@ namespace AIState
 
 
 	private:
-		AerialAtack() {};
-		~AerialAtack() {};
+		AerialAttack() {};
+		~AerialAttack() {};
 
-		AerialAtack(const AerialAtack&){}
-		AerialAtack& operator=(const AerialAtack&){}
+		AerialAttack(const AerialAttack&){}
+		AerialAttack& operator=(const AerialAttack&){}
 	};
 
 	
 	/*******************************************************/
 	//				空中崩し攻撃 ステート　（空中で地上の相手を崩すための攻撃）
 	/*******************************************************/
-	class AerialDestructAtack :public State<AI>
+	class AerialDestructAttack :public State<AI>
 	{
 	public:
 
 		//this is a シングルトン
-		static AerialDestructAtack* GetInstance();
+		static AerialDestructAttack* GetInstance();
 
 		// 入る
 		virtual void Enter(AI* pPerson);
@@ -752,22 +752,22 @@ namespace AIState
 
 
 	private:
-		AerialDestructAtack() {};
-		~AerialDestructAtack() {};
+		AerialDestructAttack() {};
+		~AerialDestructAttack() {};
 
-		AerialDestructAtack(const AerialDestructAtack&){}
-		AerialDestructAtack& operator=(const AerialDestructAtack&){}
+		AerialDestructAttack(const AerialDestructAttack&){}
+		AerialDestructAttack& operator=(const AerialDestructAttack&){}
 	};
 
 	/*******************************************************/
 	//				無敵攻撃ステート
 	/*******************************************************/
-	class InvincibleAtack :public State<AI>
+	class InvincibleAttack :public State<AI>
 	{
 	public:
 
 		//this is a シングルトン
-		static InvincibleAtack* GetInstance();
+		static InvincibleAttack* GetInstance();
 
 		// 入る
 		virtual void Enter(AI* pPerson);
@@ -786,23 +786,23 @@ namespace AIState
 
 
 	private:
-		InvincibleAtack() {};
-		~InvincibleAtack() {};
+		InvincibleAttack() {};
+		~InvincibleAttack() {};
 
-		InvincibleAtack(const InvincibleAtack&){}
-		InvincibleAtack& operator=(const InvincibleAtack&){}
+		InvincibleAttack(const InvincibleAttack&){}
+		InvincibleAttack& operator=(const InvincibleAttack&){}
 	};
 
 
 	/*******************************************************/
 	//			キャラクター固有の攻撃系スキル発動ステート
 	/*******************************************************/
-	class SkillAtack :public State<AI>
+	class SkillAttack :public State<AI>
 	{
 	public:
 
 		//this is a シングルトン
-		static SkillAtack* GetInstance();
+		static SkillAttack* GetInstance();
 
 		// 入る
 		virtual void Enter(AI* pPerson);
@@ -821,11 +821,115 @@ namespace AIState
 
 
 	private:
-		SkillAtack() {};
-		~SkillAtack() {};
+		SkillAttack() {};
+		~SkillAttack() {};
 
-		SkillAtack(const SkillAtack&){}
-		SkillAtack& operator=(const SkillAtack&){}
+		SkillAttack(const SkillAttack&){}
+		SkillAttack& operator=(const SkillAttack&){}
+	};
+
+
+	/*******************************************************/
+	//			中段技
+	/*******************************************************/
+	class DokkoiAttack :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static DokkoiAttack* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		DokkoiAttack() {};
+		~DokkoiAttack() {};
+
+		DokkoiAttack(const DokkoiAttack&) {}
+		DokkoiAttack& operator=(const DokkoiAttack&) {}
+	};
+
+
+	/*******************************************************/
+	//			イージーアタック
+	/*******************************************************/
+	class EasyAttack :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static EasyAttack* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		EasyAttack() {};
+		~EasyAttack() {};
+
+		EasyAttack(const EasyAttack&) {}
+		EasyAttack& operator=(const EasyAttack&) {}
+	};
+
+	/*******************************************************/
+	//			後ろ歩き 
+	/*******************************************************/
+	class BackWark :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static BackWark* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		BackWark() {};
+		~BackWark() {};
+
+		BackWark(const EasyAttack&) {}
+		BackWark& operator=(const EasyAttack&) {}
 	};
 }
 

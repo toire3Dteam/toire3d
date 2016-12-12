@@ -1298,7 +1298,7 @@ void Airou::HeavehoDriveOverFlowSuccessUpdate()
 }
 
 // AI
-//PLAYER_INPUT Airou::AIHighAtackButton()
+//PLAYER_INPUT Airou::AIHighAttackButton()
 //{
 //	m_pAI->Update();;
 //}
