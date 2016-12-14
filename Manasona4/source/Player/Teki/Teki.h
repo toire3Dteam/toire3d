@@ -41,6 +41,11 @@ public:
 	void ThirdRushUpdate();//
 
 	/****************************/
+	//	カウンター成功
+	/****************************/
+	void OnInvincibleCounterSuccess();
+
+	/****************************/
 	//	キャラクター固有スキル
 	/****************************/
 	void SkillInit();
@@ -93,6 +98,27 @@ public:
 		{
 		public:
 			Land2(Teki *pTeki);
+			void Enter();
+			bool Execute();
+			void Exit();
+		};
+
+		class Aerial :public Base
+		{
+		public:
+			Aerial(Teki *pTeki);
+			void Enter();
+			bool Execute();
+			void Exit();
+		private:
+			int m_ActiveFrame;	// 初段、二段と攻撃を分けるので、時間の計測で
+		};
+
+		// 着地にしたろ
+		class AerialDrop :public Base
+		{
+		public:
+			AerialDrop(Teki *pTeki);
 			void Enter();
 			bool Execute();
 			void Exit();
@@ -163,8 +189,8 @@ public:
 	};
 
 	// AIの攻撃範囲
-	float AIAttackRange() { return 20; }
-	float AIRunAttackRange() { return 35; }
+	float AIAttackRange() { return 14; }
+	float AIRunAttackRange() { return 27; }
 
 private:
 	// 純粋仮想関数オーバーライド

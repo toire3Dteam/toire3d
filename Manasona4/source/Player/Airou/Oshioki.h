@@ -89,6 +89,8 @@ namespace OshiokiAirou
 						  {
 							  // プレイヤーにメッセージ送信
 							  HIT_DAMAGE_INFO DamageInfo;
+							  DamageInfo.fComboRate = 1;
+							  DamageInfo.bOverDrive = true;
 
 							  // 最後のアイルーのダメージ
 							  if (m_bLast)
@@ -96,13 +98,13 @@ namespace OshiokiAirou
 								  DamageInfo.BeInvincible = true;	// 無敵になるかどうか
 								  DamageInfo.damage = 427;				// ダメージ(スコア)
 								  DamageInfo.FlyVector.Set((m_pUser->GetTargetDir() == DIR::LEFT) ? -2.5f : 2.5f, 2.5f);			// 吹っ飛びベクトル
-								  DamageInfo.hitStopFlame = 8;		// ヒットストップ
+								  DamageInfo.iHitStopFrame = 8;		// ヒットストップ
 								  DamageInfo.HitRecoveryFrame = 60;		// 硬直時間
 								  DamageInfo.HitEffectType = (int)EFFECT_TYPE::DAMAGE;			// この攻撃のヒットエフェクトを相手に送る
 								  DamageInfo.iAttackType = (int)BASE_ACTION_STATE::HEAVEHO_DRIVE;						// 何の攻撃かのタイプ(コンボ中に同じ攻撃を使わせないように)
-								  DamageInfo.bOverDrive = true;
 								  DamageInfo.HitSE = "ぐちょヒット";
 								  DamageInfo.DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
+
 
 								  // 最後の1撃だけフィニッシュ判定
 								  DamageInfo.bFinishOK = true;
@@ -115,13 +117,12 @@ namespace OshiokiAirou
 							  else
 							  {
 								  DamageInfo.BeInvincible = false;	// 無敵になるかどうか
-								  DamageInfo.damage = 18;				// ダメージ(スコア)
+								  DamageInfo.damage = 20;				// ダメージ(スコア)
 								  DamageInfo.FlyVector.Set(0, 0);			// 吹っ飛びベクトル
-								  DamageInfo.hitStopFlame = 1;		// ヒットストップ
-								  DamageInfo.HitRecoveryFrame = 30;		// 硬直時間
+								  DamageInfo.iHitStopFrame = 1;		// ヒットストップ
+								  DamageInfo.HitRecoveryFrame = 45;		// 硬直時間
 								  DamageInfo.HitEffectType = (int)EFFECT_TYPE::MULTIPLE_HIT;			// この攻撃のヒットエフェクトを相手に送る
 								  DamageInfo.iAttackType = (int)BASE_ACTION_STATE::HEAVEHO_DRIVE;						// 何の攻撃かのタイプ(コンボ中に同じ攻撃を使わせないように)
-								  DamageInfo.bOverDrive = true;
 								  DamageInfo.HitSE = "ぐちょヒット";
 								  DamageInfo.bFinishOK = false;
 								  DamageInfo.DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;

@@ -259,12 +259,46 @@ void tdnPolygon::DrawLine3D(Vector3 pos1, Vector3 pos2, DWORD color, float size,
 //		固定機能版	
 //------------------------------------------------------
 void	tdnPolygon::Circle2D(int cx, int cy, float r, u32 dwFlags, COLOR color, float z)
-{
-}
+{}
 
 //------------------------------------------------------
 //		シェーダー版
 //------------------------------------------------------
 void	tdnPolygon::Circle2D(int cx, int cy, float r, tdnShader* shader, char* name, COLOR color, float z)
+{}
+
+//*****************************************************************************
+//	三角形(2D)描画
+//*****************************************************************************
+void tdnPolygon::Triangle(int DstX, int DstY, int DstW, int DstH, COLOR color, float angle, u32 dwFlags, float z)
 {
+	// ▲(時計回り)
+	TLVERTEX v[3]
+	{
+		// 左下
+		{ (float)DstX,					(float)(DstY + DstH),	z,	1.0f, color },
+		// 上
+		{ (float)(DstX + DstW * .5f),	(float)DstY,			z,	1.0f, color },
+		// 右下
+		{ (float)(DstX + DstW),			(float)(DstY + DstH),	z,	1.0f, color }
+	};
+
+	// 回転
+	FOR(3)
+	{
+		// 原点に戻す
+		v[i].sx -= DstX + DstW*.5f;
+		v[i].sy -= DstY + DstH*.5f;
+
+		// 回転処理
+		const float x{ v[i].sx }, y{ v[i].sy };
+		v[i].sx = x * cosf(angle) - y * sinf(angle);
+		v[i].sy = x * sinf(angle) + y * cosf(angle);
+
+		// 元の座標に戻す
+		v[i].sx += DstX + DstW*.5f;
+		v[i].sy += DstY + DstH*.5f;
+	}
+
+	Render2D(v, 1, NULL, dwFlags);
 }

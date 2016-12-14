@@ -84,6 +84,9 @@ void BasePlayer::LoadCharacterParam(LPSTR filename)
 	ifs >> skip;
 	ifs >> m_tagCharacterParam.iMaxHP;
 	m_iHP = m_tagCharacterParam.iMaxHP;
+
+	// 初期情報を保存
+	memcpy_s(&m_tagOrgCharacterParam, sizeof(CharacterParam), &m_tagCharacterParam, sizeof(CharacterParam));
 }
 
 // アクションフレーム情報読み込み
@@ -107,7 +110,7 @@ void BasePlayer::LoadAttackFrameList(LPSTR filename)
 		{ "[[中段攻撃]]", BASE_ACTION_STATE::DOKKOI_ATTACK },
 		{ "[[しゃがみ下段攻撃]]", BASE_ACTION_STATE::SQUAT_ATTACK },
 		{ "[[あしばらい攻撃]]", BASE_ACTION_STATE::DOWN_ATTACK },
-		{ "[[空中攻撃]]", BASE_ACTION_STATE::AERIAL },
+		{ "[[空中攻撃]]", BASE_ACTION_STATE::AERIAL_ATTACK },
 		{ "[[空中下攻撃]]", BASE_ACTION_STATE::AERIALDROP },
 		{ "[[逆切れ攻撃]]", BASE_ACTION_STATE::INVINCIBLE_ATTACK },
 		{ "[[キャラ固有地上ニュートラル]]", BASE_ACTION_STATE::SKILL },
@@ -172,7 +175,7 @@ void BasePlayer::LoadAttackDatas(LPSTR filename)
 		{ "[[中段攻撃]]",					BASE_ACTION_STATE::DOKKOI_ATTACK },
 		{ "[[しゃがみ下段攻撃]]",			BASE_ACTION_STATE::SQUAT_ATTACK },
 		{ "[[あしばらい攻撃]]",				BASE_ACTION_STATE::DOWN_ATTACK },
-		{ "[[空中攻撃]]",					BASE_ACTION_STATE::AERIAL },
+		{ "[[空中攻撃]]",					BASE_ACTION_STATE::AERIAL_ATTACK },
 		{ "[[空中下攻撃]]",					BASE_ACTION_STATE::AERIALDROP },
 		{ "[[逆切れ攻撃]]",					BASE_ACTION_STATE::INVINCIBLE_ATTACK },
 		{ "[[キャラ固有地上ニュートラル]]", BASE_ACTION_STATE::SKILL },
@@ -228,7 +231,7 @@ void BasePlayer::LoadAttackDatas(LPSTR filename)
 BasePlayer::BasePlayer(SIDE side, const SideData &data) :m_bAI(data.bAI), m_iDeviceID(data.iDeviceID), m_side(side), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + (int)side)),
 m_dir(DIR::LEFT), m_pDefaultObj(nullptr), m_pHHDOFObj(nullptr),
 m_pObj(nullptr),
-m_vMove(0, 0, 0), m_bLand(false), m_bSquat(false), m_bAerialJump(true), m_bAerialDash(false), m_iAerialDashFrame(0), m_ActionState(BASE_ACTION_STATE::NO_ACTION),
+m_vMove(0, 0, 0), m_bLand(false), m_bSquat(false), m_bAerialJump(true), m_bAerialDash(false), m_iAerialDashFrame(0), m_eActionState(BASE_ACTION_STATE::NO_ACTION),
 m_iInvincibleLV(0), m_iInvincibleTime(0), m_iCurrentActionFrame(0), m_iRecoveryFrame(0), m_bEscape(false), m_iScore(0), m_iCollectScore(0), m_pAI(nullptr),
 m_iHitStopFrame(0),// ★★★バグの原因　ひっとすトップ初期化のし忘れ。
 m_fInvincibleColRate(0), m_iInvincibleColRateFlame(0), m_bInvincibleColRateUpFlag(false),
@@ -236,8 +239,8 @@ m_OverDriveGage(0), m_bOverDrive(false), m_OverDriveFrame(0), m_OverDriveType(OV
 m_bMoveUpdate(true),
 m_iHP(0),
 m_bGameTimerStopFlag(false), m_iHeavehoStopTimer(0), m_iHeaveHoDriveOverFlowFrame(0),
-m_iWinNum(0), m_GuardState(GUARD_STATE::NO_GUARD),
-m_pFacePic(nullptr), m_pTargetPlayer(nullptr), m_pSpeedLine(nullptr), m_SkillActionType(SKILL_ACTION_TYPE::MAX),
+m_iWinNum(0), m_eGuardState(GUARD_STATE::NO_GUARD),
+m_pFacePic(nullptr), m_pTargetPlayer(nullptr), m_pSpeedLine(nullptr), m_eSkillActionType(SKILL_ACTION_TYPE::MAX),
 m_fOrangeColRate(0), m_fMagentaColRate(0),
 m_pCutinPic(nullptr), m_pName("None"), m_iRushStep(0), m_pThrowMark(nullptr),
 m_bWillPower(false), m_bDown(false), m_iDashFrame(0),
@@ -302,7 +305,8 @@ m_bNotOverDrive(false), m_iSpGettingFrame(0), m_tagCharacterParam{}
 	// コマンド履歴初期化
 	memset(m_wCommandHistory, (int)PLAYER_COMMAND_BIT::NEUTRAL, sizeof(m_wCommandHistory));
 
-
+	// モーション初期化(キャラごとの初期化を設定したい→Reset関数をキャラクター固有ロードより下に書くことに→モーションの初期化が来る前にモーションを設定してしまう→じゃあ先ここで全部0にしよう→最初の待機モーションが0であることが前提のコードになってしまう)
+	memset(m_iMotionNumbers, 0, sizeof(m_iMotionNumbers));
 }
 
 void BasePlayer::Reset()
@@ -368,16 +372,22 @@ void BasePlayer::Reset()
 
 	/* [ポインタ型]の初期化(newしてるやつは極力そのまま) */
 	//m_pTargetPlayer = nullptr;
+	if (m_pDefaultObj) m_pDefaultObj->SetMotion(m_iMotionNumbers[(int)MOTION_TYPE::WAIT]);
 	m_pObj = m_pDefaultObj;
-	if (m_pObj) m_pObj->SetMotion(m_iMotionNumbers[(int)MOTION_TYPE::WAIT]);
 	//m_pStateMachine->SetCurrentState(BasePlayerState::Wait::GetInstance()); 
 	m_pStateMachine->ChangeState(BasePlayerState::Wait::GetInstance());			// [11/28] リセット時はもうステートが設定されているのチェンジで
 	m_pStateMachine->SetPreviousState(BasePlayerState::Wait::GetInstance());
 
 	/* [列挙型]の初期化 */
-	m_ActionState = BASE_ACTION_STATE::NO_ACTION;
+	m_eSkillActionType = SKILL_ACTION_TYPE::NO_ACTION;
+	m_eActionState = BASE_ACTION_STATE::NO_ACTION;
 	m_OverDriveType = OVERDRIVE_TYPE::BURST;
-	m_GuardState = GUARD_STATE::NO_GUARD;
+	m_eGuardState = GUARD_STATE::NO_GUARD;
+
+	/* [構造体]の初期化 */
+	memcpy_s(&m_tagCharacterParam, sizeof(CharacterParam), &m_tagOrgCharacterParam, sizeof(CharacterParam));
+	m_vMove.Set(0, 0, 0);
+
 
 	// IDで座標の分岐
 	switch ((int)m_side)
@@ -395,8 +405,6 @@ void BasePlayer::Reset()
 
 	// コンボ補正初期化
 	m_RecoveryDamageCount.clear();
-
-	m_vMove.Set(0, 0, 0);
 
 	/* インプットリストの初期化 */
 	memset(m_iInputList, 0, sizeof(m_iInputList));
@@ -522,17 +530,17 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 		if (isFrameAction())
 		{
 			// 攻撃フレームなら
-			if (m_ActionDatas[(int)m_ActionState].isAttackData())
+			if (m_ActionDatas[(int)m_eActionState].isAttackData())
 			{
 				// 今の経過時間とディレイフレームになったら
-				if (m_ActionDatas[(int)m_ActionState].pAttackData->WhiffDelayFrame == m_iCurrentActionFrame)
+				if (m_ActionDatas[(int)m_eActionState].pAttackData->WhiffDelayFrame == m_iCurrentActionFrame)
 				{
 					// (A列車)ここで攻撃判定が発動した瞬間を取ってきてる
 					
 					// 振りエフェクト発動（仮）！
-					AddEffectAction(m_vPos + Vector3(0, 5, -3) , m_ActionDatas[(int)m_ActionState].pAttackData->WhiffEffectType);
+					AddEffectAction(m_vPos + Vector3(0, 5, -3) , m_ActionDatas[(int)m_eActionState].pAttackData->WhiffEffectType);
 
-					LPCSTR SE_ID = m_ActionDatas[(int)m_ActionState].pAttackData->WhiffSE;
+					LPCSTR SE_ID = m_ActionDatas[(int)m_eActionState].pAttackData->WhiffSE;
 					// 空振りSE入ってたら
 					if (SE_ID)
 					{
@@ -542,7 +550,7 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 				}
 
 				// 判定復活フレーム
-				if (m_ActionFrameList[(int)m_ActionState][m_iCurrentActionFrame] == FRAME_STATE::RECOVERY_HIT)
+				if (m_ActionFrameList[(int)m_eActionState][m_iCurrentActionFrame] == FRAME_STATE::RECOVERY_HIT)
 				{
 					// 判定リセット
 					GetAttackData()->bHit = GetAttackData()->bHitSuccess = false;
@@ -554,10 +562,10 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 			m_iCurrentActionFrame++;
 
 			// フレーム最後まで再生したら
-			if (m_ActionFrameList[(int)m_ActionState][m_iCurrentActionFrame] == FRAME_STATE::END)
+			if (m_ActionFrameList[(int)m_eActionState][m_iCurrentActionFrame] == FRAME_STATE::END)
 			{
 				// ★アクションステート解除
-				m_ActionState = BASE_ACTION_STATE::NO_ACTION;
+				m_eActionState = BASE_ACTION_STATE::NO_ACTION;
 			}
 		}
 
@@ -578,7 +586,7 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 			!m_pStateMachine->isInState(*BasePlayerState::Escape::GetInstance()) &&
 			!m_pStateMachine->isInState(*BasePlayerState::AerialDash::GetInstance()) &&
 			!m_pStateMachine->isInState(*BasePlayerState::AerialBackDash::GetInstance()) &&
-			!m_pStateMachine->isInState(*BasePlayerState::FinishAttack::GetInstance()) &&
+			!m_pStateMachine->isInState(*BasePlayerState::InvincibleAttack::GetInstance()) &&
 			!m_pStateMachine->isInState(*BasePlayerState::AerialAttack::GetInstance())
 			)
 		{
@@ -678,17 +686,17 @@ void BasePlayer::UpdateDrive()
 		if (isFrameAction())
 		{
 			// 攻撃フレームなら
-			if (m_ActionDatas[(int)m_ActionState].isAttackData())
+			if (m_ActionDatas[(int)m_eActionState].isAttackData())
 			{
 				// 今の経過時間とディレイフレームになったら
-				if (m_ActionDatas[(int)m_ActionState].pAttackData->WhiffDelayFrame == m_iCurrentActionFrame)
+				if (m_ActionDatas[(int)m_eActionState].pAttackData->WhiffDelayFrame == m_iCurrentActionFrame)
 				{
 					// (A列車)ここで攻撃判定が発動した瞬間を取ってきてる
 
 					// 振りエフェクト発動（仮）！
-					AddEffectAction(m_vPos + Vector3(0, 5, -3), m_ActionDatas[(int)m_ActionState].pAttackData->WhiffEffectType);
+					AddEffectAction(m_vPos + Vector3(0, 5, -3), m_ActionDatas[(int)m_eActionState].pAttackData->WhiffEffectType);
 
-					LPCSTR SE_ID = m_ActionDatas[(int)m_ActionState].pAttackData->WhiffSE;
+					LPCSTR SE_ID = m_ActionDatas[(int)m_eActionState].pAttackData->WhiffSE;
 					// 空振りSE入ってたら
 					if (SE_ID)
 					{
@@ -703,10 +711,10 @@ void BasePlayer::UpdateDrive()
 			m_iCurrentActionFrame++;
 
 			// フレーム最後まで再生したら
-			if (m_ActionFrameList[(int)m_ActionState][m_iCurrentActionFrame] == FRAME_STATE::END)
+			if (m_ActionFrameList[(int)m_eActionState][m_iCurrentActionFrame] == FRAME_STATE::END)
 			{
 				// ★アクションステート解除
-				m_ActionState = BASE_ACTION_STATE::NO_ACTION;
+				m_eActionState = BASE_ACTION_STATE::NO_ACTION;
 			}
 		}
 
@@ -1259,6 +1267,12 @@ void BasePlayer::Render()
 		}
 	}
 
+	Vector2 pos2d = Math::WorldToScreen(m_vPos);
+	if (m_bAI)
+	{
+		tdnText::Draw((int)pos2d.x - 20, (int)pos2d.y - 128, 0xffffffff, "硬直: %d", m_iRecoveryFrame);
+	}
+
 #endif
 
 	// デバッグ
@@ -1270,18 +1284,6 @@ void BasePlayer::Render()
 	
 	//tdnText::Draw(32 + m_deviceID * 250, 430, 0xff00ff80, "OD ゲージ: %d", m_OverDriveGage);
 	//tdnText::Draw(32 + m_deviceID * 250, 460, 0xffff8000, "OD残り時間: %d", m_OverDriveFrame);
-
-
-	Vector2 pos2d = Math::WorldToScreen(m_vPos);
-	
-	//if (m_deviceID == 1 || m_deviceID == 2)
-	{
-		//tdnText::Draw((int)pos2d.x, (int)pos2d.y - 150, 0xff00ff80, "C_Score : %d", m_CollectScore);
-		//tdnText::Draw((int)pos2d.x, (int)pos2d.y-100, 0xffff8000, "%dP!!", m_deviceID);
-
-	}
-
-
 }
 
 void BasePlayer::Render(tdnShader* shader, char* name)

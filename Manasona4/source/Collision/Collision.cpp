@@ -16,7 +16,7 @@ void Collision::PlayerCollision(PlayerManager *pPlayerMgr, ShotManager *pShotMgr
 	BasePlayer *pPlayer1(pPlayerMgr->GetPlayer(0)), *pPlayer2(pPlayerMgr->GetPlayer(1));
 
 	/* プレイヤーVSプレイヤーの攻撃判定 */
-	HIT_DAMAGE_INFO *pHitDamageInfo[(int)SIDE::ARRAY_MAX] = { nullptr };
+	HIT_DAMAGE_INFO *pHitDamageInfo[(int)SIDE::ARRAY_MAX]{};
 
 	// 敵への方向フラグ更新
 	{
@@ -61,15 +61,14 @@ void Collision::PlayerCollision(PlayerManager *pPlayerMgr, ShotManager *pShotMgr
 	// ごりくｎ
 	if (pHitDamageInfo[0] && pHitDamageInfo[1])
 	{
-		if (pHitDamageInfo[0]->iAttribute == (int)ATTACK_ATTRIBUTE::THROW)
-		{
-			// 打撃と投げなら投げが勝つ
-			if (pHitDamageInfo[1]->iAttribute == (int)ATTACK_ATTRIBUTE::STRIKE)
-			{
-				// 2重ヒット防止用のフラグをONにする
-				if (pPlayer2->isAttackState())pPlayer2->GetAttackData()->bHit = true;
-			}
+		bool bThrowed(false);
 
+		// 打撃と投げなら投げが勝つ
+		if (pHitDamageInfo[0]->iAttribute == (int)ATTACK_ATTRIBUTE::THROW && pHitDamageInfo[1]->iAttribute == (int)ATTACK_ATTRIBUTE::STRIKE)
+		{
+			// 2重ヒット防止用のフラグをONにする
+			if (pPlayer2->isAttackState())pPlayer2->GetAttackData()->bHit = true;
+			bThrowed = true;
 		}
 		else
 		{
@@ -80,23 +79,22 @@ void Collision::PlayerCollision(PlayerManager *pPlayerMgr, ShotManager *pShotMgr
 			if (pPlayer2->isAttackState())pPlayer2->GetAttackData()->bHit = true;
 		}
 
-		if (pHitDamageInfo[1]->iAttribute == (int)ATTACK_ATTRIBUTE::THROW)
+		if (!bThrowed)
 		{
 			// 打撃と投げなら投げが勝つ
-			if (pHitDamageInfo[0]->iAttribute == (int)ATTACK_ATTRIBUTE::STRIKE)
+			if (pHitDamageInfo[1]->iAttribute == (int)ATTACK_ATTRIBUTE::THROW && pHitDamageInfo[0]->iAttribute == (int)ATTACK_ATTRIBUTE::STRIKE)
 			{
 				// 2重ヒット防止用のフラグをONにする
 				if (pPlayer1->isAttackState())pPlayer1->GetAttackData()->bHit = true;
 			}
+			else
+			{
+				// メッセージを送信
+				SendHitMessage(pPlayer1, pPlayer2, pHitDamageInfo[1]);
 
-		}
-		else
-		{
-			// メッセージを送信
-			SendHitMessage(pPlayer1, pPlayer2, pHitDamageInfo[1]);
-
-			// 2重ヒット防止用のフラグをONにする
-			if (pPlayer1->isAttackState())pPlayer1->GetAttackData()->bHit = true;
+				// 2重ヒット防止用のフラグをONにする
+				if (pPlayer1->isAttackState())pPlayer1->GetAttackData()->bHit = true;
+			}
 		}
 	}
 
@@ -168,8 +166,8 @@ void Collision::SendHitMessage(BasePlayer *pAttackPlayer, BasePlayer *pDamagePla
 	MsgMgr->Dispatch(0, pAttackPlayer->GetID(), pDamagePlayer->GetID(), MESSAGE_TYPE::HIT_DAMAGE, pHitDamageInfo);
 
 	// ダメージを与えるやつに対してヒットストップをかける
-	pAttackPlayer->SetHitStopFrame(pHitDamageInfo->hitStopFlame);
-	//pDamagePlayer->SetHitStopFrame(pHitDamageInfo->hitStopFlame);
+	pAttackPlayer->SetHitStopFrame(pHitDamageInfo->iHitStopFrame);
+	//pDamagePlayer->SetHitStopFrame(pHitDamageInfo->iHitStopFrame);
 }
 
 void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAGE_INFO **OutDamageInfo)
@@ -232,8 +230,8 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 				//pAttackData->bHit = true;
 
 				// ★ごり押しでヒットストップをかける
-				//my->SetHitStopFrame(pAttackData->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame);
-				//you->SetHitStopFrame(pAttackData->places[(int)AttackData::HIT_PLACE::LAND].hitStopFlame);
+				//my->SetHitStopFrame(pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame);
+				//you->SetHitStopFrame(pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame);
 
 				// 掴まれたメッセージ
 				MsgMgr->Dispatch(0, my->GetID(), you->GetID(), MESSAGE_TYPE::BE_THROWN, nullptr);
@@ -283,7 +281,7 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 				(*OutDamageInfo)->BeInvincible = pAttackData->places[iHitPlace].bBeInvincible;	// 無敵になるかどうか
 				(*OutDamageInfo)->damage = pAttackData->damage;				// ダメージ(スコア)
 				(*OutDamageInfo)->FlyVector = pAttackData->places[iHitPlace].FlyVector;			// 吹っ飛びベクトル
-				(*OutDamageInfo)->hitStopFlame = pAttackData->places[iHitPlace].hitStopFlame;		// ヒットストップ
+				(*OutDamageInfo)->iHitStopFrame = pAttackData->places[iHitPlace].iHitStopFrame;		// ヒットストップ
 				(*OutDamageInfo)->HitRecoveryFrame = pAttackData->places[iHitPlace].HitRecoveryFrame;		// 硬直時間
 				(*OutDamageInfo)->GuardRecoveryFrame = pAttackData->GuardRecoveryFrame;		// 硬直時間
 				(*OutDamageInfo)->HitEffectType = (int)pAttackData->HitEffectType;			// この攻撃のヒットエフェクトを相手に送る
@@ -358,7 +356,7 @@ bool Collision::CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou)
 			// まず、攻撃をヒットさせた人に送信
 			//HIT_ATTACK_INFO hai;
 			//hai.bOverDrive = false;
-			//hai.hitStopFlame = pStandAttackData->places[iHitPlace].hitStopFlame;		// 自分自身にもの自分のヒットストップ
+			//hai.iHitStopFrame = pStandAttackData->places[iHitPlace].iHitStopFrame;		// 自分自身にもの自分のヒットストップ
 			//hai.HitScore = pStandAttackData->HitScore;				// ダメージ(スコア)
 			//MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, (ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + pStand->GetDeviceID()), MESSAGE_TYPE::HIT_ATTACK, &hai);
 			//// 数字エフェクト追加
@@ -371,7 +369,7 @@ bool Collision::CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou)
 			HitDamageInfo.BeInvincible = pStandAttackData->places[iHitPlace].bBeInvincible;	// 無敵になるかどうか
 			HitDamageInfo.damage = pStandAttackData->damage;				// ダメージ(スコア)
 			HitDamageInfo.FlyVector = pStandAttackData->places[iHitPlace].FlyVector;			// 吹っ飛びベクトル
-			HitDamageInfo.hitStopFlame = pStandAttackData->places[iHitPlace].hitStopFlame;		// ヒットストップ
+			HitDamageInfo.iHitStopFrame = pStandAttackData->places[iHitPlace].iHitStopFrame;		// ヒットストップ
 			HitDamageInfo.HitRecoveryFrame = pStandAttackData->places[iHitPlace].HitRecoveryFrame;		// 硬直時間
 			HitDamageInfo.GuardRecoveryFrame = pStandAttackData->GuardRecoveryFrame;		// 硬直時間
 			HitDamageInfo.HitEffectType = (int)pStandAttackData->HitEffectType;			// この攻撃のヒットエフェクトを相手に送る
@@ -451,7 +449,7 @@ bool Collision::CollisionShot(Shot::Base *shot, BasePlayer *you)
 		HitDamageInfo.BeInvincible = pShotAttackData->places[iHitPlace].bBeInvincible;	// 無敵になるかどうか
 		HitDamageInfo.damage = pShotAttackData->damage;				// ダメージ(スコア)
 		HitDamageInfo.FlyVector = pShotAttackData->places[iHitPlace].FlyVector;			// 吹っ飛びベクトル
-		HitDamageInfo.hitStopFlame = pShotAttackData->places[iHitPlace].hitStopFlame;		// ヒットストップ
+		HitDamageInfo.iHitStopFrame = pShotAttackData->places[iHitPlace].iHitStopFrame;		// ヒットストップ
 		HitDamageInfo.HitRecoveryFrame = pShotAttackData->places[iHitPlace].HitRecoveryFrame;		// 硬直時間
 		HitDamageInfo.GuardRecoveryFrame = pShotAttackData->GuardRecoveryFrame;		// 硬直時間
 		HitDamageInfo.HitEffectType = (int)pShotAttackData->HitEffectType;			// この攻撃のヒットエフェクトを相手に送る

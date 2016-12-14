@@ -987,6 +987,8 @@ public:
 
 	static void	Release(Texture2D* lpTexture);
 
+	// 検索
+	static const TEXINFO* SerchTexinfo(Texture2D* lpTexture);
 };
 /********************************************/
 //				tdnLight				     
@@ -1726,6 +1728,16 @@ public:
 	// 円(2D)
 	static void Circle2D(int cx, int cy, float r, u32 dwFlags, COLOR color, float z = .0f);
 	static void Circle2D(int cx, int cy, float r, tdnShader* shader, char* name, COLOR color, float z = .0f);
+
+	/*
+	*@brief			3角形描画(2D)
+	*@param[in]		DstX		開始 X点
+	*@param[in]		DstY		開始 Y点
+	*@param[in]		DstW		横幅
+	*@param[in]		DstH		縦幅
+	*@param[in]		angle		三角形の回転角度(radian)
+	*/
+	static void Triangle(int DstX, int DstY, int DstW, int DstH, COLOR color, float angle, u32 dwFlags = RS::COPY, float z = .0f);
 private:
 
 };
@@ -3476,8 +3488,10 @@ protected:
 	Quaternion*		orgPose;
 	Vector3*		orgPos;
 
-	Quaternion*		CurPose;
-	Vector3*		CurPos;
+	Quaternion*		CurPose1;
+	Quaternion*		CurPose2;
+	Vector3*		CurPos1;
+	Vector3*		CurPos2;
 
 public:
 	void	SetLoadFlag( BOOL bLoad ){ this->bLoad = bLoad; }
@@ -3494,6 +3508,7 @@ public:
 	BOOL LoadObject( char* filename );
 	int LoadiEM( LPIEMFILE lpIem, LPSTR filename );
 	BOOL CreateFromIEM( char* path, LPIEMFILE lpIem );
+	BOOL ExportIEM( char* path );
 
 	LPD3DXSKININFO	CreateSkinInfo( LPIEMFILE lpIem );
 	LPD3DXMESH	CreateMesh( LPIEMFILE lpIem );
@@ -3502,7 +3517,8 @@ public:
 
 	static BOOL SaveObject( LPIEMFILE lpIem, LPSTR filename );
 
-	void Update();
+	// slerp : [ 0 < slerp < 1 ] 前フレームの姿勢の影響度
+	void Update( float slerp = 0.0f );
 	void SetMotion( int motion );
 	inline int GetMotion(){ return Motion; }
 	inline WORD GetMotionOffset( int m ){ return M_Offset[m]; }
@@ -3524,12 +3540,13 @@ public:
 
 	inline int GetNumFrame(){ return NumFrame; }
 
-	inline Quaternion*	GetPose( int n ){ return &CurPose[n]; }
-	inline Vector3*		GetBonePos( int n ){ return &CurPos[n]; }
+	inline Quaternion*	GetPose( int n ){ return &CurPose1[n]; }
+	inline Vector3*		GetBonePos( int n ){ return &CurPos1[n]; }
 	inline int	GetNumBone(){ return NumBone; }
 	inline Matrix*	GetBone( int n ){ return &lpBoneMatrix[n]; }
 
-	void UpdateSkinMeshFrame( float frame );
+	// slerp : [ 0 < slerp < 1 ] 前フレームの姿勢の影響度
+	void UpdateSkinMeshFrame( float frame, float slerp = 0.0f );
 	void UpdateBoneMatrix();
 	void UpdateSkinMesh();
 };

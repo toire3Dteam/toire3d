@@ -1007,12 +1007,12 @@ namespace BasePlayerState
 	/*******************************************************/
 	//				フィニッシュモーション
 	/*******************************************************/
-	class FinishAttack :public State<BasePlayer>
+	class InvincibleAttack :public State<BasePlayer>
 	{
 	public:
 
 		// this is a シングルトン
-		static FinishAttack* GetInstance(){ static FinishAttack instance; return &instance; }
+		static InvincibleAttack* GetInstance(){ static InvincibleAttack instance; return &instance; }
 
 		// 入る
 		virtual void Enter(BasePlayer* pPerson);
@@ -1031,11 +1031,11 @@ namespace BasePlayerState
 
 
 	private:
-		FinishAttack() {};
-		~FinishAttack() {};
+		InvincibleAttack() {};
+		~InvincibleAttack() {};
 
-		FinishAttack(const StandAction&) {}
-		FinishAttack& operator=(const StandAction&) {}
+		InvincibleAttack(const InvincibleAttack&) {}
+		InvincibleAttack& operator=(const InvincibleAttack&) {}
 	};
 	
 	/*******************************************************/

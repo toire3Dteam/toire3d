@@ -46,7 +46,7 @@ const SE_Manager::DATA all_dataS[]
 	{ "ガード中",					"DATA/Sound/SE/BlazBlue/guard2.wav", 4, false },
 	{ "ガード強",					"DATA/Sound/SE/BlazBlue/guard3.wav", 4, false },
 	{ "空中ダッシュ",				"DATA/Sound/SE/BlazBlue/aerial_dash.wav", 2, false },
-	//{ "Eカウンター成功",			"DATA/Sound/SE/Battle/counter_success.wav",	2, false },
+	{ "カウンター成功",				"DATA/Sound/SE/Battle/counter_success.wav",	1, false },
 	//{ "ブレーキ1",				"DATA/Sound/SE/Battle/brake1.wav",	2, false },
 	{ "ダッシュ",					"DATA/Sound/SE/Battle/dash.wav", 2, false },
 	{ "ペルソナ召喚",				"DATA/Sound/SE/Battle/kyuin.wav", 2, false },

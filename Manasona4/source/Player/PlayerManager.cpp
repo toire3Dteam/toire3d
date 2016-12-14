@@ -62,7 +62,7 @@ void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage, SideData Side
 			break;
 		}
 		m_pPlayers[i]->InitActionDatas();		// ★攻撃情報を各キャラに初期化させる
-		m_pPlayers[i]->InitMotionDatas();		// 各キャラごとの必殺技
+		m_pPlayers[i]->InitMotionDatas();		// 各キャラごとのモーション番号
 	}
 
 	// プレイヤーが2人という前提のコード
@@ -197,8 +197,8 @@ void PlayerManager::RenderUI()
 //	MsgMgr->Dispatch(0, pAttackPlayer->GetID(), pDamagePlayer->GetID(), MESSAGE_TYPE::HIT_DAMAGE, pHitDamageInfo);
 //
 //	// ダメージを与えるやつに対してヒットストップをかける
-//	pAttackPlayer->SetHitStopFrame(pHitDamageInfo->hitStopFlame);
-//	//pDamagePlayer->SetHitStopFrame(pHitDamageInfo->hitStopFlame);
+//	pAttackPlayer->SetHitStopFrame(pHitDamageInfo->iHitStopFrame);
+//	//pDamagePlayer->SetHitStopFrame(pHitDamageInfo->iHitStopFrame);
 //}
 
 bool PlayerManager::HandleMessage(const Message &msg)

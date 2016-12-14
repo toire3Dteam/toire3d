@@ -15,7 +15,6 @@
 // エフェクト関連
 #include "../Effect/PanelEffect/PanelEffectManager.h"
 #include "../Effect\UVEffect\UVEffectManager.h"
-#include "../Effect\UVEffect\UVEffectManager.h"
 
 // UI
 #include "../UI/ComboUI.h"
@@ -146,7 +145,7 @@ enum class BASE_ACTION_STATE
 	DOKKOI_ATTACK,		// 中段攻撃
 	SQUAT_ATTACK,		// しゃがみ攻撃
 	DOWN_ATTACK,		// 足払い攻撃
-	AERIAL,				// 空中攻撃
+	AERIAL_ATTACK,		// 空中攻撃
 	AERIALDROP,			// 空中下攻撃
 	INVINCIBLE_ATTACK,	// フィニッシュアーツ→無敵技
 	SKILL,				// 地上キャラクター固有技
@@ -164,11 +163,15 @@ enum class BASE_ACTION_STATE
 
 enum class SKILL_ACTION_TYPE
 {
+	NO_ACTION = -1,
 	LAND,
-	LAND2,
 	SQUAT,
 	AERIAL,
 	AERIALDROP,
+
+	// 追加はここに。ここ以前に書くとスタンドがおかしくなる
+	LAND2,
+	AERIAL2,
 	MAX
 };
 
@@ -315,7 +318,7 @@ public:
 		//Vector2 LandFlyVector;		// 当たって吹っ飛ばすベクトル(★基本的にxは+にすること)
 		//Vector2 AerialFlyVector;	// ※相手が空中にいた時　当たって吹っ飛ばす空中ベクトル(★基本的にxは+にすること)
 		Vector2 FlyVector;
-		int hitStopFlame;			// ヒットストップの時間
+		int iHitStopFrame;			// ヒットストップの時間
 		int HitRecoveryFrame;		// 攻撃がヒットした際に「相手に与える」硬直の時間
 		DAMAGE_MOTION DamageMotion;	// 喰らった時のモーション
 	}places[(int)HIT_PLACE::MAX];
@@ -452,6 +455,11 @@ public:
 	virtual void ThirdRushUpdate() = 0;//
 
 	/****************************/
+	//	無敵攻撃カウンター成功したときのイベント
+	/****************************/
+	virtual void OnInvincibleCounterSuccess(){ MyAssert(0, "継承しよう。"); }
+
+	/****************************/
 	//	キャラクター固有スキル
 	/****************************/
 	virtual void SkillInit() = 0;		// スキル発動時に呼び出す
@@ -551,31 +559,31 @@ public:
 	//------------------------------------------------------
 	//	プレイヤーアクション・攻撃アクション・ステート
 	//------------------------------------------------------
-	BASE_ACTION_STATE GetActionState(){ return m_ActionState; }
+	BASE_ACTION_STATE GetActionState(){ return m_eActionState; }
 	AttackData *GetAttackData(BASE_ACTION_STATE state)
 	{
 		// [12/10]
 		MyAssert(isAttackState(),"GetAttackDataでアタックデータがないことが判明");	// アタックデータがないステートでアタックデータを参照しようとしている}
 		return m_ActionDatas[(int)state].pAttackData;
 	}
-	AttackData *GetAttackData(){ return GetAttackData(m_ActionState);}// 自分の状態の攻撃データを渡す
+	AttackData *GetAttackData(){ return GetAttackData(m_eActionState);}// 自分の状態の攻撃データを渡す
 	bool isHitAttack() { return (isAttackState()) ? GetAttackData()->bHit : false; }
-	bool isFrameAction() { return (m_ActionState != BASE_ACTION_STATE::NO_ACTION); }
+	bool isFrameAction() { return (m_eActionState != BASE_ACTION_STATE::NO_ACTION); }
 	bool isAttackState()
 	{
 		// ★ステートが何もないのかそうでないか確認と、これがtrueならAttackDataがnull出ないことが保証される
-		if (isFrameAction()){ return m_ActionDatas[(int)m_ActionState].isAttackData(); }// アクションデータがnullじゃないかどうかを返す
+		if (isFrameAction()){ return m_ActionDatas[(int)m_eActionState].isAttackData(); }// アクションデータがnullじゃないかどうかを返す
 		else return false;
 	}
 	bool isActiveFrame()
 	{
 		if (!isFrameAction()) return false;
-		return (m_ActionFrameList[(int)m_ActionState][m_iCurrentActionFrame] == FRAME_STATE::ACTIVE);
+		return (m_ActionFrameList[(int)m_eActionState][m_iCurrentActionFrame] == FRAME_STATE::ACTIVE);
 	}
 	FRAME_STATE GetActionFrame()
 	{
 		if (!isFrameAction()) return FRAME_STATE::END;
-		return m_ActionFrameList[(int)m_ActionState][m_iCurrentActionFrame];
+		return m_ActionFrameList[(int)m_eActionState][m_iCurrentActionFrame];
 	}
 	FRAME_STATE GetActionFrame(BASE_ACTION_STATE state, int frame)
 	{
@@ -583,7 +591,7 @@ public:
 	}
 	void SetActionState(BASE_ACTION_STATE state)
 	{
-		m_ActionState = state;
+		m_eActionState = state;
 
 		// NO_ACTIONじゃなかったら
 		if (isFrameAction())
@@ -601,9 +609,10 @@ public:
 	}
 	int GetCurrentFrame(){ return m_iCurrentActionFrame; }
 	int GetRushStep(){ return m_iRushStep; }
+	SKILL_ACTION_TYPE GetSkillActionType(){ return m_eSkillActionType; }
 	void AddRushStep(){ m_iRushStep++; }
 	void RushStepReset(){ m_iRushStep = 0; }
-	void SetSkillActionType(SKILL_ACTION_TYPE type){ m_SkillActionType = type; }
+	void SetSkillActionType(SKILL_ACTION_TYPE type){ m_eSkillActionType = type; }
 	bool isDownState(){ return (m_pStateMachine->isInState(*BasePlayerState::KnockDown::GetInstance())); }
 	bool isHeavehoDriveState() { return (m_pStateMachine->isInState(*BasePlayerState::HeavehoDrive::GetInstance())); }
 
@@ -629,7 +638,7 @@ public:
 	//------------------------------------------------------
 	int GetRecoveryFrame() { return m_iRecoveryFrame; }
 	int GetHitStopFrame(){ return m_iHitStopFrame; }
-	void SetHitStopFrame(int frame) { m_iHitStopFrame = frame; }
+	void SetHitStopFrame(int frame){m_iHitStopFrame = frame; }
 	void SetRecoveryFrame(int frame) { m_iRecoveryFrame = frame; }
 	std::list<BASE_ACTION_STATE> *GetRecoveryDamageCount(){ return &m_RecoveryDamageCount; }
 	bool isDown() { return m_bDown; }
@@ -638,8 +647,8 @@ public:
 	//------------------------------------------------------
 	//	ガード
 	//------------------------------------------------------
-	GUARD_STATE GetGuardState(){ return m_GuardState; }
-	void SetGuardState(GUARD_STATE state){ m_GuardState = state; }
+	GUARD_STATE GetGuardState(){ return m_eGuardState; }
+	void SetGuardState(GUARD_STATE state){ m_eGuardState = state; }
 
 
 	//------------------------------------------------------
@@ -654,7 +663,7 @@ public:
 	void InvincibleOff(){ m_iInvincibleLV = 0; m_iInvincibleTime = 0; }
 	bool isEscape() { return m_bEscape; }
 	void SetEscapeFlag(bool bEscape) { m_bEscape = bEscape; }
-
+	bool isInvincibleCounterType(){ return m_tagCharacterParam.bInvincibleCoutner; }
 
 	//------------------------------------------------------
 	//	モーション
@@ -921,9 +930,11 @@ protected:
 		int iMaxHP;									// 最大HP
 		float fMaxSpeed;							// 最大スピード(実質走る速さ)
 		float fAerialDashSpeed;						// 空中ダッシュの速度
+		bool bInvincibleCoutner;					// 無敵攻撃がカウンタータイプか
 		CollisionShape::Square HitSquare;			// 四角判定(ステージ衝突で使う)
 		EFFECT_CAMERA_ID eHeaveHoOverFlowCameraID;	// 一撃必殺カメラのID
 	}m_tagCharacterParam;
+	CharacterParam m_tagOrgCharacterParam;			// 初期の情報を保存
 	
 	//------------------------------------------------------
 	//	位置・移動量
@@ -946,10 +957,10 @@ protected:
 	//------------------------------------------------------
 	FRAME_STATE m_ActionFrameList[(int)BASE_ACTION_STATE::END][FRAME_MAX];
 	ActionData m_ActionDatas[(int)BASE_ACTION_STATE::END];
-	BASE_ACTION_STATE m_ActionState;
+	BASE_ACTION_STATE m_eActionState;
 	int m_iCurrentActionFrame;				// 攻撃フレームリストの中を再生しているフレーム
 	int m_iRushStep;						// ラッシュアタックのステップ
-	SKILL_ACTION_TYPE m_SkillActionType;	// スキルアクション
+	SKILL_ACTION_TYPE m_eSkillActionType;	// スキルアクション
 
 
 	//------------------------------------------------------
@@ -972,7 +983,7 @@ protected:
 	//------------------------------------------------------
 	//	ガード
 	//------------------------------------------------------
-	GUARD_STATE m_GuardState;
+	GUARD_STATE m_eGuardState;
 
 
 	//------------------------------------------------------

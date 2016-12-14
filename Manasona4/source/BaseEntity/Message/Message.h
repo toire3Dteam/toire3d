@@ -83,7 +83,7 @@ struct HIT_DAMAGE_INFO
 	bool BeInvincible;	// 無敵になるかどうか(たとえば、通常の1.2段目ならfalseだし、3段目ならtrue)
 	int damage;			// 受けるダメ―ジ(スコア)
 	Vector2 FlyVector;	// 吹っ飛びベクトル(強さもある)
-	int hitStopFlame;		// ヒットストップフレーム
+	int iHitStopFrame;		// ヒットストップフレーム
 	int HitRecoveryFrame;	// ヒット硬直フレーム
 	int GuardRecoveryFrame;	// ガード硬直フレーム
 	int HitEffectType;		// HITした相手に送るエフェクト (A列車)←をintじゃなくてEFFECT_TYPEにしたい。どうしたものか・・
@@ -96,13 +96,13 @@ struct HIT_DAMAGE_INFO
 	DAMAGE_MOTION DamageMotion;	// 喰らったモーションタイプ
 	float fComboRate;		// コンボ補正
 	int iAttribute;			// 属性
-	HIT_DAMAGE_INFO():iAttribute(0), fComboRate(1), BeInvincible(false), damage(0), FlyVector(0,0), hitStopFlame(0), HitRecoveryFrame(0), GuardRecoveryFrame(0), HitEffectType(0), bOverDrive(false), iAttackType(0), iAntiGuard(0), HitSE(nullptr), bFinishOK(true), DamageMotion(DAMAGE_MOTION::KNOCK_BACK), fGuardKnockBackPower(0){}
+	HIT_DAMAGE_INFO(){ ZeroMemory(this, sizeof(this)); }
 };
 
 // 攻撃ヒットしたプレイヤー用
 struct HIT_ATTACK_INFO
 {
-	int hitStopFlame;		// ヒットストップフレーム
+	int iHitStopFrame;		// ヒットストップフレーム
 	int HitScore;			// 加算されるスコア
 	bool bOverDrive;		// フィニッシュアタック
 };

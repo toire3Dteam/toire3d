@@ -672,6 +672,102 @@ bool AIState::PracticeAttack::OnMessage(AI * pPerson, const Message & msg)
 
 
 /*******************************************************/
+//				無敵割り込みチェック用ステート
+/*******************************************************/
+
+AIState::InterruptInvincible * AIState::InterruptInvincible::GetInstance()
+{
+	// ここに変数を作る
+	static AIState::InterruptInvincible instance;
+	return &instance;
+}
+
+void AIState::InterruptInvincible::Enter(AI * pPerson){}
+
+void AIState::InterruptInvincible::Execute(AI * pPerson)
+{
+	// ★何か攻撃を受けて倒れる最中ならば
+	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) == true ||
+		MyPlayer->GetFSM()->isInState(*BasePlayerState::DownFall::GetInstance()) == true
+		)
+	{
+		// 復帰ボタン
+		pPerson->PushInputList(PLAYER_INPUT::B);
+
+		pPerson->m_bPracticeGuardFlag = false;
+		pPerson->m_iGuardFrame = 0;
+	}
+
+	// ガード中
+	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::Guard::GetInstance()))
+	{
+		// まだ相手の攻撃をガードしていない状態(モーションだけガードしてる状態)
+		if (!pPerson->m_bPracticeGuardFlag)
+		{
+			// ガードリカバリーフレームが0以上、すなわち相手の攻撃を受けたらフラグをONにする
+			pPerson->m_bPracticeGuardFlag = (MyPlayer->GetRecoveryFrame() > 0);
+		}
+
+		// ガードを1度でも受けた場合のif文
+		else
+		{
+			// 2フレーム単位で無敵攻撃ボタンを連打する
+			if (++pPerson->m_iGuardFrame % 2) pPerson->PushInputList(PLAYER_INPUT::L2);
+		}
+	}
+
+	// 無敵攻撃を振ってたら、じょうほうをりせっと　
+	else if (MyPlayer->GetFSM()->isInState(*BasePlayerState::InvincibleAttack::GetInstance()))
+	{
+		pPerson->m_bPracticeGuardFlag = false;
+		pPerson->m_iGuardFrame = 0;
+	}
+
+	// 相手が攻撃振ったら
+	if (TargetPlayer->isAttackState() == true)
+	{
+		// 相手と逆方向レバーを押す
+		if (MyPlayer->GetDir() == DIR::LEFT)
+		{
+			pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+		}
+		else
+		{
+			pPerson->PushInputList(PLAYER_INPUT::LEFT);
+		}
+
+		// 基本下段ガード
+		if (TargetPlayer->GetAttackData()->AntiGuard != ANTIGUARD_ATTACK::UP_ATTACK)
+		{
+			pPerson->PushInputList(PLAYER_INPUT::DOWN);
+		}
+	}
+}
+
+void AIState::InterruptInvincible::Exit(AI * pPerson)
+{
+}
+
+void AIState::InterruptInvincible::Render(AI * pPerson)
+{
+#ifdef _DEBUG
+
+	tdnText::Draw(420, 610, 0xffffffff, "AI無敵割り込みチェック用");
+
+#endif // _DEBUG
+
+}
+
+bool AIState::InterruptInvincible::OnMessage(AI * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+	//}
+	return false;
+}
+
+/*******************************************************/
 //				待機ステート
 /*******************************************************/
 
@@ -2445,15 +2541,15 @@ void AIState::InvincibleAttack::Enter(AI * pPerson)
 void AIState::InvincibleAttack::Execute(AI * pPerson)
 {
 	// 無敵ステートが終わっていたら
-	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::FinishAttack::GetInstance()) == false)
+	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::InvincibleAttack::GetInstance()) == false)
 	{
 		//待機に戻る
 		pPerson->GetFSM()->ChangeState(AIState::Wait::GetInstance());
 		return;
 	}
 
-	//// FinishAttack中
-	//if (MyPlayer->GetFSM()->isInState(*BasePlayerState::FinishAttack::GetInstance()) == true)
+	//// InvincibleAttack中
+	//if (MyPlayer->GetFSM()->isInState(*BasePlayerState::InvincibleAttack::GetInstance()) == true)
 	//{
 	//	if (MyPlayer->GetActionFrame() == FRAME_STATE::END)
 	//	{

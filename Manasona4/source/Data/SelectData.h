@@ -28,6 +28,8 @@ enum class AI_TYPE
 	PRACTICE_LAND,		//	[練習用]何も動かない
 	PRACTICE_JUMP,		//	[練習用]飛び続ける
 	PRACTICE_ATTACK,	//	[練習用]一定間隔で攻撃する
+
+	INTERRUPT_INVINCIBLE	// [デバッグ用]ガード中にひたすら無敵割り込みをする
 };
 
 struct SideData

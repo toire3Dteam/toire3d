@@ -196,3 +196,13 @@ void tdnTexture::Release(Texture2D* lpTexture)
 	}
 }
 
+// åüçı
+const tdnTexture::TEXINFO* tdnTexture::SerchTexinfo(Texture2D* lpTexture)
+{
+	for (int i = 0; i < MAX_TEXTURE; i++)
+	{
+		if (TexInfo[i].lpTexture == lpTexture)
+			return &TexInfo[i];
+	}
+	return nullptr;
+}

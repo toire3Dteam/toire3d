@@ -100,7 +100,7 @@ bool SceneMainState::StageIntro::OnMessage(sceneMain *pMain, const Message & msg
 void SceneMainState::CharaIntro::Enter(sceneMain *pMain)
 {
 	// フェード初期化
-	if(Fade::m_alpha >= 128) Fade::Set(Fade::FLAG::FADE_IN, 8, 0x00000000);
+	Fade::Set(Fade::FLAG::FADE_IN, 8, 0, Fade::m_alpha, 0x00000000);
 
 	// キャラクターたちのイントロ
 	PlayerMgr->SetIntroState();
@@ -172,7 +172,7 @@ bool SceneMainState::CharaIntro::OnMessage(sceneMain *pMain, const Message & msg
 void SceneMainState::Round::Enter(sceneMain *pMain)
 {
 	// フェード初期化
-	if (Fade::m_alpha >= 128) Fade::Set(Fade::FLAG::FADE_IN, 8, 0x00000000);
+	if (Fade::m_alpha > 0) Fade::Set(Fade::FLAG::FADE_IN, 8, 0, Fade::m_alpha, 0x00000000);
 
 #ifdef ROUND_SKIP
 	//if (pMain->GetRoundNum() == 0)
@@ -242,9 +242,6 @@ bool SceneMainState::Round::OnMessage(sceneMain *pMain, const Message & msg)
 
 void SceneMainState::Main::Enter(sceneMain *pMain)
 {
-	// フェード初期化
-	if (Fade::m_alpha >= 128) Fade::Set(Fade::FLAG::FADE_IN, 8, 0x00000000);
-
 	// タイマー始動
 	GameUIMgr->TimerStart();
 }

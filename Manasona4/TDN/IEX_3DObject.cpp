@@ -35,8 +35,10 @@ iex3DObj::~iex3DObj()
 
 		delete[] orgPose;
 		delete[] orgPos;
-		delete[] CurPose;
-		delete[] CurPos;
+		delete[] CurPose1;
+		delete[] CurPose2;
+		delete[] CurPos1;
+		delete[] CurPos2;
 
 		delete[] lpVertex;
 
@@ -107,10 +109,10 @@ void iex3DObj::SetMotion( int motion )
 //*****************************************************************************
 //		更新処理
 //*****************************************************************************
-void iex3DObj::Update()
+void iex3DObj::Update( float slerp )
 {
 	/*	スキンメッシュ更新	*/ 
-	UpdateSkinMeshFrame( (float)dwFrame );
+	UpdateSkinMeshFrame( ( float ) dwFrame, slerp );
 	UpdateBoneMatrix();
 	UpdateSkinMesh();
 
@@ -390,8 +392,10 @@ BOOL iex3DObj::CreateFromIEM( char* path, LPIEMFILE lpIem )
 
 	orgPose		= new Quaternion[ NumBone ];
 	orgPos		= new Vector3[ NumBone ];
-	CurPose		= new Quaternion[ NumBone ];
-	CurPos		= new Vector3[ NumBone ];
+	CurPose1	= new Quaternion[ NumBone ];
+	CurPose2	= new Quaternion[ NumBone ];
+	CurPos1		= new Vector3[ NumBone ];
+	CurPos2		= new Vector3[NumBone];
 
 	//
 	NumFrame = lpIem->MaxFrame;
@@ -435,6 +439,117 @@ BOOL iex3DObj::CreateFromIEM( char* path, LPIEMFILE lpIem )
 	dwFlags = 0;
 	iexMesh::Update();
 	
+	return TRUE;
+}
+
+BOOL iex3DObj::ExportIEM( char* path )
+{
+	IEMFILE		iem;
+	iem.version = version;
+	iem.NumVertex = ( u16 ) NumVertex;
+	iem.lpVertex = lpVertex;
+	iem.NumFace = ( u16 ) lpMesh->GetNumFaces();
+
+	iem.lpFace = new u16[iem.NumFace * 3];
+	u8 *pFace;
+	lpMesh->LockIndexBuffer( 0, ( void** ) &pFace );
+	CopyMemory( iem.lpFace, pFace, sizeof( u16 )*iem.NumFace * 3 );
+	lpMesh->UnlockIndexBuffer();
+
+	iem.lpAtr = new u32[iem.NumFace];
+	u32			*pData;
+	lpMesh->LockAttributeBuffer( 0, &pData );
+	CopyMemory( iem.lpAtr, pData, sizeof( u32 )*iem.NumFace );
+	lpMesh->UnlockAttributeBuffer();
+
+	iem.NumMaterial = ( u16 ) MaterialCount;
+	CopyMemory( iem.Material, lpMaterial, sizeof( D3DMATERIAL9 )*MaterialCount );
+	for( u32 mi = 0; mi < MaterialCount; mi++ )
+	{
+		auto texInfo = tdnTexture::SerchTexinfo( lpTexture[mi] );
+		for( int i = lstrlen( texInfo->filename ); i > 0; i-- )
+		{
+			if( IsDBCSLeadByte( texInfo->filename[i - 2] ) )
+			{
+				i--;
+				continue;
+			}
+			if( texInfo->filename[i - 1] == '\\' || texInfo->filename[i - 1] == '/' )
+			{
+				CopyMemory( iem.Texture[mi], texInfo->filename + i, lstrlen( texInfo->filename ) - i );
+				break;
+			}
+		}
+	}
+
+	iem.NumBone = ( u16 ) NumBone;
+	iem.lpBone = new IEMBONE[NumBone];
+	iem.lpMotion = new IEMMOTION[NumBone];
+	for( u32 i = 0; i < NumBone; i++ )
+	{
+		iem.lpBone[i].parent = BoneParent[i];			//	親
+		iem.lpBone[i].BoneMatrix = lpOffsetMatrix[i];	//	基準化行列
+		iem.lpBone[i].orgPos = orgPos[i];				//	標準位置
+		iem.lpBone[i].orgPose = orgPose[i];				//	標準姿勢
+
+		iem.lpBone[i].IndexNum = ( u16 ) lpSkinInfo->GetNumBoneInfluences( i );
+		iem.lpBone[i].Influence = new float[iem.lpBone[i].IndexNum];
+		iem.lpBone[i].Index = new u32[iem.lpBone[i].IndexNum];
+		lpSkinInfo->GetBoneInfluence( i, iem.lpBone[i].Index, iem.lpBone[i].Influence );
+
+		//	クォータニオンコピー
+		iem.lpMotion[i].NumRotate = ( u16 ) lpAnime[i].rotNum;
+		iem.lpMotion[i].RotateFrame = new WORD[lpAnime[i].rotNum];
+		iem.lpMotion[i].Rotate = new Quaternion[lpAnime[i].rotNum];
+		for( u32 j = 0; j < lpAnime[i].rotNum; j++ )
+		{
+			iem.lpMotion[i].RotateFrame[j] = lpAnime[i].rotFrame[j];
+			iem.lpMotion[i].Rotate[j] = lpAnime[i].rot[j];
+		}
+		//	ポジションコピー
+		iem.lpMotion[i].NumPosition = ( u16 ) lpAnime[i].posNum;
+		if( lpAnime[i].posNum > 0 )
+		{
+			iem.lpMotion[i].PositionFrame = new WORD[lpAnime[i].posNum];
+			iem.lpMotion[i].Position = new Vector3[lpAnime[i].posNum];
+		}
+		for( u32 j = 0; j < lpAnime[i].posNum; j++ )
+		{
+			iem.lpMotion[i].PositionFrame[j] = lpAnime[i].posFrame[j];
+			iem.lpMotion[i].Position[j] = lpAnime[i].pos[j];
+		}
+	}
+
+	iem.MaxFrame = ( u16 ) NumFrame;
+	CopyMemory( iem.M_Offset, M_Offset, 2 * 256 );
+	CopyMemory( iem.FrameFlag, dwFrameFlag, 2 * NumFrame );
+
+	for( int i = 0; i < 256; i++ )
+	{
+		if( M_Offset[i] == 65535 )
+		{
+			iem.NumMotion = i;
+			break;
+		}
+	}
+
+	SaveObject( &iem, path );
+
+	for( int i = 0; i<iem.NumBone; i++ )
+	{
+		delete[]	iem.lpBone[i].Index;
+		delete[]	iem.lpBone[i].Influence;
+		delete[]	iem.lpMotion[i].Rotate;
+		delete[]	iem.lpMotion[i].RotateFrame;
+		delete[]	iem.lpMotion[i].Position;
+		delete[]	iem.lpMotion[i].PositionFrame;
+	}
+	//delete[]	iem.lpVertex;
+	delete[]	iem.lpFace;
+	delete[]	iem.lpAtr;
+	delete[]	iem.lpBone;
+	delete[]	iem.lpMotion;
+
 	return TRUE;
 }
 

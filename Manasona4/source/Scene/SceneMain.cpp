@@ -255,6 +255,9 @@ void sceneMain::Update()
 	HeaveHoFinishUI->Update();
 	if (HeaveHoFinishUI->IsAction() == true)return ;
 	
+	// フェード更新
+	Fade::Update();
+
 	// ポーズ中は更新しない
 	if (m_bPause == false)
 	{
@@ -266,9 +269,6 @@ void sceneMain::Update()
 		//{
 		//	return true;
 		//}
-
-		// フェード更新
-		Fade::Update();
 
 		// カメラ更新(ステートマシンに書いた)
 		//CameraMgr->Update();

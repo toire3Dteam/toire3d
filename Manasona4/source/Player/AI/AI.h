@@ -100,6 +100,6 @@ private:
 	friend class AIState::Wait;
 	friend class AIState::Chase;
 	friend class AIState::Guard;
-
+	friend class AIState::InterruptInvincible;
 
 };

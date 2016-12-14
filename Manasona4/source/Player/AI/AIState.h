@@ -179,6 +179,40 @@ namespace AIState
 	};
 
 	/*******************************************************/
+	//					無敵割り込み用ステート
+	/*******************************************************/
+	class InterruptInvincible :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static InterruptInvincible* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		InterruptInvincible() {};
+		~InterruptInvincible() {};
+
+		InterruptInvincible(const InterruptInvincible&) {}
+		InterruptInvincible& operator=(const InterruptInvincible&) {}
+	};
+
+	/*******************************************************/
 	//				待機ステート
 	/*******************************************************/
 	class Wait :public State<AI>

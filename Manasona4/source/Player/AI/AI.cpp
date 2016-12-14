@@ -68,6 +68,14 @@ AI::AI(SIDE side,BasePlayer* myBasePlayer , AI_TYPE AIType)
 		m_pStateMachine->SetCurrentState(AIState::PracticeAttack::GetInstance());
 
 		break;
+
+	case AI_TYPE::INTERRUPT_INVINCIBLE:
+		// ガード中に無敵割り込みを行う確認用ステートマシン
+		m_pStateMachine = new StateMachine<AI>(this);
+		m_pStateMachine->SetGlobalState(AIState::PracticeGlobal::GetInstance());// グローバル
+		m_pStateMachine->SetCurrentState(AIState::InterruptInvincible::GetInstance());
+
+		break;
 	default:
 		break;
 	}
