@@ -1,5 +1,8 @@
 #pragma once
 #include "BaseWindow.h"
+#include "ParamSetting\BGMParamSetting.h"
+#include "ParamSetting\SEParamSetting.h"
+#include "ParamSetting\VoiceParamSetting.h"
 
 //+-------------------------------
 //	サウンドウィンドウ
@@ -20,6 +23,11 @@ public:
 	void Action();	// Windowを出す
 	void Stop();	// 止める
 
+	// パラメータ設定用に
+	void RenderParamSetting(int No, int x, int y);
+	void CtrlParamSetting(int SelectNo,int DeviceID);
+
+
 	// 選択状態
 	enum SOUND_STATE
 	{
@@ -31,17 +39,16 @@ public:
 
 
 private:
-	static const int SizeX = 432;
+	static const int m_cSizeX = 768;
 
-	// このウィンドウの演出のために色々作ろう
-	int m_iAlpha;
-	int m_iAddX;
-	int m_iAddY;
+	BGMParamSetting* m_pBGMParam;
+	SEParamSetting* m_pSEParam;
+	VoiceParamSetting* m_pVoiceParam;
 
-	// ピッ...ピッ...ピッ..ピッ.ピッピッピッピッ
-	// って感じの触り心地に
-	int iSpeedLv;
-	int iLeftPushFrame;
-	int iRightPushFrame;
-	int iFrame;
+	//// ピッ...ピッ...ピッ..ピッ.ピッピッピッピッ
+	//// って感じの触り心地に
+	//int iSpeedLv;
+	//int iLeftPushFrame;
+	//int iRightPushFrame;
+	//int iFrame;
 };

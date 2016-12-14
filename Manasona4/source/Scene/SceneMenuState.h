@@ -103,6 +103,38 @@ namespace SceneMenuState
 		bool PadUpdate(sceneMenu* pMain, int DeviceID);
 	};
 
+	//--------------------トレーニングのコントローラー選択
+	class TrainingControllerSelectStep : public State<sceneMenu>
+	{
+	public:
+		// this is a シングルトン
+		static TrainingControllerSelectStep* GetInstance() { static TrainingControllerSelectStep state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMenu* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMenu* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMenu* pMain);
+
+		// 描画
+		virtual void Render(sceneMenu* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMenu* pMain, const Message& msg);
+
+	private:
+		TrainingControllerSelectStep() {};
+		~TrainingControllerSelectStep() {};
+
+		TrainingControllerSelectStep(const TrainingControllerSelectStep&) {}
+		TrainingControllerSelectStep& operator=(const TrainingControllerSelectStep&) {}
+
+		bool PadUpdate(sceneMenu* pMain, int DeviceID);
+	};
+
 
 	//--------------------チュートリアル選択
 	class TutorialSelectStep : public State<sceneMenu>

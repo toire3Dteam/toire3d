@@ -153,14 +153,12 @@ void FrameworkEx::Render()
 
 #ifdef _DEBUG
 
-
-
 	//	フレーム表示
 	tdnText::Draw(tdnSystem::GetScreenSize().right - 128, tdnSystem::GetScreenSize().bottom-36, 0xff00ffff, "FPS %d/%d", m_iFPS, m_iRenderFPS);
-
-#endif
 	// ストップウォッチの描画
 	tdnStopWatch::DrawResult(300, 0);
+#endif
+
 	//【描画終了】
 	tdnSystem::EndScene();
 

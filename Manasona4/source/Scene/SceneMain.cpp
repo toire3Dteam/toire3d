@@ -143,6 +143,8 @@ bool sceneMain::Initialize()
 	m_bTutorialFlag = SelectDataMgr->Get()->bTutorial;
 	m_eSelectTutorial = (TUTORIAL_TYPE)0;// (TODO)選んだチュートリアルを設定してあげる 					 
 
+	m_bTrainingFlag = SelectDataMgr->Get()->bTraining;
+
 
 	if (m_bTutorialFlag == true)
 	{
@@ -151,6 +153,13 @@ bool sceneMain::Initialize()
 		// チュートリアル用の対戦
 		m_pStateMachine->SetCurrentState(SceneMainState::TutorialIntro::GetInstance());
 
+	}
+	else if (m_bTrainingFlag == true)
+	{
+		// UIを最初の一回だけ起動
+		GameUIMgr->Action();
+		// トレーニング用の対戦
+		m_pStateMachine->SetCurrentState(SceneMainState::Training::GetInstance());
 	}
 	else
 	{
@@ -175,6 +184,9 @@ bool sceneMain::Initialize()
 			break;
 		case BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE:
 			m_pWindow[i] = new TutorialPauseWindow(Vector2(424, 128));
+			break;
+		case BATTLE_WINDOW_TYPE::TRAINING_PAUSE:
+			m_pWindow[i] = new TrainingPauseWindow(Vector2(424, 128));
 			break;
 		case BATTLE_WINDOW_TYPE::SOUND:
 			m_pWindow[i] = new SoundWindow(Vector2(424, 128));

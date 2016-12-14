@@ -1,4 +1,5 @@
 #include "BaseWindow.h"
+#include "Sound\SoundManager.h"
 
 //+------------------------
 // ウィンドウ画面のベース
@@ -25,6 +26,11 @@ BaseWindow::BaseWindow(Vector2 vPos)
 	m_aIconData.clear();
 	m_aIconData.reserve(64);
 	m_iChoiceState = CHOICE_STATE::HOLD;
+
+	// 演出用に
+	m_iAlpha = 0;
+	m_iAddX = 0;
+	m_iAddY = 0;
 }
 
 BaseWindow::~BaseWindow()
@@ -36,6 +42,47 @@ BaseWindow::~BaseWindow()
 	SAFE_DELETE(m_pSelect);
 	SAFE_DELETE(m_pFontBox);
 	m_aIconData.clear();
+}
+
+// 下に表記する説明描画
+void BaseWindow::RednerInfo()
+{
+	// 文字
+	DWORD fontCol = 0xffffffff;
+	//if (m_iSelectNo == i)fontCol = 0xff030a58;
+	tdnFont::RenderStringCentering(m_aIconData[m_iSelectNo].pInfoString, "HGS創英角ｺﾞｼｯｸUB",// HGP創英ﾌﾟﾚｾﾞﾝｽEB
+		24, 1280 / 2 + (255 - m_iAlpha), 652, ARGB(m_iAlpha, 255, 255, 255), RS::COPY);
+}
+
+// 操作音
+void BaseWindow::CtrlSE(int DeviceID)
+{
+	// 押したときのSE
+
+	// 決定
+	if (tdnInput::KeyGet(KEYCODE::KEY_B, DeviceID) == 3)
+	{
+		se->Play("決定1");
+	}
+
+	// 戻る
+	if (tdnInput::KeyGet(KEYCODE::KEY_A, DeviceID) == 3)
+	{
+		se->Play("キャンセル1");
+	}
+
+	// ↑
+	if (tdnInput::KeyGet(KEYCODE::KEY_UP, DeviceID) == 3)
+	{
+		se->Play("カーソル1");
+	}
+
+	// ↓
+	if (tdnInput::KeyGet(KEYCODE::KEY_DOWN, DeviceID) == 3)
+	{
+		se->Play("カーソル1");
+	}
+
 }
 
 void BaseWindow::Action()

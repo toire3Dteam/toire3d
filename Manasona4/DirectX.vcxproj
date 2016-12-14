@@ -198,9 +198,14 @@
     <ClCompile Include="source\Window\BaseWindow.cpp" />
     <ClCompile Include="source\Window\BattleWindow.cpp" />
     <ClCompile Include="source\Window\OptionWindow.cpp" />
+    <ClCompile Include="source\Window\ParamSetting\BaseParamSetting.cpp" />
+    <ClCompile Include="source\Window\ParamSetting\BGMParamSetting.cpp" />
+    <ClCompile Include="source\Window\ParamSetting\SEParamSetting.cpp" />
+    <ClCompile Include="source\Window\ParamSetting\VoiceParamSetting.cpp" />
     <ClCompile Include="source\Window\PauseWindow.cpp" />
     <ClCompile Include="source\Window\ResultWindow.cpp" />
     <ClCompile Include="source\Window\SoundWindow.cpp" />
+    <ClCompile Include="source\Window\TrainingPauseWindow.cpp" />
     <ClCompile Include="source\Window\TutorialPauseWindow.cpp" />
     <ClCompile Include="TDN\DirectShow\baseclasses\amfilter.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -347,9 +352,14 @@
     <ClInclude Include="source\Window\BaseWindow.h" />
     <ClInclude Include="source\Window\BattleWindow.h" />
     <ClInclude Include="source\Window\OptionWindow.h" />
+    <ClInclude Include="source\Window\ParamSetting\BaseParamSetting.h" />
+    <ClInclude Include="source\Window\ParamSetting\BGMParamSetting.h" />
+    <ClInclude Include="source\Window\ParamSetting\SEParamSetting.h" />
+    <ClInclude Include="source\Window\ParamSetting\VoiceParamSetting.h" />
     <ClInclude Include="source\Window\PauseWindow.h" />
     <ClInclude Include="source\Window\ResultWindow.h" />
     <ClInclude Include="source\Window\SoundWindow.h" />
+    <ClInclude Include="source\Window\TrainingPauseWindow.h" />
     <ClInclude Include="source\Window\TutorialPauseWindow.h" />
     <ClInclude Include="TDN\DirectShow\baseclasses\amextra.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>

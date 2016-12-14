@@ -34,9 +34,9 @@ private:
 	static const int SizeX = 432;
 
 	// このウィンドウの演出のために色々作ろう
-	int m_iAlpha;
-	int m_iAddX;
-	int m_iAddY;
+	//int m_iAlpha;
+	//int m_iAddX;
+	//int m_iAddY;
 
 	// 説明のプレート
 	InformationPlate* m_pInfoPlate;

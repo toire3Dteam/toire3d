@@ -296,6 +296,37 @@ namespace SceneMainState
 	};
 
 
+	//--------------------トレーニング　ステート
+	class Training : public State<sceneMain>
+	{
+	public:
+		// this is a シングルトン
+		static Training* GetInstance() { static Training state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMain* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMain* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMain* pMain);
+
+		// 描画
+		virtual void Render(sceneMain* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMain* pMain, const Message& msg);
+
+
+	private:
+		Training() {};
+		~Training() {};
+
+		Training(const Training&) {}
+		Training& operator=(const Training&) {}
+	};
+
 
 	//--------------------ポーズメニューステート
 	class PauseMenu : public State<sceneMain>
@@ -359,6 +390,36 @@ namespace SceneMainState
 		TutorialPauseMenu& operator=(const TutorialPauseMenu&) {}
 	};
 
+	//--------------------トレーニングポーズ　ステート
+	class TrainingPause : public State<sceneMain>
+	{
+	public:
+		// this is a シングルトン
+		static TrainingPause* GetInstance() { static TrainingPause state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMain* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMain* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMain* pMain);
+
+		// 描画
+		virtual void Render(sceneMain* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMain* pMain, const Message& msg);
+
+
+	private:
+		TrainingPause() {};
+		~TrainingPause() {};
+
+		TrainingPause(const TrainingPause&) {}
+		TrainingPause& operator=(const TrainingPause&) {}
+	};
 
 	//--------------------サウンドメニューステート
 	class SoundMenu : public State<sceneMain>

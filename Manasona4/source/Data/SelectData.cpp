@@ -9,8 +9,8 @@ iDeviceID(0),					// 操作するデバイスID
 bAI(false)						// AI
 {}
 
-SelectData::SelectData():stage(STAGE::SEA),
-bTutorial(false),
+SelectData::SelectData():stage(STAGE::NANASATO_SITY),
+bTutorial(false), bTraining(false),
 iWinRound(2),	// ラウンド数
 iBattleMusicID(BattleMusicManager::RANDOM),
 iRoundTime(99)	// 一試合の初期時間

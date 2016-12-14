@@ -22,7 +22,7 @@ OptionWindow::OptionWindow(Vector2 vPos) :BaseWindow(vPos)
 	AddIconData("戻る", "このウィンドウを閉じます。");
 
 	// 演出
-	m_iAlpha = 0;
+	//m_iAlpha = 0;
 
 }
 
@@ -154,11 +154,11 @@ void OptionWindow::Redner()
 		y += 40;
 	}
 
-	// 文字
-	DWORD fontCol = 0xffffffff;
-	//if (m_iSelectNo == i)fontCol = 0xff030a58;
-	tdnFont::RenderStringCentering(m_aIconData[m_iSelectNo].pInfoString, "HGS創英角ｺﾞｼｯｸUB",// HGP創英ﾌﾟﾚｾﾞﾝｽEB
-		24, 1280 / 2 + (255 - m_iAlpha), 652, ARGB(m_iAlpha, 255, 255, 255), RS::COPY);
+	//// 文字
+	//DWORD fontCol = 0xffffffff;
+	////if (m_iSelectNo == i)fontCol = 0xff030a58;
+	//tdnFont::RenderStringCentering(m_aIconData[m_iSelectNo].pInfoString, "HGS創英角ｺﾞｼｯｸUB",// HGP創英ﾌﾟﾚｾﾞﾝｽEB
+	//	24, 1280 / 2 + (255 - m_iAlpha), 652, ARGB(m_iAlpha, 255, 255, 255), RS::COPY);
 }
 
 // 操作
@@ -166,6 +166,8 @@ bool  OptionWindow::Ctrl(int DeviceID)
 {
 	// 起動していなかったらハジく
 	if (m_bActive == false)return false;
+
+	CtrlSE(DeviceID);// 操作音
 
 	// 選択切り替え
 	if (tdnInput::KeyGet(KEYCODE::KEY_UP, DeviceID) == 3)

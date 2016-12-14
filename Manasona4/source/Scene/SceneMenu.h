@@ -74,12 +74,17 @@ public:
 	TipsCard* GetTips(TIPS_TYPE type) { return m_pTips[(int)type]; }
 	BaseWindow* GetWindow(WINDOW_TYPE type) { return m_pWindow[(int)type]; }
 
+	int GetTrainingCtrlDevice() { return m_iTrainingCtrlDevice; };
+	void SetTrainingCtrlDevice(int DeviceID) { m_iTrainingCtrlDevice= DeviceID; };
+
 private:
 
 	// メニューUI
 	MenuUIManager*	m_pMenuUIMgr;
 	static int m_iSelectNo;
 	static int m_iCtrlDevice;
+	
+	int m_iTrainingCtrlDevice;
 
 	// コントローラーセレクト用
 	ControllerSelectUI* m_pCtrlSelectUI;

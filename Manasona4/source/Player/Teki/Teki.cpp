@@ -410,7 +410,7 @@ void Teki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].InstanceAttackData();	// アタックデータ作成
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->damage = 400;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->pierceLV = 0;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->HitSE = "ヒット5";
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->HitSE = "フィニッシュ小";
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->WhiffSE = "空振り5";
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->HitEffectType = EFFECT_TYPE::DAMAGE;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->WhiffEffectType = EFFECT_TYPE::WHIFF;

@@ -148,7 +148,11 @@ bool SceneMenuState::FirstStep::PadUpdate(sceneMenu *pMain, int DeviceID)
 			bChangedState = true;	// ★関数分けしたので、これをtrueにしたらreturnするようにした
 			break;
 		case MENU_ICON_TYPE::TRAINING:
-			M_UIMgr->ActionUp();
+			//M_UIMgr->ActionUp();
+			pMain->GetFSM()->ChangeState(TrainingControllerSelectStep::GetInstance());
+			// ★ここで決定したデバイスを保存
+			pMain->SetTrainingCtrlDevice(DeviceID);
+			bChangedState = true;	// ★関数分けしたので、これをtrueにしたらreturnするようにした
 			break;
 		case MENU_ICON_TYPE::COLLECT:
 			M_UIMgr->Action();
@@ -311,7 +315,10 @@ bool SceneMenuState::BattleControllerSelectStep::PadUpdate(sceneMenu *pMain, int
 		
 			// チュートリアルではない
 			SelectDataMgr->Get()->bTutorial = false;
-			
+
+			// トレーニングでもない
+			SelectDataMgr->Get()->bTraining = false;
+
 			// (TODO) ラウンド数設定 [12/1] ここでラウンドの設定はしない
 			//SelectDataMgr->Get()->iWinRound = 2;
 
@@ -354,6 +361,195 @@ bool SceneMenuState::BattleControllerSelectStep::OnMessage(sceneMenu *pMain, con
 	return false;
 }
 
+/*******************************************************/
+//				トレーニングのコントローラー選択
+/*******************************************************/
+
+void SceneMenuState::TrainingControllerSelectStep::Enter(sceneMenu *pMain)
+{
+	
+	C_UIMgr->Action();
+}
+
+void SceneMenuState::TrainingControllerSelectStep::Execute(sceneMenu *pMain)
+{
+
+	// パッド分更新
+	const int NumDevice(tdnInputManager::GetNumDevice());
+
+	// パッド何もささってないとき用
+	if (NumDevice == 0)
+	{
+		if (PadUpdate(pMain, 0)) return;
+	}
+	else
+	{
+		for (int i = 0; i < NumDevice; i++)
+		{
+			if (PadUpdate(pMain, i)) return;
+		}
+	}
+
+	// UI
+	M_UIMgr->Update();
+
+	// コントローラーセレクト
+	C_UIMgr->Update();
+
+}
+
+bool SceneMenuState::TrainingControllerSelectStep::PadUpdate(sceneMenu *pMain, int DeviceID)
+{
+	bool bChangedState(false);
+
+	// アイコン切り替え
+	if (tdnInput::KeyGet(KEYCODE::KEY_LEFT, DeviceID) == 3)
+	{
+		C_UIMgr->PadMoveLeftSide(DeviceID);
+	}
+
+	else if (tdnInput::KeyGet(KEYCODE::KEY_RIGHT, DeviceID) == 3)
+	{
+		C_UIMgr->PadMoveRightSide(DeviceID);
+	}
+
+	// もどる
+	else if (tdnInput::KeyGet(KEYCODE::KEY_A, DeviceID) == 3)
+	{
+		pMain->GetFSM()->ChangeState(FirstStep::GetInstance());
+		bChangedState = true;
+	}
+
+	// 仮決定
+	else if (tdnInput::KeyGet(KEYCODE::KEY_B, DeviceID) == 3)
+	{
+		// 誰も何も選択していなかったら←サイドに移動させるやさしさ
+		if (C_UIMgr->IsLeftPlayer() == false && C_UIMgr->IsRightPlayer() == false)
+		{
+			C_UIMgr->PadMoveLeftSide(DeviceID);
+			return bChangedState;
+		}
+
+		// SEの再生
+		se->Play("決定1");
+
+		// トレーニングをしようとしていた人が入るまで先へは進ませない
+		// どっちもトレーニングしたいコントローラーが入っていない、やり直し
+		if (C_UIMgr->GetLeftPlayer().iPlayerDeviceID != pMain->GetTrainingCtrlDevice() &&
+			C_UIMgr->GetRightPlayer().iPlayerDeviceID != pMain->GetTrainingCtrlDevice())
+		{
+			return bChangedState;
+		}
+
+		// ★ここまで通ったらどちらかにデバイスが入ったということ
+		
+		// もし左に練習する人が入ってたら
+		if (C_UIMgr->GetLeftPlayer().iPlayerDeviceID == pMain->GetTrainingCtrlDevice())
+		{
+			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = false;
+			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = C_UIMgr->GetLeftPlayer().iPlayerDeviceID;
+
+			// 右をAIに
+			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = true;
+			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = C_UIMgr->GetLeftPlayer().iPlayerDeviceID;
+		}
+		// もし右に練習する人が入ってたら
+		else if (C_UIMgr->GetRightPlayer().iPlayerDeviceID == pMain->GetTrainingCtrlDevice())
+		{
+			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = false;
+			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = C_UIMgr->GetRightPlayer().iPlayerDeviceID;
+	
+			// 左をAIに
+			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = true;
+			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = C_UIMgr->GetRightPlayer().iPlayerDeviceID;
+
+		}
+
+
+		//else
+		{
+
+			//[10/30] ここで↑の情報をもとに誰がどっちサイドなのかを次のシーンに渡す
+
+			// 自分がサイドを選択していて、かつもう片方が空いている状態なら
+			// 空いてるAI側に自分のデバイスを入れる
+			//if (C_UIMgr->IsLeftPlayer() == false)
+			//{
+			//	// (★)誰も選んでないのでAIフラグをONにする操作デバイスを同じに
+			//	SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = true;
+			//	SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = false;
+			//	SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = C_UIMgr->GetRightPlayer().iPlayerDeviceID;
+			//	SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = C_UIMgr->GetRightPlayer().iPlayerDeviceID;
+
+			//}
+			//else if (C_UIMgr->IsRightPlayer() == false)
+			//{
+
+			//	// (★)誰も選んでないのでAIフラグをONにするの操作デバイスを同じに
+			//	SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = false;
+			//	SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = true;
+			//	SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = C_UIMgr->GetLeftPlayer().iPlayerDeviceID;//
+			//	SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = C_UIMgr->GetLeftPlayer().iPlayerDeviceID;// 
+
+			//}
+			//else
+			//{
+			//	// 全員入ったら
+			//	SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = false;
+			//	SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = false;
+			//	SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = C_UIMgr->GetLeftPlayer().iPlayerDeviceID;
+			//	SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = C_UIMgr->GetRightPlayer().iPlayerDeviceID;
+
+			//}
+
+
+			// チュートリアルではない
+			SelectDataMgr->Get()->bTutorial = false;
+
+			// トレーニングです
+			SelectDataMgr->Get()->bTraining = true;
+
+			// (TODO) ラウンド数設定 [12/1] ここでラウンドの設定はしない
+			//SelectDataMgr->Get()->iWinRound = 2;
+
+			MainFrameEx->ChangeScene(new sceneSelect, true);
+			bChangedState = true;
+		}
+
+	}
+
+	return bChangedState;
+}
+
+void SceneMenuState::TrainingControllerSelectStep::Exit(sceneMenu *pMain)
+{
+	C_UIMgr->Stop();
+}
+
+void SceneMenuState::TrainingControllerSelectStep::Render(sceneMenu *pMain)
+{
+	// アイコンUI
+	M_UIMgr->Render();
+
+	// コントローラーセレクト
+	C_UIMgr->Render();
+
+	tdnText::Draw(0, 0, 0xffffffff, "TrainingControllerSelectStep");
+}
+
+bool SceneMenuState::TrainingControllerSelectStep::OnMessage(sceneMenu *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+
+	//default:
+	//	break;
+	//}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
 
 
 /*******************************************************/
@@ -397,6 +593,10 @@ void SceneMenuState::TutorialSelectStep::Execute(sceneMenu *pMain)
 		// ★(TODO)ここでチュートリアルに移動します
 		// その前に自分・相手・ステージ・チュートリアルフラグをここで変えてやりましょう
 		SelectDataMgr->Get()->bTutorial = true;
+		
+		// トレーニングではない
+		SelectDataMgr->Get()->bTraining = false;
+
 		//SelectDataMgr->Get()->iWinRound = 0;
 		// 
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = false;
@@ -543,6 +743,9 @@ void SceneMenuState::OptionStep::Render(sceneMenu *pMain)
 	// 黒い板
 	//tdnPolygon::Rect(0, 0, 1280, 720, RS::COPY, 0xaa000000);
 
+	// 選択ウィンドウの説明
+	pMain->GetWindow(WINDOW_TYPE::OPTION)->RednerInfo();
+
 
 	tdnText::Draw(0, 0, 0xffffffff, "OptionStep");
 }
@@ -613,7 +816,7 @@ bool SceneMenuState::SoundWindowStep::PadUpdate(sceneMenu *pMain, int DeviceID)
 {
 	bool bChangedState(false);
 
-	// オプションウィンドウの操作
+	// 選択ウィンドウの操作
 	pMain->GetWindow(WINDOW_TYPE::SOUND)->Ctrl(DeviceID);
 
 	return bChangedState;
@@ -628,6 +831,9 @@ void SceneMenuState::SoundWindowStep::Render(sceneMenu *pMain)
 {
 	// アイコンUI
 	M_UIMgr->Render();
+
+	// 選択ウィンドウの説明
+	pMain->GetWindow(WINDOW_TYPE::SOUND)->RednerInfo();
 
 	tdnText::Draw(0, 0, 0xffffffff, "SoundWindowStep");
 }

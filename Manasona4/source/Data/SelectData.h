@@ -16,7 +16,7 @@ enum class CHARACTER { AIROU, TEKI, NAZENARA, END };
 enum class PARTNER { MOKOI, MAYA, END };
 
 // ステージのタイプ
-enum class STAGE { SAND, SEA, GARDEN, SYUTEN, A, HEAVE_HO, MAX };
+enum class STAGE { SAND, SEA, GARDEN, SYUTEN, A, NANASATO_SITY, HEAVE_HO, MAX };
 
 struct SideData
 {
@@ -33,6 +33,7 @@ struct SelectData
 	SideData tagSideDatas[(int)SIDE::ARRAY_MAX];	// 左右の情報
 	STAGE stage;			// 選んでるステージ
 	bool bTutorial;			// チュートリアルフラグ
+	bool bTraining;			// トレーニングフラグ
 	int iWinRound;			// 勝利ラウンド数
 	int iRoundTime;			// 一試合時間
 	int iBattleMusicID;		// 戦闘曲の番号

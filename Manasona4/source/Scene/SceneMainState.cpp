@@ -924,6 +924,127 @@ bool SceneMainState::TutorialClear::OnMessage(sceneMain *pMain, const Message & 
 
 
 /*******************************************************/
+//			トレーニングステート
+/*******************************************************/
+
+void SceneMainState::Training::Enter(sceneMain *pMain)
+{
+	// フェード初期化
+	Fade::Set(Fade::FLAG::FADE_IN, 12, 0x00000000);
+
+	// 情報初期化
+	pMain->Reset();
+
+}
+
+// 更新
+void SceneMainState::Training::Execute(sceneMain *pMain)
+{
+	//#ifdef ROUND_SKIP
+	//	pMain->GetFSM()->ChangeState(Main::GetInstance());
+	//#endif
+
+	// チュートリアル更新
+	TutorialMgr->Update();
+
+	// プレイヤー更新
+	PlayerMgr->Update(PLAYER_UPDATE::CONTROL_OK);
+	PlayerMgr->UpdatePos();
+
+	// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
+	Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager());
+
+	// カメラ更新
+	CameraMgr->Update();
+
+	/********************************************/
+	// 自分リスタート
+	if (Fade::GetMode() != Fade::FLAG::FADE_OUT)
+	{
+		// ★ポーズでトレーニング専用のポーズメニューへ
+		if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID) == 3)
+		{
+			pMain->GetFSM()->ChangeState(TrainingPause::GetInstance());
+			return;
+		}
+
+		// セレクトでもう一度イントロへ戻る
+		if (tdnInput::KeyGet(KEYCODE::KEY_SELECT, SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID) == 3)
+		{
+			// フェードアウト
+			Fade::Set(Fade::FLAG::FADE_OUT, 14, 0x00000000);
+			return;
+		}
+
+	}
+
+	// フェードアウト完了後
+	if (Fade::isFadeOutCompletion())
+	{
+		// チュートリアルのイントロへ
+		pMain->GetFSM()->ChangeState(Training::GetInstance());
+		return;
+	}
+
+}
+
+void SceneMainState::Training::Exit(sceneMain *pMain)
+{
+	// イントロのTipsを閉じる
+	TutorialMgr->GetTutorial()->StopIntroTips();
+
+}
+
+void SceneMainState::Training::Render(sceneMain *pMain)
+{
+	TutorialMgr->Render();
+}
+
+bool SceneMainState::Training::OnMessage(sceneMain *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	switch (msg.Msg)
+	{
+	case MESSAGE_TYPE::OVER_DRIVE_STAGE:
+	{
+		bool *bAction = (bool*)msg.ExtraInfo;
+		if (*bAction)
+			pMain->OverDriveAction();
+		else
+			pMain->OverDriveEnd();
+		return true;
+	}
+	break;
+	// カットイン発動する瞬間
+	case MESSAGE_TYPE::HEAVE_HO_OVERFLOW_START:
+		// BGMのクロスフェード(超必殺BGMを流す)
+		//pMain->GetMyMusicManager()->PlayHeaveHo();
+		bgm->StopStreamIn();
+		bgm->PlayStreamIn("DATA/Sound/BGM/HeaveHo/HeaveHo.ogg");
+		break;
+		// カットイン終わったらって感じ
+	case MESSAGE_TYPE::HEAVE_HO_OVER_DRIVE_HIT:
+		pMain->GetFSM()->ChangeState(HeaveHoDriveOverFlowSuccess::GetInstance());
+		return true;
+		break;
+	case MESSAGE_TYPE::KO:	// 誰かのHPが0になったら切り替え
+	{
+		FINISH_TYPE *type = (FINISH_TYPE*)msg.ExtraInfo;
+		pMain->GetFSM()->ChangeState(Finish::GetInstance());
+		if (*type == FINISH_TYPE::NORMAL)pMain->GetRoundCall()->CallFinish(msg.Sender);
+		else if (*type == FINISH_TYPE::OVER_DRIVE) pMain->GetRoundCall()->CallOverDriveFinish(msg.Sender);
+
+		return true;
+	}
+	break;
+	}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
+
+
+/*******************************************************/
 //			ポーズメニューステート
 /*******************************************************/
 
@@ -1126,6 +1247,99 @@ void SceneMainState::TutorialPauseMenu::Render(sceneMain *pMain)
 }
 
 bool SceneMainState::TutorialPauseMenu::OnMessage(sceneMain *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+	//case MESSAGE_TYPE::END_ROUNDCALL:	// ラウンドコールが終わったというメッセージが届いたら
+	//	pMain->GetFSM()->ChangeState(Main::GetInstance());
+	//	break;
+	//}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
+
+
+
+/*******************************************************/
+//			トレーニングポーズメニューステート
+/*******************************************************/
+
+void SceneMainState::TrainingPause::Enter(sceneMain *pMain)
+{
+	// トレーニングポーズウィンドウ起動 
+	pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Action();
+	pMain->SetPause(true);
+
+}
+
+// 更新
+void SceneMainState::TrainingPause::Execute(sceneMain *pMain)
+{
+
+	//+--------------------------------------------
+	//	トレーニングポーズメニューの操作
+	//+--------------------------------------------
+	// パッド分更新
+	const int NumDevice(tdnInputManager::GetNumDevice());
+	// パッド何もささってないとき用
+	if (NumDevice == 0)
+	{
+		// ポーズウィンドウの操作
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Ctrl(0);
+	}
+	else
+	{
+		for (int i = 0; i < NumDevice; i++)
+		{
+			// ポーズウィンドウの操作
+			pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Ctrl(i);
+		}
+	}
+
+
+	// 戻るボタンを押したら
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->GetChoiceState() == TrainingPauseWindow::TRAINING_PAUSE_STATE::BACK)
+	{
+		// ポーズウィンドウ止める
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Stop();
+
+		pMain->GetFSM()->ChangeState(Training::GetInstance());	// トレーニングへ戻る
+
+	}
+
+	// キャラクターセレクトへ
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->GetChoiceState() == TrainingPauseWindow::TRAINING_PAUSE_STATE::BACK_CHARA_SELECT)
+	{
+		// ポーズウィンドウ止める
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Stop();
+		MainFrameEx->ChangeScene(new sceneSelect());
+		return;
+	}
+
+	// メニューへ
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->GetChoiceState() == TrainingPauseWindow::TRAINING_PAUSE_STATE::BACK_MENU_SELECT)
+	{
+		// ポーズウィンドウ止める
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Stop();
+		MainFrameEx->ChangeScene(new sceneMenu());
+		return;
+	}
+
+}
+
+void SceneMainState::TrainingPause::Exit(sceneMain *pMain)
+{
+	pMain->SetPause(false);
+}
+
+void SceneMainState::TrainingPause::Render(sceneMain *pMain)
+{
+	// ★★★Exitではウィンドウは止めない
+}
+
+bool SceneMainState::TrainingPause::OnMessage(sceneMain *pMain, const Message & msg)
 {
 	// メッセージタイプ
 	//switch (msg.Msg)

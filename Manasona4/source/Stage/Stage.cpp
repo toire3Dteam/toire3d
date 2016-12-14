@@ -178,9 +178,10 @@ void Stage::Garden::Initialize(Camera *pCamera)
 void Stage::NanasatoSity::Initialize(Camera *pCamera)
 {
 	m_pObj = new iexMesh("DATA/Stage/nanasato/NanasatoSity.IMO");// nanasato/stage
-	m_pObj->SetAngle(3.14f);
-	m_pObj->Update();
+	//m_pObj->SetAngle(3.14f);
+	//m_pObj->Update();
 
+	//m_pBack = new iexMesh("DATA/Stage/Nanasato/skydome_night.IMO");
 	m_pBack = new iexMesh("DATA/Stage/Senjo/Skydome.IMO");
 	m_pBack->SetPos(Vector3(0, 0, 300));
 	m_pBack->SetScale(3.5f);

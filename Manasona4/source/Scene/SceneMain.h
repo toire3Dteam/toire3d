@@ -12,6 +12,7 @@
 // ポーズウィンドウ
 #include "Window\PauseWindow.h"
 #include "Window\TutorialPauseWindow.h"
+#include "Window\TrainingPauseWindow.h"
 #include "Window\SoundWindow.h"
 
 // リザルトデータ
@@ -34,6 +35,7 @@ enum class BATTLE_WINDOW_TYPE
 {
 	PAUSE, // ポーズ
 	TUTORIAL_PAUSE, // チュートリアルポーズ
+	TRAINING_PAUSE, // トレーニングポーズ
 	SOUND,			// サウンド
 	ARRAY_END	// 配列終了
 
@@ -119,6 +121,9 @@ private:
 	// チュートリアルかどうか
 	bool m_bTutorialFlag;
 	TUTORIAL_TYPE m_eSelectTutorial;		// 選択してるチュートリアル
+
+	// トレーニングかどうか
+	bool m_bTrainingFlag;
 
 	// Window類
 	BaseWindow* m_pWindow[(int)BATTLE_WINDOW_TYPE::ARRAY_END];

@@ -20,9 +20,9 @@ BattleWindow::BattleWindow(Vector2 vPos) :BaseWindow(vPos)
 	AddIconData("ñﬂÇÈ", "Ç±ÇÃÉEÉBÉìÉhÉEÇï¬Ç∂Ç‹Ç∑ÅB");
 
 	// ââèo
-	m_iAlpha = 0;
-	m_iAddX = 0;
-	m_iAddY = 0;
+	//m_iAlpha = 0;
+	//m_iAddX = 0;
+	//m_iAddY = 0;
 }
 
 BattleWindow::~BattleWindow()
@@ -127,11 +127,11 @@ void BattleWindow::Redner()
 		y += 40;
 	}
 
-	// ï∂éö
-	DWORD fontCol = 0xffffffff;
-	//if (m_iSelectNo == i)fontCol = 0xff030a58;
-	tdnFont::RenderStringCentering(m_aIconData[m_iSelectNo].pInfoString, "HGSënâpäp∫ﬁºØ∏UB",// HGPënâpÃﬂ⁄æﬁ›ΩEB
-		24, 1280 / 2 + (255 - m_iAlpha), 652, ARGB(m_iAlpha, 255, 255, 255), RS::COPY);
+	//// ï∂éö
+	//DWORD fontCol = 0xffffffff;
+	////if (m_iSelectNo == i)fontCol = 0xff030a58;
+	//tdnFont::RenderStringCentering(m_aIconData[m_iSelectNo].pInfoString, "HGSënâpäp∫ﬁºØ∏UB",// HGPënâpÃﬂ⁄æﬁ›ΩEB
+	//	24, 1280 / 2 + (255 - m_iAlpha), 652, ARGB(m_iAlpha, 255, 255, 255), RS::COPY);
 }
 
 // ëÄçÏ

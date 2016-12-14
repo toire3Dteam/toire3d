@@ -21,9 +21,9 @@ PauseWindow::PauseWindow(Vector2 vPos) :BaseWindow(vPos)
 	AddIconData("–ß‚é", "‚±‚ÌƒEƒBƒ“ƒhƒE‚ğ•Â‚¶‚Ü‚·B");
 
 	// ‰‰o
-	m_iAlpha = 0;
-	m_iAddX = 0;
-	m_iAddY = 0;
+	//m_iAlpha = 0;
+	//m_iAddX = 0;
+	//m_iAddY = 0;
 }
 
 PauseWindow::~PauseWindow()
@@ -126,11 +126,11 @@ void PauseWindow::Redner()
 		y += 40;
 	}
 
-	// •¶š
-	DWORD fontCol = 0xffffffff;
-	//if (m_iSelectNo == i)fontCol = 0xff030a58;
-	tdnFont::RenderStringCentering(m_aIconData[m_iSelectNo].pInfoString, "HGS‘n‰pŠpºŞ¼¯¸UB",// HGP‘n‰pÌßÚ¾Şİ½EB
-		24, 1280 / 2 + (255 - m_iAlpha), 652, ARGB(m_iAlpha, 255, 255, 255), RS::COPY);
+	//// •¶š
+	//DWORD fontCol = 0xffffffff;
+	////if (m_iSelectNo == i)fontCol = 0xff030a58;
+	//tdnFont::RenderStringCentering(m_aIconData[m_iSelectNo].pInfoString, "HGS‘n‰pŠpºŞ¼¯¸UB",// HGP‘n‰pÌßÚ¾Şİ½EB
+	//	24, 1280 / 2 + (255 - m_iAlpha), 652, ARGB(m_iAlpha, 255, 255, 255), RS::COPY);
 }
 
 // ‘€ì
@@ -138,7 +138,9 @@ bool  PauseWindow::Ctrl(int DeviceID)
 {
 	// ‹N“®‚µ‚Ä‚¢‚È‚©‚Á‚½‚çƒnƒW‚­
 	if (m_bActive == false)return false;
-
+	
+	// ‘€ì‰¹
+	CtrlSE(DeviceID);
 
 	// Œˆ’è
 	if ((BATTLE_STATE)m_iSelectNo== BATTLE_STATE::BACK)

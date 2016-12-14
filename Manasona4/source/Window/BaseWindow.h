@@ -13,8 +13,10 @@ public:
 
 	virtual bool Update() = 0;	// 戻り値で起動しているか確認　他の制御を止める為に使います
 	virtual void Redner() = 0;	// 描画
+	virtual void RednerInfo();	// 下に表記する文字描画
 
 	virtual bool Ctrl(int DeviceID) = 0; // コントロール
+	virtual void CtrlSE(int DeviceID);	 // 操作音
 
 	virtual void Action();	// Windowを出す
 	virtual void Stop();	// 止める
@@ -58,6 +60,12 @@ protected:
 	};
 
 	int m_iChoiceState;
+
+	// 共通する演出用のパラメータ
+	// 他のWindowと違うことやりたかったら子の方で作ってください
+	int m_iAlpha;
+	int m_iAddX;
+	int m_iAddY;
 
 protected:
 	void AddIconData(LPSTR string, LPSTR infoString);

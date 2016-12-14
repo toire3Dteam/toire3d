@@ -25,6 +25,7 @@ bool sceneMenu::Initialize()
 {	
 	// セレクトナンバー
 	//m_iSelectNo = 0;
+	m_iTrainingCtrlDevice = 0;
 
 	// UIマネージャー
 	m_pMenuUIMgr = new MenuUIManager(m_iSelectNo);
@@ -54,10 +55,10 @@ bool sceneMenu::Initialize()
 		switch ((WINDOW_TYPE)i)
 		{
 		case WINDOW_TYPE::OPTION:
-			m_pWindow[i] = new OptionWindow(Vector2(500, 250));
+			m_pWindow[i] = new OptionWindow(Vector2(500, 50));
 			break;
 		case WINDOW_TYPE::SOUND:
-			m_pWindow[i] = new SoundWindow(Vector2(800, 250));
+			m_pWindow[i] = new SoundWindow(Vector2(200, 250));
 			break;
 		default:
 			MyAssert(0, "そんなウィンドウはない");
