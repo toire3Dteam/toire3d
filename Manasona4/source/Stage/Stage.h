@@ -113,6 +113,9 @@ namespace Stage
 	public:
 		NanasatoSity() :Base() {}
 		void Initialize(Camera *pCamera);
+		void Update();
+		void Render(tdnShader* shader, char* name);
+
 		EFFECT_CAMERA_ID GetIntroCameraScriptID() { return EFFECT_CAMERA_ID::SEA_STAGE_INTRO; }
 	};
 

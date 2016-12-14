@@ -193,10 +193,11 @@ bool  TrainingPauseWindow::Ctrl(int DeviceID)
 	//	m_iChoiceState = (TRAINING_PAUSE_STATE::BACK);
 	//	return true;
 	//}
-	Bでもどったらりせっとになる
-		とりま完成
-		あしたはWindowの設定とか
-		セーブデータにトレーニングようのでーたつくってもらう
+
+	// Bでもどったらりせっとになる
+	//	とりま完成
+	//	あしたはWindowの設定とか
+	//	セーブデータにトレーニングようのでーたつくってもらう
 
 	// 決定を押してない時
 	if (tdnInput::KeyGet(KEYCODE::KEY_B, DeviceID) == 0)

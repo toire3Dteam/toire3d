@@ -36,7 +36,11 @@ iexMesh* g_pStage;
 iexMesh* g_pSky;
 
 iexMesh* g_pPlayer;
-Vector3 g_vPlayerPos;
+Vector3	g_vPlayerPos;
+
+iexMesh* g_pTarget;
+
+float g_fY = 0;;
 
 //+-------------
 //	水
@@ -66,17 +70,20 @@ bool sceneRenderingTest2::Initialize()
 
 	// 必要な奴
 	g_pStage = new iexMesh("Data/Stage/Sister/stage.imo");
-	g_pSky =new iexMesh("Data/Stage/Sister/skydome.imo");
-	g_pSky->SetScale(3.0f);
+	g_pSky =new iexMesh("Data/Stage/nanasato/skydome_night.imo");//Sister
+	//g_pSky->SetScale(3.0f);
 	g_pSky->Update();
-	g_pPlayer= new iexMesh("Data/Stage/nanasato/stage.imo");//Data/CHR/aramitama/aramitama_toire.IEM
-	g_vPlayerPos = VECTOR_ZERO;
-	g_vPlayerPos.y = 5;
+	g_pPlayer= new iexMesh("Data/Stage/Nanasato/NanasatoSity.imo");//Data/CHR/aramitama/aramitama_toire.IEM
+	g_vPlayerPos = VECTOR_ZERO;//anasato/NanasatoSity.imo
+	g_vPlayerPos.y = 0;
+
+	g_pTarget = new iexMesh("Data/CHR/teki/teki.imo");
+
 
 	// 水
-	g_tagWater.pObj = new iexMesh("Data/Water/water.imo");
+	g_tagWater.pObj = new iexMesh("Data/Water/water2.imo");
 	g_tagWater.vPos = VECTOR_ZERO;
-	g_tagWater.vPos.y = 10;
+	g_tagWater.vPos.y = -28;
 
 	g_pSoundWindow = new SoundWindow(Vector2(500, 100));
 
@@ -88,6 +95,10 @@ bool sceneRenderingTest2::Initialize()
 	}
 	m_pWaterEnvScreen = new tdn2DObj(1280, 720, TDN2D::USEALPHA);
 
+
+	// PLの場所
+	m_aPos.clear();
+	m_aPos.reserve(32);
 
 	return true;
 }
@@ -105,6 +116,7 @@ sceneRenderingTest2::~sceneRenderingTest2()
 	SAFE_RELEASE(m_pStencilSurface);
 	SAFE_DELETE(m_pWaterEnvScreen);
 	SAFE_DELETE(g_pPlayer);
+	SAFE_DELETE(g_pTarget);
 
 	// ウィンドウ
 	SAFE_DELETE(g_pSoundWindow);
@@ -125,16 +137,32 @@ void sceneRenderingTest2::Update()
 	if (KeyBoard(KB_A)) { cameraAngle -= 0.05f; }
 	if (KeyBoard(KB_D)) { cameraAngle += 0.05f; }
 
-	if (KeyBoard(KB_W)) { cameraRange -= 1; }
-	if (KeyBoard(KB_S)) { cameraRange += 1; }
+	if (KeyBoard(KB_W)) 
+	{
+		m_camera.target.x -= sinf(cameraAngle) * 1;
+		m_camera.target.z -= cosf(cameraAngle) * 1;
+	}
+	if (KeyBoard(KB_S)) 
+	{
+		m_camera.target.x += sinf(cameraAngle) * 1;
+		m_camera.target.z += cosf(cameraAngle) * 1;
+	}
 
-	if (KeyBoard(KB_Q)) { m_camera.pos.y -= 0.5f; }
-	if (KeyBoard(KB_E)) { m_camera.pos.y += 0.5f; }
+	if (KeyBoard(KB_Q)) { m_camera.pos.y = m_camera.target.y -= 0.5f; }
+	if (KeyBoard(KB_E)) { m_camera.pos.y = m_camera.target.y += 0.5f; }
 
-	m_camera.pos.x = sinf(cameraAngle) * cameraRange;
-	m_camera.pos.z = cosf(cameraAngle) * cameraRange;
+	if (KeyBoard(KB_R)) { g_fY -= 1.5f; }
+	if (KeyBoard(KB_T)) { g_fY += 1.5f; }
 
-	tdnView::Set(m_camera.pos, m_camera.target);
+
+	m_camera.pos.x =m_camera.target.x + sinf(cameraAngle) * cameraRange;
+	m_camera.pos.z =m_camera.target.z + cosf(cameraAngle) * cameraRange;
+	m_camera.pos.y = m_camera.target.y + g_fY;// Y軸補正
+
+	g_pTarget->SetPos(m_camera.target);
+	g_pTarget->Update();
+
+
 
 	// パーティクル更新
 	ParticleManager::Update();
@@ -175,8 +203,8 @@ void sceneRenderingTest2::Update()
 	g_pStage->Update();
 	
 	// プレイヤーの高さを変える
-	if (KeyBoard(KB_U)) { g_vPlayerPos.y += 1.0f; }
-	if (KeyBoard(KB_J)) { g_vPlayerPos.y -= 1.0f; }
+	//if (KeyBoard(KB_U)) { g_vPlayerPos.y += 1.0f; }
+	//if (KeyBoard(KB_J)) { g_vPlayerPos.y -= 1.0f; }
 	
 	g_pPlayer->SetPos(g_vPlayerPos);
 	//g_pPlayer->Animation();
@@ -184,8 +212,12 @@ void sceneRenderingTest2::Update()
 
 
 	// 水の高さを変える
-	if (KeyBoard(KB_I)) { g_tagWater.vPos.y += 1.0f; }
-	if (KeyBoard(KB_K)) { g_tagWater.vPos.y -= 1.0f; }
+	if (KeyBoard(KB_Y)) { g_tagWater.vPos.y += 1.0f; }
+	if (KeyBoard(KB_I)) { g_tagWater.vPos.y -= 1.0f; }
+	if (KeyBoard(KB_U)) { g_tagWater.vPos.z += 1.0f; }
+	if (KeyBoard(KB_J)) { g_tagWater.vPos.z -= 1.0f; }
+	if (KeyBoard(KB_H)) { g_tagWater.vPos.x += 1.0f; }
+	if (KeyBoard(KB_K)) { g_tagWater.vPos.x -= 1.0f; }
 
 	g_tagWater.pObj->SetPos(g_tagWater.vPos);
 	g_tagWater.pObj->Update();
@@ -204,6 +236,32 @@ void sceneRenderingTest2::Update()
 
 	g_pSoundWindow->Ctrl(0);
 
+
+
+	// ポイントライトフェス
+	Vector3 LightCol = Vector3(1.5f, 0.75f, 0.4f);
+
+	 //PointLightMgr->AddPointLight(Vector3(0,20,0), LightCol, 90, 4, 1, 1, 1);
+	 //PointLightMgr->AddPointLight(Vector3(-60, 20, 0), LightCol, 90, 4, 1, 1, 1);
+	 //PointLightMgr->AddPointLight(Vector3(60, 20, 0), LightCol, 90, 4, 1, 1, 1);
+	 //PointLightMgr->AddPointLight(Vector3(120, 20, 0), LightCol, 90, 4, 1, 1, 1);
+
+	// ライトを置く
+	if (KeyBoardTRG(KB_L))
+	{
+		m_aPos.push_back(m_camera.target);
+	}
+	if (KeyBoardTRG(KB_K))
+	{
+		m_aPos.pop_back();
+	}
+
+	// ポイントライト
+	for (int i = 0; i < (int)m_aPos.size(); i++)
+	{
+		PointLightMgr->AddPointLight(m_aPos[i], LightCol, 90*1, 4*1, 1, 1, 1);
+	}
+
 }
 
 //******************************************************************
@@ -212,9 +270,13 @@ void sceneRenderingTest2::Update()
 
 void sceneRenderingTest2::Render()
 {
+	tdnView::Set(m_camera.pos, m_camera.target);
+
 	tdnView::Activate();
 	tdnView::Clear();
-	
+
+	tdnStopWatch::Start();
+
 	// 水用の環境光
 	WaterEnvRender();
 
@@ -239,15 +301,16 @@ void sceneRenderingTest2::Render()
 
 		g_pPlayer->Render(shaderM, "G_Buffer");
 		//g_tagWater.pObj->Render(shaderM, "G_Buffer");
+		g_pTarget->Render(shaderM, "G_Buffer");
 
 		// シェーダ終わり
 		DeferredManagerEx.G_End();
 
 
-		//DeferredManagerEx.DirLight(m_dirLight, Vector3(0.8f, 0.72f, 0.72f));
-		//DeferredManagerEx.HemiLight(Vector3(0.6f, 0.5f, 0.5f), Vector3(0.45f, 0.43f, 0.43f));
-		DeferredManagerEx.AllLight(m_dirLight, Vector3(0.8f, 0.72f, 0.72f)
-			, Vector3(0.6f, 0.5f, 0.5f), Vector3(0.45f, 0.43f, 0.43f));
+		DeferredManagerEx.DirLight(m_dirLight, Vector3(0.4f, 0.32f, 0.72f));
+		DeferredManagerEx.HemiLight(Vector3(0.3f, 0.1f, 0.1f), Vector3(0.35f, 0.23f, 0.23f));
+		//DeferredManagerEx.AllLight(m_dirLight, Vector3(0.8f, 0.72f, 0.72f)
+		//	, Vector3(0.6f, 0.5f, 0.5f), Vector3(0.45f, 0.43f, 0.43f));
 
 		// ポイントライト描画
 		DeferredManagerEx.GpuPointLightRender();
@@ -258,9 +321,11 @@ void sceneRenderingTest2::Render()
 
 			// ステージ描画
 			//g_pStage->Render(shaderM, "Stage");
-			g_pSky->Render(shaderM, "sky");
+			g_pSky->Render(shaderM, "nightsky");
 			// プレイヤー
 			g_pPlayer->Render(shaderM, "DefaultLighting");
+			// ターゲット
+			g_pTarget->Render(shaderM, "DefaultLighting");
 
 			// パーティクル
 			ParticleManager::Render();
@@ -272,12 +337,10 @@ void sceneRenderingTest2::Render()
 		DeferredManagerEx.SendFinalScreenEnv();
 
 		// 水
-		tdnStopWatch::Start();
 		g_fUvWater += 0.001f;
 		shaderM->SetValue("g_fUvWater", g_fUvWater);
 		g_tagWater.pObj->Render(shaderM, "CrystalWater");//CrystalWater
-		tdnStopWatch::End();
-
+	
 		// ブルーム
 		DeferredManagerEx.BloomRender();
 
@@ -303,7 +366,7 @@ void sceneRenderingTest2::Render()
 		m_pWaterEnvScreen->Render(0, 0, 1280, 720, 0, 0, 1280, 720, RS::ADD);
 		m_pWaterEnvScreen->SetAlpha(256);
 
-		m_pWaterEnvScreen->Render(0, 720/4, 1280 / 4, 720 / 4, 0, 0, 1280, 720);
+		//m_pWaterEnvScreen->Render(0, 720/4, 1280 / 4, 720 / 4, 0, 0, 1280, 720);
 		
 
 	}
@@ -314,8 +377,16 @@ void sceneRenderingTest2::Render()
 
 	tdnText::Draw(0, 30, 0xffffffff, "CameraPos    : %.1f %.1f %.1f", m_camera.pos.x, m_camera.pos.y, m_camera.pos.z);
 	tdnText::Draw(0, 60, 0xffffffff, "CameraTarget : %.1f %.1f %.1f", m_camera.target.x, m_camera.target.y, m_camera.target.z);
-	tdnText::Draw(0, 90, 0xff00ffff, "水の高さ	   : %.1f", g_tagWater.vPos.y);
+	tdnText::Draw(0, 90, 0xff00ffff, "水の高さ	   : %.1f %.1f %.1f", g_tagWater.vPos.x, g_tagWater.vPos.y, g_tagWater.vPos.z);
+	tdnText::Draw(0, 120, 0xff00ffff,"プレイヤー　: %.1f %.1f %.1f", g_vPlayerPos.x, g_vPlayerPos.y, g_vPlayerPos.z);
+	tdnText::Draw(0, 150, 0xff00ffff, "目の順応度: %.1f", DeferredManagerEx.GetExposure());
 
+	for (int i = 0; i < (int)m_aPos.size(); i++)
+	{
+		tdnText::Draw(400, 30 + (i * 32) , 0xffffffff, "PlPos  : %.1f %.1f %.1f", m_aPos[i].x, m_aPos[i].y, m_aPos[i].z);
+	}
+
+	tdnStopWatch::End();
 
 }
 
@@ -338,8 +409,9 @@ void sceneRenderingTest2::RenderShadow()
 
 void sceneRenderingTest2::SurfaceRender()
 {
-	enum {
-		X = 320/*/2*/, Y = 180/*/2*/
+	enum 
+	{
+		X = 320/2, Y = 180/2
 	};
 
 	int texX = 0;

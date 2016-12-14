@@ -1032,7 +1032,11 @@ DEF_POINTLIGHT PS_PointLightSphere(VS_POINTLIGHT In)
 	DEF_POINTLIGHT OUT = (DEF_POINTLIGHT)0;
 
 	//スクリーン空間をテクスチャ座標に ○
+	In.wvpPos.x += 0.5f;// ★ずらす
+	In.wvpPos.y -= 0.5f;// ★ずらす
+
 	const float2 ScreenTex = In.wvpPos.xy / In.wvpPos.w * float2(0.5f, -0.5f) + float2(0.5f, 0.5f);
+	//ScreenTex.x += 0.001f;
 	// 必要な情報を取得　○
 	const float4 NormalDepth = tex2D(NormalDepthSamp, ScreenTex);
 	const float3 Normal = CalcNormal(NormalDepth.xy*2.0f - 1.0f);// ○
@@ -2124,6 +2128,51 @@ technique sky
 	}
 }
 
+//------------------------------------------------------
+//		夜空ピクセルシェーダー	
+//------------------------------------------------------
+PS_TONEMAP PS_NightSky(VS_OUTPUT_FINAL In) : COLOR
+{
+	PS_TONEMAP	OUT = (PS_TONEMAP)0;
+
+//スクリーン空間をテクスチャ座標に  NDC->UV y反転
+//const float2 ScreenTex = In.wvpPos.xy / In.wvpPos.w * float2(0.5, -0.5) + float2(0.5, 0.5);
+
+//	ピクセル色決定
+OUT.color = In.Color * tex2D(DecaleSamp, In.Tex);
+
+// 必殺暗転の値
+OUT.color.rgb *= g_OverDriveDim;
+
+//トーンマッピング
+OUT.color.rgb *= exp2(exposure);
+//OUT.color.rgb -= float3(0.05f, 0.1f, 0.3f);
+OUT.high.rgb = float3(0.05f, 0.05f, 0.1f)*g_OverDriveDim;// 必殺暗転の値
+OUT.high.a = 1.0f;
+
+return OUT;
+}
+//------------------------------------------------------
+//		夜空テクニック
+//------------------------------------------------------
+technique nightsky
+{
+	pass P0
+	{
+		ZEnable = true;				// 奥行考慮
+		ZWriteEnable = true;		// 奥行を書き込むか
+
+		AlphaBlendEnable = true;	// アルファブレンド考慮
+		BlendOp = Add;				// ブレンド仕様
+		SrcBlend = SrcAlpha;		// 現在描いてる方
+		DestBlend = InvSrcAlpha;	// 描かれている方
+		CullMode = CCW;				// カリングの仕様
+
+		VertexShader = compile vs_3_0 VS_Sky();
+		PixelShader = compile ps_3_0 PS_NightSky();
+	}
+}
+
 
 
 //**************************************
@@ -2705,6 +2754,7 @@ float4 PS_WATER(VS_OUTPUT_WATER In) : COLOR
 	const float4 NormalDepth = tex2D(NormalDepthSamp, G_Fetch);
 	//const float3 Normal = CalcNormal(NormalDepth.xy*2.0f - 1.0f);
 	//const float3 envPos = CalcViewPosition(G_Fetch, NormalDepth.zw);
+	const float3 envPos = CalcViewPosition(G_Fetch, NormalDepth.zw);
 	////float4 proj;
 	////proj.xy = (G_Fetch*float2(2.0f, -2.0f) + float2(-1.0f, 1.0f))* NormalDepth.zw.y;
 	////proj.zw = NormalDepth.zw;	// ZとWはそのまま入れる
@@ -2750,7 +2800,7 @@ float4 PS_WATER(VS_OUTPUT_WATER In) : COLOR
 	//******************************************************
 
 	// 歪み度
-	float distortion = 0.02f;
+	float distortion = 0.01f;
 
 	// 環境度
 	float3 Env = tex2D(EnvFullBufSamp, G_Fetch + (float2(NMap.x, NMap.y)*distortion));
@@ -2763,14 +2813,18 @@ float4 PS_WATER(VS_OUTPUT_WATER In) : COLOR
 	// プロジェクション逆行列でビュー座標系に変換　Proj->View
 	float4 worldPos = mul(proj, InvVPMatrix);
 	worldPos.xyz /= worldPos.w;		// ワールド空間へはWで割る必要がある
-	float G_Depth = proj.z / proj.w;
+	
+	// (TODO) 後で
+	//float G_Depth = proj.z / proj.w;
+	//float G_Depth = envPos.z;
+	////float myDepth = In.wvpPos.z / In.wvpPos.w;			//wで割って-1~1に変換する
+	//float myDepth = In.vPos.z;
 
-	float myDepth = In.wvpPos.z / In.wvpPos.w;			//wで割って-1~1に変換する
-	// (if文)手前のPixel情報なら手前のオブジェクトの情報をとってこない処理
-	if (myDepth > G_Depth)
-	{
-		Env.rgb = tex2D(EnvFullBufSamp, G_Fetch);
-	}
+	//// (if文)手前のPixel情報なら手前のオブジェクトの情報をとってこない処理
+	//if (myDepth > G_Depth)
+	//{
+	//	Env.rgb = tex2D(EnvFullBufSamp, G_Fetch);
+	//}
 
 	
 	Env *= 0.7f;// 色を暗くする度あい

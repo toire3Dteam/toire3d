@@ -477,7 +477,14 @@ void  DeferredEx::AddPLSdata(const Vector3 pos, const Vector3 color, const float
 	data.power = power;
 
 
-	if ((int)m_PLSdata.size() >= PLS_MAX)assert(0);
+	if ((int)m_PLSdata.size() >= PLS_MAX)
+	{
+
+	#ifdef _DEBUG
+		MyAssert(0, "‚»‚êˆÈãƒ‰ƒCƒg‚Í‚¨‚¯‚È‚¢");
+	#endif // _DEBUG
+		return;
+	}
 
 	// ”z—ñ‚É‰Á‚¦‚é
 	m_PLSdata.push_back(data);

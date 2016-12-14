@@ -2,7 +2,8 @@
 #include "Stage.h"
 #include "../Player/BasePlayer.h"
 #include "../Collision/Collision.h"
-
+#include "PointLight\PointLight.h"
+#include "DeferredEx\DeferredEx.h"
 
 Stage::Base::Base() : m_pObj(nullptr), m_pBack(nullptr), m_fBottom(0), m_fWidth(200)
 {
@@ -178,25 +179,52 @@ void Stage::Garden::Initialize(Camera *pCamera)
 void Stage::NanasatoSity::Initialize(Camera *pCamera)
 {
 	m_pObj = new iexMesh("DATA/Stage/nanasato/NanasatoSity.IMO");// nanasato/stage
-	//m_pObj->SetAngle(3.14f);
-	//m_pObj->Update();
+	m_pObj->SetAngle(-1.57f / 24);
+	m_pObj->Update();
 
-	//m_pBack = new iexMesh("DATA/Stage/Nanasato/skydome_night.IMO");
-	m_pBack = new iexMesh("DATA/Stage/Senjo/Skydome.IMO");
-	m_pBack->SetPos(Vector3(0, 0, 300));
-	m_pBack->SetScale(3.5f);
+	m_pBack = new iexMesh("DATA/Stage/Nanasato/skydome_night.IMO");
+	//m_pBack = new iexMesh("DATA/Stage/Senjo/Skydome.IMO");
+	//m_pBack->SetPos(Vector3(0, 0, 300));
+	//m_pBack->SetScale(3.5f);
 	m_pBack->Update();
 	m_fBottom = 0;
 	m_fWidth = 200;
 
 	// ステージ毎にシェーダに渡すパラメーター
 	m_tagShaderParam.vDirLightVec = Vector3(-0.84f, -0.99f, -0.53f);
-	m_tagShaderParam.vDirLightColor = Vector3(0.8f, 0.72f, 0.72f);
-	m_tagShaderParam.vSkyColor = Vector3(0.6f, 0.5f, 0.5f);
-	m_tagShaderParam.vGroundColor = Vector3(0.45f, 0.43f, 0.43f);
+	m_tagShaderParam.vDirLightColor = Vector3(0.4f, 0.32f, 0.72f);
+	m_tagShaderParam.vSkyColor = Vector3(0.3f, 0.1f, 0.1f);
+	m_tagShaderParam.vGroundColor = Vector3(0.35f, 0.23f, 0.23f);
 
 	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
 	pCamera->SetStageCameraInfo("DATA/Stage/Sister/camera.txt");
+}
+
+void Stage::NanasatoSity::Update()
+{
+	Base::Update();
+
+	// ポイントライト配置
+	Vector3 LightCol = Vector3(1.5f, 0.75f, 0.4f);
+	float LightSize = 80;
+	PointLightMgr->AddPointLight(Vector3(11, 19, -8), LightCol, LightSize , 4 * 1, 1, 1, 1);
+	PointLightMgr->AddPointLight(Vector3(-34, 34, -8), LightCol, LightSize , 4 * 1, 1, 1, 1);
+	PointLightMgr->AddPointLight(Vector3(92, 31, 49), LightCol, LightSize , 4 * 1, 1, 1, 1);
+	PointLightMgr->AddPointLight(Vector3(-85, 31, 21), LightCol, LightSize, 4 * 1, 1, 1, 1);
+	PointLightMgr->AddPointLight(Vector3(-53, 13, 120), LightCol, LightSize , 4 * 1, 1, 1, 1);
+	PointLightMgr->AddPointLight(Vector3(1, 24, 120), LightCol, LightSize , 4 * 1, 1, 1, 1);
+	PointLightMgr->AddPointLight(Vector3(-67, 16,205 ), LightCol, LightSize , 4 * 1, 1, 1, 1);
+	PointLightMgr->AddPointLight(Vector3(4, 6, 217), LightCol, LightSize , 4 * 1, 1, 1, 1);
+	PointLightMgr->AddPointLight(Vector3(6, 30, 321), LightCol, LightSize , 4 * 1, 1, 1, 1);
+	PointLightMgr->AddPointLight(Vector3(-66, 22, 319), LightCol, LightSize, 4 * 1, 1, 1, 1);
+
+}
+
+void Stage::NanasatoSity::Render(tdnShader* shader, char* name)
+{
+	if (m_pBack) m_pBack->Render(shaderM, "nightsky");
+	m_pObj->Render(shader, name);
+	m_pAreWall->RenderAreaWall();// 壁
 }
 
 void Stage::Syuten::Initialize(Camera *pCamera)

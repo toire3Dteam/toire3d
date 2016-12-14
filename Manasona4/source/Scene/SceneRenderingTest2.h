@@ -29,10 +29,13 @@ private:
 	Vector3 m_dirLight;// ライト方向ﾆｷ
 	bool m_bShaderFlag;
 
-
 	// 水用
 	Surface*	m_pStencilSurface;	// 奥行
 	tdn2DObj*	m_pWaterEnvScreen;	// ゲーム画面
+
+
+	// ポイントライト配列
+	std::vector<Vector3> m_aPos;
 
 
 };
