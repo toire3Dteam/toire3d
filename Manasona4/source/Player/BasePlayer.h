@@ -6,11 +6,15 @@
 #include "../BaseEntity/State/StateMachine.h"
 #include "BasePlayerState.h"
 
+//
+#include "Data\SelectData.h"
+
 // 判定のインクルード
 #include "../Collision/Collision.h"
 
 // エフェクト関連
 #include "../Effect/PanelEffect/PanelEffectManager.h"
+#include "../Effect\UVEffect\UVEffectManager.h"
 #include "../Effect\UVEffect\UVEffectManager.h"
 
 // UI
@@ -381,7 +385,7 @@ public:
 	//	コンストラクタ・初期化
 	//------------------------------------------------------
 	BasePlayer(SIDE side, const SideData &data);
-	void InitAI();	// AI用の初期化
+	void InitAI(AI_TYPE type);	// AI用の初期化
 
 	//------------------------------------------------------
 	//	デストラクタ

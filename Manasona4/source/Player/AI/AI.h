@@ -8,19 +8,7 @@
 // ステート
 #include "AIState.h"
 
-
-// AIのタイプ
-enum class AI_TYPE
-{
-	CPU_EASY,			// 弱いAI
-	CPU_NORMAL,			// 普通のAI
-	CPU_HARD,			// 強いAI
-	CPU_YOKOE,			// 横江くん用に作られたマジキチなAI
-
-	PRACTICE_LAND,		//	[練習用]何も動かない
-	PRACTICE_JUMP,		//	[練習用]飛び続ける
-	PRACTICE_ATTACK,	//	[練習用]一定間隔で攻撃する
-};
+#include "Data\SelectData.h"
 
 //+---------------------------------
 //	AI

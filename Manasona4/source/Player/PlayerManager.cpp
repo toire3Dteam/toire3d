@@ -72,8 +72,19 @@ void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage, SideData Side
 
 	FOR(NumPlayer)
 	{
+		// (TODO)チームを今は仮で振り分け!! 2016/10.04日　左か右をTeamで変えてる
+		SIDE side;
+		if (i % 2 == 0)
+		{
+			side = SIDE::LEFT;
+		}
+		else
+		{
+			side = SIDE::RIGHT;
+		}
+
 		// AI初期化 なぜここで初期化するというと、初期化の中でプレイヤーを参照することがあり、全員の初期化が完了した後に呼び出したいから
-		m_pPlayers[i]->InitAI();
+		m_pPlayers[i]->InitAI(SideDatas[(int)side].eAIType);
 	}
 }
 

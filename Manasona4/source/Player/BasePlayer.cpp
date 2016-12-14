@@ -402,12 +402,12 @@ void BasePlayer::Reset()
 	memset(m_iInputList, 0, sizeof(m_iInputList));
 }
 
-void BasePlayer::InitAI()
+void BasePlayer::InitAI(AI_TYPE type)
 {
 	// AIフラグかつ、AIがnewされてなかったら
 	//if (m_pAI) return;
 	// 仮でAIの種類タイプ
-	if (m_bAI) m_pAI = new AI(m_side, this, AI_TYPE::PRACTICE_LAND);
+	if (m_bAI) m_pAI = new AI(m_side, this, type);
 }
 
 BasePlayer::~BasePlayer()

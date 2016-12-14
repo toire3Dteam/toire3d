@@ -923,17 +923,95 @@ bool SceneMainState::TutorialClear::OnMessage(sceneMain *pMain, const Message & 
 }
 
 
+
+/*******************************************************/
+//			トレーニングステート
+/*******************************************************/
+
+void SceneMainState::TrainingIntro::Enter(sceneMain *pMain)
+{
+	if (Fade::isFadeOutCompletion())
+	{
+		// フェード初期化
+		Fade::Set(Fade::FLAG::FADE_IN, 12, 0x00000000);
+	}
+
+	// 情報初期化
+	pMain->Reset();
+
+
+	// トレーニングリアルへ
+	pMain->GetFSM()->ChangeState(Training::GetInstance());
+	return;
+}
+
+// 更新
+void SceneMainState::TrainingIntro::Execute(sceneMain *pMain)
+{
+
+}
+
+void SceneMainState::TrainingIntro::Exit(sceneMain *pMain)
+{
+
+}
+
+void SceneMainState::TrainingIntro::Render(sceneMain *pMain)
+{
+
+}
+
+bool SceneMainState::TrainingIntro::OnMessage(sceneMain *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	switch (msg.Msg)
+	{
+	case MESSAGE_TYPE::OVER_DRIVE_STAGE:
+	{
+		bool *bAction = (bool*)msg.ExtraInfo;
+		if (*bAction)
+			pMain->OverDriveAction();
+		else
+			pMain->OverDriveEnd();
+		return true;
+	}
+	break;
+	// カットイン発動する瞬間
+	case MESSAGE_TYPE::HEAVE_HO_OVERFLOW_START:
+		// BGMのクロスフェード(超必殺BGMを流す)
+		//pMain->GetMyMusicManager()->PlayHeaveHo();
+		bgm->StopStreamIn();
+		bgm->PlayStreamIn("DATA/Sound/BGM/HeaveHo/HeaveHo.ogg");
+		break;
+		// カットイン終わったらって感じ
+	case MESSAGE_TYPE::HEAVE_HO_OVER_DRIVE_HIT:
+		pMain->GetFSM()->ChangeState(HeaveHoDriveOverFlowSuccess::GetInstance());
+		return true;
+		break;
+	case MESSAGE_TYPE::KO:	// 誰かのHPが0になったら切り替え
+	{
+		FINISH_TYPE *type = (FINISH_TYPE*)msg.ExtraInfo;
+		pMain->GetFSM()->ChangeState(Finish::GetInstance());
+		if (*type == FINISH_TYPE::NORMAL)pMain->GetRoundCall()->CallFinish(msg.Sender);
+		else if (*type == FINISH_TYPE::OVER_DRIVE) pMain->GetRoundCall()->CallOverDriveFinish(msg.Sender);
+
+		return true;
+	}
+	break;
+	}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
+
+
 /*******************************************************/
 //			トレーニングステート
 /*******************************************************/
 
 void SceneMainState::Training::Enter(sceneMain *pMain)
 {
-	// フェード初期化
-	Fade::Set(Fade::FLAG::FADE_IN, 12, 0x00000000);
 
-	// 情報初期化
-	pMain->Reset();
 
 }
 
@@ -982,7 +1060,7 @@ void SceneMainState::Training::Execute(sceneMain *pMain)
 	if (Fade::isFadeOutCompletion())
 	{
 		// チュートリアルのイントロへ
-		pMain->GetFSM()->ChangeState(Training::GetInstance());
+		pMain->GetFSM()->ChangeState(TrainingIntro::GetInstance());
 		return;
 	}
 
@@ -990,14 +1068,12 @@ void SceneMainState::Training::Execute(sceneMain *pMain)
 
 void SceneMainState::Training::Exit(sceneMain *pMain)
 {
-	// イントロのTipsを閉じる
-	TutorialMgr->GetTutorial()->StopIntroTips();
 
 }
 
 void SceneMainState::Training::Render(sceneMain *pMain)
 {
-	TutorialMgr->Render();
+
 }
 
 bool SceneMainState::Training::OnMessage(sceneMain *pMain, const Message & msg)

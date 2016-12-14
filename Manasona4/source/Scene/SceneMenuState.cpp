@@ -7,6 +7,7 @@
 #include "../Fade/Fade.h"
 #include "../Sound/SoundManager.h"
 #include "Data\SelectData.h"
+#include "Data\PlayerData.h"
 #include "Window\OptionWindow.h"	// 必要なウィンドウ
 
 //+--------------------
@@ -287,6 +288,7 @@ bool SceneMenuState::BattleControllerSelectStep::PadUpdate(sceneMenu *pMain, int
 			{
 				// (★)誰も選んでないのでAIフラグをONにする操作デバイスを同じに
 				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = true;
+				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].eAIType = AI_TYPE::CPU_HARD;// (TODO)
 				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = false;
 				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = C_UIMgr->GetRightPlayer().iPlayerDeviceID;
 				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = C_UIMgr->GetRightPlayer().iPlayerDeviceID;
@@ -298,6 +300,7 @@ bool SceneMenuState::BattleControllerSelectStep::PadUpdate(sceneMenu *pMain, int
 				// (★)誰も選んでないのでAIフラグをONにするの操作デバイスを同じに
 				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = false;
 				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = true;
+				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].eAIType = AI_TYPE::CPU_HARD;// (TODO)
 				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = C_UIMgr->GetLeftPlayer().iPlayerDeviceID;//
 				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = C_UIMgr->GetLeftPlayer().iPlayerDeviceID;// 
 
@@ -451,6 +454,7 @@ bool SceneMenuState::TrainingControllerSelectStep::PadUpdate(sceneMenu *pMain, i
 
 			// 右をAIに
 			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = true;
+			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].eAIType = AI_TYPE::PRACTICE_LAND;// (TODO) 練習用AI
 			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = C_UIMgr->GetLeftPlayer().iPlayerDeviceID;
 		}
 		// もし右に練習する人が入ってたら
@@ -461,6 +465,7 @@ bool SceneMenuState::TrainingControllerSelectStep::PadUpdate(sceneMenu *pMain, i
 	
 			// 左をAIに
 			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = true;
+			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].eAIType = AI_TYPE::PRACTICE_LAND;// (TODO) 練習用AI
 			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = C_UIMgr->GetRightPlayer().iPlayerDeviceID;
 
 		}
@@ -601,6 +606,7 @@ void SceneMenuState::TutorialSelectStep::Execute(sceneMenu *pMain)
 		// 
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = false;
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = true;
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].eAIType = AI_TYPE::PRACTICE_LAND;// (TODO)
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = pMain->GetCtrlDevice();
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = pMain->GetCtrlDevice();
 

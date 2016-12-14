@@ -829,7 +829,7 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 if (pPerson->isWillPower())
 									 {
 										 // –hŒä—Í‚ğã‚°‚é
-										 damage = (int)((float)damage* 0.65f);
+										 damage = (int)((float)damage* 0.6f);
 									 }
 									 
 

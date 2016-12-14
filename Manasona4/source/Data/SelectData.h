@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../BaseEntity/Message/Message.h"
-//#include "Player\AI\AI.h"		(TODO)AIの種類はどこで設定しようか
 
 //*****************************************************************************
 //
@@ -18,14 +17,28 @@ enum class PARTNER { MOKOI, MAYA, END };
 // ステージのタイプ
 enum class STAGE { SAND, SEA, GARDEN, SYUTEN, A, NANASATO_SITY, HEAVE_HO, MAX };
 
+// AIのタイプ
+enum class AI_TYPE
+{
+	CPU_EASY,			// 弱いAI
+	CPU_NORMAL,			// 普通のAI
+	CPU_HARD,			// 強いAI
+	CPU_YOKOE,			// 横江くん用に作られたマジキチなAI
+
+	PRACTICE_LAND,		//	[練習用]何も動かない
+	PRACTICE_JUMP,		//	[練習用]飛び続ける
+	PRACTICE_ATTACK,	//	[練習用]一定間隔で攻撃する
+};
+
 struct SideData
 {
 	CHARACTER character;
 	PARTNER partner;
 	int iDeviceID;	// コントローラーデバイスのID
 	bool bAI;		// AIフラグ
+	AI_TYPE eAIType;// AIのタイプ
 	SideData();
-	SideData &operator=(const SideData &data) { character = data.character, partner = data.partner, iDeviceID = data.iDeviceID, bAI = data.bAI; return *this; }
+	//SideData &operator=(const SideData &data) { character = data.character, partner = data.partner, iDeviceID = data.iDeviceID, bAI = data.bAI; return *this; }
 };
 
 struct SelectData

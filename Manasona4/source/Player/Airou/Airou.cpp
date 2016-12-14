@@ -47,7 +47,7 @@ Airou::Airou(SIDE side, const SideData &data) :BasePlayer(side, data)
 
 	if (m_side == SIDE::RIGHT)
 	{
-		LPSTR path = "DATA/CHR/Airou/tex_airou2.png";
+		LPSTR path = "DATA/CHR/Airou/tex_airou4.png";
 		m_pDefaultObj->SetTexture(tdnTexture::Load(path), 0);
 		m_pHHDOFObj->SetTexture(tdnTexture::Load(path), 0);
 	}

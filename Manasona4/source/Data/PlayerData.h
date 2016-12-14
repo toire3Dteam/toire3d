@@ -32,6 +32,38 @@ namespace PlayerData
 		unsigned int ‹ó‚«˜g6		: 32;
 	};
 
+	struct Training
+	{
+		int ‹ó‚«˜g1;
+		int ‹ó‚«˜g2;
+		int ‹ó‚«˜g3;
+		int ‹ó‚«˜g4;
+		int ‹ó‚«˜g5;
+		int ‹ó‚«˜g6;
+		int ‹ó‚«˜g7;
+		int ‹ó‚«˜g8;
+		int ‹ó‚«˜g9;
+		int ‹ó‚«˜g10;
+		int ‹ó‚«˜g11;
+		int ‹ó‚«˜g12;
+		int ‹ó‚«˜g13;
+		int ‹ó‚«˜g14;
+		int ‹ó‚«˜g15;
+		int ‹ó‚«˜g16;
+		int ‹ó‚«˜g17;
+		int ‹ó‚«˜g18;
+		int ‹ó‚«˜g19;
+		int ‹ó‚«˜g20;
+		int ‹ó‚«˜g21;
+		int ‹ó‚«˜g22;
+		int ‹ó‚«˜g23;
+		int ‹ó‚«˜g24;
+		int ‹ó‚«˜g25;
+		int ‹ó‚«˜g26;
+		int ‹ó‚«˜g27;
+		int ‹ó‚«˜g28;
+	};
+
 	// ƒgƒƒtƒB[
 	struct Trophy
 	{
@@ -77,9 +109,11 @@ public:
 	bool Initialize();
 
 	PlayerData::Infomation m_PlayerInfo;	// ƒvƒŒƒCî•ñ
+	PlayerData::Confing m_ConfigData;		// ƒvƒŒƒCƒ„[‚Ìİ’èî•ñ
+	PlayerData::Training m_TrainingData;	// ƒgƒŒ[ƒjƒ“ƒO
 	PlayerData::Trophy m_TrophyData;			// ƒgƒƒtƒB[
 	PlayerData::Secret m_SecretData;			// ‰B‚µ—v‘f
-	PlayerData::Confing m_ConfigData;		// ƒvƒŒƒCƒ„[‚Ìİ’èî•ñ
+
 
 	// ƒfƒXƒgƒ‰ƒNƒ^(ƒ_ƒuƒ‹ƒ|ƒCƒ“ƒ^ŠÖ˜A‚ğ‚±‚Ì’†‚ÅŠ®Œ‹‚³‚¹‚Ä‚é‚Ì‚ÅAg‚¤l‚Í‹C‚É‚µ‚È‚­‚ÄOK)
 	~PlayerDataManager();

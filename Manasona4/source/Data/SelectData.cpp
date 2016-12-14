@@ -6,7 +6,8 @@ SideData::SideData() :
 character(CHARACTER::TEKI),		// 選択キャラクター
 partner(PARTNER::MAYA),			// 選択パートナー
 iDeviceID(0),					// 操作するデバイスID
-bAI(false)						// AI
+bAI(false),						// AI
+eAIType(AI_TYPE::PRACTICE_LAND)	// AIのタイプ
 {}
 
 SelectData::SelectData():stage(STAGE::NANASATO_SITY),

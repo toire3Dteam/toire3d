@@ -47,7 +47,10 @@ bool PlayerDataManager::LoadPlayerData()
 	
 	// コンフィグ
 	fread_s((LPSTR)&m_ConfigData, sizeof(PlayerData::Confing), sizeof(PlayerData::Confing), 1, fp);
-	//ZeroMemory(&m_ConfigData, sizeof(m_ConfigData));
+
+	// トレーニング設定データ
+	fread_s((LPSTR)&m_TrainingData, sizeof(PlayerData::Training), sizeof(PlayerData::Training), 1, fp);
+	//ZeroMemory(&m_TrainingData, sizeof(PlayerData::Training));
 
 	// トロフィー読み込み
 	fread_s((LPSTR)&m_TrophyData, sizeof(PlayerData::Trophy), sizeof(PlayerData::Trophy), 1, fp);
@@ -79,8 +82,11 @@ void PlayerDataManager::SavePlayerData()
 	// プレイヤー基本データ書き出し
 	fwrite((LPSTR)&m_PlayerInfo, 1, sizeof(PlayerData::Infomation), fp);
 
-	// プレイヤー基本データ書き出し
+	// プレイヤー設定データ書き出し
 	fwrite((LPSTR)&m_ConfigData, 1, sizeof(PlayerData::Confing), fp);
+
+	// プレイヤートレーニング設定データ書き出し
+	fwrite((LPSTR)&m_TrainingData, 1, sizeof(PlayerData::Training), fp);
 
 	// トロフィー情報書き出し
 	fwrite((LPSTR)&m_TrophyData, 1, sizeof(PlayerData::Trophy), fp);
