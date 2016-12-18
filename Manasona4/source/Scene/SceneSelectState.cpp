@@ -254,11 +254,22 @@ bool SceneSelectState::StageAndBGM::PadUpdate(sceneSelect *pMain, int DeviceID)
 		{
 			pMain->m_iSelectStageNo--;
 			pMain->m_tagSecondSelect.pStageLeftRip->Action();
+			// -1になれば最後のステージにする
+			if (pMain->m_iSelectStageNo < 0)
+			{
+				pMain->m_iSelectStageNo = (int)STAGE::MAX;	// -1にしないのはRANDOMを含めているから
+			}
 		}
 		else if (tdnInput::KeyGet(KEYCODE::KEY_RIGHT, DeviceID) == 3)
 		{
 			pMain->m_iSelectStageNo++;
 			pMain->m_tagSecondSelect.pStageRightRip->Action();
+
+			// 最後のステージまできたら最初に戻す
+			if (pMain->m_iSelectBGMNo > (int)STAGE::MAX)
+			{
+				pMain->m_iSelectBGMNo = 0;
+			}
 		}
 	}
 
@@ -285,7 +296,7 @@ void SceneSelectState::StageAndBGM::Render(sceneSelect *pMain)
 	pMain->StageAndBGMRender();
 	tdnText::Draw(0, 0, 0xffffffff, "StageAndBGM");
 	
-	tdnText::Draw(68, 128, 0xffffffff, "m_iSelectStageNo->%d",pMain->m_iSelectStageNo);
+	//tdnText::Draw(68, 128, 0xffffffff, "m_iSelectStageNo->%d",pMain->m_iSelectStageNo);
 	//tdnText::Draw(68, 156, 0xffffffff, "m_iSelectBGMNo->%d",pMain->m_iSelectBGMNo);
 	//tdnText::Draw(68, 256, 0xffffffff, "曲めい->%s", BattleMusicMgr->GetMusicName(pMain->m_iSelectBGMNo).c_str());
 }
@@ -322,19 +333,34 @@ void SceneSelectState::End::Execute(sceneSelect *pMain)
 	{
 		// (TODO) ↑で選択したキャラクター・パートナー・ステージ・BGMを設定する
 		
-		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].character
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].eCharacter
 			= pMain->GetSelectUIMgr()->GetSelectCharacter(SIDE::LEFT);
 
-		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].character
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].eCharacter
 			= pMain->GetSelectUIMgr()->GetSelectCharacter(SIDE::RIGHT);				
 
-		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].partner
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].ePartner
 			= pMain->GetSelectUIMgr()->GetSelectPartner(SIDE::LEFT);
 
-		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].partner
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].ePartner
 			= pMain->GetSelectUIMgr()->GetSelectPartner(SIDE::RIGHT);
 
 		SelectDataMgr->Get()->iBattleMusicID=pMain->m_iSelectBGMNo;
+
+		// ステージの登録(★RANDOMを0にしているので、実際のenumに合わす必要がある)
+		if (pMain->m_iSelectStageNo == 0)
+		{
+			int r;
+			// なぜかランダムで0～MAX-1でない値が入っていたので、その値が出るまで無限ループにする(なんでこうなったんだろう？)
+			do{ r = tdnRandom::Get(0, (int)STAGE::MAX - 1); } while (r < 0 || r >= (int)STAGE::MAX);
+
+			// ランダム処理
+			SelectDataMgr->Get()->eStage = (STAGE)r;
+		}
+		else
+		{
+			SelectDataMgr->Get()->eStage = (STAGE)(pMain->m_iSelectStageNo - 1);	// RANDOMぶんを引いている
+		}
 
 		MainFrameEx->ChangeScene(new sceneMain());
 		return;

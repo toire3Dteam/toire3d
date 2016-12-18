@@ -71,20 +71,24 @@ void Stage::Base::CreateStage(Stage::Base**p,STAGE id, Camera *pCamera)
 	case STAGE::SAND:
 		*p = new Stage::Sand;
 		break;
+	case STAGE::SYUTEN:
+		*p = new Stage::Syuten;
+		break;
 	case STAGE::SEA:
 		*p = new Stage::Sea;
 		break;
 	case STAGE::GARDEN:
 		*p = new Stage::Garden;
 		break;
-	case STAGE::SYUTEN:
-		*p = new Stage::Syuten;
-		break;
-	case STAGE::A:
-		*p = new Stage::A;
-		break;
+	//case STAGE::A:
+	//	*p = new Stage::A;
+	//	break;
 	case STAGE::NANASATO_SITY:
 		*p = new Stage::NanasatoSity;
+		break;
+	default:
+		MyAssert(0, "ステージに不正な値が入っています%d", (int)id);
+		*p = new Stage::Sand;
 		break;
 	}
 

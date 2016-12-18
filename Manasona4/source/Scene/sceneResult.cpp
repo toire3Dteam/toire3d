@@ -78,7 +78,7 @@ bool sceneResult::Initialize()
 	m_AllScreen = new tdn2DObj(tdnSystem::GetScreenSize().right, tdnSystem::GetScreenSize().bottom, TDN2D::RENDERTARGET);
 
 	// ŸŽÒ
-	switch ((SelectDataMgr->Get()->tagSideDatas[(int)m_tagResultData.eWinnerSide].character))
+	switch ((SelectDataMgr->Get()->tagSideDatas[(int)m_tagResultData.eWinnerSide].eCharacter))
 	{
 	case CHARACTER::AIROU:
 		m_WinPlayer = new iex3DObj("DATA/CHR/Airou/result.IEM");
@@ -110,7 +110,7 @@ bool sceneResult::Initialize()
 
 	// ”sŽÒ
 	const SIDE LoserSide(m_tagResultData.eWinnerSide == SIDE::LEFT ? SIDE::RIGHT : SIDE::LEFT);
-	switch ((SelectDataMgr->Get()->tagSideDatas[(int)LoserSide].character))
+	switch ((SelectDataMgr->Get()->tagSideDatas[(int)LoserSide].eCharacter))
 	{
 	case CHARACTER::AIROU:
 		m_LosePlayer = new iex3DObj("DATA/CHR/Airou/airou.IEM");
@@ -119,7 +119,7 @@ bool sceneResult::Initialize()
 
 	case CHARACTER::TEKI:
 		m_LosePlayer = new iex3DObj("DATA/CHR/Teki/teki.IEM");
-		m_iLoseMotion = 31;
+		m_iLoseMotion = 34;
 		break;
 
 	case CHARACTER::NAZENARA:

@@ -424,6 +424,11 @@ bool HeaveHoOverFlowCancel(BasePlayer * pPerson)
 {
 	if (pPerson->isOverDrive() == false)return false;
 
+	// 相手が根性中じゃなかったらはじく
+	if (!pPerson->GetTargetPlayer()->isWillPower()) return false;
+
+	ラウンド
+
 	// 超必殺技キャンセル
 	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R3))
 	{
@@ -2536,7 +2541,7 @@ void BasePlayerState::RushAttack::Enter(BasePlayer * pPerson)
 void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 {
 	// 攻撃終了してたら
-	if (!pPerson->isAttackState())
+	if (pPerson->GetActionFrame() == FRAME_STATE::END)
 	{
 		// 待機モーションに戻る
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
@@ -3086,7 +3091,7 @@ void BasePlayerState::LandRecovery::Execute(BasePlayer * pPerson)
 	const int iRecoveryCount(pPerson->GetCurrentFrame());
 
 	// ★5フレーム前から先行入力受付(リバサ無敵用)
-	if (iRecoveryCount > BasePlayer::c_RECOVERY_FLAME - 5)pPerson->AheadCommandUpdate();
+	if (iRecoveryCount > BasePlayer::c_RECOVERY_FLAME - 6)pPerson->AheadCommandUpdate();
 
 	// リカバリーフレームを超えたら終わり！
 	if (iRecoveryCount >= BasePlayer::c_RECOVERY_FLAME)
@@ -3177,15 +3182,17 @@ void BasePlayerState::AerialRecovery::Enter(BasePlayer * pPerson)
 
 void BasePlayerState::AerialRecovery::Execute(BasePlayer * pPerson)
 {
-	//pPerson->AddRecoveryCount(1);
 	const int iRecoveryCount(pPerson->GetCurrentFrame());
 
 	// ★5フレーム前から先行入力受付(リバサ無敵用)
-	if (iRecoveryCount > BasePlayer::c_RECOVERY_FLAME - 5)pPerson->AheadCommandUpdate();
+	if (iRecoveryCount > BasePlayer::c_RECOVERY_FLAME - 6)pPerson->AheadCommandUpdate();
 
 	// リカバリーフレームを超えたら終わり！
 	if (iRecoveryCount >= BasePlayer::c_RECOVERY_FLAME)
 	{
+		// リバサ無敵
+		if (InvincibleAttackCancel(pPerson)) return;
+
 		// 空中なので落ちるステートに
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Fall::GetInstance());
 	}
@@ -4805,6 +4812,12 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 	{
 									 HIT_DAMAGE_INFO *HitDamageInfo = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
 
+									 // ガード不能技は問答無用でくらう
+									 if (HitDamageInfo->iAntiGuard == (int)ANTIGUARD_ATTACK::ALL_BREAK)
+									 {
+										 return false;	// ダメージ喰らってどうぞ
+									 }
+
 									 bool bGuardSuccess(false);
 									 if (pPerson->GetGuardState() == GUARD_STATE::UP_GUARD)
 									 {
@@ -5177,7 +5190,7 @@ void BasePlayerState::ThrowBind::Enter(BasePlayer * pPerson)
 	pPerson->GetStand()->Break();
 
 	// 掴みSEをここで再生
-	se->Play("掴み成功");
+	//se->Play("掴み成功");
 
 	// バースト使用不可に
 	pPerson->ActionNotOverDrive();
@@ -5372,13 +5385,13 @@ void BasePlayerState::HeavehoDriveOverFlow::Enter(BasePlayer * pPerson)
 
 	// SE
 	se->Play("超必殺発動");
+
+	// ★必殺はフォローまで無敵
+	pPerson->SetInvincible(114514, 1);
 }
 
 void BasePlayerState::HeavehoDriveOverFlow::Execute(BasePlayer * pPerson)
 {
-	// そのキャラクターのヒーホーの更新
-	pPerson->HeavehoDriveOverFlowUpdate();
-
 	// 攻撃ステート終わったら
 	if (!pPerson->isAttackState())
 	{
@@ -5386,6 +5399,12 @@ void BasePlayerState::HeavehoDriveOverFlow::Execute(BasePlayer * pPerson)
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
 		return;
 	}
+
+	// そのキャラクターのヒーホーの更新
+	pPerson->HeavehoDriveOverFlowUpdate();
+
+	// フォローになったら無敵解除
+	if (pPerson->GetActionFrame() == FRAME_STATE::FOLLOW) pPerson->InvincibleOff();
 
 	// HandleMessageに移植
 	//static bool flag = false;
@@ -5408,6 +5427,9 @@ void BasePlayerState::HeavehoDriveOverFlow::Execute(BasePlayer * pPerson)
 
 void BasePlayerState::HeavehoDriveOverFlow::Exit(BasePlayer * pPerson)
 {
+	// 一応無敵を解除する
+	pPerson->InvincibleOff();
+
 	// ヒーホーの終わり
 	pPerson->HeavehoDriveExit();
 	pPerson->SetOverDriveFrame(0);
@@ -5435,6 +5457,9 @@ bool BasePlayerState::HeavehoDriveOverFlow::OnMessage(BasePlayer * pPerson, cons
 									 MsgMgr->Dispatch(0, pPerson->GetID(), ENTITY_ID::SCENE_MAIN, MESSAGE_TYPE::HEAVE_HO_OVERFLOW_START, nullptr);
 
 									 // return trueはしない。SPゲージ関連の処理をGlobalStateのメッセージを行っているため
+
+									 // やっぱりする。∵くんのために
+									 return true;
 									 break;
 	}
 	}

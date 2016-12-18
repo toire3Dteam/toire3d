@@ -24,7 +24,7 @@ const int BasePlayer::c_RECOVERY_FLAME = 32;			// リカバリーステートにいる時間
 const int BasePlayer::c_OVERDRIVE_MAX_GAGE = 100;	// 覚醒ゲージの最大値
 const int BasePlayer::c_OVERDRIVE_MAX_TIME = 480;	// 覚醒が切れるまでの時間
 
-const int BasePlayer::c_THROW_ESCAPE_FRAME = 12;	// 投げぬけの猶予フレーム
+const int BasePlayer::c_THROW_ESCAPE_FRAME = 15;	// 投げぬけの猶予フレーム
 const int BasePlayer::c_THROW_MISS_FRAME = 30;	// 投げ外しロスのフレーム(全キャラ共通だろうという考え)
 const int BasePlayer::c_THROW_RELEASE_FRAME = 15;	// 投げ抜けで、パシンてなってる間のフレーム(これも全キャラ共通だろう)
 const int BasePlayer::c_WINNER_TIME = 180;
@@ -39,20 +39,22 @@ void BasePlayer::LoadCharacterParam(LPSTR filename)
 
 	std::string sDirectory(tdnFile::GetDirectoryPath(filename));
 
-	char skip[64];	// 読み飛ばし用変数
+	char skip[128];	// 読み飛ばし用変数
 
 	// メッシュ
 	char path[MAX_PATH];
 	ifs >> skip;
 	ifs >> path;
-	if (!m_pDefaultObj) m_pDefaultObj = new iex3DObj((char*)(sDirectory + "/" + path).c_str());
+	assert(!m_pDefaultObj);	// ここでnullじゃないならおかしい
+	m_pDefaultObj = new iex3DObj((char*)(sDirectory + "/" + path).c_str());
 	m_pDefaultObj->SetPos(m_vPos);
 	m_pDefaultObj->Update();
 
 	// 必殺用メッシュ
 	ifs >> skip;
 	ifs >> path;
-	if (!m_pHHDOFObj) m_pHHDOFObj = new iex3DObj((char*)(sDirectory + "/" + path).c_str());
+	assert(!m_pHHDOFObj);	// ここでnullじゃないならおかしい
+	m_pHHDOFObj = new iex3DObj((char*)(sDirectory + "/" + path).c_str());
 	m_pHHDOFObj->SetAngle(PI);
 	m_pHHDOFObj->Update();
 
@@ -150,7 +152,7 @@ void BasePlayer::LoadAttackFrameList(LPSTR filename)
 				MyAssert(count < 256, "アクションフレームの合計は255以下にしてください");
 			}
 		}
-		// 終端
+		// 終端(全部ENDで初期化してるから大丈夫だけど一応)
 		m_ActionFrameList[iActionType][count] = FRAME_STATE::END;
 	}
 
@@ -228,26 +230,116 @@ void BasePlayer::LoadAttackDatas(LPSTR filename)
 	}
 }
 
-BasePlayer::BasePlayer(SIDE side, const SideData &data) :m_bAI(data.bAI), m_iDeviceID(data.iDeviceID), m_side(side), BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + (int)side)),
-m_dir(DIR::LEFT), m_pDefaultObj(nullptr), m_pHHDOFObj(nullptr),
-m_pObj(nullptr),
-m_vMove(0, 0, 0), m_bLand(false), m_bSquat(false), m_bAerialJump(true), m_bAerialDash(false), m_iAerialDashFrame(0), m_eActionState(BASE_ACTION_STATE::NO_ACTION),
-m_iInvincibleLV(0), m_iInvincibleTime(0), m_iCurrentActionFrame(0), m_iRecoveryFrame(0), m_bEscape(false), m_iScore(0), m_iCollectScore(0), m_pAI(nullptr),
-m_iHitStopFrame(0),// ★★★バグの原因　ひっとすトップ初期化のし忘れ。
-m_fInvincibleColRate(0), m_iInvincibleColRateFlame(0), m_bInvincibleColRateUpFlag(false),
-m_OverDriveGage(0), m_bOverDrive(false), m_OverDriveFrame(0), m_OverDriveType(OVERDRIVE_TYPE::BURST),
+/*
+コンストラクタにおいて、初期化子リストとして各メンバーのデフォルトコンストラクタを呼び出す形式
+「memberVariableName()」で記述することにより、
+組込の値型、enum型やポインタ型だけでなく、
+固定長配列もPOD型構造体もすべてゼロクリアできます
+
+（ただし配列やPOD構造体のメンバーをゼロ以外の数で初期化するには、
+後述するようにC++11のinitializer list/uniform initializationにフル対応したコンパイラが必要になります）。
+*/
+BasePlayer::BasePlayer(SIDE side, const SideData &data) :
+BaseGameEntity((ENTITY_ID)(ENTITY_ID::ID_PLAYER_FIRST + (int)side)),
+
+// m_tagCharacterParam{} だともれなくアウト
+m_tagCharacterParam(CharacterParam{}),
+m_tagOrgCharacterParam(CharacterParam{}),
+
+m_vPos(0,0,0),
+m_vMove(0,0,0),
 m_bMoveUpdate(true),
+
+m_fAngleY(0),
+m_dir(DIR::LEFT),
+m_TargetDir(DIR::LEFT),
+
+//m_ActionFrameList(),
+//m_ActionDatas(),
+m_eActionState(BASE_ACTION_STATE::NO_ACTION),
+m_iCurrentActionFrame(0),
+m_iRushStep(0),
+m_eSkillActionType(SKILL_ACTION_TYPE::NO_ACTION),
+
+m_bLand(true),
+m_bSquat(false),
+m_bAerialJump(true),
+m_bAerialDash(false),
+m_iAerialDashFrame(0),
+
+//m_RecoveryDamageCount(),
+m_iRecoveryFrame(0),
+m_iHitStopFrame(0),// ★★★バグの原因　ひっとすトップ初期化のし忘れ。
+m_bDown(false),
+
+m_eGuardState(GUARD_STATE::NO_GUARD),
+
+m_iInvincibleLV(0),
+m_iInvincibleTime(0),
+m_fInvincibleColRate(0),
+m_iInvincibleColRateFlame(0),
+m_bInvincibleColRateUpFlag(false),
+m_bEscape(false),
+
+//m_iMotionNumbers(),
+
 m_iHP(0),
-m_bGameTimerStopFlag(false), m_iHeavehoStopTimer(0), m_iHeaveHoDriveOverFlowFrame(0),
-m_iWinNum(0), m_eGuardState(GUARD_STATE::NO_GUARD),
-m_pFacePic(nullptr), m_pTargetPlayer(nullptr), m_pSpeedLine(nullptr), m_eSkillActionType(SKILL_ACTION_TYPE::MAX),
-m_fOrangeColRate(0), m_fMagentaColRate(0),
-m_pCutinPic(nullptr), m_pName("None"), m_iRushStep(0), m_pThrowMark(nullptr),
-m_bWillPower(false), m_bDown(false), m_iDashFrame(0),
-m_bNotOverDrive(false), m_iSpGettingFrame(0), m_tagCharacterParam{}
+m_fDamageRate(0),
+
+m_iScore(0),
+m_iCollectScore(0),
+
+//m_iInputList(),
+//m_wCommandHistory(),
+m_wAheadCommand(0),
+
+m_pStand(nullptr),
+
+m_pTargetPlayer(nullptr),
+
+m_pDefaultObj(nullptr),
+m_pHHDOFObj(nullptr),
+m_pObj(nullptr),
+m_pSpeedLine(nullptr),
+m_pFacePic(nullptr),
+
+m_pPanelEffectMGR(nullptr),
+m_pUVEffectMGR(nullptr),
+m_pThrowMark(nullptr),
+
+m_OverDriveGage(0),
+m_bOverDrive(false),
+m_OverDriveFrame(0),
+m_OverDriveType(OVERDRIVE_TYPE::ONEMORE),
+
+m_bWillPower(false),
+m_iSpGettingFrame(0),
+
+m_iDeviceID(data.iDeviceID),
+m_side(side),
+m_pStateMachine(nullptr),
+m_pAI(nullptr),
+m_bAI(data.bAI),
+
+m_iDashFrame(0),
+
+m_iHeavehoStopTimer(0),
+m_iHeaveHoDriveOverFlowFrame(0),
+
+m_fOrangeColRate(0),
+m_fMagentaColRate(0),
+
+m_bGameTimerStopFlag(false),
+
+m_iWinNum(0),
+
+m_bNotOverDrive(false),
+
+m_pCutinPic(nullptr),
+m_pName("None")
 {
 	// スタンド
-	switch (data.partner)
+	switch (data.ePartner)
 	{
 	case PARTNER::MOKOI:
 		m_pStand = new Stand::Mokoi(this);
@@ -296,17 +388,26 @@ m_bNotOverDrive(false), m_iSpGettingFrame(0), m_tagCharacterParam{}
 
 	m_fAngleY = DIR_ANGLE[(int)m_dir];
 
-	// 喰らってる中に喰らってるかうんと初期化
 	m_RecoveryDamageCount.clear();
 
-
-	//m_pComboUI = new ComboUI(&m_RecoveryFlame);
+	// 入力リスト初期化
+	memset(m_iInputList, 0, sizeof(m_iInputList));
 
 	// コマンド履歴初期化
 	memset(m_wCommandHistory, (int)PLAYER_COMMAND_BIT::NEUTRAL, sizeof(m_wCommandHistory));
 
 	// モーション初期化(キャラごとの初期化を設定したい→Reset関数をキャラクター固有ロードより下に書くことに→モーションの初期化が来る前にモーションを設定してしまう→じゃあ先ここで全部0にしよう→最初の待機モーションが0であることが前提のコードになってしまう)
 	memset(m_iMotionNumbers, 0, sizeof(m_iMotionNumbers));
+	
+	// アクションフレームリスト初期化(memsetでやるとなぜか変な値が入ってた)
+	FOR((int)BASE_ACTION_STATE::END)
+	{
+		m_ActionDatas[i] = ActionData{};
+		for (int j = 0; j < FRAME_MAX; j++) m_ActionFrameList[i][j] = FRAME_STATE::END;
+	}
+
+	//tdnDebug::OutPutLog("[初期化チェック}\n");
+	//tdnDebug::OutPutLog("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, ");
 }
 
 void BasePlayer::Reset()
@@ -358,8 +459,6 @@ void BasePlayer::Reset()
 	m_bEscape =
 	m_bInvincibleColRateUpFlag =
 	m_bOverDrive =
-	//m_bThrowSuccess =
-	//m_bGuard =
 	m_bGameTimerStopFlag =
 	m_bAerialDash =
 	m_bLand=
@@ -403,11 +502,15 @@ void BasePlayer::Reset()
 		break;
 	}
 
+
+	/* [配列]の初期化 */
+	memset(m_iInputList, 0, sizeof(m_iInputList));
+	memset(m_wCommandHistory, (int)PLAYER_COMMAND_BIT::NEUTRAL, sizeof(m_wCommandHistory));
+
+
+
 	// コンボ補正初期化
 	m_RecoveryDamageCount.clear();
-
-	/* インプットリストの初期化 */
-	memset(m_iInputList, 0, sizeof(m_iInputList));
 }
 
 void BasePlayer::InitAI(AI_TYPE type)
@@ -436,6 +539,8 @@ BasePlayer::~BasePlayer()
 
 void BasePlayer::Update(PLAYER_UPDATE flag)
 {
+	//bool bOutLog(false);
+
 	// デバッグ
 	if (KeyBoardTRG(KB_8))
 	{
@@ -449,9 +554,11 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 	}
 	if (KeyBoardTRG(KB_0))
 	{
-		m_iHP = 3600;
+		m_iHP = 3000;
+		//bOutLog = true;
 	}
 
+	//if (bOutLog) tdnStopWatch::Start();
 	// 覚醒の更新
 	OverDriveUpdate();
 
@@ -477,6 +584,14 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 
 	// 光色の更新
 	ColorUpdate();
+
+	//if (bOutLog)
+	//{
+	//	tdnStopWatch::End();
+	//	tdnDebug::OutPutLog("プレイヤー%s:\n更新1にかかった時間 %.1lf\n",(m_side == SIDE::LEFT) ? "LEFT" : "RIGHT", tdnStopWatch::GetResult());
+	//}
+
+	//if (bOutLog) tdnStopWatch::Start();
 
 	// 入力受付
 	if (flag != PLAYER_UPDATE::CONTROL_NO)
@@ -510,6 +625,12 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 		memset(m_wCommandHistory, 0, sizeof(m_wCommandHistory));
 	}
 
+	//if (bOutLog)
+	//{
+	//	tdnStopWatch::End();
+	//	tdnDebug::OutPutLog("プレイヤー%s:\n入力にかかった時間 %.1lf\n", (m_side == SIDE::LEFT) ? "LEFT" : "RIGHT", tdnStopWatch::GetResult());
+	//}
+
 	// ★ヒットストップ中
 	if (m_iHitStopFrame > 0)
 	{
@@ -524,7 +645,7 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 		// ★硬直時間のデクリメント
 		if (m_iRecoveryFrame > 0)
 			m_iRecoveryFrame--;
-		else m_fDamageRate = 1.0f;	// コンボ切れたら、ダメージレートを戻す
+		else m_fDamageRate = 1.0f;	// (TODOコンボ切れる1フレームで補正が切れてるのにコンボが入る(アイルー1,2,下,スキル下で3400がでる))コンボ切れたら、ダメージレートを戻す
 
 		// アクションフレームの更新
 		if (isFrameAction())
@@ -570,6 +691,7 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 		}
 
 
+
 		// ★自分の向きを設定
 		// このif文に入ってるやつ以外だったら振り向く
 		if (!m_pStateMachine->isInState(*BasePlayerState::Skill::GetInstance()) &&
@@ -609,36 +731,64 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 			}
 		}
 
+		//if (bOutLog) tdnStopWatch::Start();
+
 		// 入力受付後にステートマシン更新
 		if (flag != PLAYER_UPDATE::NO_FSM) m_pStateMachine->Update();
 
-		//if (m_InputList[(int)PLAYER_INPUT::LEFT] == 1) m_vMove.x = -2;
-		//else m_vMove.x = 0;
-
-		// ★★★　なぞのバグは　ここをとおってないからおこる
+		//if (bOutLog)
+		//{
+		//	tdnStopWatch::End();
+		//	tdnDebug::OutPutLog("プレイヤー%s:\nステートマシン更新にかかった時間 %.1lf\n", (m_side == SIDE::LEFT) ? "LEFT" : "RIGHT", tdnStopWatch::GetResult());
+		//}
 
 		// 動きの制御
 		MoveUpdate();
 
 		// メッシュの更新
+		//if (bOutLog) tdnStopWatch::Start();
 		if (!m_pStateMachine->isInState(*BasePlayerState::KnockBack::GetInstance()))m_pObj->Animation();
 		else if (m_iRecoveryFrame < 30)m_pObj->Animation();
+		//if (bOutLog)
+		//{
+		//	tdnStopWatch::End();
+		//	tdnDebug::OutPutLog("プレイヤー%s:\nメッシュAnimation()にかかった時間 %.1lf\n", (m_side == SIDE::LEFT) ? "LEFT" : "RIGHT", tdnStopWatch::GetResult());
+		//}
+
+		//if (bOutLog) tdnStopWatch::Start();
 		m_pObj->SetAngle(m_fAngleY);	// 左右のアングルのセット
 		m_pObj->SetPos(m_vPos);
+		//if (bOutLog)
+		//{
+		//	tdnStopWatch::End();
+		//	tdnDebug::OutPutLog("プレイヤー%s:\nメッシュSetPos()とかにかかった時間 %.1lf\n", (m_side == SIDE::LEFT) ? "LEFT" : "RIGHT", tdnStopWatch::GetResult());
+		//}
+
+		//if (bOutLog) tdnStopWatch::Start();
+
+		// モーション補間を掛けるのだが、攻撃モーションが若干遅れてしまうので、攻撃モーションのときは補間を掛けない
+		const float slerp((isAttackState()) ? 0 : .5f);
 		m_pObj->Update();
+		//if (bOutLog)
+		//{
+		//	tdnStopWatch::End();
+		//	tdnDebug::OutPutLog("プレイヤー%s:\nメッシュUpdate()にかかった時間 %.1lf\n", (m_side == SIDE::LEFT) ? "LEFT" : "RIGHT", tdnStopWatch::GetResult());
+		//}
+
 	}
 
+	//if (bOutLog) tdnStopWatch::Start();
 
 	// エフェクトマネージャー更新 (ヒットストップ無視)
 	m_pPanelEffectMGR->Update();
 	m_pUVEffectMGR->Update();
 	m_pThrowMark->Update();
 
-
-
-	// コンボUI
-	//m_pComboUI->Update();
-
+	//if (bOutLog)
+	//{
+	//	tdnStopWatch::End();
+	//	tdnDebug::OutPutLog("プレイヤー%s:\nエフェクト更新にかかった時間 %.1lf\n", (m_side == SIDE::LEFT) ? "LEFT" : "RIGHT", tdnStopWatch::GetResult());
+	//}
 }
 
 void BasePlayer::UpdateDrive()

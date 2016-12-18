@@ -8,6 +8,7 @@
 #include "../Shot/ShotManager.h"
 #include "../Shot/BaseShot.h"
 #include "../Stand/Stand.h"
+#include "../Sound/SoundManager.h"
 
 Stage::Base *Collision::m_pStage = nullptr;
 
@@ -61,40 +62,29 @@ void Collision::PlayerCollision(PlayerManager *pPlayerMgr, ShotManager *pShotMgr
 	// ごりくｎ
 	if (pHitDamageInfo[0] && pHitDamageInfo[1])
 	{
-		bool bThrowed(false);
-
 		// 打撃と投げなら投げが勝つ
 		if (pHitDamageInfo[0]->iAttribute == (int)ATTACK_ATTRIBUTE::THROW && pHitDamageInfo[1]->iAttribute == (int)ATTACK_ATTRIBUTE::STRIKE)
 		{
 			// 2重ヒット防止用のフラグをONにする
 			if (pPlayer2->isAttackState())pPlayer2->GetAttackData()->bHit = true;
-			bThrowed = true;
+		}
+
+		else if (pHitDamageInfo[1]->iAttribute == (int)ATTACK_ATTRIBUTE::THROW && pHitDamageInfo[0]->iAttribute == (int)ATTACK_ATTRIBUTE::STRIKE)
+		{
+			// 2重ヒット防止用のフラグをONにする
+			if (pPlayer1->isAttackState())pPlayer1->GetAttackData()->bHit = true;
 		}
 		else
 		{
 			// メッセージを送信
 			SendHitMessage(pPlayer2, pPlayer1, pHitDamageInfo[0]);
-
 			// 2重ヒット防止用のフラグをONにする
 			if (pPlayer2->isAttackState())pPlayer2->GetAttackData()->bHit = true;
-		}
 
-		if (!bThrowed)
-		{
-			// 打撃と投げなら投げが勝つ
-			if (pHitDamageInfo[1]->iAttribute == (int)ATTACK_ATTRIBUTE::THROW && pHitDamageInfo[0]->iAttribute == (int)ATTACK_ATTRIBUTE::STRIKE)
-			{
-				// 2重ヒット防止用のフラグをONにする
-				if (pPlayer1->isAttackState())pPlayer1->GetAttackData()->bHit = true;
-			}
-			else
-			{
-				// メッセージを送信
-				SendHitMessage(pPlayer1, pPlayer2, pHitDamageInfo[1]);
-
-				// 2重ヒット防止用のフラグをONにする
-				if (pPlayer1->isAttackState())pPlayer1->GetAttackData()->bHit = true;
-			}
+			// メッセージを送信
+			SendHitMessage(pPlayer1, pPlayer2, pHitDamageInfo[1]);
+			// 2重ヒット防止用のフラグをONにする
+			if (pPlayer1->isAttackState())pPlayer1->GetAttackData()->bHit = true;
 		}
 	}
 
@@ -235,6 +225,10 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 
 				// 掴まれたメッセージ
 				MsgMgr->Dispatch(0, my->GetID(), you->GetID(), MESSAGE_TYPE::BE_THROWN, nullptr);
+
+				// 投げSEをここで再生
+				LPCSTR seID = pAttackData->HitSE;
+				if (seID) se->Play((LPSTR)seID);
 			}
 
 			else
@@ -808,7 +802,7 @@ void Collision::Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2)
 
 		sinking1.y = 0;
 		sinking2.y = 0;
-		static const float rate = .5f;
+		static const float rate = .75f;
 		sinking1 *= rate;	// 完全に戻すと不自然なので
 		sinking2 *= rate;
 

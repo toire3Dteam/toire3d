@@ -74,7 +74,7 @@ bool sceneMain::Initialize()
 #endif
 
 	// ステージ初期化(★セレクトしたステージのタイプを引数に渡す)
-	Stage::Base::CreateStage(&m_pStage, SelectDataMgr->Get()->stage, CameraMgr);	// 関数の中で作ってもらう
+	Stage::Base::CreateStage(&m_pStage, SelectDataMgr->Get()->eStage, CameraMgr);	// 関数の中で作ってもらう
 	Collision::SetStage(m_pStage);
 
 	//std::unique_ptr<std::thread> PlayerLoadThread(new std::thread([&](){

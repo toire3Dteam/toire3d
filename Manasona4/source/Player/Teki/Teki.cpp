@@ -59,7 +59,7 @@ Teki::Teki(SIDE side, const SideData &data) :BasePlayer(side, data)
 
 	if (m_side == SIDE::RIGHT)
 	{
-		LPSTR path = "DATA/CHR/Teki/teki2.png";
+		LPSTR path("DATA/CHR/Teki/teki2.png");
 		m_pDefaultObj->SetTexture(tdnTexture::Load(path), 0);
 		m_pHHDOFObj->SetTexture(tdnTexture::Load(path), 0);
 	}
@@ -118,7 +118,7 @@ void Teki::InitActionDatas()
 	//	通常1段
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->damage = 280;
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->damage = 240;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->HitSE = "ヒット4";
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->WhiffSE = "空振り5";
@@ -151,7 +151,7 @@ void Teki::InitActionDatas()
 	//	通常2段
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->damage = 420;
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->damage = 360;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->HitSE = "ヒット5";
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->WhiffSE = "空振り5";
@@ -227,7 +227,7 @@ void Teki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->bFinish = true;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->AntiGuard = ANTIGUARD_ATTACK::UP_ATTACK;	// ★しゃがみガードをつぶす
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->ShakeCameraInfo.Set(.1f, 2);
-	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->GuardRecoveryFrame = 20;
+	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->GuardRecoveryFrame = 10;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->fGuardKnockBackPower = .45f;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->fComboRate = 0.85f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
@@ -251,7 +251,7 @@ void Teki::InitActionDatas()
 	//	しゃがみ下段攻撃
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->damage = 320;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->damage = 400;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->HitSE = "ヒット4";
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->WhiffSE = "空振り5";
@@ -272,7 +272,7 @@ void Teki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 7;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 7;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 22;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 32;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 24;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_BACK;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SQUAT_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	// 判定形状
@@ -286,7 +286,7 @@ void Teki::InitActionDatas()
 	//	足払い攻撃
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].pAttackData->damage = 360;
+	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].pAttackData->damage = 420;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].pAttackData->HitSE = "ヒット4";
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOWN_ATTACK].pAttackData->WhiffSE = "空振り5";
@@ -337,7 +337,7 @@ void Teki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(.5f, .0f);
-	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.35f, 1.45f);
+	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.35f, 1.75f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 7;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 7;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 35;
@@ -355,7 +355,7 @@ void Teki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].InstanceAttackData();	// アタックデータ作成
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->damage = 200;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->pierceLV = 0;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->HitSE = "ヒット6";
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->HitSE = "ヒット3";
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->WhiffSE = "空振り5";
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->HitEffectType = EFFECT_TYPE::DAMAGE;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->WhiffEffectType = EFFECT_TYPE::WHIFF;
@@ -387,7 +387,7 @@ void Teki::InitActionDatas()
 	//	第2キャラクター固有スキル(コークスクリュー)
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->damage = 500;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->damage = 700;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->HitSE = "フィニッシュ小";
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->WhiffSE = "空振り5";
@@ -424,7 +424,7 @@ void Teki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].InstanceAttackData();	// アタックデータ作成
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->damage = 30;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->pierceLV = 0;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->HitSE = "ヒット6";
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->HitSE = "ヒット3";
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->WhiffSE = "空振り5";
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->HitEffectType = EFFECT_TYPE::MULTIPLE_HIT;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->WhiffEffectType = EFFECT_TYPE::WHIFF;
@@ -589,7 +589,7 @@ void Teki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->WhiffEffectType = EFFECT_TYPE::WHIFF;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->bAntiAir = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->bFinish = false;
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->AntiGuard = ANTIGUARD_ATTACK::UP_ATTACK;	// 中断攻撃
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->AntiGuard = ANTIGUARD_ATTACK::NONE;	// 中断攻撃
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->ShakeCameraInfo.Set(0, 0);
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->GuardRecoveryFrame = 18;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW].pAttackData->fComboRate = 0.85f;
@@ -663,8 +663,8 @@ void Teki::InitMotionDatas()
 {
 	m_iMotionNumbers[(int)MOTION_TYPE::WAIT] = 0;
 	m_iMotionNumbers[(int)MOTION_TYPE::WALK] = 1;
-	m_iMotionNumbers[(int)MOTION_TYPE::RUN] = 3;
-	m_iMotionNumbers[(int)MOTION_TYPE::BACK_WALK] = 2;
+	m_iMotionNumbers[(int)MOTION_TYPE::RUN] = 2;
+	m_iMotionNumbers[(int)MOTION_TYPE::BACK_WALK] = 3;
 	m_iMotionNumbers[(int)MOTION_TYPE::BACK_STEP] = 4;
 	m_iMotionNumbers[(int)MOTION_TYPE::RUSH_ATTACK1] = 5;
 	m_iMotionNumbers[(int)MOTION_TYPE::RUSH_ATTACK2] = 6;
@@ -721,75 +721,130 @@ void Teki::KakeaiExit()
 
 void Teki::ThirdRushInit()
 {
-	// モーションに変える
-	SetMotion(MOTION_TYPE::RUSH_ATTACK3);
-
-	// アクションステート変更
-	SetActionState(BASE_ACTION_STATE::SKILL);
-
-	// アングルセット
-	SetDirAngle();
+	m_eSkillActionType = SKILL_ACTION_TYPE::LAND;
+	SkillInit();
 }
 
 void Teki::ThirdRushUpdate()
 {
-	if (!isAttackState()) return;
+	if (GetActionFrame() == FRAME_STATE::END) return;
 
-	// ヒットしてる状態
-	if (GetAttackData()->bHit)
+	// キルラッシュ
+	if (m_eSkillActionType == SKILL_ACTION_TYPE::LAND)
 	{
-		// キルラッシュ→コークスクリュー
-		if (GetActionState() == BASE_ACTION_STATE::SKILL)
+		m_pSkillActions[(int)SKILL_ACTION_TYPE::LAND]->Execute();
+
+		// ヒットしてる状態
+		if (
+			//GetAttackData()->bHit && 
+			GetActionFrame() == FRAME_STATE::FOLLOW)
 		{
 			// 攻撃ボタン押したら
-			if (isPushInputTRG(PLAYER_COMMAND_BIT::C, true) && GetActionFrame() == FRAME_STATE::FOLLOW)
+			if (isPushInputTRG(PLAYER_COMMAND_BIT::C, true))
 			{
-				// 先行入力リセット
-				AheadCommandReset();
-
-				// モーションに変える
-				SetMotion(MOTION_TYPE::SKILL2);
-
-				// アクションステート変更
-				SetActionState(BASE_ACTION_STATE::SKILL2);
+				SkillExit();
+				m_eSkillActionType = SKILL_ACTION_TYPE::LAND2;
+				SkillInit();
 			}
 		}
-		else
-		{
-			// 横に移動
-			if (isActiveFrame())
-			{
-				SetMove(Vector3(m_dir == DIR::LEFT ? -2.0f : 2.0f, 0, 0));
-			}
+	}
 
+	// コークスクリュー
+	else
+	{
+		m_pSkillActions[(int)SKILL_ACTION_TYPE::LAND2]->Execute();
+
+		// ヒットしてる状態
+		if (
+			//GetAttackData()->bHit && 
+			GetActionFrame() == FRAME_STATE::FOLLOW)
+		{
 			// 攻撃ボタン押したら
 			if (isPushInputTRG(PLAYER_COMMAND_BIT::C, true))
 			{
 				// 先行入力リセット
 				AheadCommandReset();
-
 				// ゲージ50%以上で必殺技にキャンセルする
-				// オーバードライブ中ならゲージなしで打てる
-				if (isOverDrive())
+				//if (GetActionFrame() == FRAME_STATE::FOLLOW)
 				{
-					// オーバードライブを終了して発動
-					SetOverDriveFrame(0);
+					// オーバードライブ中ならゲージなしで打てる
+					if (isOverDrive())
+					{
+						// オーバードライブを終了して発動
+						SetOverDriveFrame(0);
+					}
+					else if (GetOverDriveGage() < 50) return;
+
+					// 50%消費
+					AddOverDriveGage(-50);
+
+					// 必殺ステートへ
+					m_pStateMachine->ChangeState(BasePlayerState::HeavehoDrive::GetInstance());
 				}
-				else if (GetOverDriveGage() < 50) return;
-
-				// 50%消費
-				AddOverDriveGage(-50);
-
-				// 必殺ステートへ
-				m_pStateMachine->ChangeState(BasePlayerState::HeavehoDrive::GetInstance());
 			}
 		}
 	}
+
+
+	//// ヒットしてる状態
+	//if (GetAttackData()->bHit)
+	//{
+	//	// キルラッシュ→コークスクリュー
+	//	if (GetActionState() == BASE_ACTION_STATE::SKILL)
+	//	{
+	//		// 攻撃ボタン押したら
+	//		if (isPushInputTRG(PLAYER_COMMAND_BIT::C, true) && GetActionFrame() == FRAME_STATE::FOLLOW)
+	//		{
+	//			// 先行入力リセット
+	//			AheadCommandReset();
+
+	//			// モーションに変える
+	//			SetMotion(MOTION_TYPE::SKILL2);
+
+	//			// アクションステート変更
+	//			SetActionState(BASE_ACTION_STATE::SKILL2);
+	//		}
+	//	}
+	//	else
+	//	{
+	//		// 横に移動
+	//		if (isActiveFrame())
+	//		{
+	//			SetMove(Vector3(m_dir == DIR::LEFT ? -2.0f : 2.0f, 0, 0));
+	//		}
+
+	//		// 攻撃ボタン押したら
+	//		if (isPushInputTRG(PLAYER_COMMAND_BIT::C, true))
+	//		{
+	//			// 先行入力リセット
+	//			AheadCommandReset();
+
+	//			// ゲージ50%以上で必殺技にキャンセルする
+	//			// オーバードライブ中ならゲージなしで打てる
+	//			if (isOverDrive())
+	//			{
+	//				// オーバードライブを終了して発動
+	//				SetOverDriveFrame(0);
+	//			}
+	//			else if (GetOverDriveGage() < 50) return;
+
+	//			// 50%消費
+	//			AddOverDriveGage(-50);
+
+	//			// 必殺ステートへ
+	//			m_pStateMachine->ChangeState(BasePlayerState::HeavehoDrive::GetInstance());
+	//		}
+	//	}
+	//}
 }
 
 void Teki::ThirdRushExit()
 {
-
+	if (m_eSkillActionType != SKILL_ACTION_TYPE::NO_ACTION)
+	{
+		m_pSkillActions[(int)m_eSkillActionType]->Exit();
+		m_eSkillActionType = SKILL_ACTION_TYPE::NO_ACTION;
+	}
 }
 
 
@@ -968,7 +1023,7 @@ bool Teki::SkillAction::Squat::Execute()
 	else if (m_pTeki->m_iCurrentActionFrame < 10)
 	{
 		// 移動するだけ
-		m_pTeki->SetMove(Vector3((m_pTeki->m_dir == DIR::LEFT) ? -m_pTeki->m_tagCharacterParam.fMaxSpeed : m_pTeki->m_tagCharacterParam.fMaxSpeed, 0, 0));
+		m_pTeki->SetMove(Vector3((m_pTeki->m_dir == DIR::LEFT) ? -m_pTeki->m_tagCharacterParam.fMaxSpeed * 1.25f : m_pTeki->m_tagCharacterParam.fMaxSpeed * 1.25f, 0, 0));
 	}
 
 	else //if (m_pTeki->m_iCurrentActionFrame < 20)
@@ -1079,7 +1134,7 @@ void Teki::SkillAction::Aerial::Enter()
 	m_pTeki->SetActionState(BASE_ACTION_STATE::SKILL_AERIAL);
 
 	// 移動量を消す
-	m_pTeki->SetMove(VECTOR_ZERO);
+	m_pTeki->SetMove(Vector3((m_pTeki->GetDir() == DIR::LEFT) ? -1.5f : 1.5f, 4.5f, 0));
 
 	// 重力の影響受けるな！
 	m_pTeki->SetMoveUpdate(false);
@@ -1123,9 +1178,8 @@ bool Teki::SkillAction::Aerial::Execute()
 	}
 
 	// 始動中は上方向に移動
-	if(m_pTeki->GetActionFrame() == FRAME_STATE::START) m_pTeki->SetMove(Vector3((m_pTeki->GetDir() == DIR::LEFT) ? -1.0f : 1.0f, 2, 0));
+	if(m_pTeki->GetActionFrame() != FRAME_STATE::START)m_pTeki->SetMove(Vector3(0, -3, 0));
 	// それ以降は下方向に移動
-	else m_pTeki->SetMove(Vector3(0, -3, 0));
 
 
 	//if (m_pTeki->GetActionFrame() == FRAME_STATE::ACTIVE)
@@ -1305,7 +1359,7 @@ void Teki::HeavehoDriveOverFlowSuccessUpdate()
 		// ローカルマトリックスにモデルのトランスマトリックスを掛けて
 		// ローカルからワールド座標へ返還する
 		// マトリックスに代入したらアングルとか行けそう
-		D3DXMATRIX WorldMat = *m_pObj->GetBone(19) * m_pObj->TransMatrix;
+		D3DXMATRIX WorldMat = *m_pObj->GetBone(22) * m_pObj->TransMatrix;
 
 		// マトリックスから位置の部分のみをベクトルとして設定する
 		m_pTargetPlayer->SetPos(Vector3(WorldMat._41, WorldMat._42, WorldMat._43));
@@ -1334,9 +1388,95 @@ void Teki::HeavehoDriveOverFlowSuccessUpdate()
 	// コンボ
 	//COMBO_DESK comboDesk;
 
-	//switch (m_iHeaveHoDriveOverFlowFrame++)
-	//{
-	//}
+	switch (m_iHeaveHoDriveOverFlowFrame++)
+	{
+	case 170:	// HIT
+		se->Play("ヒット3");
+		break;
+
+	case 220:	// HIT
+		se->Play("ヒット3");
+		break;
+
+	case 270:	// HIT
+		se->Play("ヒット3");
+		break;
+
+	case 300:	// HIT
+		se->Play("ヒット3");
+		break;
+
+	case 330:	// HIT
+		se->Play("ヒット3");
+		break;
+
+	case 360:	// HIT
+		se->Play("ヒット3");
+		break;
+
+	case 390:	// HIT
+		se->Play("ヒット3");
+		break;
+
+	case 400:	// HIT
+		se->Play("ヒット3");
+		break;
+
+	case 410:	// HIT
+		se->Play("ヒット3");
+		break;
+	case 420:	// HIT
+		se->Play("ヒット3");
+		break;
+	case 430:	// HIT
+		se->Play("ヒット3");
+		break;
+	case 440:	// HIT
+		se->Play("ヒット3");
+		break;
+	case 450:	// HIT
+		se->Play("ヒット3");
+		break;
+	case 460:	// HIT
+		se->Play("ヒット3");
+		break;
+	case 470:	// HIT
+		se->Play("ヒット3");
+		break;
+	case 480:	// HIT
+		se->Play("ヒット3");
+		break;
+	case 490:	// HIT
+		se->Play("ヒット3");
+		break;
+	case 500:	// HIT
+		se->Play("ヒット3");
+		break;
+	case 510:	// HIT
+		se->Play("ヒット3");
+		break;
+	case 520:	// HIT
+		se->Play("ヒット3");
+		break;
+	case 530:	// HIT
+		se->Play("ヒット3");
+		break;
+	case 540:	// HIT
+		se->Play("ヒット3");
+		break;
+	case 550:	// HIT
+		se->Play("ヒット3");
+		break;
+	case 560:	// HIT
+		se->Play("ヒット3");
+		break;
+	case 570:	// HIT
+		se->Play("ヒット3");
+		break;
+	case 710:
+		HeaveHoFinishUI->Action();	// ふぃにっしゅ
+		break;
+	}
 
 }
 

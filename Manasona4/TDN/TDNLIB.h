@@ -351,7 +351,8 @@ public:
 	//------------------------------------------------------
 	//	コンストラクタ
 	//------------------------------------------------------
-	Quaternion(){}
+	Quaternion():D3DXQUATERNION(0,0,0,1)	// ※キャラがたまに表示されないバグの原因。ここに初期値を与えていなかったせいで、new Quaternion[num]の初期値に不正な値が入っていた。Fix by Hidaka.
+	{}
 	Quaternion(const D3DXQUATERNION& in) :D3DXQUATERNION(in)
 	{}
 	Quaternion( float sx, float sy, float sz, float sw ) : D3DXQUATERNION( sx, sy, sz, sw ){}
@@ -3305,6 +3306,50 @@ private:
 
 };
 
+
+/**
+*@brief		主にデバッグに役立つ関数をまとめるクラス
+*@author		Yamagoe
+*/
+class tdnDebug
+{
+public:
+
+	/**
+	*@brief			引数の文字列をテキストファイル(DATA/System/log.txt)に吐き出す。主にデバッグが効かないときに。
+	*@param[in]		*format	とりあえずprintf的な感じにしてみる
+	*/
+	static void OutPutLog(const char *format, ...)
+	{
+		char str[65536];
+
+		// printfの引数を文字列に変換
+		{
+			// 可変長引数を操作するためのもの
+			va_list ptr;
+			va_start(ptr, format);
+			// このvsprintfでstrに可変長引数込みのformatを格納させる(sprintfの可変長対応verみたいな感じ)
+			vsprintf_s(str, sizeof(str), format, ptr);
+			va_end(ptr);
+		}
+
+		// ログテキストに追加で書き出し(上書きはしない)
+		std::ofstream ofs("DATA/System/log.txt", std::ios::out | std::ios::ate | std::ios::app);
+		ofs << str;
+	}
+
+	/**
+	*@brief					ログテキストファイル(DATA/System/log.txt)を白紙にする
+	*/
+	static void ClearLog()
+	{
+		// ログテキストを開いて何もしない
+		std::ofstream ofs("DATA/System/log.txt");
+	}
+private:
+};
+
+
 //+----------------------
 //	ストップウォッチ
 //+----------------------
@@ -3315,7 +3360,8 @@ public:
 	static void Start();
 	static void End();
 
-	static void DrawResult(int x,int y);
+	static double GetResult();
+	static void DrawResult(int x, int y);
 private:
 	//static double m_dStart;
 	//static double m_dEnd;
@@ -3323,8 +3369,6 @@ private:
 	static LARGE_INTEGER m_dEnd;
 	//static LARGE_INTEGER m_dFrep;
 };
-
-
 
 /********************************************/
 //		IEXゾーン			     
@@ -3361,7 +3405,7 @@ public:
 	//------------------------------------------------------
 	//	初期化
 	//------------------------------------------------------
-	iexMesh( char* filename );
+	iexMesh(char* filename);
 	iexMesh(){ bLoad = FALSE; }
 	iexMesh*	Clone();
 	iexMesh*	Clone(int num_tex);
@@ -3371,8 +3415,8 @@ public:
 	//------------------------------------------------------
 	//	読み込み
 	//------------------------------------------------------
-	BOOL LoadIMO( char* filename );
-	BOOL LoadX( char* filename );
+	BOOL LoadIMO(char* filename);
+	BOOL LoadX(char* filename);
 
 	//------------------------------------------------------
 	//	更新
@@ -3383,14 +3427,14 @@ public:
 	//	描画
 	//------------------------------------------------------
 	void Render();
-	void Render( u32 dwFlags, float param=-1 );
-	void Render( tdnShader* shader, char* name );
+	void Render(u32 dwFlags, float param = -1);
+	void Render(tdnShader* shader, char* name);
 
 	//------------------------------------------------------
 	//	レイ判定
 	//------------------------------------------------------
-	int	RayPick( Vector3* out, Vector3* pos, Vector3* vec, float *Dist );
-	int	RayPickUD( Vector3* out, Vector3* pos, Vector3* vec, float *Dist );
+	int	RayPick(Vector3* out, Vector3* pos, Vector3* vec, float *Dist);
+	int	RayPickUD(Vector3* out, Vector3* pos, Vector3* vec, float *Dist);
 	int	RayPick2(Vector3* out, const Vector3* pos, Vector3* vec, float *Dist);	// 真夏に入ってたやつ
 
 	struct NearestPointOut
@@ -3399,30 +3443,30 @@ public:
 		Vector3 Pos;
 		Vector3 Normal;
 	};
-	void NearestPoint( NearestPointOut *out, const Vector3 &pos );
+	void NearestPoint(NearestPointOut *out, const Vector3 &pos);
 
 	//------------------------------------------------------
 	//	情報設定・取得
 	//------------------------------------------------------
 	//	位置
-	void SetPos( Vector3& pos );
-	void SetPos( float x, float y, float z );
+	void SetPos(Vector3& pos);
+	void SetPos(float x, float y, float z);
 	inline Vector3	GetPos(){ return Pos; }
 	//	角度
-	void SetAngle( Vector3& angle );
-	void SetAngle( float angle );
-	void SetAngle( float x, float y, float z );
+	void SetAngle(Vector3& angle);
+	void SetAngle(float angle);
+	void SetAngle(float x, float y, float z);
 	inline Vector3	GetAngle(){ return Angle; }
 	//	スケール
-	void SetScale( Vector3& scale );
-	void SetScale( float scale );
-	void SetScale( float x, float y, float z );
+	void SetScale(Vector3& scale);
+	void SetScale(float scale);
+	void SetScale(float x, float y, float z);
 	inline Vector3	GetScale(){ return Scale; }
 
 	//	情報
 	LPD3DXMESH	GetMesh(){ return lpMesh; }
 
-	Texture2D*	GetTexture( int n ){ return lpTexture[n]; }
+	Texture2D*	GetTexture(int n){ return lpTexture[n]; }
 	void SetTexture(Texture2D *t, int n){ lpTexture[n] = t; }
 	Texture2D*	ChangeTexture(Texture2D *t, int n){ Texture2D *ret = lpTexture[n]; lpTexture[n] = t; return ret; }
 
@@ -3494,59 +3538,59 @@ protected:
 	Vector3*		CurPos2;
 
 public:
-	void	SetLoadFlag( BOOL bLoad ){ this->bLoad = bLoad; }
+	void	SetLoadFlag(BOOL bLoad){ this->bLoad = bLoad; }
 	iex3DObj(){
 		bLoad = FALSE;
-		for( int i=0 ; i<16 ; i++ ) Param[i] = 0;
+		for (int i = 0; i<16; i++) Param[i] = 0;
 	}
-	iex3DObj( char* filename );
+	iex3DObj(char* filename);
 	~iex3DObj();
 
 	iex3DObj*	Clone();
 	iex3DObj*	Clone(int num_tex);
 
-	BOOL LoadObject( char* filename );
-	int LoadiEM( LPIEMFILE lpIem, LPSTR filename );
-	BOOL CreateFromIEM( char* path, LPIEMFILE lpIem );
-	BOOL ExportIEM( char* path );
+	BOOL LoadObject(char* filename);
+	int LoadiEM(LPIEMFILE lpIem, LPSTR filename);
+	BOOL CreateFromIEM(char* path, LPIEMFILE lpIem);
+	BOOL ExportIEM(char* path);
 
-	LPD3DXSKININFO	CreateSkinInfo( LPIEMFILE lpIem );
-	LPD3DXMESH	CreateMesh( LPIEMFILE lpIem );
+	LPD3DXSKININFO	CreateSkinInfo(LPIEMFILE lpIem);
+	LPD3DXMESH	CreateMesh(LPIEMFILE lpIem);
 
 
 
-	static BOOL SaveObject( LPIEMFILE lpIem, LPSTR filename );
+	static BOOL SaveObject(LPIEMFILE lpIem, LPSTR filename);
 
 	// slerp : [ 0 < slerp < 1 ] 前フレームの姿勢の影響度
-	void Update( float slerp = 0.0f );
-	void SetMotion( int motion );
+	void Update(float slerp = 0.0f);
+	void SetMotion(int motion);
 	inline int GetMotion(){ return Motion; }
-	inline WORD GetMotionOffset( int m ){ return M_Offset[m]; }
+	inline WORD GetMotionOffset(int m){ return M_Offset[m]; }
 
-	inline void SetFrame( int frame ){ dwFrame = frame; }
+	inline void SetFrame(int frame){ dwFrame = frame; }
 	inline int GetFrame(){ return dwFrame; }
 
 	void Animation();
 
 	void Render();
-	void Render( DWORD flag, float alpha=-1 );
-	void Render( tdnShader* shader, char* name );
+	void Render(DWORD flag, float alpha = -1);
+	void Render(tdnShader* shader, char* name);
 
-	inline int GetParam( int n ){ return Param[n]; }
-	inline void SetParam( int n, int p ){ Param[n] = p; }
+	inline int GetParam(int n){ return Param[n]; }
+	inline void SetParam(int n, int p){ Param[n] = p; }
 
-	inline WORD GetFrameFlag( int frame ){ return dwFrameFlag[frame]; }
-	inline void SetFrameFlag( int frame, WORD p ){ dwFrameFlag[frame] = p; }
+	inline WORD GetFrameFlag(int frame){ return dwFrameFlag[frame]; }
+	inline void SetFrameFlag(int frame, WORD p){ dwFrameFlag[frame] = p; }
 
 	inline int GetNumFrame(){ return NumFrame; }
 
-	inline Quaternion*	GetPose( int n ){ return &CurPose1[n]; }
-	inline Vector3*		GetBonePos( int n ){ return &CurPos1[n]; }
+	inline Quaternion*	GetPose(int n){ return &CurPose1[n]; }
+	inline Vector3*		GetBonePos(int n){ return &CurPos1[n]; }
 	inline int	GetNumBone(){ return NumBone; }
-	inline Matrix*	GetBone( int n ){ return &lpBoneMatrix[n]; }
+	inline Matrix*	GetBone(int n){ return &lpBoneMatrix[n]; }
 
 	// slerp : [ 0 < slerp < 1 ] 前フレームの姿勢の影響度
-	void UpdateSkinMeshFrame( float frame, float slerp = 0.0f );
+	void UpdateSkinMeshFrame(float frame, float slerp = 0.0f);
 	void UpdateBoneMatrix();
 	void UpdateSkinMesh();
 };

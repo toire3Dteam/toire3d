@@ -191,5 +191,8 @@ private:
 
 	// 一撃必殺
 	OverFlow *m_pOverFlow;
+
+	// ごりごりくんの登場やでえええええ！！！！！！！！！え
+	bool m_bSuikomi;
 };
 

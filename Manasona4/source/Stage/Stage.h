@@ -104,7 +104,7 @@ namespace Stage
 	public:
 		Garden() :Base() {}
 		void Initialize(Camera *pCamera);
-		EFFECT_CAMERA_ID GetIntroCameraScriptID() { return EFFECT_CAMERA_ID::SEA_STAGE_INTRO; }
+		EFFECT_CAMERA_ID GetIntroCameraScriptID() { return EFFECT_CAMERA_ID::GARDEN_STAGE_INTRO; }
 	};
 
 	// 七里ステージ
@@ -116,7 +116,7 @@ namespace Stage
 		void Update();
 		void Render(tdnShader* shader, char* name);
 
-		EFFECT_CAMERA_ID GetIntroCameraScriptID() { return EFFECT_CAMERA_ID::SEA_STAGE_INTRO; }
+		EFFECT_CAMERA_ID GetIntroCameraScriptID() { return EFFECT_CAMERA_ID::NANASATO_STAGE_INTRO; }
 	};
 
 	// 終点ステージ

@@ -27,6 +27,11 @@ void tdnStopWatch::End()
 }
 
 // Œ‹‰Ê‚ð•Ô‚·
+double tdnStopWatch::GetResult()
+{
+	return (double)(m_dEnd.QuadPart - m_dStart.QuadPart);
+}
+
 void tdnStopWatch::DrawResult(int x, int y)
 {
 

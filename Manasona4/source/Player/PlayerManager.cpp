@@ -45,7 +45,7 @@ void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage, SideData Side
 		}
 
 		// キャラクターで分岐する
-		switch (SideDatas[(int)side].character)
+		switch (SideDatas[(int)side].eCharacter)
 		{
 		case CHARACTER::AIROU:
 			m_pPlayers[i] = new Airou(side, SideDatas[(int)side]);

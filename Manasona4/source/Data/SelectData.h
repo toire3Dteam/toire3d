@@ -15,7 +15,9 @@ enum class CHARACTER { AIROU, TEKI, NAZENARA, END };
 enum class PARTNER { MOKOI, MAYA, END };
 
 // ステージのタイプ
-enum class STAGE { SAND, SEA, GARDEN, SYUTEN, A, NANASATO_SITY, HEAVE_HO, MAX };
+enum class STAGE { SAND, SYUTEN, SEA, GARDEN, NANASATO_SITY, 
+	//HEAVE_HO, A,	// 無かったことにされたステージたち
+	MAX };
 
 // AIのタイプ
 enum class AI_TYPE
@@ -34,8 +36,8 @@ enum class AI_TYPE
 
 struct SideData
 {
-	CHARACTER character;
-	PARTNER partner;
+	CHARACTER eCharacter;
+	PARTNER ePartner;
 	int iDeviceID;	// コントローラーデバイスのID
 	bool bAI;		// AIフラグ
 	AI_TYPE eAIType;// AIのタイプ
@@ -46,7 +48,7 @@ struct SideData
 struct SelectData
 {
 	SideData tagSideDatas[(int)SIDE::ARRAY_MAX];	// 左右の情報
-	STAGE stage;			// 選んでるステージ
+	STAGE eStage;			// 選んでるステージ
 	bool bTutorial;			// チュートリアルフラグ
 	bool bTraining;			// トレーニングフラグ
 	int iWinRound;			// 勝利ラウンド数
