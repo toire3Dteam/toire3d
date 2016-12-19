@@ -142,5 +142,96 @@ private:
 
 };
 
+
+//+-------------------------------
+//	TEKIの演出
+//+-------------------------------
+class TekiResultPerformance : public BaseResultPerformance
+{
+public:
+	TekiResultPerformance();
+	~TekiResultPerformance();
+
+	void Update();
+	void BackRender();
+	void FrontRender();
+	void Action();
+
+private:
+	// 必要なやつ
+	Pic m_winner;
+	Pic m_winnerDon;
+	Pic m_edge;
+	Pic m_back;
+
+
+	Pic m_font;
+	int m_iFontAnimFrame;
+	//Pic m_fontKill;
+
+	Pic m_pTopLight;
+	Pic m_pFlontRing;
+	Pic m_pBackRing;
+
+	Pic m_blackInk;
+	Pic m_whiteSoul;
+
+	// バックムービー
+	tdnMovie*  m_movieMgr;
+	tdn2DObj* m_movieTex;
+
+};
+
+
+//+-------------------------------
+//	Nazenarabaの演出
+//+-------------------------------
+class NazenarabaResultPerformance : public BaseResultPerformance
+{
+public:
+	NazenarabaResultPerformance();
+	~NazenarabaResultPerformance();
+
+	void Update();
+	void BackRender();
+	void FrontRender();
+	void Action();
+
+private:
+	// 必要なやつ
+	Pic m_winner;
+	Pic m_winnerDon;
+	Pic m_edge;
+	Pic m_back;
+	Pic m_back2;
+
+	Pic m_font;
+	int m_iFontAnimFrame;
+	//Pic m_fontKill;
+
+	Pic m_pTopLight;
+	Pic m_pFlontRing;
+	Pic m_pBackRing;
+
+	Pic m_blackInk;
+	Pic m_whiteSoul;
+
+	Pic m_pBalloon;// 吹き出し
+
+	static const int NORT_MAX = 3;
+	Pic m_pNort[NORT_MAX];
+
+	 
+	 // 
+	//Pic m_pNort2; // 
+	//Pic m_pNort3; // 
+
+
+	// バックムービー
+	tdnMovie*  m_movieMgr;
+	tdn2DObj* m_movieTex;
+
+};
+
 //tdn2DobjwoAnimnisuru 
 //SpaeadとかいみわからんｍにゃちうのなんまえをScareとかにもこのさいｓかえる

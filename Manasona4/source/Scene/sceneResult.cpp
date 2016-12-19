@@ -86,11 +86,11 @@ bool sceneResult::Initialize()
 		break;
 	case CHARACTER::TEKI:
 		m_WinPlayer = new iex3DObj("DATA/CHR/Teki/result.IEM");
-		m_ResultPerformance = new AirouResultPerformance();
+		m_ResultPerformance = new TekiResultPerformance();
 		break;
 	case CHARACTER::NAZENARA:
 		m_WinPlayer = new iex3DObj("DATA/CHR/Nazenara/result.IEM");
-		m_ResultPerformance = new AirouResultPerformance();
+		m_ResultPerformance = new NazenarabaResultPerformance();
 		break;
 
 	//case CHARACTER::ARAMIATAMA:
