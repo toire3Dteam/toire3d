@@ -216,11 +216,11 @@ void Stage::NanasatoSity::Update()
 	PointLightMgr->AddPointLight(Vector3(92, 31, 49), LightCol, LightSize , 4 * 1, 1, 1, 1);
 	PointLightMgr->AddPointLight(Vector3(-85, 31, 21), LightCol, LightSize, 4 * 1, 1, 1, 1);
 	PointLightMgr->AddPointLight(Vector3(-53, 13, 120), LightCol, LightSize , 4 * 1, 1, 1, 1);
-	//PointLightMgr->AddPointLight(Vector3(1, 24, 120), LightCol, LightSize , 4 * 1, 1, 1, 1);
-	//PointLightMgr->AddPointLight(Vector3(-67, 16,205 ), LightCol, LightSize , 4 * 1, 1, 1, 1);
-	//PointLightMgr->AddPointLight(Vector3(4, 6, 217), LightCol, LightSize , 4 * 1, 1, 1, 1);
-	//PointLightMgr->AddPointLight(Vector3(6, 30, 321), LightCol, LightSize , 4 * 1, 1, 1, 1);
-	//PointLightMgr->AddPointLight(Vector3(-66, 22, 319), LightCol, LightSize, 4 * 1, 1, 1, 1);
+	PointLightMgr->AddPointLight(Vector3(1, 24, 120), LightCol, LightSize , 4 * 1, 1, 1, 1);
+	PointLightMgr->AddPointLight(Vector3(-67, 16,205 ), LightCol, LightSize , 4 * 1, 1, 1, 1);
+	PointLightMgr->AddPointLight(Vector3(4, 6, 217), LightCol, LightSize , 4 * 1, 1, 1, 1);
+	PointLightMgr->AddPointLight(Vector3(6, 30, 321), LightCol, LightSize , 4 * 1, 1, 1, 1);
+	PointLightMgr->AddPointLight(Vector3(-66, 22, 319), LightCol, LightSize, 4 * 1, 1, 1, 1);
 
 }
 
