@@ -161,6 +161,9 @@ void SpGage::Update()
 
 void SpGage::Render()
 {
+	int number = (int)m_pPlayerReferences->GetOverDriveGage();
+	number = min(100, number);
+
 	// ƒQ[ƒW‚Ì•`‰æ
 	if (m_sSideFlag == SIDE::LEFT)
 	{
@@ -210,7 +213,7 @@ void SpGage::Render()
 				m_iGageWidth - l_w, m_iGageHeight*m_iGageLevel,
 				l_w, m_iGageHeight, RS::ADD);
 
-			int number = (int)m_pPlayerReferences->GetOverDriveGage();
+			
 			for (int count = 0; count <= 2; ++count)
 			{
 				int digitNum = number % 10;	// ˆê”Ô¬‚³‚¢Œ…‚ð“üŽè
@@ -281,7 +284,7 @@ void SpGage::Render()
 				0, m_iGageHeight*m_iGageLevel,
 				l_w, m_iGageHeight, RS::ADD);
 
-			int number = (int)m_pPlayerReferences->GetOverDriveGage();
+
 			for (int count = 0; count <= 2; ++count)
 			{
 				int digitNum = number % 10;	// ˆê”Ô¬‚³‚¢Œ…‚ð“üŽè

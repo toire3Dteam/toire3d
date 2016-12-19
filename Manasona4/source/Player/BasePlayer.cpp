@@ -1936,6 +1936,18 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::RED_WAVE, 0.75f, 1.0f, Vector3(0, 0, 0), Vector3(0, 0, 0));
 
 	}	break;
+	case EFFECT_TYPE::DROP_IMPACT_SUPER:
+	{
+		// プレッシャー
+		m_pUVEffectMGR->AddEffect(m_vPos, UV_EFFECT_TYPE::PRESSURE, 1.5f, 2.0f, Vector3(0, 0, 0), Vector3(0, 0, 0));
+
+		// 風
+		//m_pUVEffectMGR->AddEffect(m_vPos + Vector3(0, -5, 0) , UV_EFFECT_TYPE::BREAK_IMPACT, 0.15f, 0.35f);
+
+		// 波紋
+		m_pUVEffectMGR->AddEffect(m_vPos, UV_EFFECT_TYPE::WAVE, 1.0f, 1.5f, Vector3(0, 0, 0), Vector3(0, 0, 0));
+
+	}	break;
 	default:
 		MyAssert(0,"そんなエフェクトは存在しない ");	// そんなエフェクトは存在しない AddEffectAction()
 		break;

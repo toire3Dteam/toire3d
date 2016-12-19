@@ -427,7 +427,7 @@ bool HeaveHoOverFlowCancel(BasePlayer * pPerson)
 	// 相手が根性中じゃなかったらはじく
 	if (!pPerson->GetTargetPlayer()->isWillPower()) return false;
 
-	ラウンド
+	// ラウンド
 
 	// 超必殺技キャンセル
 	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R3))

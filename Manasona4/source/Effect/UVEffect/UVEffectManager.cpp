@@ -97,6 +97,9 @@ UVEffectManager::UVEffectManager()
 		case UV_EFFECT_TYPE::WILL_POWER_AURA:
 			m_baseUVEffect[i] = new WillPowerAuraEffect();
 			break;
+		case UV_EFFECT_TYPE::CYCLONE:
+			m_baseUVEffect[i] = new CycloneEffect();
+			break;
 		default:
 			assert(0);	// "そんなエフェクトはない"
 			break;

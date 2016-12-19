@@ -181,7 +181,10 @@ void MenuUIManager::Render()
 	// タイトル
 	//m_pTitle->Render(0, 0);
 
+#ifdef _DEBUG
 	tdnText::Draw(100, 100, 0xffffffff, "%dセレクト番号", m_iSelectNo);
+#endif // _DEBUG
+
 }
 
 // [初回]アクション

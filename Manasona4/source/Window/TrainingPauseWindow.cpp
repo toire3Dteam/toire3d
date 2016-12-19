@@ -187,12 +187,12 @@ bool  TrainingPauseWindow::Ctrl(int DeviceID)
 		m_iChoiceState = (TRAINING_PAUSE_STATE::BACK);
 		return true;
 	}
-	//if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, DeviceID) == 3)
-	//{
-	//	// ëIëÇµÇΩî‘çÜäiî[ÅI
-	//	m_iChoiceState = (TRAINING_PAUSE_STATE::BACK);
-	//	return true;
-	//}
+	if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, DeviceID) == 3)
+	{
+		// ëIëÇµÇΩî‘çÜäiî[ÅI
+		m_iChoiceState = (TRAINING_PAUSE_STATE::BACK);
+		return true;
+	}
 
 	// BÇ≈Ç‡Ç«Ç¡ÇΩÇÁÇËÇπÇ¡Ç∆Ç…Ç»ÇÈ
 	//	Ç∆ÇËÇ‹äÆê¨

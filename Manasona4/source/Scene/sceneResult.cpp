@@ -131,9 +131,9 @@ bool sceneResult::Initialize()
 		MyAssert(0, "そんなキャラは存在しない");
 		break;
 	}
-	m_LosePlayer->SetAngle(PI * 1.5f);
-	m_LosePlayer->SetScale(1.5f);		// ★★★★★　今だけスケール大きくしてる！！
-	m_losePos=Vector3(-50, 0, 50);
+	//m_LosePlayer->SetAngle(PI * 1.5f);
+	//m_LosePlayer->SetScale(1.5f);		// ★★★★★　今だけスケール大きくしてる！！
+	m_losePos=Vector3(-30, 0, 20);
 	m_LosePlayer->SetPos(m_losePos);
 	m_LosePlayer->Update();
 

@@ -255,6 +255,7 @@ enum class EFFECT_TYPE
 	MUZZLE_FLASH,		// マズルフラッシュ
 	THROW,				// 投げ
 	WILL_POWER,			// 根性
+	DROP_IMPACT_SUPER,	// すごい衝撃波
 };
 
 // ガードの種類

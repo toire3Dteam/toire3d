@@ -411,7 +411,7 @@ void HpGage::MaskScreen()
 	m_pMaskScreen->RenderTarget(0);
 	{
 		// 画面クリア
-		//tdnView::Clear();
+		tdnView::Clear();
 
 		// 初期の真ん中から広がり描画される演出のためのマスク
 		m_pMaskPic->Render((tdnSystem::GetScreenSize().right / 2) - 128 , 0);
