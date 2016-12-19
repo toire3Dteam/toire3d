@@ -352,10 +352,29 @@ void SceneSelectState::End::Execute(sceneSelect *pMain)
 		{
 			int r;
 			// なぜかランダムで0～MAX-1でない値が入っていたので、その値が出るまで無限ループにする(なんでこうなったんだろう？)
-			do{ r = tdnRandom::Get(0, (int)STAGE::MAX - 1); } while (r < 0 || r >= (int)STAGE::MAX);
+			//do
+			//{
+				r = tdnRandom::Get(0, (int)STAGE::MAX - 1);
+				// ランダム処理
+				SelectDataMgr->Get()->eStage = (STAGE)r;
 
-			// ランダム処理
-			SelectDataMgr->Get()->eStage = (STAGE)r;
+				switch ((STAGE)r)
+				{
+				case STAGE::SAND:
+					break;
+				case STAGE::SYUTEN:
+					break;
+				case STAGE::SEA:
+					break;
+				case STAGE::GARDEN:
+					break;
+				case STAGE::NANASATO_SITY:
+					break;
+				default:
+					MyAssert(0, "ステージに不正な値%d", r);
+					break;
+				}
+			//} while (r < 0 || r >= (int)STAGE::MAX);
 		}
 		else
 		{

@@ -15,9 +15,7 @@ enum class CHARACTER { AIROU, TEKI, NAZENARA, END };
 enum class PARTNER { MOKOI, MAYA, END };
 
 // ステージのタイプ
-enum class STAGE { SAND, SYUTEN, SEA, GARDEN, NANASATO_SITY, 
-	//HEAVE_HO, A,	// 無かったことにされたステージたち
-	MAX };
+enum class STAGE { SAND, SYUTEN, SEA, GARDEN, NANASATO_SITY, MAX };
 
 // AIのタイプ
 enum class AI_TYPE

@@ -9,10 +9,7 @@
 #include "../Camera/camera.h"
 
 // 定数
-static const float HUTTOBI_LINE = 3.0f;
 static const float REPEAT_ATTACK_RATE = 0.85f;		// 同じ攻撃当たるなレート
-
-#define GUARD_ON	// ガードあり
 
 /*******************************************************/
 //	ファンクション
@@ -26,10 +23,16 @@ void ChangeWaitState(BasePlayer *pPerson)
 {
 	// 下キーを押しているなら、待機ステートではなく、しゃがみステートに行く
 	if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN))
+	{
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Squat::GetInstance());
+		return;
+	}
+
+	// 相手が攻撃ステートでガード入力していたら、ガードステートに行く
+	if (GuardUpdate(pPerson)) return;
 
 	// それ以外なら待機ステートに戻る
-	else pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+	pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
 }
 
 bool JumpCancel(BasePlayer * pPerson)
@@ -424,10 +427,8 @@ bool HeaveHoOverFlowCancel(BasePlayer * pPerson)
 {
 	if (pPerson->isOverDrive() == false)return false;
 
-	// 相手が根性中じゃなかったらはじく
-	if (!pPerson->GetTargetPlayer()->isWillPower()) return false;
-
-	// ラウンド
+	// 一撃必殺発動状態じゃなかったらはじく
+	if (!pPerson->isHeaveHoDriveOverFlowOK()) return false;
 
 	// 超必殺技キャンセル
 	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R3))
@@ -605,16 +606,15 @@ bool isInputGuardCommand(BasePlayer *pPerson)
 	return bGuardCommand;
 }
 
-void GuardUpdate(BasePlayer *pPerson)
+bool GuardUpdate(BasePlayer *pPerson)
 {
-#ifdef GUARD_ON
 	// ガードコマンドを入力してたら
 	if (isInputGuardCommand(pPerson))
 	{
 		BasePlayer *target(pPerson->GetTargetPlayer());
 		bool bAttackState(false);
 		// ★相手が何かしらの攻撃をしていたら、
-		if (target->isAttackState()) if (target->GetAttackData()->attribute != ATTACK_ATTRIBUTE::THROW) bAttackState=true;	
+		if (target->isAttackState()) if (target->GetAttackData()->attribute != ATTACK_ATTRIBUTE::THROW) bAttackState = true;
 
 		// スタンド
 		if (target->GetStand()->isActive() && target->GetStand()->GetAttackData()) bAttackState = true;
@@ -622,20 +622,19 @@ void GuardUpdate(BasePlayer *pPerson)
 		if (bAttackState)
 		{
 			// 距離
-			if (Math::Length(pPerson->GetPos(), target->GetPos()) > BasePlayer::c_GUARD_DISTANCE) return;	// ガード発動距離
+			if (Math::Length(pPerson->GetPos(), target->GetPos()) > BasePlayer::c_GUARD_DISTANCE) return false;	// ガード発動距離
 
 			// ガード条件を満たしたのでガード
 			pPerson->GetFSM()->ChangeState(BasePlayerState::Guard::GetInstance());
+
+			return true;
 		}
 	}
 
 	// ガードコマンドを入力していないので、ガードしてないステートを設定
-	else
-#endif
-	{
-		pPerson->SetGuardState(GUARD_STATE::NO_GUARD);
-	}
+	pPerson->SetGuardState(GUARD_STATE::NO_GUARD);
 
+	return false;
 }
 
 bool isPossibleGuardState(BasePlayer *pPerson)
@@ -985,10 +984,16 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 	}break;
 
 	case MESSAGE_TYPE::END_FINISHCALL:	// フィニッシュのコールが終わったら、勝ちモーションに行く
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Win::GetInstance());
-		break;
 
-	// (A列車)死んだぜメッセージ
+
+	{
+											// 必要勝利ラウンド数が送られてくるので、あと1回勝てば試合終了フラグのチェック(一撃必殺用)
+											int *RoundNum((int*)msg.ExtraInfo);
+											if (pPerson->GetWinNum() == *RoundNum - 2) pPerson->SetLastOneWin();
+
+											pPerson->GetFSM()->ChangeState(BasePlayerState::Win::GetInstance());
+	}
+		break;
 	}
 
 	return false;
@@ -2475,7 +2480,7 @@ void BasePlayerState::Land::Execute(BasePlayer * pPerson)
 		// 左右方向キーを押してなかったら、「待機」ステートへ
 		else
 		{
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+			ChangeWaitState(pPerson);
 		}
 
 	}
@@ -2544,7 +2549,7 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 	if (pPerson->GetActionFrame() == FRAME_STATE::END)
 	{
 		// 待機モーションに戻る
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		ChangeWaitState(pPerson);
 		return;
 	}
 
@@ -2783,7 +2788,7 @@ void BasePlayerState::KnockBack::Execute(BasePlayer * pPerson)
 	if (pPerson->GetRecoveryFrame() <= 0)
 	{
 		// 待機ステートに戻る
-		pPerson->GetFSM()->ChangeState(BasePlayerState::Wait::GetInstance());
+		ChangeWaitState(pPerson);
 
 		// 喰らったカウントリセット
 		pPerson->GetRecoveryDamageCount()->clear();
@@ -3113,7 +3118,7 @@ void BasePlayerState::LandRecovery::Execute(BasePlayer * pPerson)
 		}
 
 		// 待機ステートへ
-		pPerson->GetFSM()->ChangeState(Wait::GetInstance());
+		ChangeWaitState(pPerson);
 	}
 }
 
@@ -5450,7 +5455,7 @@ bool BasePlayerState::HeavehoDriveOverFlow::OnMessage(BasePlayer * pPerson, cons
 	{
 									 pPerson->HeavehoDriveOverFlowSuccessInit();	// 必殺のターゲットとなる相手の実体を初期化のときに突っ込む
 									 // カットイン発動メッセージを送る
-									 CUTIN_TYPE_NAME data = CUTIN_TYPE_NAME::AIROU;
+									 CUTIN_TYPE_NAME data = pPerson->GetCutInType();
 									 MsgMgr->Dispatch(0, pPerson->GetID(), ENTITY_ID::CUTIN_MGR, MESSAGE_TYPE::CUTIN_ACTION, &data);
 
 									 // シーンメインステートに対して曲変更メッセージ

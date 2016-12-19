@@ -7,7 +7,8 @@
 #include "BasePlayerState.h"
 
 //
-#include "Data\SelectData.h"
+#include "Data/SelectData.h"
+#include "../Cutin/CutIn.h"
 
 // 判定のインクルード
 #include "../Collision/Collision.h"
@@ -255,7 +256,6 @@ enum class EFFECT_TYPE
 	MUZZLE_FLASH,		// マズルフラッシュ
 	THROW,				// 投げ
 	WILL_POWER,			// 根性
-	DROP_IMPACT_SUPER,	// すごい衝撃波
 };
 
 // ガードの種類
@@ -877,6 +877,13 @@ public:
 	// ひーほー
 	EFFECT_CAMERA_ID GetOverFlowCameraID(){ return m_tagCharacterParam.eHeaveHoOverFlowCameraID; }
 
+	void SetLastOneWin(){ m_bLastOneWin = true; }
+
+	// 覚醒かつラウンド取ったら勝ち状態のチェック(一撃必殺)
+	bool isHeaveHoDriveOverFlowOK(){ return (m_bLastOneWin && m_pTargetPlayer->isWillPower()); }
+
+	CUTIN_TYPE_NAME GetCutInType(){ return m_tagCharacterParam.eCutInType; }
+
 	iex3DObj *GetDefaultObj(){ return m_pDefaultObj; }
 	iex3DObj *GetObj(){ return m_pObj; }
 
@@ -934,6 +941,7 @@ protected:
 		bool bInvincibleCoutner;					// 無敵攻撃がカウンタータイプか
 		CollisionShape::Square HitSquare;			// 四角判定(ステージ衝突で使う)
 		EFFECT_CAMERA_ID eHeaveHoOverFlowCameraID;	// 一撃必殺カメラのID
+		CUTIN_TYPE_NAME eCutInType;					// 一撃必殺カットインのID
 	}m_tagCharacterParam;
 	CharacterParam m_tagOrgCharacterParam;			// 初期の情報を保存
 	
@@ -1082,6 +1090,7 @@ protected:
 	// ヒーホー用の変数
 	int m_iHeavehoStopTimer;			// ヒーホードライブ発動のザワールドの時間
 	int m_iHeaveHoDriveOverFlowFrame;	// ヒーホーの必殺のSEとかエフェクト用に作る
+	bool m_bLastOneWin;					// あと1ラウンドで勝利(一撃必殺のフラグで使う)
 
 	float m_fOrangeColRate;		// 無敵技のオレンジの光レート
 	float m_fMagentaColRate;	// 中段技のマゼンタの光レート

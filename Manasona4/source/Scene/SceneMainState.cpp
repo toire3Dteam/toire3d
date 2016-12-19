@@ -521,8 +521,11 @@ bool SceneMainState::Finish::OnMessage(sceneMain *pMain, const Message & msg)
 			// それ以外なら勝ったプレイヤーの勝ち演出
 			else
 			{
-				ENTITY_ID *WinnerID = (ENTITY_ID*)msg.ExtraInfo;
-				MsgMgr->Dispatch(0, ENTITY_ID::SCENE_MAIN, *WinnerID, MESSAGE_TYPE::END_FINISHCALL, nullptr);
+				ENTITY_ID *WinnerID((ENTITY_ID*)msg.ExtraInfo);
+
+				// プレイヤー側からは何回勝ったらいいのかわからないので、メッセージで勝利ラウンド数を送る
+				int RoundNum(pMain->GetRoundNum());
+				MsgMgr->Dispatch(0, ENTITY_ID::SCENE_MAIN, *WinnerID, MESSAGE_TYPE::END_FINISHCALL, &RoundNum);
 			}
 		}
 		break;

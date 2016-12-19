@@ -325,6 +325,7 @@ m_iDashFrame(0),
 
 m_iHeavehoStopTimer(0),
 m_iHeaveHoDriveOverFlowFrame(0),
+m_bLastOneWin(false),
 
 m_fOrangeColRate(0),
 m_fMagentaColRate(0),
@@ -2036,7 +2037,7 @@ void BasePlayer::WillPowerUpdate(PLAYER_UPDATE updateFlag)
 		m_pUVEffectMGR->StopEffectRoop(UV_EFFECT_TYPE::WILL_POWER_AURA);
 	
 		m_iSpGettingFrame++;
-		if (m_iSpGettingFrame >= 30)//1202
+		if (m_iSpGettingFrame >= 45)//1202
 		{
 			m_iSpGettingFrame = 0;
 			m_OverDriveGage += 1;// SPƒQ[ƒW‚ğ‘«‚·

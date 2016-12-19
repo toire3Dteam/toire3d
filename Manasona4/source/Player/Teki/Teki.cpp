@@ -10,6 +10,9 @@ Teki::Teki(SIDE side, const SideData &data) :BasePlayer(side, data)
 	// エフェクトカメラID
 	m_tagCharacterParam.eHeaveHoOverFlowCameraID = EFFECT_CAMERA_ID::TEKI_OVERFLOW;
 
+	// カットインのID
+	m_tagCharacterParam.eCutInType = CUTIN_TYPE_NAME::TEKI;
+
 	// 無敵攻撃がかうんたーかどうか
 	m_tagCharacterParam.bInvincibleCoutner = true;
 
@@ -966,7 +969,8 @@ bool Teki::SkillAction::Land::Execute()
 		// 走ってる間
 		else //if (m_pTeki->m_iCurrentActionFrame < 12)
 		{
-			m_pTeki->SetMove(Vector3((m_pTeki->m_dir == DIR::LEFT) ? -3.5f : 3.5f, 0, 0));
+			m_pTeki->AddMove(Vector3((m_pTeki->m_dir == DIR::LEFT) ? -.5f : .5f, 0, 0));
+			m_pTeki->MoveClampX(3.5f);
 
 			// 接近したらキルラッシュモーション
 			if ((m_pTeki->GetPos() - m_pTeki->m_pTargetPlayer->GetPos()).LengthSq() < 16 * 16)

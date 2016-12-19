@@ -14,6 +14,9 @@ Airou::Airou(SIDE side, const SideData &data) :BasePlayer(side, data)
 	// エフェクトカメラID
 	m_tagCharacterParam.eHeaveHoOverFlowCameraID = EFFECT_CAMERA_ID::AIROU_OVERFLOW;
 
+	// カットインのID
+	m_tagCharacterParam.eCutInType = CUTIN_TYPE_NAME::AIROU;
+
 	// 無敵攻撃がかうんたーかどうか
 	m_tagCharacterParam.bInvincibleCoutner = false;
 

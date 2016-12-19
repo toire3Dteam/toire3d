@@ -67,6 +67,131 @@ void CutInType::Airou::Action()
 }
 
 
+CutInType::Nazenara::Nazenara()
+{
+	m_pPic.PicClean();
+	m_pPic.pic = new tdn2DAnim("Data/UI/Game/CutIn/Nazenara.png");
+	m_pPic.pic->OrderNone();
+	//m_pPic.pic->OrderJump(24, 1, 0.1f);
+
+	m_pPicShink.PicClean();
+	m_pPicShink.pic = new tdn2DAnim("Data/UI/Game/CutIn/Nazenara.png");
+	m_pPicShink.pic->OrderShrink(8, 1, 2);
+
+	m_pPicBackRip.PicClean();
+	m_pPicBackRip.pic = new tdn2DAnim("Data/UI/Game/CutIn/Nazenara.png");
+	m_pPicBackRip.pic->OrderRipple(14, 1, 0.035f);
+
+	m_pPicBackRip2.PicClean();
+	m_pPicBackRip2.pic = new tdn2DAnim("Data/UI/Game/CutIn/Nazenara.png");
+	m_pPicBackRip2.pic->OrderRipple(14, 1, 0.035f);
+
+	m_pBackCol = new tdn2DObj("Data/UI/Game/CutIn/AirouBack.png");
+}
+
+CutInType::Nazenara::~Nazenara()
+{
+	SAFE_DELETE(m_pPic.pic);
+	SAFE_DELETE(m_pPicShink.pic);
+	SAFE_DELETE(m_pPicBackRip.pic);
+	SAFE_DELETE(m_pPicBackRip2.pic);
+	SAFE_DELETE(m_pBackCol);
+}
+
+
+void CutInType::Nazenara::Update()
+{
+	m_pPic.pic->Update();
+	m_pPicShink.pic->Update();
+	m_pPicBackRip.pic->Update();
+	m_pPicBackRip2.pic->Update();
+}
+
+void CutInType::Nazenara::Render()
+{
+	m_pBackCol->Render(0, 0);
+
+	m_pPicBackRip2.pic->Render((int)m_pPicBackRip2.pos.x, (int)m_pPicBackRip2.pos.y, RS::ADD);
+	m_pPicBackRip.pic->Render((int)m_pPicBackRip.pos.x, (int)m_pPicBackRip.pos.y, RS::ADD);
+	//m_pPic.pic->Render((int)m_pPic.pos.x, (int)m_pPic.pos.y);
+	m_pPicShink.pic->Render((int)m_pPicShink.pos.x, (int)m_pPicShink.pos.y);
+}
+
+void CutInType::Nazenara::Action()
+{
+	Base::Action();
+	m_pPic.pic->Action();
+	m_pPicShink.pic->Action();
+
+	m_pPicBackRip.pic->Action(12);
+	m_pPicBackRip2.pic->Action(20);
+
+}
+
+
+
+CutInType::Teki::Teki()
+{
+	m_pPic.PicClean();
+	m_pPic.pic = new tdn2DAnim("Data/UI/Game/CutIn/Teki.png");
+	m_pPic.pic->OrderNone();
+	//m_pPic.pic->OrderJump(24, 1, 0.1f);
+
+	m_pPicShink.PicClean();
+	m_pPicShink.pic = new tdn2DAnim("Data/UI/Game/CutIn/Teki.png");
+	m_pPicShink.pic->OrderShrink(8, 1, 2);
+
+	m_pPicBackRip.PicClean();
+	m_pPicBackRip.pic = new tdn2DAnim("Data/UI/Game/CutIn/Teki.png");
+	m_pPicBackRip.pic->OrderRipple(14, 1, 0.035f);
+
+	m_pPicBackRip2.PicClean();
+	m_pPicBackRip2.pic = new tdn2DAnim("Data/UI/Game/CutIn/Teki.png");
+	m_pPicBackRip2.pic->OrderRipple(14, 1, 0.035f);
+
+	m_pBackCol = new tdn2DObj("Data/UI/Game/CutIn/AirouBack.png");
+}
+
+CutInType::Teki::~Teki()
+{
+	SAFE_DELETE(m_pPic.pic);
+	SAFE_DELETE(m_pPicShink.pic);
+	SAFE_DELETE(m_pPicBackRip.pic);
+	SAFE_DELETE(m_pPicBackRip2.pic);
+	SAFE_DELETE(m_pBackCol);
+}
+
+
+void CutInType::Teki::Update()
+{
+	m_pPic.pic->Update();
+	m_pPicShink.pic->Update();
+	m_pPicBackRip.pic->Update();
+	m_pPicBackRip2.pic->Update();
+}
+
+void CutInType::Teki::Render()
+{
+	m_pBackCol->Render(0, 0);
+
+	m_pPicBackRip2.pic->Render((int)m_pPicBackRip2.pos.x, (int)m_pPicBackRip2.pos.y, RS::ADD);
+	m_pPicBackRip.pic->Render((int)m_pPicBackRip.pos.x, (int)m_pPicBackRip.pos.y, RS::ADD);
+	//m_pPic.pic->Render((int)m_pPic.pos.x, (int)m_pPic.pos.y);
+	m_pPicShink.pic->Render((int)m_pPicShink.pos.x, (int)m_pPicShink.pos.y);
+}
+
+void CutInType::Teki::Action()
+{
+	Base::Action();
+	m_pPic.pic->Action();
+	m_pPicShink.pic->Action();
+
+	m_pPicBackRip.pic->Action(12);
+	m_pPicBackRip2.pic->Action(20);
+
+}
+
+
 //+--------------------
 //	カットイン
 //+--------------------
@@ -89,6 +214,12 @@ CutIn::CutIn() :BaseGameEntity(ENTITY_ID::CUTIN_MGR)
 		{
 		case CUTIN_TYPE_NAME::AIROU:
 			m_pCutinType[i] = new CutInType::Airou();
+			break;
+		case CUTIN_TYPE_NAME::TEKI:
+			m_pCutinType[i] = new CutInType::Teki();
+			break;
+		case CUTIN_TYPE_NAME::NAZENARABA:
+			m_pCutinType[i] = new CutInType::Nazenara();
 			break;
 		default:
 			assert(0);// "そんなエフェクトはない"

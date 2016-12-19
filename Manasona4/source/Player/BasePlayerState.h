@@ -28,7 +28,7 @@ bool AerialDashCancel(BasePlayer *pPerson);
 bool AerialAttackCancel(BasePlayer *pPerson);
 bool DokkoiAttackCancel(BasePlayer *pPerson);
 bool isInputGuardCommand(BasePlayer *pPerson);
-void GuardUpdate(BasePlayer *pPerson);
+bool GuardUpdate(BasePlayer *pPerson);
 bool isPossibleGuardState(BasePlayer *pPerson);
 
 

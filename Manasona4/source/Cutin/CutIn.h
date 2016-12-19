@@ -61,6 +61,48 @@ namespace CutInType
 		tdn2DObj* m_pBackCol;
 	};
 
+	// てきカットイン
+	class Teki :public Base
+	{
+	public:
+		Teki();
+		~Teki();
+
+		void Update();
+		void Render();
+		void Action();
+
+	private:
+		Pic m_pPic;
+		Pic m_pPicShink;
+
+		Pic m_pPicBackRip;
+		Pic m_pPicBackRip2;
+
+		tdn2DObj* m_pBackCol;
+	};
+
+	// なぜならカットイン
+	class Nazenara :public Base
+	{
+	public:
+		Nazenara();
+		~Nazenara();
+
+		void Update();
+		void Render();
+		void Action();
+
+	private:
+		Pic m_pPic;
+		Pic m_pPicShink;
+
+		Pic m_pPicBackRip;
+		Pic m_pPicBackRip2;
+
+		tdn2DObj* m_pBackCol;
+	};
+
 }
 
 
@@ -72,7 +114,7 @@ namespace CutInType
 
 enum class CUTIN_TYPE_NAME
 {
-	AIROU, ARRAY_END
+	AIROU, TEKI, NAZENARABA, ARRAY_END
 };
 
 class CutIn :public BaseGameEntity
