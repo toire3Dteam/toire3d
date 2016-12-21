@@ -939,7 +939,11 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 else
 									 {
 										 // UŒ‚‚ð“–‚Ä‚ÄSPƒQ[ƒWã¸‚¾I
-										 if (HitAttackInfo->HitScore <= 200)
+										 if (HitAttackInfo->HitScore <= 100)
+										 {
+											 pPerson->AddOverDriveGage(1);
+										 }
+										 else if (HitAttackInfo->HitScore <= 200)
 										 {
 											 pPerson->AddOverDriveGage(2);
 										 }

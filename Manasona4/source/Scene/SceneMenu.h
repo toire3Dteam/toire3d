@@ -37,6 +37,7 @@ enum class TIPS_TYPE
 enum class WINDOW_TYPE
 {
 	OPTION,		// オプション
+	GAME,		// ゲーム
 	SOUND,		// サウンド
 	ARRAY_END	// 配列終了
 

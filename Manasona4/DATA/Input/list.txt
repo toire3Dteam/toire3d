@@ -11,8 +11,8 @@ NAME: Controller (XBOX 360 For Windows)|
 ID: DEFAULT
 
 NAME: PLAYSTATION(R)3 Controller|
-ID: DEFAULT
+ID: PS3
 
 NAME: Wireless Controller|
-ID: DEFAULT
+ID: PS3
 

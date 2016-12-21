@@ -864,6 +864,24 @@ private:
 };
 
 /**************************/
+//	サイクロンショート
+/**************************/
+class CycloneShortEffect :public BaseUVEffect
+{
+public:
+	CycloneShortEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Cyclone/Cyclone.imo", 0.070f, -0.035f, 16, false, 2, 4);
+	};
+	~CycloneShortEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+/**************************/
 //	ゴッドハンド
 /**************************/
 class GodHandEffect :public BaseUVEffect

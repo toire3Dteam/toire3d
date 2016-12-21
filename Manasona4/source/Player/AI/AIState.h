@@ -965,6 +965,42 @@ namespace AIState
 		BackWark(const EasyAttack&) {}
 		BackWark& operator=(const EasyAttack&) {}
 	};
+
+	/*******************************************************/
+	//			最強の歩行 (難易度 横江くん用)
+	/*******************************************************/
+	class MightyWark :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static MightyWark* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		MightyWark() {};
+		~MightyWark() {};
+
+		MightyWark(const MightyWark&) {}
+		MightyWark& operator=(const MightyWark&) {}
+	};
+
+
 }
 
 

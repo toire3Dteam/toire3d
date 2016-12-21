@@ -5,8 +5,9 @@
 #include "../BaseEntity/Message/Message.h"
 #include "../Fade/Fade.h"
 #include "../Sound/SoundManager.h"
-#include "Window\OptionWindow.h"	// 必要なウィンドウ
-#include "Window\SoundWindow.h"	// 
+#include "Window/OptionWindow.h"	// 必要なウィンドウ
+#include "Window/SoundWindow.h"	// 
+#include "Window/GameWindow.h"
 #include "../Scene/sceneResult.h"
 
 //#include "sceneResult.h"
@@ -56,6 +57,9 @@ bool sceneMenu::Initialize()
 		{
 		case WINDOW_TYPE::OPTION:
 			m_pWindow[i] = new OptionWindow(Vector2(500, 50));
+			break;
+		case WINDOW_TYPE::GAME:
+			m_pWindow[i] = new GameWindow(Vector2(200, 250));
 			break;
 		case WINDOW_TYPE::SOUND:
 			m_pWindow[i] = new SoundWindow(Vector2(200, 250));

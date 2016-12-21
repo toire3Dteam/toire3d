@@ -9,6 +9,7 @@
 #include "Data\SelectData.h"
 #include "Data\PlayerData.h"
 #include "Window\OptionWindow.h"	// 必要なウィンドウ
+#include "../Window/GameWindow.h"
 
 //+--------------------
 // 作業効率化
@@ -288,7 +289,7 @@ bool SceneMenuState::BattleControllerSelectStep::PadUpdate(sceneMenu *pMain, int
 			{
 				// (★)誰も選んでないのでAIフラグをONにする操作デバイスを同じに
 				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = true;
-				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].eAIType = AI_TYPE::CPU_HARD;// (TODO)
+				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].eAIType = (AI_TYPE)PlayerDataMgr->m_ConfigData.iDifficultyAI;// (TODO)
 				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = false;
 				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = C_UIMgr->GetRightPlayer().iPlayerDeviceID;
 				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = C_UIMgr->GetRightPlayer().iPlayerDeviceID;
@@ -300,7 +301,7 @@ bool SceneMenuState::BattleControllerSelectStep::PadUpdate(sceneMenu *pMain, int
 				// (★)誰も選んでないのでAIフラグをONにするの操作デバイスを同じに
 				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = false;
 				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = true;
-				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].eAIType = AI_TYPE::CPU_HARD;// (TODO)
+				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].eAIType = (AI_TYPE)PlayerDataMgr->m_ConfigData.iDifficultyAI;// (TODO)
 				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = C_UIMgr->GetLeftPlayer().iPlayerDeviceID;//
 				SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = C_UIMgr->GetLeftPlayer().iPlayerDeviceID;// 
 
@@ -697,6 +698,15 @@ void SceneMenuState::OptionStep::Execute(sceneMenu *pMain)
 		pMain->GetFSM()->ChangeState(FirstStep::GetInstance());	// メニューへ戻る
 	}
 
+	// ゲームでボタンを押したら
+	if (pMain->GetWindow(WINDOW_TYPE::OPTION)->GetChoiceState()
+		== OptionWindow::OPTION_STATE::GAME)
+	{
+		// サウンドメニューへ
+		pMain->GetFSM()->ChangeState(GameWindowStep::GetInstance());
+		return;
+	}
+
 	// サウンドでボタンを押したら
 	if (pMain->GetWindow(WINDOW_TYPE::OPTION)->GetChoiceState()
 		== OptionWindow::OPTION_STATE::SOUND)
@@ -771,6 +781,83 @@ bool SceneMenuState::OptionStep::OnMessage(sceneMenu *pMain, const Message & msg
 }
 
 
+/*******************************************************/
+//				ゲームウィンドウ選択
+/*******************************************************/
+
+void SceneMenuState::GameWindowStep::Enter(sceneMenu *pMain)
+{
+	// サウンドウィンドウ起動
+	pMain->GetWindow(WINDOW_TYPE::GAME)->Action();
+}
+
+void SceneMenuState::GameWindowStep::Execute(sceneMenu *pMain)
+{
+	// UI
+	M_UIMgr->Update();
+
+	// 戻るボタンを押したら
+	if (pMain->GetWindow(WINDOW_TYPE::GAME)->GetChoiceState()
+		== GameWindow::GAME_STATE::BACK)
+	{
+		pMain->GetWindow(WINDOW_TYPE::GAME)->Stop();	// ウィンドウを閉じる
+		pMain->GetFSM()->RevertToPreviousState();		// 前のステートへ戻る
+		return;
+	}
+
+
+
+	//+----------------------------------
+	//	このステートでの操作
+	//+----------------------------------
+	// パッド分更新
+	const int NumDevice(tdnInputManager::GetNumDevice());
+
+	// パッド何もささってないとき用
+	if (NumDevice == 0)
+	{
+		if (PadUpdate(pMain, 0)) return;
+	}
+	else
+	{
+		for (int i = 0; i < NumDevice; i++)
+		{
+			if (PadUpdate(pMain, i)) return;
+		}
+	}
+}
+
+bool SceneMenuState::GameWindowStep::PadUpdate(sceneMenu *pMain, int DeviceID)
+{
+	bool bChangedState(false);
+
+	// 選択ウィンドウの操作
+	pMain->GetWindow(WINDOW_TYPE::GAME)->Ctrl(DeviceID);
+
+	return bChangedState;
+}
+
+void SceneMenuState::GameWindowStep::Exit(sceneMenu *pMain)
+{
+
+}
+
+void SceneMenuState::GameWindowStep::Render(sceneMenu *pMain)
+{
+	// アイコンUI
+	M_UIMgr->Render();
+
+	// 選択ウィンドウの説明
+	pMain->GetWindow(WINDOW_TYPE::GAME)->RednerInfo();
+
+	tdnText::Draw(0, 0, 0xffffffff, "GameWindowStep");
+}
+
+bool SceneMenuState::GameWindowStep::OnMessage(sceneMenu *pMain, const Message & msg)
+{
+	return false;
+}
+
 
 /*******************************************************/
 //				サウンドウィンドウ選択
@@ -786,7 +873,7 @@ void SceneMenuState::SoundWindowStep::Execute(sceneMenu *pMain)
 {
 	// UI
 	M_UIMgr->Update();
-
+	
 	// 戻るボタンを押したら
 	if (pMain->GetWindow(WINDOW_TYPE::SOUND)->GetChoiceState()
 		== SoundWindow::SOUND_STATE::BACK)

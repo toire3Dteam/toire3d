@@ -5,7 +5,7 @@ nazenaraba.IEM
 naze_hissatsu.IEM
 
 本体の判定の横幅・縦幅・高さ:
-1.75 4 4
+1.85 4 4
 
 最大速度(ダッシュ速度):
 1.3

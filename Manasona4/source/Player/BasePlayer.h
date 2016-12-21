@@ -257,6 +257,7 @@ enum class EFFECT_TYPE
 	THROW,				// “Š‚°
 	WILL_POWER,			// ª«
 	DROP_IMPACT_SUPER,	// ‚Ä‚«‚ÌÕŒ‚”g
+	CYCLONE_RUN,		// —³Šª‚ð‹N‚±‚µ‚Ä‘–‚é
 };
 
 // ƒK[ƒh‚ÌŽí—Þ

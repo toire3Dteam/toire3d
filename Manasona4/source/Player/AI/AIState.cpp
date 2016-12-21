@@ -195,6 +195,7 @@ bool EasyTypeChaseBrain(AI * pPerson)
 // 難易度が高い追いかけるステート　様々な選択肢がある
 bool HardTypeChaseBrain(AI * pPerson)
 {
+
 	//+----------------------------
 	//		ガード・切り替えし
 	//+----------------------------
@@ -248,6 +249,13 @@ bool HardTypeChaseBrain(AI * pPerson)
 	{
 		pPerson->GetFSM()->ChangeState(AIState::SetAnitiAir::GetInstance());
 		return  true;
+	}
+
+	if (tdnRandom::Get(0, 100) <= 40)//	←の確率で飛ぶ
+	{
+		// 無敵歩行（逆切れ対策）
+		pPerson->GetFSM()->ChangeState(AIState::MightyWark::GetInstance());
+		return true;
 	}
 
 	//+---------------------------------------
@@ -1978,6 +1986,18 @@ void AIState::SetThrow::Execute(AI * pPerson)
 		}
 
 	}
+
+
+	// 相手の近くにいて＆＆相手が攻撃振ったら
+	if (MyPlayer->AIAttackRange() >= GetRange(pPerson) &&
+		TargetPlayer->isAttackState() == true)
+	{
+		// ガードへ
+		pPerson->GetFSM()->ChangeState(AIState::Guard::GetInstance());
+		return;
+
+	}
+
 }
 
 void AIState::SetThrow::Exit(AI * pPerson)
@@ -2867,6 +2887,97 @@ void AIState::BackWark::Render(AI * pPerson)
 }
 
 bool AIState::BackWark::OnMessage(AI * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+	//}
+	return false;
+}
+
+
+
+/*******************************************************/
+//			最強の歩行 (攻撃してきたらガードへ)ステート
+/*******************************************************/
+
+AIState::MightyWark * AIState::MightyWark::GetInstance()
+{
+	// ここに変数を作る
+	static AIState::MightyWark  instance;
+	return &instance;
+}
+
+void AIState::MightyWark::Enter(AI * pPerson)
+{
+	// 相手の方向に進む
+	if (MyPlayer->GetDir() == DIR::RIGHT)
+	{
+		pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+	}
+	else
+	{
+		pPerson->PushInputList(PLAYER_INPUT::LEFT);
+	}
+
+	pPerson->SetWaitFrame(0);
+}
+
+void AIState::MightyWark::Execute(AI * pPerson)
+{
+	// 相手の方向に進む
+	if (MyPlayer->GetDir() == DIR::RIGHT)
+	{
+		pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+	}
+	else
+	{
+		pPerson->PushInputList(PLAYER_INPUT::LEFT);
+	}
+
+
+	// 相手の近くにいて＆＆相手が攻撃振ったら
+	if (MyPlayer->AIAttackRange() >= GetRange(pPerson) && 
+		TargetPlayer->isAttackState() == true)
+	{
+		if (tdnRandom::Get(0, 1) == 0)
+		{
+			// ガードへ
+			pPerson->GetFSM()->ChangeState(AIState::Guard::GetInstance());
+		}else
+		{
+			// 回避へ
+			pPerson->GetFSM()->ChangeState(AIState::Escape::GetInstance());
+		}
+		return;
+	}
+
+	// 歩い一定まで
+	pPerson->AddWaitFrame(1);
+	if (pPerson->GetWaitFrame() >= 20)
+	{
+		// 待機へ
+		pPerson->GetFSM()->ChangeState(AIState::Wait::GetInstance());
+		return;
+	}
+
+}
+
+void AIState::MightyWark::Exit(AI * pPerson)
+{
+
+}
+
+void AIState::MightyWark::Render(AI * pPerson)
+{
+#ifdef _DEBUG
+
+	tdnText::Draw(420, 610, 0xffffffff, "MightyWark");
+
+#endif // _DEBUG
+}
+
+bool AIState::MightyWark::OnMessage(AI * pPerson, const Message & msg)
 {
 	// メッセージタイプ
 	//switch (msg.Msg)

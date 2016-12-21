@@ -1943,10 +1943,31 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 		m_pUVEffectMGR->AddEffect(m_vPos, UV_EFFECT_TYPE::PRESSURE, 1.5f, 2.0f, Vector3(0, 0, 0), Vector3(0, 0, 0));
 
 		// 風
-		//m_pUVEffectMGR->AddEffect(m_vPos + Vector3(0, -5, 0) , UV_EFFECT_TYPE::BREAK_IMPACT, 0.15f, 0.35f);
+		m_pUVEffectMGR->AddEffect(m_vPos + Vector3(0, -5, 0) , UV_EFFECT_TYPE::CYCLONE_SHORT, 1.15f, 2.35f);
 
 		// 波紋
 		m_pUVEffectMGR->AddEffect(m_vPos, UV_EFFECT_TYPE::WAVE, 1.0f, 1.5f, Vector3(0, 0, 0), Vector3(0, 0, 0));
+
+	}	break;
+	case EFFECT_TYPE::CYCLONE_RUN:
+	{
+		// ダッシュエフェクト
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::RUN,
+			1.3f, 1.5f, Vector3(0, diaAngle, 0), Vector3(0, diaAngle, 0));
+		ParticleManager::EffectRunSmoke(m_vPos, (m_dir != DIR::LEFT));
+
+		// ベクトル値を考慮
+		Vector3 v = m_vMove;
+		v.Normalize();
+		float z = (m_vMove.x >= 0) ? PI / 2 : -PI / 2;
+
+		// 風
+		m_pUVEffectMGR->AddEffect(pos + Vector3(0, 5, 1), UV_EFFECT_TYPE::CYCLONE_SHORT, 1.0f, 1.2f, Vector3(0, 0, z), Vector3(0, 0, z));
+
+		// 波紋
+		//m_pUVEffectMGR->AddEffect(m_vPos, UV_EFFECT_TYPE::WAVE, 1.0f, 1.5f, Vector3(0, 0, 0), Vector3(0, 0, 0));
+		// ジャンプエフェクト
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::JUMP_WAVE, 0.55f, 0.8f, Vector3(0, 0, z), Vector3(0, 0, z));
 
 	}	break;
 	default:
