@@ -1,5 +1,6 @@
 #include "DifficultyParamSetting.h"
 #include "Data/PlayerData.h"
+#include "Data/SelectData.h"
 
 //+----------------------------
 //	CPU難易度のパラメーター設定
@@ -34,36 +35,63 @@ void DifficultyParamSetting::Render(int x, int y, bool selectFlag)
 	if (PlayerDataMgr->m_ConfigData.iVoiceVolume < 100)
 	m_pRightArrow->Render(x + m_iWidthSize, y, 32, 32, 32, (32 * selectFlag), 32, 32);	// 右
 
-	//  これは％表記で描画
-	
-	// %のサイズ
-	float fPersentSize = (float)(m_iWidthSize*0.725f);
 
-	// 最大値と現在の値を割って割合を取得
-	float fPersent = (float)(PlayerDataMgr->m_ConfigData.iVoiceVolume) / (float)(100);
-	float fAns = fPersentSize *fPersent;
+	// これは文字表記で描画
 
+	// 文字の色
+	DWORD l_dCol = 0xff4e84e6;
+	if (selectFlag == true)l_dCol = 0xff030a58;
 
-	// ゲージの左淵
-	m_pPersentFrame->Render(x + 32 - 2, y, 2, 32, (selectFlag * 2) , 0, 2, 32);	
-	// 中身
-	for (int i = 0; i < (int)fPersentSize; i++)
+	LPCSTR l_pString = "なし";
+
+	switch ((AI_TYPE)PlayerDataMgr->m_ConfigData.iDifficultyAI)
 	{
-		// 中身があれば塗りつぶす
-		if (i < (int)fAns)
-		{
-			m_pPersentGage->Render(x + 32 + i, y, 1, 32, selectFlag, 0, 1, 32);
-		}
-		else
-		{
-			m_pPersentGage->Render(x + 32 + i, y, 1, 32, selectFlag, 32, 1, 32);
-		}
+	case AI_TYPE::CPU_EASY:
+		l_pString = "イージー";
+		break;
+	case AI_TYPE::CPU_NORMAL:
+		l_pString = "ノーマル";
+		break;
+	case AI_TYPE::CPU_HARD:
+		l_pString = "ハード";
+		break;
+	case AI_TYPE::CPU_YOKOE:
+		l_pString = "横江くん";
+		break;
+	default:
+		break;
 	}
-	// ゲージの右淵
-	m_pPersentFrame->Render(x + 32+ (int)fPersentSize, y, 2, 32, (selectFlag * 2), 0, 2, 32);
+	tdnFont::RenderString(l_pString, "HGｺﾞｼｯｸE", 24, x + 32, y + 4, l_dCol, RS::COPY);
 
-	// 数値
-	RenderNumber(x + m_iWidthSize - 24, y, PlayerDataMgr->m_ConfigData.iDifficultyAI, selectFlag);
+
+	//  これは％表記で描画
+
+	//// %のサイズ
+	//float fPersentSize = (float)(m_iWidthSize*0.725f);
+
+	//// 最大値と現在の値を割って割合を取得
+	//float fPersent = (float)(PlayerDataMgr->m_ConfigData.iVoiceVolume) / (float)(100);
+	//float fAns = fPersentSize *fPersent;
+	//// ゲージの左淵
+	//m_pPersentFrame->Render(x + 32 - 2, y, 2, 32, (selectFlag * 2) , 0, 2, 32);	
+	//// 中身
+	//for (int i = 0; i < (int)fPersentSize; i++)
+	//{
+	//	// 中身があれば塗りつぶす
+	//	if (i < (int)fAns)
+	//	{
+	//		m_pPersentGage->Render(x + 32 + i, y, 1, 32, selectFlag, 0, 1, 32);
+	//	}
+	//	else
+	//	{
+	//		m_pPersentGage->Render(x + 32 + i, y, 1, 32, selectFlag, 32, 1, 32);
+	//	}
+	//}
+	//// ゲージの右淵
+	//m_pPersentFrame->Render(x + 32+ (int)fPersentSize, y, 2, 32, (selectFlag * 2), 0, 2, 32);
+
+	//// 数値
+	//RenderNumber(x + m_iWidthSize - 24, y, PlayerDataMgr->m_ConfigData.iDifficultyAI, selectFlag);
 
 }
 
