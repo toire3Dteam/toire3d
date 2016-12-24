@@ -201,13 +201,22 @@ bool  OptionWindow::Ctrl(int DeviceID)
 		return true;
 	}
 
+	// キャンセルで
+	// ゲームに戻るステートを格納
+	if (tdnInput::KeyGet(KEYCODE::KEY_A, DeviceID) == 3)
+	{
+		// 選択した番号格納！
+		m_iChoiceState = (OPTION_STATE::BACK);
+		return true;
+	}
+
 	return false;
 
 }
 
 void OptionWindow::Action()
 {
-	if (m_bActive == false)// もうウィンドウが出ているときはハジク
+	if (m_bActive == false)// もうウィンドウが出ているときは演習をハジク
 	{
 		// 透明度を最初は透明に
 		m_iAlpha = 0;

@@ -20,6 +20,7 @@ public:
 
 	virtual void Action();	// Windowを出す
 	virtual void Stop();	// 止める
+	virtual void ChoiceClear();	// 選択していたものを未選択へ
 
 	// アクセサ
 	bool IsActive() { return m_bActive; };// ★

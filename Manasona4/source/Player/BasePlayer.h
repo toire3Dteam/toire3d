@@ -425,6 +425,7 @@ public:
 	virtual void RenderDeferred();
 	virtual void RenderUI();
 	virtual void ShaderSendParam();
+	virtual void RenderCommandFrame(int x,int y);
 
 	//------------------------------------------------------
 	//	継承してるやつに強制的に呼ばせる系
@@ -681,6 +682,7 @@ public:
 	int GetMaxHP() { return m_tagCharacterParam.iMaxHP; }
 	int GetHP() { return m_iHP; }
 	void SetHP(int hp) { m_iHP = hp; }
+	void AddHP(int add) { m_iHP += add; }
 	float GetDamageRate(){ return m_fDamageRate; }
 	void AddDamageRate(float rate){ m_fDamageRate = min(m_fDamageRate + rate, 1);}		// 加算(1.0以上にならないようにする)
 	void MultDamageRate(float rate){ m_fDamageRate = max(m_fDamageRate * rate, 0.3f); }	// 乗算(0.3以下にはならないようにする)
@@ -813,6 +815,8 @@ public:
 		return (iCheckFrame != -1 && iCheckFrame < JudgeFrame);
 	}
 
+	//int GetCOMMAND_FRAME_MAX() { return c_COMMAND_FRAME_MAX; }
+	
 	//------------------------------------------------------
 	//	スタンド
 	//------------------------------------------------------
@@ -1076,6 +1080,11 @@ protected:
 	//------------------------------------------------------
 	bool m_bWillPower;				// 根性値フラグ
 	int m_iSpGettingFrame;			// SPが回復していく頻度 
+
+	//------------------------------------------------------
+	//	トレーニング用	(12/24) 外部のデータで設定するのでメンバ変数は作らない 
+	//------------------------------------------------------
+
 
 
 	//------------------------------------------------------

@@ -32,6 +32,55 @@ enum class AI_TYPE
 	INTERRUPT_INVINCIBLE	// [デバッグ用]ガード中にひたすら無敵割り込みをする
 };
 
+// ラウンド数タイプ
+enum class ROUND_NUM_TYPE
+{
+	ROUND_1,
+	ROUND_2,
+	ROUND_3,
+	ROUND_4,
+};
+
+// ラウンド時間タイプ
+enum class ROUND_TIME_TYPE
+{
+	SEC_30,
+	SEC_45,
+	SEC_60,
+	SEC_75,
+	SEC_99,
+	SEC_INFINITY,
+};
+
+//+----------------------
+//	トレーニング用
+//+----------------------
+
+// 自動回復するかしないか
+enum class HP_RECOVERY_TYPE
+{
+	DEFAULT,		// 通常
+	AUTO_RECOVERY,	// 自動回復
+};
+
+// パートナーゲージ
+enum class PARTNER_RECOVERY_TYPE
+{
+	DEFAULT,		// 通常
+	MAX,			// MAX固定
+};
+
+// 最大ダメージや入力覆歴を表示するかどうか
+enum class TRAINING_INFO_TYPE
+{
+	NONE,		// なし
+	DAMEGE,		// ダメージのみ
+	COMMAND,	// コマンドのみ
+	ALL			// 全て
+};
+
+
+
 struct SideData
 {
 	CHARACTER eCharacter;
@@ -52,7 +101,7 @@ struct SelectData
 	int iWinRound;			// 勝利ラウンド数
 	int iRoundTime;			// 一試合時間
 	int iBattleMusicID;		// 戦闘曲の番号
-
+	SIDE eOrderTrainingSide;// トレーニングを選んだ側
 	SelectData();
 	//SelectData &operator=(const SelectData &data) { tagSideDatas[(int)SIDE::LEFT] = data.tagSideDatas[(int)SIDE::LEFT], tagSideDatas[(int)SIDE::RIGHT] = data.tagSideDatas[(int)SIDE::RIGHT], stage = data.stage, bTutorial = data.bTutorial, iWinRound = data.iWinRound, iBattleMusicID = data.iBattleMusicID; return *this; }
 };

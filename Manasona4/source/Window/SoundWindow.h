@@ -34,6 +34,7 @@ public:
 		BGM,
 		SE,
 		VOICE,
+		RESET,
 		BACK
 	};
 

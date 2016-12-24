@@ -45,6 +45,7 @@ AI::AI(SIDE side,BasePlayer* myBasePlayer , AI_TYPE AIType)
 		m_pStateMachine = new StateMachine<AI>(this);
 		m_pStateMachine->SetGlobalState(AIState::Global::GetInstance());// グローバル
 		m_pStateMachine->SetCurrentState(AIState::Wait::GetInstance());
+		m_pStateMachine->SetPreviousState(AIState::Wait::GetInstance());
 
 		break;
 	case AI_TYPE::PRACTICE_LAND:
@@ -52,6 +53,7 @@ AI::AI(SIDE side,BasePlayer* myBasePlayer , AI_TYPE AIType)
 		m_pStateMachine = new StateMachine<AI>(this);
 		m_pStateMachine->SetGlobalState(AIState::PracticeGlobal::GetInstance());// グローバル
 		m_pStateMachine->SetCurrentState(AIState::PracticeLand::GetInstance());
+		m_pStateMachine->SetPreviousState(AIState::PracticeLand::GetInstance());
 
 		break;
 	case AI_TYPE::PRACTICE_JUMP:
@@ -59,6 +61,7 @@ AI::AI(SIDE side,BasePlayer* myBasePlayer , AI_TYPE AIType)
 		m_pStateMachine = new StateMachine<AI>(this);
 		m_pStateMachine->SetGlobalState(AIState::PracticeGlobal::GetInstance());// グローバル
 		m_pStateMachine->SetCurrentState(AIState::PracticeJump::GetInstance());
+		m_pStateMachine->SetPreviousState(AIState::PracticeJump::GetInstance());
 
 		break;
 	case AI_TYPE::PRACTICE_ATTACK:
@@ -66,6 +69,7 @@ AI::AI(SIDE side,BasePlayer* myBasePlayer , AI_TYPE AIType)
 		m_pStateMachine = new StateMachine<AI>(this);
 		m_pStateMachine->SetGlobalState(AIState::PracticeGlobal::GetInstance());// グローバル
 		m_pStateMachine->SetCurrentState(AIState::PracticeAttack::GetInstance());
+		m_pStateMachine->SetPreviousState(AIState::PracticeAttack::GetInstance());
 
 		break;
 
@@ -74,6 +78,7 @@ AI::AI(SIDE side,BasePlayer* myBasePlayer , AI_TYPE AIType)
 		m_pStateMachine = new StateMachine<AI>(this);
 		m_pStateMachine->SetGlobalState(AIState::PracticeGlobal::GetInstance());// グローバル
 		m_pStateMachine->SetCurrentState(AIState::InterruptInvincible::GetInstance());
+		m_pStateMachine->SetPreviousState(AIState::InterruptInvincible::GetInstance());
 
 		break;
 	default:

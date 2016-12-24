@@ -40,7 +40,7 @@ Stand::Base::Base(BasePlayer *pPlayer) :
 m_pPlayer(pPlayer), 
 m_pObj(nullptr),
 m_bActive(false),
-m_standStockMAX(2),
+m_standStockMAX(1),
 m_standStock(0),
 m_standGageMAX(360),
 m_standGage(0),
@@ -178,6 +178,7 @@ void Stand::Base::Action(SKILL_ACTION_TYPE type)
 
 	// ストックを消費
 	m_standStock--;
+	m_standGage = 0;// (12/24)ゲージ0
 
 	m_ActionType = type;		// 技のタイプ設定
 	m_CurrentActionFrame = 0;	// フレームリセット

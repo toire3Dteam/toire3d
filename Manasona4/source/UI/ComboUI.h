@@ -25,6 +25,9 @@ public:
 	// ç≈ëÂÉ_ÉÅÅ[ÉW
 	int GetMaxDamage() { return m_iMaxDamage; }
 
+	int GetNowDamage() { return m_iNowDamage; }
+	int GetComboDamage() { return  m_iComboDamage; }
+
 private:
 	SIDE m_eSide;
 	Vector2 m_vPos;
@@ -40,6 +43,8 @@ private:
 	int m_iMaxCount;
 
 	int m_iDamage;
+	int m_iNowDamage;
+	int m_iComboDamage;
 	int m_iMaxDamage;
 
 	tdn2DObj* m_gageFramePic;

@@ -1,6 +1,8 @@
 #pragma once
 #include "BaseWindow.h"
 #include "ParamSetting/DifficultyParamSetting.h"
+#include "ParamSetting/RoundNumTypeParamSetting.h"
+#include "ParamSetting/RoundTimeTypeParamSetting.h"
 
 //+-------------------------------
 //	ゲームウィンドウ
@@ -30,19 +32,18 @@ public:
 	enum GAME_STATE
 	{
 		DIFFICULTY,
+		ROUND,
+		TIME,
+		RESET,
 		BACK
 	};
 
 
 private:
-	static const int m_cSizeX = 768;
+	static const int m_cSizeX = 704;
 
 	DifficultyParamSetting* m_pDifficultyParam;
+	RoundNumTypeParamSetting* m_pRoundNumTypeParam;
+	RoundTimeTypeParamSetting* m_pRoundTimeTypeParam;
 
-	//// ピッ...ピッ...ピッ..ピッ.ピッピッピッピッ
-	//// って感じの触り心地に
-	//int iSpeedLv;
-	//int iLeftPushFrame;
-	//int iRightPushFrame;
-	//int iFrame;
 };

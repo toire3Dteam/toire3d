@@ -254,12 +254,12 @@ int ScoreUI::CalcRankScore()
 	if (m_tagScore[SCORE_TYPE::TIME].iPoint <= 30)
 	{
 		// Œo‰ßŽžŠÔ‚ª30•b“à‚Å“|‚¹‚½‚ç
-		ScorePoint += 5;	
+		ScorePoint += 5+1;	
 	}
 	else if (m_tagScore[SCORE_TYPE::TIME].iPoint <= 50)
 	{
 		// Œo‰ßŽžŠÔ‚ª45•b“à‚Å“|‚¹‚½‚ç
-		ScorePoint += 4;		
+		ScorePoint += 4+1;		
 	}
 	else if (m_tagScore[SCORE_TYPE::TIME].iPoint <= 70)
 	{

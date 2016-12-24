@@ -24,6 +24,7 @@ public:
 	void Initialize(int NumPlayer, Stage::Base *pStage, SideData aSideDatas[(int)SIDE::ARRAY_MAX]);
 	void Release(){ SAFE_DELETE(pInstance); }
 	void Update(PLAYER_UPDATE flag);
+	void UpdateTraining();
 	void UpdateHit();
 	void UpdatePos();
 	void Render();
@@ -31,6 +32,7 @@ public:
 	void RenderShadow();
 	void RenderDeferred();
 	void RenderUI();
+	void RenderTraining();
 
 	int GetNumPlayer() { return m_NumPlayer; }
 	BasePlayer *GetPlayer(int no) { return m_pPlayers[no]; }
@@ -99,6 +101,9 @@ private:
 
 	// 覚醒暗転
 	float m_OverDriveDim;
+
+	// トレーニング用の画像
+	tdn2DObj* m_pDamageInfoPlate;
 
 	// プレイヤーが持っている敵への向きフラグを設定
 	//void UpdatePlayerTargetDir(BasePlayer *my, BasePlayer *you);

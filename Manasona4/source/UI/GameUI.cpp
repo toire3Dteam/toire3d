@@ -79,7 +79,7 @@ GameUIManager::~GameUIManager()
 
 }
 
-void GameUIManager::InitData(BasePlayer* pLeftPlayer, BasePlayer* pRightPlayer, int iRoundNum)
+void GameUIManager::InitData(BasePlayer* pLeftPlayer, BasePlayer* pRightPlayer, int iRoundNum, ROUND_TIME_TYPE eRoundTimeType)
 {
 	m_pHpGage1P = new HpGage(pLeftPlayer);
 	m_pHpGage2P = new HpGage(pRightPlayer);
@@ -101,6 +101,8 @@ void GameUIManager::InitData(BasePlayer* pLeftPlayer, BasePlayer* pRightPlayer, 
 
 	m_pCombo1P = new ComboUI(pLeftPlayer);
 	m_pCombo2P = new ComboUI(pRightPlayer);
+
+	m_pTimer->SetTimerType(eRoundTimeType);
 }
 
 void GameUIManager::Update()

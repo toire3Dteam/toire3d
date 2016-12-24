@@ -8,6 +8,10 @@
 #include "../Stand/Stand.h"
 #include "../Number/Number.h"
 #include "../Collision/Collision.h"
+#include "Data\PlayerData.h"
+#include "Data\SelectData.h"
+#include "UI\GameUI.h"
+
 
 // 幚懱偺愰尵
 PlayerManager *PlayerManager::pInstance = nullptr;
@@ -86,6 +90,10 @@ void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage, SideData Side
 		// AI弶婜壔 側偤偙偙偱弶婜壔偡傞偲偄偆偲丄弶婜壔偺拞偱僾儗僀儎乕傪嶲徠偡傞偙偲偑偁傝丄慡堳偺弶婜壔偑姰椆偟偨屻偵屇傃弌偟偨偄偐傜
 		m_pPlayers[i]->InitAI(SideDatas[(int)side].eAIType);
 	}
+
+	m_pDamageInfoPlate = new tdn2DObj("Data/UI/Game/Training/DamageInfoPlate.png");
+
+
 }
 
 PlayerManager::~PlayerManager()
@@ -93,6 +101,8 @@ PlayerManager::~PlayerManager()
 	// 僟僽儖億僀儞僞乕偺奐曻
 	FOR(m_NumPlayer)delete m_pPlayers[i];
 	delete[] m_pPlayers;
+
+	SAFE_DELETE(m_pDamageInfoPlate);
 }
 
 void PlayerManager::Update(PLAYER_UPDATE flag)
@@ -130,6 +140,100 @@ void PlayerManager::Update(PLAYER_UPDATE flag)
 
 	// 僠乕儉億僀儞僩寁嶼
 	//CalcTeamPoint();
+}
+
+// 僩儗乕僯儞僌偺帪偺傒峏怴
+void PlayerManager::UpdateTraining()
+{
+	// (壖)
+	PlayerDataMgr->m_TrainingData.iHpRecovery = (int)HP_RECOVERY_TYPE::AUTO_RECOVERY;
+	PlayerDataMgr->m_TrainingData.iHp1P = 50;
+	PlayerDataMgr->m_TrainingData.iHp2P = 75;
+	PlayerDataMgr->m_TrainingData.iSpGage = 50;
+	PlayerDataMgr->m_TrainingData.iPartnerRecovery= (int)PARTNER_RECOVERY_TYPE::MAX;
+	PlayerDataMgr->m_TrainingData.iInfo = (int)TRAINING_INFO_TYPE::DAMEGE;
+
+
+	// 愝掕偟偨嵟戝HP傛傝懡偐偭偨傜尭傜偡
+	float fHpPersent1P = (float)(PlayerDataMgr->m_TrainingData.iHp1P) / (float)(100);
+	float fHpPersent2P = (float)(PlayerDataMgr->m_TrainingData.iHp2P) / (float)(100);
+	float fTrainingMaxHp1P = m_pPlayers[(int)SIDE::LEFT]->GetMaxHP()*fHpPersent1P;
+	float fTrainingMaxHp2P = m_pPlayers[(int)SIDE::RIGHT]->GetMaxHP()*fHpPersent2P;
+
+	// 嵍偺嵟戝HP
+	if (m_pPlayers[(int)SIDE::LEFT]->GetHP() > m_pPlayers[(int)SIDE::LEFT]->GetMaxHP()*fHpPersent1P)
+	{
+		m_pPlayers[(int)SIDE::LEFT]->SetHP((int)fTrainingMaxHp1P);
+	};
+	// 塃偺嵟戝HP
+	if (m_pPlayers[(int)SIDE::RIGHT]->GetHP() > m_pPlayers[(int)SIDE::RIGHT]->GetMaxHP()*fHpPersent2P)
+	{
+		m_pPlayers[(int)SIDE::RIGHT]->SetHP((int)fTrainingMaxHp2P);
+	};
+
+
+	// 愝掕偟偨SP僎乕僕傛傝彮側偐偭偨傜愝掕偟偨抣偵
+	// 偍屳偄偺峝捈偑夝偗偨傜
+	if (m_pPlayers[(int)SIDE::LEFT]->GetRecoveryFrame() <= 0 &&
+		m_pPlayers[(int)SIDE::RIGHT]->GetRecoveryFrame() <= 0)
+	{
+		FOR(m_NumPlayer)
+		{
+			// 帺暘偑峌寕偟偰側偄偲偒 + 僷乕僩僫乕傕峌寕偟偰偄側偄
+			if (m_pPlayers[i]->isAttackState() == false && 
+				m_pPlayers[i]->GetStand()->isActive() == false)
+			{
+				if (m_pPlayers[i]->GetOverDriveGage() < PlayerDataMgr->m_TrainingData.iSpGage)
+				{
+					m_pPlayers[i]->SetOverDriveGage((float)PlayerDataMgr->m_TrainingData.iSpGage);
+				}
+			}
+		}
+	};
+	
+
+	// 僷乕僩僫乕僎乕僕傪MAX屌掕偵偟偰偄偨傜
+	if (PlayerDataMgr->m_TrainingData.iPartnerRecovery == (int)PARTNER_RECOVERY_TYPE::MAX)
+	{
+		// 偍屳偄偺峝捈偑夝偗偨傜
+		if (m_pPlayers[(int)SIDE::LEFT]->GetRecoveryFrame() <= 0 &&
+			m_pPlayers[(int)SIDE::RIGHT]->GetRecoveryFrame() <= 0)
+		{
+			FOR(m_NumPlayer)
+			{
+				// 帺暘偑峌寕偟偰側偄偲偒 + 僷乕僩僫乕傕峌寕偟偰偄側偄
+				if (m_pPlayers[i]->isAttackState() == false &&
+					m_pPlayers[i]->GetStand()->isActive() == false)
+				{	
+					if (m_pPlayers[i]->GetStand()->GetStandGage() < m_pPlayers[i]->GetStand()->GetStandGageMAX())
+					{
+						m_pPlayers[i]->GetStand()->SetStandGage(m_pPlayers[i]->GetStand()->GetStandGageMAX());
+					}
+				}
+			}
+		};
+	}
+
+	// 帺摦夞暅偐偳偆偐
+	if (PlayerDataMgr->m_TrainingData.iHpRecovery == (int)HP_RECOVERY_TYPE::AUTO_RECOVERY)
+	{
+
+		FOR(m_NumPlayer)
+		{
+			// 峝捈帪娫偑側偗傟偽夞暅
+			if (m_pPlayers[i]->GetRecoveryFrame() <= 0)
+			{
+
+				m_pPlayers[i]->AddHP(100);
+			
+			}		
+		}
+
+	}
+	
+
+
+
 }
 
 void PlayerManager::UpdateHit()
@@ -187,6 +291,86 @@ void PlayerManager::RenderUI()
 {
 	// 僾儗僀儎乕偺UI昤夋
 	FOR(m_NumPlayer) m_pPlayers[i]->RenderUI();
+}
+
+void PlayerManager::RenderTraining()
+{
+	// 僑儕孨
+	SIDE eOrderSide = SelectDataMgr->Get()->eOrderTrainingSide;
+	SIDE eTargetSide = m_pPlayers[(int)eOrderSide]->GetTargetPlayer()->GetSide();
+
+	// 慡偰偺忣曬傪昤夋
+	if (PlayerDataMgr->m_TrainingData.iInfo == (int)TRAINING_INFO_TYPE::ALL)
+	{
+		// 僐儅儞僪暍楌
+		m_pPlayers[(int)eOrderSide]->RenderCommandFrame(10, 625);
+
+		int iFontX = 200;
+		int iFontY = 120;
+
+		// 僟儊乕僕偺僀儞僼僅儊乕僔儑儞偺棤偵揧偊傞僾儗乕僩
+		m_pDamageInfoPlate->Render(iFontX - 16, iFontY - 8);
+
+		std::string pStr = "側偟";
+		// 堦敪僟儊乕僕
+		pStr = "僟儊乕僕丂丂丂丂丂      ";
+		pStr += std::to_string(GameUIMgr->GetComboUI(eTargetSide)->GetNowDamage());
+		tdnFont::RenderString(pStr.c_str(), "HGS憂塸妏恨集窾B", 24, iFontX + 2, iFontY + 2 , 0xaa000000, RS::COPY);
+		tdnFont::RenderString(pStr.c_str(), "HGS憂塸妏恨集窾B", 24, iFontX, iFontY, 0xffeeeeee, RS::COPY);
+			
+		// 僐儞儃僟儊乕僕
+		pStr = "僐儞儃僟儊乕僕 丂丂     ";
+		pStr += std::to_string(GameUIMgr->GetComboUI(eTargetSide)->GetComboDamage());
+		iFontY += 40;
+		tdnFont::RenderString(pStr.c_str(), "HGS憂塸妏恨集窾B", 24, iFontX + 2, iFontY + 2, 0xaa000000, RS::COPY);
+		tdnFont::RenderString(pStr.c_str(), "HGS憂塸妏恨集窾B", 24, iFontX, iFontY, 0xffeeeeee, RS::COPY);
+
+		// 嵟戝僟儊乕僕
+		pStr = "嵟戝僐儞儃僟儊乕僕      ";
+		pStr += std::to_string(GameUIMgr->GetComboUI(eTargetSide)->GetMaxDamage());
+		iFontY += 40;
+		tdnFont::RenderString(pStr.c_str(), "HGS憂塸妏恨集窾B", 24, iFontX + 2, iFontY + 2, 0xaa000000, RS::COPY);
+		tdnFont::RenderString(pStr.c_str(), "HGS憂塸妏恨集窾B", 24, iFontX, iFontY, 0xffeeeeee, RS::COPY);
+
+	}
+	else if (PlayerDataMgr->m_TrainingData.iInfo == (int)TRAINING_INFO_TYPE::COMMAND)
+	{
+		// 僐儅儞僪暍楌
+		m_pPlayers[(int)eOrderSide]->RenderCommandFrame(10, 625);
+
+	}
+	else if (PlayerDataMgr->m_TrainingData.iInfo == (int)TRAINING_INFO_TYPE::DAMEGE)
+	{
+		int iFontX = 200;
+		int iFontY = 120;
+
+		// 僟儊乕僕偺僀儞僼僅儊乕僔儑儞偺棤偵揧偊傞僾儗乕僩
+		m_pDamageInfoPlate->Render(iFontX - 16, iFontY - 8);
+
+		std::string pStr = "側偟";
+		// 堦敪僟儊乕僕
+		pStr = "僟儊乕僕丂丂丂丂丂      ";
+		pStr += std::to_string(GameUIMgr->GetComboUI(eTargetSide)->GetNowDamage());
+		tdnFont::RenderString(pStr.c_str(), "HGS憂塸妏恨集窾B", 24, iFontX + 2, iFontY + 2, 0xaa000000, RS::COPY);
+		tdnFont::RenderString(pStr.c_str(), "HGS憂塸妏恨集窾B", 24, iFontX, iFontY, 0xffeeeeee, RS::COPY);
+
+		// 僐儞儃僟儊乕僕
+		pStr = "僐儞儃僟儊乕僕 丂丂     ";
+		pStr += std::to_string(GameUIMgr->GetComboUI(eTargetSide)->GetComboDamage());
+		iFontY += 40;
+		tdnFont::RenderString(pStr.c_str(), "HGS憂塸妏恨集窾B", 24, iFontX + 2, iFontY + 2, 0xaa000000, RS::COPY);
+		tdnFont::RenderString(pStr.c_str(), "HGS憂塸妏恨集窾B", 24, iFontX, iFontY, 0xffeeeeee, RS::COPY);
+
+		// 嵟戝僟儊乕僕
+		pStr = "嵟戝僐儞儃僟儊乕僕      ";
+		pStr += std::to_string(GameUIMgr->GetComboUI(eTargetSide)->GetMaxDamage());
+		iFontY += 40;
+		tdnFont::RenderString(pStr.c_str(), "HGS憂塸妏恨集窾B", 24, iFontX + 2, iFontY + 2, 0xaa000000, RS::COPY);
+		tdnFont::RenderString(pStr.c_str(), "HGS憂塸妏恨集窾B", 24, iFontX, iFontY, 0xffeeeeee, RS::COPY);
+
+	}
+
+
 }
 
 //void PlayerManager::SendHitMessage(BasePlayer *pAttackPlayer, BasePlayer *pDamagePlayer, HIT_DAMAGE_INFO *pHitDamageInfo)

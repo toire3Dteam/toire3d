@@ -37,7 +37,7 @@ public:
 	}
 
 	// éQè∆Ç≥ÇπÇÈ
-	void InitData(BasePlayer* pLeftPlayer, BasePlayer* pRightPlayer, int iRoundNum);
+	void InitData(BasePlayer* pLeftPlayer, BasePlayer* pRightPlayer, int iRoundNum, ROUND_TIME_TYPE eRoundTimeType);
 
 	void Update();
 	void Render();

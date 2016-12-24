@@ -18,6 +18,7 @@
 #include "../SceneSwitch/SceneSwitch.h"
 #include "../PointLight/PointLight.h"
 #include "Data\SelectData.h"
+#include "Data\PlayerData.h"
 #include "../Number/Number.h"
 #include "../UI/GameUI.h"
 #include	"../Cutin/CutIn.h"
@@ -48,11 +49,29 @@ bool sceneMain::Initialize()
 	if (SelectDataMgr->Get()->bTutorial == false &&
 		SelectDataMgr->Get()->bTraining == false)
 	{
-		m_iRoundNum = SelectDataMgr->Get()->iWinRound;
+		//m_iRoundNum = SelectDataMgr->Get()->iWinRound;
+		switch ((ROUND_NUM_TYPE)PlayerDataMgr->m_ConfigData.iRoundNumType)
+		{
+		case ROUND_NUM_TYPE::ROUND_1:
+			m_iRoundNum = 1;
+			break;
+		case ROUND_NUM_TYPE::ROUND_2:
+			m_iRoundNum = 2;
+			break;
+		case ROUND_NUM_TYPE::ROUND_3:
+			m_iRoundNum = 3;
+			break;
+		case ROUND_NUM_TYPE::ROUND_4:
+			m_iRoundNum = 4;
+			break;
+		default:
+			MyAssert(0, "そのラウンド数のタイプはない");
+			break;
+		}
 	}
 	else
 	{
-		m_iRoundNum = 0;
+		m_iRoundNum = 0;// ラウンド数が0だと無限ループ(チュートリアル・トレーニング)
 	}
 
 	m_dirLight = Vector3(1, -1, 1);
@@ -92,7 +111,18 @@ bool sceneMain::Initialize()
 	BasePlayer* p1 = PlayerMgr->GetPlayer_TeamInSearch(SIDE::LEFT);
 	BasePlayer* p2 = PlayerMgr->GetPlayer_TeamInSearch(SIDE::RIGHT);
 	GameUIMgr;
-	GameUIMgr->InitData(p1, p2, m_iRoundNum);
+	
+	if (SelectDataMgr->Get()->bTutorial == false &&
+		SelectDataMgr->Get()->bTraining == false)
+	{
+		GameUIMgr->InitData(p1, p2, m_iRoundNum, (ROUND_TIME_TYPE)PlayerDataMgr->m_ConfigData.iRoundTimeType);
+	}
+	else
+	{
+		// 戦闘以外はどの設定にしても∞
+		GameUIMgr->InitData(p1, p2, m_iRoundNum, (ROUND_TIME_TYPE::SEC_INFINITY));
+	}
+
 	//}));
 
 
@@ -190,7 +220,10 @@ bool sceneMain::Initialize()
 			m_pWindow[i] = new TrainingPauseWindow(Vector2(424, 128));
 			break;
 		case BATTLE_WINDOW_TYPE::SOUND:
-			m_pWindow[i] = new SoundWindow(Vector2(424, 128));
+			m_pWindow[i] = new SoundWindow(Vector2(324, 228));
+			break;
+		case BATTLE_WINDOW_TYPE::TRAINING_OPTION:
+			m_pWindow[i] = new TrainingOptionWindow(Vector2(224, 128));
 			break;
 		default:
 			MyAssert(0, "そんなウィンドウはない");

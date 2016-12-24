@@ -16,7 +16,8 @@ bTutorial(false),							// チュートリアルかどうか
 bTraining(false),							// トレーニングかどうか
 iWinRound(2),								// ラウンド数			
 iBattleMusicID(BattleMusicManager::RANDOM),	// 流す曲の番号
-iRoundTime(99)								// 一試合の初期時間
+iRoundTime(99),								// 一試合の初期時間
+eOrderTrainingSide(SIDE::LEFT)				// トレーニングを選んだ側
 {
 	tagSideDatas[(int)SIDE::LEFT].iDeviceID = 0;
 	tagSideDatas[(int)SIDE::RIGHT].iDeviceID = 1;

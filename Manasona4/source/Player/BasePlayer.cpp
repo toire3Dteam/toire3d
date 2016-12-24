@@ -1614,6 +1614,92 @@ void BasePlayer::ShaderSendParam()
 
 }
 
+void BasePlayer::RenderCommandFrame(int x, int y)
+{
+	// コマンド履歴の描画
+	FOR(c_COMMAND_FRAME_MAX)
+	{
+		char *c = "";
+
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::LEFT)
+		{
+			c = "←";
+		}
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::RIGHT)
+		{
+			c = "→";
+		}
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::UP)
+		{
+			c = "↑";
+		}
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::DOWN)
+		{
+			c = "↓";
+		}
+		//if (m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::LEFT) &&
+		//	m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::UP))
+		//{
+		//	c = "┏";
+		//}
+		//if (m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::RIGHT) &&
+		//	m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::UP))
+		//{
+		//	c = "┓";
+		//}
+		if (m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::LEFT) &&
+			m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::DOWN))
+		{
+			c = "／";
+		}
+		if (m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::RIGHT) &&
+			m_wCommandHistory[i] & ((int)PLAYER_COMMAND_BIT::DOWN))
+		{
+			c = "＼";
+		}
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::A)
+		{
+			c = "×";
+		}
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::B)
+		{
+			c = "○";
+		}
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::C)
+		{
+			c = "□";
+		}
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::D)
+		{
+			c = "△";
+		}
+
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::L1)
+		{
+			c = "◇";
+		}
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::R1)
+		{
+			c = "▽";
+		}
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::L2)
+		{
+			c = "㊧";
+		}
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::R2)
+		{
+			c = "㊨";
+		}
+		if (m_wCommandHistory[i] & (int)PLAYER_COMMAND_BIT::R3)
+		{
+			c = "◎";
+		}
+
+		tdnFont::RenderString(c, "メイリオ", 34, x + ((i % 64) * 44), y, 0xffffffff, RS::COPY);
+	}
+
+}
+
 // ステートマシンへの他から来るメッセージ
 bool BasePlayer::HandleMessage(const Message & msg)
 {

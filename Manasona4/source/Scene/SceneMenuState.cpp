@@ -450,6 +450,7 @@ bool SceneMenuState::TrainingControllerSelectStep::PadUpdate(sceneMenu *pMain, i
 		// もし左に練習する人が入ってたら
 		if (C_UIMgr->GetLeftPlayer().iPlayerDeviceID == pMain->GetTrainingCtrlDevice())
 		{
+			SelectDataMgr->Get()->eOrderTrainingSide = SIDE::LEFT;// ★トレーニング主のサイドを左に
 			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = false;
 			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = C_UIMgr->GetLeftPlayer().iPlayerDeviceID;
 
@@ -461,6 +462,7 @@ bool SceneMenuState::TrainingControllerSelectStep::PadUpdate(sceneMenu *pMain, i
 		// もし右に練習する人が入ってたら
 		else if (C_UIMgr->GetRightPlayer().iPlayerDeviceID == pMain->GetTrainingCtrlDevice())
 		{
+			SelectDataMgr->Get()->eOrderTrainingSide = SIDE::RIGHT;// ★トレーニング主のサイドを右に
 			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = false;
 			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = C_UIMgr->GetRightPlayer().iPlayerDeviceID;
 	

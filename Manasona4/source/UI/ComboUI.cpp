@@ -42,6 +42,8 @@ ComboUI::ComboUI(BasePlayer* PlayerData)
 	m_iMaxCount = 0;
 
 	m_iDamage = 0;
+	m_iNowDamage = 0;
+	m_iComboDamage = 0;
 	m_iMaxDamage = 0;
 
 	// 
@@ -213,6 +215,10 @@ void ComboUI::Count(int damage, int maxRecovery, bool bCounterHit)
 	}
 	
 	m_iDamage += damage;
+
+	m_iNowDamage = damage;
+	m_iComboDamage = m_iDamage;
+
 	// Å‘åƒRƒ“ƒ{”‚ğ•Û‘¶
 	if (m_iMaxDamage <= m_iDamage)
 	{

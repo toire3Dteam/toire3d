@@ -1,5 +1,6 @@
 #include "GameWindow.h"
 #include "Data/PlayerData.h"
+#include "Data/SelectData.h"
 
 //+------------------------
 //  ゲームウィンドウ
@@ -7,17 +8,21 @@
 
 GameWindow::GameWindow(Vector2 vPos) :BaseWindow(vPos)
 {
-	m_pWindow = new tdn2DObj("Data/UI/Window/GameSettingWindow.png");
+	m_pWindow = new tdn2DObj("Data/UI/Window/GameOptionsWindow.png");
 
 	//選択アイコンの長さ
-	m_iSelectLength = 65;
+	m_iSelectLength = 54;
 
 	// ポーズウィンドウに存在するアイコンを詰めていく
 	AddIconData("CPU難易度", "CPUの難易度の変更を行います。");
+	AddIconData("勝利ラウンド数", "勝利条件ラウンド数を設定します。");
+	AddIconData("時間制限", "1ラウンドの制限時間を設定します。");
+	AddIconData("初期値に戻す", "初期設定に戻します。");
 	AddIconData("戻る", "このウィンドウを閉じます。");
 
-	m_pDifficultyParam = new DifficultyParamSetting(1, 400);
-
+	m_pDifficultyParam = new DifficultyParamSetting(1, 275);
+	m_pRoundNumTypeParam = new RoundNumTypeParamSetting(2, 275);
+	m_pRoundTimeTypeParam = new RoundTimeTypeParamSetting(3, 275);
 	//// スピードレベル
 	//iSpeedLv = 0;
 	//iLeftPushFrame = 0;
@@ -27,6 +32,8 @@ GameWindow::GameWindow(Vector2 vPos) :BaseWindow(vPos)
 GameWindow::~GameWindow()
 {
 	SAFE_DELETE(m_pDifficultyParam);
+	SAFE_DELETE(m_pRoundNumTypeParam);
+	SAFE_DELETE(m_pRoundTimeTypeParam);
 }
 
 
@@ -50,6 +57,8 @@ bool GameWindow::Update()
 
 	// パラメーター更新
 	m_pDifficultyParam->Update();
+	m_pRoundNumTypeParam->Update();
+	m_pRoundTimeTypeParam->Update();
 
 	return true;// 起動中
 }
@@ -102,7 +111,7 @@ void GameWindow::Redner()
 
 		//+------------------------------------------------
 		// ただし戻るなどはいつも通り文字分の枠に　逐一記入
-		if (i == GameWindow::BACK)
+		if (i == GameWindow::BACK|| i == GameWindow::RESET)
 		{
 			for (int j = 0; j < m_aIconData[i].iStringLength; j++)
 			{
@@ -157,9 +166,9 @@ void GameWindow::Redner()
 
 #ifdef _DEBUG
 	// 
-	tdnText::Draw(300, 100, 0xffff00aa, "BGMパラメーター%d",PlayerDataMgr->m_ConfigData.iBGMVolume);
-	tdnText::Draw(300, 150, 0xffff00aa, "SEパラメーター%d", PlayerDataMgr->m_ConfigData.iSEVolume);
-	tdnText::Draw(300, 200, 0xffff00aa, "VOICEパラメーター%d", PlayerDataMgr->m_ConfigData.iVoiceVolume);
+	//tdnText::Draw(300, 100, 0xffff00aa, "BGMパラメーター%d",PlayerDataMgr->m_ConfigData.iBGMVolume);
+	//tdnText::Draw(300, 150, 0xffff00aa, "SEパラメーター%d", PlayerDataMgr->m_ConfigData.iSEVolume);
+	//tdnText::Draw(300, 200, 0xffff00aa, "VOICEパラメーター%d", PlayerDataMgr->m_ConfigData.iVoiceVolume);
 
 	//tdnText::Draw(300, 250, 0xffff00aa, "スピードレベル%d", iSpeedLv);
 	//tdnText::Draw(300, 300, 0xffff00aa, "左おしっぱ%d", iLeftPushFrame);
@@ -198,6 +207,16 @@ bool  GameWindow::Ctrl(int DeviceID)
 		{
 			// 選択した番号格納！
 			m_iChoiceState = (GAME_STATE)m_iSelectNo;
+		
+			// ↑リセットを押したとき
+			if (m_iChoiceState == (GAME_STATE::RESET))
+			{
+				// 決定ボタンで初期設定に戻します。
+				PlayerDataMgr->m_ConfigData.iRoundNumType = (int)ROUND_NUM_TYPE::ROUND_2;
+				PlayerDataMgr->m_ConfigData.iRoundTimeType = (int)ROUND_TIME_TYPE::SEC_99;
+				PlayerDataMgr->m_ConfigData.iDifficultyAI = (int)AI_TYPE::CPU_NORMAL;
+			}
+
 			return true;
 		}
 	}
@@ -284,6 +303,12 @@ void GameWindow::RenderParamSetting(int No, int x, int y)
 	case GameWindow::DIFFICULTY:
 		m_pDifficultyParam->Render(x, y, bSelect);
 		break;
+	case GameWindow::GAME_STATE::ROUND:
+		m_pRoundNumTypeParam->Render(x, y, bSelect);
+		break;
+	case GameWindow::GAME_STATE::TIME:
+		m_pRoundTimeTypeParam->Render(x, y, bSelect);
+		break;
 	case GameWindow::BACK:
 		break;
 	default:
@@ -299,6 +324,15 @@ void GameWindow::CtrlParamSetting(int SelectNo, int DeviceID)
 	{
 	case GameWindow::DIFFICULTY:
 		m_pDifficultyParam->Ctrl(DeviceID);
+		break;
+	case GameWindow::GAME_STATE::ROUND:
+		m_pRoundNumTypeParam->Ctrl(DeviceID);
+		break;
+	case GameWindow::GAME_STATE::TIME:
+		m_pRoundTimeTypeParam->Ctrl(DeviceID);
+		break;
+	case GameWindow::RESET:
+
 		break;
 	case GameWindow::BACK:
 		

@@ -100,6 +100,11 @@ void BaseWindow::Stop()
 	m_iChoiceState = CHOICE_STATE::HOLD;// (12/12) Ç±Ç±Ç…Ç‡HOLDÇÃèàóù
 }
 
+void BaseWindow::ChoiceClear()
+{
+	m_iChoiceState = CHOICE_STATE::HOLD; // ñ¢ëIëÇ÷
+}
+
 void BaseWindow::AddIconData(LPSTR string, LPSTR infoString)
 {
 	IconData data;

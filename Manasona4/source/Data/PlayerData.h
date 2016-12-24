@@ -24,7 +24,8 @@ namespace PlayerData
 		signed int iBGMVolume		: 8;
 		signed int iSEVolume		: 8;
 		signed int iVoiceVolume		: 8;
-		unsigned int ‹ó‚«˜g1		: 8;
+		unsigned int iRoundNumType	: 4;
+		unsigned int iRoundTimeType : 4;
 		unsigned int ‹ó‚«˜g2		: 32;
 		unsigned int ‹ó‚«˜g3		: 32;
 		unsigned int ‹ó‚«˜g4		: 32;
@@ -34,12 +35,12 @@ namespace PlayerData
 
 	struct Training
 	{
-		int ‹ó‚«˜g1;
-		int ‹ó‚«˜g2;
-		int ‹ó‚«˜g3;
-		int ‹ó‚«˜g4;
-		int ‹ó‚«˜g5;
-		int ‹ó‚«˜g6;
+		int iHpRecovery;
+		int iHp1P;
+		int iHp2P;
+		int iSpGage;
+		int iPartnerRecovery;
+		int iInfo;
 		int ‹ó‚«˜g7;
 		int ‹ó‚«˜g8;
 		int ‹ó‚«˜g9;

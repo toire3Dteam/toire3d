@@ -144,7 +144,7 @@ bool EasyTypeChaseBrain(AI * pPerson)
 	// 相手が攻撃してきたら。
 	if (TargetPlayer->isAttackState() == true)
 	{
-		if (tdnRandom::Get(0, 100) <= 25)
+		if (tdnRandom::Get(0, 100) <= 20)
 		{
 			// ガード
 			pPerson->GetFSM()->ChangeState(AIState::Guard::GetInstance());
@@ -159,36 +159,137 @@ bool EasyTypeChaseBrain(AI * pPerson)
 
 	}
 
-	// もじもじタイマーがある一定時間を過ぎてから行動ができる
-	if (pPerson->GetWaitFrame() >= 40)
+
+	// 相手が無敵じゃなかったら
+	//if (TargetPlayer->GetInvincibleTime() <= 0)
 	{
-
-		// ジャンプしてみる
-		if (tdnRandom::Get(0, 100) <= 15)// ←の確率で
+		// もじもじタイマーがある一定時間を過ぎてから行動ができる
+		if (pPerson->GetWaitFrame() >= 60)
 		{
-			pPerson->GetFSM()->ChangeState(AIState::SimpleJump::GetInstance());
+
+			// ジャンプしてみる
+			if (tdnRandom::Get(0, 100) <= 15)// ←の確率で
+			{
+				pPerson->GetFSM()->ChangeState(AIState::SimpleJump::GetInstance());
+				return true;
+
+			}
+
+			// 後ろに下がってみる　（こっちに来たのにもどるのか）
+			if (tdnRandom::Get(0, 100) <= 30)// ←の確率で
+			{
+				pPerson->GetFSM()->ChangeState(AIState::BackWark::GetInstance());
+				return true;
+			}
+
+			//+---------------------------------------
+			// 相手が地上・空中にいるかで動きを変える
+			//+---------------------------------------
+			if (pPerson->GetTargetPlayer()->isLand() == true)
+			{
+				pPerson->GetFSM()->ChangeState(AIState::EasyAttack::GetInstance());
+				return true;
+			}
+
+		}
+	}
+
+	return false;
+}
+
+
+// 難易度が普通の追いかけるステート　まあまあ
+bool NormalTypeChaseBrain(AI * pPerson)
+{
+
+	//+----------------------------
+	//		ガード
+	//+----------------------------
+	// 相手が攻撃してきたら。
+	if (TargetPlayer->isAttackState() == true)
+	{
+		// 10%の確率で無敵
+		if (tdnRandom::Get(0, 100) <= 10)
+		{
+			// 無敵技(リバーサル昇竜)
+			pPerson->GetFSM()->ChangeState(AIState::InvincibleAttack::GetInstance());
 			return true;
 
 		}
-
-		// 後ろに下がってみる　（こっちに来たのにもどるのか）
-		if (tdnRandom::Get(0, 100) <= 30)// ←の確率で
+		else if (tdnRandom::Get(0, 100) <= 40)
 		{
-			pPerson->GetFSM()->ChangeState(AIState::BackWark::GetInstance());
+			// ガード
+			pPerson->GetFSM()->ChangeState(AIState::Guard::GetInstance());
 			return true;
-		}
 
-		//+---------------------------------------
-		// 相手が地上・空中にいるかで動きを変える
-		//+---------------------------------------
-		if (pPerson->GetTargetPlayer()->isLand() == true)
+		}
+		else
 		{
+			// 何もしない　やられよう
 			pPerson->GetFSM()->ChangeState(AIState::EasyAttack::GetInstance());
 			return true;
 		}
 
 	}
 
+
+	// 相手が無敵じゃなかったら
+	if (TargetPlayer->GetInvincibleTime() <= 0)
+	{
+
+		// もじもじタイマーがある一定時間を過ぎてから行動ができる
+		if (pPerson->GetWaitFrame() >= 40)
+		{
+			// 弱いステート　ノーマルでも少しの確率で残しておく
+			{
+				// ジャンプしてみる
+				if (tdnRandom::Get(0, 100) <= 10)// ←の確率で
+				{
+					pPerson->GetFSM()->ChangeState(AIState::SimpleJump::GetInstance());
+					return true;
+				}
+
+				// 後ろに下がってみる　（こっちに来たのにもどるのか）
+				if (tdnRandom::Get(0, 100) <= 25)// ←の確率で
+				{
+					pPerson->GetFSM()->ChangeState(AIState::BackWark::GetInstance());
+					return true;
+				}
+			}
+
+			// 投げステート
+			if (tdnRandom::Get(0, 100) <= 20)// ←の確率で飛ぶ
+			{
+				// ★相手がダウンしていないときかつ、飛んでいないとき
+				if (TargetPlayer->isDown() == false && TargetPlayer->isLand() == true)
+				{
+					pPerson->GetFSM()->ChangeState(AIState::SetThrow::GetInstance());
+					return true;
+				}
+			}
+
+			// 空中攻撃
+			if (tdnRandom::Get(0, 100) <= 15)// ←の確率で飛ぶ
+			{
+				// 前回空中崩し攻撃をかましていなかったら
+				if (pPerson->GetFSM()->isPrevState(*AIState::AerialDestructAttack::GetInstance()) != true)
+				{
+					pPerson->GetFSM()->ChangeState(AIState::ChaseAir::GetInstance());
+					return true;
+				}
+			}
+
+			//+---------------------------------------
+			// 相手が地上・空中にいるかで動きを変える
+			//+---------------------------------------
+			if (pPerson->GetTargetPlayer()->isLand() == true)
+			{
+				pPerson->GetFSM()->ChangeState(AIState::EasyAttack::GetInstance());
+				return true;
+			}
+
+		}
+	}
 	return false;
 }
 
@@ -202,15 +303,132 @@ bool HardTypeChaseBrain(AI * pPerson)
 	// 相手が攻撃してきたら。
 	if (TargetPlayer->isAttackState() == true)
 	{
-		// 30%の確率で無敵
-		if (tdnRandom::Get(0, 100) <= 30)
+		int ram = tdnRandom::Get(0, 100);
+
+		// 20%の確率で無敵
+		if (ram <= 20)
 		{
 			// 無敵技(リバーサル昇竜)
 			pPerson->GetFSM()->ChangeState(AIState::InvincibleAttack::GetInstance());
 			return true;
 
 		}
-		else if (tdnRandom::Get(0, 100) <= 20)
+		else if (ram <= 40)
+		{
+			// 回避ステート
+			pPerson->GetFSM()->ChangeState(AIState::Escape::GetInstance());
+			return true;
+		}
+		else if (ram <= 70)
+		{
+			// ガード
+			pPerson->GetFSM()->ChangeState(AIState::Guard::GetInstance());
+			return true;
+		}
+		else
+		{
+			// 何もしない　やられよう
+			pPerson->GetFSM()->ChangeState(AIState::EasyAttack::GetInstance());
+			return true;
+		}
+	}
+
+
+	// 相手が無敵じゃなかったら
+	if (TargetPlayer->GetInvincibleTime() <= 0)
+	{
+
+		// 投げステート
+		if (tdnRandom::Get(0, 100) <= 20)// ←の確率で飛ぶ
+		{
+			// ★相手がダウンしていないときかつ、飛んでいないとき
+			if (TargetPlayer->isDown() == false && TargetPlayer->isLand() == true)
+			{
+				pPerson->GetFSM()->ChangeState(AIState::SetThrow::GetInstance());
+				return true;
+			}
+		}
+
+		if (tdnRandom::Get(0, 100) <= 15)// ←の確率で飛ぶ
+		{
+			// 前回空中崩し攻撃をかましていなかったら
+			if (pPerson->GetFSM()->isPrevState(*AIState::AerialDestructAttack::GetInstance()) != true)
+			{
+				pPerson->GetFSM()->ChangeState(AIState::ChaseAir::GetInstance());
+				return true;
+			}
+		}
+
+		if (tdnRandom::Get(0, 100) <= 15)//	←の確率で飛ぶ
+		{
+			pPerson->GetFSM()->ChangeState(AIState::SetAnitiAir::GetInstance());
+			return  true;
+		}
+
+		if (tdnRandom::Get(0, 100) <= 20)//	←の確率で飛ぶ
+		{
+			// 無敵歩行（逆切れ対策）
+			pPerson->GetFSM()->ChangeState(AIState::MightyWark::GetInstance());
+			return true;
+		}
+
+		//+---------------------------------------
+		// 相手が地上・空中にいるかで動きを変える
+		//+---------------------------------------
+		if (pPerson->GetTargetPlayer()->isLand() == true)
+		{
+			pPerson->GetFSM()->ChangeState(AIState::RushAttack::GetInstance());
+			return  true;
+		}
+		else
+		{
+			// 相手が空中にいる場合は走っていようが歩いてでも当たる場所に行く
+			//float  nearLen = MyPlayer->AIAttackRange();	// 自分のキャラクターのレンジ
+
+
+			// ★（難易度に属する物）製作者の慈悲により絶対対空当てるマンを確立に
+
+			// 2分の1の確立で対空攻撃
+			if (tdnRandom::Get(0, 2) == 0)
+			{
+				pPerson->GetFSM()->ChangeState(AIState::SetAnitiAir::GetInstance());
+				return true;
+			}
+			else
+			{
+				pPerson->GetFSM()->ChangeState(AIState::ChaseAir::GetInstance());
+				return true;
+			}
+
+		}
+	}
+
+	return false;
+}
+
+
+
+// 難易度が最強の追いかけるステート　最強
+bool YokoeTypeChaseBrain(AI * pPerson)
+{
+
+	//+----------------------------
+	//		ガード・切り替えし
+	//+----------------------------
+	// 相手が攻撃してきたら。
+	if (TargetPlayer->isAttackState() == true)
+	{
+		int ram = tdnRandom::Get(0, 100);
+
+		// 40%の確率で無敵
+		if (ram <= 40)
+		{
+			// 無敵技(リバーサル昇竜)
+			pPerson->GetFSM()->ChangeState(AIState::InvincibleAttack::GetInstance());
+			return true;
+
+		}
+		else if (ram <= 65)
 		{
 			// 回避ステート
 			pPerson->GetFSM()->ChangeState(AIState::Escape::GetInstance());
@@ -224,71 +442,74 @@ bool HardTypeChaseBrain(AI * pPerson)
 		}
 	}
 
-	// 投げステート
-	if (tdnRandom::Get(0, 100) <= 20)// ←の確率で飛ぶ
+	// 相手が無敵じゃなかったら
+	if (TargetPlayer->GetInvincibleTime() <= 0)
 	{
-		// ★相手がダウンしていないときかつ、飛んでいないとき
-		if (TargetPlayer->isDown() == false && TargetPlayer->isLand() == true)
+
+		// 投げステート
+		if (tdnRandom::Get(0, 100) <= 20)// ←の確率で飛ぶ
 		{
-			pPerson->GetFSM()->ChangeState(AIState::SetThrow::GetInstance());
-			return true;
+			// ★相手がダウンしていないときかつ、飛んでいないとき
+			if (TargetPlayer->isDown() == false && TargetPlayer->isLand() == true)
+			{
+				pPerson->GetFSM()->ChangeState(AIState::SetThrow::GetInstance());
+				return true;
+			}
 		}
-	}
 
-	if (tdnRandom::Get(0, 100) <= 15)// ←の確率で飛ぶ
-	{
-		// 前回空中崩し攻撃をかましていなかったら
-		if (pPerson->GetFSM()->isPrevState(*AIState::AerialDestructAttack::GetInstance()) != true)
+		if (tdnRandom::Get(0, 100) <= 15)// ←の確率で飛ぶ
 		{
-			pPerson->GetFSM()->ChangeState(AIState::ChaseAir::GetInstance());
-			return true;
+			// 前回空中崩し攻撃をかましていなかったら
+			if (pPerson->GetFSM()->isPrevState(*AIState::AerialDestructAttack::GetInstance()) != true)
+			{
+				pPerson->GetFSM()->ChangeState(AIState::ChaseAir::GetInstance());
+				return true;
+			}
 		}
-	}
 
-	if (tdnRandom::Get(0, 100) <= 15)//	←の確率で飛ぶ
-	{
-		pPerson->GetFSM()->ChangeState(AIState::SetAnitiAir::GetInstance());
-		return  true;
-	}
-
-	if (tdnRandom::Get(0, 100) <= 40)//	←の確率で飛ぶ
-	{
-		// 無敵歩行（逆切れ対策）
-		pPerson->GetFSM()->ChangeState(AIState::MightyWark::GetInstance());
-		return true;
-	}
-
-	//+---------------------------------------
-	// 相手が地上・空中にいるかで動きを変える
-	//+---------------------------------------
-	if (pPerson->GetTargetPlayer()->isLand() == true)
-	{
-		pPerson->GetFSM()->ChangeState(AIState::RushAttack::GetInstance());
-		return  true;
-	}
-	else
-	{
-		// 相手が空中にいる場合は走っていようが歩いてでも当たる場所に行く
-		//float  nearLen = MyPlayer->AIAttackRange();	// 自分のキャラクターのレンジ
-
-
-		// ★（難易度に属する物）製作者の慈悲により絶対対空当てるマンを確立に
-
-		// 2分の1の確立で対空攻撃
-		if (tdnRandom::Get(0, 2) == 0)
+		if (tdnRandom::Get(0, 100) <= 15)//	←の確率で飛ぶ
 		{
 			pPerson->GetFSM()->ChangeState(AIState::SetAnitiAir::GetInstance());
+			return  true;
+		}
+
+		if (tdnRandom::Get(0, 100) <= 25)//	←の確率で飛ぶ
+		{
+			// 無敵歩行（逆切れ対策）
+			pPerson->GetFSM()->ChangeState(AIState::MightyWark::GetInstance());
 			return true;
+		}
+
+		//+---------------------------------------
+		// 相手が地上・空中にいるかで動きを変える
+		//+---------------------------------------
+		if (pPerson->GetTargetPlayer()->isLand() == true)
+		{
+			pPerson->GetFSM()->ChangeState(AIState::RushAttack::GetInstance());
+			return  true;
 		}
 		else
 		{
-			pPerson->GetFSM()->ChangeState(AIState::ChaseAir::GetInstance());
-			return true;
+			// 相手が空中にいる場合は走っていようが歩いてでも当たる場所に行く
+			//float  nearLen = MyPlayer->AIAttackRange();	// 自分のキャラクターのレンジ
+
+
+			// ★（難易度に属する物）製作者の慈悲により絶対対空当てるマンを確立に
+
+			// 2分の1の確立で対空攻撃
+			if (tdnRandom::Get(0, 2) == 0)
+			{
+				pPerson->GetFSM()->ChangeState(AIState::SetAnitiAir::GetInstance());
+				return true;
+			}
+			else
+			{
+				pPerson->GetFSM()->ChangeState(AIState::ChaseAir::GetInstance());
+				return true;
+			}
+
 		}
-
 	}
-
-
 	return false;
 }
 
@@ -322,8 +543,13 @@ void AIState::Global::Execute(AI * pPerson)
 	// 投げに捕まったら
 	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::ThrowBind::GetInstance()) == true)
 	{
-		// 投げ抜け判断ステートへ
-		pPerson->GetFSM()->ChangeState(AIState::ThrowTech::GetInstance());
+		// なげ抜けステートにまだ移行してなかったら
+		if (pPerson->GetFSM()->isInState(*AIState::ThrowTech::GetInstance()) == false)
+		{
+			// 投げ抜け判断ステートへ
+			pPerson->GetFSM()->ChangeState(AIState::ThrowTech::GetInstance());
+			return;
+		}
 	}
 
 }
@@ -802,7 +1028,7 @@ void AIState::Wait::Execute(AI * pPerson)
 		switch (pPerson->m_eAIType)
 		{
 		case AI_TYPE::CPU_EASY:
-			l_iStrong += 40;
+			l_iStrong += 50;
 			break;
 		case AI_TYPE::CPU_NORMAL:
 			l_iStrong += 25;
@@ -819,7 +1045,8 @@ void AIState::Wait::Execute(AI * pPerson)
 
 
 		// 相手が起き上がり攻撃被せてきたら
-		if (TargetPlayer->isAttackState() == true)
+		if (TargetPlayer->isAttackState() == true &&
+			TargetPlayer->AIAttackRange() > GetRange(pPerson))
 		{
 			// 35%の確率で無敵
 			if (l_iStrong <= 35)
@@ -837,18 +1064,66 @@ void AIState::Wait::Execute(AI * pPerson)
 
 		}
 
+		// 相手にダメージが通る　かつ　低確率でスキル技も出してみる
+		if (TargetPlayer->GetInvincibleTime() <= 0 && 
+			TargetPlayer->isAttackState() == false)
+		{
+			if (tdnRandom::Get(0, 100) <= 7)
+			{
+				// スキルモードに
+				pPerson->GetFSM()->ChangeState(AIState::SkillAttack::GetInstance());
+				return;
+			}
+		}
+
+		//if (pPerson->m_eAIType == AI_TYPE::CPU_EASY) 
+		//{
+		//	// 3分の1で
+		//	if (tdnRandom::Get(0, 3) <= 0)
+		//	{
+		//		// 後ろへ歩く
+		//		pPerson->GetFSM()->ChangeState(AIState::BackWark::GetInstance());
+		//		return;
+		//	}
+		//}
+		if (pPerson->m_eAIType == AI_TYPE::CPU_EASY||
+			pPerson->m_eAIType == AI_TYPE::CPU_NORMAL)
+		{
+			// 5分の1で
+			if (tdnRandom::Get(0, 5) <= 0)
+			{
+				// 前回後ろ歩きしていなかったら
+				if (pPerson->GetFSM()->isPrevState(*AIState::BackWark::GetInstance()) != true)
+				{
+					// 後ろへ歩く
+					pPerson->GetFSM()->ChangeState(AIState::BackWark::GetInstance());
+					return;
+				}
+			}
+		}
+
 		// 空中か地上どちらで追いかけるか
 		if (tdnRandom::Get(0, 100) <= 30)
 		{
-			// イージーモードならただ飛ぶたげ
-			//if (pPerson->GetAIType() == AI_TYPE::CPU_EASY)
-			//{
-			//	// ジャンプ
-			//	pPerson->GetFSM()->ChangeState(AIState::SimpleJump::GetInstance());
-			//	return;
-			//}
-			//else
+			// イージーモードなら弱体化
+			if (pPerson->GetAIType() == AI_TYPE::CPU_EASY)
+			{
+				// 前回飛んでいなかったら
+				if (pPerson->GetFSM()->isPrevState(*AIState::SimpleJump::GetInstance()) != true)
+				{
+					// ジャンプモードに
+					pPerson->GetFSM()->ChangeState(AIState::SimpleJump::GetInstance());
+					return;
+				}
+				else
+				{
+					// 追跡モードに
+					pPerson->GetFSM()->ChangeState(AIState::Chase::GetInstance());
+					return;
+				}
 
+			}
+			else
 			{
 				// 空中追跡モードに
 				pPerson->GetFSM()->ChangeState(AIState::ChaseAir::GetInstance());
@@ -860,13 +1135,17 @@ void AIState::Wait::Execute(AI * pPerson)
 		{
 			// もしイージーモードなら
 			if (pPerson->GetAIType() == AI_TYPE::CPU_EASY)
-			{
-				// 4分の1で
-				if (tdnRandom::Get(0, 4) <= 0)
+			{	
+				// 前回飛んでいなかったら
+				if (pPerson->GetFSM()->isPrevState(*AIState::SimpleJump::GetInstance()) != true)
 				{
-					// 後ろへ歩く
-					pPerson->GetFSM()->ChangeState(AIState::SimpleJump::GetInstance());
-					return;
+					// 4分の1で
+					if (tdnRandom::Get(0, 4) <= 0)
+					{
+						// 後ろへ歩く
+						pPerson->GetFSM()->ChangeState(AIState::SimpleJump::GetInstance());
+						return;
+					}
 				}
 			}
 
@@ -1363,8 +1642,7 @@ void AIState::Chase::Execute(AI * pPerson)
 	//	↑の距離で一定まで近づいたら　(ランダム)で攻撃 (1210) xの距離に変更 
 	//+-------------------------------------------------
 
-	if (Math::Length(TargetPos.x, MyPos.x) < len &&
-		TargetPlayer->GetInvincibleTime() <= 0)
+	if (Math::Length(TargetPos.x, MyPos.x) < len)
 	{
 		bool bReturn = false;
 
@@ -1372,13 +1650,16 @@ void AIState::Chase::Execute(AI * pPerson)
 		switch (pPerson->m_eAIType)
 		{
 		case AI_TYPE::CPU_EASY:
-		case AI_TYPE::CPU_NORMAL:
 			bReturn = EasyTypeChaseBrain(pPerson);
-
+			break;
+		case AI_TYPE::CPU_NORMAL:
+			bReturn = NormalTypeChaseBrain(pPerson);
 			break;
 		case AI_TYPE::CPU_HARD:
-		case AI_TYPE::CPU_YOKOE:
 			bReturn = HardTypeChaseBrain(pPerson);
+			break;
+		case AI_TYPE::CPU_YOKOE:
+			bReturn = YokoeTypeChaseBrain(pPerson);
 			break;
 		default:
 			break;
@@ -1395,7 +1676,7 @@ void AIState::Chase::Execute(AI * pPerson)
 	//+-----------------------------------------
 	int iDushRange = 25;
 	if (pPerson->GetAIType() == AI_TYPE::CPU_EASY)iDushRange = 60;
-	if (pPerson->GetAIType() == AI_TYPE::CPU_NORMAL)iDushRange = 35;
+	if (pPerson->GetAIType() == AI_TYPE::CPU_NORMAL)iDushRange = 40;
 
 	if (Math::Length(TargetPos, MyPos) >= iDushRange)		// ←のパラメーターが走りに切り替える距離
 	{
@@ -1427,8 +1708,8 @@ void AIState::Chase::Execute(AI * pPerson)
 	else // 近いから歩くポン
 	{
 		// 左右の移動
-		if (TargetPos.x > MyPos.x + 5)	pPerson->PushInputList(PLAYER_INPUT::RIGHT);
-		else if (TargetPos.x < MyPos.x - 5)	pPerson->PushInputList(PLAYER_INPUT::LEFT);
+		if (TargetPos.x > MyPos.x + 8)	pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+		else if (TargetPos.x < MyPos.x - 8)	pPerson->PushInputList(PLAYER_INPUT::LEFT);
 		else// ↓相手のにぎりぎりまで迫ったときの処理
 		{
 			// 待機に戻ろう　ここまで近づいて何もしないのは
@@ -1438,7 +1719,7 @@ void AIState::Chase::Execute(AI * pPerson)
 			//pPerson->GetFSM()->ChangeState(AIState::EasyAttack::GetInstance());
 			//return;
 			
-			pPerson->m_iWaitFrame += 100;
+			//pPerson->m_iWaitFrame += 100;
 
 		}
 
@@ -1681,6 +1962,24 @@ void AIState::RushAttack::Execute(AI * pPerson)
 	}
 
 
+	// 難易度最高だった場合
+	if (pPerson->GetAIType() == AI_TYPE::CPU_YOKOE)
+	{
+
+		// ラッシュ攻撃する途中で相手が先に殴ってきたら＋
+		// 自分がまだ攻撃していなかったら
+		if (MyPlayer->isAttackState() == false && 
+			TargetPlayer->isAttackState() == true)
+		{
+			//+----------------------------
+			//		ガード・切り替えし
+			//+----------------------------
+			pPerson->GetFSM()->ChangeState(AIState::Guard::GetInstance());
+			return;
+		}
+
+	}
+
 	// 相手方向にレバーを倒す うまくつながらん
 	//if (TargetPos.x > MyPos.x)
 	//{
@@ -1730,28 +2029,29 @@ void AIState::RushAttack::Execute(AI * pPerson)
 					// 中距離技があたらないなら
 					if (abs(TargetPos.x - MyPos.x) <= MyPlayer->AIAttackRange())
 					{
-						// 中段ステートへ
-						//pPerson->PushInputList(PLAYER_INPUT::R1);
-						pPerson->GetFSM()->ChangeState(AIState::DokkoiAttack::GetInstance());
-						//pPerson->GetFSM()->ChangeState(AIState::ChaseAir::GetInstance());
+						// 確率で中段ステートへ
+						if (tdnRandom::Get(0, 1) == 0)
+						{
+							pPerson->GetFSM()->ChangeState(AIState::BackStep::GetInstance());
+							return;
+
+						}
+						else
+						{
+							//pPerson->PushInputList(PLAYER_INPUT::R1);
+							pPerson->GetFSM()->ChangeState(AIState::DokkoiAttack::GetInstance());
+							return;
+						}
 
 					}
 					else
 					{
 						// バックステップ
-						if (TargetPos.x < MyPos.x)
-						{
-							// ★二回押し
-							pPerson->ActionDoublePush(PLAYER_INPUT::RIGHT);
-						}
-						else
-						{
-							// ★二回押し
-							pPerson->ActionDoublePush(PLAYER_INPUT::LEFT);
-						}
+						pPerson->GetFSM()->ChangeState(AIState::BackStep::GetInstance());
+						return;
 
 					}
-
+					//pPerson->GetFSM()->ChangeState(AIState::Wait::GetInstance());
 					return;
 
 				}
@@ -1903,12 +2203,46 @@ AIState::ThrowTech * AIState::ThrowTech::GetInstance()
 
 void AIState::ThrowTech::Enter(AI * pPerson)
 {
-	// 投げ抜け
-	pPerson->PushInputList(PLAYER_INPUT::A);
+	int l_iRate = tdnRandom::Get(0, 100);	
+	
+	switch (pPerson->GetAIType())
+	{
+	case AI_TYPE::CPU_EASY:
+		l_iRate += 35;
+		break;
+	case AI_TYPE::CPU_NORMAL:
+		l_iRate += 15;
+		break;
+	case AI_TYPE::CPU_HARD:
+		l_iRate += -25;
+		break;
+	case AI_TYPE::CPU_YOKOE:
+		l_iRate += -40;
+		break;
+	default:
+		break;
+	}
+
+	// ↓の数値よりも下なら投げ抜けして
+	if (l_iRate <= 50)
+	{
+		// 投げ抜け
+		pPerson->PushInputList(PLAYER_INPUT::A);
+	}
+	//else
+	//{
+	//	// 投げ抜け失敗。待機に戻る
+	//	pPerson->GetFSM()->ChangeState(AIState::Wait::GetInstance());
+	//	return;
+	//}
+
+
 }
 
 void AIState::ThrowTech::Execute(AI * pPerson)
 {
+	// ↑でなげ抜けをしてなかったらここで足止め
+
 	// 待機ステートに戻ったらAIのステートも待機に
 	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::Wait::GetInstance()) == true)
 	{
@@ -1988,14 +2322,26 @@ void AIState::SetThrow::Execute(AI * pPerson)
 	}
 
 
-	// 相手の近くにいて＆＆相手が攻撃振ったら
-	if (MyPlayer->AIAttackRange() >= GetRange(pPerson) &&
-		TargetPlayer->isAttackState() == true)
+	// 難易度最高だった場合
+	if (pPerson->GetAIType() == AI_TYPE::CPU_YOKOE)
 	{
-		// ガードへ
-		pPerson->GetFSM()->ChangeState(AIState::Guard::GetInstance());
-		return;
-
+		// 相手の近くにいて＆＆相手が攻撃振ったら
+		if (MyPlayer->AIAttackRange() >= GetRange(pPerson) &&
+			TargetPlayer->isAttackState() == true)
+		{
+			if (tdnRandom::Get(0, 1) == 0)
+			{
+				// ガードへ
+				pPerson->GetFSM()->ChangeState(AIState::Guard::GetInstance());
+				return;
+			}
+			else
+			{
+				// 回避へ
+				pPerson->GetFSM()->ChangeState(AIState::Escape::GetInstance());
+				return;
+			}
+		}
 	}
 
 }
@@ -2135,9 +2481,27 @@ void AIState::SetAnitiAir::Execute(AI * pPerson)
 
 	}
 
-
-
-
+	// 難易度最高だった場合
+	if (pPerson->GetAIType() == AI_TYPE::CPU_YOKOE)
+	{
+		// 相手の近くにいて＆＆相手が攻撃振ったら
+		if (MyPlayer->AIAttackRange() >= GetRange(pPerson) &&
+			TargetPlayer->isAttackState() == true)
+		{
+			if (tdnRandom::Get(0, 1) == 0)
+			{
+				// ガードへ
+				pPerson->GetFSM()->ChangeState(AIState::Guard::GetInstance());
+				return;
+			}
+			else
+			{
+				// 回避へ
+				pPerson->GetFSM()->ChangeState(AIState::Escape::GetInstance());
+				return;
+			}
+		}
+	}
 
 
 }
@@ -2781,8 +3145,13 @@ void AIState::EasyAttack::Execute(AI * pPerson)
 {
 	pPerson->AddWaitFrame(1);
 
-	float fWaitRate = 60;
+	float fWaitRate = 70;
 	
+	// 難易度によってレートえお下げる
+	if (pPerson->GetAIType() == AI_TYPE::CPU_NORMAL)fWaitRate = 40;
+	if (pPerson->GetAIType() == AI_TYPE::CPU_HARD)fWaitRate = 10;
+	if (pPerson->GetAIType() == AI_TYPE::CPU_YOKOE)fWaitRate = 5;
+
 	// 自分が負けてたら
 	if (MyPlayer->GetHP()<= TargetPlayer->GetHP())
 	{
@@ -2796,9 +3165,43 @@ void AIState::EasyAttack::Execute(AI * pPerson)
 		// まだこれだけ待って相手が近くにいたら攻撃
 		if (GetRange(pPerson) <=  MyPlayer->AIAttackRange())
 		{
-			// ラッシュに
-			pPerson->GetFSM()->ChangeState(AIState::RushAttack::GetInstance());
-			return;
+			if (pPerson->GetAIType() == AI_TYPE::CPU_EASY)
+			{
+				// 3分の一でラッシュに
+				if (tdnRandom::Get(0, 100) <= 30)
+				{
+					// ラッシュに
+					pPerson->GetFSM()->ChangeState(AIState::RushAttack::GetInstance());
+					return;
+				}
+				else
+				{
+					// 一発殴っておわり
+					pPerson->PushInputList(PLAYER_INPUT::C);
+					pPerson->GetFSM()->ChangeState(AIState::Wait::GetInstance());
+					return;
+				}
+			}
+			else
+			{
+				// 45%でラッシュに
+				if (tdnRandom::Get(0, 100) <= 45)
+				{
+					// ラッシュに
+					pPerson->GetFSM()->ChangeState(AIState::RushAttack::GetInstance());
+					return;
+				}
+				else
+				{
+					// 一発殴っておわり
+					pPerson->PushInputList(PLAYER_INPUT::DOWN);
+					pPerson->PushInputList(PLAYER_INPUT::C);	
+					pPerson->GetFSM()->ChangeState(AIState::Wait::GetInstance());
+					return;
+				}
+			}
+
+
 		}
 		else 
 		{
@@ -2852,14 +3255,18 @@ void AIState::BackWark::Enter(AI * pPerson)
 
 void AIState::BackWark::Execute(AI * pPerson)
 {
-	// ひたすら後ろに歩くだけ
-	if (MyPlayer->GetDir() == DIR::LEFT)
+	// 相手が攻撃してないとき
+	if (TargetPlayer->isAttackState() == false)
 	{
-		pPerson->PushInputList(PLAYER_INPUT::RIGHT);
-	}
-	else
-	{
-		pPerson->PushInputList(PLAYER_INPUT::LEFT);
+		// ひたすら後ろに歩くだけ
+		if (MyPlayer->GetDir() == DIR::LEFT)
+		{
+			pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+		}
+		else
+		{
+			pPerson->PushInputList(PLAYER_INPUT::LEFT);
+		}
 	}
 
 	pPerson->AddWaitFrame(1);
@@ -2978,6 +3385,91 @@ void AIState::MightyWark::Render(AI * pPerson)
 }
 
 bool AIState::MightyWark::OnMessage(AI * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+	//}
+	return false;
+}
+
+
+/*******************************************************/
+//			バックステップステート
+/*******************************************************/
+
+AIState::BackStep * AIState::BackStep::GetInstance()
+{
+	// ここに変数を作る
+	static AIState::BackStep  instance;
+	return &instance;
+}
+
+void AIState::BackStep::Enter(AI * pPerson)
+{
+	pPerson->SetWaitFrame(0);
+	
+	// バックステップ
+	if (TargetPlayer->GetPos().x < MyPlayer->GetPos().x)
+	{
+		// ★二回押し
+		pPerson->ActionDoublePush(PLAYER_INPUT::RIGHT);
+	}
+	else
+	{
+		// ★二回押し
+		pPerson->ActionDoublePush(PLAYER_INPUT::LEFT);
+	}
+
+}
+
+void AIState::BackStep::Execute(AI * pPerson)
+{
+	// バックステップ
+	if (TargetPlayer->GetPos().x < MyPlayer->GetPos().x)
+	{
+		// ★二回押し
+		pPerson->ActionDoublePush(PLAYER_INPUT::RIGHT);
+	}
+	else
+	{
+		// ★二回押し
+		pPerson->ActionDoublePush(PLAYER_INPUT::LEFT);
+	}
+
+	pPerson->AddWaitFrame(1);
+	if (pPerson->GetWaitFrame() >= 20)
+	{
+		// 待機へ
+		pPerson->GetFSM()->ChangeState(AIState::Wait::GetInstance());
+		return;
+	}
+
+	// バックステップに成功したら終り
+	if (MyPlayer->GetFSM()->isPrevState(*BasePlayerState::BackStep::GetInstance()) == true)
+	{
+		// 待機へ
+		pPerson->GetFSM()->ChangeState(AIState::Wait::GetInstance());
+		return;
+	}
+
+}
+
+void AIState::BackStep::Exit(AI * pPerson)
+{
+
+}
+
+void AIState::BackStep::Render(AI * pPerson)
+{
+#ifdef _DEBUG
+
+	tdnText::Draw(420, 610, 0xffffffff, "BackStep");
+
+#endif // _DEBUG
+}
+
+bool AIState::BackStep::OnMessage(AI * pPerson, const Message & msg)
 {
 	// メッセージタイプ
 	//switch (msg.Msg)

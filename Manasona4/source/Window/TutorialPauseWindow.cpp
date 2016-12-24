@@ -228,15 +228,19 @@ bool  TutorialPauseWindow::Ctrl(int DeviceID)
 
 void TutorialPauseWindow::Action()
 {
+	if (m_bActive == false)// もうウィンドウが出ているときは演習をハジク
+	{
+		// 透明度を最初は透明に
+		m_iAlpha = 0;
+		m_pWindow->SetAlpha(m_iAlpha);			// 透明度更新
+		m_pFontBox->SetAlpha(m_iAlpha);			// 透明度更新
+		m_pSelect->SetAlpha(m_iAlpha);			// 透明度更新
+
+		m_pInfoPlate->Action();// (TODO) ベースで
+	}
+
 	BaseWindow::Action();
 
-	// 透明度を最初は透明に
-	m_iAlpha = 0;
-	m_pWindow->SetAlpha(m_iAlpha);			// 透明度更新
-	m_pFontBox->SetAlpha(m_iAlpha);			// 透明度更新
-	m_pSelect->SetAlpha(m_iAlpha);			// 透明度更新
-
-	m_pInfoPlate->Action();// (TODO) ベースで
 }
 
 void TutorialPauseWindow::Stop()

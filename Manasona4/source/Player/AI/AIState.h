@@ -962,8 +962,8 @@ namespace AIState
 		BackWark() {};
 		~BackWark() {};
 
-		BackWark(const EasyAttack&) {}
-		BackWark& operator=(const EasyAttack&) {}
+		BackWark(const BackWark&) {}
+		BackWark& operator=(const BackWark&) {}
 	};
 
 	/*******************************************************/
@@ -1000,6 +1000,39 @@ namespace AIState
 		MightyWark& operator=(const MightyWark&) {}
 	};
 
+	/*******************************************************/
+	//			バックステップ 
+	/*******************************************************/
+	class BackStep :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static BackStep* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		BackStep() {};
+		~BackStep() {};
+
+		BackStep(const BackStep&) {}
+		BackStep& operator=(const BackStep&) {}
+	};
 
 }
 

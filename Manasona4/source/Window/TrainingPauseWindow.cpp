@@ -158,8 +158,9 @@ bool  TrainingPauseWindow::Ctrl(int DeviceID)
 	// 操作音
 	CtrlSE(DeviceID);
 
-	// 決定
-	if ((TRAINING_PAUSE_STATE)m_iSelectNo == TRAINING_PAUSE_STATE::BACK)
+	// 決定　ゲームに戻る選択肢ならば離して進むように
+	if ((TRAINING_PAUSE_STATE)m_iSelectNo == TRAINING_PAUSE_STATE::BACK || 
+		(TRAINING_PAUSE_STATE)m_iSelectNo == TRAINING_PAUSE_STATE::POSITION_RESET)
 	{
 		// ゲームに戻る動作は離して進む
 		if (tdnInput::KeyGet(KEYCODE::KEY_B, DeviceID) == 2)
@@ -236,15 +237,19 @@ bool  TrainingPauseWindow::Ctrl(int DeviceID)
 
 void TrainingPauseWindow::Action()
 {
+	if (m_bActive == false)// もうウィンドウが出ているときは演習をハジク
+	{
+		// 透明度を最初は透明に
+		m_iAlpha = 0;
+		m_pWindow->SetAlpha(m_iAlpha);			// 透明度更新
+		m_pFontBox->SetAlpha(m_iAlpha);			// 透明度更新
+		m_pSelect->SetAlpha(m_iAlpha);			// 透明度更新
+
+		m_pInfoPlate->Action();// (TODO) ベースで
+	}
+
 	BaseWindow::Action();
 
-	// 透明度を最初は透明に
-	m_iAlpha = 0;
-	m_pWindow->SetAlpha(m_iAlpha);			// 透明度更新
-	m_pFontBox->SetAlpha(m_iAlpha);			// 透明度更新
-	m_pSelect->SetAlpha(m_iAlpha);			// 透明度更新
-
-	m_pInfoPlate->Action();// (TODO) ベースで
 }
 
 void TrainingPauseWindow::Stop()

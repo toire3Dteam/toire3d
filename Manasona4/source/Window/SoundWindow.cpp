@@ -1,5 +1,6 @@
 #include "SoundWindow.h"
 #include "Data\PlayerData.h"
+#include "Data\SelectData.h"
 #include "Sound\SoundManager.h"
 
 //+------------------------
@@ -21,6 +22,7 @@ SoundWindow::SoundWindow(Vector2 vPos) :BaseWindow(vPos)
 	AddIconData("BGM音量", "BGMの音量の調整を行います。");
 	AddIconData("SE音量" , "サウンドエフェクトの音量の調整を行います。");
 	AddIconData("ボイス音量", "キャラクターボイスの音量の調整を行います。");
+	AddIconData("初期値に戻す", "初期設定に戻します。");
 	AddIconData("戻る", "このウィンドウを閉じます。");
 
 	m_pBGMParam = new BGMParamSetting(1, 400);
@@ -115,7 +117,7 @@ void SoundWindow::Redner()
 
 		//+------------------------------------------------
 		// ただし戻るなどはいつも通り文字分の枠に　逐一記入
-		if (i == SoundWindow::BACK)
+		if (i == SoundWindow::BACK || i == SoundWindow::RESET)
 		{
 			for (int j = 0; j < m_aIconData[i].iStringLength; j++)
 			{
@@ -211,6 +213,16 @@ bool  SoundWindow::Ctrl(int DeviceID)
 		{
 			// 選択した番号格納！
 			m_iChoiceState = (SOUND_STATE)m_iSelectNo;
+
+			// ↑リセットを押したとき
+			if (m_iChoiceState == (SOUND_STATE::RESET))
+			{
+				// 決定ボタンで初期設定に戻します。
+				PlayerDataMgr->m_ConfigData.iBGMVolume = 75;
+				PlayerDataMgr->m_ConfigData.iSEVolume= 75;
+				PlayerDataMgr->m_ConfigData.iVoiceVolume= 75;
+			}
+
 			return true;
 		}
 	}

@@ -1,5 +1,6 @@
 #pragma once
 #include "TDNLIB.h"
+#include "Data\SelectData.h"
 
 //// タイム管理<Singleton>
 //class TimeManager
@@ -73,8 +74,12 @@ public:
 	bool isTimeUp() { return (m_iFrame <= 0); }
 	int GetElapsedTime() { return m_iElapsedTime; }
 
+	void SetTimerType(ROUND_TIME_TYPE eTimeType);
+	bool GetInfinity() { return m_bInfinity; }
+
 private:
 	int m_iFrame;		// フレーム
+	int m_iMaxFrame;	// 最大フレーム
 	tdn2DAnim* m_pPic;	// 画像
 	Vector2 m_vPos;		// 場所
 	bool m_bStop;		// 時間を止めるフラグ
@@ -82,4 +87,9 @@ private:
 	int m_iElapsedTime;			// 一試合最低経過時間
 	int m_iElapsedFrame;		// 経過フレーム
 	int m_iRoundElapsedTime;	// ラウンド毎の経過時間
+
+	// ∞フラグ
+	bool m_bInfinity;
+	tdn2DAnim* m_pInfinityPic;	// 画像
+	
 };

@@ -4,7 +4,7 @@ InformationPlate::InformationPlate()
 {
 	m_vPos = VECTOR2_ZERO;
 	m_vPos.x = 0.0f;
-	m_vPos.y = 596;
+	m_vPos.y = 592;
 
 	m_fMoveY = 0.0f;
 

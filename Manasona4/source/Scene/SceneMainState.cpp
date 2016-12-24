@@ -299,6 +299,8 @@ void SceneMainState::Main::Execute(sceneMain *pMain)
 		// メニュー切り替え
 		if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, 0) == 3)
 		{
+			// (12/24) ここでメニュー起動
+			//pMain->GetWindow(BATTLE_WINDOW_TYPE::PAUSE)->Action();
 			pMain->GetFSM()->ChangeState(PauseMenu::GetInstance());
 			return;
 		}
@@ -310,6 +312,8 @@ void SceneMainState::Main::Execute(sceneMain *pMain)
 			// メニュー切り替え
 			if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, i) == 3)
 			{
+				// (12/24) ここでメニュー起動
+				//pMain->GetWindow(BATTLE_WINDOW_TYPE::PAUSE)->Action();
 				pMain->GetFSM()->ChangeState(PauseMenu::GetInstance());
 				return;
 			}
@@ -750,6 +754,8 @@ void SceneMainState::TutorialMain::Execute(sceneMain *pMain)
 		// ポーズでチュートリアル専用のポーズメニューへ
 		if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID) == 3)
 		{
+			// (12/24) ここでメニュー起動
+			//pMain->GetWindow(BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE)->Action();
 			pMain->GetFSM()->ChangeState(TutorialPauseMenu::GetInstance());
 			return;
 		}
@@ -996,6 +1002,10 @@ void SceneMainState::Training::Execute(sceneMain *pMain)
 	PlayerMgr->Update(PLAYER_UPDATE::CONTROL_OK);
 	PlayerMgr->UpdatePos();
 
+	// ★★★　(12/24)トレーニング用の更新
+	PlayerMgr->UpdateTraining();
+
+
 	// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
 	Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager());
 
@@ -1006,20 +1016,30 @@ void SceneMainState::Training::Execute(sceneMain *pMain)
 	// 自分リスタート
 	if (Fade::GetMode() != Fade::FLAG::FADE_OUT)
 	{
-		// ★ポーズでトレーニング専用のポーズメニューへ
-		if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID) == 3)
+		// パッド分更新
+		int NumDevice(tdnInputManager::GetNumDevice());
+		if (NumDevice == 0)NumDevice = 1;// デバイスがなかったら仮想で1つ追加
+		for (int i = 0; i < NumDevice; i++)
 		{
-			pMain->GetFSM()->ChangeState(TrainingPause::GetInstance());
-			return;
+			// ★ポーズでトレーニング専用のポーズメニューへ
+			if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, i) == 3)
+			{
+				// (12/24) ここで起動
+				//pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Action();
+				pMain->GetFSM()->ChangeState(TrainingPause::GetInstance());
+				return;
+			}
+
+			// セレクトでもう一度イントロへ戻る
+			if (tdnInput::KeyGet(KEYCODE::KEY_SELECT, i) == 3)
+			{
+				// フェードアウト
+				Fade::Set(Fade::FLAG::FADE_OUT, 14, 0x00000000);
+				return;
+			}
+
 		}
 
-		// セレクトでもう一度イントロへ戻る
-		if (tdnInput::KeyGet(KEYCODE::KEY_SELECT, SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID) == 3)
-		{
-			// フェードアウト
-			Fade::Set(Fade::FLAG::FADE_OUT, 14, 0x00000000);
-			return;
-		}
 
 	}
 
@@ -1040,6 +1060,8 @@ void SceneMainState::Training::Exit(sceneMain *pMain)
 
 void SceneMainState::Training::Render(sceneMain *pMain)
 {
+	// ★★★　(12/24)トレーニング用の描画
+	PlayerMgr->RenderTraining();
 
 }
 
@@ -1093,6 +1115,8 @@ bool SceneMainState::Training::OnMessage(sceneMain *pMain, const Message & msg)
 
 void SceneMainState::PauseMenu::Enter(sceneMain *pMain)
 {	
+	// (12/24) ここで起動すると戻った場合でも呼ばれるのでメニューを呼ぶとこで起動
+	// (追記)　やっぱりここでif文など使って書く
 	// ポーズウィンドウ起動 
 	pMain->GetWindow(BATTLE_WINDOW_TYPE::PAUSE)->Action();
 	pMain->SetPause(true);
@@ -1209,7 +1233,9 @@ bool SceneMainState::PauseMenu::OnMessage(sceneMain *pMain, const Message & msg)
 
 void SceneMainState::TutorialPauseMenu::Enter(sceneMain *pMain)
 {
-	// チュートリアルポーズウィンドウ起動 
+	// (12/24) ここで起動すると戻った場合でも呼ばれるのでメニューを呼ぶとこで起動
+	// (追記)　やっぱりここでif文など使って書く
+	// ★チュートリアルポーズウィンドウ起動 
 	pMain->GetWindow(BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE)->Action();
 	pMain->SetPause(true);
 
@@ -1311,6 +1337,8 @@ bool SceneMainState::TutorialPauseMenu::OnMessage(sceneMain *pMain, const Messag
 
 void SceneMainState::TrainingPause::Enter(sceneMain *pMain)
 {
+	// (12/24) ここで起動すると戻った場合でも呼ばれるのでメニューを呼ぶとこで起動
+	// (追記)　やっぱりここでif文など使って書く
 	// トレーニングポーズウィンドウ起動 
 	pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Action();
 	pMain->SetPause(true);
@@ -1325,21 +1353,15 @@ void SceneMainState::TrainingPause::Execute(sceneMain *pMain)
 	//	トレーニングポーズメニューの操作
 	//+--------------------------------------------
 	// パッド分更新
-	const int NumDevice(tdnInputManager::GetNumDevice());
+	int NumDevice(tdnInputManager::GetNumDevice());
 	// パッド何もささってないとき用
-	if (NumDevice == 0)
+	if (NumDevice == 0)NumDevice = 1;
+	for (int i = 0; i < NumDevice; i++)
 	{
 		// ポーズウィンドウの操作
-		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Ctrl(0);
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Ctrl(i);
 	}
-	else
-	{
-		for (int i = 0; i < NumDevice; i++)
-		{
-			// ポーズウィンドウの操作
-			pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Ctrl(i);
-		}
-	}
+	
 
 
 	// 戻るボタンを押したら
@@ -1349,7 +1371,37 @@ void SceneMainState::TrainingPause::Execute(sceneMain *pMain)
 		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Stop();
 
 		pMain->GetFSM()->ChangeState(Training::GetInstance());	// トレーニングへ戻る
+		return;
 
+	}
+
+	// トレーニングオプションへ
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->GetChoiceState()
+		== TrainingPauseWindow::TRAINING_PAUSE_STATE::TRAINING_SETTING)
+	{
+		// トレーニングオプション設定へ
+		pMain->GetFSM()->ChangeState(TrainingOptionMenu::GetInstance());
+		return;
+	}
+
+	// ポジションリセットボタンを押したら
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->GetChoiceState()
+		== TrainingPauseWindow::TRAINING_PAUSE_STATE::POSITION_RESET)
+	{
+		// ポーズウィンドウ止める
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Stop();	
+		// フェードアウト(ポジションリセット効果の引きがね)
+		Fade::Set(Fade::FLAG::FADE_OUT, 14, 0x00000000);
+		pMain->GetFSM()->ChangeState(Training::GetInstance());	// トレーニングへ戻る
+		return;
+	}
+
+	// サウンドへ
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->GetChoiceState() == TrainingPauseWindow::TRAINING_PAUSE_STATE::SOUND_SETTING)
+	{
+		// サウンド設定へ
+		pMain->GetFSM()->ChangeState(SoundMenu::GetInstance());	
+		return;
 	}
 
 	// キャラクターセレクトへ
@@ -1389,6 +1441,157 @@ bool SceneMainState::TrainingPause::OnMessage(sceneMain *pMain, const Message & 
 	//{
 	//case MESSAGE_TYPE::END_ROUNDCALL:	// ラウンドコールが終わったというメッセージが届いたら
 	//	pMain->GetFSM()->ChangeState(Main::GetInstance());
+	//	break;
+	//}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
+
+
+/*******************************************************/
+//				サウンドウィンドウ選択
+/*******************************************************/
+
+void SceneMainState::SoundMenu::Enter(sceneMain *pMain)
+{
+	// サウンドウィンドウ起動
+	pMain->GetWindow(BATTLE_WINDOW_TYPE::SOUND)->Action();
+}
+
+void SceneMainState::SoundMenu::Execute(sceneMain *pMain)
+{
+
+	// 戻るボタンを押したら
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::SOUND)->GetChoiceState()
+		== SoundWindow::SOUND_STATE::BACK)
+	{
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::SOUND)->Stop();	// ウィンドウを閉じる
+		pMain->GetFSM()->RevertToPreviousState();		// 前のステートへ戻る
+		return;
+	}
+
+
+
+	//+----------------------------------
+	//	このステートでの操作
+	//+----------------------------------
+	// パッド分更新
+	const int NumDevice(tdnInputManager::GetNumDevice());
+	// パッド何もささってないとき用
+	if (NumDevice == 0)
+	{
+		// ポーズウィンドウの操作
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::SOUND)->Ctrl(0);
+	}
+	else
+	{
+		for (int i = 0; i < NumDevice; i++)
+		{
+			// ポーズウィンドウの操作
+			pMain->GetWindow(BATTLE_WINDOW_TYPE::SOUND)->Ctrl(i);
+		}
+	}
+
+}
+
+void SceneMainState::SoundMenu::Exit(sceneMain *pMain)
+{
+
+}
+
+void SceneMainState::SoundMenu::Render(sceneMain *pMain)
+{
+
+	// 選択ウィンドウの説明
+	pMain->GetWindow(BATTLE_WINDOW_TYPE::SOUND)->RednerInfo();
+
+#ifdef _DEBUG
+
+	tdnText::Draw(0, 0, 0xffffffff, "SoundMenu");
+#endif // _DEBUG
+
+}
+
+bool SceneMainState::SoundMenu::OnMessage(sceneMain *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+
+	//default:
+	//	break;
+	//}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
+
+
+/*******************************************************/
+//				トレーニングオプションウィンドウ選択
+/*******************************************************/
+
+void SceneMainState::TrainingOptionMenu::Enter(sceneMain *pMain)
+{
+	// トレーニングオプション起動
+	pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_OPTION)->Action();
+}
+
+void SceneMainState::TrainingOptionMenu::Execute(sceneMain *pMain)
+{
+
+	// 戻るボタンを押したら
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_OPTION)->GetChoiceState()
+		== TrainingOptionWindow::TRAINING_OPTION_STATE::BACK)
+	{
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_OPTION)->Stop();	// ウィンドウを閉じる
+		pMain->GetFSM()->RevertToPreviousState();		// 前のステートへ戻る
+		return;
+	}
+
+
+
+	//+----------------------------------
+	//	このステートでの操作
+	//+----------------------------------
+	// パッド分更新
+	int NumDevice(tdnInputManager::GetNumDevice());
+	// パッド何もささってないとき用
+	if (NumDevice == 0)NumDevice = 1;
+	for (int i = 0; i < NumDevice; i++)
+	{
+		// ポーズウィンドウの操作
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_OPTION)->Ctrl(i);
+	}
+	
+
+}
+
+void SceneMainState::TrainingOptionMenu::Exit(sceneMain *pMain)
+{
+
+}
+
+void SceneMainState::TrainingOptionMenu::Render(sceneMain *pMain)
+{
+	// 選択ウィンドウの説明
+	pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_OPTION)->RednerInfo();
+
+#ifdef _DEBUG
+
+	tdnText::Draw(0, 0, 0xffffffff, "SoundMenu");
+#endif // _DEBUG
+
+}
+
+bool SceneMainState::TrainingOptionMenu::OnMessage(sceneMain *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+
+	//default:
 	//	break;
 	//}
 
