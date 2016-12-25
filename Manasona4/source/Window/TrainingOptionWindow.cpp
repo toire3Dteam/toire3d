@@ -3,35 +3,46 @@
 #include "Data\SelectData.h"
 #include "Sound\SoundManager.h"
 
-//+------------------------
-//  サウンドウィンドウ
-//+------------------------
+//+-----------------------------------
+//  トレーニングオプションウィンドウ
+//+-----------------------------------
 
 TrainingOptionWindow::TrainingOptionWindow(Vector2 vPos) :BaseWindow(vPos)
 {
 	m_pWindow = new tdn2DObj("Data/UI/Window/TrainingOption.png");
 
 	//選択アイコンの長さ
-	m_iSelectLength = 65;
+	m_iSelectLength = 70;
 
 	// ポーズウィンドウに存在するアイコンを詰めていく
-	AddIconData("BGM音量", "BGMの音量の調整を行います。");
-	AddIconData("SE音量", "サウンドエフェクトの音量の調整を行います。");
-	AddIconData("ボイス音量", "キャラクターボイスの音量の調整を行います。");
+	AddIconData("ヒットポイントの回復", "ヒットポイントの自動回復の設定を行います。");
+	AddIconData("ヒットポイントの最大値(1P)", "1Pのヒットポイントの最大値を設定します。");
+	AddIconData("ヒットポイントの最大値(2P)", "2Pのヒットポイントの最大値を設定します。");
+	AddIconData("SPゲージ", "SPゲージの設定を行います。");
+	AddIconData("パートナーゲージ", "パートナーゲージの設定を行います。");
+	AddIconData("情報表示", "入力覆歴やダメージ情報の表示を設定します。");
 	AddIconData("初期値に戻す", "初期設定に戻します。");
 	AddIconData("戻る", "このウィンドウを閉じます。");
 
-	m_pBGMParam = new BGMParamSetting(1, 400);
-	m_pSEParam = new SEParamSetting(2, 400);
-	m_pVoiceParam = new VoiceParamSetting(3, 400);
+
+	m_pHpRecoveryParam		= new HpRecoveryParamSetting(1, 400);
+	m_pHp1PParam			= new Hp1pParamSetting(2, 400);
+	m_pHp2PParam			= new Hp2pParamSetting(3, 400);
+	m_pSpGageParam			= new SpGageParamSetting(4, 400);
+	m_pPartnerRecoveryParam = new PartnerRecoveryParamSetting(5, 400);
+	m_pInfoParam			= new InfoParamSetting(6, 400);
 
 }
 
 TrainingOptionWindow::~TrainingOptionWindow()
 {
-	SAFE_DELETE(m_pBGMParam);
-	SAFE_DELETE(m_pSEParam);
-	SAFE_DELETE(m_pVoiceParam);
+	SAFE_DELETE(m_pHpRecoveryParam);
+	SAFE_DELETE(m_pHp1PParam);
+	SAFE_DELETE(m_pHp2PParam);
+	SAFE_DELETE(m_pSpGageParam);
+	SAFE_DELETE(m_pPartnerRecoveryParam);
+	SAFE_DELETE(m_pInfoParam);
+
 }
 
 
@@ -53,11 +64,14 @@ bool TrainingOptionWindow::Update()
 	m_pFontBox->SetAlpha(m_iAlpha);			// 透明度更新
 	m_pSelect->SetAlpha(m_iAlpha);			// 透明度更新
 
-											// パラメーター更新
-	m_pBGMParam->Update();
-	m_pSEParam->Update();
-	m_pVoiceParam->Update();
-
+	// パラメーター更新
+	m_pHpRecoveryParam->Update();
+	m_pHp1PParam->Update();
+	m_pHp2PParam->Update();
+	m_pSpGageParam->Update();
+	m_pPartnerRecoveryParam->Update();
+	m_pInfoParam->Update();
+		
 	return true;// 起動中
 }
 
@@ -127,7 +141,7 @@ void TrainingOptionWindow::Redner()
 		else
 		{
 			// パラメータ調整系のWindowなので枠は均等に
-			for (int j = 0; j < 25/*m_aIconData[i].iStringLength*/; j++)
+			for (int j = 0; j < 28/*m_aIconData[i].iStringLength*/; j++)
 			{
 				m_pFontBox->Render(x + (j * 11) - 4, y, 32, 32, 0, 0, 32, 32);
 
@@ -150,7 +164,7 @@ void TrainingOptionWindow::Redner()
 
 
 		// パラメーター関連の描画
-		RenderParamSetting(i, x + 300, y);
+		RenderParamSetting(i, x + 330, y);
 
 		// for(ぱらめ)
 		// if(i ==　パラメータウィンドウの番号と合っていたら)　描画 
@@ -211,9 +225,12 @@ bool  TrainingOptionWindow::Ctrl(int DeviceID)
 			if (m_iChoiceState == (TRAINING_OPTION_STATE::RESET))
 			{
 				// 決定ボタンで初期設定に戻します。
-				PlayerDataMgr->m_ConfigData.iBGMVolume = 75;
-				PlayerDataMgr->m_ConfigData.iSEVolume = 75;
-				PlayerDataMgr->m_ConfigData.iVoiceVolume = 75;
+				PlayerDataMgr->m_TrainingData.iHpRecovery = (int)HP_RECOVERY_TYPE::AUTO_RECOVERY;
+				PlayerDataMgr->m_TrainingData.iHp1P = (int)100;
+				PlayerDataMgr->m_TrainingData.iHp2P = (int)100;
+				PlayerDataMgr->m_TrainingData.iSpGage = (int)100;
+				PlayerDataMgr->m_TrainingData.iPartnerRecovery = (int)PARTNER_RECOVERY_TYPE::MAX;
+				PlayerDataMgr->m_TrainingData.iInfo = (int)TRAINING_INFO_TYPE::DAMEGE;
 			}
 
 			return true;
@@ -301,16 +318,25 @@ void TrainingOptionWindow::RenderParamSetting(int No, int x, int y)
 
 	switch ((TRAINING_OPTION_STATE)No)
 	{
-	case TrainingOptionWindow::BGM:
-		m_pBGMParam->Render(x, y, bSelect);
+	case TRAINING_OPTION_STATE::HP_RECOVERY:
+		m_pHpRecoveryParam->Render(x, y, bSelect);
 		break;
-	case TrainingOptionWindow::SE:
-		m_pSEParam->Render(x, y, bSelect);
+	case TRAINING_OPTION_STATE::MAXHP_1P:
+		m_pHp1PParam->Render(x, y, bSelect);
 		break;
-	case TrainingOptionWindow::VOICE:
-		m_pVoiceParam->Render(x, y, bSelect);
+	case TRAINING_OPTION_STATE::MAXHP_2P:
+		m_pHp2PParam->Render(x, y, bSelect);
 		break;
-	case TrainingOptionWindow::BACK:
+	case TRAINING_OPTION_STATE::SP_GAGE:
+		m_pSpGageParam->Render(x, y, bSelect);
+		break;
+	case TRAINING_OPTION_STATE::PARTNER_GAGE:
+		m_pPartnerRecoveryParam->Render(x, y, bSelect);
+		break;
+	case TRAINING_OPTION_STATE::INFO:
+		m_pInfoParam->Render(x, y, bSelect);
+		break;
+	case TRAINING_OPTION_STATE::BACK:
 		break;
 	default:
 		break;
@@ -323,17 +349,25 @@ void TrainingOptionWindow::CtrlParamSetting(int SelectNo, int DeviceID)
 {
 	switch ((TRAINING_OPTION_STATE)SelectNo)
 	{
-	case TrainingOptionWindow::BGM:
-		m_pBGMParam->Ctrl(DeviceID);
+	case TRAINING_OPTION_STATE::HP_RECOVERY:
+		m_pHpRecoveryParam->Ctrl(DeviceID);
 		break;
-	case TrainingOptionWindow::SE:
-		m_pSEParam->Ctrl(DeviceID);
+	case TRAINING_OPTION_STATE::MAXHP_1P:
+		m_pHp1PParam->Ctrl(DeviceID);
 		break;
-	case TrainingOptionWindow::VOICE:
-		m_pVoiceParam->Ctrl(DeviceID);
+	case TRAINING_OPTION_STATE::MAXHP_2P:
+		m_pHp2PParam->Ctrl(DeviceID);
 		break;
-	case TrainingOptionWindow::BACK:
-
+	case TRAINING_OPTION_STATE::SP_GAGE:
+		m_pSpGageParam->Ctrl(DeviceID);
+		break;
+	case TRAINING_OPTION_STATE::PARTNER_GAGE:
+		m_pPartnerRecoveryParam->Ctrl(DeviceID);
+		break;
+	case TRAINING_OPTION_STATE::INFO:
+		m_pInfoParam->Ctrl(DeviceID);
+		break;
+	case TRAINING_OPTION_STATE::BACK:
 		break;
 	default:
 		break;

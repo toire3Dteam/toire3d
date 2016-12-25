@@ -41,4 +41,6 @@ private:
 	// à–¾‚ÌƒvƒŒ[ƒg
 	InformationPlate* m_pInfoPlate;
 
+	// “ñ‰ñ–ß‚è–h~
+	bool m_bBackPush;
 };

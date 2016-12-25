@@ -79,6 +79,38 @@ enum class TRAINING_INFO_TYPE
 	ALL			// 全て
 };
 
+// 敵の状態
+enum class ENEMY_STATE_TYPE
+{
+	STAND,		// 立ち状態
+	SQUAT,		// しゃがみ状態
+	JUMP,		// ジャンプし続ける
+	ATTACK,		// 一定間隔で攻撃
+};
+
+// 敵のガードの設定
+enum class ENEMY_GUARD_TYPE
+{
+	NO,		// ガードしない
+	WAY,	// 途中からガードする
+	ALL		// 全部ガードする
+};
+
+// 敵の受け身の設定
+enum class ENEMY_TECH_TYPE
+{
+	NO,		// 受け身しない
+	LAND,	// 地上のみ受け身をする
+	AIR,	// 空中のみ受け身をする
+	ALL,	// 全て
+};
+
+// 敵のなげ抜けの設定
+enum class ENEMY_THROW_TECH_TYPE
+{
+	NO,		// なげ抜けしない
+	OK		// なげ抜けする
+};
 
 
 struct SideData

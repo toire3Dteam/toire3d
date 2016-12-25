@@ -94,6 +94,12 @@ private:
 	int m_iDoublePushFrame;				// 
 	PLAYER_INPUT m_eDoublePushInput;	// 
 
+	//+------------------------------------
+	//	トレーニング用
+	//+------------------------------------
+	
+
+
 	// ステートをフレンドクラスへ
 	friend class AIState::PracticeLand;
 	friend class AIState::PracticeAttack;

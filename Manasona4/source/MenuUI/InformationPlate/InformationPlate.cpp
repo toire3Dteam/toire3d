@@ -48,7 +48,7 @@ void InformationPlate::Render()
 void InformationPlate::Action()
 {
 	m_bRender = true;
-	m_vPos.y = 596.0f;
+	m_vPos.y = 592.0f;
 	m_fMoveY = 0.0f;
 	m_pPic->Action();
 }

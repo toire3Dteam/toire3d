@@ -1,15 +1,15 @@
 #pragma once
-#include "BaseParamSetting.h"
+#include "../BaseParamSetting.h"
 
 //+----------------------------
-//	CPU難易度のパラメーター設定
+//	Hpの回復の状態設定
 //+----------------------------
 
-class DifficultyParamSetting: public BaseParamSetting
+class HpRecoveryParamSetting: public BaseParamSetting
 {
 public:
-	DifficultyParamSetting(int Number, int WidthSize);
-	~DifficultyParamSetting();
+	HpRecoveryParamSetting(int Number, int WidthSize);
+	~HpRecoveryParamSetting();
 
 	void Update();
 	void Render(int x, int y, bool selectFlag);

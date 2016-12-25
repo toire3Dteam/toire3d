@@ -1426,12 +1426,12 @@ void SceneMainState::TrainingPause::Execute(sceneMain *pMain)
 
 void SceneMainState::TrainingPause::Exit(sceneMain *pMain)
 {
-	pMain->SetPause(false);
+	pMain->SetPause(false);// ★★★Exitではウィンドウは止めない
 }
 
 void SceneMainState::TrainingPause::Render(sceneMain *pMain)
 {
-	// ★★★Exitではウィンドウは止めない
+	pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->RednerInfo();
 }
 
 bool SceneMainState::TrainingPause::OnMessage(sceneMain *pMain, const Message & msg)
@@ -1497,7 +1497,7 @@ void SceneMainState::SoundMenu::Execute(sceneMain *pMain)
 
 void SceneMainState::SoundMenu::Exit(sceneMain *pMain)
 {
-
+	pMain->GetWindow(BATTLE_WINDOW_TYPE::SOUND)->RednerInfo();
 }
 
 void SceneMainState::SoundMenu::Render(sceneMain *pMain)

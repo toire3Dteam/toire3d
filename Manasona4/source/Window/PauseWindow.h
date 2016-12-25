@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseWindow.h"
 
+#include "MenuUI\InformationPlate\InformationPlate.h"
 //+------------------------
 // ポーズウィンドウ
 //+------------------------
@@ -37,4 +38,8 @@ private:
 	//int m_iAddX;
 	//int m_iAddY;
 
+	InformationPlate* m_pInfoPlate;
+
+	// 二回戻り防止
+	int m_bBackPush;
 };

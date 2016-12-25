@@ -1,15 +1,15 @@
 #pragma once
-#include "BaseParamSetting.h"
+#include "../BaseParamSetting.h"
 
 //+----------------------------
-//	CPU難易度のパラメーター設定
+//	パートナーゲージの設定
 //+----------------------------
 
-class DifficultyParamSetting: public BaseParamSetting
+class PartnerRecoveryParamSetting : public BaseParamSetting
 {
 public:
-	DifficultyParamSetting(int Number, int WidthSize);
-	~DifficultyParamSetting();
+	PartnerRecoveryParamSetting(int Number, int WidthSize);
+	~PartnerRecoveryParamSetting();
 
 	void Update();
 	void Render(int x, int y, bool selectFlag);
@@ -19,6 +19,4 @@ private:
 
 
 };
-
-
 

@@ -1,8 +1,12 @@
 #pragma once
 #include "BaseWindow.h"
-#include "ParamSetting\BGMParamSetting.h"
-#include "ParamSetting\SEParamSetting.h"
-#include "ParamSetting\VoiceParamSetting.h"
+#include "ParamSetting\Training\Hp1PParamSetting.h"
+#include "ParamSetting\Training\Hp2PParamSetting.h"
+#include "ParamSetting\Training\HPRecoveryParamSetting.h"
+#include "ParamSetting\Training\InfoParamSetting.h"
+#include "ParamSetting\Training\PartnerRecoveryParamSetting.h"
+#include "ParamSetting\Training\SpGageParamSetting.h"
+
 
 //+----------------------------------
 //	トレーニングオプションウィンドウ
@@ -30,19 +34,26 @@ public:
 	// 選択状態
 	enum TRAINING_OPTION_STATE
 	{
-		BGM,
-		SE,
-		VOICE,
+		HP_RECOVERY,
+		MAXHP_1P,
+		MAXHP_2P,
+		SP_GAGE,
+		PARTNER_GAGE,
+		INFO,
 		RESET,
 		BACK
 	};
 
 
 private:
-	static const int m_cSizeX = 768;
+	static const int m_cSizeX = 832;
 
-	BGMParamSetting* m_pBGMParam;
-	SEParamSetting* m_pSEParam;
-	VoiceParamSetting* m_pVoiceParam;
+	Hp1pParamSetting*				m_pHp1PParam;
+	Hp2pParamSetting*				m_pHp2PParam;
+	HpRecoveryParamSetting*			m_pHpRecoveryParam;
+	InfoParamSetting*				m_pInfoParam;
+	PartnerRecoveryParamSetting*	m_pPartnerRecoveryParam;
+	SpGageParamSetting*				m_pSpGageParam;
+
 
 };

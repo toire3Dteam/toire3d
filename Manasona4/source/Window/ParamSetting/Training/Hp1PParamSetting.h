@@ -1,15 +1,15 @@
 #pragma once
-#include "BaseParamSetting.h"
+#include "../BaseParamSetting.h"
 
-//+----------------------------
-//	SEのパラメーター設定
-//+----------------------------
+//+--------------------------------
+//	1pのHP最大値のパラメーター設定
+//+--------------------------------
 
-class SEParamSetting: public BaseParamSetting
+class Hp1pParamSetting : public BaseParamSetting
 {
 public:
-	SEParamSetting(int Number, int WidthSize);
-	~SEParamSetting();
+	Hp1pParamSetting(int Number, int WidthSize);
+	~Hp1pParamSetting();
 
 	void Update();
 	void Render(int x, int y, bool selectFlag);
@@ -19,6 +19,5 @@ private:
 
 
 };
-
 
 

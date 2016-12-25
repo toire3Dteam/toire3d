@@ -205,6 +205,12 @@
     <ClCompile Include="source\Window\ParamSetting\RoundNumTypeParamSetting.cpp" />
     <ClCompile Include="source\Window\ParamSetting\RoundTimeTypeParamSetting.cpp" />
     <ClCompile Include="source\Window\ParamSetting\SEParamSetting.cpp" />
+    <ClCompile Include="source\Window\ParamSetting\Training\Hp1PParamSetting.cpp" />
+    <ClCompile Include="source\Window\ParamSetting\Training\Hp2PParamSetting.cpp" />
+    <ClCompile Include="source\Window\ParamSetting\Training\HPRecoveryParamSetting.cpp" />
+    <ClCompile Include="source\Window\ParamSetting\Training\InfoParamSetting.cpp" />
+    <ClCompile Include="source\Window\ParamSetting\Training\PartnerRecoveryParamSetting.cpp" />
+    <ClCompile Include="source\Window\ParamSetting\Training\SpGageParamSetting.cpp" />
     <ClCompile Include="source\Window\ParamSetting\VoiceParamSetting.cpp" />
     <ClCompile Include="source\Window\PauseWindow.cpp" />
     <ClCompile Include="source\Window\ResultWindow.cpp" />
@@ -364,6 +370,12 @@
     <ClInclude Include="source\Window\ParamSetting\RoundNumTypeParamSetting.h" />
     <ClInclude Include="source\Window\ParamSetting\RoundTimeTypeParamSetting.h" />
     <ClInclude Include="source\Window\ParamSetting\SEParamSetting.h" />
+    <ClInclude Include="source\Window\ParamSetting\Training\Hp1PParamSetting.h" />
+    <ClInclude Include="source\Window\ParamSetting\Training\Hp2PParamSetting.h" />
+    <ClInclude Include="source\Window\ParamSetting\Training\HPRecoveryParamSetting.h" />
+    <ClInclude Include="source\Window\ParamSetting\Training\InfoParamSetting.h" />
+    <ClInclude Include="source\Window\ParamSetting\Training\PartnerRecoveryParamSetting.h" />
+    <ClInclude Include="source\Window\ParamSetting\Training\SpGageParamSetting.h" />
     <ClInclude Include="source\Window\ParamSetting\VoiceParamSetting.h" />
     <ClInclude Include="source\Window\PauseWindow.h" />
     <ClInclude Include="source\Window\ResultWindow.h" />

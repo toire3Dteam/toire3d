@@ -146,12 +146,29 @@ void PlayerManager::Update(PLAYER_UPDATE flag)
 void PlayerManager::UpdateTraining()
 {
 	// (‰¼)
-	PlayerDataMgr->m_TrainingData.iHpRecovery = (int)HP_RECOVERY_TYPE::AUTO_RECOVERY;
-	PlayerDataMgr->m_TrainingData.iHp1P = 50;
-	PlayerDataMgr->m_TrainingData.iHp2P = 75;
-	PlayerDataMgr->m_TrainingData.iSpGage = 50;
-	PlayerDataMgr->m_TrainingData.iPartnerRecovery= (int)PARTNER_RECOVERY_TYPE::MAX;
-	PlayerDataMgr->m_TrainingData.iInfo = (int)TRAINING_INFO_TYPE::DAMEGE;
+	//PlayerDataMgr->m_TrainingData.iHpRecovery = (int)HP_RECOVERY_TYPE::AUTO_RECOVERY;
+	//PlayerDataMgr->m_TrainingData.iHp1P = 50;
+	//PlayerDataMgr->m_TrainingData.iHp2P = 75;
+	//PlayerDataMgr->m_TrainingData.iSpGage = 50;
+	//PlayerDataMgr->m_TrainingData.iPartnerRecovery= (int)PARTNER_RECOVERY_TYPE::MAX;
+	//PlayerDataMgr->m_TrainingData.iInfo = (int)TRAINING_INFO_TYPE::DAMEGE;
+
+	// Ž©“®‰ñ•œ‚©‚Ç‚¤‚©
+	if (PlayerDataMgr->m_TrainingData.iHpRecovery == (int)HP_RECOVERY_TYPE::AUTO_RECOVERY)
+	{
+
+		FOR(m_NumPlayer)
+		{
+			// d’¼ŽžŠÔ‚ª‚È‚¯‚ê‚Î‰ñ•œ
+			if (m_pPlayers[i]->GetRecoveryFrame() <= 0)
+			{
+
+				m_pPlayers[i]->AddHP(100);
+
+			}
+		}
+
+	}
 
 
 	// Ý’è‚µ‚½Å‘åHP‚æ‚è‘½‚©‚Á‚½‚çŒ¸‚ç‚·
@@ -214,22 +231,7 @@ void PlayerManager::UpdateTraining()
 		};
 	}
 
-	// Ž©“®‰ñ•œ‚©‚Ç‚¤‚©
-	if (PlayerDataMgr->m_TrainingData.iHpRecovery == (int)HP_RECOVERY_TYPE::AUTO_RECOVERY)
-	{
 
-		FOR(m_NumPlayer)
-		{
-			// d’¼ŽžŠÔ‚ª‚È‚¯‚ê‚Î‰ñ•œ
-			if (m_pPlayers[i]->GetRecoveryFrame() <= 0)
-			{
-
-				m_pPlayers[i]->AddHP(100);
-			
-			}		
-		}
-
-	}
 	
 
 

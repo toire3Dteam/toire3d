@@ -108,11 +108,11 @@ void DifficultyParamSetting::Ctrl(int DeviceID)
 	// 左押してたら
 	if (m_bLeftPush)
 	{
-		PlayerDataMgr->m_ConfigData.iDifficultyAI = (PlayerDataMgr->m_ConfigData.iDifficultyAI > 0) ? PlayerDataMgr->m_ConfigData.iDifficultyAI - 1 : 3;	// ★ 3という数字は0,1,2,3という事を想定した仮コード
+		PlayerDataMgr->m_ConfigData.iDifficultyAI = (PlayerDataMgr->m_ConfigData.iDifficultyAI > (int)AI_TYPE::CPU_EASY) ? PlayerDataMgr->m_ConfigData.iDifficultyAI - 1 : (int)AI_TYPE::CPU_YOKOE;
 	}
 	// 右押してたら
 	if (m_bRightPush)
 	{
-		PlayerDataMgr->m_ConfigData.iDifficultyAI = (PlayerDataMgr->m_ConfigData.iDifficultyAI < 3) ? PlayerDataMgr->m_ConfigData.iDifficultyAI + 1 : 0;	// ★ 3という数字は0,1,2,3という事を想定した仮コード
+		PlayerDataMgr->m_ConfigData.iDifficultyAI = (PlayerDataMgr->m_ConfigData.iDifficultyAI < (int)AI_TYPE::CPU_YOKOE) ? PlayerDataMgr->m_ConfigData.iDifficultyAI + 1 : (int)AI_TYPE::CPU_EASY;
 	}
 }

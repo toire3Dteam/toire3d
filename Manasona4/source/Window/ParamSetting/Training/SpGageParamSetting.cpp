@@ -1,16 +1,16 @@
-#include "SEParamSetting.h"
+#include "SpGageParamSetting.h"
 #include "Data\PlayerData.h"
 
-//+----------------------------
-//	SEのパラメーター設定
-//+----------------------------
+//+--------------------------------
+//	SPゲージのパラメーター設定
+//+--------------------------------
 
-SEParamSetting::SEParamSetting(int Number, int WidthSize) :BaseParamSetting(Number, WidthSize)
+SpGageParamSetting::SpGageParamSetting(int Number, int WidthSize) :BaseParamSetting(Number, WidthSize)
 {
 
 }
 
-SEParamSetting::~SEParamSetting()
+SpGageParamSetting::~SpGageParamSetting()
 {
 
 }
@@ -18,34 +18,34 @@ SEParamSetting::~SEParamSetting()
 //+----------------------------
 //	更新・描画
 //+----------------------------
-void SEParamSetting::Update()
+void SpGageParamSetting::Update()
 {
 	BaseParamSetting::Update();
 }
 
 // ★各自様々な描画方法で描画　ユーザーに分かりやすく作る
-void SEParamSetting::Render(int x, int y, bool selectFlag)
+void SpGageParamSetting::Render(int x, int y, bool selectFlag)
 {
 	//// 共通描画（矢印とか）
-	//BaseParamSetting::Render(x, y, selectFlag);
+	//BaSpGageParamSetting::Render(x, y, selectFlag);
 	// 矢印描画
-	if (PlayerDataMgr->m_ConfigData.iSEVolume > 0)
-	m_pLeftArrow->Render(x, y, 32, 32, 0, (32 * selectFlag), 32, 32);	// 左
-	if (PlayerDataMgr->m_ConfigData.iSEVolume < 100)
-	m_pRightArrow->Render(x + m_iWidthSize, y, 32, 32, 32, (32 * selectFlag), 32, 32);	// 右
+	if (PlayerDataMgr->m_TrainingData.iSpGage > 0)
+		m_pLeftArrow->Render(x, y, 32, 32, 0, (32 * selectFlag), 32, 32);	// 左
+	if (PlayerDataMgr->m_TrainingData.iSpGage < 100)
+		m_pRightArrow->Render(x + m_iWidthSize, y, 32, 32, 32, (32 * selectFlag), 32, 32);	// 右
 
-	//  これは％表記で描画
-	
-	// %のサイズ
+																							//  これは％表記で描画
+
+																							// %のサイズ
 	float fPersentSize = (float)(m_iWidthSize*0.725f);
 
 	// 最大値と現在の値を割って割合を取得
-	float fPersent = (float)(PlayerDataMgr->m_ConfigData.iSEVolume) / (float)(100);
+	float fPersent = (float)(PlayerDataMgr->m_TrainingData.iSpGage) / (float)(100);
 	float fAns = fPersentSize *fPersent;
 
 
 	// ゲージの左淵
-	m_pPersentFrame->Render(x + 32 - 2, y, 2, 32, (selectFlag * 2) , 0, 2, 32);	
+	m_pPersentFrame->Render(x + 32 - 2, y, 2, 32, (selectFlag * 2), 0, 2, 32);
 	// 中身
 	for (int i = 0; i < (int)fPersentSize; i++)
 	{
@@ -60,16 +60,16 @@ void SEParamSetting::Render(int x, int y, bool selectFlag)
 		}
 	}
 	// ゲージの右淵
-	m_pPersentFrame->Render(x + 32+ (int)fPersentSize, y, 2, 32, (selectFlag * 2), 0, 2, 32);
+	m_pPersentFrame->Render(x + 32 + (int)fPersentSize, y, 2, 32, (selectFlag * 2), 0, 2, 32);
 
 	// 数値
-	RenderNumber(x + m_iWidthSize - 24, y, PlayerDataMgr->m_ConfigData.iSEVolume, selectFlag);
+	RenderNumber(x + m_iWidthSize - 24, y, PlayerDataMgr->m_TrainingData.iSpGage, selectFlag);
 
 }
 
 
 //	操作
-void SEParamSetting::Ctrl(int DeviceID)
+void SpGageParamSetting::Ctrl(int DeviceID)
 {
 	// 基本操作
 	BaseParamSetting::Ctrl(DeviceID);
@@ -80,27 +80,25 @@ void SEParamSetting::Ctrl(int DeviceID)
 	// 左押してたら
 	if (m_bLeftPush)
 	{
-		PlayerDataMgr->m_ConfigData.iSEVolume--;
+		PlayerDataMgr->m_TrainingData.iSpGage--;
 	}
 	// 右押してたら
 	if (m_bRightPush)
 	{
-		PlayerDataMgr->m_ConfigData.iSEVolume++;
+		PlayerDataMgr->m_TrainingData.iSpGage++;
 	}
 
 	// ★100または0まで来たら一度完全に止めて、もう一度押し込むまでパラメータを変更できない
-	if (PlayerDataMgr->m_ConfigData.iSEVolume == 100||
-		PlayerDataMgr->m_ConfigData.iSEVolume == 0)
+	if (PlayerDataMgr->m_TrainingData.iSpGage == 100 ||
+		PlayerDataMgr->m_TrainingData.iSpGage == 0)
 	{
 		m_iLeftPushFrame = 0;
 		m_iRightPushFrame = 0;
 		m_iSpeedLv = 0;
 	}
 
-	// 0~100の間に止める
-	//PlayerDataMgr->m_ConfigData.iSEVolume = min(100, max(0, PlayerDataMgr->m_ConfigData.iSEVolume));
 
 	// 100を超えたら0へ 0より下げたら100へ
-	if (PlayerDataMgr->m_ConfigData.iSEVolume > 100)PlayerDataMgr->m_ConfigData.iSEVolume = 0;
-	if (PlayerDataMgr->m_ConfigData.iSEVolume < 0)PlayerDataMgr->m_ConfigData.iSEVolume = 100;
+	if (PlayerDataMgr->m_TrainingData.iSpGage > 100)PlayerDataMgr->m_TrainingData.iSpGage = 0;
+	if (PlayerDataMgr->m_TrainingData.iSpGage < 0)PlayerDataMgr->m_TrainingData.iSpGage = 100;
 }

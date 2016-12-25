@@ -1,15 +1,15 @@
 #pragma once
-#include "BaseParamSetting.h"
+#include "../BaseParamSetting.h"
 
 //+----------------------------
-//	CPU難易度のパラメーター設定
+//	トレーニングの情報設定
 //+----------------------------
 
-class DifficultyParamSetting: public BaseParamSetting
+class InfoParamSetting : public BaseParamSetting
 {
 public:
-	DifficultyParamSetting(int Number, int WidthSize);
-	~DifficultyParamSetting();
+	InfoParamSetting(int Number, int WidthSize);
+	~InfoParamSetting();
 
 	void Update();
 	void Render(int x, int y, bool selectFlag);
@@ -19,6 +19,5 @@ private:
 
 
 };
-
 
 

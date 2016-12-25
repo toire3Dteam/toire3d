@@ -29,6 +29,8 @@ TutorialPauseWindow::TutorialPauseWindow(Vector2 vPos) :BaseWindow(vPos)
 
 	m_pInfoPlate = new InformationPlate();
 
+	// 二回戻り防止
+	m_bBackPush = false;
 }
 
 TutorialPauseWindow::~TutorialPauseWindow()
@@ -175,24 +177,33 @@ bool  TutorialPauseWindow::Ctrl(int DeviceID)
 		}
 	}
 
-	// キャンセル
-	// ゲームに戻る動作は離して進む
-	if (tdnInput::KeyGet(KEYCODE::KEY_A, DeviceID) == 2)
+	// キャンセルボタンを押し込む動作が必要に
+	if (tdnInput::KeyGet(KEYCODE::KEY_A, DeviceID) == 3)
 	{
-		// 選択した番号格納！
-		m_iChoiceState = (TUTORIAL_PAUSE_STATE::BACK);
-		return true;
-	}
-	if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, DeviceID) == 3)
-	{
-		// 選択した番号格納！
-		m_iChoiceState = (TUTORIAL_PAUSE_STATE::BACK);
-		return true;
+		m_bBackPush = true;
 	}
 
+	// キャンセルボタン
+	if (m_bBackPush == true)// 一度キャンセルボタンを押し込んでいたら
+	{
+		// ゲームに戻る動作は離して進む
+		if (tdnInput::KeyGet(KEYCODE::KEY_A, DeviceID) == 2)
+		{
+			// 選択した番号格納！
+			m_iChoiceState = (TUTORIAL_PAUSE_STATE::BACK);
+			return true;
+		}
+		if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, DeviceID) == 3)
+		{
+			// 選択した番号格納！
+			m_iChoiceState = (TUTORIAL_PAUSE_STATE::BACK);
+			return true;
+		}
+	}
 
-	// 決定を押してない時
-	if (tdnInput::KeyGet(KEYCODE::KEY_B, DeviceID) == 0)
+	// 決定やキャンセルを押してない時
+	if (tdnInput::KeyGet(KEYCODE::KEY_B, DeviceID) == 0 &&
+		tdnInput::KeyGet(KEYCODE::KEY_A, DeviceID) == 0)
 	{
 
 		// 選択切り替え
@@ -241,6 +252,8 @@ void TutorialPauseWindow::Action()
 
 	BaseWindow::Action();
 
+	// 二回戻り防止
+	m_bBackPush = false;
 }
 
 void TutorialPauseWindow::Stop()
@@ -248,4 +261,7 @@ void TutorialPauseWindow::Stop()
 	BaseWindow::Stop();
 
 	m_pInfoPlate->Stop();
+
+	// 二回戻り防止
+	m_bBackPush = false;
 }

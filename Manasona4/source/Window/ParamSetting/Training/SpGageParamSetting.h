@@ -1,15 +1,15 @@
 #pragma once
-#include "BaseParamSetting.h"
+#include "../BaseParamSetting.h"
 
-//+----------------------------
-//	SEのパラメーター設定
-//+----------------------------
+//+--------------------------------
+//	SPゲージのパラメーター設定
+//+--------------------------------
 
-class SEParamSetting: public BaseParamSetting
+class SpGageParamSetting : public BaseParamSetting
 {
 public:
-	SEParamSetting(int Number, int WidthSize);
-	~SEParamSetting();
+	SpGageParamSetting(int Number, int WidthSize);
+	~SpGageParamSetting();
 
 	void Update();
 	void Render(int x, int y, bool selectFlag);
@@ -19,6 +19,5 @@ private:
 
 
 };
-
 
 
