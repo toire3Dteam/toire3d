@@ -15,6 +15,7 @@
 #include "Window\TrainingPauseWindow.h"
 #include "Window\SoundWindow.h"
 #include "Window\TrainingOptionWindow.h"
+#include "Window\TrainingDummyWindow.h"
 
 // リザルトデータ
 #include "Data\ResultData.h"
@@ -34,12 +35,13 @@ namespace Stage{		// ○
 // バトルのウィンドウの種類
 enum class BATTLE_WINDOW_TYPE
 {
-	PAUSE, // ポーズ
-	TUTORIAL_PAUSE, // チュートリアルポーズ
-	TRAINING_PAUSE, // トレーニングポーズ
-	SOUND,			// サウンド
-	TRAINING_OPTION,// トレーニングオプション
-	ARRAY_END	// 配列終了
+	PAUSE,					// ポーズ
+	TUTORIAL_PAUSE,			// チュートリアルポーズ
+	TRAINING_PAUSE,			// トレーニングポーズ
+	SOUND,					// サウンド
+	TRAINING_OPTION,		// トレーニングオプション
+	TRAINING_DUMMY,			// トレーニングダミーオプション
+	ARRAY_END				// 配列終了
 
 };
 

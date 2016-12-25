@@ -26,6 +26,7 @@ enum class AI_TYPE
 	CPU_YOKOE,			// 横江くん用に作られたマジキチなAI
 
 	PRACTICE_LAND,		//	[練習用]何も動かない
+	PRACTICE_SQUAT,		//	[練習用]しゃがんで何も動かない
 	PRACTICE_JUMP,		//	[練習用]飛び続ける
 	PRACTICE_ATTACK,	//	[練習用]一定間隔で攻撃する
 
@@ -79,6 +80,7 @@ enum class TRAINING_INFO_TYPE
 	ALL			// 全て
 };
 
+// ダミー
 // 敵の状態
 enum class ENEMY_STATE_TYPE
 {
@@ -94,6 +96,13 @@ enum class ENEMY_GUARD_TYPE
 	NO,		// ガードしない
 	WAY,	// 途中からガードする
 	ALL		// 全部ガードする
+};
+
+// 敵のガード切り替えの設定
+enum class ENEMY_GUARD_SWITCH_TYPE
+{
+	NO,		// 切り替えしない
+	OK,		// 切り替えする
 };
 
 // 敵の受け身の設定

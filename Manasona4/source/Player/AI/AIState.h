@@ -145,6 +145,40 @@ namespace AIState
 	};
 
 	/*******************************************************/
+	//					練習用地面しゃがみステート
+	/*******************************************************/
+	class PracticeSquat :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static PracticeSquat* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		PracticeSquat() {};
+		~PracticeSquat() {};
+
+		PracticeSquat(const PracticeSquat&) {}
+		PracticeSquat& operator=(const PracticeSquat&) {}
+	};
+
+	/*******************************************************/
 	//					練習用攻撃ステート
 	/*******************************************************/
 	class PracticeAttack :public State<AI>
@@ -176,6 +210,40 @@ namespace AIState
 
 		PracticeAttack(const PracticeAttack&) {}
 		PracticeAttack& operator=(const PracticeAttack&) {}
+	};
+
+	/*******************************************************/
+	//					練習用ガードステート
+	/*******************************************************/
+	class PracticeGuard :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static PracticeGuard* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		PracticeGuard() {};
+		~PracticeGuard() {};
+
+		PracticeGuard(const PracticeGuard&) {}
+		PracticeGuard& operator=(const PracticeGuard&) {}
 	};
 
 	/*******************************************************/

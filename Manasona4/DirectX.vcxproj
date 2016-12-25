@@ -205,6 +205,11 @@
     <ClCompile Include="source\Window\ParamSetting\RoundNumTypeParamSetting.cpp" />
     <ClCompile Include="source\Window\ParamSetting\RoundTimeTypeParamSetting.cpp" />
     <ClCompile Include="source\Window\ParamSetting\SEParamSetting.cpp" />
+    <ClCompile Include="source\Window\ParamSetting\Training2\EnemyGuardParamSetting.cpp" />
+    <ClCompile Include="source\Window\ParamSetting\Training2\EnemyGuardSwitchParamSetting.cpp" />
+    <ClCompile Include="source\Window\ParamSetting\Training2\EnemyStateParamSetting.cpp" />
+    <ClCompile Include="source\Window\ParamSetting\Training2\TechParamSetting.cpp" />
+    <ClCompile Include="source\Window\ParamSetting\Training2\ThrowTechParamSetting.cpp" />
     <ClCompile Include="source\Window\ParamSetting\Training\Hp1PParamSetting.cpp" />
     <ClCompile Include="source\Window\ParamSetting\Training\Hp2PParamSetting.cpp" />
     <ClCompile Include="source\Window\ParamSetting\Training\HPRecoveryParamSetting.cpp" />
@@ -215,6 +220,7 @@
     <ClCompile Include="source\Window\PauseWindow.cpp" />
     <ClCompile Include="source\Window\ResultWindow.cpp" />
     <ClCompile Include="source\Window\SoundWindow.cpp" />
+    <ClCompile Include="source\Window\TrainingDummyWindow.cpp" />
     <ClCompile Include="source\Window\TrainingOptionWindow.cpp" />
     <ClCompile Include="source\Window\TrainingPauseWindow.cpp" />
     <ClCompile Include="source\Window\TutorialPauseWindow.cpp" />
@@ -370,6 +376,11 @@
     <ClInclude Include="source\Window\ParamSetting\RoundNumTypeParamSetting.h" />
     <ClInclude Include="source\Window\ParamSetting\RoundTimeTypeParamSetting.h" />
     <ClInclude Include="source\Window\ParamSetting\SEParamSetting.h" />
+    <ClInclude Include="source\Window\ParamSetting\Training2\EnemyGuardParamSetting.h" />
+    <ClInclude Include="source\Window\ParamSetting\Training2\EnemyGuardSwitchParamSetting.h" />
+    <ClInclude Include="source\Window\ParamSetting\Training2\EnemyStateParamSetting.h" />
+    <ClInclude Include="source\Window\ParamSetting\Training2\TechParamSetting.h" />
+    <ClInclude Include="source\Window\ParamSetting\Training2\ThrowTechParamSetting.h" />
     <ClInclude Include="source\Window\ParamSetting\Training\Hp1PParamSetting.h" />
     <ClInclude Include="source\Window\ParamSetting\Training\Hp2PParamSetting.h" />
     <ClInclude Include="source\Window\ParamSetting\Training\HPRecoveryParamSetting.h" />
@@ -380,6 +391,7 @@
     <ClInclude Include="source\Window\PauseWindow.h" />
     <ClInclude Include="source\Window\ResultWindow.h" />
     <ClInclude Include="source\Window\SoundWindow.h" />
+    <ClInclude Include="source\Window\TrainingDummyWindow.h" />
     <ClInclude Include="source\Window\TrainingOptionWindow.h" />
     <ClInclude Include="source\Window\TrainingPauseWindow.h" />
     <ClInclude Include="source\Window\TutorialPauseWindow.h" />

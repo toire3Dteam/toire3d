@@ -41,5 +41,5 @@ private:
 	InformationPlate* m_pInfoPlate;
 
 	// “ñ‰ñ–ß‚è–hŽ~
-	int m_bBackPush;
+	bool m_bBackPush;
 };

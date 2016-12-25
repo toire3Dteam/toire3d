@@ -2869,10 +2869,11 @@ void BasePlayerState::DownFall::Execute(BasePlayer * pPerson)
 			pPerson->isPushInput(PLAYER_COMMAND_BIT::L1) ||
 			pPerson->isPushInput(PLAYER_COMMAND_BIT::R2) ||
 			pPerson->isPushInput(PLAYER_COMMAND_BIT::L2) ||
-			pPerson->isPushInput(PLAYER_COMMAND_BIT::UP) ||
-			pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN) ||
-			pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT) ||
-			pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::UP) 
+			//pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN) ||
+			//pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT) ||
+			//pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT)
+			)
 		{
 
 			// 地上リカバリーステートへ！
@@ -2960,9 +2961,9 @@ void BasePlayerState::KnockDown::Execute(BasePlayer * pPerson)
 		pPerson->GetRecoveryDamageCount()->clear();
 		// ダメージ補正リセット
 		pPerson->ResetDamageRate();
-
+		
 		//pPerson->SetInvincible(60, 1);
-
+		// (12/25)受け身はボタンのみにします　ダミーの事情で
 		if (pPerson->isPushInput(PLAYER_COMMAND_BIT::A) ||
 			pPerson->isPushInput(PLAYER_COMMAND_BIT::B) ||
 			pPerson->isPushInput(PLAYER_COMMAND_BIT::C) ||
@@ -2971,10 +2972,11 @@ void BasePlayerState::KnockDown::Execute(BasePlayer * pPerson)
 			pPerson->isPushInput(PLAYER_COMMAND_BIT::L1) ||
 			pPerson->isPushInput(PLAYER_COMMAND_BIT::R2) ||
 			pPerson->isPushInput(PLAYER_COMMAND_BIT::L2) ||
-			pPerson->isPushInput(PLAYER_COMMAND_BIT::UP) ||
-			pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN) ||
-			pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT) ||
-			pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT))
+			pPerson->isPushInput(PLAYER_COMMAND_BIT::UP) 
+			//pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN) ||
+			//pPerson->isPushInput(PLAYER_COMMAND_BIT::LEFT) ||
+			//pPerson->isPushInput(PLAYER_COMMAND_BIT::RIGHT)
+			)
 		{
 			// ダウンフラグを解除
 			pPerson->SetDown(false);

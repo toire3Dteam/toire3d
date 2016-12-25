@@ -918,6 +918,10 @@ public:
 	void ActionNotOverDrive() { m_bNotOverDrive = true; /*m_pNotOverDriveMark->Action(); */}
 	void StopNotOverDrive() {	m_bNotOverDrive = false;/* m_pNotOverDriveMark->Stop();*/}
 
+	// AI‚©
+	bool isAI() { return m_bAI; }
+	AI* GetAI() { return m_pAI; }
+
 	//_/_/_/_/_/_/__/_/__/_/__/_/__
 	// ’è”
 	//_/_/_/_/__/_/__/_/__/_/__/_/_

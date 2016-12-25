@@ -153,6 +153,15 @@ void PlayerManager::UpdateTraining()
 	//PlayerDataMgr->m_TrainingData.iPartnerRecovery= (int)PARTNER_RECOVERY_TYPE::MAX;
 	//PlayerDataMgr->m_TrainingData.iInfo = (int)TRAINING_INFO_TYPE::DAMEGE;
 
+	// AI‚É‘Î‚µ‚Ä‚Ì–½—ß
+	FOR(m_NumPlayer)
+	{
+		if (m_pPlayers[i]->isAI() == true)
+		{
+			m_pPlayers[i]->GetAI()->UpdateTraining();
+		}
+	}
+
 	// Ž©“®‰ñ•œ‚©‚Ç‚¤‚©
 	if (PlayerDataMgr->m_TrainingData.iHpRecovery == (int)HP_RECOVERY_TYPE::AUTO_RECOVERY)
 	{

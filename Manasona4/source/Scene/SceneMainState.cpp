@@ -1384,6 +1384,15 @@ void SceneMainState::TrainingPause::Execute(sceneMain *pMain)
 		return;
 	}
 
+	// トレーニングダミーへ
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->GetChoiceState()
+		== TrainingPauseWindow::TRAINING_PAUSE_STATE::TRAINING_DUMMY_SETTING)
+	{
+		// トレーニングダミー設定へ
+		pMain->GetFSM()->ChangeState(TrainingDummyMenu::GetInstance());
+		return;
+	}
+
 	// ポジションリセットボタンを押したら
 	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->GetChoiceState()
 		== TrainingPauseWindow::TRAINING_PAUSE_STATE::POSITION_RESET)
@@ -1580,12 +1589,84 @@ void SceneMainState::TrainingOptionMenu::Render(sceneMain *pMain)
 
 #ifdef _DEBUG
 
-	tdnText::Draw(0, 0, 0xffffffff, "SoundMenu");
+	tdnText::Draw(0, 0, 0xffffffff, "TrainingOptionMenu");
 #endif // _DEBUG
 
 }
 
 bool SceneMainState::TrainingOptionMenu::OnMessage(sceneMain *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+
+	//default:
+	//	break;
+	//}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
+
+
+/*******************************************************/
+//				トレーニングダミーウィンドウ選択
+/*******************************************************/
+
+void SceneMainState::TrainingDummyMenu::Enter(sceneMain *pMain)
+{
+	// トレーニングオプション起動
+	pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_DUMMY)->Action();
+}
+
+void SceneMainState::TrainingDummyMenu::Execute(sceneMain *pMain)
+{
+
+	// 戻るボタンを押したら
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_DUMMY)->GetChoiceState()
+		== TrainingDummyWindow::TRAINING_DUMMY_STATE::BACK)
+	{
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_DUMMY)->Stop();	// ウィンドウを閉じる
+		pMain->GetFSM()->RevertToPreviousState();		// 前のステートへ戻る
+		return;
+	}
+
+
+
+	//+----------------------------------
+	//	このステートでの操作
+	//+----------------------------------
+	// パッド分更新
+	int NumDevice(tdnInputManager::GetNumDevice());
+	// パッド何もささってないとき用
+	if (NumDevice == 0)NumDevice = 1;
+	for (int i = 0; i < NumDevice; i++)
+	{
+		// ポーズウィンドウの操作
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_DUMMY)->Ctrl(i);
+	}
+
+
+}
+
+void SceneMainState::TrainingDummyMenu::Exit(sceneMain *pMain)
+{
+
+}
+
+void SceneMainState::TrainingDummyMenu::Render(sceneMain *pMain)
+{
+	// 選択ウィンドウの説明
+	pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_DUMMY)->RednerInfo();
+
+#ifdef _DEBUG
+
+	tdnText::Draw(0, 0, 0xffffffff, "TRAINING_DUMMY");
+#endif // _DEBUG
+
+}
+
+bool SceneMainState::TrainingDummyMenu::OnMessage(sceneMain *pMain, const Message & msg)
 {
 	// メッセージタイプ
 	//switch (msg.Msg)

@@ -22,6 +22,7 @@ public:
 	void Control();
 	void Update();
 	void DoublePushUpdate();
+	void UpdateTraining();
 
 	// AIの種類を変える
 	void ChangeAIType(AI_TYPE type);
@@ -101,8 +102,11 @@ private:
 
 
 	// ステートをフレンドクラスへ
+	friend class AIState::PracticeGlobal;
 	friend class AIState::PracticeLand;
+	friend class AIState::PracticeSquat;
 	friend class AIState::PracticeAttack;
+	friend class AIState::PracticeGuard;
 	friend class AIState::Wait;
 	friend class AIState::Chase;
 	friend class AIState::Guard;

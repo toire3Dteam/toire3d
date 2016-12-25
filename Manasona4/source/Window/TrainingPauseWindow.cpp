@@ -20,6 +20,7 @@ TrainingPauseWindow::TrainingPauseWindow(Vector2 vPos) :BaseWindow(vPos)
 	// ポーズウィンドウに存在するアイコンを詰めていく
 	//AddIconData("前のチュートリアルへ", "一つ前のチュートリアルに戻ります。");
 	AddIconData("トレーニング設定", "トレーニングの基本設定を行います。");
+	AddIconData("トレーニングダミー設定", "トレーニングダミーの設定を行います。");
 	AddIconData("ポジションリセット","ポジションを初期状態に戻します。");
 	AddIconData("サウンド設定", "各種サウンドの設定を行います。");
 	AddIconData("キャラクターセレクト", "キャラクターセレクトに戻ります。");

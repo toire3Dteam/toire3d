@@ -41,11 +41,11 @@ namespace PlayerData
 		int iSpGage;
 		int iPartnerRecovery;
 		int iInfo;
-		int ‹ó‚«˜g7;
-		int ‹ó‚«˜g8;
-		int ‹ó‚«˜g9;
-		int ‹ó‚«˜g10;
-		int ‹ó‚«˜g11;
+		int iEnemyState;
+		int iEnemyGuard;
+		int iEnemyTech;
+		int iEnemyThrowTech;
+		int iEnemyGuardSwitch;
 		int ‹ó‚«˜g12;
 		int ‹ó‚«˜g13;
 		int ‹ó‚«˜g14;

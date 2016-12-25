@@ -1,5 +1,7 @@
 #include "AI.h"
 #include "AIState.h"
+#include "Data\PlayerData.h"
+#include "Data\SelectData.h"
 
 /**********************************/
 //		AIクラス
@@ -54,6 +56,14 @@ AI::AI(SIDE side,BasePlayer* myBasePlayer , AI_TYPE AIType)
 		m_pStateMachine->SetGlobalState(AIState::PracticeGlobal::GetInstance());// グローバル
 		m_pStateMachine->SetCurrentState(AIState::PracticeLand::GetInstance());
 		m_pStateMachine->SetPreviousState(AIState::PracticeLand::GetInstance());
+
+		break;
+	case AI_TYPE::PRACTICE_SQUAT:
+		// 練習用ステートマシン
+		m_pStateMachine = new StateMachine<AI>(this);
+		m_pStateMachine->SetGlobalState(AIState::PracticeGlobal::GetInstance());// グローバル
+		m_pStateMachine->SetCurrentState(AIState::PracticeSquat::GetInstance());
+		m_pStateMachine->SetPreviousState(AIState::PracticeSquat::GetInstance());
 
 		break;
 	case AI_TYPE::PRACTICE_JUMP:
@@ -156,6 +166,50 @@ void AI::DoublePushUpdate()
 
 }
 
+// トレーニング用
+void AI::UpdateTraining()
+{ 
+	switch ((ENEMY_STATE_TYPE)PlayerDataMgr->m_TrainingData.iEnemyState)
+	{
+	case ENEMY_STATE_TYPE::STAND:
+		// 設定したタイプと違っていたら
+		if (m_eAIType != AI_TYPE::PRACTICE_LAND)
+		{
+			ChangeAIType(AI_TYPE::PRACTICE_LAND);
+		}
+
+		break;
+	case ENEMY_STATE_TYPE::SQUAT:
+		// 設定したタイプと違っていたら
+		if (m_eAIType != AI_TYPE::PRACTICE_SQUAT)
+		{
+			ChangeAIType(AI_TYPE::PRACTICE_SQUAT);
+		}
+
+		break;
+	case ENEMY_STATE_TYPE::JUMP:
+		// 設定したタイプと違っていたら
+		if (m_eAIType != AI_TYPE::PRACTICE_JUMP)
+		{
+			ChangeAIType(AI_TYPE::PRACTICE_JUMP);
+		}
+
+		break;
+	case ENEMY_STATE_TYPE::ATTACK:
+		// 設定したタイプと違っていたら
+		if (m_eAIType != AI_TYPE::PRACTICE_ATTACK)
+		{
+			ChangeAIType(AI_TYPE::PRACTICE_ATTACK);
+		}
+
+		break;
+	default:
+		MyAssert(0, "そのタイプはない");
+		break;
+	}
+
+}
+
 // AIの種類を変える		※ ステート切り替えはSetで変えてます
 void AI::ChangeAIType(AI_TYPE type)
 {
@@ -172,30 +226,42 @@ void AI::ChangeAIType(AI_TYPE type)
 
 		// 戦闘用
 		// ステートマシン　引数は自分自身のポインタ
-		m_pStateMachine = new StateMachine<AI>(this);
+		//m_pStateMachine = new StateMachine<AI>(this);
 		m_pStateMachine->SetGlobalState(AIState::Global::GetInstance());// グローバル
-		m_pStateMachine->SetCurrentState(AIState::Chase::GetInstance());
+		m_pStateMachine->SetCurrentState(AIState::Wait::GetInstance());
+		m_pStateMachine->SetPreviousState(AIState::Wait::GetInstance());
 
 		break;
 	case AI_TYPE::PRACTICE_LAND:
 		// 練習用ステートマシン
-		m_pStateMachine = new StateMachine<AI>(this);
+		//m_pStateMachine = new StateMachine<AI>(this);
 		m_pStateMachine->SetGlobalState(AIState::PracticeGlobal::GetInstance());// グローバル
 		m_pStateMachine->SetCurrentState(AIState::PracticeLand::GetInstance());
+		m_pStateMachine->SetPreviousState(AIState::PracticeLand::GetInstance());
+
+		break;
+	case AI_TYPE::PRACTICE_SQUAT:
+		// 練習用ステートマシン
+		//m_pStateMachine = new StateMachine<AI>(this);
+		m_pStateMachine->SetGlobalState(AIState::PracticeGlobal::GetInstance());// グローバル
+		m_pStateMachine->SetCurrentState(AIState::PracticeSquat::GetInstance());
+		m_pStateMachine->SetPreviousState(AIState::PracticeSquat::GetInstance());
 
 		break;
 	case AI_TYPE::PRACTICE_JUMP:
 		// 空中に飛び続ける練習用ステートマシン
-		m_pStateMachine = new StateMachine<AI>(this);
+		//m_pStateMachine = new StateMachine<AI>(this);
 		m_pStateMachine->SetGlobalState(AIState::PracticeGlobal::GetInstance());// グローバル
 		m_pStateMachine->SetCurrentState(AIState::PracticeJump::GetInstance());
+		m_pStateMachine->SetPreviousState(AIState::PracticeJump::GetInstance());
 
 		break;
 	case AI_TYPE::PRACTICE_ATTACK:
 		// 攻撃を振り続ける練習用ステートマシン
-		m_pStateMachine = new StateMachine<AI>(this);
+		//m_pStateMachine = new StateMachine<AI>(this);
 		m_pStateMachine->SetGlobalState(AIState::PracticeGlobal::GetInstance());// グローバル
 		m_pStateMachine->SetCurrentState(AIState::PracticeAttack::GetInstance());
+		m_pStateMachine->SetPreviousState(AIState::PracticeAttack::GetInstance());
 
 		break;
 	default:

@@ -225,6 +225,9 @@ bool sceneMain::Initialize()
 		case BATTLE_WINDOW_TYPE::TRAINING_OPTION:
 			m_pWindow[i] = new TrainingOptionWindow(Vector2(224, 128));
 			break;
+		case BATTLE_WINDOW_TYPE::TRAINING_DUMMY:
+			m_pWindow[i] = new TrainingDummyWindow(Vector2(224, 128));
+			break;
 		default:
 			MyAssert(0, "そんなウィンドウはない");
 			break;
