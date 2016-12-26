@@ -16,6 +16,9 @@ PauseWindow::PauseWindow(Vector2 vPos) :BaseWindow(vPos)
 	m_iSelectLength = 34;
 
 	// ポーズウィンドウに存在するアイコンを詰めていく
+	AddIconData("サウンド設定", "各種サウンドの設定を行います。");
+	AddIconData("メニュー非表示", "メニュー画面を非表示にします。");
+
 	AddIconData("キャラクターに戻る", "キャラクター画面に戻ります。");
 	AddIconData("メニューに戻る", "メニュー画面に戻ります。");
 	AddIconData("戻る", "このウィンドウを閉じます。");
@@ -195,12 +198,13 @@ bool  PauseWindow::Ctrl(int DeviceID)
 			m_iChoiceState = (BATTLE_STATE::BACK);
 			return true;
 		}
-		if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, DeviceID) == 3)
-		{
-			// 選択した番号格納！
-			m_iChoiceState = (BATTLE_STATE::BACK);
-			return true;
-		}
+	}
+
+	if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, DeviceID) == 3)
+	{
+		// 選択した番号格納！
+		m_iChoiceState = (BATTLE_STATE::BACK);
+		return true;
 	}
 
 	// 決定やキャンセルを押してない時

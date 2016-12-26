@@ -193,12 +193,13 @@ bool  TutorialPauseWindow::Ctrl(int DeviceID)
 			m_iChoiceState = (TUTORIAL_PAUSE_STATE::BACK);
 			return true;
 		}
-		if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, DeviceID) == 3)
-		{
-			// 選択した番号格納！
-			m_iChoiceState = (TUTORIAL_PAUSE_STATE::BACK);
-			return true;
-		}
+	}
+
+	if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, DeviceID) == 3)
+	{
+		// 選択した番号格納！
+		m_iChoiceState = (TUTORIAL_PAUSE_STATE::BACK);
+		return true;
 	}
 
 	// 決定やキャンセルを押してない時

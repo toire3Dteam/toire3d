@@ -93,6 +93,11 @@ public:
 
 	bool GetTutorialFlag() { return m_bTutorialFlag; }
 
+	// 
+	tdn2DAnim* GetHideInfo() { return m_pHideInfo; };
+	bool GetHideUI() { return m_bHideUI; }
+	void SetHideUI(bool flag) { m_bHideUI = flag; }
+
 private:
 	int m_iRoundNum;				// ラウンド数
 
@@ -128,6 +133,10 @@ private:
 
 	// トレーニングかどうか
 	bool m_bTrainingFlag;
+
+	// メニュー非表示用
+	tdn2DAnim* m_pHideInfo;
+	bool	   m_bHideUI;
 
 	// Window類
 	BaseWindow* m_pWindow[(int)BATTLE_WINDOW_TYPE::ARRAY_END];

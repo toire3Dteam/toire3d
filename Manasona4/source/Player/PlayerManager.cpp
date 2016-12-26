@@ -310,14 +310,21 @@ void PlayerManager::RenderTraining()
 	SIDE eOrderSide = SelectDataMgr->Get()->eOrderTrainingSide;
 	SIDE eTargetSide = m_pPlayers[(int)eOrderSide]->GetTargetPlayer()->GetSide();
 
+	// ダメージフォント配置
+	int iFontX = 200;
+	int iFontY = 120;
+	if (SelectDataMgr->Get()->eOrderTrainingSide == SIDE::RIGHT)
+	{
+		iFontX = 750;
+		iFontY = 120;
+	}
+
+
 	// 全ての情報を描画
 	if (PlayerDataMgr->m_TrainingData.iInfo == (int)TRAINING_INFO_TYPE::ALL)
 	{
 		// コマンド覆歴
 		m_pPlayers[(int)eOrderSide]->RenderCommandFrame(10, 625);
-
-		int iFontX = 200;
-		int iFontY = 120;
 
 		// ダメージのインフォメーションの裏に添えるプレート
 		m_pDamageInfoPlate->Render(iFontX - 16, iFontY - 8);
@@ -352,8 +359,6 @@ void PlayerManager::RenderTraining()
 	}
 	else if (PlayerDataMgr->m_TrainingData.iInfo == (int)TRAINING_INFO_TYPE::DAMEGE)
 	{
-		int iFontX = 200;
-		int iFontY = 120;
 
 		// ダメージのインフォメーションの裏に添えるプレート
 		m_pDamageInfoPlate->Render(iFontX - 16, iFontY - 8);

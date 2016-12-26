@@ -1171,11 +1171,32 @@ void SceneMainState::PauseMenu::Execute(sceneMain *pMain)
 		//}
 		//else
 		//{
+
+		// ポーズ終了
+		pMain->SetPause(false);
 			pMain->GetFSM()->ChangeState(Main::GetInstance());	// メインへ戻る
 
 		//}
 
 	}
+
+	// サウンドへ
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::PAUSE)->GetChoiceState()
+		== PauseWindow::BATTLE_STATE::SOUND_SETTING)
+	{
+		// サウンド設定へ
+		pMain->GetFSM()->ChangeState(SoundMenu::GetInstance());
+		return;
+	}
+
+	// メニュー非表示へ
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::PAUSE)->GetChoiceState() 
+		== PauseWindow::BATTLE_STATE::HIDE_MENU)
+	{
+		pMain->GetFSM()->ChangeState(HideMenu::GetInstance());
+		return;
+	}
+
 
 	// キャラクターセレクトへ
 	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::PAUSE)->GetChoiceState() == PauseWindow::BATTLE_STATE::BACK_CHARA_SELECT)
@@ -1204,7 +1225,6 @@ void SceneMainState::PauseMenu::Exit(sceneMain *pMain)
 {
 	// ★★★Exitではウィンドウは止めない
 
-	pMain->SetPause(false);
 }
 
 void SceneMainState::PauseMenu::Render(sceneMain *pMain)
@@ -1289,6 +1309,8 @@ void SceneMainState::TutorialPauseMenu::Execute(sceneMain *pMain)
 	{
 		// ポーズウィンドウ止める
 		pMain->GetWindow(BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE)->Stop();
+		// ポーズ終了
+		pMain->SetPause(false);
 
 		pMain->GetFSM()->ChangeState(TutorialMain::GetInstance());	// チュートリアルへ戻る
 
@@ -1307,7 +1329,7 @@ void SceneMainState::TutorialPauseMenu::Execute(sceneMain *pMain)
 
 void SceneMainState::TutorialPauseMenu::Exit(sceneMain *pMain)
 {
-	pMain->SetPause(false);
+
 }
 
 void SceneMainState::TutorialPauseMenu::Render(sceneMain *pMain)
@@ -1369,6 +1391,9 @@ void SceneMainState::TrainingPause::Execute(sceneMain *pMain)
 	{
 		// ポーズウィンドウ止める
 		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Stop();
+		
+		// ポーズ終了
+		pMain->SetPause(false);
 
 		pMain->GetFSM()->ChangeState(Training::GetInstance());	// トレーニングへ戻る
 		return;
@@ -1401,6 +1426,8 @@ void SceneMainState::TrainingPause::Execute(sceneMain *pMain)
 		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Stop();	
 		// フェードアウト(ポジションリセット効果の引きがね)
 		Fade::Set(Fade::FLAG::FADE_OUT, 14, 0x00000000);
+		// ポーズ終了
+		pMain->SetPause(false);
 		pMain->GetFSM()->ChangeState(Training::GetInstance());	// トレーニングへ戻る
 		return;
 	}
@@ -1410,6 +1437,13 @@ void SceneMainState::TrainingPause::Execute(sceneMain *pMain)
 	{
 		// サウンド設定へ
 		pMain->GetFSM()->ChangeState(SoundMenu::GetInstance());	
+		return;
+	}
+
+	// メニュー非表示へ
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->GetChoiceState() == TrainingPauseWindow::TRAINING_PAUSE_STATE::HIDE_MENU)
+	{
+		pMain->GetFSM()->ChangeState(HideMenu::GetInstance());
 		return;
 	}
 
@@ -1435,7 +1469,7 @@ void SceneMainState::TrainingPause::Execute(sceneMain *pMain)
 
 void SceneMainState::TrainingPause::Exit(sceneMain *pMain)
 {
-	pMain->SetPause(false);// ★★★Exitではウィンドウは止めない
+	//pMain->SetPause(false);// ★★★Exitではウィンドウは止めない
 }
 
 void SceneMainState::TrainingPause::Render(sceneMain *pMain)
@@ -1667,6 +1701,107 @@ void SceneMainState::TrainingDummyMenu::Render(sceneMain *pMain)
 }
 
 bool SceneMainState::TrainingDummyMenu::OnMessage(sceneMain *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+
+	//default:
+	//	break;
+	//}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
+
+
+/*******************************************************/
+//				メニュー非表示
+/*******************************************************/
+
+void SceneMainState::HideMenu::Enter(sceneMain *pMain)
+{
+	// 前回のステートで表示されているメニュー画面を消す
+	if (pMain->GetFSM()->isPrevState(*SceneMainState::PauseMenu::GetInstance()))
+	{
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::PAUSE)->Stop();
+	}
+	if (pMain->GetFSM()->isPrevState(*SceneMainState::TrainingPause::GetInstance()))
+	{
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Stop();
+	}
+	if (pMain->GetFSM()->isPrevState(*SceneMainState::TutorialPauseMenu::GetInstance()))
+	{
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE)->Stop();
+	}
+
+	// 非表示インフォ開始
+	pMain->GetHideInfo()->Action();
+}
+
+void SceneMainState::HideMenu::Execute(sceneMain *pMain)
+{
+	// 非表示インフォ点滅
+	if (pMain->GetHideInfo()->GetAction()->IsEnd() == true)
+	{
+		pMain->GetHideInfo()->Action();
+	}
+
+	// 非表示インフォ
+	pMain->GetHideInfo()->Update();
+	
+	//+----------------------------------
+	//	このステートでの操作
+	//+----------------------------------
+	// パッド分更新
+	int NumDevice(tdnInputManager::GetNumDevice());
+	// パッド何もささってないとき用
+	if (NumDevice == 0)NumDevice = 1;
+	for (int i = 0; i < NumDevice; i++)
+	{
+		// UI非表示
+		if (KEY(KEY_C, i) == 3 || KEY(KEY_D, i) == 3)
+		{	
+			if (pMain->GetHideUI() == false)
+			{
+				pMain->SetHideUI(true);
+			}
+			else
+			{
+				pMain->SetHideUI(false);
+			}
+		}
+
+		// 戻るボタンを押したら
+		if (KEY(KEY_A, i) == 3 || KEY(KEY_B, i) == 3 )
+		{
+			pMain->GetFSM()->RevertToPreviousState();		// 前のステートへ戻る
+			return;
+		}
+
+	}
+
+
+}
+
+void SceneMainState::HideMenu::Exit(sceneMain *pMain)
+{
+	pMain->SetHideUI(false);// UIを表示させる（元にもどす）
+}
+
+void SceneMainState::HideMenu::Render(sceneMain *pMain)
+{
+	// 非表示インフォ
+	pMain->GetHideInfo()->Render(464, 640);
+
+#ifdef _DEBUG
+
+	tdnText::Draw(0, 0, 0xffffffff, "HideMenu");
+#endif // _DEBUG
+
+}
+
+bool SceneMainState::HideMenu::OnMessage(sceneMain *pMain, const Message & msg)
 {
 	// メッセージタイプ
 	//switch (msg.Msg)

@@ -547,4 +547,35 @@ namespace SceneMainState
 		TrainingDummyMenu& operator=(const TrainingDummyMenu&) {}
 	};
 
+	//--------------------メニュー非表示メニューステート
+	class HideMenu : public State<sceneMain>
+	{
+	public:
+		// this is a シングルトン
+		static HideMenu* GetInstance() { static HideMenu state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMain* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMain* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMain* pMain);
+
+		// 描画
+		virtual void Render(sceneMain* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMain* pMain, const Message& msg);
+
+
+	private:
+		HideMenu() {};
+		~HideMenu() {};
+
+		HideMenu(const HideMenu&) {}
+		HideMenu& operator=(const HideMenu&) {}
+	};
+
 }

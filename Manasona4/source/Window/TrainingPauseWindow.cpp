@@ -23,6 +23,7 @@ TrainingPauseWindow::TrainingPauseWindow(Vector2 vPos) :BaseWindow(vPos)
 	AddIconData("トレーニングダミー設定", "トレーニングダミーの設定を行います。");
 	AddIconData("ポジションリセット","ポジションを初期状態に戻します。");
 	AddIconData("サウンド設定", "各種サウンドの設定を行います。");
+	AddIconData("メニュー非表示", "メニュー画面を非表示にします。");
 	AddIconData("キャラクターセレクト", "キャラクターセレクトに戻ります。");
 	AddIconData("メインメニュー", "メインメニューに戻ります。");
 	AddIconData("戻る", "このウィンドウを閉じ、ゲームに戻ります。");
@@ -185,7 +186,8 @@ bool  TrainingPauseWindow::Ctrl(int DeviceID)
 	}
 
 	// キャンセルボタンを押し込む動作が必要に
-	if (tdnInput::KeyGet(KEYCODE::KEY_A, DeviceID) == 3)
+	if (tdnInput::KeyGet(KEYCODE::KEY_A, DeviceID) == 3||
+		tdnInput::KeyGet(KEYCODE::KEY_ENTER, DeviceID) == 3)
 	{
 		m_bBackPush = true;
 	}
@@ -200,7 +202,7 @@ bool  TrainingPauseWindow::Ctrl(int DeviceID)
 			m_iChoiceState = (TRAINING_PAUSE_STATE::BACK);
 			return true;
 		}
-		if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, DeviceID) == 3)
+		if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, DeviceID) == 2)
 		{
 			// 選択した番号格納！
 			m_iChoiceState = (TRAINING_PAUSE_STATE::BACK);

@@ -212,8 +212,8 @@ bool NormalTypeChaseBrain(AI * pPerson)
 	// ‘ŠŽè‚ªUŒ‚‚µ‚Ä‚«‚½‚çB
 	if (TargetPlayer->isAttackState() == true)
 	{
-		// 10%‚ÌŠm—¦‚Å–³“G
-		if (tdnRandom::Get(0, 100) <= 10)
+		// 5%‚ÌŠm—¦‚Å–³“G
+		if (tdnRandom::Get(0, 100) <= 5)
 		{
 			// –³“G‹Z(ƒŠƒo[ƒTƒ‹¸—³)
 			pPerson->GetFSM()->ChangeState(AIState::InvincibleAttack::GetInstance());
@@ -1321,8 +1321,8 @@ void AIState::Wait::Execute(AI * pPerson)
 		if (TargetPlayer->isAttackState() == true &&
 			TargetPlayer->AIAttackRange() > GetRange(pPerson))
 		{
-			// 35%‚ÌŠm—¦‚Å–³“G
-			if (l_iStrong <= 35)
+			// «%‚ÌŠm—¦‚Å–³“G
+			if (l_iStrong <= 30)
 			{
 				// –³“G‹Z(ƒŠƒo[ƒTƒ‹¸—³)
 				pPerson->GetFSM()->ChangeState(AIState::InvincibleAttack::GetInstance());

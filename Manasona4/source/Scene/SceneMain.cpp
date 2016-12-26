@@ -240,6 +240,11 @@ bool sceneMain::Initialize()
 	// ステージ影焼き込み
 	m_bBakeStageShadow = true;
 
+	// メニュー非表示用
+	m_pHideInfo=new tdn2DAnim("Data/UI/GAME/HideInfo.png");
+	m_pHideInfo->OrderAlphaMove(150, 60, 90);
+	m_bHideUI = false;
+
 	// プレイヤーの読み込みが終わるまで待機
 	//PlayerLoadThread->join();
 
@@ -275,6 +280,7 @@ sceneMain::~sceneMain()
 	SAFE_DELETE(m_pMaskScreen);
 	SAFE_DELETE(m_pOverDriveStage);
 	//SAFE_DELETE(com);
+	SAFE_DELETE(m_pHideInfo);
 	// ウィンドウ覧
 	for (int i = 0; i < (int)BATTLE_WINDOW_TYPE::ARRAY_END; i++)
 	{
@@ -536,7 +542,10 @@ void sceneMain::Render()
 			}
 
 			// キャラクターより下に描画するUI
-			GameUIMgr->RenderBack();
+			if (m_bHideUI == false)
+			{
+				GameUIMgr->RenderBack();
+			}
 
 			// ストップウォッチ開始
 	
@@ -589,10 +598,10 @@ void sceneMain::Render()
 	// 手前のUI （約200->150）
 	//+---------------------------
 
-
 	NumberEffect.Render();
 	// PlayerMgr->RenderUI();		// (1206) コンボで使っていたが全てゲームUIで表示させたのでコメントアウト
-	if (m_pStateMachine->isInState(*SceneMainState::HeaveHoDriveOverFlowSuccess::GetInstance()) == false)
+	if (m_pStateMachine->isInState(*SceneMainState::HeaveHoDriveOverFlowSuccess::GetInstance()) == false &&
+		m_bHideUI == false)
 	{
 		GameUIMgr->Render();
 	}
