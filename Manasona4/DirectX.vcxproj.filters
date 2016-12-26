@@ -444,6 +444,9 @@
     <ClCompile Include="source\Window\TrainingDummyWindow.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="source\Window\ParamSetting\Training2\EnemyLvParamSetting.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\system\Framework.h">
@@ -954,6 +957,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="source\Window\TrainingDummyWindow.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Window\ParamSetting\Training2\EnemyLvParamSetting.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

@@ -46,7 +46,7 @@ namespace PlayerData
 		int iEnemyTech;
 		int iEnemyThrowTech;
 		int iEnemyGuardSwitch;
-		int ‹ó‚«˜g12;
+		int iEnemyLv;
 		int ‹ó‚«˜g13;
 		int ‹ó‚«˜g14;
 		int ‹ó‚«˜g15;

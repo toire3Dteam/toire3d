@@ -57,6 +57,9 @@ namespace Stand
 		tdn2DAnim* GetIcon() { return m_pIcon; }
 		tdn2DAnim* GetIconRip() { return m_pIconRip; }
 
+		//パートナーの種類
+		PARTNER GetPartnerType() { return m_ePartnerType; }
+
 	protected:
 		BasePlayer *m_pPlayer;	// 自分の実体を持っているプレイヤーへのポインタ
 		iex3DObj *m_pObj;		// 3D実体
@@ -83,6 +86,8 @@ namespace Stand
 		void LoadActionFrameList(char *filename);
 
 		AttackData *m_pAttackData[(int)SKILL_ACTION_TYPE::MAX];	// 攻撃データ
+
+		PARTNER m_ePartnerType;
 
 	private:
 		void StandGageUpdate();

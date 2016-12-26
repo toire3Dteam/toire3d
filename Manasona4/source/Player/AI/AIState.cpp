@@ -3,6 +3,7 @@
 #include "../../Player/BasePlayer.h"
 #include "../../Player/PlayerManager.h"
 #include "../BasePlayerState.h"
+#include "Stand\Stand.h"
 #include "Data\PlayerData.h"
 #include "Data\SelectData.h"
 
@@ -389,8 +390,7 @@ bool HardTypeChaseBrain(AI * pPerson)
 			// 相手が空中にいる場合は走っていようが歩いてでも当たる場所に行く
 			//float  nearLen = MyPlayer->AIAttackRange();	// 自分のキャラクターのレンジ
 
-
-			// ★（難易度に属する物）製作者の慈悲により絶対対空当てるマンを確立に
+			//TargetPlayer->GetRecoveryFrame
 
 			// 2分の1の確立で対空攻撃
 			if (tdnRandom::Get(0, 2) == 0)
@@ -1292,6 +1292,8 @@ void AIState::Wait::Enter(AI * pPerson)
 
 void AIState::Wait::Execute(AI * pPerson)
 {	
+
+
 	// 待機モーションになったら
 	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::Wait::GetInstance()) == true)
 	{
@@ -1335,6 +1337,42 @@ void AIState::Wait::Execute(AI * pPerson)
 				return;
 			}
 
+		}
+
+		// ★パートナーゲージが溜まっていて
+		// 相手にダメージが通る場合
+		// 低確率でパートナー発動
+			if (TargetPlayer->GetInvincibleTime() <= 0 &&
+				TargetPlayer->isAttackState() == false && 
+				MyPlayer->GetStand()->GetStandStock() >= 1)
+		{
+			// 確率 
+			int l_iPartnerPow = 0;
+			// 難易度による補正値
+			switch (pPerson->m_eAIType)
+			{
+			case AI_TYPE::CPU_EASY:
+				l_iPartnerPow = 5;
+				break;
+			case AI_TYPE::CPU_NORMAL:
+				l_iPartnerPow = 15;
+				break;
+			case AI_TYPE::CPU_HARD:
+				l_iPartnerPow = 25;
+				break;
+			case AI_TYPE::CPU_YOKOE:
+				l_iPartnerPow = 30;
+				break;
+			default:
+				break;
+			}
+
+			if (tdnRandom::Get(0, 100) <= l_iPartnerPow)
+			{
+				// パートナー発動モードに
+				pPerson->GetFSM()->ChangeState(AIState::PartnerAttack::GetInstance());
+				return;
+			}
 		}
 
 		// 相手にダメージが通る　かつ　低確率でスキル技も出してみる
@@ -2487,17 +2525,17 @@ void AIState::ThrowTech::Enter(AI * pPerson)
 		l_iRate += 15;
 		break;
 	case AI_TYPE::CPU_HARD:
-		l_iRate += -25;
+		l_iRate += -30;
 		break;
 	case AI_TYPE::CPU_YOKOE:
-		l_iRate += -40;
+		l_iRate += -50;
 		break;
 	default:
 		break;
 	}
 
 	// ↓の数値よりも下なら投げ抜けして
-	if (l_iRate <= 50)
+	if (l_iRate <= 40)
 	{
 		// 投げ抜け
 		pPerson->PushInputList(PLAYER_INPUT::A);
@@ -2573,9 +2611,9 @@ void AIState::SetThrow::Execute(AI * pPerson)
 	Vector3 TargetPos = pPerson->GetTargetPlayer()->GetPos();
 	Vector3 MyPos = MyPlayer->GetPos();
 
-	// 対空範囲内 (自分の攻撃範囲内)
-	enum { ABJUST = 3 };
-	if (abs(TargetPos.x - MyPos.x) < (MyPlayer->AIAttackRange() / ABJUST))
+	// 投げ範囲内 (自分の攻撃範囲内)
+	//enum { ABJUST = 2 };
+	if (abs(TargetPos.x - MyPos.x) < (MyPlayer->AIThrowRange() /*/ ABJUST*/))
 	{
 		// 投げ発動ステートへ！
 		pPerson->GetFSM()->ChangeState(AIState::Throw::GetInstance());
@@ -3743,6 +3781,142 @@ void AIState::BackStep::Render(AI * pPerson)
 }
 
 bool AIState::BackStep::OnMessage(AI * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+	//}
+	return false;
+}
+
+
+/*******************************************************/
+//			パートナー発動攻撃 ステート
+/*******************************************************/
+
+AIState::PartnerAttack * AIState::PartnerAttack::GetInstance()
+{
+	// ここに変数を作る
+	static AIState::PartnerAttack  instance;
+	return &instance;
+}
+
+void AIState::PartnerAttack::Enter(AI * pPerson)
+{
+	// ★ゲージがまだ溜まっていなかったら
+	if (MyPlayer->GetStand()->GetStandStock() == 0)
+	{
+		// 待機に戻る
+		pPerson->GetFSM()->ChangeState(AIState::Wait::GetInstance());
+		return;
+	}
+
+	// ここで現状の相手と自分のポジションで出す技を決める
+	// 現在存在する種類は　[近距離]　[中距離]　[遠距離]　[近距離空中]
+
+	// キャラクターのX軸での距離を取得
+	float l_fRange = Math::Length(TargetPlayer->GetPos().x, MyPlayer->GetPos().x);
+	enum
+	{
+		NEAR_RANGE = 25,
+		MIDDLE_RANGE = 40,
+		//FAR_RANGE = 80,
+	};
+
+	// 場所に伴ったコマンドを入力
+	bool l_bActionFlag = false;
+	if (l_fRange <= NEAR_RANGE)
+	{
+		// 近距離
+		switch (MyPlayer->GetStand()->GetPartnerType())
+		{
+		case PARTNER::MOKOI:
+			pPerson->PushInputList(PLAYER_INPUT::L1);
+			l_bActionFlag = true;
+			break;
+		case PARTNER::MAYA:
+			pPerson->PushInputList(PLAYER_INPUT::L1);
+			l_bActionFlag = true;
+			break;
+		case PARTNER::END:
+			break;
+		default:
+			break;
+		}
+
+	}
+	else if (l_fRange <= MIDDLE_RANGE)
+	{
+		// 中距離
+		switch (MyPlayer->GetStand()->GetPartnerType())
+		{
+		case PARTNER::MOKOI:
+			break;
+		case PARTNER::MAYA:
+			pPerson->PushInputList(PLAYER_INPUT::L1);
+			l_bActionFlag = true;
+			break;
+		case PARTNER::END:
+			break;
+		default:
+			break;
+		}
+
+	}
+	else
+	{
+		// 遠距離
+		switch (MyPlayer->GetStand()->GetPartnerType())
+		{
+		case PARTNER::MOKOI:
+			break;
+		case PARTNER::MAYA:
+			pPerson->PushInputList(PLAYER_INPUT::L1);
+			l_bActionFlag = true;
+			break;
+		case PARTNER::END:
+			break;
+		default:
+			break;
+		}
+	}
+
+
+	// 発動できる技がなかった
+	if (l_bActionFlag == false)
+	{
+		// もし当てはまった環境の技が設定されていなかった場合待機に戻る
+		//待機に戻る
+		pPerson->GetFSM()->ChangeState(AIState::Wait::GetInstance());
+		return;
+	}
+
+
+}
+
+void AIState::PartnerAttack::Execute(AI * pPerson)
+{
+	// 待機に戻ってたら
+	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::Wait::GetInstance()) == true)
+	{
+		// 待機に戻る
+		pPerson->GetFSM()->ChangeState(AIState::Wait::GetInstance());
+		return;
+	}
+
+}
+
+void AIState::PartnerAttack::Exit(AI * pPerson)
+{
+
+}
+
+void AIState::PartnerAttack::Render(AI * pPerson)
+{
+	tdnText::Draw(420, 610, 0xffffffff, "PartnerAttack");
+}
+
+bool AIState::PartnerAttack::OnMessage(AI * pPerson, const Message & msg)
 {
 	// メッセージタイプ
 	//switch (msg.Msg)

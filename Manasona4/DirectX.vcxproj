@@ -207,6 +207,7 @@
     <ClCompile Include="source\Window\ParamSetting\SEParamSetting.cpp" />
     <ClCompile Include="source\Window\ParamSetting\Training2\EnemyGuardParamSetting.cpp" />
     <ClCompile Include="source\Window\ParamSetting\Training2\EnemyGuardSwitchParamSetting.cpp" />
+    <ClCompile Include="source\Window\ParamSetting\Training2\EnemyLvParamSetting.cpp" />
     <ClCompile Include="source\Window\ParamSetting\Training2\EnemyStateParamSetting.cpp" />
     <ClCompile Include="source\Window\ParamSetting\Training2\TechParamSetting.cpp" />
     <ClCompile Include="source\Window\ParamSetting\Training2\ThrowTechParamSetting.cpp" />
@@ -378,6 +379,7 @@
     <ClInclude Include="source\Window\ParamSetting\SEParamSetting.h" />
     <ClInclude Include="source\Window\ParamSetting\Training2\EnemyGuardParamSetting.h" />
     <ClInclude Include="source\Window\ParamSetting\Training2\EnemyGuardSwitchParamSetting.h" />
+    <ClInclude Include="source\Window\ParamSetting\Training2\EnemyLvParamSetting.h" />
     <ClInclude Include="source\Window\ParamSetting\Training2\EnemyStateParamSetting.h" />
     <ClInclude Include="source\Window\ParamSetting\Training2\TechParamSetting.h" />
     <ClInclude Include="source\Window\ParamSetting\Training2\ThrowTechParamSetting.h" />

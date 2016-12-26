@@ -32,7 +32,7 @@ void EnemyStateParamSetting::Render(int x, int y, bool selectFlag)
 	// –îˆó•`‰æ
 	if (PlayerDataMgr->m_TrainingData.iEnemyState != (int)ENEMY_STATE_TYPE::STAND)
 		m_pLeftArrow->Render(x, y, 32, 32, 0, (32 * selectFlag), 32, 32);	// ¶
-	if (PlayerDataMgr->m_TrainingData.iEnemyState != (int)ENEMY_STATE_TYPE::ATTACK)
+	if (PlayerDataMgr->m_TrainingData.iEnemyState != (int)ENEMY_STATE_TYPE::COM)
 		m_pRightArrow->Render(x + m_iWidthSize, y, 32, 32, 32, (32 * selectFlag), 32, 32);	// ‰E
 
 																							// ‚±‚ê‚Í•¶Žš•\‹L‚Å•`‰æ
@@ -56,6 +56,9 @@ void EnemyStateParamSetting::Render(int x, int y, bool selectFlag)
 	case ENEMY_STATE_TYPE::ATTACK:
 		l_pString = "UŒ‚‚µ‘±‚¯‚é";
 		break;
+	case ENEMY_STATE_TYPE::COM:
+		l_pString = "COM";
+		break;
 	default:
 		break;
 	}
@@ -77,12 +80,12 @@ void EnemyStateParamSetting::Ctrl(int DeviceID)
 	if (m_bLeftPush)
 	{
 		PlayerDataMgr->m_TrainingData.iEnemyState = (PlayerDataMgr->m_TrainingData.iEnemyState > (int)ENEMY_STATE_TYPE::STAND)
-			? PlayerDataMgr->m_TrainingData.iEnemyState - 1 : (int)ENEMY_STATE_TYPE::ATTACK;
+			? PlayerDataMgr->m_TrainingData.iEnemyState - 1 : (int)ENEMY_STATE_TYPE::COM;
 	}
 	// ‰E‰Ÿ‚µ‚Ä‚½‚ç
 	if (m_bRightPush)
 	{
-		PlayerDataMgr->m_TrainingData.iEnemyState = (PlayerDataMgr->m_TrainingData.iEnemyState < (int)ENEMY_STATE_TYPE::ATTACK)
+		PlayerDataMgr->m_TrainingData.iEnemyState = (PlayerDataMgr->m_TrainingData.iEnemyState < (int)ENEMY_STATE_TYPE::COM)
 			? PlayerDataMgr->m_TrainingData.iEnemyState + 1 : (int)ENEMY_STATE_TYPE::STAND;
 	}
 }

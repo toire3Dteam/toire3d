@@ -203,6 +203,44 @@ void AI::UpdateTraining()
 		}
 
 		break;
+	case ENEMY_STATE_TYPE::COM:
+
+		// COMレベルによって強さを変える
+		if (PlayerDataMgr->m_TrainingData.iEnemyLv <= 30)
+		{
+			// 設定したタイプと違っていたら
+			if (m_eAIType != AI_TYPE::CPU_EASY)
+			{
+				ChangeAIType(AI_TYPE::CPU_EASY);
+			}
+		}
+		else if (PlayerDataMgr->m_TrainingData.iEnemyLv <= 60)
+		{
+			// 設定したタイプと違っていたら
+			if (m_eAIType != AI_TYPE::CPU_NORMAL)
+			{
+				ChangeAIType(AI_TYPE::CPU_NORMAL);
+			}
+		}
+		else if (PlayerDataMgr->m_TrainingData.iEnemyLv <= 85)
+		{
+			// 設定したタイプと違っていたら
+			if (m_eAIType != AI_TYPE::CPU_HARD)
+			{
+				ChangeAIType(AI_TYPE::CPU_HARD);
+			}
+		}
+		else 
+		{
+			// 設定したタイプと違っていたら
+			if (m_eAIType != AI_TYPE::CPU_YOKOE)
+			{
+				ChangeAIType(AI_TYPE::CPU_YOKOE);
+			}
+		}
+
+	
+		break;
 	default:
 		MyAssert(0, "そのタイプはない");
 		break;

@@ -48,7 +48,8 @@ m_pIcon(nullptr),
 m_pIconRip(nullptr),
 m_ActionType(SKILL_ACTION_TYPE::NO_ACTION),
 m_CurrentActionFrame(0),
-m_dir(DIR::LEFT)
+m_dir(DIR::LEFT),
+m_ePartnerType(PARTNER::MOKOI)
 {
 	FOR((int)SKILL_ACTION_TYPE::MAX) m_pAttackData[i] = nullptr;
 }
@@ -200,6 +201,9 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 	// モコイの実体
 	m_pObj = new iex3DObj("DATA/CHR/Stand/Mokoi/mokoi.IEM");
 	
+	// タイプ設定
+	m_ePartnerType = PARTNER::MOKOI;
+
 	// アクションフレームロードする
 	LoadActionFrameList("DATA/CHR/Stand/Mokoi/FrameList.txt");
 
@@ -284,6 +288,9 @@ Stand::Maya::Maya(BasePlayer *pPlayer) :Base(pPlayer)
 {
 	// マーヤの実体
 	m_pObj = new iex3DObj("DATA/CHR/Stand/Maya/maya.IEM");
+
+	// タイプ設定
+	m_ePartnerType = PARTNER::MAYA;
 
 	// 玉の実体
 	m_pBullet = new  MayaShotEffect();/*iexMesh("DATA/UVeffect/Airou/AirouBoost.IMO");*/

@@ -1102,6 +1102,40 @@ namespace AIState
 		BackStep& operator=(const BackStep&) {}
 	};
 
+
+	/*******************************************************/
+	//			パートナー発動ステート
+	/*******************************************************/
+	class PartnerAttack :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static PartnerAttack* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		PartnerAttack() {};
+		~PartnerAttack() {};
+
+		PartnerAttack(const PartnerAttack&) {}
+		PartnerAttack& operator=(const PartnerAttack&) {}
+	};
 }
 
 

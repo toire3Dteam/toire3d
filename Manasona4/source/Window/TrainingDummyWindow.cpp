@@ -9,13 +9,14 @@
 
 TrainingDummyWindow::TrainingDummyWindow(Vector2 vPos) :BaseWindow(vPos)
 {
-	m_pWindow = new tdn2DObj("Data/UI/Window/TrainingOption.png");
+	m_pWindow = new tdn2DObj("Data/UI/Window/trainingDummy.png");
 
 	//選択アイコンの長さ
 	m_iSelectLength = 70;
 
 	// ポーズウィンドウに存在するアイコンを詰めていく
 	AddIconData("相手の状態", "相手の状態を設定します。");
+	AddIconData("COMレベル", "相手の状態がCOMの場合、相手の強さを設定します。");
 	AddIconData("ガードの基本設定", "トレーニングダミーのガード条件を設定します。");
 	AddIconData("ガードの自動切り替え", "立ちガードとしゃがみガードの自動切り替えを設定します。");
 	AddIconData("受け身", "トレーニングダミーの受け身の設定を行います。");
@@ -26,16 +27,18 @@ TrainingDummyWindow::TrainingDummyWindow(Vector2 vPos) :BaseWindow(vPos)
 
 
 	m_pEStateParam = new EnemyStateParamSetting(1, 400);
-	m_pEGuardParam = new EnemyGuardParamSetting(2, 400);
-	m_pEGuardSwitchParam = new EnemyGuardSwitchParamSetting(3, 400);
-	m_pETechParam = new TechParamSetting(4, 400);
-	m_pEThrowTechParam = new ThrowTechParamSetting(5, 400);
+	m_pELvParam = new EnemyLvParamSetting(2, 400);
+	m_pEGuardParam = new EnemyGuardParamSetting(3, 400);
+	m_pEGuardSwitchParam = new EnemyGuardSwitchParamSetting(4, 400);
+	m_pETechParam = new TechParamSetting(5, 400);
+	m_pEThrowTechParam = new ThrowTechParamSetting(6, 400);
 
 }
 
 TrainingDummyWindow::~TrainingDummyWindow()
 {
 	SAFE_DELETE(m_pEStateParam);
+	SAFE_DELETE(m_pELvParam);
 	SAFE_DELETE(m_pEGuardParam);
 	SAFE_DELETE(m_pEGuardSwitchParam);
 	SAFE_DELETE(m_pETechParam);
@@ -64,6 +67,7 @@ bool TrainingDummyWindow::Update()
 
 	// パラメーター更新
 	m_pEStateParam->Update();
+	m_pELvParam->Update();
 	m_pEGuardParam->Update();
 	m_pEGuardSwitchParam->Update();
 	m_pETechParam->Update();
@@ -224,6 +228,7 @@ bool  TrainingDummyWindow::Ctrl(int DeviceID)
 			{
 				// 決定ボタンで初期設定に戻します。
 				PlayerDataMgr->m_TrainingData.iEnemyState = (int)ENEMY_STATE_TYPE::STAND;
+				PlayerDataMgr->m_TrainingData.iEnemyLv= (int)50;
 				PlayerDataMgr->m_TrainingData.iEnemyGuard = (int)ENEMY_GUARD_TYPE::NO;
 				PlayerDataMgr->m_TrainingData.iEnemyGuardSwitch = (int)ENEMY_GUARD_SWITCH_TYPE::OK;
 				PlayerDataMgr->m_TrainingData.iEnemyTech = (int)ENEMY_TECH_TYPE::ALL;
@@ -318,6 +323,9 @@ void TrainingDummyWindow::RenderParamSetting(int No, int x, int y)
 	case TRAINING_DUMMY_STATE::ENEMY_STATE:
 		m_pEStateParam->Render(x, y, bSelect);
 		break;
+	case TRAINING_DUMMY_STATE::ENEMY_LV:
+		m_pELvParam->Render(x, y, bSelect);
+		break;
 	case TRAINING_DUMMY_STATE::ENEMY_GUARD:
 		m_pEGuardParam->Render(x, y, bSelect);
 		break;
@@ -345,6 +353,9 @@ void TrainingDummyWindow::CtrlParamSetting(int SelectNo, int DeviceID)
 	{
 	case TRAINING_DUMMY_STATE::ENEMY_STATE:
 		m_pEStateParam->Ctrl(DeviceID);
+		break;
+	case TRAINING_DUMMY_STATE::ENEMY_LV:
+		m_pELvParam->Ctrl(DeviceID);
 		break;
 	case TRAINING_DUMMY_STATE::ENEMY_GUARD:
 		m_pEGuardParam->Ctrl(DeviceID);

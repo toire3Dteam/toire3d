@@ -88,6 +88,7 @@ enum class ENEMY_STATE_TYPE
 	SQUAT,		// しゃがみ状態
 	JUMP,		// ジャンプし続ける
 	ATTACK,		// 一定間隔で攻撃
+	COM,		// コンピュータ
 };
 
 // 敵のガードの設定

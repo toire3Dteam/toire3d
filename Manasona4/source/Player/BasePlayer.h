@@ -515,6 +515,7 @@ public:
 
 	virtual float AIAttackRange() = 0;		// 攻撃範囲
 	virtual float AIRunAttackRange() = 0;	// 走ってるときの攻撃範囲
+	virtual float AIThrowRange() = 0;		// 投げの範囲
 
 	//void AI_Brain();	// ここで考え->行動の処理を行う
 	//void AI_Think();	// 考える関数

@@ -170,6 +170,7 @@ public:
 	// AIの攻撃範囲
 	float AIAttackRange() { return 20; }
 	float AIRunAttackRange() { return 35; }
+	float AIThrowRange() { return 6; }
 
 private:
 	// 純粋仮想関数オーバーライド
