@@ -105,6 +105,7 @@ struct HIT_ATTACK_INFO
 	int iHitStopFrame;		// ヒットストップフレーム
 	int HitScore;			// 加算されるスコア
 	bool bOverDrive;		// フィニッシュアタック
+	bool bFirstAttack;		// (12/27)最初の一撃かどうか
 };
 
 // プレイヤーInfo

@@ -687,6 +687,7 @@ public:
 	float GetDamageRate(){ return m_fDamageRate; }
 	void AddDamageRate(float rate){ m_fDamageRate = min(m_fDamageRate + rate, 1);}		// ‰ÁZ(1.0ˆÈã‚É‚È‚ç‚È‚¢‚æ‚¤‚É‚·‚é)
 	void MultDamageRate(float rate){ m_fDamageRate = max(m_fDamageRate * rate, 0.3f); }	// æZ(0.3ˆÈ‰º‚É‚Í‚È‚ç‚È‚¢‚æ‚¤‚É‚·‚é)
+	//void MultOverDriveDamageRate(float rate) { m_fDamageRate = max(m_fDamageRate * rate, 0.5f); }	// •KE‹Z‚ÍÅ’á•Ûá’l‚ğã‚°‚é
 	void ResetDamageRate(){ m_fDamageRate = 1.0f; }
 	// HP‚ÌŠ„‡
 	int  GetHPPercentage()

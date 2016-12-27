@@ -947,6 +947,36 @@ void SceneMainState::TrainingIntro::Enter(sceneMain *pMain)
 	// 情報初期化
 	pMain->Reset();
 
+	// ゴリ君
+	// SPゲージも初期化
+	PlayerMgr->GetPlayer(SIDE::LEFT)->SetOverDriveGage(0);
+	PlayerMgr->GetPlayer(SIDE::RIGHT)->SetOverDriveGage(0);
+
+	// 十字キーおしっぱで初期位置を変える
+	// パッド分更新
+	// スティックの取得
+	float x, y;
+	int NumDevice(tdnInputManager::GetNumDevice());
+	if (NumDevice == 0)NumDevice = 1;// デバイスがなかったら仮想で1つ追加
+	for (int i = 0; i < NumDevice; i++)
+	{
+		// 
+		tdnInput::GetAxisXYf(&x, &y, i);
+		static const float gosa(.2f);
+		if (x > .5f - gosa||
+			tdnInput::KeyGet(KEYCODE::KEY_RIGHT, i) == 1)
+		{
+			PlayerMgr->GetPlayer(SIDE::LEFT)->SetPos(Vector3(60, 0, 0));
+			PlayerMgr->GetPlayer(SIDE::RIGHT)->SetPos(Vector3(97.5, 0, 0));
+		}
+		else if (x < -.5f + gosa ||
+			tdnInput::KeyGet(KEYCODE::KEY_LEFT, i) == 1)
+		{
+			PlayerMgr->GetPlayer(SIDE::LEFT)->SetPos(Vector3(-97.5, 0, 0));
+			PlayerMgr->GetPlayer(SIDE::RIGHT)->SetPos(Vector3(-60, 0, 0));
+		}
+	}
+
 
 	// トレーニングへ
 	pMain->GetFSM()->ChangeState(Training::GetInstance());

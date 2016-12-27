@@ -105,6 +105,7 @@ private:
 	friend class AIState::PracticeGlobal;
 	friend class AIState::PracticeLand;
 	friend class AIState::PracticeSquat;
+	friend class AIState::PracticeJump;
 	friend class AIState::PracticeAttack;
 	friend class AIState::PracticeGuard;
 	friend class AIState::Wait;

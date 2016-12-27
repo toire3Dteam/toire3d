@@ -278,6 +278,9 @@ void Stand::Mokoi::Action(SKILL_ACTION_TYPE type)
 	m_pObj->SetMotion(0);
 	m_pObj->SetPos(m_pos);
 	m_pObj->Update();
+
+	// ‹ó’†ƒWƒƒƒ“ƒv•œŠˆ
+	m_pPlayer->SetAerialJump(true);
 }
 
 

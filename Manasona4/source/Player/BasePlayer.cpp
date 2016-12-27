@@ -488,7 +488,6 @@ void BasePlayer::Reset()
 	memcpy_s(&m_tagCharacterParam, sizeof(CharacterParam), &m_tagOrgCharacterParam, sizeof(CharacterParam));
 	m_vMove.Set(0, 0, 0);
 
-
 	// ID‚ÅÀ•W‚Ì•ªŠò
 	switch ((int)m_side)
 	{
@@ -2144,7 +2143,7 @@ void BasePlayer::WillPowerUpdate(PLAYER_UPDATE updateFlag)
 		m_pUVEffectMGR->StopEffectRoop(UV_EFFECT_TYPE::WILL_POWER_AURA);
 	
 		m_iSpGettingFrame++;
-		if (m_iSpGettingFrame >= 45)//1202
+		if (m_iSpGettingFrame >= 60)//1202
 		{
 			m_iSpGettingFrame = 0;
 			m_OverDriveGage += 1;// SPƒQ[ƒW‚ğ‘«‚·

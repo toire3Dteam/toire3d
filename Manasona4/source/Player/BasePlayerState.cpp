@@ -9,7 +9,7 @@
 #include "../Camera/camera.h"
 
 // 定数
-static const float REPEAT_ATTACK_RATE = 0.85f;		// 同じ攻撃当たるなレート
+static const float REPEAT_ATTACK_RATE = 0.75f;		// 同じ攻撃当たるなレート　(12/26) 同技補正を強く
 
 /*******************************************************/
 //	ファンクション
@@ -751,12 +751,6 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 
 									 HIT_DAMAGE_INFO *HitDamageInfo = (HIT_DAMAGE_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
 
-									 // ★ダメージを与えた人に送り返す(ガードしても必殺が発動するバグを直すために、このHandleMessageを受け取ったら発動という風にする)
-									 HIT_ATTACK_INFO HitAttackInfo;
-									 HitAttackInfo.bOverDrive = HitDamageInfo->bOverDrive;
-									 HitAttackInfo.HitScore = HitDamageInfo->damage;
-									 HitAttackInfo.iHitStopFrame = HitDamageInfo->iHitStopFrame;
-									 MsgMgr->Dispatch(0, msg.Receiver, msg.Sender, MESSAGE_TYPE::HIT_ATTACK, &HitAttackInfo);
 									 
 									 // ダメージSEの再生
 									 LPCSTR seID = HitDamageInfo->HitSE;
@@ -785,8 +779,19 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 // 硬直フレーム設定
 									 int RecoveryFrame(HitDamageInfo->HitRecoveryFrame);
 
-									 // ダメージ
-									 int damage((int)(HitDamageInfo->damage * pPerson->GetDamageRate()));							// ★自分のダメージレートにかけ合わせる
+									 // ダメージ		
+									 int damage = 0;
+									 // ★ (12/27) 必殺技の場合レート値を底上げする
+									 if (HitDamageInfo->bOverDrive == true)
+									 {
+										 // 底上げ
+										 damage = (int)(HitDamageInfo->damage * max(pPerson->GetDamageRate(), 0.35f));							// ★自分のダメージレートにかけ合わせる
+									 }
+									 else
+									 {
+										 damage = (int)(HitDamageInfo->damage * pPerson->GetDamageRate());
+									 }
+
 
 #ifdef _DEBUG
 									 // 数字エフェクト追加
@@ -826,6 +831,25 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 											 damage += BasePlayer::c_FIRST_HIT_ADD_DAMAGE;	// 初段だけダメージを増やす
 									 }
 
+									 // (12/27) ★初段ダメージとかが欲しかったのでこちらに移動
+									 // ★ダメージを与えた人に送り返す(ガードしても必殺が発動するバグを直すために、このHandleMessageを受け取ったら発動という風にする)
+									 HIT_ATTACK_INFO HitAttackInfo;
+									 HitAttackInfo.bOverDrive = HitDamageInfo->bOverDrive;
+									 HitAttackInfo.HitScore = damage;// ↑の補正した値を送る
+									 HitAttackInfo.iHitStopFrame = HitDamageInfo->iHitStopFrame;
+									 if (pPerson->GetRecoveryDamageCount()->empty())
+									 {
+										 HitAttackInfo.bFirstAttack = true;
+									 }
+									 else
+									 {
+										 HitAttackInfo.bFirstAttack = false;
+									 }
+
+									 MsgMgr->Dispatch(0, msg.Receiver, msg.Sender, MESSAGE_TYPE::HIT_ATTACK, &HitAttackInfo);
+
+
+
 									 comboDesk.side = pPerson->GetSide();
 									 comboDesk.damage = damage;
 									 comboDesk.recoveryFrame = RecoveryFrame;
@@ -849,9 +873,12 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 										 pPerson->SetInvincible(90, 1);
 									 }
 
-									 // ダメージ処理
-									 pPerson->MultDamageRate(HitDamageInfo->fComboRate);						// ダメージレートを受けた技のレートで乗算する(だんだんダメージが減っていく)
-
+					
+									 {
+										 // 次のダメージ補正処理
+										 pPerson->MultDamageRate(HitDamageInfo->fComboRate);						// ダメージレートを受けた技のレートで乗算する(だんだんダメージが減っていく)
+									 }
+									
 									 const int DamagedHP(max(pPerson->GetHP() - damage, 0));
 									 // ダメージを受けた後のHPを設定
 									 pPerson->SetHP(DamagedHP);
@@ -878,27 +905,42 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 {
 
 										 // 受けたダメージでもSPゲージ少し上昇
-										 if (damage <= 50)
+										 if (damage <= 25)
 										 {
 											// なし
+										 }
+										 else if (damage <= 100)
+										 {
+											 pPerson->AddOverDriveGage(0.25f);
 										 }
 										 else if (damage <= 200)
 										 {
 											 pPerson->AddOverDriveGage(0.5f);
 										 }
-										 else if (damage <= 500)
+										 else if (damage <= 350)
 										 {
 											 pPerson->AddOverDriveGage(1);
 
 										 }
-										 else if (damage <= 900)
+										 else if (damage <= 500)
+										 {
+											 pPerson->AddOverDriveGage(1.25f);
+
+										 }
+
+										 else if (damage <= 700)
 										 {
 											 pPerson->AddOverDriveGage(1.5f);
 
 										 }
+										 else if (damage <= 900)
+										 {
+											 pPerson->AddOverDriveGage(2.0f);
+
+										 }
 										 else 
 										 {
-											 pPerson->AddOverDriveGage(2.5f);
+											 pPerson->AddOverDriveGage(3.0f);
 										 }
 
 										 switch (HitDamageInfo->DamageMotion)
@@ -938,18 +980,41 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 // 必殺以外
 									 else
 									 {
+										 // 最初の一回はボーナスでSP上昇
+										 if (HitAttackInfo->bFirstAttack == true)
+										 {
+											 pPerson->AddOverDriveGage(5);
+										 }
+
 										 // 攻撃を当ててSPゲージ上昇だ！
-										 if (HitAttackInfo->HitScore <= 100)
+										 if (HitAttackInfo->HitScore <= 50)
+										 {
+											 pPerson->AddOverDriveGage(0.5f);
+										 }
+										 else if (HitAttackInfo->HitScore <= 100)
 										 {
 											 pPerson->AddOverDriveGage(1);
 										 }
 										 else if (HitAttackInfo->HitScore <= 200)
 										 {
-											 pPerson->AddOverDriveGage(2);
+											 pPerson->AddOverDriveGage(2.0f);
+										 }
+										 else if (HitAttackInfo->HitScore <= 300)
+										 {
+											 pPerson->AddOverDriveGage(2.25f);
+										 }
+										 else if (HitAttackInfo->HitScore <= 400)
+										 {
+											 pPerson->AddOverDriveGage(2.5f);
 										 }
 										 else if (HitAttackInfo->HitScore <= 500)
 										 {
-											 pPerson->AddOverDriveGage(3);
+											 pPerson->AddOverDriveGage(4);
+
+										 }
+										 else if (HitAttackInfo->HitScore <= 700)
+										 {
+											 pPerson->AddOverDriveGage(4.5);
 
 										 }
 										 else if (HitAttackInfo->HitScore <= 900)
@@ -957,13 +1022,18 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 											 pPerson->AddOverDriveGage(5);
 
 										 }
-										 else if (HitAttackInfo->HitScore <= 1200)
+										 else if (HitAttackInfo->HitScore <= 1000)
 										 {
 											 pPerson->AddOverDriveGage(6);
+
+										 }
+										 else if (HitAttackInfo->HitScore <= 1200)
+										 {
+											 pPerson->AddOverDriveGage(6.5f);
 										 }
 										 else
 										 {
-											 pPerson->AddOverDriveGage(8);
+											 pPerson->AddOverDriveGage(7);
 										 }
 									 }
 
@@ -3161,7 +3231,7 @@ void BasePlayerState::AerialRecovery::Enter(BasePlayer * pPerson)
 
 	// リカバー中は無敵！！！
 	//pPerson->SetInvincibleLV(1);
-	pPerson->SetInvincible(90, 1);
+	pPerson->SetInvincible(60, 1);
 
 	Vector3 move;
 	move = pPerson->GetMove()*0.25f;
@@ -3494,7 +3564,7 @@ void BasePlayerState::AntiAirAttack::Execute(BasePlayer * pPerson)
 		//////////////////////////////////////////////
 		//	どっこい攻撃と足払いキャンセル
 		//============================================
-		if (DokkoiAttackCancel(pPerson)) return;
+		//if (DokkoiAttackCancel(pPerson)) return;// (12/26) 対空を特殊技扱いにするとどうなるのか
 
 		//////////////////////////////////////////////
 		//	ヒーホードライブキャンセル
@@ -3688,7 +3758,7 @@ void BasePlayerState::DokkoiAttack::Execute(BasePlayer * pPerson)
 		//////////////////////////////////////////////
 		//	スタンドキャンセル
 		//============================================
-		if (StandCancel(pPerson)) return;
+		if (StandCancel(pPerson)) return;   // (12/26) かなりダメージが伸びるなら後でなしに
 
 		//////////////////////////////////////////////
 		//	必殺キャンセル
@@ -4449,7 +4519,11 @@ void BasePlayerState::OverDrive_OneMore::Enter(BasePlayer * pPerson)
 		it = TargetPlayerDamageCount->erase(it);
 
 	// コンボ補正に0.5足す(1.0以上にはならない)
-	pPerson->GetTargetPlayer()->AddDamageRate(0.5f);
+	//pPerson->GetTargetPlayer()->AddDamageRate(0.5f);
+
+	// (12/26) インフレ化しているので調整を試み中
+	pPerson->GetTargetPlayer()->AddDamageRate(0.35f);
+
 }
 
 void BasePlayerState::OverDrive_OneMore::Execute(BasePlayer * pPerson)
@@ -4863,7 +4937,7 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 										 case 0:
 											 seID = "ガード小";
 											 // ガードでゲージ回復（小）
-											 pPerson->AddOverDriveGage(0.25f);
+											 pPerson->AddOverDriveGage(0.35f);
 											 // 攻撃した相手側は防御側よりも多く獲得
 											 pPerson->GetTargetPlayer()->AddOverDriveGage(0.5f);
 											 break;
@@ -4872,12 +4946,14 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 											 // ガードでゲージ回復（中）
 											 pPerson->AddOverDriveGage(0.5f);
 											 // 攻撃した相手側は防御側よりも多く獲得
-											 pPerson->GetTargetPlayer()->AddOverDriveGage(0.5f);
+											 pPerson->GetTargetPlayer()->AddOverDriveGage(0.75f);
 											 break;
 										 case 2:
 											 seID = "ガード強";
 											 // ガードでゲージ回復（強）
 											 pPerson->AddOverDriveGage(1.0f);
+											 // 攻撃した相手側は防御側よりも多く獲得
+											 pPerson->GetTargetPlayer()->AddOverDriveGage(1.0f);
 											 break;
 
 										 }

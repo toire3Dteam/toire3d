@@ -675,8 +675,10 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 		pPerson->m_iPracticeGuardFrame = 0;
 	}
 
-	// 練習用ガードフラグが立ってたら　
-	if (pPerson->m_bPracticeGuardFlag == true /*&& MyPlayer->GetRecoveryFrame() <= 0　ガード硬直も含むのでなし*/)
+	// 練習用ガードフラグが立ってたら+地上にいたら　
+	if (pPerson->m_bPracticeGuardFlag == true &&
+		MyPlayer->isLand() == true && 
+		MyPlayer->GetFSM()->isInState(*BasePlayerState::Jump::GetInstance()) == false)
 	{
 		pPerson->m_iPracticeGuardFrame++;
 
@@ -790,13 +792,16 @@ void AIState::PracticeJump::Execute(AI * pPerson)
 		pPerson->PushInputList(PLAYER_INPUT::B);
 	}
 
-	// 地上に付いたらジャンプする
-	if (MyPlayer->isLand())
+	// ガード状態じゃなかったら
+	if (pPerson->m_bPracticeGuardFlag == false)
 	{
-		// ジャンプ
-		pPerson->PushInputList(PLAYER_INPUT::UP);
+		// 地上に付いたらジャンプする
+		if (MyPlayer->isLand())
+		{
+			// ジャンプ
+			pPerson->PushInputList(PLAYER_INPUT::UP);
+		}
 	}
-
 }
 
 void AIState::PracticeJump::Exit(AI * pPerson)
