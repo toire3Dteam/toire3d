@@ -69,6 +69,13 @@ void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage, SideData Side
 		m_pPlayers[i]->InitMotionDatas();		// 各キャラごとのモーション番号
 	}
 
+	// キャラが被ってたら2Pの色を変える
+	if (SideDatas[(int)SIDE::LEFT].eCharacter== SideDatas[(int)SIDE::RIGHT].eCharacter)
+	{
+		m_pPlayers[(int)SIDE::RIGHT]->ChangeColor();
+	}
+
+
 	// プレイヤーが2人という前提のコード
 	assert(NumPlayer == 2);
 	m_pPlayers[0]->SetTargetPlayer(m_pPlayers[1]);
@@ -142,7 +149,7 @@ void PlayerManager::Update(PLAYER_UPDATE flag)
 	//CalcTeamPoint();
 }
 
-// トレーニングの時のみ更新
+// トレーニング・練習の時のみ更新
 void PlayerManager::UpdateTraining()
 {
 	// (仮)
@@ -163,7 +170,7 @@ void PlayerManager::UpdateTraining()
 	}
 
 	// 自動回復かどうか
-	if (PlayerDataMgr->m_TrainingData.iHpRecovery == (int)HP_RECOVERY_TYPE::AUTO_RECOVERY)
+	if (SelectDataMgr->Get()->tagTrainingDatas.eHpRecovery == HP_RECOVERY_TYPE::AUTO_RECOVERY)
 	{
 
 		FOR(m_NumPlayer)
@@ -181,8 +188,8 @@ void PlayerManager::UpdateTraining()
 
 
 	// 設定した最大HPより多かったら減らす
-	float fHpPersent1P = (float)(PlayerDataMgr->m_TrainingData.iHp1P) / (float)(100);
-	float fHpPersent2P = (float)(PlayerDataMgr->m_TrainingData.iHp2P) / (float)(100);
+	float fHpPersent1P = (float)(SelectDataMgr->Get()->tagTrainingDatas.iHp1P) / (float)(100);
+	float fHpPersent2P = (float)(SelectDataMgr->Get()->tagTrainingDatas.iHp2P) / (float)(100);
 	float fTrainingMaxHp1P = m_pPlayers[(int)SIDE::LEFT]->GetMaxHP()*fHpPersent1P;
 	float fTrainingMaxHp2P = m_pPlayers[(int)SIDE::RIGHT]->GetMaxHP()*fHpPersent2P;
 
@@ -209,9 +216,9 @@ void PlayerManager::UpdateTraining()
 			if (m_pPlayers[i]->isAttackState() == false && 
 				m_pPlayers[i]->GetStand()->isActive() == false)
 			{
-				if (m_pPlayers[i]->GetOverDriveGage() < PlayerDataMgr->m_TrainingData.iSpGage)
+				if (m_pPlayers[i]->GetOverDriveGage() < SelectDataMgr->Get()->tagTrainingDatas.iSpGage)
 				{
-					m_pPlayers[i]->SetOverDriveGage((float)PlayerDataMgr->m_TrainingData.iSpGage);
+					m_pPlayers[i]->SetOverDriveGage((float)SelectDataMgr->Get()->tagTrainingDatas.iSpGage);
 				}
 			}
 		}
@@ -219,7 +226,7 @@ void PlayerManager::UpdateTraining()
 	
 
 	// パートナーゲージをMAX固定にしていたら
-	if (PlayerDataMgr->m_TrainingData.iPartnerRecovery == (int)PARTNER_RECOVERY_TYPE::MAX)
+	if (SelectDataMgr->Get()->tagTrainingDatas.ePartnerRecovery == PARTNER_RECOVERY_TYPE::MAX)
 	{
 		// お互いの硬直が解けたら
 		if (m_pPlayers[(int)SIDE::LEFT]->GetRecoveryFrame() <= 0 &&
@@ -321,7 +328,7 @@ void PlayerManager::RenderTraining()
 
 
 	// 全ての情報を描画
-	if (PlayerDataMgr->m_TrainingData.iInfo == (int)TRAINING_INFO_TYPE::ALL)
+	if (SelectDataMgr->Get()->tagTrainingDatas.eTrainingInfo == TRAINING_INFO_TYPE::ALL)
 	{
 		// コマンド覆歴
 		m_pPlayers[(int)eOrderSide]->RenderCommandFrame(10, 625);
@@ -351,13 +358,13 @@ void PlayerManager::RenderTraining()
 		tdnFont::RenderString(pStr.c_str(), "HGS創英角ｺﾞｼｯｸUB", 24, iFontX, iFontY, 0xffeeeeee, RS::COPY);
 
 	}
-	else if (PlayerDataMgr->m_TrainingData.iInfo == (int)TRAINING_INFO_TYPE::COMMAND)
+	else if (SelectDataMgr->Get()->tagTrainingDatas.eTrainingInfo == TRAINING_INFO_TYPE::COMMAND)
 	{
 		// コマンド覆歴
 		m_pPlayers[(int)eOrderSide]->RenderCommandFrame(10, 625);
 
 	}
-	else if (PlayerDataMgr->m_TrainingData.iInfo == (int)TRAINING_INFO_TYPE::DAMEGE)
+	else if (SelectDataMgr->Get()->tagTrainingDatas.eTrainingInfo == TRAINING_INFO_TYPE::DAMEGE)
 	{
 
 		// ダメージのインフォメーションの裏に添えるプレート

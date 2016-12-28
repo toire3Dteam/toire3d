@@ -232,3 +232,81 @@ public:
 private:
 
 };
+
+//+-----------------------------
+//	ラッシュ攻撃の説明
+//+-----------------------------
+class  RushTutorial :public BaseTutorial
+{
+public:
+	RushTutorial();
+	~RushTutorial() {};
+
+	void Init(int iDeviceID = 0);
+
+	// それぞれのタスクをここで作る
+	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
+
+private:
+
+};
+
+
+//+-----------------------------
+//	立ちガードの説明
+//+-----------------------------
+class  StandGuardTutorial :public BaseTutorial
+{
+public:
+	StandGuardTutorial();
+	~StandGuardTutorial() {};
+
+	void Init(int iDeviceID = 0);
+
+	// それぞれのタスクをここで作る
+	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
+
+private:
+
+	bool m_bStop;
+	int m_iCount;
+};
+
+//+-----------------------------
+//	しゃがみガードの説明
+//+-----------------------------
+class  SquatGuardTutorial :public BaseTutorial
+{
+public:
+	SquatGuardTutorial();
+	~SquatGuardTutorial() {};
+
+	void Init(int iDeviceID = 0);
+
+	// それぞれのタスクをここで作る
+	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
+
+private:
+
+	bool m_bStop;
+	int m_iCount;
+};
+
+//+-----------------------------
+//	回避の説明
+//+-----------------------------
+class  EscapeTutorial :public BaseTutorial
+{
+public:
+	EscapeTutorial();
+	~EscapeTutorial() {};
+
+	void Init(int iDeviceID = 0);
+
+	// それぞれのタスクをここで作る
+	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
+
+private:
+
+
+};

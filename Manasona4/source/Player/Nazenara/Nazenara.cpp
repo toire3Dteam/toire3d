@@ -53,13 +53,7 @@ Nazenara::Nazenara(SIDE side, const SideData &data) :BasePlayer(side, data), m_p
 	m_pGodHandWind = new CycloneEffect;
 	m_pGodHandImpact = new FireRingEffect;
 
-	if (m_side == SIDE::RIGHT)
-	{
-		LPSTR path("DATA/CHR/Nazenara/tex_nazenaraba4.png");
-		m_pDefaultObj->SetTexture(tdnTexture::Load(path), 0);
-		m_pHHDOFObj->SetTexture(tdnTexture::Load(path), 0);
-		m_pArm->SetTexture(tdnTexture::Load(path), 0);
-	}
+
 }
 
 void Nazenara::Reset()
@@ -761,6 +755,14 @@ void Nazenara::RenderDrive()
 
 	// ˆêŒ‚•KŽE•`‰æ
 	if (m_pOverFlow) m_pOverFlow->Render();
+}
+
+void Nazenara::ChangeColor()
+{
+	LPSTR path("DATA/CHR/Nazenara/tex_nazenaraba4.png");
+	m_pDefaultObj->SetTexture(tdnTexture::Load(path), 0);
+	m_pHHDOFObj->SetTexture(tdnTexture::Load(path), 0);
+	m_pArm->SetTexture(tdnTexture::Load(path), 0);	
 }
 
 void Nazenara::InitMotionDatas()

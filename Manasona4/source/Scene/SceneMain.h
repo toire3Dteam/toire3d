@@ -62,6 +62,9 @@ public:
 
 	void Reset();
 	
+	void InitTrainingData();	// ★トレーニングデータを適用
+
+
 	// ステートマシン取得
 	StateMachine<sceneMain> *GetFSM(){ return m_pStateMachine; }
 

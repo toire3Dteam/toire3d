@@ -4740,6 +4740,9 @@ void BasePlayerState::Guard::Enter(BasePlayer * pPerson)
 		pPerson->SetGuardState(GUARD_STATE::UP_GUARD);
 	}
 
+	// ガード成功フラグ初期化
+	pPerson->SetGuardSuccess(false);
+
 }
 
 void BasePlayerState::Guard::Execute(BasePlayer * pPerson)
@@ -4776,7 +4779,7 @@ void BasePlayerState::Guard::Execute(BasePlayer * pPerson)
 		if (DokkoiAttackCancel(pPerson)) return;
 
 
-		// ジャンプはここでキャンセルしたら意地悪なのでなし（空中ガードない）
+		// ジャンプはここでキャンセルしたら意地悪なのでなし（空中ガードないから）
 		
 	}
 
@@ -4878,6 +4881,10 @@ void BasePlayerState::Guard::Exit(BasePlayer * pPerson)
 	pPerson->SetGuardState(GUARD_STATE::NO_GUARD);// ガード状態解除
 
 	pPerson->GuardEffectStop();
+
+	// ガード成功フラグ初期化
+	pPerson->SetGuardSuccess(false);
+
 }
 
 void BasePlayerState::Guard::Render(BasePlayer * pPerson)
@@ -4903,20 +4910,21 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 										 return false;	// ダメージ喰らってどうぞ
 									 }
 
-									 bool bGuardSuccess(false);
+									 // ガード成功フラグ初期化
+									 pPerson->SetGuardSuccess(false);
 									 if (pPerson->GetGuardState() == GUARD_STATE::UP_GUARD)
 									 {
 										 // ★相手が立ちガードしてて、下段攻撃じゃなかったらガード成功！
-										 if (HitDamageInfo->iAntiGuard != (int)ANTIGUARD_ATTACK::DOWN_ATTACK) bGuardSuccess = true;
+										 if (HitDamageInfo->iAntiGuard != (int)ANTIGUARD_ATTACK::DOWN_ATTACK) pPerson->SetGuardSuccess(true);
 									 }
 									 else if (pPerson->GetGuardState() == GUARD_STATE::DOWN_GUARD)
 									 {
 										 // ★相手がしゃがみガードしてて、上段攻撃じゃなかったらガード成功！
-										 if (HitDamageInfo->iAntiGuard != (int)ANTIGUARD_ATTACK::UP_ATTACK) bGuardSuccess = true;
+										 if (HitDamageInfo->iAntiGuard != (int)ANTIGUARD_ATTACK::UP_ATTACK) pPerson->SetGuardSuccess(true);
 									 }
 
 									 // ★ガード成功してたら！！！
-									 if (bGuardSuccess)
+									 if (pPerson->isGuardSuccess() == true)
 									 {
 										 // ガードした時にモーションをサッっと変える
 										 /* しゃがみガード */

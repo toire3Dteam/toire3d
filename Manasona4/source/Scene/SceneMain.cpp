@@ -792,3 +792,24 @@ void sceneMain::Reset()
 	ParticleManager::Reset();
 	GameUIMgr->TimerReset();
 }
+
+void sceneMain::InitTrainingData()
+{
+	// HP・SP
+	SelectDataMgr->Get()->tagTrainingDatas.eHpRecovery = (HP_RECOVERY_TYPE)PlayerDataMgr->m_TrainingData.iHpRecovery;
+	SelectDataMgr->Get()->tagTrainingDatas.ePartnerRecovery= (PARTNER_RECOVERY_TYPE)PlayerDataMgr->m_TrainingData.iPartnerRecovery;
+	SelectDataMgr->Get()->tagTrainingDatas.eTrainingInfo = (TRAINING_INFO_TYPE)PlayerDataMgr->m_TrainingData.iInfo;
+	SelectDataMgr->Get()->tagTrainingDatas.iHp1P = PlayerDataMgr->m_TrainingData.iHp1P;
+	SelectDataMgr->Get()->tagTrainingDatas.iHp2P = PlayerDataMgr->m_TrainingData.iHp2P;
+	SelectDataMgr->Get()->tagTrainingDatas.iSpGage = PlayerDataMgr->m_TrainingData.iSpGage;
+
+	// ダミー
+	SelectDataMgr->Get()->tagTrainingDatas.eEnemyState = (ENEMY_STATE_TYPE)PlayerDataMgr->m_TrainingData.iEnemyState;
+	SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuard = (ENEMY_GUARD_TYPE)PlayerDataMgr->m_TrainingData.iEnemyGuard;
+	SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch = (ENEMY_GUARD_SWITCH_TYPE)PlayerDataMgr->m_TrainingData.iEnemyGuardSwitch;
+	SelectDataMgr->Get()->tagTrainingDatas.eEnemyTech = (ENEMY_TECH_TYPE)PlayerDataMgr->m_TrainingData.iEnemyTech;
+	SelectDataMgr->Get()->tagTrainingDatas.eEnemyThrowTech = (ENEMY_THROW_TECH_TYPE)PlayerDataMgr->m_TrainingData.iEnemyThrowTech;
+	SelectDataMgr->Get()->tagTrainingDatas.iEnemyLv = PlayerDataMgr->m_TrainingData.iEnemyLv;
+
+
+}

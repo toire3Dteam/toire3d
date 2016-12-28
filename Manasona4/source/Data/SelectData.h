@@ -30,6 +30,9 @@ enum class AI_TYPE
 	PRACTICE_JUMP,		//	[練習用]飛び続ける
 	PRACTICE_ATTACK,	//	[練習用]一定間隔で攻撃する
 
+	T_DOKKOI_ATTACK,	// [説明用]中段攻撃
+	T_DOWN_ATTACK,		// [説明用]下段攻撃
+
 	INTERRUPT_INVINCIBLE	// [デバッグ用]ガード中にひたすら無敵割り込みをする
 };
 
@@ -84,11 +87,13 @@ enum class TRAINING_INFO_TYPE
 // 敵の状態
 enum class ENEMY_STATE_TYPE
 {
-	STAND,		// 立ち状態
-	SQUAT,		// しゃがみ状態
-	JUMP,		// ジャンプし続ける
-	ATTACK,		// 一定間隔で攻撃
-	COM,		// コンピュータ
+	STAND,				// 立ち状態
+	SQUAT,				// しゃがみ状態
+	JUMP,				// ジャンプし続ける
+	ATTACK,				// 一定間隔で攻撃
+	COM,				// コンピュータ
+	T_DOKKOI_ATTACK,	// [説明用]中段攻撃
+	T_DOWN_ATTACK,		// [説明用]足払い攻撃
 };
 
 // 敵のガードの設定
@@ -122,6 +127,23 @@ enum class ENEMY_THROW_TECH_TYPE
 	OK		// なげ抜けする
 };
 
+// トレーニング用データ
+struct TrainingData
+{
+	HP_RECOVERY_TYPE		eHpRecovery;		// 自動回復するかしないか
+	int						iHp1P;				// 1PのHP
+	int						iHp2P;				// 1PのHP
+	int						iSpGage;			// SPゲージ
+	PARTNER_RECOVERY_TYPE	ePartnerRecovery;	// パートナーゲージ
+	TRAINING_INFO_TYPE		eTrainingInfo;		// 最大ダメージや入力覆歴を表示するかどうか
+	ENEMY_STATE_TYPE		eEnemyState;		// 敵の状態
+	ENEMY_GUARD_TYPE		eEnemyGuard;		// 敵のガードの設定
+	ENEMY_GUARD_SWITCH_TYPE eEnemyGuardSwitch;	// 敵のガード切り替えの設定
+	ENEMY_TECH_TYPE			eEnemyTech;			// 敵の受け身の設定
+	ENEMY_THROW_TECH_TYPE	eEnemyThrowTech;	// 敵のなげ抜けの設定
+	int						iEnemyLv;			// 敵のLV
+	TrainingData();
+};
 
 struct SideData
 {
@@ -137,13 +159,14 @@ struct SideData
 struct SelectData
 {
 	SideData tagSideDatas[(int)SIDE::ARRAY_MAX];	// 左右の情報
-	STAGE eStage;			// 選んでるステージ
-	bool bTutorial;			// チュートリアルフラグ
-	bool bTraining;			// トレーニングフラグ
-	int iWinRound;			// 勝利ラウンド数
-	int iRoundTime;			// 一試合時間
-	int iBattleMusicID;		// 戦闘曲の番号
-	SIDE eOrderTrainingSide;// トレーニングを選んだ側
+	STAGE eStage;					// 選んでるステージ
+	bool bTutorial;					// チュートリアルフラグ
+	bool bTraining;					// トレーニングフラグ
+	int iWinRound;					// 勝利ラウンド数
+	int iRoundTime;					// 一試合時間
+	int iBattleMusicID;				// 戦闘曲の番号
+	SIDE eOrderTrainingSide;		// トレーニングを選んだ側
+	TrainingData tagTrainingDatas;	// トレーニングのデータ
 	SelectData();
 	//SelectData &operator=(const SelectData &data) { tagSideDatas[(int)SIDE::LEFT] = data.tagSideDatas[(int)SIDE::LEFT], tagSideDatas[(int)SIDE::RIGHT] = data.tagSideDatas[(int)SIDE::RIGHT], stage = data.stage, bTutorial = data.bTutorial, iWinRound = data.iWinRound, iBattleMusicID = data.iBattleMusicID; return *this; }
 };

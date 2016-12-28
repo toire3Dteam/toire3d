@@ -60,12 +60,7 @@ Teki::Teki(SIDE side, const SideData &data) :BasePlayer(side, data)
 	// スピードライン
 	m_pSpeedLine = new SpeedLineGreenEffect;
 
-	if (m_side == SIDE::RIGHT)
-	{
-		LPSTR path("DATA/CHR/Teki/teki2.png");
-		m_pDefaultObj->SetTexture(tdnTexture::Load(path), 0);
-		m_pHHDOFObj->SetTexture(tdnTexture::Load(path), 0);
-	}
+
 }
 
 void Teki::Reset()
@@ -661,6 +656,15 @@ void Teki::RenderDrive()
 {
 	// 基底クラスの更新
 	BasePlayer::RenderDrive();
+}
+
+void Teki::ChangeColor()
+{
+
+	LPSTR path("DATA/CHR/Teki/teki2.png");
+	m_pDefaultObj->SetTexture(tdnTexture::Load(path), 0);
+	m_pHHDOFObj->SetTexture(tdnTexture::Load(path), 0);
+	
 }
 
 void Teki::InitMotionDatas()

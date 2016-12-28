@@ -108,6 +108,8 @@ private:
 	friend class AIState::PracticeJump;
 	friend class AIState::PracticeAttack;
 	friend class AIState::PracticeGuard;
+	friend class AIState::PracticeDokkoiAttack;
+	friend class AIState::PracticeDownAttack;
 	friend class AIState::Wait;
 	friend class AIState::Chase;
 	friend class AIState::Guard;

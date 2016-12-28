@@ -601,7 +601,7 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::ThrowBind::GetInstance()) == true)
 	{
 		// 設定で投げ抜けするようにしていたら
-		if (PlayerDataMgr->m_TrainingData.iEnemyThrowTech == (int)ENEMY_THROW_TECH_TYPE::OK)
+		if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyThrowTech == ENEMY_THROW_TECH_TYPE::OK)
 		{
 			// 投げ抜け
 			pPerson->PushInputList(PLAYER_INPUT::A);
@@ -610,7 +610,7 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 
 
 	// ガードの設定
-	switch ((ENEMY_GUARD_TYPE)PlayerDataMgr->m_TrainingData.iEnemyGuard)
+	switch ((ENEMY_GUARD_TYPE)SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuard)
 	{
 	case ENEMY_GUARD_TYPE::NO:
 		// ガードしない
@@ -636,7 +636,7 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 		)
 	{
 		// 受け身
-		switch ((ENEMY_TECH_TYPE)PlayerDataMgr->m_TrainingData.iEnemyTech)
+		switch ((ENEMY_TECH_TYPE)SelectDataMgr->Get()->tagTrainingDatas.eEnemyTech)
 		{
 		case ENEMY_TECH_TYPE::NO:
 			// 何もボタンを押さない
@@ -704,7 +704,7 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 			30 >= GetRange(pPerson))// (TODO)
 		{
 			// ★設定によりガードを切り替えるか変えないか設定する
-			if (PlayerDataMgr->m_TrainingData.iEnemyGuardSwitch == (int)ENEMY_GUARD_SWITCH_TYPE::OK)
+			if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch == ENEMY_GUARD_SWITCH_TYPE::OK)
 			{
 				// 相手と逆方向レバーを押す
 				if (MyPlayer->GetDir() == DIR::LEFT)
@@ -905,8 +905,8 @@ void AIState::PracticeSquat::Execute(AI * pPerson)
 			30 >= GetRange(pPerson))// (TODO)
 		{
 			// ★設定によりガードを切り替えるか変えないか
-			if (PlayerDataMgr->m_TrainingData.iEnemyGuardSwitch 
-				== (int)ENEMY_GUARD_SWITCH_TYPE::OK)
+			if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch 
+				== ENEMY_GUARD_SWITCH_TYPE::OK)
 			{
 				// しゃがまない
 
@@ -1278,6 +1278,154 @@ bool AIState::InterruptInvincible::OnMessage(AI * pPerson, const Message & msg)
 	//}
 	return false;
 }
+
+
+/*******************************************************/
+//				練習用中段攻撃ステート
+/*******************************************************/
+
+AIState::PracticeDokkoiAttack* AIState::PracticeDokkoiAttack::GetInstance()
+{
+	// ここに変数を作る
+	static AIState::PracticeDokkoiAttack instance;
+	return &instance;
+}
+
+void AIState::PracticeDokkoiAttack::Enter(AI * pPerson)
+{
+	pPerson->m_iPracticeAttackIntervalFrame = 60;
+
+}
+
+void AIState::PracticeDokkoiAttack::Execute(AI * pPerson)
+{
+
+	// 一定時間がたったら攻撃
+	pPerson->m_iPracticeAttackIntervalFrame++;
+	if (pPerson->m_iPracticeAttackIntervalFrame >= 90)
+	{
+
+
+		// 相手方向に歩く
+		Vector3 TargetPos = pPerson->GetTargetPlayer()->GetPos();
+		Vector3 MyPos = MyPlayer->GetPos();
+		if (MyPlayer->GetRecoveryFrame() <= 0 &&	// 自分が攻撃終わったら
+			MyPlayer->GetFSM()->isInState(*BasePlayerState::DokkoiAttack::GetInstance()) == false)
+		{
+			if (TargetPos.x > MyPos.x + 14)	pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+			else if (TargetPos.x < MyPos.x - 14)	pPerson->PushInputList(PLAYER_INPUT::LEFT);
+			else
+			{
+				// 相手の懐に入ったら
+				pPerson->m_iPracticeAttackIntervalFrame = 0;
+				// 中段攻撃
+				pPerson->PushInputList(PLAYER_INPUT::R1);
+			}
+		}
+
+
+
+
+	}
+
+
+}
+
+void AIState::PracticeDokkoiAttack::Exit(AI * pPerson)
+{
+}
+
+void AIState::PracticeDokkoiAttack::Render(AI * pPerson)
+{
+#ifdef _DEBUG
+
+	tdnText::Draw(420, 610, 0xffffffff, "AIPracticeDokkoiAttack練習");
+
+#endif // _DEBUG
+
+}
+
+bool AIState::PracticeDokkoiAttack::OnMessage(AI * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+	//}
+	return false;
+}
+
+
+/*******************************************************/
+//				練習用下段攻撃ステート
+/*******************************************************/
+
+AIState::PracticeDownAttack* AIState::PracticeDownAttack::GetInstance()
+{
+	// ここに変数を作る
+	static AIState::PracticeDownAttack instance;
+	return &instance;
+}
+
+void AIState::PracticeDownAttack::Enter(AI * pPerson)
+{
+	pPerson->m_iPracticeAttackIntervalFrame = 60;
+
+}
+
+void AIState::PracticeDownAttack::Execute(AI * pPerson)
+{
+
+	// 一定時間がたったら攻撃
+	pPerson->m_iPracticeAttackIntervalFrame++;
+	if (pPerson->m_iPracticeAttackIntervalFrame >= 90)
+	{
+
+		// 相手方向に歩く
+		Vector3 TargetPos = pPerson->GetTargetPlayer()->GetPos();
+		Vector3 MyPos = MyPlayer->GetPos();
+		if (MyPlayer->GetRecoveryFrame() <= 0)// 自分が攻撃終わったら
+		{
+			if (TargetPos.x > MyPos.x + 14)	pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+			else if (TargetPos.x < MyPos.x - 14)	pPerson->PushInputList(PLAYER_INPUT::LEFT);
+			else
+			{
+				// 相手の懐に入ったら
+				pPerson->m_iPracticeAttackIntervalFrame = 0;
+				// 下段攻撃
+				pPerson->PushInputList(PLAYER_INPUT::DOWN);
+				pPerson->PushInputList(PLAYER_INPUT::R1);
+			}
+		}
+
+	}
+
+
+}
+
+void AIState::PracticeDownAttack::Exit(AI * pPerson)
+{
+}
+
+void AIState::PracticeDownAttack::Render(AI * pPerson)
+{
+#ifdef _DEBUG
+
+	tdnText::Draw(420, 610, 0xffffffff, "AIPracticeDownAttack練習");
+
+#endif // _DEBUG
+
+}
+
+bool AIState::PracticeDownAttack::OnMessage(AI * pPerson, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+	//}
+	return false;
+}
+
+
 
 /*******************************************************/
 //				待機ステート

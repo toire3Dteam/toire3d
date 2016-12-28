@@ -273,6 +273,7 @@ m_iHitStopFrame(0),// ★★★バグの原因　ひっとすトップ初期化のし忘れ。
 m_bDown(false),
 
 m_eGuardState(GUARD_STATE::NO_GUARD),
+m_bGuardSuccess(false),
 
 m_iInvincibleLV(0),
 m_iInvincibleTime(0),
@@ -467,6 +468,7 @@ void BasePlayer::Reset()
 	m_bWillPower=
 	m_bDown=
 	m_bNotOverDrive=
+	m_bGuardSuccess=
 	false;
 
 
@@ -511,6 +513,11 @@ void BasePlayer::Reset()
 
 	// コンボ補正初期化
 	m_RecoveryDamageCount.clear();
+
+	// パートナーのゲージも初期化
+	m_pStand->SetStandGage(0);
+	m_pStand->SetStandStock(0);
+
 }
 
 void BasePlayer::InitAI(AI_TYPE type)

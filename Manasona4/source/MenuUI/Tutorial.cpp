@@ -65,6 +65,22 @@ void BaseTutorial::Init(int iDeviceID)
 	m_iSelectTask = 0;
 
 	m_iDeviceID = iDeviceID;
+
+	// 初期の状況設定
+	// 必要な状況があるなら各自書き換える
+	SelectDataMgr->Get()->tagTrainingDatas.eHpRecovery = HP_RECOVERY_TYPE::AUTO_RECOVERY;
+	SelectDataMgr->Get()->tagTrainingDatas.iHp1P=100;
+	SelectDataMgr->Get()->tagTrainingDatas.iHp2P=100;
+	SelectDataMgr->Get()->tagTrainingDatas.iSpGage = 0;
+	SelectDataMgr->Get()->tagTrainingDatas.ePartnerRecovery = PARTNER_RECOVERY_TYPE::DEFAULT;
+	SelectDataMgr->Get()->tagTrainingDatas.eTrainingInfo = TRAINING_INFO_TYPE::NONE;
+	SelectDataMgr->Get()->tagTrainingDatas.eEnemyState=ENEMY_STATE_TYPE::STAND;
+	SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuard=ENEMY_GUARD_TYPE::NO;
+	SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch = ENEMY_GUARD_SWITCH_TYPE::NO;
+	SelectDataMgr->Get()->tagTrainingDatas.eEnemyTech = ENEMY_TECH_TYPE::ALL;
+	SelectDataMgr->Get()->tagTrainingDatas.eEnemyThrowTech = ENEMY_THROW_TECH_TYPE::NO;
+	SelectDataMgr->Get()->tagTrainingDatas.iEnemyLv = 20;
+
 }
 
 void BaseTutorial::Update()
@@ -452,7 +468,6 @@ void JumpTutorial::Init(int iDeviceID)
 {
 	// ★共通
 	BaseTutorial::Init(iDeviceID);
-
 }
 
 // それぞれのクリア処理
@@ -668,7 +683,7 @@ OverDriveTutorial::OverDriveTutorial()
 	m_pClearTips = new TipsCard("よくできました！\n「必殺技」はとても強力な技です。\nまた「攻撃」や「スキル」から繋げて発動できます。");
 
 	// タスクセット
-	AddTaskData("必殺技－ゲージ50%以上で▽");
+	AddTaskData("必殺技－ゲージ50%以上で㊨");
 
 	Init();
 }
@@ -677,6 +692,8 @@ void OverDriveTutorial::Init(int iDeviceID)
 {
 	// ★共通
 	BaseTutorial::Init(iDeviceID);
+
+	SelectDataMgr->Get()->tagTrainingDatas.iSpGage = 50;
 
 }
 
@@ -692,11 +709,368 @@ void OverDriveTutorial::TaskUpdate(BasePlayer * pPerson)
 	// 必殺技ステートにいたらクリア
 	if (pPerson->GetFSM()->isInState(*BasePlayerState::HeavehoDrive::GetInstance()))
 	{
+		//if (pPerson->isHitAttack() == true)
+		{
+			TaskSuccess(OVER_DRIVE);
+		}
+
+	}
+
+}
+
+//+------------------------------------------------------
+//	ラッシュ攻撃の説明
+//+------------------------------------------------------
+
+RushTutorial::RushTutorial()
+{
+	// タイトル名
+	m_pTaskTitle.pSting = "No.07 ラッシュコンボ";
+
+	// クリアから終りまで
+	m_iWaitFrameMAX = 120;
+
+	// 文字の長さを調べる
+	UINT	myByte = 0; UINT	addByte = 0;
+
+	// 終端文字までループ
+	for (UINT i = 0; m_pTaskTitle.pSting[i] != '\0'; i += myByte)
+	{
+		//	文字のバイト数を調べる	
+		myByte = _mbclen((BYTE*)&m_pTaskTitle.pSting[i]);
+		addByte += myByte;
+	}
+	m_pTaskTitle.iStingLength = addByte;
+
+	// Tips
+	m_pIntroTips = new TipsCard("ずっと□。\n「必殺技」を発動できます。");
+	m_pClearTips = new TipsCard("よくできました！\n「必殺技」はとても強力な技です。\nまた「攻撃」や「スキル」から繋げて発動できます。");
+
+	// タスクセット
+	AddTaskData("攻撃－□");
+	AddTaskData("追撃－□");
+	AddTaskData("スキル－□");
+	AddTaskData("必殺技－□");
+
+	Init();
+}
+
+void RushTutorial::Init(int iDeviceID)
+{
+	// ★共通
+	BaseTutorial::Init(iDeviceID);
+
+	SelectDataMgr->Get()->tagTrainingDatas.iSpGage = 50;
+
+}
+
+// それぞれのクリア処理
+void RushTutorial::TaskUpdate(BasePlayer * pPerson)
+{
+	// クリアしていたらハジク
+	if (m_bClearFlag == true)return;	
+
+
+	//ここで色々クリア処理頑張る！
+	enum
+	{
+		ATTACK = 0,
+		ATTACK2 = 1,
+		SKIL = 2,
+		OVER_DRIVE = 3,
+
+	};
+
+	// 待機に戻ると最初からやり直し
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::Wait::GetInstance()))
+	{
+		Init(m_iDeviceID);// デバイスは自分自身と同じ
+	}
+
+
+	// 一段目を当てたらクリア
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::RushAttack::GetInstance()) &&
+		pPerson->GetRushStep() == 0)
+	{
+		if (pPerson->isHitAttack() == true)
+		{
+			TaskSuccess(ATTACK);
+		}
+
+	}
+
+	// 二段目を当てたらクリア
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::RushAttack::GetInstance()) &&
+		pPerson->GetRushStep() == 1)
+	{
+		if (pPerson->isHitAttack() == true)
+		{
+			TaskSuccess(ATTACK2);
+		}
+
+	}
+
+	// 三段目を当てたらクリア
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::RushAttack::GetInstance()) &&
+		pPerson->GetRushStep() == 2)
+	{
+		if (pPerson->isHitAttack() == true)
+		{
+			TaskSuccess(SKIL);
+		}
+
+	}
+
+	// 必殺技ステートにいたらクリア
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::HeavehoDrive::GetInstance()))
+	{
 		if (pPerson->isHitAttack() == true)
 		{
 			TaskSuccess(OVER_DRIVE);
 		}
 
+	}
+
+}
+
+
+//+------------------------------------------------------
+//	立ちガードの説明
+//+------------------------------------------------------
+
+StandGuardTutorial::StandGuardTutorial()
+{
+	// タイトル名
+	m_pTaskTitle.pSting = "No.08 立ちガード";
+
+	// クリアから終りまで
+	m_iWaitFrameMAX = 60;
+
+	// 文字の長さを調べる
+	UINT	myByte = 0; UINT	addByte = 0;
+
+	// 終端文字までループ
+	for (UINT i = 0; m_pTaskTitle.pSting[i] != '\0'; i += myByte)
+	{
+		//	文字のバイト数を調べる	
+		myByte = _mbclen((BYTE*)&m_pTaskTitle.pSting[i]);
+		addByte += myByte;
+	}
+	m_pTaskTitle.iStingLength = addByte;
+
+	// Tips
+	m_pIntroTips = new TipsCard("ガード三回。\n「必殺技」を発動できます。");
+	m_pClearTips = new TipsCard("よくできました！\n「必殺技」はとても強力な技です。\nまた「攻撃」や「スキル」から繋げて発動できます。");
+
+	// タスクセット
+	AddTaskData("ガード－←");
+	AddTaskData("ガード－←");
+	AddTaskData("ガード－←");
+
+	Init();
+}
+
+void StandGuardTutorial::Init(int iDeviceID)
+{
+	// ★共通
+	BaseTutorial::Init(iDeviceID);
+
+	SelectDataMgr->Get()->tagTrainingDatas.iSpGage = 50;
+	SelectDataMgr->Get()->tagTrainingDatas.eEnemyState = ENEMY_STATE_TYPE::T_DOKKOI_ATTACK;
+
+	m_bStop = false;
+	m_iCount = 0;
+}
+
+// それぞれのクリア処理
+void StandGuardTutorial::TaskUpdate(BasePlayer * pPerson)
+{
+	// クリアしていたらハジク
+	if (m_bClearFlag == true)return;
+
+
+	//ここで色々クリア処理頑張る！
+	enum
+	{
+		SUCCESS1 = 0,
+		SUCCESS2 = 1,
+		SUCCESS3 = 2,
+	};
+
+	// 成功した場合ガード状態が解けてから次のタスクへ
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::Guard::GetInstance()) == false)
+	{
+		m_bStop = false;
+	}
+
+	// ガードしたらクリア
+	if (m_bStop == false && 
+		pPerson->isGuardSuccess() == true)
+	{
+		//for (int i = 0; i < m_aTask.size(); i++)
+		//{
+
+		//}
+		if (m_iCount == 0)		TaskSuccess(SUCCESS1);
+		else if (m_iCount == 1)	TaskSuccess(SUCCESS2);
+		else if (m_iCount == 2)	TaskSuccess(SUCCESS3);
+
+		m_bStop = true;
+		m_iCount++;
+	}
+
+
+}
+
+
+
+//+------------------------------------------------------
+//	しゃがみガードの説明
+//+------------------------------------------------------
+
+SquatGuardTutorial::SquatGuardTutorial()
+{
+	// タイトル名
+	m_pTaskTitle.pSting = "No.09 しゃがみガード";
+
+	// クリアから終りまで
+	m_iWaitFrameMAX = 60;
+
+	// 文字の長さを調べる
+	UINT	myByte = 0; UINT	addByte = 0;
+
+	// 終端文字までループ
+	for (UINT i = 0; m_pTaskTitle.pSting[i] != '\0'; i += myByte)
+	{
+		//	文字のバイト数を調べる	
+		myByte = _mbclen((BYTE*)&m_pTaskTitle.pSting[i]);
+		addByte += myByte;
+	}
+	m_pTaskTitle.iStingLength = addByte;
+
+	// Tips
+	m_pIntroTips = new TipsCard("しゃがみガード三回。\n「必殺技」を発動できます。");
+	m_pClearTips = new TipsCard("よくできました！\n「必殺技」はとても強力な技です。\nまた「攻撃」や「スキル」から繋げて発動できます。");
+
+	// タスクセット
+	AddTaskData("しゃがみガード－／");
+	AddTaskData("しゃがみガード－／");
+	AddTaskData("しゃがみガード－／");
+
+	Init();
+}
+
+void SquatGuardTutorial::Init(int iDeviceID)
+{
+	// ★共通
+	BaseTutorial::Init(iDeviceID);
+
+	SelectDataMgr->Get()->tagTrainingDatas.iSpGage = 50;
+	SelectDataMgr->Get()->tagTrainingDatas.eEnemyState = ENEMY_STATE_TYPE::T_DOWN_ATTACK;
+
+	m_bStop = false;
+	m_iCount = 0;
+}
+
+// それぞれのクリア処理
+void SquatGuardTutorial::TaskUpdate(BasePlayer * pPerson)
+{
+	// クリアしていたらハジク
+	if (m_bClearFlag == true)return;
+
+
+	//ここで色々クリア処理頑張る！
+	enum
+	{
+		SUCCESS1 = 0,
+		SUCCESS2 = 1,
+		SUCCESS3 = 2,
+	};
+
+	// 成功した場合ガード状態が解けてから次のタスクへ
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::Guard::GetInstance()) == false)
+	{
+		m_bStop = false;
+	}
+
+	// ガードしたらクリア
+	if (m_bStop == false &&
+		pPerson->isGuardSuccess() == true)
+	{
+		//for (int i = 0; i < m_aTask.size(); i++)
+		//{
+
+		//}
+		if (m_iCount == 0)		TaskSuccess(SUCCESS1);
+		else if (m_iCount == 1)	TaskSuccess(SUCCESS2);
+		else if (m_iCount == 2)	TaskSuccess(SUCCESS3);
+
+		m_bStop = true;
+		m_iCount++;
+	}
+
+}
+
+
+//+------------------------------------------------------
+//	しゃがみガードの説明
+//+------------------------------------------------------
+
+EscapeTutorial::EscapeTutorial()
+{
+	// タイトル名
+	m_pTaskTitle.pSting = "No.10 回避";
+
+	// クリアから終りまで
+	m_iWaitFrameMAX = 60;
+
+	// 文字の長さを調べる
+	UINT	myByte = 0; UINT	addByte = 0;
+
+	// 終端文字までループ
+	for (UINT i = 0; m_pTaskTitle.pSting[i] != '\0'; i += myByte)
+	{
+		//	文字のバイト数を調べる	
+		myByte = _mbclen((BYTE*)&m_pTaskTitle.pSting[i]);
+		addByte += myByte;
+	}
+	m_pTaskTitle.iStingLength = addByte;
+
+	// Tips
+	m_pIntroTips = new TipsCard("回避。\n「必殺技」を発動できます。");
+	m_pClearTips = new TipsCard("よくできました！\n「必殺技」はとても強力な技です。\nまた「攻撃」や「スキル」から繋げて発動できます。");
+
+	// タスクセット
+	AddTaskData("回避－○");
+
+	Init();
+}
+
+void EscapeTutorial::Init(int iDeviceID)
+{
+	// ★共通
+	BaseTutorial::Init(iDeviceID);
+
+
+}
+
+// それぞれのクリア処理
+void EscapeTutorial::TaskUpdate(BasePlayer * pPerson)
+{
+	// クリアしていたらハジク
+	if (m_bClearFlag == true)return;
+
+
+	//ここで色々クリア処理頑張る！
+	enum
+	{
+		ESCAPE = 0,
+	};
+
+	// 回避したら成功
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::Escape::GetInstance()) == true)
+	{
+		TaskSuccess(ESCAPE);
 	}
 
 }

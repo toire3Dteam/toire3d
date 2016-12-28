@@ -654,7 +654,8 @@ public:
 	//------------------------------------------------------
 	GUARD_STATE GetGuardState(){ return m_eGuardState; }
 	void SetGuardState(GUARD_STATE state){ m_eGuardState = state; }
-
+	bool isGuardSuccess() { return m_bGuardSuccess; }
+	void SetGuardSuccess(bool flag) { m_bGuardSuccess = flag; }
 
 	//------------------------------------------------------
 	//	無敵関連
@@ -924,6 +925,9 @@ public:
 	bool isAI() { return m_bAI; }
 	AI* GetAI() { return m_pAI; }
 
+	// カラー
+	virtual void ChangeColor() = 0;// (12/28) 後で色変えれるようにしたい
+
 	//_/_/_/_/_/_/__/_/__/_/__/_/__
 	// 定数
 	//_/_/_/_/__/_/__/_/__/_/__/_/_
@@ -1005,7 +1009,7 @@ protected:
 	//	ガード
 	//------------------------------------------------------
 	GUARD_STATE m_eGuardState;
-
+	bool m_bGuardSuccess;
 
 	//------------------------------------------------------
 	//	無敵関連

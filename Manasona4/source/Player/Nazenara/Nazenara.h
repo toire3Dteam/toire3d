@@ -175,6 +175,11 @@ public:
 	float AIRunAttackRange() { return 27; }
 	float AIThrowRange() { return 6; }
 
+	/****************************/
+	//	 カラー
+	/****************************/
+	void ChangeColor();
+
 private:
 	// 純粋仮想関数オーバーライド
 	void InitActionDatas();

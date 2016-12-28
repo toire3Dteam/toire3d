@@ -166,10 +166,47 @@ void AI::DoublePushUpdate()
 
 }
 
-// トレーニング用
+// トレーニング・練習用
 void AI::UpdateTraining()
-{ 
-	switch ((ENEMY_STATE_TYPE)PlayerDataMgr->m_TrainingData.iEnemyState)
+{
+	// 結局ステートの変更前に設定し直しているので必要ないけど一応
+	// 設定が変更されていたら切り替える
+	//if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyState 
+	//	== (ENEMY_STATE_TYPE)PlayerDataMgr->m_TrainingData.iEnemyState)
+	//{
+	//	SelectDataMgr->Get()->tagTrainingDatas.eEnemyState
+	//		= (ENEMY_STATE_TYPE)PlayerDataMgr->m_TrainingData.iEnemyState;
+	//}
+
+	//if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuard
+	//	== (ENEMY_GUARD_TYPE)PlayerDataMgr->m_TrainingData.iEnemyGuard)
+	//{
+	//	SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuard
+	//		= (ENEMY_GUARD_TYPE)PlayerDataMgr->m_TrainingData.iEnemyGuard;
+	//}
+
+	//if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch
+	//	== (ENEMY_GUARD_SWITCH_TYPE)PlayerDataMgr->m_TrainingData.iEnemyGuardSwitch)
+	//{
+	//	SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch
+	//		= (ENEMY_GUARD_SWITCH_TYPE)PlayerDataMgr->m_TrainingData.iEnemyGuardSwitch;
+	//}
+
+	//if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyTech
+	//	== (ENEMY_TECH_TYPE)PlayerDataMgr->m_TrainingData.iEnemyTech)
+	//{
+	//	SelectDataMgr->Get()->tagTrainingDatas.eEnemyTech
+	//		= (ENEMY_TECH_TYPE)PlayerDataMgr->m_TrainingData.iEnemyTech;
+	//}
+
+	//if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyThrowTech
+	//	== (ENEMY_THROW_TECH_TYPE)PlayerDataMgr->m_TrainingData.iEnemyThrowTech)
+	//{
+	//	SelectDataMgr->Get()->tagTrainingDatas.eEnemyThrowTech
+	//		= (ENEMY_THROW_TECH_TYPE)PlayerDataMgr->m_TrainingData.iEnemyThrowTech;
+	//}
+
+	switch (SelectDataMgr->Get()->tagTrainingDatas.eEnemyState)
 	{
 	case ENEMY_STATE_TYPE::STAND:
 		// 設定したタイプと違っていたら
@@ -206,7 +243,7 @@ void AI::UpdateTraining()
 	case ENEMY_STATE_TYPE::COM:
 
 		// COMレベルによって強さを変える
-		if (PlayerDataMgr->m_TrainingData.iEnemyLv <= 30)
+		if (SelectDataMgr->Get()->tagTrainingDatas.iEnemyLv <= 30)
 		{
 			// 設定したタイプと違っていたら
 			if (m_eAIType != AI_TYPE::CPU_EASY)
@@ -214,7 +251,7 @@ void AI::UpdateTraining()
 				ChangeAIType(AI_TYPE::CPU_EASY);
 			}
 		}
-		else if (PlayerDataMgr->m_TrainingData.iEnemyLv <= 60)
+		else if (SelectDataMgr->Get()->tagTrainingDatas.iEnemyLv <= 60)
 		{
 			// 設定したタイプと違っていたら
 			if (m_eAIType != AI_TYPE::CPU_NORMAL)
@@ -222,7 +259,7 @@ void AI::UpdateTraining()
 				ChangeAIType(AI_TYPE::CPU_NORMAL);
 			}
 		}
-		else if (PlayerDataMgr->m_TrainingData.iEnemyLv <= 85)
+		else if (SelectDataMgr->Get()->tagTrainingDatas.iEnemyLv <= 85)
 		{
 			// 設定したタイプと違っていたら
 			if (m_eAIType != AI_TYPE::CPU_HARD)
@@ -240,6 +277,23 @@ void AI::UpdateTraining()
 		}
 
 	
+		break;
+	case ENEMY_STATE_TYPE::T_DOKKOI_ATTACK:
+		// 設定したタイプと違っていたら
+		if (m_eAIType != AI_TYPE::T_DOKKOI_ATTACK)
+		{
+			ChangeAIType(AI_TYPE::T_DOKKOI_ATTACK);
+		}
+		
+
+		break;
+	case ENEMY_STATE_TYPE::T_DOWN_ATTACK:
+		// 設定したタイプと違っていたら
+		if (m_eAIType != AI_TYPE::T_DOWN_ATTACK)
+		{
+			ChangeAIType(AI_TYPE::T_DOWN_ATTACK);
+		}
+
 		break;
 	default:
 		MyAssert(0, "そのタイプはない");
@@ -300,6 +354,20 @@ void AI::ChangeAIType(AI_TYPE type)
 		m_pStateMachine->SetGlobalState(AIState::PracticeGlobal::GetInstance());// グローバル
 		m_pStateMachine->SetCurrentState(AIState::PracticeAttack::GetInstance());
 		m_pStateMachine->SetPreviousState(AIState::PracticeAttack::GetInstance());
+
+		break;
+	case AI_TYPE::T_DOKKOI_ATTACK:
+		// 中段攻撃を振り続ける練習用ステートマシン
+		m_pStateMachine->SetGlobalState(AIState::PracticeGlobal::GetInstance());// グローバル
+		m_pStateMachine->SetCurrentState(AIState::PracticeDokkoiAttack::GetInstance());
+		m_pStateMachine->SetPreviousState(AIState::PracticeDokkoiAttack::GetInstance());
+
+		break;
+	case AI_TYPE::T_DOWN_ATTACK:
+		// 下段攻撃を振り続ける練習用ステートマシン
+		m_pStateMachine->SetGlobalState(AIState::PracticeGlobal::GetInstance());// グローバル
+		m_pStateMachine->SetCurrentState(AIState::PracticeDownAttack::GetInstance());
+		m_pStateMachine->SetPreviousState(AIState::PracticeDownAttack::GetInstance());
 
 		break;
 	default:

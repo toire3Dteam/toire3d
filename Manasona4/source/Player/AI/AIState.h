@@ -246,6 +246,76 @@ namespace AIState
 		PracticeGuard& operator=(const PracticeGuard&) {}
 	};
 
+
+	/*******************************************************/
+	//					練習用中段攻撃ステート
+	/*******************************************************/
+	class PracticeDokkoiAttack:public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static PracticeDokkoiAttack* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		PracticeDokkoiAttack() {};
+		~PracticeDokkoiAttack() {};
+
+		PracticeDokkoiAttack(const PracticeDokkoiAttack&) {}
+		PracticeDokkoiAttack& operator=(const PracticeDokkoiAttack&) {}
+	};
+
+	/*******************************************************/
+	//					練習用足払い攻撃ステート
+	/*******************************************************/
+	class PracticeDownAttack :public State<AI>
+	{
+	public:
+
+		//this is a シングルトン
+		static PracticeDownAttack* GetInstance();
+
+		// 入る
+		virtual void Enter(AI* pPerson);
+
+		// 実行します
+		virtual void Execute(AI* pPerson);
+
+		// 帰る
+		virtual void Exit(AI* pPerson);
+
+		// 描画
+		virtual void Render(AI* pPerson);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(AI* pPerson, const Message& msg);
+
+
+	private:
+		PracticeDownAttack() {};
+		~PracticeDownAttack() {};
+
+		PracticeDownAttack(const PracticeDownAttack&) {}
+		PracticeDownAttack& operator=(const PracticeDownAttack&) {}
+	};
+
+
 	/*******************************************************/
 	//					無敵割り込み用ステート
 	/*******************************************************/

@@ -606,7 +606,12 @@ void SceneMenuState::TutorialSelectStep::Execute(sceneMenu *pMain)
 		SelectDataMgr->Get()->bTraining = false;
 
 		//SelectDataMgr->Get()->iWinRound = 0;
-		// 
+		// トレーニングに登場するキャラクター設定をここで設定する
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].eCharacter = CHARACTER::NAZENARA;
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].eCharacter = CHARACTER::TEKI;
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].ePartner = PARTNER::MAYA;
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].ePartner = PARTNER::MOKOI;
+
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = false;
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = true;
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].eAIType = AI_TYPE::PRACTICE_LAND;// (TODO)

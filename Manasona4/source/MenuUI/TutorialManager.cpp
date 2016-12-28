@@ -15,7 +15,7 @@ TutorialManager::TutorialManager()
 		switch ((TUTORIAL_TYPE)i)
 		{
 		case WALK:
-			m_pTutorial[i] = new WalkTutorial();
+			m_pTutorial[i] = new EscapeTutorial();// WalkTutorial
 			break;
 		case SQUAT:
 			m_pTutorial[i] = new SquatTutorial();
@@ -31,6 +31,18 @@ TutorialManager::TutorialManager()
 			break;
 		case OVER_DRIVE:
 			m_pTutorial[i] = new OverDriveTutorial();
+			break;
+		case RUSH:
+			m_pTutorial[i] = new RushTutorial();
+			break;
+		case STAND_GUARD:
+			m_pTutorial[i] = new StandGuardTutorial();
+			break;
+		case SQUAT_GUARD:
+			m_pTutorial[i] = new SquatGuardTutorial();
+			break;
+		case ESCAPE:
+			m_pTutorial[i] = new EscapeTutorial();
 			break;
 		case ARRAY_END:
 			assert(0);

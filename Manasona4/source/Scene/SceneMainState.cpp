@@ -630,12 +630,19 @@ void SceneMainState::TutorialIntro::Enter(sceneMain *pMain)
 	// 情報初期化
 	pMain->Reset();
 
-	//  チュートリアル毎に必要な設定をここでしてあげる
-	if (pMain->GetSelectTutorial() == TUTORIAL_TYPE::OVER_DRIVE)
-	{
-		PlayerMgr->GetPlayerByDeviceID
-			(SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID)->SetOverDriveGage(100);
-	}
+	// ゴリ君
+	// SPゲージも初期化
+	PlayerMgr->GetPlayer(SIDE::LEFT)->SetOverDriveGage(0);
+	PlayerMgr->GetPlayer(SIDE::RIGHT)->SetOverDriveGage(0);
+
+	//  チュートリアル毎に必要な設定をここでもしてあげる
+	//if (pMain->GetSelectTutorial() == TUTORIAL_TYPE::STAND_GUARD)
+	//{
+	//	PlayerMgr->GetPlayer(SIDE::LEFT)->SetPos(Vector3(-97.5, 0, 0));
+	//	PlayerMgr->GetPlayer(SIDE::RIGHT)->SetPos(Vector3(-60, 0, 0));
+	//}
+
+
 }
 
 // 更新
@@ -706,10 +713,13 @@ void SceneMainState::TutorialMain::Enter(sceneMain *pMain)
 
 void SceneMainState::TutorialMain::Execute(sceneMain *pMain)
 {
+	// ★★★　(12/28)チュートリアルでも更新
+	PlayerMgr->UpdateTraining();
+
 	// プレイヤー更新
 	if (TutorialMgr->GetTutorial()->isClear())
 	{
-		// クリアにたので動きを止める
+		// クリアしたので動きを止める
 		PlayerMgr->Update(PLAYER_UPDATE::CONTROL_NO);
 
 		// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
@@ -946,6 +956,9 @@ void SceneMainState::TrainingIntro::Enter(sceneMain *pMain)
 
 	// 情報初期化
 	pMain->Reset();
+	
+	// トレーニングデータ適用
+	pMain->InitTrainingData();
 
 	// ゴリ君
 	// SPゲージも初期化
@@ -1014,8 +1027,8 @@ bool SceneMainState::TrainingIntro::OnMessage(sceneMain *pMain, const Message & 
 
 void SceneMainState::Training::Enter(sceneMain *pMain)
 {
-
-
+	// メニューから戻ってきたときにトレーニングデータ適用
+	pMain->InitTrainingData();
 }
 
 // 更新
@@ -1025,8 +1038,6 @@ void SceneMainState::Training::Execute(sceneMain *pMain)
 	//	pMain->GetFSM()->ChangeState(Main::GetInstance());
 	//#endif
 
-	// チュートリアル更新
-	TutorialMgr->Update();
 
 	// プレイヤー更新
 	PlayerMgr->Update(PLAYER_UPDATE::CONTROL_OK);
