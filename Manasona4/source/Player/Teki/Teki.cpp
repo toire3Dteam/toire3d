@@ -19,8 +19,6 @@ Teki::Teki(SIDE side, const SideData &data) :BasePlayer(side, data)
 	// キャラごとの設定を読み込む
 	BasePlayer::LoadCharacterParam("DATA/CHR/Teki/param.txt");
 
-	Reset();
-
 	m_pName = "Teki";
 	m_pCutinPic = new tdn2DAnim("DATA/UI/Game/OverDriveCutin/teki.png");
 	m_pCutinPic->OrderMoveAppeared(8, -400, +200);
@@ -60,13 +58,22 @@ Teki::Teki(SIDE side, const SideData &data) :BasePlayer(side, data)
 	// スピードライン
 	m_pSpeedLine = new SpeedLineGreenEffect;
 
+	// 敵専用エフェクト 
+	m_pUpperLineEffect = new TekiUpperLineEffect();
+	m_pCycloneEffect = new CycloneEffect();
 
+	// リセットはなるべく最後に
+	Reset();
 }
 
 void Teki::Reset()
 {
 	// 必ず書く
 	BasePlayer::Reset();
+
+	m_pUpperLineEffect->Stop();
+	m_pCycloneEffect->Stop();
+
 }
 
 void Teki::InitActionDatas()
@@ -637,12 +644,19 @@ void Teki::InitActionDatas()
 Teki::~Teki()
 {
 	FOR((int)SKILL_ACTION_TYPE::MAX) SAFE_DELETE(m_pSkillActions[i])
+
+	SAFE_DELETE(m_pUpperLineEffect);
 }
 
 void Teki::Update(PLAYER_UPDATE flag)
 {
 	// 基底クラスの更新
 	BasePlayer::Update(flag);
+
+	// 専用エフェクト
+	m_pUpperLineEffect->Update();
+	m_pCycloneEffect->Update();
+
 }
 
 void Teki::Render()
@@ -650,6 +664,9 @@ void Teki::Render()
 	// 基底クラスの更新
 	BasePlayer::Render();
 
+	// 専用エフェクト
+	m_pUpperLineEffect->Render();
+	m_pCycloneEffect->Render();
 }
 
 void Teki::RenderDrive()
@@ -869,6 +886,7 @@ void Teki::OnInvincibleCounterSuccess()
 
 	// 一定時間無敵にする(だいたいコークスクリューのフレーム)
 	SetInvincible(40, 1);
+
 }
 
 
@@ -1312,8 +1330,17 @@ bool Teki::HeavehoDriveUpdate()
 	// ヒーホーストップ時間計測
 	if (m_iHeavehoStopTimer > 0) if (--m_iHeavehoStopTimer == 0)
 	{
-		// しょおおおおおおりゅううううけんん！！！！！ウーハー！
+		// しょおおおおおおりゅううううけんん！！！！！ウーハー！小杉
 		m_vMove.Set((m_dir == DIR::LEFT) ? -.5f : .5f, 2.5f, 0);
+
+
+		// アッパーラインエフェクト
+		Vector3 l_vMoveVec = m_vMove;
+		l_vMoveVec.Normalize();
+		float l_fZAngle = atan2(-l_vMoveVec.x, l_vMoveVec.y);
+		m_pUpperLineEffect->Action(GetFlontPos(), 1, 1, Vector3(0, 0, l_fZAngle), Vector3(0, 0, l_fZAngle));
+
+		m_pCycloneEffect->Action(GetFlontPos(), 1.5f, 3.5f, Vector3(0, 0, l_fZAngle), Vector3(0, 0, l_fZAngle));
 
 		// 重力の影響を戻す！
 		SetMoveUpdate(true);

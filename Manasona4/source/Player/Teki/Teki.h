@@ -203,5 +203,11 @@ private:
 	void InitActionDatas();
 	void InitMotionDatas();
 
+	// TEKI用のエフェクト
+	TekiUpperLineEffect* m_pUpperLineEffect;
+	BaseUVEffect *m_pCycloneEffect;	// 必殺の風
+
+
+
 };
 

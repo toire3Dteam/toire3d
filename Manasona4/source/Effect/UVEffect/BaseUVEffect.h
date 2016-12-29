@@ -899,3 +899,23 @@ public:
 
 private:
 };
+
+/*****************************************/
+//	TEKIアッパーライン
+/*****************************************/
+class TekiUpperLineEffect :public BaseUVEffect
+{
+public:
+	TekiUpperLineEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Teki/tekiUpperLine.IMO", 0.0f, -0.01f, 16, false, 3, 11);
+	};
+	~TekiUpperLineEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	//void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+
+};
