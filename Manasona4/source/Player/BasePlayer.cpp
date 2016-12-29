@@ -1832,7 +1832,7 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 		break;
 	case EFFECT_TYPE::RUN:
 		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::RUN,
-			0.8f, 1.0f, Vector3(0, diaAngle, 0), Vector3(0, diaAngle, 0));
+			1.0f, 1.2f, Vector3(0, diaAngle, 0), Vector3(0, diaAngle, 0));
 		ParticleManager::EffectRunSmoke(m_vPos, (m_dir != DIR::LEFT));
 
 		break;

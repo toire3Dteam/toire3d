@@ -206,7 +206,7 @@ void TipsCard::Render()
 	
 	// •¶Žš•`‰æ
 	//tdnFont::RenderString(m_pString, "HGºÞ¼¯¸E", 26, 340, 287, 0xffffffff, RS::COPY);
-	tdnFont::RenderStringCentering(m_pString, "HGºÞ¼¯¸E", 24, (1280 / 2) + 22 , 287, col, RS::COPY);
+	tdnFont::RenderStringCentering(m_pString, "HGºÞ¼¯¸E", 24, (1280 / 2) + 30 , 287, col, RS::COPY);
 
 	// ‘I‘ðŽˆ‚ª‚ ‚é‚©‚È‚¢‚©
 	if (m_bChoice == true)

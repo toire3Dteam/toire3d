@@ -781,7 +781,7 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 
 									 // ダメージ		
 									 int damage = 0;
-									 // ★ (12/27) 必殺技の場合レート値を底上げする
+									 // ★ (12/27) 必殺技の場合(保証ダメージ)を底上げする
 									 if (HitDamageInfo->bOverDrive == true)
 									 {
 										 // 底上げ
@@ -3741,7 +3741,7 @@ void BasePlayerState::DokkoiAttack::Execute(BasePlayer * pPerson)
 			return;
 		}
 
-		float speed(pPerson->GetMaxSpeed());
+		float speed(pPerson->GetMaxSpeed()*1.25f);// (12/29) 少し早く　ボコスカっぽく
 		// 向いてる方に移動
 		pPerson->SetMove(Vector3((pPerson->GetDir() == DIR::LEFT) ? -speed : speed, 0, 0));
 
@@ -3777,11 +3777,14 @@ void BasePlayerState::DokkoiAttack::Execute(BasePlayer * pPerson)
 	// HITしていたらキャンセルできる
 	else if (pPerson->GetAttackData()->bHitSuccess == true)
 	{
-		// 同じボタンか相手の方向
-		if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R1, true) || pPerson->isPushInputTRG((pPerson->GetDir() == DIR::LEFT) ? PLAYER_COMMAND_BIT::LEFT : PLAYER_COMMAND_BIT::RIGHT, true))
+		// 同じボタンか相手の方向 + (12/29)攻撃ボタンも追加。やっぱ止めた
+		if (/*pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::C, true) ||*/ pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R1, true) || pPerson->isPushInputTRG((pPerson->GetDir() == DIR::LEFT) ? PLAYER_COMMAND_BIT::LEFT : PLAYER_COMMAND_BIT::RIGHT, true))
 		{
 			// 走りモーション
 			pPerson->SetMotion(MOTION_TYPE::RUN);
+
+			// ダッシュエフェクト
+			pPerson->AddEffectAction(pPerson->GetPos(), EFFECT_TYPE::RUN);
 
 			// フレーム計測ステートへ
 			pPerson->SetActionState(BASE_ACTION_STATE::FRAMECOUNT);

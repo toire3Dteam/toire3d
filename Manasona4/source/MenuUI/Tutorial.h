@@ -50,7 +50,7 @@
 class BaseTutorial
 {
 public:
-	BaseTutorial();
+	BaseTutorial(int iTitleNo);
 	virtual ~BaseTutorial();
 
 	virtual void Init(int iDeviceID = 0) = 0;// 最初に毎回初期化
@@ -99,7 +99,7 @@ protected:
 	// タスクデータ
 	struct Task
 	{
-		LPSTR pSting;	// 文字
+		std::string pString;	// 文字
 		bool bClear;	// クリアしたか
 		int iStingLength;	//　文字数 
 	};
@@ -115,6 +115,8 @@ protected:
 
 	bool m_bAllTaskClear;
 
+	int m_iTitleNo;//
+
 	tdn2DAnim* m_pClearPic;
 	tdn2DAnim* m_pClearPicRip;
 };
@@ -125,7 +127,7 @@ protected:
 class  WalkTutorial :public BaseTutorial
 {
 public:
-	WalkTutorial();
+	WalkTutorial(int iTitleNo);
 	~WalkTutorial() {};
 
 	void Init(int iDeviceID = 0);
@@ -146,7 +148,7 @@ private:
 class  SquatTutorial :public BaseTutorial
 {
 public:
-	SquatTutorial();
+	SquatTutorial(int iTitleNo);
 	~SquatTutorial() {};
 
 	void Init(int iDeviceID = 0);
@@ -165,7 +167,7 @@ private:
 class  JumpTutorial :public BaseTutorial
 {
 public:
-	JumpTutorial();
+	JumpTutorial(int iTitleNo);
 	~JumpTutorial() {};
 
 	void Init(int iDeviceID = 0);
@@ -184,7 +186,7 @@ private:
 class  AttackTutorial :public BaseTutorial
 {
 public:
-	AttackTutorial();
+	AttackTutorial(int iTitleNo);
 	~AttackTutorial() {};
 
 	void Init(int iDeviceID = 0);
@@ -202,7 +204,7 @@ private:
 class  SkillTutorial :public BaseTutorial
 {
 public:
-	SkillTutorial();
+	SkillTutorial(int iTitleNo);
 	~SkillTutorial() {};
 
 	void Init(int iDeviceID = 0);
@@ -221,7 +223,7 @@ private:
 class  OverDriveTutorial :public BaseTutorial
 {
 public:
-	OverDriveTutorial();
+	OverDriveTutorial(int iTitleNo);
 	~OverDriveTutorial() {};
 
 	void Init(int iDeviceID = 0);
@@ -239,7 +241,7 @@ private:
 class  RushTutorial :public BaseTutorial
 {
 public:
-	RushTutorial();
+	RushTutorial(int iTitleNo);
 	~RushTutorial() {};
 
 	void Init(int iDeviceID = 0);
@@ -258,7 +260,7 @@ private:
 class  StandGuardTutorial :public BaseTutorial
 {
 public:
-	StandGuardTutorial();
+	StandGuardTutorial(int iTitleNo);
 	~StandGuardTutorial() {};
 
 	void Init(int iDeviceID = 0);
@@ -278,7 +280,7 @@ private:
 class  SquatGuardTutorial :public BaseTutorial
 {
 public:
-	SquatGuardTutorial();
+	SquatGuardTutorial(int iTitleNo);
 	~SquatGuardTutorial() {};
 
 	void Init(int iDeviceID = 0);
@@ -298,7 +300,7 @@ private:
 class  EscapeTutorial :public BaseTutorial
 {
 public:
-	EscapeTutorial();
+	EscapeTutorial(int iTitleNo);
 	~EscapeTutorial() {};
 
 	void Init(int iDeviceID = 0);
@@ -308,5 +310,171 @@ public:
 
 private:
 
+
+};
+
+//+-----------------------------
+//	投げの説明
+//+-----------------------------
+class  ThrowTutorial :public BaseTutorial
+{
+public:
+	ThrowTutorial(int iTitleNo);
+	~ThrowTutorial() {};
+
+	void Init(int iDeviceID = 0);
+
+	// それぞれのタスクをここで作る
+	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
+
+private:
+
+
+};
+
+//+-----------------------------
+//	無敵技の説明
+//+-----------------------------
+class  InvincibleTutorial :public BaseTutorial
+{
+public:
+	InvincibleTutorial(int iTitleNo);
+	~InvincibleTutorial() {};
+
+	void Init(int iDeviceID = 0);
+
+	// それぞれのタスクをここで作る
+	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
+
+private:
+
+
+};
+
+
+//+-----------------------------
+//	ダッシュ説明
+//+-----------------------------
+class  DushTutorial :public BaseTutorial
+{
+public:
+	DushTutorial(int iTitleNo);
+	~DushTutorial() {};
+
+	void Init(int iDeviceID = 0);
+
+	// それぞれのタスクをここで作る
+	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
+
+private:
+	int m_iDushFrame;
+
+};
+
+//+-----------------------------
+//	バックステップ説明
+//+-----------------------------
+class  BackStepTutorial :public BaseTutorial
+{
+public:
+	BackStepTutorial(int iTitleNo);
+	~BackStepTutorial() {};
+
+	void Init(int iDeviceID = 0);
+
+	// それぞれのタスクをここで作る
+	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
+
+private:
+
+};
+
+//+-----------------------------
+//	パートナー説明
+//+-----------------------------
+class  PartnerTutorial :public BaseTutorial
+{
+public:
+	PartnerTutorial(int iTitleNo);
+	~PartnerTutorial() {};
+
+	void Init(int iDeviceID = 0);
+
+	// それぞれのタスクをここで作る
+	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
+
+private:
+
+};
+
+//+-----------------------------
+//	中段攻撃説明
+//+-----------------------------
+class  DokkoiTutorial :public BaseTutorial
+{
+public:
+	DokkoiTutorial(int iTitleNo);
+	~DokkoiTutorial() {};
+
+	void Init(int iDeviceID = 0);
+
+	// それぞれのタスクをここで作る
+	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
+
+private:
+
+};
+
+//+-----------------------------
+//	足払い説明
+//+-----------------------------
+class  DownAttackTutorial :public BaseTutorial
+{
+public:
+	DownAttackTutorial(int iTitleNo);
+	~DownAttackTutorial() {};
+
+	void Init(int iDeviceID = 0);
+
+	// それぞれのタスクをここで作る
+	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
+
+private:
+
+};
+
+//+-----------------------------
+//	覚醒説明
+//+-----------------------------
+class  OverDriveOneMoreTutorial :public BaseTutorial
+{
+public:
+	OverDriveOneMoreTutorial(int iTitleNo);
+	~OverDriveOneMoreTutorial() {};
+
+	void Init(int iDeviceID = 0);
+
+	// それぞれのタスクをここで作る
+	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
+
+private:
+
+};
+
+//+-----------------------------
+//	バースト覚醒説明
+//+-----------------------------
+class  OverDriveBurstTutorial :public BaseTutorial
+{
+public:
+	OverDriveBurstTutorial(int iTitleNo);
+	~OverDriveBurstTutorial() {};
+
+	void Init(int iDeviceID = 0);
+
+	// それぞれのタスクをここで作る
+	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
+
+private:
 
 };

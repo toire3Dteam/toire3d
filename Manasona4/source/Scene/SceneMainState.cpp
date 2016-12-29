@@ -635,7 +635,10 @@ void SceneMainState::TutorialIntro::Enter(sceneMain *pMain)
 	PlayerMgr->GetPlayer(SIDE::LEFT)->SetOverDriveGage(0);
 	PlayerMgr->GetPlayer(SIDE::RIGHT)->SetOverDriveGage(0);
 
-	//  チュートリアル毎に必要な設定をここでもしてあげる
+	//  チュートリアル毎に必要な設定をここでもする
+	// 相手との距離は基本近づける
+	PlayerMgr->GetPlayer(SIDE::LEFT)->SetPos(Vector3(-7, 0, 0));
+	PlayerMgr->GetPlayer(SIDE::RIGHT)->SetPos(Vector3(7, 0, 0));
 	//if (pMain->GetSelectTutorial() == TUTORIAL_TYPE::STAND_GUARD)
 	//{
 	//	PlayerMgr->GetPlayer(SIDE::LEFT)->SetPos(Vector3(-97.5, 0, 0));
@@ -706,8 +709,6 @@ void SceneMainState::TutorialMain::Enter(sceneMain *pMain)
 {
 
 	// ★TODO　ボタン　が履歴が残ったままなので　はいを選択したらそのまま攻撃してしまう
-	// ここで履歴をkesu
-
 
 }
 
@@ -858,11 +859,8 @@ void SceneMainState::TutorialClear::Enter(sceneMain *pMain)
 	// 次のチュートリアルへ
 	// (TODO)ここで配列の最後まできたらメニューに戻る処理
 	// お疲れ様でした！とかは最後のクリアティップスで書こう。
-	pMain->SetSelectTutorial(TUTORIAL_TYPE(pMain->GetSelectTutorial() + (TUTORIAL_TYPE)1));
-	if (pMain->GetSelectTutorial() == TUTORIAL_TYPE::ARRAY_END)
-	{
+	pMain->SetSelectTutorial(TUTORIAL_TYPE((int)pMain->GetSelectTutorial() + 1));
 
-	}
 
 }
 
@@ -899,6 +897,14 @@ void SceneMainState::TutorialClear::Execute(sceneMain *pMain)
 
 	}else// フェードアウト完了後	
 	{
+		// 忙しい人はここで終り
+		if (TutorialMgr->isBusy() == true && 
+			pMain->GetSelectTutorial() == TUTORIAL_TYPE::PARTNER)
+		{
+			MainFrameEx->ChangeScene(new sceneMenu());
+			return;
+		}
+
 		// (TODO)ここで配列の最後まできたらメニューに戻る処理
 		if (pMain->GetSelectTutorial() == TUTORIAL_TYPE::ARRAY_END)
 		{
