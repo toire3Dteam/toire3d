@@ -491,21 +491,21 @@ TekiResultPerformance::TekiResultPerformance()
 	m_winner.PicClean();
 	m_winner.pic = new tdn2DAnim("DATA/Result/teki/Winner.png");
 	m_winner.pic->OrderShake(3, 0, 63, 3);
-	m_winner.pic->SetScale(1.15f);
+	//m_winner.pic->SetScale(1.15f);
 
 	m_winnerDon.PicClean();
 	m_winnerDon.pic = new tdn2DAnim("DATA/Result/teki/Winner.png");
 	m_winnerDon.pic->OrderRipple(6, 1.15f, 0.025f);
-	m_winnerDon.pic->SetScale(1.15f);
+	//m_winnerDon.pic->SetScale(1.15f);
 
 	m_edge.PicClean();
 	m_edge.pic = new tdn2DAnim("DATA/Result/teki/Edge.png");
 	m_edge.pic->OrderShake(3, 0, 63, 3);
-	m_edge.pic->SetScale(1.25f);
+	//m_edge.pic->SetScale(1.25f);
 
 	m_back.PicClean();
 	m_back.pic = new tdn2DAnim("DATA/Result/teki/back.png");
-	m_back.pic->SetScale(1.5f);
+	//m_back.pic->SetScale(1.5f);
 	m_back.pic->OrderNone();
 
 	m_font.PicClean();
@@ -528,13 +528,13 @@ TekiResultPerformance::TekiResultPerformance()
 	m_pFlontRing.pic = new tdn2DAnim("DATA/Result/teki/FlontRing.png");
 	m_pFlontRing.uv.x = 0.0f;
 	m_pFlontRing.uv.y = 0.0f;
-	m_pFlontRing.pic->OrderMoveAppeared(10, -800, 600);
+	m_pFlontRing.pic->OrderMoveAppeared(10, -1000, 500);
 
 	m_pBackRing.PicClean();
 	m_pBackRing.pic = new tdn2DAnim("DATA/Result/teki/BackRing.png");
 	m_pBackRing.uv.x = 0.0f;
 	m_pBackRing.uv.y = 0.0f;
-	m_pBackRing.pic->OrderMoveAppeared(10, 1280, 600);
+	m_pBackRing.pic->OrderMoveAppeared(10, 1280, 500);
 
 	// 上のリングの光
 	m_pTopLight.PicClean();
@@ -585,7 +585,7 @@ void TekiResultPerformance::Update()
 {
 	if (m_bAction == false)return;// アクションフラグが立つまでハジク
 
-	m_back.uv.x -= 0.2f;
+	//m_back.uv.x -= 0.2f;
 	m_back.pic->Update();
 
 	/*m_soul.pos.x += 0.05f;*/
@@ -606,12 +606,12 @@ void TekiResultPerformance::Update()
 	m_blackInk.pic->Update();
 
 	// リング
-	m_pBackRing.pos.x += -0.25f;// 左にわー
-	m_pBackRing.pos.y += +0.05f;
+	m_pBackRing.pos.x += -0.3f;// 左にわー
+	m_pBackRing.pos.y += +0.125f;
 	m_pBackRing.pic->Update();
 
-	m_pFlontRing.pos.x += 0.25f;// 右にわー
-	m_pFlontRing.pos.y += -0.05f;
+	m_pFlontRing.pos.x += 0.4f;// 右にわー
+	m_pFlontRing.pos.y += -0.125f;
 	m_pFlontRing.pic->Update();
 
 	// 上の光
@@ -640,7 +640,7 @@ void TekiResultPerformance::BackRender()
 		(int)m_back.uv.x, (int)m_back.uv.y, m_back.pic->GetWidth(), m_back.pic->GetHeight());
 
 	// 後ろのライト
-	m_pTopLight.pic->Render((int)m_pTopLight.pos.x, (int)m_pTopLight.pos.y);
+	//m_pTopLight.pic->Render((int)m_pTopLight.pos.x, (int)m_pTopLight.pos.y);
 
 	// 後ろのリング
 	m_pBackRing.pic->Render((int)m_pBackRing.pos.x, (int)m_pBackRing.pos.y);
@@ -674,15 +674,15 @@ void TekiResultPerformance::Action()
 
 	// 初期化＆始動
 	m_winner.pos.x = 0;
-	m_winner.pos.y = 0;
+	m_winner.pos.y = 20;
 	m_winner.pic->Action();
 
 	m_winnerDon.pos.x = 0;
-	m_winnerDon.pos.y = 0;
+	m_winnerDon.pos.y = 20;
 	m_winnerDon.pic->Action();
 
-	m_edge.pos.x = -20;
-	m_edge.pos.y = -10;
+	m_edge.pos.x = -10;
+	m_edge.pos.y = 15;
 	m_edge.pic->Action();
 
 	m_back.pic->Action();
@@ -732,17 +732,17 @@ NazenarabaResultPerformance::NazenarabaResultPerformance()
 	m_winner.PicClean();
 	m_winner.pic = new tdn2DAnim("DATA/Result/nazenaraba/Winner.png");
 	m_winner.pic->OrderShake(3, 0, 63, 3);
-	m_winner.pic->SetScale(1.15f);
+	m_winner.pic->SetScale(1.1f);
 
 	m_winnerDon.PicClean();
 	m_winnerDon.pic = new tdn2DAnim("DATA/Result/nazenaraba/Winner.png");
 	m_winnerDon.pic->OrderRipple(6, 1.15f, 0.025f);
-	m_winnerDon.pic->SetScale(1.15f);
+	m_winnerDon.pic->SetScale(1.1f);
 
 	m_edge.PicClean();
 	m_edge.pic = new tdn2DAnim("DATA/Result/nazenaraba/Edge.png");
 	m_edge.pic->OrderShake(3, 0, 63, 3);
-	m_edge.pic->SetScale(1.15f);
+	m_edge.pic->SetScale(1.1f);
 
 	m_back.PicClean();
 	m_back.pic = new tdn2DAnim("DATA/Result/nazenaraba/back.png");
@@ -808,23 +808,47 @@ NazenarabaResultPerformance::NazenarabaResultPerformance()
 	// ノーツ
 	for (int i = 0; i < NORT_MAX; i++)
 	{
+		std::string sFont;
+		sFont = "DATA/Result/nazenaraba/nort/nort";
+		sFont += std::to_string(i);
+		sFont += ".png";
+
 		m_pNort[i].PicClean();
-		m_pNort[i].pic = new tdn2DAnim("DATA/Result/nazenaraba/nort/nort0.png");
+		m_pNort[i].pic = new tdn2DAnim(sFont.c_str());
 		
 		m_pNort[i].pic->OrderJump(18, 1.0f, 0.25f);
 
-		// 二の乗数なら
-		//if (0 == i % 2)
-		//{
-		//	m_pNort[i].pic->OrderShake(128, 0, 24, 64);
-		//}
-		//else
-		//{
-		//	m_pNort[i].pic->OrderShake(128, 0, -24, 64);
-		//}
+	}
+
+	// スター
+	for (int i = 0; i < STAR_MAX; i++)
+	{
+		std::string sFont;
+		sFont = "DATA/Result/nazenaraba/star/star";
+		sFont += std::to_string(i);
+		sFont += ".png";
+
+		m_pStar[i].PicClean();
+		m_pStar[i].pic = new tdn2DAnim(sFont.c_str());
+
+		m_pStar[i].pic->OrderMoveAppeared(12, 1280, 720);
 
 	}
 
+	// ハート
+	for (int i = 0; i < HART_MAX; i++)
+	{
+		std::string sFont;
+		sFont = "DATA/Result/nazenaraba/hart/hart";
+		sFont += std::to_string(i);
+		sFont += ".png";
+
+		m_pHart[i].PicClean();
+		m_pHart[i].pic = new tdn2DAnim(sFont.c_str());
+
+		m_pHart[i].pic->OrderMoveAppeared(12, 1280, 720);
+
+	}
 
 	// 吹き出し
 	m_pBalloon.PicClean();
@@ -857,7 +881,16 @@ NazenarabaResultPerformance::~NazenarabaResultPerformance()
 	{
 		SAFE_DELETE(m_pNort[i].pic);
 	}
-
+	// スター
+	for (int i = 0; i < STAR_MAX; i++)
+	{
+		SAFE_DELETE(m_pStar[i].pic);
+	}
+	// ハート
+	for (int i = 0; i < HART_MAX; i++)
+	{
+		SAFE_DELETE(m_pHart[i].pic);
+	}
 }
 
 void NazenarabaResultPerformance::Update()
@@ -915,7 +948,22 @@ void NazenarabaResultPerformance::Update()
 	// ノーツ
 	for (int i = 0; i < NORT_MAX; i++)
 	{
+		m_pNort[i].pos += m_pNort[i].vMove;
 		m_pNort[i].pic->Update();
+	}
+	// スター
+	for (int i = 0; i < STAR_MAX; i++)
+	{
+		m_pStar[i].pos += m_pStar[i].vMove;
+		m_pStar[i].rotate += 0.01f;
+		m_pStar[i].pic->SetAngle(m_pStar[i].rotate);
+		m_pStar[i].pic->Update();
+	}
+	// ハート
+	for (int i = 0; i < HART_MAX; i++)
+	{
+		m_pHart[i].pos += m_pHart[i].vMove;
+		m_pHart[i].pic->Update();
 	}
 
 };
@@ -942,6 +990,16 @@ void NazenarabaResultPerformance::BackRender()
 	for (int i = 0; i < NORT_MAX; i++)
 	{
 		m_pNort[i].pic->Render((int)m_pNort[i].pos.x, (int)m_pNort[i].pos.y);
+	}
+	// スター
+	for (int i = 0; i < STAR_MAX; i++)
+	{
+		m_pStar[i].pic->Render((int)m_pStar[i].pos.x, (int)m_pStar[i].pos.y);
+	}
+	// ハート
+	for (int i = 0; i < HART_MAX; i++)
+	{
+		m_pHart[i].pic->Render((int)m_pHart[i].pos.x, (int)m_pHart[i].pos.y);
 	}
 
 	// 後ろのライト
@@ -989,8 +1047,8 @@ void NazenarabaResultPerformance::Action()
 	m_winnerDon.pos.y = 0;
 	m_winnerDon.pic->Action();
 
-	m_edge.pos.x = -20;
-	m_edge.pos.y = -10;
+	m_edge.pos.x = -10;
+	m_edge.pos.y = -5;
 	m_edge.pic->Action();
 
 	m_back.pic->Action();
@@ -1034,12 +1092,67 @@ void NazenarabaResultPerformance::Action()
 	m_pNort[0].pic->Action();
 
 	m_pNort[1].pos.x = 200;
-	m_pNort[1].pos.y = 400;
+	m_pNort[1].pos.y = 300;
 	m_pNort[1].pic->Action();
 
 	m_pNort[2].pos.x = 800;
 	m_pNort[2].pos.y = 100;
 	m_pNort[2].pic->Action();
+
+
+	Vector2 vS;
+	Vector2 vMoveVec = VECTOR2_ZERO;
+	vS.x = 1280;
+	vS.y = 720;
+	
+
+	// スターを個別に設定
+	m_pStar[0].pos.x = 300;
+	m_pStar[0].pos.y = 0;
+	m_pStar[0].pic->Action(2);	
+
+	m_pStar[1].pos.x = 140;
+	m_pStar[1].pos.y = 500;
+	m_pStar[1].pic->Action(4);
+	   
+	m_pStar[2].pos.x = 848;
+	m_pStar[2].pos.y = 64;
+	m_pStar[2].pic->Action(6);
+
+	m_pStar[3].pos.x = 641;
+	m_pStar[3].pos.y = 448;
+	m_pStar[3].pic->Action(8);
+
+	for (int i = 0; i < STAR_MAX; i++)
+	{
+		vMoveVec = m_pStar[i].pos - vS;
+		vMoveVec.Normalize();
+		m_pStar[i].vMove = vMoveVec*0.25f;
+	}
+
+	// ハートを個別に設定
+	m_pHart[0].pos.x = 1152;
+	m_pHart[0].pos.y = 0;
+	m_pHart[0].pic->Action(2);
+	   
+	m_pHart[1].pos.x = -32;
+	m_pHart[1].pos.y = 224;
+	m_pHart[1].pic->Action(4);
+	   
+	m_pHart[2].pos.x = 496;
+	m_pHart[2].pos.y = 448;
+	m_pHart[2].pic->Action(6);
+
+	m_pHart[3].pos.x = 528;
+	m_pHart[3].pos.y = 224;
+	m_pHart[3].pic->Action(8);
+
+	for (int i = 0; i < HART_MAX; i++)
+	{
+		vMoveVec = m_pHart[i].pos - vS;
+		vMoveVec.Normalize();
+		m_pHart[i].vMove = vMoveVec*0.25f;
+	}
 
 	// ムービープレイ
 	//m_movieMgr->SetTime(0);

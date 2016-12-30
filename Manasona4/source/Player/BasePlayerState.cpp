@@ -196,7 +196,7 @@ bool SquatAttackCancel(BasePlayer * pPerson)
 bool AntiAirCancel(BasePlayer *pPerson)
 {
 	// 対空攻撃キャンセル
-	if ((pPerson->isPushInput((pPerson->GetDir() == DIR::LEFT) ? PLAYER_COMMAND_BIT::RIGHT : PLAYER_COMMAND_BIT::LEFT, true)) && pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::C, true) && !pPerson->GetFSM()->isPrevState(*BasePlayerState::AntiAirAttack::GetInstance()))
+	if ((pPerson->isPushInput((pPerson->GetDir() == DIR::LEFT) ? PLAYER_COMMAND_BIT::RIGHT : PLAYER_COMMAND_BIT::LEFT, true)) && pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R1, true) && !pPerson->GetFSM()->isPrevState(*BasePlayerState::AntiAirAttack::GetInstance()))
 	{
 		// 先行入力リセット
 		pPerson->AheadCommandReset();
@@ -231,14 +231,15 @@ bool AttackCancel(BasePlayer *pPerson)
 	{
 		if (pPerson->isLand() == true)
 		{
-			// 4入力
-			if (pPerson->isPushInput((pPerson->GetDir() == DIR::LEFT) ? PLAYER_COMMAND_BIT::RIGHT : PLAYER_COMMAND_BIT::LEFT, true))
-			{
-				// 対空攻撃
-				pPerson->GetFSM()->ChangeState(BasePlayerState::AntiAirAttack::GetInstance());
-			}
+			// (12/30) 対空を特殊技扱いへ
+			//// 4入力
+			//if (pPerson->isPushInput((pPerson->GetDir() == DIR::LEFT) ? PLAYER_COMMAND_BIT::RIGHT : PLAYER_COMMAND_BIT::LEFT, true))
+			//{
+			//	// 対空攻撃
+			//	pPerson->GetFSM()->ChangeState(BasePlayerState::AntiAirAttack::GetInstance());
+			//}
 			// 2入力
-			else if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN, true))
+			if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN, true))
 			{
 				// しゃがみ下段
 				pPerson->GetFSM()->ChangeState(BasePlayerState::SquatAttack::GetInstance());
@@ -558,7 +559,13 @@ bool DokkoiAttackCancel(BasePlayer *pPerson)
 	{
 		if (pPerson->isLand() == true)
 		{
-			if (/*pPerson->isSquat() == false*/
+			// 4入力
+			if (pPerson->isPushInput((pPerson->GetDir() == DIR::LEFT) ? PLAYER_COMMAND_BIT::RIGHT : PLAYER_COMMAND_BIT::LEFT, true))
+			{
+				// 対空攻撃
+				pPerson->GetFSM()->ChangeState(BasePlayerState::AntiAirAttack::GetInstance());
+			}
+			else if (/*pPerson->isSquat() == false*/
 				pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN, true))
 			{
 				// しゃがみ
@@ -1113,6 +1120,11 @@ void BasePlayerState::Wait::Execute(BasePlayer * pPerson)
 	//============================================
 	if (AttackCancel(pPerson)) return;
 
+	////////////////////////////////////////////////
+	////	対空攻撃キャンセル
+	////============================================
+	//if (AntiAirCancel(pPerson)) return;
+
 	//////////////////////////////////////////////
 	//	どっこい攻撃キャンセル
 	//============================================
@@ -1243,6 +1255,11 @@ void BasePlayerState::Walk::Execute(BasePlayer * pPerson)
 	//	攻撃キャンセル
 	//============================================
 	if (AttackCancel(pPerson)) return;
+
+	////////////////////////////////////////////////
+	////	対空攻撃キャンセル
+	////============================================
+	//if (AntiAirCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	どっこい攻撃キャンセル
@@ -1419,6 +1436,11 @@ void BasePlayerState::BackWalk::Execute(BasePlayer * pPerson)
 	//	攻撃キャンセル
 	//============================================
 	if (AttackCancel(pPerson)) return;
+
+	////////////////////////////////////////////////
+	////	対空攻撃キャンセル
+	////============================================
+	//if (AntiAirCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	どっこい攻撃キャンセル
@@ -1601,6 +1623,11 @@ void BasePlayerState::Run::Execute(BasePlayer * pPerson)
 	//	攻撃キャンセル
 	//============================================
 	if (AttackCancel(pPerson)) return;
+
+	////////////////////////////////////////////////
+	////	対空攻撃キャンセル
+	////============================================
+	//if (AntiAirCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	どっこい攻撃キャンセル
@@ -2293,6 +2320,11 @@ void BasePlayerState::AerialJump::Execute(BasePlayer * pPerson)
 	if (AttackCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
+	//	どっこい攻撃キャンセル
+	//============================================
+	if (DokkoiAttackCancel(pPerson)) return;
+
+	//////////////////////////////////////////////
 	//	ヒーホードライブボタン
 	//============================================
 	if (HeaveHoCancel(pPerson)) return;
@@ -2415,6 +2447,11 @@ void BasePlayerState::Fall::Execute(BasePlayer * pPerson)
 	if (AttackCancel(pPerson))return;
 
 	//////////////////////////////////////////////
+	//	どっこい攻撃キャンセル
+	//============================================
+	if (DokkoiAttackCancel(pPerson)) return;
+
+	//////////////////////////////////////////////
 	//	フィニッシュ攻撃ボタン
 	//============================================
 	if (InvincibleAttackCancel(pPerson)) return;
@@ -2512,6 +2549,11 @@ void BasePlayerState::Land::Execute(BasePlayer * pPerson)
 		//	攻撃キャンセル
 		//============================================
 		if (AttackCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	どっこい攻撃キャンセル
+		//============================================
+		if (DokkoiAttackCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	フィニッシュ攻撃ボタン
@@ -2657,15 +2699,15 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 				//============================================
 				if (HeaveHoCancel(pPerson)) return;
 
+				////////////////////////////////////////////////
+				////	対空攻撃キャンセル
+				////============================================
+				//if (AntiAirCancel(pPerson)) return;
+
 				//////////////////////////////////////////////
 				//	どっこい攻撃キャンセル
 				//============================================
 				if (DokkoiAttackCancel(pPerson)) return;
-
-				//////////////////////////////////////////////
-				//	対空攻撃キャンセル
-				//============================================
-				if (AntiAirCancel(pPerson)) return;
 
 				//////////////////////////////////////////////
 				//	しゃがみ攻撃キャンセル
@@ -2747,15 +2789,15 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 				//============================================
 				if (HeaveHoCancel(pPerson)) return;
 
+				////////////////////////////////////////////////
+				////	対空攻撃キャンセル
+				////============================================
+				//if (AntiAirCancel(pPerson)) return;
+
 				//////////////////////////////////////////////
 				//	どっこい攻撃キャンセル
 				//============================================
 				if (DokkoiAttackCancel(pPerson)) return;
-
-				//////////////////////////////////////////////
-				//	対空攻撃キャンセル
-				//============================================
-				if (AntiAirCancel(pPerson)) return;
 
 				//////////////////////////////////////////////
 				//	しゃがみ攻撃キャンセル
@@ -3328,6 +3370,11 @@ void BasePlayerState::Squat::Execute(BasePlayer * pPerson)
 	//============================================
 	if (SkillCancel(pPerson)) return;
 
+	////////////////////////////////////////////////
+	////	対空攻撃キャンセル
+	////============================================
+	//if (AntiAirCancel(pPerson)) return;
+
 	//////////////////////////////////////////////
 	//	どっこい攻撃キャンセル
 	//============================================
@@ -3423,15 +3470,15 @@ void BasePlayerState::SquatAttack::Execute(BasePlayer * pPerson)
 		//============================================
 		if (StandCancel(pPerson)) return;
 
+		////////////////////////////////////////////////
+		////	対空攻撃キャンセル
+		////============================================
+		//if (AntiAirCancel(pPerson)) return;
+
 		//////////////////////////////////////////////
 		//	どっこい攻撃と足払いキャンセル
 		//============================================
 		if (DokkoiAttackCancel(pPerson)) return;
-
-		//////////////////////////////////////////////
-		//	対空攻撃キャンセル
-		//============================================
-		if (AntiAirCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	ラッシュ攻撃キャンセル
@@ -4775,6 +4822,11 @@ void BasePlayerState::Guard::Execute(BasePlayer * pPerson)
 		//	ヒーホードライブボタン
 		//============================================
 		if (HeaveHoCancel(pPerson)) return;
+
+		////////////////////////////////////////////////
+		////	対空攻撃キャンセル
+		////============================================
+		//if (AntiAirCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	どっこい攻撃キャンセル

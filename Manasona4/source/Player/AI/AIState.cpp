@@ -221,7 +221,7 @@ bool NormalTypeChaseBrain(AI * pPerson)
 			return true;
 
 		}
-		else if (tdnRandom::Get(0, 100) <= 40)
+		else if (tdnRandom::Get(0, 100) <= 30)
 		{
 			// ガード
 			pPerson->GetFSM()->ChangeState(AIState::Guard::GetInstance());
@@ -1483,7 +1483,7 @@ void AIState::Wait::Execute(AI * pPerson)
 				pPerson->GetFSM()->ChangeState(AIState::InvincibleAttack::GetInstance());
 				return;
 			} 		
-			else if (l_iStrong <= 70)	// ←%の確率でガード
+			else if (l_iStrong <= 60)	// ←%の確率でガード
 			{
 				// ガード
 				pPerson->GetFSM()->ChangeState(AIState::Guard::GetInstance());

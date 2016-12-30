@@ -39,6 +39,7 @@ public:
 		//Vector2 moveUV;
 
 		Vector2 pos;
+		Vector2 vMove;
 		Vector2 uv;
 		float rotate;
 
@@ -52,6 +53,16 @@ public:
 
 			pos.x = pos.y = 0.0f;
 			uv.x = uv.y = 0.0f;
+			vMove.x = vMove.y = 0.0f;
+			rotate = 0.0f;
+		}
+
+		Pic() 
+		{
+			pic = nullptr;
+			pos.x = pos.y = 0.0f;
+			uv.x = uv.y = 0.0f;
+			vMove.x = vMove.y = 0.0f;
 			rotate = 0.0f;
 		}
 	};
@@ -221,7 +232,12 @@ private:
 	static const int NORT_MAX = 3;
 	Pic m_pNort[NORT_MAX];
 
-	 
+	static const int STAR_MAX = 4;
+	Pic m_pStar[STAR_MAX];
+
+	static const int HART_MAX = 4;
+	Pic m_pHart[HART_MAX];
+
 	 // 
 	//Pic m_pNort2; // 
 	//Pic m_pNort3; // 

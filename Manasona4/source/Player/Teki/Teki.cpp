@@ -1333,13 +1333,11 @@ bool Teki::HeavehoDriveUpdate()
 		// しょおおおおおおりゅううううけんん！！！！！ウーハー！小杉
 		m_vMove.Set((m_dir == DIR::LEFT) ? -.5f : .5f, 2.5f, 0);
 
-
 		// アッパーラインエフェクト
 		Vector3 l_vMoveVec = m_vMove;
 		l_vMoveVec.Normalize();
 		float l_fZAngle = atan2(-l_vMoveVec.x, l_vMoveVec.y);
 		m_pUpperLineEffect->Action(GetFlontPos(), 1, 1, Vector3(0, 0, l_fZAngle), Vector3(0, 0, l_fZAngle));
-
 		m_pCycloneEffect->Action(GetFlontPos(), 1.5f, 3.5f, Vector3(0, 0, l_fZAngle), Vector3(0, 0, l_fZAngle));
 
 		// 重力の影響を戻す！
