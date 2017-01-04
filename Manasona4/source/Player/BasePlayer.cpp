@@ -2062,6 +2062,35 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::JUMP_WAVE, 0.55f, 0.8f, Vector3(0, 0, z), Vector3(0, 0, z));
 
 	}	break;
+	case EFFECT_TYPE::MULTIPLE_HIT_BLOW:
+	{
+		//m_pPanelEffectMGR->AddEffect(pos, PANEL_EFFECT_TYPE::DAMAGE);
+		
+		// 相手と自分のベクトル (自分がくらう側)
+		Vector3 vVec = m_vPos - m_pTargetPlayer->GetPos();
+		vVec.Normalize();
+
+		// ヒットリップ
+		float ram = tdnRandom::Get(-1.57f, 1.57f);
+		m_pUVEffectMGR->AddMultipleEffect(pos + (vVec * 2.5f), UV_EFFECT_MULTIPLE_TYPE::HIT_BLOW_RIP_MUL, .25f, 1.75f, Vector3(ram, -supportAngleY*1.5f, 0), Vector3(ram, -supportAngleY*1.5f, 0));
+
+		float slashRam = tdnRandom::Get(-3.14f, 3.14f);
+		m_pUVEffectMGR->AddMultipleEffect(pos + (vVec * 2.5f) + Vector3(0, 0, -2.5), UV_EFFECT_MULTIPLE_TYPE::HIT_IMPACT_MUL, 0.75f, 2.2f, Vector3(0, 0, slashRam), Vector3(0, 0, slashRam));
+
+		// 弱めで貫通波
+		// 相手のMove値考慮
+		float z = atan2(-vVec.x, vVec.y);
+		m_pUVEffectMGR->AddEffect(pos + (vVec * 5) , UV_EFFECT_TYPE::HIT_IMPACT,
+			0.5f, 1.25f, Vector3(0, 0, z), Vector3(0, 0, z));
+
+		// ブラ―エフェクト
+		DeferredManagerEx.SetRadialBlur(m_vPos, 2.55f);
+
+		// 飛び散るパーティクル
+
+		ParticleManager::EffectHitMultiple(pos + (vVec * 2.5f), -vVec);
+
+	}	break;
 	default:
 		MyAssert(0,"そんなエフェクトは存在しない ");	// そんなエフェクトは存在しない AddEffectAction()
 		break;

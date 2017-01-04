@@ -792,7 +792,7 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 if (HitDamageInfo->bOverDrive == true)
 									 {
 										 // 底上げ
-										 damage = (int)(HitDamageInfo->damage * max(pPerson->GetDamageRate(), 0.35f));							// ★自分のダメージレートにかけ合わせる
+										 damage = (int)(HitDamageInfo->damage * max(pPerson->GetDamageRate(), 0.25f));							// ★自分のダメージレートにかけ合わせる
 									 }
 									 else
 									 {

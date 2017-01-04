@@ -81,9 +81,11 @@ public:
 	static void EffectLandSmoke(const Vector3 &pos);		// 着地の煙
 	static void EffectHit(const Vector3 &pos, const Vector3 &v);
 	static void EffectGuard(const Vector3 &pos, const Vector3 &v);	// ガード
+	static void EffectHitMultiple(const Vector3 &pos, const Vector3 &v);	// ヒットパーティクル
 	static void EffectResultSplash(const Vector3 &pos);		// リザルトの血しぶき
 	static void EffectExplosion(const Vector3 &pos);		// 爆発の炎
 	static void EffectShotLocus(const Vector3 &pos);		// 弾の軌跡
+
 	//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
 
 private:

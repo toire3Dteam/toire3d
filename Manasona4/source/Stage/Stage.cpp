@@ -207,7 +207,7 @@ void Stage::NanasatoSity::Update()
 
 	// ポイントライト配置
 	Vector3 LightCol = Vector3(1.5f, 0.75f, 0.4f);
-	float LightSize = 60;
+	float LightSize = 70;
 	PointLightMgr->AddPointLight(Vector3(11, 19, -8), LightCol, LightSize , 4 * 1, 1, 1, 1);
 	PointLightMgr->AddPointLight(Vector3(-34, 34, -8), LightCol, LightSize , 4 * 1, 1, 1, 1);
 	PointLightMgr->AddPointLight(Vector3(92, 31, 49), LightCol, LightSize , 4 * 1, 1, 1, 1);

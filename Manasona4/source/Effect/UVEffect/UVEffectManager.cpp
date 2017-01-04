@@ -133,6 +133,12 @@ UVEffectManager::UVEffectManager()
 			case UV_EFFECT_MULTIPLE_TYPE::HIT_SLASH:
 				m_pMultipleEffect[i].pBaseUVEffectMultiple[j] = new HitSlashGridEffect();
 				break;
+			case UV_EFFECT_MULTIPLE_TYPE::HIT_IMPACT_MUL:
+				m_pMultipleEffect[i].pBaseUVEffectMultiple[j] = new HitImpactMulEffect();
+				break;
+			case UV_EFFECT_MULTIPLE_TYPE::HIT_BLOW_RIP_MUL:
+				m_pMultipleEffect[i].pBaseUVEffectMultiple[j] = new HitRipBlowMulEffect();
+				break;
 			default:
 				break;
 			}

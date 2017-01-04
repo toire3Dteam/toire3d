@@ -485,8 +485,14 @@ void sceneMain::Render()
 		// シェーダ  (最適化)　85 ステージによって様々だがこれは仕方がない
 		DeferredManagerEx.G_Begin();
 		{
-			// ステージ描画
-			m_pStage->RenderDeferred();
+
+			// ★必殺用のステージが描画されるなら描画しない
+			if (m_bOverDriveStageFlag == false)
+			{
+				// ステージ描画
+				m_pStage->RenderDeferred();
+			}
+
 			// プレイヤー
 			PlayerMgr->RenderDeferred();
 		}

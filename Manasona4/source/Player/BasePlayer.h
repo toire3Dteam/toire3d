@@ -258,6 +258,7 @@ enum class EFFECT_TYPE
 	WILL_POWER,			// ª«
 	DROP_IMPACT_SUPER,	// ‚Ä‚«‚ÌÕŒ‚”g
 	CYCLONE_RUN,		// —³Šª‚ğ‹N‚±‚µ‚Ä‘–‚é
+	MULTIPLE_HIT_BLOW,	// ‘½’iƒqƒbƒgi•¨—j
 };
 
 // ƒK[ƒh‚Ìí—Ş
@@ -687,7 +688,7 @@ public:
 	void AddHP(int add) { m_iHP += add; }
 	float GetDamageRate(){ return m_fDamageRate; }
 	void AddDamageRate(float rate){ m_fDamageRate = min(m_fDamageRate + rate, 1);}		// ‰ÁZ(1.0ˆÈã‚É‚È‚ç‚È‚¢‚æ‚¤‚É‚·‚é)
-	void MultDamageRate(float rate){ m_fDamageRate = max(m_fDamageRate * rate, 0.3f); }	// æZ(0.3ˆÈ‰º‚É‚Í‚È‚ç‚È‚¢‚æ‚¤‚É‚·‚é)
+	void MultDamageRate(float rate){ m_fDamageRate = max(m_fDamageRate * rate, 0.2f); }	// æZ(0.3ˆÈ‰º‚É‚Í‚È‚ç‚È‚¢‚æ‚¤‚É‚·‚é) // (12/31) ƒRƒ“ƒ{‚Ì•‚ª‚©‚È‚èL‚ª‚Á‚Ä‚«‚½‚Ì‚Å­‚µ‚³‚°‚Ü‚·3.0->2.0
 	//void MultOverDriveDamageRate(float rate) { m_fDamageRate = max(m_fDamageRate * rate, 0.5f); }	// •KE‹Z‚ÍÅ’á•Ûá’l‚ğã‚°‚é
 	void ResetDamageRate(){ m_fDamageRate = 1.0f; }
 	// HP‚ÌŠ„‡

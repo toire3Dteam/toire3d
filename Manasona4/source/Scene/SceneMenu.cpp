@@ -9,6 +9,9 @@
 #include "Window/SoundWindow.h"	// 
 #include "Window/GameWindow.h"
 #include "../Scene/sceneResult.h"
+#include	"Trophy\TrophyManager.h"
+#include "BaseEntity\Message\MessageDispatcher.h"
+#include "Data\PlayerData.h"
 
 //#include "sceneResult.h"
 //#include "SceneSwitch/SceneSwitch.h"
@@ -121,11 +124,37 @@ void sceneMenu::Update()
 	// フェード
 	Fade::Update();
 
+	// トロフィー
+	TrophyMgr->Update();
+
 	{
 		// ★ステートマシン更新(何故ここに書くかというと、中でシーンチェンジの処理を行っているため)
 		m_pStateMachine->Update();
 
 #ifdef DEBUG
+		// Tでトロフィー解禁
+		if (KeyBoard(KB_T) == 2)
+		{
+			TROPHY_TYPE eType;
+			eType = TROPHY_TYPE::FIRST;
+			MsgMgr->Dispatch(0, ENTITY_ID::SCENE_MENU, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
+			
+		}
+		if (KeyBoard(KB_U) == 2)
+		{
+			TROPHY_TYPE eType;
+			eType = TROPHY_TYPE::FIRST_BATTLE;
+			MsgMgr->Dispatch(0, ENTITY_ID::SCENE_MENU, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
+
+		}
+		// Yでトロフィーロック
+		if (KeyBoard(KB_Y) == 2)
+		{
+			PlayerDataMgr->m_TrophyData.iFirstPlay = 0;
+			PlayerDataMgr->m_TrophyData.iFirstBattle= 0;
+		}
+
+
 		// エンターでワープ
 		if (KeyBoard(KB_ENTER) == 2)
 		{
@@ -174,6 +203,8 @@ void sceneMenu::Render()
 		m_pTips[i]->Render();
 	}
 	
+	// トロフィー
+	TrophyMgr->Render();
 
 	// 処理不可実験
 	//std::vector<int> v;

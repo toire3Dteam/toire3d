@@ -265,10 +265,11 @@ bool SceneSelectState::StageAndBGM::PadUpdate(sceneSelect *pMain, int DeviceID)
 			pMain->m_iSelectStageNo++;
 			pMain->m_tagSecondSelect.pStageRightRip->Action();
 
+			// (1/2) ↓ここの変数間違ってたから直した。
 			// 最後のステージまできたら最初に戻す
-			if (pMain->m_iSelectBGMNo > (int)STAGE::MAX)
+			if (pMain->m_iSelectStageNo > (int)STAGE::MAX)
 			{
-				pMain->m_iSelectBGMNo = 0;
+				pMain->m_iSelectStageNo = 0;
 			}
 		}
 	}
@@ -296,7 +297,7 @@ void SceneSelectState::StageAndBGM::Render(sceneSelect *pMain)
 	pMain->StageAndBGMRender();
 	tdnText::Draw(0, 0, 0xffffffff, "StageAndBGM");
 	
-	//tdnText::Draw(68, 128, 0xffffffff, "m_iSelectStageNo->%d",pMain->m_iSelectStageNo);
+	tdnText::Draw(68, 128, 0xffffffff, "m_iSelectStageNo->%d",pMain->m_iSelectStageNo);
 	//tdnText::Draw(68, 156, 0xffffffff, "m_iSelectBGMNo->%d",pMain->m_iSelectBGMNo);
 	//tdnText::Draw(68, 256, 0xffffffff, "曲めい->%s", BattleMusicMgr->GetMusicName(pMain->m_iSelectBGMNo).c_str());
 }

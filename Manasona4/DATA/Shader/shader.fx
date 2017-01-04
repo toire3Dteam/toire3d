@@ -2289,6 +2289,22 @@ technique uvAnime_add
 	}
 }
 
+technique uvAnime_add_noz
+{
+	pass P0
+	{
+		AlphaBlendEnable = true;
+		BlendOp = Add;
+		SrcBlend = SrcAlpha;
+		DestBlend = one;
+		CullMode = CCW;
+		ZEnable = false;			// このオブジェクトはZバッファを考慮しない
+		ZWriteEnable = false;	// このオブジェクトをZバッファに書き込まない
+
+		VertexShader = compile vs_3_0 VS_UvAnime();
+		PixelShader = compile ps_3_0 PS_UvAnime();
+	}
+}
 
 //------------------------------------------------------
 ///		ガード用ピクセルシェーダー	

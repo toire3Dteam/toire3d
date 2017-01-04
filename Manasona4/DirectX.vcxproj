@@ -162,6 +162,7 @@
     <ClCompile Include="source\RoundCall\RoundCallManager.cpp" />
     <ClCompile Include="source\SceneSwitch\SceneSwitch.cpp" />
     <ClCompile Include="source\Scene\SceneCollect.cpp" />
+    <ClCompile Include="source\Scene\SceneCollectState.cpp" />
     <ClCompile Include="source\Scene\SceneEffectTool.cpp" />
     <ClCompile Include="source\Scene\sceneLoading.cpp" />
     <ClCompile Include="source\Scene\LoadSceneThread.cpp" />
@@ -186,6 +187,8 @@
     <ClCompile Include="source\Stand\Stand.cpp" />
     <ClCompile Include="source\system\FrameworkEx.cpp" />
     <ClCompile Include="source\Timer\Timer.cpp" />
+    <ClCompile Include="source\Trophy\BaseTrophy.cpp" />
+    <ClCompile Include="source\Trophy\TrophyManager.cpp" />
     <ClCompile Include="source\UI\ComboUI.cpp" />
     <ClCompile Include="source\UI\FacePic.cpp" />
     <ClCompile Include="source\UI\GameUI.cpp" />
@@ -333,6 +336,7 @@
     <ClInclude Include="source\RoundCall\RoundCallManager.h" />
     <ClInclude Include="source\SceneSwitch\SceneSwitch.h" />
     <ClInclude Include="source\Scene\SceneCollect.h" />
+    <ClInclude Include="source\Scene\SceneCollectState.h" />
     <ClInclude Include="source\Scene\SceneEffectTool.h" />
     <ClInclude Include="source\Scene\sceneLoading.h" />
     <ClInclude Include="source\Scene\LoadSceneThread.h" />
@@ -358,6 +362,8 @@
     <ClInclude Include="source\Stand\Stand.h" />
     <ClInclude Include="source\system\FrameworkEx.h" />
     <ClInclude Include="source\Timer\Timer.h" />
+    <ClInclude Include="source\Trophy\BaseTrophy.h" />
+    <ClInclude Include="source\Trophy\TrophyManager.h" />
     <ClInclude Include="source\UI\ComboUI.h" />
     <ClInclude Include="source\UI\FacePic.h" />
     <ClInclude Include="source\UI\GameUI.h" />

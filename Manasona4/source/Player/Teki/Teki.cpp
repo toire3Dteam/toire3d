@@ -363,7 +363,7 @@ void Teki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->HitSE = "ヒット3";
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->WhiffSE = "空振り5";
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->HitEffectType = EFFECT_TYPE::DAMAGE;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->HitEffectType = EFFECT_TYPE::MULTIPLE_HIT_BLOW;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->WhiffEffectType = EFFECT_TYPE::BACK_STEP;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->bAntiAir = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->bFinish = true;
@@ -432,7 +432,7 @@ void Teki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->HitSE = "ヒット3";
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->WhiffSE = "空振り5";
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->HitEffectType = EFFECT_TYPE::MULTIPLE_HIT;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->HitEffectType = EFFECT_TYPE::MULTIPLE_HIT_BLOW;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->WhiffEffectType = EFFECT_TYPE::WHIFF;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->bAntiAir = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->bFinish = true;
@@ -646,6 +646,7 @@ Teki::~Teki()
 	FOR((int)SKILL_ACTION_TYPE::MAX) SAFE_DELETE(m_pSkillActions[i])
 
 	SAFE_DELETE(m_pUpperLineEffect);
+	SAFE_DELETE(m_pCycloneEffect);
 }
 
 void Teki::Update(PLAYER_UPDATE flag)
@@ -992,7 +993,7 @@ bool Teki::SkillAction::Land::Execute()
 		// 走ってる間
 		else //if (m_pTeki->m_iCurrentActionFrame < 12)
 		{
-			m_pTeki->AddMove(Vector3((m_pTeki->m_dir == DIR::LEFT) ? -.5f : .5f, 0, 0));
+			m_pTeki->AddMove(Vector3((m_pTeki->m_dir == DIR::LEFT) ? -1.0f : 1.0f, 0, 0));
 			m_pTeki->MoveClampX(3.5f);
 
 			// 接近したらキルラッシュモーション
@@ -1311,6 +1312,9 @@ void Teki::HeavehoDriveInit()
 
 	// 重力の影響受けるな！
 	SetMoveUpdate(false);
+
+	// Move値無効
+	m_vMove = VECTOR_ZERO;
 
 	// ストップタイマー
 	SetGameTimerStopFlag(true);

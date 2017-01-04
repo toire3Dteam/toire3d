@@ -13,6 +13,8 @@
 #include	"../Data/PlayerData.h"
 #include	"../Effect/Particle.h"
 #include    "../MenuUI/TutorialManager.h"
+#include	"Trophy\TrophyManager.h"
+
 
 //*****************************/
 //		WinMain
@@ -48,7 +50,7 @@ BOOL InitApp(HINSTANCE hInstance, int nCmdShow)									// ƒQ[ƒ€‹N“®‚ÌÅ‰‚Ì
 	SoundManager::SetBaseVolume(PlayerDataMgr->m_ConfigData.iBGMVolume, PlayerDataMgr->m_ConfigData.iSEVolume, PlayerDataMgr->m_ConfigData.iVoiceVolume);
 	tdnMovieManager::Initialize();
 	ParticleManager::Initialize("DATA/Effect/particle.png", 1024);	// ƒp[ƒeƒBƒNƒ‹‰Šú‰»(š‚È‚º‚±‚±‚É‘‚­‚©‚Æ‚¢‚¤‚ÆAƒV[ƒ€ƒŒƒXƒV[ƒ“‚É‚ÄA‰Šú‰»¨‰Šú‰»¨‰ğ•ú‚É‚È‚Á‚Ä‚µ‚Ü‚¤‚½‚ß)
-
+	TrophyMgr;
 	//IEX‚ÌƒVƒXƒeƒ€ŠÖ”‚ğˆê“IÌ—pA˜b‚µ‡‚¢‚ÅSystem.h‚ğ–•Á‚·‚é‚©Œˆ‚ß‚é
 	SYSTEM_Initialize();
 
@@ -77,7 +79,9 @@ BOOL EndApp()																	// ‚±‚Ì’†‚ÅƒVƒXƒeƒ€‚àŠÜ‚ß‚½‘S‚Ä‚ÌŒãˆ—‚ğ‚·‚é‚Ì‚Åƒ
 	MainFrameEx->Release();
 	ParticleManager::Release();
 	SYSTEM_Release();
+	TrophyMgr->Rerease();
 	TutorialMgr->Rerease();
+	// ƒ‰ƒCƒuƒ‰ƒŠ[ŠÖŒW‚ÍÅŒã‚ÉÁ‚·
 	tdnFont::Release();
 	tdnSystem::Release();
 	tdnText::CleanUpModule();

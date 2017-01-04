@@ -68,8 +68,9 @@ namespace PlayerData
 	// ƒgƒƒtƒB[
 	struct Trophy
 	{
-		unsigned int ƒQ[ƒ€‰ƒvƒŒƒC : 1;
-		unsigned int ‹ó‚«˜g			: 32;
+		unsigned int iFirstPlay		: 1;
+		unsigned int iFirstBattle	: 1;
+		unsigned int ‹ó‚«˜g			: 31;
 	};
 
 	// ‰B‚µ—v‘f

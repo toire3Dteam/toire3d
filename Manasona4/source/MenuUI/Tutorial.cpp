@@ -1444,7 +1444,7 @@ DokkoiTutorial::DokkoiTutorial(int iTitleNo) : BaseTutorial(iTitleNo)
 
 	// タスクセット
 	AddTaskData("中段攻撃－▽");
-	AddTaskData("ダッシュキャンセル－中段攻撃HIT後▽");
+	AddTaskData("ダッシュキャンセル－中段攻撃HIT後▽or→");
 
 	Init();
 }

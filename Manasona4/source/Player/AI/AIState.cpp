@@ -2672,10 +2672,10 @@ void AIState::ThrowTech::Enter(AI * pPerson)
 	switch (pPerson->GetAIType())
 	{
 	case AI_TYPE::CPU_EASY:
-		l_iRate += 35;
+		l_iRate += 40;
 		break;
 	case AI_TYPE::CPU_NORMAL:
-		l_iRate += 15;
+		l_iRate += 30;
 		break;
 	case AI_TYPE::CPU_HARD:
 		l_iRate += -30;

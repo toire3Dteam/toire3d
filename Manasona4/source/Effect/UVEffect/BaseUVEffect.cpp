@@ -35,6 +35,12 @@ void BaseUVEffect::RenderADD()
 	m_pic->Render_ADD();
 }
 
+void BaseUVEffect::RenderADDNOZ()
+{
+	// èÊéZï`âÊ(Zílçló∂ÇµÇ»Ç¢)
+	m_pic->Render_ADD_NOZ();
+}
+
 void BaseUVEffect::RenderGuard()
 {
 	// ÉKÅ[Éhópï`âÊ

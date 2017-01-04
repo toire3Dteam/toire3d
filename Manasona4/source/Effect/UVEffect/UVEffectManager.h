@@ -29,6 +29,8 @@ enum class UV_EFFECT_MULTIPLE_TYPE
 	GUARD_GRID,
 	HIT_RIP,
 	HIT_SLASH,
+	HIT_IMPACT_MUL,
+	HIT_BLOW_RIP_MUL,
 	ARRAY_END, // Å¶îzóÒÇÃèIÇÌÇË
 };
 

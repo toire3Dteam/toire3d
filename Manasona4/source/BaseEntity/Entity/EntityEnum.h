@@ -16,6 +16,7 @@ namespace GAME_ID
 		SCENE_MAIN,					// シーンメイン
 		SCENE_MENU,					// シーンメニュー
 		SCENE_SELECT,				// シーンキャラセレ
+		SCENE_COLLECT,				// シーンコレクト
 		PLAYER_MGR,					// マネージャーのID 
 		JUDGE_MNG,					// ジャッジマネージャーID
 		CAMERA_MGR,					// カメラマネージャーID
@@ -25,6 +26,7 @@ namespace GAME_ID
 		SHOT_MGR,					// ショットマネージャー
 		SELECT_UI_LEFT,				// キャラクターセレクトのUI左
 		SELECT_UI_RIGHT,			// キャラクターセレクトのUI右
+		TROPHY_MGR,					// トロフィーマネージャー
 		ID_PLAYER_FIRST,			//人のIDの初め
 		ID_PLAYER_MAX = ID_PLAYER_FIRST + GAME_PLAYER_MAX,	//人の最大ID+1
 

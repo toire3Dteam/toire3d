@@ -15,6 +15,7 @@ public:
 	virtual void Update();
 	virtual void Render();
 	virtual void RenderADD();
+	virtual void RenderADDNOZ();
 	virtual void RenderGuard();
 	virtual void RenderAreaWall();// 壁
 
@@ -918,4 +919,42 @@ public:
 
 private:
 
+};
+
+/*************************/
+//	多段ヒットエフェクト
+/*************************/
+class HitImpactMulEffect :public BaseUVEffect
+{
+public:
+	HitImpactMulEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/HitEffect/HitImpact.IMO", 0.0f, 0.0f, 14, false, 2, 8);
+	};
+	~HitImpactMulEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADDNOZ(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/*************************/
+//	多段物理ヒットリップエフェクト
+/*************************/
+class HitRipBlowMulEffect :public BaseUVEffect
+{
+public:
+	HitRipBlowMulEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/HitEffect/HitRipBlow.IMO", 0.0f, 0.0f, 12, false, 2, 6);
+	};
+	~HitRipBlowMulEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADDNOZ(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
 };

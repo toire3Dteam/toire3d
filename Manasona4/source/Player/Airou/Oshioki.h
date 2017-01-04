@@ -438,7 +438,7 @@ namespace OshiokiManager
 
 		std::list <OshiokiAirou::OverDrive*> m_list;
 	public:
-		OverDrive(Airou *pAirouPlayer, BasePlayer *pTarget) :Base(pAirouPlayer, pTarget), m_iCreateTimer(0), m_CreateInterval(30), m_iCreateCount(0)
+		OverDrive(Airou *pAirouPlayer, BasePlayer *pTarget) :Base(pAirouPlayer, pTarget), m_iCreateTimer(0), m_CreateInterval(25), m_iCreateCount(0)
 		{
 			// ‘ŠŽè‚Ì“®‚«‚ð••‚¶‚é
 			pTarget->SetMoveUpdate(false);

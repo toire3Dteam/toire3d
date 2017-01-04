@@ -32,6 +32,7 @@ enum MESSAGE_TYPE
 	COMBO_GUARD,		// コンボガードされたぜ
 	ADD_SHOT,			// ショットの実体を格納してね
 	BACK_MENU,			// メニュー画面にもどりたいです。
+	TROPHY_GET,			// トロフィーゲット
 	OTHER				// その他。
 };
 

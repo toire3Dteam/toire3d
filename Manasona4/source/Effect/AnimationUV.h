@@ -33,6 +33,7 @@ public:
 	void Update(Vector3 pos ,Vector3 angle , Vector3 scale);			// 更新スケールをvector型に変えたもの
 	void Render();			// 描画
 	void Render_ADD();			// 乗算描画
+	void Render_ADD_NOZ();			// 乗算描画Z値無効
 	void Render_Guard();			// ガード用描画
 	void Render_AreaWall();			// エリアの壁用
 
