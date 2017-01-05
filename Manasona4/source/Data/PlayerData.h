@@ -68,18 +68,129 @@ namespace PlayerData
 	// ƒgƒƒtƒB[
 	struct Trophy
 	{
-		unsigned int iFirstPlay		: 1;
-		unsigned int iFirstBattle	: 1;
-		unsigned int ‹ó‚«˜g			: 31;
+		union
+		{
+			struct
+			{
+				int iFirstPlay;
+				int iFirstBattle;
+				int iBigDamage;
+				int ‹ó‚«˜g4;
+				int ‹ó‚«˜g5;
+				int ‹ó‚«˜g6;
+				int ‹ó‚«˜g7;
+				int ‹ó‚«˜g8;
+				int ‹ó‚«˜g9;
+				int ‹ó‚«˜g10;
+				int ‹ó‚«˜g11;
+				int ‹ó‚«˜g12;
+				int ‹ó‚«˜g13;
+				int ‹ó‚«˜g14;
+				int ‹ó‚«˜g15;
+				int ‹ó‚«˜g16;
+				int ‹ó‚«˜g17;
+				int ‹ó‚«˜g18;
+				int ‹ó‚«˜g19;
+				int ‹ó‚«˜g20;
+				int ‹ó‚«˜g21;
+				int ‹ó‚«˜g22;
+				int ‹ó‚«˜g23;
+				int ‹ó‚«˜g24;
+				int ‹ó‚«˜g25;
+				int ‹ó‚«˜g26;
+				int ‹ó‚«˜g27;
+				int ‹ó‚«˜g28;
+				int ‹ó‚«˜g29;
+				int ‹ó‚«˜g30;
+				int ‹ó‚«˜g31;
+				int ‹ó‚«˜g32;
+			};
+			int iAllData[32];
+		};
 	};
 
+	//struct PrevTrophy
+	//{
+	//	unsigned int iFirstPlay : 1;
+	//	unsigned int iFirstBattle : 1;
+	//	unsigned int ‹ó‚«˜g : 31;
+	//};
+
 	// ‰B‚µ—v‘f
-	struct Secret
+	struct PrevSecret
 	{
 		unsigned int ƒGƒEƒŒƒVƒA‰ğ‹Ö : 1;
 		unsigned int ŒZ‹M‰ğ‹Ö		: 1;
 		unsigned int ‹ó‚«˜g1		: 32;
 		unsigned int ‹ó‚«˜g2		: 32;
+	};
+
+	struct Secret
+	{
+		union
+		{
+			struct
+			{
+				union
+				{
+					struct
+					{
+						int Movie‹ó‚«˜g1;
+						int Movie‹ó‚«˜g2;
+						int Movie‹ó‚«˜g3;
+						int Movie‹ó‚«˜g4;
+						int Movie‹ó‚«˜g5;
+						int Movie‹ó‚«˜g6;
+						int Movie‹ó‚«˜g7;
+						int Movie‹ó‚«˜g8;
+					};
+					int AllMovie[8];
+				};
+				union
+				{
+					struct
+					{
+						int Pic‹ó‚«˜g1;
+						int Pic‹ó‚«˜g2;
+						int Pic‹ó‚«˜g3;
+						int Pic‹ó‚«˜g4;
+						int Pic‹ó‚«˜g5;
+						int Pic‹ó‚«˜g6;
+						int Pic‹ó‚«˜g7;
+						int Pic‹ó‚«˜g8;
+						int Pic‹ó‚«˜g9;
+						int Pic‹ó‚«˜g10;
+						int Pic‹ó‚«˜g11;
+						int Pic‹ó‚«˜g12;
+						int Pic‹ó‚«˜g13;
+						int Pic‹ó‚«˜g14;
+						int Pic‹ó‚«˜g15;
+						int Pic‹ó‚«˜g16;
+						int Pic‹ó‚«˜g17;
+						int Pic‹ó‚«˜g18;
+						int Pic‹ó‚«˜g19;
+						int Pic‹ó‚«˜g20;
+						int Pic‹ó‚«˜g21;
+						int Pic‹ó‚«˜g22;
+						int Pic‹ó‚«˜g23;
+						int Pic‹ó‚«˜g24;
+						int Pic‹ó‚«˜g25;
+						int Pic‹ó‚«˜g26;
+						int Pic‹ó‚«˜g27;
+						int Pic‹ó‚«˜g28;
+						int Pic‹ó‚«˜g29;
+						int Pic‹ó‚«˜g30;
+						int Pic‹ó‚«˜g31;
+						int Pic‹ó‚«˜g32;
+					};
+					int iAllPic[32];
+				};
+
+			};	// AllUnionStruct.
+
+			int iAllData[40];
+
+		};	// AllUnion.
 	};
 
 	//// ƒvƒŒƒCƒ„[‚ÌƒIƒvƒVƒ‡ƒ“

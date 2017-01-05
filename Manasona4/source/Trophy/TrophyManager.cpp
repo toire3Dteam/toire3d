@@ -1,5 +1,8 @@
 #include "TrophyManager.h"
 #include "Data\PlayerData.h"
+#include "Player\PlayerManager.h"
+#include "UI\GameUI.h"
+#include "BaseEntity\Message\MessageDispatcher.h"
 
 //+--------------------------
 //	ƒgƒƒtƒB[‚ÌŠÇ—ƒNƒ‰ƒX
@@ -24,6 +27,10 @@ TrophyManager::TrophyManager() :BaseGameEntity(ENTITY_ID::TROPHY_MGR)	// ƒGƒ“ƒeƒ
 			m_pTrophy[i] = new FirstBattleTrophy();
 
 			break;
+		case TROPHY_TYPE::BIG_DAMAGE:
+			m_pTrophy[i] = new BigDamageTrophy();
+
+			break;
 		default:
 			m_pTrophy[i] = new FirstTrophy();
 			//MyAssert(0, "‚»‚Ìƒ^ƒCƒv‚Í‘¶İ‚µ‚È‚¢B");	
@@ -31,6 +38,10 @@ TrophyManager::TrophyManager() :BaseGameEntity(ENTITY_ID::TROPHY_MGR)	// ƒGƒ“ƒeƒ
 		}
 
 	}
+
+	// ƒƒbƒNƒAƒCƒRƒ“
+	m_pRockIcon = new tdn2DObj("Data/Trophy/Rock.png");
+
 }
 
 TrophyManager::~TrophyManager()
@@ -40,6 +51,8 @@ TrophyManager::~TrophyManager()
 	{
 		SAFE_DELETE(m_pTrophy[i]);
 	}
+
+	SAFE_DELETE(m_pRockIcon);
 
 }
 
@@ -76,6 +89,99 @@ void TrophyManager::Render()
 
 }
 
+void TrophyManager::RenderRoom(int iTrophyType, int iX, int iY)
+{
+	// ƒƒbƒN
+	bool l_bRock = true;
+
+	//switch ((TROPHY_TYPE)iTrophyType)
+	//{
+	//case TROPHY_TYPE::FIRST:
+	//	if (PlayerDataMgr->m_TrophyData.iFirstPlay == 1)
+	//	{
+	//		l_bRock = false;
+	//	}
+	//
+	//	break;
+	//case TROPHY_TYPE::FIRST_BATTLE:
+	//	if (PlayerDataMgr->m_TrophyData.iFirstBattle == 1)
+	//	{
+	//		l_bRock = false;
+	//	}
+	//	break;
+	//default:
+	//	//MyAssert(0, "‚»‚Ìƒ^ƒCƒv‚È‚¢‚Å‚·");
+	//	break;
+	//}
+
+	if (PlayerDataMgr->m_TrophyData.iAllData[iTrophyType] == 1)
+	{
+		// ‘I‘ğ‚µ‚Ä‚¢‚éƒgƒƒtƒB[
+		m_pTrophy[(int)iTrophyType]->RenderRoom(iX, iY);
+	}
+	else
+	{
+		// ƒƒbƒNƒCƒ‰ƒXƒg
+		m_pRockIcon->SetScale(0.5f);
+		m_pRockIcon->Render((int)m_pTrophy[(int)iTrophyType]->GetRoomPos().x + iX,
+			(int)m_pTrophy[(int)iTrophyType]->GetRoomPos().y + iY);
+	}
+
+
+}
+
+void TrophyManager::RenderInfo(int iTrophyType, int iX, int iY)
+{
+	// ƒƒbƒN ‚ª‰ğœ‚³‚ê‚Ä‚¢‚é‚È‚ç
+	if (PlayerDataMgr->m_TrophyData.iAllData[iTrophyType] == 1)
+	{
+		// •’Ê‚Éà–¾•`‰æ
+		m_pTrophy[(int)iTrophyType]->RenderInfo(iX, iY);
+
+	}else
+	{
+		// ‰ğœ‚³‚ê‚Ä‚È‚¢‚©‚Â‰B‚µƒgƒƒtƒB[‚È‚ç
+		if (m_pTrophy[(int)iTrophyType]->isHide())
+		{
+			// ‰B‚µ—p‚ÌƒƒbƒZ[ƒW
+			// ƒ^ƒCƒgƒ‹
+			tdnFont::RenderString("‰B‚µƒgƒƒtƒB[", "HGºŞ¼¯¸E",
+				22, iX, iY, 0xffffffff, RS::COPY);
+			// à–¾
+			tdnFont::RenderString("‰ğ‹Öî•ñ‚ª‰B‚³‚ê‚Ä‚¢‚éƒgƒƒtƒB[‚Å‚·B", "HGºŞ¼¯¸E",
+				19, iX, iY + 30, 0xffffffff, RS::COPY);
+		}
+		else
+		{
+			// •’Ê‚Éà–¾•`‰æ
+			m_pTrophy[(int)iTrophyType]->RenderInfo(iX, iY);
+		}
+
+
+	}
+
+
+}
+
+// ‰‰o‚ğØ‚é
+void TrophyManager::Stop()
+{
+	// ‘I‘ğ‚µ‚Ä‚¢‚éƒgƒƒtƒB[
+	m_pTrophy[(int)m_eSelectTrophy]->Stop();
+
+}
+
+// ‘SƒgƒƒtƒB[‰ğ‹Ö
+void TrophyManager::AllReset()
+{
+	// ‘SƒgƒƒtƒB[ƒƒbƒN
+	for (int i = 0; i < (int)TROPHY_TYPE::ARRAY_END; i++)
+	{
+		PlayerDataMgr->m_TrophyData.iAllData[i] = 0;
+	}
+
+}
+
 bool TrophyManager::HandleMessage(const Message & msg)
 {
 	// î•ñ•œŒ³
@@ -87,28 +193,37 @@ bool TrophyManager::HandleMessage(const Message & msg)
 	case MESSAGE_TYPE::TROPHY_GET:
 		
 
-		switch (*l_eType)
+		//switch (*l_eType)
+		//{
+		//case TROPHY_TYPE::FIRST:
+		//	if (PlayerDataMgr->m_TrophyData.iFirstPlay == 0) 
+		//	{
+		//		PlayerDataMgr->m_TrophyData.iFirstPlay = 1;
+		//		m_eSelectTrophy = TROPHY_TYPE::FIRST;
+		//		m_pTrophy[(int)m_eSelectTrophy]->Action(30);
+		//		return true;
+		//	}
+		//	break;
+		//case TROPHY_TYPE::FIRST_BATTLE:
+		//	if (PlayerDataMgr->m_TrophyData.iFirstBattle== 0)
+		//	{
+		//		PlayerDataMgr->m_TrophyData.iFirstBattle = 1;
+		//		m_eSelectTrophy = TROPHY_TYPE::FIRST_BATTLE;
+		//		m_pTrophy[(int)m_eSelectTrophy]->Action(30);
+		//		return true;
+		//	}
+		//	break;
+		//default:
+		//	break;
+		//}
+
+
+		if (PlayerDataMgr->m_TrophyData.iAllData[(int)*l_eType] == 0)
 		{
-		case TROPHY_TYPE::FIRST:
-			if (PlayerDataMgr->m_TrophyData.iFirstPlay == 0) 
-			{
-				PlayerDataMgr->m_TrophyData.iFirstPlay = 1;
-				m_eSelectTrophy = TROPHY_TYPE::FIRST;
-				m_pTrophy[(int)m_eSelectTrophy]->Action(30);
-				return true;
-			}
-			break;
-		case TROPHY_TYPE::FIRST_BATTLE:
-			if (PlayerDataMgr->m_TrophyData.iFirstBattle== 0)
-			{
-				PlayerDataMgr->m_TrophyData.iFirstBattle = 1;
-				m_eSelectTrophy = TROPHY_TYPE::FIRST_BATTLE;
-				m_pTrophy[(int)m_eSelectTrophy]->Action(30);
-				return true;
-			}
-			break;
-		default:
-			break;
+			PlayerDataMgr->m_TrophyData.iAllData[(int)*l_eType] = 1;
+			m_eSelectTrophy = *l_eType;
+			m_pTrophy[(int)m_eSelectTrophy]->Action(20);
+			return true;
 		}
 
 
@@ -120,3 +235,45 @@ bool TrophyManager::HandleMessage(const Message & msg)
 
 	return false;
 }
+
+void TrophyManager::InitBattleMission()
+{
+
+
+}
+
+void TrophyManager::UpdateBattleMission()
+{
+
+	// ‚Ü‚¾«‚ÌƒgƒƒtƒB[‚ğè‚É“ü‚ê‚Ä‚¢‚È‚©‚Á‚½‚ç
+	if (PlayerDataMgr->m_TrophyData.iBigDamage == 0)
+	{
+
+		if (PlayerMgr->GetPlayer(SIDE::LEFT)->isAI() == false)
+		{
+			// Å‘åƒ_ƒ[ƒW5000ˆÈã
+			if (GameUIMgr->GetComboUI(SIDE::RIGHT)->GetMaxDamage() >= 5000)
+			{
+				TROPHY_TYPE eType = TROPHY_TYPE::BIG_DAMAGE;
+				MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
+
+			}
+
+
+		}
+		else if (PlayerMgr->GetPlayer(SIDE::RIGHT)->isAI() == false)
+		{
+			// Å‘åƒ_ƒ[ƒW5000ˆÈã
+			if (GameUIMgr->GetComboUI(SIDE::LEFT)->GetMaxDamage() >= 5000)
+			{
+				TROPHY_TYPE eType = TROPHY_TYPE::BIG_DAMAGE;
+				MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
+
+			}
+		}
+
+	}
+
+}
+
+

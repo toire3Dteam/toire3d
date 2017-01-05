@@ -27,7 +27,7 @@
 #include "../Shot/ShotManager.h"
 #include "RoundCall\RoundCallManager.h"
 #include "Stage\OverDriveStage\OverDriveStage.h"
-
+#include "Trophy\TrophyManager.h"
 
 
 //BaseEffect* g_eff;
@@ -247,6 +247,9 @@ bool sceneMain::Initialize()
 
 	// プレイヤーの読み込みが終わるまで待機
 	//PlayerLoadThread->join();
+	
+	// トロフィー
+	TrophyMgr->InitBattleMission();
 
 	// BGM流す
 	bgm->PlayStreamIn((LPSTR)BattleMusicMgr->GetMusicFilePath(SelectDataMgr->Get()->iBattleMusicID).c_str());
@@ -286,6 +289,10 @@ sceneMain::~sceneMain()
 	{
 		SAFE_DELETE(m_pWindow[i]);
 	}
+
+	// トロフィー
+	TrophyMgr->Stop();
+
 }
 
 //******************************************************************
@@ -294,6 +301,10 @@ sceneMain::~sceneMain()
 
 void sceneMain::Update()
 {
+	// トロフィー
+	TrophyMgr->Update();
+	TrophyMgr->UpdateBattleMission();
+
 	HeaveHoFinishUI->Update();
 	if (HeaveHoFinishUI->IsAction() == true)return ;
 	
@@ -646,7 +657,10 @@ void sceneMain::Render()
 
 	CutInMgr->Render();
 
-	//com->Render(400, 400);
+	// com->Render(400, 400);
+
+	// トロフィー
+	TrophyMgr->Render();
 
 #ifdef _DEBUG
 	tdnText::Draw(0, 30, 0xffffffff, "CameraPos    : %.1f %.1f %.1f", CameraMgr->m_ViewData.pos.x, CameraMgr->m_ViewData.pos.y, CameraMgr->m_ViewData.pos.z);

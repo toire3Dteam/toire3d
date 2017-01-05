@@ -86,6 +86,9 @@ bool sceneMenu::Initialize()
 
 sceneMenu::~sceneMenu()
 {
+	// トロフィーの演出を止める
+	TrophyMgr->Stop();
+
 	bgm->StopStreamIn();
 	delete m_pMenuUIMgr;
 	SAFE_DELETE(m_pCtrlSelectUI);
@@ -150,8 +153,7 @@ void sceneMenu::Update()
 		// Yでトロフィーロック
 		if (KeyBoard(KB_Y) == 2)
 		{
-			PlayerDataMgr->m_TrophyData.iFirstPlay = 0;
-			PlayerDataMgr->m_TrophyData.iFirstBattle= 0;
+			TrophyMgr->AllReset();
 		}
 
 

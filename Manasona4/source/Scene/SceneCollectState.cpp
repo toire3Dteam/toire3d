@@ -114,6 +114,22 @@ void SceneCollectState::TrophyStep::Render(sceneCollect *pMain)
 	// トロフィーの絵
 	pMain->TrophyRender();
 
+	// ★トロフィー用のスクロールバー
+	enum { ABUJ = 1 };// 最大の高さを＋１しているので
+	float l_fArrowRate = (float)(pMain->m_tagTI.iBottom + ABUJ) / (float)(pMain->m_tagTI.iMaxHeight);
+	
+	// スクロールする必要があるならスクロールバーを描画
+	if (l_fArrowRate < 1.0f)
+	{
+		int l_iScrollY = 384 * (float)(pMain->m_tagTI.iTop) / (float)(pMain->m_tagTI.iMaxHeight);
+
+		pMain->m_pImages[sceneCollect::IMAGE::SCROLL_BAR]->Render((int)pMain->m_vScrollPos.x, (int)pMain->m_vScrollPos.y);
+		pMain->m_pImages[sceneCollect::IMAGE::SCROLL_ARROW]->Render
+			((int)pMain->m_vScrollPos.x,
+				(int)pMain->m_vScrollPos.y + l_iScrollY,
+				32, (int)(384 * l_fArrowRate), 0, 0, 32, 384);
+	}
+
 	tdnText::Draw(0, 0, 0xffffffff, "TrophyStep");
 }
 

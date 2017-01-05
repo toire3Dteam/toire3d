@@ -11,7 +11,8 @@ enum class TROPHY_TYPE
 {
 	FIRST,				//	始めの一回
 	FIRST_BATTLE,		//	始めてのバトル
-	_1,_2,_3,_4,_5,_6,
+	BIG_DAMAGE,			//	物凄い火力
+	_2,_3,_4,_5,_6,
 	_7, _8, _9, _10, _11, _12,
 	_13, _14, _15, _16, _17, _18,
 	ARRAY_END
@@ -42,6 +43,13 @@ public:
 
 	void Update();
 	void Render();
+	void RenderRoom(int iTrophyType, int iX, int iY);	
+	void RenderInfo(int iTrophyType, int iX, int iY);
+
+	void Stop();		// 演出を切る
+
+	// 全データさよなら
+	void AllReset();
 
 	// BaseGameEntiryサブクラスはメッセージを使って通信する
 	bool  HandleMessage(const Message& msg);
@@ -63,6 +71,19 @@ private:
 	// 選択しているトロフィー
 	TROPHY_TYPE m_eSelectTrophy;
 
+	// ロックアイコン
+	tdn2DObj* m_pRockIcon;
+
+public:
+	//+---------------------------------------------
+	//	★色々なトロフィーの条件を作っていく
+	//+---------------------------------------------
+	void InitBattleMission();
+	void UpdateBattleMission();
+
+
+private:
+	
 
 };
 

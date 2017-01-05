@@ -63,11 +63,6 @@ public:
 	// メッセージ受信(BaseEntityによるオーバーライド)
 	bool  HandleMessage(const Message& msg) { return m_pStateMachine->HandleMessage(msg); }
 
-
-private:
-
-	StateMachine<sceneCollect> *m_pStateMachine;	// ステートマシン
-
 	enum IMAGE
 	{
 		BACK,
@@ -77,6 +72,12 @@ private:
 		INFO_PLATE,
 		ARRAY_END
 	};
+
+private:
+
+	StateMachine<sceneCollect> *m_pStateMachine;	// ステートマシン
+
+
 	tdn2DAnim *m_pImages[IMAGE::ARRAY_END];
 	
 	// プレイ情報
@@ -89,8 +90,7 @@ private:
 	// スクロール
 	float m_iScrollHeight;	// 最大の高さ
 	float m_iScrollScreenSize;// 一つのスクリーン幅
-	float m_iScrollPosY;
-
+	Vector2 m_vScrollPos;
 
 	//+-------------------------------
 	//	トロフィーで必要な変数を用意
@@ -107,7 +107,8 @@ private:
 		int iSelectNo;		// 選択しているアイコンの番号
 		Vector2 vSelectPos;	// 選択している場所
 		Vector2 vNextPos;	// 次に移動する場所
-		tdn2DObj* pSelectMark;// 選択中のマーク絵
+		tdn2DAnim* pSelectMark;// 選択中のマーク絵
+		tdn2DAnim* pSelectMarkEdge;// 選択中のマーク絵(線)
 
 		// スクロール
 		Vector2 vScrollPos;	// 選択している場所

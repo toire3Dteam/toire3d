@@ -25,15 +25,19 @@ public:
 	virtual void Update();
 	virtual void Render();
 	virtual void Action(int iDelayFrame = 0);
+	virtual void Stop();
 
-	void RenderRoom(int iX, int iY);		//	閲覧用
-
+	void RenderRoom(int iX, int iY/*, bool bRock*/);		//	閲覧用
+	void RenderInfo(int iX, int iY);					// トロフィーのタイトルと説明
+	
 	// アクセサ
 	TROPHY_DATA GetTrophy() { return m_tagTrophy; }// トロフィーの構造体
 
 	// 閲覧用のポジション
 	Vector2 GetRoomPos() { return m_vRoomPos; };
 	void SetRoomPos(Vector2 vPos) { m_vRoomPos = vPos; }
+
+	bool isHide() { return m_bHide; }
 
 protected:
 	bool m_bAction;
@@ -43,17 +47,20 @@ protected:
 	
 	tdn2DObj* m_pPlate;
 	tdn2DAnim* m_pIconRip;// トロフィーのアイコンの波紋
-
 	int m_iDelayFrame;
-
 	Vector2 m_vRoomPos;		//	閲覧用の場所
+	
+	// ロック関連
+	// bool m_bRock;
+	// tdn2DObj* m_pRockIcon;
+
+	bool m_bHide;			// 隠しトロフィー
 
 };
 
 //+---------------------------------
 //	初プレイのトロフィー
 //+---------------------------------
-
 class FirstTrophy :public BaseTrophy
 {
 public:
@@ -68,12 +75,25 @@ private:
 //+---------------------------------
 //	初めて対戦をしたのトロフィー
 //+---------------------------------
-
 class FirstBattleTrophy :public BaseTrophy
 {
 public:
 	FirstBattleTrophy();
 	~FirstBattleTrophy();
+
+private:
+
+};
+
+
+//+---------------------------------
+//	大ダメージトロフィー
+//+---------------------------------
+class BigDamageTrophy :public BaseTrophy
+{
+public:
+	BigDamageTrophy();
+	~BigDamageTrophy();
 
 private:
 

@@ -1,4 +1,6 @@
 #include "BaseTrophy.h"
+#include "Data\PlayerData.h"
+#include "Data\SelectData.h"
 
 //+------------------------------
 //	基本のトロフィー
@@ -28,6 +30,10 @@ BaseTrophy::BaseTrophy()
 
 	m_vRoomPos = VECTOR2_ZERO;
 
+	//m_bRock = true;
+	//m_pRockIcon = new tdn2DObj("Data/Trophy/Rock.png");
+
+	m_bHide = false;
 }
 
 BaseTrophy::~BaseTrophy()
@@ -35,7 +41,7 @@ BaseTrophy::~BaseTrophy()
 	SAFE_DELETE(m_tagTrophy.pIcon);
 	SAFE_DELETE(m_pPlate);
 	SAFE_DELETE(m_pIconRip);
-
+	//SAFE_DELETE(m_pRockIcon);
 }
 
 // 更新・描画
@@ -101,7 +107,7 @@ void BaseTrophy::Render()
 
 	int l_iX = (int)m_tagTrophy.vPos.x;
 	int l_iY = (int)m_tagTrophy.vPos.y;
-	int l_iAlpha = 255 * m_tagTrophy.iAlpha;
+	int l_iAlpha = (int)(255 * m_tagTrophy.iAlpha);
 	DWORD l_dCol = ARGB(l_iAlpha, 255, 255, 255);
 
 	// プレート
@@ -146,13 +152,50 @@ void BaseTrophy::Action(int iDelayFrame)
 	m_iDelayFrame = iDelayFrame;
 }
 
-//	閲覧用
-void BaseTrophy::RenderRoom(int iX, int iY)
+// 演出を切る
+void BaseTrophy::Stop()
 {
+	m_bAction = false;
+	m_iActiveFrame = 0;
 
-	// アイコン
-	m_tagTrophy.pIcon->SetAlpha(255);
-	m_tagTrophy.pIcon->Render((int)m_vRoomPos.x + iX, (int)m_vRoomPos.y + iY);
+}
+
+//	閲覧用
+void BaseTrophy::RenderRoom(int iX, int iY/*, bool bRock*/)
+{
+	//　ロック中なら
+	//if (bRock)
+	//{
+	//	//m_pRockIcon->SetScale(0.5f);
+	//	//m_pRockIcon->Render((int)m_vRoomPos.x + iX, (int)m_vRoomPos.y + iY);
+	//
+	//}else
+	//{
+		// アイコン
+		m_tagTrophy.pIcon->SetAlpha(255);
+		m_tagTrophy.pIcon->Render((int)m_vRoomPos.x + iX, (int)m_vRoomPos.y + iY);
+	//}
+
+}
+
+// タイトル・説明文字
+void BaseTrophy::RenderInfo(int iX, int iY)
+{
+	// 隠しトロフィーなら
+	//if (m_bHide)
+	//{
+
+	//}
+	//else
+	{	
+		// タイトル
+		tdnFont::RenderString(m_tagTrophy.sTitle.c_str(), "HGｺﾞｼｯｸE",
+			22, iX, iY, 0xffffffff, RS::COPY);
+		// 説明
+		tdnFont::RenderString(m_tagTrophy.sText.c_str(), "HGｺﾞｼｯｸE",
+			19, iX, iY + 30, 0xffffffff, RS::COPY);
+
+	}
 
 
 }
@@ -167,6 +210,9 @@ FirstTrophy::FirstTrophy()
 	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/first.png");
 	m_tagTrophy.sTitle = "真夏のファイト開幕";
 	m_tagTrophy.sText = "初めてゲームをプレイした";
+
+	// 隠しトロフィーフラグ
+	m_bHide = false;
 }
 
 FirstTrophy::~FirstTrophy()
@@ -183,9 +229,29 @@ FirstBattleTrophy::FirstBattleTrophy()
 	m_tagTrophy.sTitle = "初対戦";
 	m_tagTrophy.sText = "初めて対戦した。";
 
+	// 隠しトロフィーフラグ
+	m_bHide = true;
 }
 
 FirstBattleTrophy::~FirstBattleTrophy()
+{
+
+}
+
+//+---------------------------------
+//	大きいダメージを出した
+//+---------------------------------
+BigDamageTrophy::BigDamageTrophy()
+{
+	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/power.png");
+	m_tagTrophy.sTitle = "強力なコンボ";
+	m_tagTrophy.sText = "一回のコンボで5000ダメージ以上与えた。";
+
+	// 隠しトロフィーフラグ
+	m_bHide = false;
+}
+
+BigDamageTrophy::~BigDamageTrophy()
 {
 
 }

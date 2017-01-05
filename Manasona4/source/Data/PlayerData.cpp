@@ -50,13 +50,19 @@ bool PlayerDataManager::LoadPlayerData()
 
 	// トレーニング設定データ
 	fread_s((LPSTR)&m_TrainingData, sizeof(PlayerData::Training), sizeof(PlayerData::Training), 1, fp);
-	//ZeroMemory(&m_TrainingData, sizeof(PlayerData::Training));
 
 	// トロフィー読み込み
+	//PlayerData::PrevTrophy a;
 	fread_s((LPSTR)&m_TrophyData, sizeof(PlayerData::Trophy), sizeof(PlayerData::Trophy), 1, fp);
+	//ZeroMemory(&m_TrophyData, sizeof(PlayerData::Trophy));
 
 	// 隠し情報読み込み
+	//PlayerData::PrevSecret a;
 	fread_s((LPSTR)&m_SecretData, sizeof(PlayerData::Secret), sizeof(PlayerData::Secret), 1, fp);
+	//ZeroMemory(&m_SecretData, sizeof(m_SecretData));
+
+	//m_SecretData.Pic空き枠10 = 1;
+	//m_SecretData.Movie空き枠2 = 1;
 
 	// ファイル閉じる
 	fclose(fp);

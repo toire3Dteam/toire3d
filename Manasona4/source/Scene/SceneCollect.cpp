@@ -24,14 +24,14 @@ bool sceneCollect::Initialize()
 	m_pImages[IMAGE::SCROLL_BAR] = new tdn2DAnim("DATA/UI/Collect/ScrollBar.png");
 	m_pImages[IMAGE::SCROLL_ARROW] = new tdn2DAnim("DATA/UI/Collect/ScrollArrow.png");
 	m_pImages[IMAGE::TITLE] = new tdn2DAnim("DATA/UI/Collect/title.png");
-	m_pImages[IMAGE::INFO_PLATE] = new tdn2DAnim("DATA/UI/CharacterSelect/Information.png");
+	m_pImages[IMAGE::INFO_PLATE] = new tdn2DAnim("DATA/UI/Collect/Information.png");
 	for (int i = 0; i < IMAGE::ARRAY_END; i++)
 	{
 		m_pImages[i]->OrderNone();
 		m_pImages[i]->Action();
 	}
 	m_pImages[IMAGE::TITLE]->OrderMoveAppeared(16, 0, -200);
-	m_pImages[IMAGE::INFO_PLATE]->OrderMoveAppeared(24, 0, 592 + 200);
+	m_pImages[IMAGE::INFO_PLATE]->OrderMoveAppeared(24, 0, 592 + (200 ));
 
 	m_fLoadPercentage = 1.0f;	// ロード割合
 
@@ -42,7 +42,9 @@ bool sceneCollect::Initialize()
 	// スクロールバー
 	m_iScrollHeight = 1440;
 	m_iScrollScreenSize= 720/2;
-	m_iScrollPosY = 0.0f;
+	m_vScrollPos = VECTOR2_ZERO;
+	m_vScrollPos.x = 1200;
+	m_vScrollPos.y = 128;
 
 	// トロフィーアイコン構造体
 	TrophyInit();
@@ -77,7 +79,7 @@ sceneCollect::~sceneCollect()
 	SAFE_DELETE(m_pStateMachine);
 
 	SAFE_DELETE(m_tagTI.pSelectMark);
-
+	SAFE_DELETE(m_tagTI.pSelectMarkEdge);
 }
 //=============================================================================================
 
@@ -98,15 +100,15 @@ void sceneCollect::Update()
 	Fade::Update();
 
 
-	if (KEY(KEYCODE::KEY_DOWN, 0) == 1)
-	{
-		m_iScrollPosY -= 10;
-	}
+	//if (KEY(KEYCODE::KEY_DOWN, 0) == 1)
+	//{
+	//	m_iScrollPosY -= 10;
+	//}
 
-	if (KEY(KEYCODE::KEY_UP, 0) == 1)
-	{
-		m_iScrollPosY += 10;
-	}
+	//if (KEY(KEYCODE::KEY_UP, 0) == 1)
+	//{
+	//	m_iScrollPosY += 10;
+	//}
 
 	//if (KEY(KEYCODE::KEY_SPACE, 0) == 1)
 	//{
@@ -119,6 +121,8 @@ void sceneCollect::Update()
 
 	// ★ステートマシン更新(何故ここに書くかというと、中でシーンチェンジの処理を行っているため)
 	m_pStateMachine->Update();
+
+
 
 #ifdef _DEBUG
 
@@ -157,9 +161,9 @@ void sceneCollect::Render()
 	tdnView::Clear();
 
 	// 背景
-	m_pImages[IMAGE::BACK]->Render(0, -m_iScrollPosY);
+	m_pImages[IMAGE::BACK]->Render(0,0);
 
-	tdnPolygon::Rect((int)(1280 * .25f) / 2, 96, (int)(1280 * .75f), (int)(720 * .75f), RS::COPY, 0xff808080);
+	// tdnPolygon::Rect((int)(1280 * .25f) / 2, 96, (int)(1280 * .75f), (int)(720 * .75f), RS::COPY, 0xff808080);
 
 	// プレイ回数
 	tdnText::Draw(400, 400, 0xffffffff, "プレイ回数: %d", m_pPlayerInfo->PlayCount);
@@ -170,20 +174,15 @@ void sceneCollect::Render()
 
 	// コイン
 	tdnText::Draw(400, 520, 0xffffffff, "コイン: %d", m_pPlayerInfo->coin);
-
-	// スクロールバー
-	float rate = (m_iScrollScreenSize / m_iScrollHeight);
-	m_pImages[IMAGE::SCROLL_BAR]->Render(0, 0);
-	m_pImages[IMAGE::SCROLL_ARROW]->Render(0, 384 * (m_iScrollPosY / m_iScrollHeight), 32, (int)(384 * rate), 0, 0, 32, 384);
 	
 	// 
-	tdnText::Draw(400, 720, 0xffffffff, "下げてる値: %.1f", m_iScrollPosY);
+	//tdnText::Draw(400, 720, 0xffffffff, "下げてる値: %.1f", m_iScrollPosY);
 
+	
 	// ★ここにステートマシン描画(多分2D関係が多いんじゃないかと)
 	m_pStateMachine->Render();
 
 	m_pImages[IMAGE::TITLE]->Render(0, 0);
-	m_pImages[IMAGE::INFO_PLATE]->Render(0, 592 + 5);
 
 
 	// 明日は新しく追加でTrophy用のInfoMationを描く
@@ -361,10 +360,10 @@ void sceneCollect::TrophyInit()
 
 	//　初期の先頭
 	m_tagTI.iTop = 0;
-	m_tagTI.iBottom = 3;
+	m_tagTI.iBottom = 2;
 	
 	// 何列かを設定
-	m_tagTI.iRowNum = 3;
+	m_tagTI.iRowNum = 6;
 	// トロフィー数分に↑列を合わせた結果、縦幅の大きさを調べる
 	int l_iCount = 0;
 	m_tagTI.iMaxHeight = 1;// ★まず最低限1はある
@@ -398,7 +397,16 @@ void sceneCollect::TrophyInit()
 	m_tagTI.vNextPos= TrophyMgr->GetTrophy(m_tagTI.iSelectNo)->GetRoomPos();
 
 	// マーク絵
-	m_tagTI.pSelectMark = new tdn2DObj("Data/Trophy/Rip.png");
+	m_tagTI.pSelectMark = new tdn2DAnim("Data/Trophy/Select.png");
+	//m_tagTI.pSelectMark->OrderRipple(42, 1.0f, 0.015f);
+	m_tagTI.pSelectMark->OrderAlphaMove(210, 90, 120);
+	//m_tagTI.pSelectMark->OrderNone();
+	m_tagTI.pSelectMark->Action();
+
+	m_tagTI.pSelectMarkEdge = new tdn2DAnim("Data/Trophy/SelectEdge.png");
+	//m_tagTI.pSelectMark->OrderRipple(42, 1.0f, 0.015f);
+	m_tagTI.pSelectMarkEdge->OrderNone();
+	m_tagTI.pSelectMarkEdge->Action();
 
 	// スクロール初期位置
 	m_tagTI.vScrollPos		= VECTOR2_ZERO;
@@ -466,13 +474,22 @@ void sceneCollect::TrophyUpdate()
 		m_tagTI.vScrollPos = m_tagTI.vScrollNextPos;
 	}
 
+	// 選択アイコン
+	m_tagTI.pSelectMark->Update();
+	if (m_tagTI.pSelectMark->GetAction()->IsEnd() == true)
+	{
+		m_tagTI.pSelectMark->Action();
+	}
+
+	m_tagTI.pSelectMarkEdge->Update();
+
 }
 
 void sceneCollect::TrophyRender()
 {
 	// (仮)　アイコンの絵
-	int l_iX = 100;
-	int l_iY = 100 - m_tagTI.vScrollPos.y;
+	int l_iX = 200;
+	int l_iY = 100 - (int)m_tagTI.vScrollPos.y;
 
 	for (int i = 0; i < (int)TROPHY_TYPE::ARRAY_END; i++)
 	{
@@ -489,15 +506,36 @@ void sceneCollect::TrophyRender()
 
 		// 生でLib描画　後でスケールやアルファなどもろもろ加工したレンダーを作る
 		//TrophyMgr->GetTrophy(i).pIcon->Render(l_iX, l_iY);
-		TrophyMgr->GetTrophy(i)->RenderRoom(l_iX, l_iY);
+		TrophyMgr->RenderRoom(i, l_iX, l_iY);
 
 		//l_iCount++;
 	}
 
-	tdnText::Draw(m_tagTI.vSelectPos.x + l_iX, m_tagTI.vSelectPos.y + l_iY, 0xffff00ff, "選択中！！");
-	m_tagTI.pSelectMark->Render((int)m_tagTI.vSelectPos.x + l_iX, (int)m_tagTI.vSelectPos.y + l_iY);
+	//tdnText::Draw(m_tagTI.vSelectPos.x + l_iX, m_tagTI.vSelectPos.y + l_iY, 0xffff00ff, "選択中！！");
+	// セレクトアイコン
+	m_tagTI.pSelectMark->Render((int)m_tagTI.vSelectPos.x + l_iX, (int)m_tagTI.vSelectPos.y + l_iY,RS::ADD);
+	m_tagTI.pSelectMarkEdge->Render((int)m_tagTI.vSelectPos.x + l_iX, (int)m_tagTI.vSelectPos.y + l_iY, RS::ADD);
+
+	// 説明用プレート
+	m_pImages[IMAGE::INFO_PLATE]->Render(0, 592 - 128);
+
+	// トロフィーのタイトルと説明
+	TrophyMgr->RenderInfo(m_tagTI.iSelectNo, 60, 580);
+
+	//tdnFont::RenderString(TrophyMgr->GetTrophyData(m_tagTI.iSelectNo).sTitle.c_str(), "HGｺﾞｼｯｸE",
+	//	22, 60, 580, 0xffffffff, RS::COPY);
+	//// 
+	//tdnFont::RenderString(TrophyMgr->GetTrophyData(m_tagTI.iSelectNo).sText.c_str(), "HGｺﾞｼｯｸE",
+	//	19,  60, 610, 0xffffffff, RS::COPY);
+
 
 }
+
+// 今日はここまで
+// あしたは裏の動画作ったり
+// トロフィーの演出シーン変わったら消したり
+// 残りのユーザーインターフェースやる
+// ×でアイコンが出てきてメニューに戻るとかのシーンステート関連
 
 void sceneCollect::TrophyCtrl(int iDeviceID)
 {
@@ -512,6 +550,10 @@ void sceneCollect::TrophyCtrl(int iDeviceID)
 		 {
 			 m_tagTI.iSelectNo = TrophyMgr->GetMaxTrophyNum() - 1;
 		 }
+
+		 // 移動演出
+		 m_tagTI.pSelectMark->Action();
+
 	}
 	// 右押してたら
 	if ( m_bRightPush)
@@ -521,6 +563,10 @@ void sceneCollect::TrophyCtrl(int iDeviceID)
 		 {
 			 m_tagTI.iSelectNo = 0;
 		 }
+
+		 // 移動演出
+		 m_tagTI.pSelectMark->Action();
+
 	}
 	// 上押してたら
 	if ( m_bUpPush)
@@ -554,6 +600,10 @@ void sceneCollect::TrophyCtrl(int iDeviceID)
 			// 列分増減
 			m_tagTI.iSelectNo -= m_tagTI.iRowNum;
 		}
+
+		// 移動演出
+		m_tagTI.pSelectMark->Action();
+
 	}
 	// 下押してたら
 	if ( m_bDownPush)
@@ -574,6 +624,10 @@ void sceneCollect::TrophyCtrl(int iDeviceID)
 			// 列分増減
 			m_tagTI.iSelectNo += m_tagTI.iRowNum;
 		}
+
+		// 移動演出
+		m_tagTI.pSelectMark->Action();
+
 
 	}
 
@@ -598,6 +652,7 @@ sceneCollect::TrophyIconDesc::TrophyIconDesc()
 	vNextPos = VECTOR2_ZERO;
 
 	pSelectMark = nullptr;
+	pSelectMarkEdge = nullptr;
 
 	vScrollPos = VECTOR2_ZERO;
 	vScrollNextPos = VECTOR2_ZERO;
