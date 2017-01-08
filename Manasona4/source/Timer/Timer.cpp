@@ -80,12 +80,17 @@ Timer::~Timer()
 //+-------------------------------------------
 void Timer::Update()
 {
-	// 止めるフラグが立っていなかったらまたは　∞フラグが立っていなかったら
-	if (m_bStop == false ||
-		m_bInfinity == false)
+	// 止めるフラグが立っていなかったら
+	if (m_bStop == false)
 	{
-		m_iFrame--;
-		if (m_iFrame <= 0)m_iFrame = 0;
+		// ∞フラグが立ってたらタイマーを更新させない
+		if (m_bInfinity == false)
+		{
+			m_iFrame--;
+			if (m_iFrame <= 0)m_iFrame = 0;
+		}
+
+		// ★∞であろうと経過フレームは図ります
 
 		// 経過フレーム
 		m_iElapsedFrame++;
@@ -99,7 +104,11 @@ void Timer::Update()
 		}
 
 	}
-	
+
+
+
+
+
 	// アニメーション
 	m_pPic->Update();
 	m_pInfinityPic->Update();

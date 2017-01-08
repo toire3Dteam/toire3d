@@ -33,6 +33,7 @@ enum MESSAGE_TYPE
 	ADD_SHOT,			// ショットの実体を格納してね
 	BACK_MENU,			// メニュー画面にもどりたいです。
 	TROPHY_GET,			// トロフィーゲット
+	PICTURE_GET,		// イラストゲット
 	OTHER				// その他。
 };
 

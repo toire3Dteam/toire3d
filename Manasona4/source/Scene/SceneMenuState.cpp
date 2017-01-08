@@ -44,7 +44,12 @@ void SceneMenuState::Intro::Execute(sceneMenu *pMain)
 void SceneMenuState::Intro::Exit(sceneMenu *pMain) {}
 void SceneMenuState::Intro::Render(sceneMenu *pMain)
 {
+
+#ifdef _DEBUG
+
 	tdnText::Draw(0, 0, 0xffffffff, "Intro");
+#endif // _DEBUG
+
 }
 
 bool SceneMenuState::Intro::OnMessage(sceneMenu *pMain, const Message & msg)
@@ -188,7 +193,10 @@ void SceneMenuState::FirstStep::Render(sceneMenu *pMain)
 	// アイコンUI
 	M_UIMgr->Render();
 
+#ifdef _DEBUG
+
 	tdnText::Draw(0, 0, 0xffffffff, "FirstStep");
+#endif // _DEBUG
 }
 
 bool SceneMenuState::FirstStep::OnMessage(sceneMenu *pMain, const Message & msg)
@@ -348,7 +356,10 @@ void SceneMenuState::BattleControllerSelectStep::Render(sceneMenu *pMain)
 	// コントローラーセレクト
 	C_UIMgr->Render();
 
+#ifdef _DEBUG
+
 	tdnText::Draw(0, 0, 0xffffffff, "BattleControllerSelectStep");
+#endif // _DEBUG
 }
 
 bool SceneMenuState::BattleControllerSelectStep::OnMessage(sceneMenu *pMain, const Message & msg)
@@ -542,7 +553,10 @@ void SceneMenuState::TrainingControllerSelectStep::Render(sceneMenu *pMain)
 	// コントローラーセレクト
 	C_UIMgr->Render();
 
+#ifdef _DEBUG
+
 	tdnText::Draw(0, 0, 0xffffffff, "TrainingControllerSelectStep");
+#endif // _DEBUG
 }
 
 bool SceneMenuState::TrainingControllerSelectStep::OnMessage(sceneMenu *pMain, const Message & msg)
@@ -664,7 +678,10 @@ void SceneMenuState::TutorialSelectStep::Render(sceneMenu *pMain)
 	// 黒い板
 	tdnPolygon::Rect(0, 0, 1280, 720, RS::COPY, 0xaa000000);
 
+#ifdef _DEBUG
+
 	tdnText::Draw(0, 0, 0xffffffff, "TutorialSelectStep");
+#endif // _DEBUG
 }
 
 bool SceneMenuState::TutorialSelectStep::OnMessage(sceneMenu *pMain, const Message & msg)
@@ -769,8 +786,10 @@ void SceneMenuState::OptionStep::Render(sceneMenu *pMain)
 	// 選択ウィンドウの説明
 	pMain->GetWindow(WINDOW_TYPE::OPTION)->RednerInfo();
 
+#ifdef _DEBUG
 
 	tdnText::Draw(0, 0, 0xffffffff, "OptionStep");
+#endif // _DEBUG
 }
 
 bool SceneMenuState::OptionStep::OnMessage(sceneMenu *pMain, const Message & msg)
@@ -857,7 +876,10 @@ void SceneMenuState::GameWindowStep::Render(sceneMenu *pMain)
 	// 選択ウィンドウの説明
 	pMain->GetWindow(WINDOW_TYPE::GAME)->RednerInfo();
 
+#ifdef _DEBUG
+
 	tdnText::Draw(0, 0, 0xffffffff, "GameWindowStep");
+#endif // _DEBUG
 }
 
 bool SceneMenuState::GameWindowStep::OnMessage(sceneMenu *pMain, const Message & msg)
@@ -935,7 +957,10 @@ void SceneMenuState::SoundWindowStep::Render(sceneMenu *pMain)
 	// 選択ウィンドウの説明
 	pMain->GetWindow(WINDOW_TYPE::SOUND)->RednerInfo();
 
+#ifdef _DEBUG
+
 	tdnText::Draw(0, 0, 0xffffffff, "SoundWindowStep");
+#endif // _DEBUG
 }
 
 bool SceneMenuState::SoundWindowStep::OnMessage(sceneMenu *pMain, const Message & msg)

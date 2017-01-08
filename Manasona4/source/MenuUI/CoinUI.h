@@ -9,7 +9,7 @@
 class CoinUI
 {
 public:
-	CoinUI(Vector2 vPos);
+	CoinUI(Vector2 vPos, bool bCollect = false);
 	~CoinUI();
 
 	void Update();

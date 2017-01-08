@@ -75,10 +75,10 @@ namespace PlayerData
 				int iFirstPlay;
 				int iFirstBattle;
 				int iBigDamage;
-				int ‹ó‚«˜g4;
-				int ‹ó‚«˜g5;
-				int ‹ó‚«˜g6;
-				int ‹ó‚«˜g7;
+				int iMaxHpFinish;
+				int iSpeedFinish;
+				int iTrainingTime;
+				int iCompleteTrophy;
 				int ‹ó‚«˜g8;
 				int ‹ó‚«˜g9;
 				int ‹ó‚«˜g10;

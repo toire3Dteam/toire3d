@@ -38,4 +38,7 @@ private:
 	std::vector<Vector3> m_aPos;
 
 
+	// ŒZ‹M
+	iex3DObj* m_pAniki;
+
 };

@@ -12,9 +12,13 @@ enum class TROPHY_TYPE
 	FIRST,				//	始めの一回
 	FIRST_BATTLE,		//	始めてのバトル
 	BIG_DAMAGE,			//	物凄い火力
-	_2,_3,_4,_5,_6,
-	_7, _8, _9, _10, _11, _12,
-	_13, _14, _15, _16, _17, _18,
+	MAX_HP_FINISH,		//	最大HP勝利
+	SPEED_FINISH,		//	最速勝利
+	TRAINING_TIME,		//  トレーニングでひたすら練習
+	COMPLETE_TROPHY,	//  全てのトロフィーを集めた
+	//_6,
+	//_7, _8, _9, _10, _11, _12,
+	//_13, _14, _15, _16, _17, _18,
 	ARRAY_END
 };
 
@@ -63,6 +67,8 @@ public:
 	// トロフィー最大数
 	int GetMaxTrophyNum() { return (int)TROPHY_TYPE::ARRAY_END; };
 
+	// トロフィー所持数
+	int GetTrophyOwned();
 private:
 
 	// トロフィー達
@@ -78,12 +84,14 @@ public:
 	//+---------------------------------------------
 	//	★色々なトロフィーの条件を作っていく
 	//+---------------------------------------------
-	void InitBattleMission();
-	void UpdateBattleMission();
-
+	void InitSeceneMain();
+	void CheakBigDamage(bool bVS = false);// 対戦フラグ
+	void CheakMaxHpFinish(int iRemainingHP);
+	void CheakSpeedFinish(int iElapsedTime);
+	void CheakTrainingTime();
 
 private:
-	
+	int m_iTrainingFrame;
 
 };
 

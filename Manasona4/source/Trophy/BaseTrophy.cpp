@@ -215,11 +215,6 @@ FirstTrophy::FirstTrophy()
 	m_bHide = false;
 }
 
-FirstTrophy::~FirstTrophy()
-{
-
-}
-
 //+---------------------------------
 //	初めて対戦をした
 //+---------------------------------
@@ -230,13 +225,9 @@ FirstBattleTrophy::FirstBattleTrophy()
 	m_tagTrophy.sText = "初めて対戦した。";
 
 	// 隠しトロフィーフラグ
-	m_bHide = true;
+	m_bHide = false;
 }
 
-FirstBattleTrophy::~FirstBattleTrophy()
-{
-
-}
 
 //+---------------------------------
 //	大きいダメージを出した
@@ -251,7 +242,56 @@ BigDamageTrophy::BigDamageTrophy()
 	m_bHide = false;
 }
 
-BigDamageTrophy::~BigDamageTrophy()
-{
 
+//+---------------------------------
+//	最大HPで勝利した
+//+---------------------------------
+MaxHpFinishTrophy::MaxHpFinishTrophy()
+{
+	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/hart.png");
+	m_tagTrophy.sTitle = "パーフェクト勝利";
+	m_tagTrophy.sText = "ダメージを受けずに勝利した。";
+
+	// 隠しトロフィーフラグ
+	m_bHide = false;
+}
+
+
+//+---------------------------------
+//	早く勝利した
+//+---------------------------------
+SpeedFinishTrophy::SpeedFinishTrophy()
+{
+	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/timer.png");
+	m_tagTrophy.sTitle = "音速の真夏ファイター";
+	m_tagTrophy.sText = "15秒以内で勝利した。";
+
+	// 隠しトロフィーフラグ
+	m_bHide = false;
+}
+
+//+---------------------------------
+//	トレーニングに連続時間こもった
+//+---------------------------------
+TrainingTimeTrophy::TrainingTimeTrophy()
+{
+	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/Plactice.png");
+	m_tagTrophy.sTitle = "努力家";
+	m_tagTrophy.sText = "5分以上トレーニングルームで練習した。";
+
+	// 隠しトロフィーフラグ
+	m_bHide = false;
+}
+
+//+---------------------------------
+//	全てのトロフィーを集めた
+//+---------------------------------
+CompleteTrophy::CompleteTrophy()
+{
+	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/full.png");
+	m_tagTrophy.sTitle = "真夏の覇者";
+	m_tagTrophy.sText = "全てのトロフィーを入手した。";
+
+	// 隠しトロフィーフラグ
+	m_bHide = false;
 }

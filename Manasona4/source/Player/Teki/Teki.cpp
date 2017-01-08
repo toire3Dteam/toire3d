@@ -242,7 +242,7 @@ void Teki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(2.4f, 1.85f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 16;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 16;
-	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 55;
+	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 45;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 25;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_BACK;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
@@ -1166,7 +1166,7 @@ void Teki::SkillAction::Aerial::Enter()
 	m_pTeki->SetActionState(BASE_ACTION_STATE::SKILL_AERIAL);
 
 	// ˆÚ“®—Ê‚ğÁ‚·
-	m_pTeki->SetMove(Vector3((m_pTeki->GetDir() == DIR::LEFT) ? -1.75f : 1.75f, 5.5f, 0));
+	m_pTeki->SetMove(Vector3((m_pTeki->GetDir() == DIR::LEFT) ? -1.8f : 1.8f, 6.0f, 0));
 
 	// d—Í‚Ì‰e‹¿ó‚¯‚é‚ÈI
 	m_pTeki->SetMoveUpdate(false);
@@ -1210,7 +1210,7 @@ bool Teki::SkillAction::Aerial::Execute()
 	}
 
 	// n“®’†‚Íã•ûŒü‚ÉˆÚ“®
-	if(m_pTeki->GetActionFrame() != FRAME_STATE::START)m_pTeki->SetMove(Vector3(0, -3, 0));
+	if(m_pTeki->GetActionFrame() != FRAME_STATE::START)m_pTeki->SetMove(Vector3(0, -3.5, 0));
 	// ‚»‚êˆÈ~‚Í‰º•ûŒü‚ÉˆÚ“®
 
 

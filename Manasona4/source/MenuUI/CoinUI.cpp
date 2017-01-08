@@ -2,7 +2,7 @@
 #include "Data\SelectData.h"
 #include "Data\PlayerData.h"
 
-CoinUI::CoinUI(Vector2 vPos)
+CoinUI::CoinUI(Vector2 vPos, bool bCollect)
 {
 	m_vPos = vPos;
 	m_vNumPos = m_vPos;
@@ -10,10 +10,21 @@ CoinUI::CoinUI(Vector2 vPos)
 	m_vNumPos.y += 6.0f;
 
 	m_pPlate = new tdn2DAnim("Data/UI/Menu/Coin/CoinPlate.png");
-	m_pPlate->OrderMoveAppeared(16, (int)m_vPos.x - 256 , (int)m_vPos.y);
 	
 	m_pNumber = new tdn2DAnim("Data/UI/Menu/Coin/Number.png");
-	m_pNumber->OrderMoveAppeared(16, (int)m_vNumPos.x - 256, (int)m_vNumPos.y);
+
+	if (bCollect == true)
+	{
+		m_pPlate->OrderMoveAppeared(8, (int)m_vPos.x + 128, (int)m_vPos.y);
+		m_pNumber->OrderMoveAppeared(8, (int)m_vNumPos.x + 128, (int)m_vNumPos.y);
+
+	}
+	else
+	{
+		m_pPlate->OrderMoveAppeared(16, (int)m_vPos.x - 256, (int)m_vPos.y);
+		m_pNumber->OrderMoveAppeared(16, (int)m_vNumPos.x - 256, (int)m_vNumPos.y);
+
+	}
 
 	// ФўТ▓Ро
 	//float abjScale = 1.25f;

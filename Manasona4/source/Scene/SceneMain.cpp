@@ -112,8 +112,8 @@ bool sceneMain::Initialize()
 	BasePlayer* p2 = PlayerMgr->GetPlayer_TeamInSearch(SIDE::RIGHT);
 	GameUIMgr;
 	
-	if (SelectDataMgr->Get()->bTutorial == false &&
-		SelectDataMgr->Get()->bTraining == false)
+	// 戦闘ならUIを戦闘用に
+	if (m_iRoundNum >= 1)
 	{
 		GameUIMgr->InitData(p1, p2, m_iRoundNum, (ROUND_TIME_TYPE)PlayerDataMgr->m_ConfigData.iRoundTimeType);
 	}
@@ -249,7 +249,7 @@ bool sceneMain::Initialize()
 	//PlayerLoadThread->join();
 	
 	// トロフィー
-	TrophyMgr->InitBattleMission();
+	TrophyMgr->InitSeceneMain();
 
 	// BGM流す
 	bgm->PlayStreamIn((LPSTR)BattleMusicMgr->GetMusicFilePath(SelectDataMgr->Get()->iBattleMusicID).c_str());
@@ -301,9 +301,13 @@ sceneMain::~sceneMain()
 
 void sceneMain::Update()
 {
+	// ラウンドアイコンが1以上なら対戦中フラグOn
+	bool l_bVS = false;
+	if (m_iRoundNum >= 1) { l_bVS = true; }
+	TrophyMgr->CheakBigDamage(l_bVS);
+
 	// トロフィー
 	TrophyMgr->Update();
-	TrophyMgr->UpdateBattleMission();
 
 	HeaveHoFinishUI->Update();
 	if (HeaveHoFinishUI->IsAction() == true)return ;

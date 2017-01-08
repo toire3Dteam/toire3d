@@ -100,6 +100,9 @@ bool sceneRenderingTest2::Initialize()
 	m_aPos.clear();
 	m_aPos.reserve(32);
 
+	// 兄貴
+	m_pAniki = new iex3DObj("Data/CHR/Aniki/Aniki.iem");
+
 	return true;
 }
 
@@ -120,6 +123,9 @@ sceneRenderingTest2::~sceneRenderingTest2()
 
 	// ウィンドウ
 	SAFE_DELETE(g_pSoundWindow);
+
+	SAFE_DELETE(m_pAniki);
+
 }
 
 //******************************************************************
@@ -262,6 +268,9 @@ void sceneRenderingTest2::Update()
 		PointLightMgr->AddPointLight(m_aPos[i], LightCol, 90*1, 4*1, 1, 1, 1);
 	}
 
+	m_pAniki->Animation();
+	m_pAniki->Update();
+
 }
 
 //******************************************************************
@@ -352,6 +361,8 @@ void sceneRenderingTest2::Render()
 		//g_pStage->Render(shaderM, "copy");
 		g_pSky->Render();
 		g_tagWater.pObj->Render(shaderM, "copy");
+
+		m_pAniki->Render(shaderM, "copy");
 
 	}
 	

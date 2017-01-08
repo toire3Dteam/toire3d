@@ -19,6 +19,7 @@
 #include "SceneMenu.h"
 #include "SceneSelect.h"
 #include "Data\/SelectData.h"
+#include "Trophy\TrophyManager.h"
 
 // これを定義するとラウンドコールがスキップされる(デバッグ時短用)
 //#define ROUND_SKIP
@@ -383,6 +384,11 @@ bool SceneMainState::Main::OnMessage(sceneMain *pMain, const Message & msg)
 		data.iMaxDamage = GameUIMgr->GetComboUI(KOInfo->LoseSide)->GetMaxDamage();		
 		data.iRemainingHP =GameUIMgr->GetHpGage(KOInfo->WinnerSide)->GetHPPercentage();
 		data.iElapsedTime = GameUIMgr->GetTimer()->GetElapsedTime();
+		
+		// 勝った側のHPを渡す
+		TrophyMgr->CheakMaxHpFinish(data.iRemainingHP);
+		// 経過時間を渡す
+		TrophyMgr->CheakSpeedFinish(data.iElapsedTime);
 
 		// ラウンド全部取って勝利確定だったら、フィニッシュの段階でリザルトシーンを読み込む
 		if (KOInfo->iNumWinnerRound == pMain->GetRoundNum() - 1)
@@ -1044,6 +1050,8 @@ void SceneMainState::Training::Execute(sceneMain *pMain)
 	//	pMain->GetFSM()->ChangeState(Main::GetInstance());
 	//#endif
 
+	// 練習時間計測
+	TrophyMgr->CheakTrainingTime();
 
 	// プレイヤー更新
 	PlayerMgr->Update(PLAYER_UPDATE::CONTROL_OK);

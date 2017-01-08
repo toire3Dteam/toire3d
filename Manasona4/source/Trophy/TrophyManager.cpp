@@ -31,6 +31,22 @@ TrophyManager::TrophyManager() :BaseGameEntity(ENTITY_ID::TROPHY_MGR)	// ÉGÉìÉeÉ
 			m_pTrophy[i] = new BigDamageTrophy();
 
 			break;
+		case TROPHY_TYPE::MAX_HP_FINISH:
+			m_pTrophy[i] = new MaxHpFinishTrophy();
+
+			break;
+		case TROPHY_TYPE::SPEED_FINISH:
+			m_pTrophy[i] = new SpeedFinishTrophy();
+
+			break;
+		case TROPHY_TYPE::TRAINING_TIME:
+			m_pTrophy[i] = new TrainingTimeTrophy();
+
+			break;
+		case TROPHY_TYPE::COMPLETE_TROPHY:
+			m_pTrophy[i] = new CompleteTrophy();
+
+			break;
 		default:
 			m_pTrophy[i] = new FirstTrophy();
 			//MyAssert(0, "ÇªÇÃÉ^ÉCÉvÇÕë∂ç›ÇµÇ»Ç¢ÅB");	
@@ -66,6 +82,34 @@ void TrophyManager::Update()
 	//{
 	//	m_pTrophy[i]->Update();
 	//}
+
+	// ÅöÉgÉçÉtÉBÅ[ÇëSÇƒèWÇﬂÇΩÇ©ämîFèàóù
+	// Ç‹ÇæÅ´ÇÃÉgÉçÉtÉBÅ[ÇéËÇ…ì¸ÇÍÇƒÇ¢Ç»Ç©Ç¡ÇΩÇÁ
+	if (PlayerDataMgr->m_TrophyData.iCompleteTrophy== 0)
+	{
+		int l_iCount = 0;
+		for (int i = 0; i < (int)TROPHY_TYPE::ARRAY_END; i++)
+		{
+			// ÉRÉìÉvÉäÅ[ÉgÉgÉçÉtÉBÅ[ÇÕîÚÇŒÇ∑
+			if (PlayerDataMgr->m_TrophyData.iAllData[i]
+				== (int)TROPHY_TYPE::COMPLETE_TROPHY)return;
+
+			// éËÇ…ì¸ÇÍÇƒÇΩÇÁÉJÉEÉìÉg
+			if (PlayerDataMgr->m_TrophyData.iAllData[i] == 1)
+			{
+				l_iCount++;
+			}	
+
+		}
+
+		// ëSïîéËÇ…ì¸ÇÍÇΩÇÁ
+		if (l_iCount == (int)TROPHY_TYPE::ARRAY_END - 1)
+		{
+			// ÉRÉìÉvÉäÅ[ÉgÇ®ÇﬂÇ≈Ç∆Ç§
+			TROPHY_TYPE eType = TROPHY_TYPE::COMPLETE_TROPHY;
+			MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
+		}
+	}
 
 }
 
@@ -236,13 +280,30 @@ bool TrophyManager::HandleMessage(const Message & msg)
 	return false;
 }
 
-void TrophyManager::InitBattleMission()
+int TrophyManager::GetTrophyOwned()
 {
+	int l_iCount = 0;
+	//
+	for (int i = 0; i < (int)TROPHY_TYPE::ARRAY_END; i++)
+	{
+		if (PlayerDataMgr->m_TrophyData.iAllData[i] == 1)
+		{
+			l_iCount++;
+		}
+
+	}
 
 
+	return l_iCount;
 }
 
-void TrophyManager::UpdateBattleMission()
+void TrophyManager::InitSeceneMain()
+{
+	// ÉgÉåÅ[ÉjÉìÉOëÿç›éûä‘
+	m_iTrainingFrame = 0;
+}
+
+void TrophyManager::CheakBigDamage(bool bVS)
 {
 
 	// Ç‹ÇæÅ´ÇÃÉgÉçÉtÉBÅ[ÇéËÇ…ì¸ÇÍÇƒÇ¢Ç»Ç©Ç¡ÇΩÇÁ
@@ -259,7 +320,6 @@ void TrophyManager::UpdateBattleMission()
 
 			}
 
-
 		}
 		else if (PlayerMgr->GetPlayer(SIDE::RIGHT)->isAI() == false)
 		{
@@ -274,6 +334,65 @@ void TrophyManager::UpdateBattleMission()
 
 	}
 
+	
+
 }
+
+void TrophyManager::CheakMaxHpFinish(int iRemainingHP)
+{
+	// ëŒêÌÇ∂Ç·Ç»Ç©Ç¡ÇΩÇÁï‘Ç∑
+	//if (bVS == false)return;
+
+	// Ç‹ÇæÅ´ÇÃÉgÉçÉtÉBÅ[ÇéËÇ…ì¸ÇÍÇƒÇ¢Ç»Ç©Ç¡ÇΩÇÁ
+	if (PlayerDataMgr->m_TrophyData.iMaxHpFinish == 0)
+	{
+		// 100%èüóòÇ»ÇÁ
+		if (iRemainingHP >= 100)
+		{
+			TROPHY_TYPE eType = TROPHY_TYPE::MAX_HP_FINISH;
+			MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
+
+		}
+
+	}
+
+
+}
+
+void TrophyManager::CheakSpeedFinish(int iElapsedTime)
+{
+	// Ç‹ÇæÅ´ÇÃÉgÉçÉtÉBÅ[ÇéËÇ…ì¸ÇÍÇƒÇ¢Ç»Ç©Ç¡ÇΩÇÁ
+	if (PlayerDataMgr->m_TrophyData.iSpeedFinish == 0)
+	{
+		// Å´ÇÃêîílÇÊÇËÇ‡ëÅÇ≠èüóòÇµÇΩÇ»ÇÁ
+		if (iElapsedTime <= 15)
+		{
+			TROPHY_TYPE eType = TROPHY_TYPE::SPEED_FINISH;
+			MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
+
+		}
+
+	}
+
+}
+
+void TrophyManager::CheakTrainingTime()
+{
+	m_iTrainingFrame++;
+
+	// Ç‹ÇæÅ´ÇÃÉgÉçÉtÉBÅ[ÇéËÇ…ì¸ÇÍÇƒÇ¢Ç»Ç©Ç¡ÇΩÇÁ
+	if (PlayerDataMgr->m_TrophyData.iTrainingTime == 0)
+	{
+		// Å´éûä‘à»è„ÉvÉåÉCÇµÇƒÇΩÇÁ
+		if (m_iTrainingFrame >= (60 * 60) * 5)
+		{
+			TROPHY_TYPE eType = TROPHY_TYPE::TRAINING_TIME;
+			MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
+
+		}
+
+	}
+}
+
 
 

@@ -135,28 +135,6 @@ void sceneMenu::Update()
 		m_pStateMachine->Update();
 
 #ifdef DEBUG
-		// Tでトロフィー解禁
-		if (KeyBoard(KB_T) == 2)
-		{
-			TROPHY_TYPE eType;
-			eType = TROPHY_TYPE::FIRST;
-			MsgMgr->Dispatch(0, ENTITY_ID::SCENE_MENU, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
-			
-		}
-		if (KeyBoard(KB_U) == 2)
-		{
-			TROPHY_TYPE eType;
-			eType = TROPHY_TYPE::FIRST_BATTLE;
-			MsgMgr->Dispatch(0, ENTITY_ID::SCENE_MENU, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
-
-		}
-		// Yでトロフィーロック
-		if (KeyBoard(KB_Y) == 2)
-		{
-			TrophyMgr->AllReset();
-		}
-
-
 		// エンターでワープ
 		if (KeyBoard(KB_ENTER) == 2)
 		{

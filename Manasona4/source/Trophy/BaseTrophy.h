@@ -65,7 +65,7 @@ class FirstTrophy :public BaseTrophy
 {
 public:
 	FirstTrophy();
-	~FirstTrophy();
+	~FirstTrophy() {};
 
 private:
 
@@ -79,7 +79,7 @@ class FirstBattleTrophy :public BaseTrophy
 {
 public:
 	FirstBattleTrophy();
-	~FirstBattleTrophy();
+	~FirstBattleTrophy() {};
 
 private:
 
@@ -93,7 +93,47 @@ class BigDamageTrophy :public BaseTrophy
 {
 public:
 	BigDamageTrophy();
-	~BigDamageTrophy();
+	~BigDamageTrophy() {};
+
+private:
+
+};
+
+//+---------------------------------
+//	MAXHP勝利トロフィー
+//+---------------------------------
+class MaxHpFinishTrophy :public BaseTrophy
+{
+public:
+	MaxHpFinishTrophy();
+	~MaxHpFinishTrophy() {};
+
+private:
+
+};
+
+
+//+---------------------------------
+//	最速勝利トロフィー
+//+---------------------------------
+class SpeedFinishTrophy :public BaseTrophy
+{
+public:
+	SpeedFinishTrophy();
+	~SpeedFinishTrophy() {};
+
+private:
+
+};
+
+//+---------------------------------
+//	トレーニングでの連続時間トロフィー
+//+---------------------------------
+class TrainingTimeTrophy :public BaseTrophy
+{
+public:
+	TrainingTimeTrophy();
+	~TrainingTimeTrophy() {};
 
 private:
 
@@ -101,3 +141,26 @@ private:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+//+---------------------------------
+//	コンプリートトロフィー
+//+---------------------------------
+class CompleteTrophy :public BaseTrophy
+{
+public:
+	CompleteTrophy();
+	~CompleteTrophy() {};
+
+private:
+
+};
