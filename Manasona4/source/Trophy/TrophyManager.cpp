@@ -1,5 +1,6 @@
 #include "TrophyManager.h"
 #include "Data\PlayerData.h"
+#include "Data\SelectData.h"
 #include "Player\PlayerManager.h"
 #include "UI\GameUI.h"
 #include "BaseEntity\Message\MessageDispatcher.h"
@@ -43,6 +44,14 @@ TrophyManager::TrophyManager() :BaseGameEntity(ENTITY_ID::TROPHY_MGR)	// ƒGƒ“ƒeƒ
 			m_pTrophy[i] = new TrainingTimeTrophy();
 
 			break;
+		case TROPHY_TYPE::POWERFUL_ENEMY:
+			m_pTrophy[i] = new PowerfulEnemyWinTrophy();
+
+			break;
+		case TROPHY_TYPE::MENY_CONTENT:
+			m_pTrophy[i] = new BuyManyContentTrophy();
+
+			break;
 		case TROPHY_TYPE::COMPLETE_TROPHY:
 			m_pTrophy[i] = new CompleteTrophy();
 
@@ -58,6 +67,11 @@ TrophyManager::TrophyManager() :BaseGameEntity(ENTITY_ID::TROPHY_MGR)	// ƒGƒ“ƒeƒ
 	// ƒƒbƒNƒAƒCƒRƒ“
 	m_pRockIcon = new tdn2DObj("Data/Trophy/Rock.png");
 
+
+	// ˜A‘±æ“¾—p
+	m_aActionStack.clear();
+	m_aActionStack.reserve(8);
+	m_iIntervalFrame = 0;
 }
 
 TrophyManager::~TrophyManager()
@@ -74,6 +88,31 @@ TrophyManager::~TrophyManager()
 
 void TrophyManager::Update()
 {
+	// ˜A‘±æ“¾—p
+	m_iIntervalFrame--;
+	if (m_iIntervalFrame <= 0)
+	{
+		m_iIntervalFrame = 0;	// 0‚Å~‚ß‚é
+
+		for (int i = 0; i < (int)m_aActionStack.size(); i++)
+		{
+			// ƒZƒŒƒNƒgƒgƒƒtƒB[‚ğİ’è Å‰‚Ì“ü‚Á‚Ä‚ ‚é”’l‚ğ“ü‚ê‚é
+			m_eSelectTrophy = m_aActionStack[i];
+
+			m_pTrophy[(int)m_eSelectTrophy]->Action(20);
+
+			// ‰ğ•ú‚µ‚½‚çæ‚èo‚·
+			//m_aActionStack.pop_back();
+			m_aActionStack.erase(m_aActionStack.begin());
+
+			// ŠÔŠuƒtƒŒ[ƒ€İ’è(ƒgƒƒtƒB[‚ÌƒAƒCƒRƒ“‚ªo‚éŠ´Šo‚Í‚±‚±‚Å’²®)
+			m_iIntervalFrame = 240;
+			break;
+		}
+
+	}
+
+
 	// ‘I‘ğ‚µ‚Ä‚¢‚éƒgƒƒtƒB[
 	m_pTrophy[(int)m_eSelectTrophy]->Update();
 
@@ -265,8 +304,12 @@ bool TrophyManager::HandleMessage(const Message & msg)
 		if (PlayerDataMgr->m_TrophyData.iAllData[(int)*l_eType] == 0)
 		{
 			PlayerDataMgr->m_TrophyData.iAllData[(int)*l_eType] = 1;
-			m_eSelectTrophy = *l_eType;
-			m_pTrophy[(int)m_eSelectTrophy]->Action(20);
+			//m_eSelectTrophy = *l_eType;
+			//m_pTrophy[(int)m_eSelectTrophy]->Action(20);
+			
+			// ª‚ÅƒAƒNƒVƒ‡ƒ“‚¹‚¸ˆê“I‚É‰ğ•úƒXƒ^ƒbƒN‚É”Ô†‚ğ“ü‚ê‚é
+			m_aActionStack.push_back(*l_eType);
+			
 			return true;
 		}
 
@@ -301,6 +344,23 @@ void TrophyManager::InitSeceneMain()
 {
 	// ƒgƒŒ[ƒjƒ“ƒO‘ØİŠÔ
 	m_iTrainingFrame = 0;
+}
+
+// ‘Îí‰ñ”
+void TrophyManager::CheakBattleCount(int iBattleCount)
+{
+	// ‚Ü‚¾«‚ÌƒgƒƒtƒB[‚ğè‚É“ü‚ê‚Ä‚¢‚È‚©‚Á‚½‚ç
+	if (PlayerDataMgr->m_TrophyData.iFirstBattle == 0)
+	{
+		// «ˆÈã‘Îí‚µ‚Ä‚¢‚½‚ç
+		if (iBattleCount >= 1)
+		{
+			TROPHY_TYPE eType = TROPHY_TYPE::FIRST_BATTLE;
+			MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
+		}
+
+	}
+
 }
 
 void TrophyManager::CheakBigDamage(bool bVS)
@@ -365,7 +425,7 @@ void TrophyManager::CheakSpeedFinish(int iElapsedTime)
 	if (PlayerDataMgr->m_TrophyData.iSpeedFinish == 0)
 	{
 		// «‚Ì”’l‚æ‚è‚à‘‚­Ÿ—˜‚µ‚½‚È‚ç
-		if (iElapsedTime <= 15)
+		if (iElapsedTime <= 20)
 		{
 			TROPHY_TYPE eType = TROPHY_TYPE::SPEED_FINISH;
 			MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
@@ -392,6 +452,50 @@ void TrophyManager::CheakTrainingTime()
 		}
 
 	}
+}
+
+
+void TrophyManager::CheakPowerfulEnemyWin(SIDE eWinnerSide)
+{
+	// •‰‚¯‚½‘¤‚ÌƒTƒCƒh‚ğ’m‚é
+	SIDE l_eLoseSide = SIDE::LEFT;
+	if (eWinnerSide == SIDE::LEFT)
+	{
+		l_eLoseSide = SIDE::RIGHT;
+	}
+	
+	// ‚Ü‚¾«‚ÌƒgƒƒtƒB[‚ğè‚É“ü‚ê‚Ä‚¢‚È‚©‚Á‚½‚ç
+	if (PlayerDataMgr->m_TrophyData.iPowerfulEnemyWin == 0)
+	{
+		// š•‰‚¯‚½‘¤‚ªAI‚Å®Š‚ÂÅ‚“ïˆÕ“x‚¾‚Á‚½‚ç
+		if (SelectDataMgr->Get()->tagSideDatas[(int)l_eLoseSide].bAI == true && 
+			SelectDataMgr->Get()->tagSideDatas[(int)l_eLoseSide].eAIType == (AI_TYPE::CPU_YOKOE))
+		{
+
+			TROPHY_TYPE eType = TROPHY_TYPE::POWERFUL_ENEMY;
+			MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
+
+		}
+
+	}
+}
+
+void TrophyManager::CheakBuyManyContent(int iOwnedContent)
+{
+	// ‚Ü‚¾«‚ÌƒgƒƒtƒB[‚ğè‚É“ü‚ê‚Ä‚¢‚È‚©‚Á‚½‚ç
+	if (PlayerDataMgr->m_TrophyData.iBuyManyContent == 0)
+	{
+		// «ˆÈãŠ‚µ‚Ä‚¢‚½‚ç
+		if (iOwnedContent >= 10)
+		{
+			TROPHY_TYPE eType = TROPHY_TYPE::MENY_CONTENT;
+			MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
+
+		}
+
+	}
+
+
 }
 
 

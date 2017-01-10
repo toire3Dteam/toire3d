@@ -19,9 +19,38 @@ PictureManager::PictureManager() :BaseGameEntity(ENTITY_ID::PICTURE_MGR)	// ƒGƒ“
 	{
 		switch ((PICTURE_TYPE)i)
 		{
+		case PICTURE_TYPE::REST:
+			m_pPicture[i] = new RestPicture();
+			break;
+		case PICTURE_TYPE::GATHERING:
+			m_pPicture[i] = new GatheringPicture();
+			break;
+		case PICTURE_TYPE::STYLISH:
+			m_pPicture[i] = new StylishPicture();
+			break;
+		case PICTURE_TYPE::COOL:
+			m_pPicture[i] = new CoolPicture();
+			break;
+		case PICTURE_TYPE::ALLEY:
+			m_pPicture[i] = new AlleyPicture();
+			break;
+		case PICTURE_TYPE::SAD:
+			m_pPicture[i] = new SadPicture();
+			break;
+		case PICTURE_TYPE::SEXY:
+			m_pPicture[i] = new SexyPicture();
+			break;
+		case PICTURE_TYPE::SEA:
+			m_pPicture[i] = new SeaPicture();
+			break;
 		case PICTURE_TYPE::AIROU:
 			m_pPicture[i] = new AirouPicture();
-
+			break;
+		case PICTURE_TYPE::TEKI:
+			m_pPicture[i] = new TekiPicture();
+			break;
+		case PICTURE_TYPE::NAZENARABA:
+			m_pPicture[i] = new NazenarabaPicture();
 			break;
 		default:
 			m_pPicture[i] = new AirouPicture();

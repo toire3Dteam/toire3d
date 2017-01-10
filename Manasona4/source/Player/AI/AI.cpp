@@ -25,6 +25,9 @@ AI::AI(SIDE side,BasePlayer* myBasePlayer , AI_TYPE AIType)
 	m_iDoublePushFrame = 0;
 	m_eDoublePushInput = PLAYER_INPUT::UP;
 
+	// どっこいダッシュフラグ
+	m_bDokkoiDush = false;
+
 	// [11/25] 親のターゲットと指定してるプレイヤーを指定
 	m_pTargetPlayer = myBasePlayer->GetTargetPlayer();
 

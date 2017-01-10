@@ -322,7 +322,7 @@ bool OverDriveCancel(BasePlayer *pPerson)
 		else
 		{
 			// 覚醒（バースト）キャンセル
-			if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R3, false))
+			if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R3, true))
 			{
 				// 守りのバースト
 				pPerson->GetFSM()->ChangeState(BasePlayerState::OverDrive_Burst::GetInstance());

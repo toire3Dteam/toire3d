@@ -184,6 +184,12 @@ void sceneCollect::Update()
 		m_pTips[i]->Update(m_iCtrlDevice);
 	}
 
+	// コンテンツ所持数
+	int l_iOwnedContent = m_pPictureMgr->GetPictureOwned();// イラスト
+
+	// コンテンツ所持数トロフィーが解除できるか確認
+	TrophyMgr->CheakBuyManyContent(l_iOwnedContent);
+
 	// トロフィ
 	TrophyMgr->Update();
 
@@ -242,6 +248,12 @@ void sceneCollect::Update()
 		MsgMgr->Dispatch(0, ENTITY_ID::PICTURE_MGR, ENTITY_ID::PICTURE_MGR, MESSAGE_TYPE::PICTURE_GET, &eType);
 
 	}
+	// プレイ回数初期化
+	if (KeyBoard(KB_P) == 2)
+	{
+		PlayerDataMgr->m_PlayerInfo.BattleCount = 0;
+	}
+
 
 	if (bEnd)
 	{
@@ -283,15 +295,18 @@ void sceneCollect::Render()
 	// tdnPolygon::Rect((int)(1280 * .25f) / 2, 96, (int)(1280 * .75f), (int)(720 * .75f), RS::COPY, 0xff808080);
 
 	// プレイ回数
-	tdnText::Draw(400, 400, 0xffffffff, "プレイ回数: %d", m_pPlayerInfo->PlayCount);
+	tdnText::Draw(700, 350, 0xffffffff, "プレイ回数: %d", m_pPlayerInfo->PlayCount);
 
 	// プレイ時間
 	const int minutes(m_pPlayerInfo->PlayTime % 60), hour(m_pPlayerInfo->PlayTime / 60);
-	tdnText::Draw(400, 460, 0xffffffff, "プレイ時間: %d時間 %d分", hour, minutes);
+	tdnText::Draw(700, 380, 0xffffffff, "プレイ時間: %d時間 %d分", hour, minutes);
 
 	// コイン
-	tdnText::Draw(400, 520, 0xffffffff, "コイン: %d", m_pPlayerInfo->coin);
+	tdnText::Draw(700, 410, 0xffffffff, "コイン: %d", m_pPlayerInfo->coin);
 	
+	// 対戦回数
+	tdnText::Draw(700, 440, 0xffffffff, "対戦回数: %d", m_pPlayerInfo->BattleCount);
+
 	// 
 	//tdnText::Draw(400, 720, 0xffffffff, "下げてる値: %.1f", m_iScrollPosY);
 
@@ -488,7 +503,7 @@ void sceneCollect::TrophyInit()
 	m_tagTI.iBottom = 2;
 	
 	// 何列かを設定
-	m_tagTI.iRowNum = 2;
+	m_tagTI.iRowNum = 6;
 	// トロフィー数分に↑列を合わせた結果、縦幅の大きさを調べる
 	int l_iCount = 0;
 	m_tagTI.iMaxHeight = 1;// ★まず最低限1はある
@@ -849,7 +864,7 @@ void sceneCollect::PictureInit()
 	m_tagPI.iBottom = 3;
 
 	// 何列かを設定
-	m_tagPI.iRowNum = 2;
+	m_tagPI.iRowNum = 5;
 	// 数分に↑列を合わせた結果、縦幅の大きさを調べる
 	int l_iCount = 0;
 	m_tagPI.iMaxHeight = 1;// ★まず最低限1はある

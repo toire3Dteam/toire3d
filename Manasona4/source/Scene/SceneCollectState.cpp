@@ -423,7 +423,8 @@ bool SceneCollectState::PictureWatch::PadUpdate(sceneCollect *pMain, int DeviceI
 
 
 	// メッセージ非表示
-	if (tdnInput::KeyGet(KEYCODE::KEY_C, DeviceID) == 3)
+	if (tdnInput::KeyGet(KEYCODE::KEY_C, DeviceID) == 3||
+		tdnInput::KeyGet(KEYCODE::KEY_D, DeviceID) == 3)
 	{
 		if (pMain->m_bWatchInfo == true)
 		{

@@ -49,6 +49,7 @@ bool sceneMain::Initialize()
 	if (SelectDataMgr->Get()->bTutorial == false &&
 		SelectDataMgr->Get()->bTraining == false)
 	{
+
 		//m_iRoundNum = SelectDataMgr->Get()->iWinRound;
 		switch ((ROUND_NUM_TYPE)PlayerDataMgr->m_ConfigData.iRoundNumType)
 		{
@@ -291,7 +292,7 @@ sceneMain::~sceneMain()
 	}
 
 	// トロフィー
-	TrophyMgr->Stop();
+	//TrophyMgr->Stop();
 
 }
 

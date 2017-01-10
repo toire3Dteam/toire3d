@@ -693,8 +693,8 @@ void TekiResultPerformance::Action()
 	m_font.pic->Action(8);
 
 
-	m_pFlontRing.pos.x = -50;
-	m_pFlontRing.pos.y = 300;
+	m_pFlontRing.pos.x = -150;
+	m_pFlontRing.pos.y = 250;
 	m_pFlontRing.pic->Action(4);
 
 	m_pBackRing.pos.x = -50;

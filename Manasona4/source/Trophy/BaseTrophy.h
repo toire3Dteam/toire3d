@@ -139,7 +139,31 @@ private:
 
 };
 
+//+---------------------------------
+//	最高難易度でCOMを倒したトロフィー
+//+---------------------------------
+class PowerfulEnemyWinTrophy :public BaseTrophy
+{
+public:
+	PowerfulEnemyWinTrophy();
+	~PowerfulEnemyWinTrophy() {};
 
+private:
+
+};
+
+//+-----------------------------------------
+//	コンテンツをたくさん解放したトロフィー
+//+-----------------------------------------
+class BuyManyContentTrophy :public BaseTrophy
+{
+public:
+	BuyManyContentTrophy();
+	~BuyManyContentTrophy() {};
+
+private:
+
+};
 
 
 

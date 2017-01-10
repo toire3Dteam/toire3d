@@ -310,8 +310,8 @@ bool HardTypeChaseBrain(AI * pPerson)
 	{
 		int ram = tdnRandom::Get(0, 100);
 
-		// 20%の確率で無敵
-		if (ram <= 20)
+		// 15%の確率で無敵
+		if (ram <= 15)
 		{
 			// 無敵技(リバーサル昇竜)
 			pPerson->GetFSM()->ChangeState(AIState::InvincibleAttack::GetInstance());
@@ -1393,7 +1393,7 @@ void AIState::PracticeDownAttack::Execute(AI * pPerson)
 				pPerson->m_iPracticeAttackIntervalFrame = 0;
 				// 下段攻撃
 				pPerson->PushInputList(PLAYER_INPUT::DOWN);
-				pPerson->PushInputList(PLAYER_INPUT::R1);
+				pPerson->PushInputList(PLAYER_INPUT::C);
 			}
 		}
 
@@ -1450,6 +1450,10 @@ void AIState::Wait::Execute(AI * pPerson)
 	// 待機モーションになったら
 	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::Wait::GetInstance()) == true)
 	{
+		// 攻撃へ
+		//pPerson->GetFSM()->ChangeState(AIState::RushAttack::GetInstance());
+		//return;
+
 		// 確率  (値が低いほど性能の良い技がでる)
 		int l_iStrong= tdnRandom::Get(0, 100);
 		// 難易度による補正値
@@ -2400,6 +2404,27 @@ AIState::RushAttack * AIState::RushAttack::GetInstance()
 
 void AIState::RushAttack::Enter(AI * pPerson)
 {
+	// 相手が浮いていたら
+	if (pPerson->GetTargetPlayer()->isLand() == false)
+	{		
+		// AIのタイプによりここを変更
+		switch (pPerson->GetAIType())
+		{
+		case AI_TYPE::CPU_HARD:
+
+			break;
+		case AI_TYPE::CPU_YOKOE:
+			// 空中攻撃へ
+			pPerson->GetFSM()->ChangeState(AIState::ChaseAir::GetInstance());
+			return;
+			break;
+		default:
+			break;
+		}
+		
+	}
+	
+
 	// 攻撃開始、最初の一段目を振るで！！！
 	pPerson->PushInputList(PLAYER_INPUT::C);
 
@@ -3139,7 +3164,7 @@ void AIState::SetAerialAttack::Execute(AI * pPerson)
 	// 相手は地上に着地してしまったら
 	if (pPerson->GetTargetPlayer()->isLand())
 	{
-		// 対空攻撃できないので戻る
+		// 攻撃できないので戻る
 		pPerson->GetFSM()->ChangeState(AIState::Wait::GetInstance());
 		return;
 	}
@@ -3151,13 +3176,13 @@ void AIState::SetAerialAttack::Execute(AI * pPerson)
 	//if (TargetPos.x > MyPos.x+5)	pPerson->PushInputList(PLAYER_INPUT::RIGHT);	
 	//else if (TargetPos.x < MyPos.x-5)	pPerson->PushInputList(PLAYER_INPUT::LEFT);
 
-	// 対空範囲内
+	// 攻撃範囲内
 	if ( Math::Length(TargetPos, MyPos) < 18 )
 	{
 		// (TODO) 見栄えとかで少し見づらい式になってるので後で直す
 
 		// 自分が落ちてるとき
-		if (MyPlayer->GetMove().y < -0.0f ||
+		if (MyPlayer->GetMove().y < 0.25f ||
 			MyPlayer->isAerialJump() == false&& MyPlayer->GetMove().y < 1.0f)// 二段ジャンプ目なら落下前にキャンセルできます
 		{
 			// ジャンプ・エリアルジャンプモードになってたら
@@ -3539,6 +3564,11 @@ void AIState::DokkoiAttack::Enter(AI * pPerson)
 {
 	// 中段技
 	pPerson->PushInputList(PLAYER_INPUT::R1);
+
+	// 初期化
+	pPerson->SetWaitFrame(0);
+	pPerson->SetDokkoiDush(false);
+
 }
 
 void AIState::DokkoiAttack::Execute(AI * pPerson)
@@ -3558,15 +3588,32 @@ void AIState::DokkoiAttack::Execute(AI * pPerson)
 		// 当たった時
 		if (MyPlayer->GetAttackData()->bHit == true) 
 		{	
-			// ついげきへ
+			// ついげきダッシュへ
 			pPerson->PushInputList(PLAYER_INPUT::R1);
-
-			// キャンセル後はラッシュに
-			pPerson->GetFSM()->ChangeState(AIState::RushAttack::GetInstance());
-			return;
+			// ダッシュフラグ立てる
+			pPerson->SetWaitFrame(0);
+			pPerson->SetDokkoiDush(true);
 		}
-
 	}
+
+	// ラッシュへ
+	if (MyPlayer->GetFSM()->isInState(*BasePlayerState::DokkoiAttack::GetInstance()) == true)
+	{
+		// ダッシュフラグが立っていたら
+		if (pPerson->GetDokkoiDush() == true)
+		{
+			// ↓のフレームを超えたら
+			pPerson->AddWaitFrame(1);
+			if (pPerson->GetWaitFrame() >= 20)
+			{
+				// キャンセル後はラッシュに
+				pPerson->GetFSM()->ChangeState(AIState::RushAttack::GetInstance());
+				return;
+			}
+
+		}
+	}
+
 }
 
 void AIState::DokkoiAttack::Exit(AI * pPerson)

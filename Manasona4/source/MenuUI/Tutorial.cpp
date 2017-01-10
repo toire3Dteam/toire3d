@@ -793,7 +793,8 @@ void RushTutorial::TaskUpdate(BasePlayer * pPerson)
 	};
 
 	// 待機に戻ると最初からやり直し
-	if (pPerson->GetFSM()->isInState(*BasePlayerState::Wait::GetInstance()))
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::Wait::GetInstance())||
+		pPerson->GetFSM()->isInState(*BasePlayerState::Jump::GetInstance()))
 	{
 		Init(m_iDeviceID);// デバイスは自分自身と同じ
 	}

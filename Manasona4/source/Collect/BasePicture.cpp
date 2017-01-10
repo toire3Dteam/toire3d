@@ -109,6 +109,13 @@ void BasePicture::UpdateExe()
 
 void BasePicture::CtrlExe(int iDevice)
 {
+	// セレクトキーで初期化
+	if (tdnInput::KeyGet(KEYCODE::KEY_SELECT, iDevice)||
+		tdnInput::KeyGet(KEYCODE::KEY_R3, iDevice))
+	{
+		m_tagPicture.vPos = VECTOR2_ZERO;
+		m_tagPicture.fScale = 1.0f;
+	}
 
 
 	// スティック誤差用
@@ -219,6 +226,280 @@ void AirouPicture::InitExe()
 	m_tagPicture.sText = "アイル―のキャラクターイラスト";
 	m_tagPicture.vPos.x = -300.0f;
 	m_tagPicture.vPos.y = -200.0f;
+	m_tagPicture.fScale = 1.0f;
+	m_tagPicture.iAlpha = 1.0f;
+}
+
+//+---------------------------------
+//	テキのイラスト
+//+---------------------------------
+TekiPicture::TekiPicture()
+{
+	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Teki.png");
+	m_tagPictureIcon.sTitle = "【キャラクターイラスト】テキ";
+	m_tagPictureIcon.sText = "テキのキャラクターイラスト";
+
+	// 隠しトロフィーフラグ
+	m_bRock = false;
+
+	// 値段
+	m_iPrice = 10;
+}
+
+// 実行後の画像の初期化
+void TekiPicture::InitExe()
+{
+	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Teki.png");
+	m_tagPicture.sTitle = "【キャラクターイラスト】テキ";
+	m_tagPicture.sText = "テキのキャラクターイラスト";
+	m_tagPicture.vPos.x = -100.0f;
+	m_tagPicture.vPos.y = 0.0f;
+	m_tagPicture.fScale = 1.0f;
+	m_tagPicture.iAlpha = 1.0f;
+}
+
+//+---------------------------------
+//	∵のイラスト
+//+---------------------------------
+NazenarabaPicture::NazenarabaPicture()
+{
+	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Nazenaraba.png");
+	m_tagPictureIcon.sTitle = "【キャラクターイラスト】(∵)";
+	m_tagPictureIcon.sText = "(∵)のキャラクターイラスト";
+
+	// 隠しトロフィーフラグ
+	m_bRock = false;
+
+	// 値段
+	m_iPrice = 10;
+}
+
+// 実行後の画像の初期化
+void NazenarabaPicture::InitExe()
+{
+	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Nazenaraba.png");
+	m_tagPicture.sTitle = "【キャラクターイラスト】(∵)";
+	m_tagPicture.sText = "(∵)のキャラクターイラスト";
+	m_tagPicture.vPos.x = 0.0f;
+	m_tagPicture.vPos.y = 0.0f;
+	m_tagPicture.fScale = 1.0f;
+	m_tagPicture.iAlpha = 1.0f;
+}
+
+
+//+---------------------------------
+//	一枚絵のイラスト
+//+---------------------------------
+RestPicture::RestPicture()
+{
+	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Rest.png");
+	m_tagPictureIcon.sTitle = "【スペシャルイラスト】お昼ご飯";
+	m_tagPictureIcon.sText = "特別なイラストです。";
+
+	// 隠しトロフィーフラグ
+	m_bRock = false;
+
+	// 値段
+	m_iPrice = 10;
+}
+
+// 実行後の画像の初期化
+void RestPicture::InitExe()
+{
+	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Rest.png");
+	m_tagPicture.sTitle = "【スペシャルイラスト】お昼ご飯";
+	m_tagPicture.sText = "みんなでわいわいお昼ご飯。\nレジャーシートの上でこれから肉を焼こうとしている大事故一歩手前の瞬間。";
+	m_tagPicture.vPos.x = 0.0f;
+	m_tagPicture.vPos.y = 0.0f;
+	m_tagPicture.fScale = 1.0f;
+	m_tagPicture.iAlpha = 1.0f;
+}
+
+//+-------------------------------------
+// 設定
+GatheringPicture::GatheringPicture()
+{
+	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Gathering.png");
+	m_tagPictureIcon.sTitle = "【スペシャルイラスト】集合写真";
+	m_tagPictureIcon.sText = "特別なイラストです。";
+
+	// 隠しトロフィーフラグ
+	m_bRock = false;
+
+	// 値段
+	m_iPrice = 10;
+}
+
+// 実行後の画像の初期化
+void GatheringPicture::InitExe()
+{
+	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Gathering.png");
+	m_tagPicture.sTitle = "【スペシャルイラスト】集合写真";
+	m_tagPicture.sText = "みんな写真に写りたすぎて後ろが映っていない、わっしょいな写真。";
+	m_tagPicture.vPos.x = 0.0f;
+	m_tagPicture.vPos.y = 0.0f;
+	m_tagPicture.fScale = 1.0f;
+	m_tagPicture.iAlpha = 1.0f;
+}
+
+//+-------------------------------------
+// 設定
+StylishPicture::StylishPicture()
+{
+	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Stylish.png");
+	m_tagPictureIcon.sTitle = "【スペシャルイラスト】スタイリッシュ";
+	m_tagPictureIcon.sText = "特別なイラストです。";
+
+	// 隠しトロフィーフラグ
+	m_bRock = false;
+
+	// 値段
+	m_iPrice = 10;
+}
+
+// 実行後の画像の初期化
+void StylishPicture::InitExe()
+{
+	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Stylish.png");
+	m_tagPicture.sTitle = "【スペシャルイラスト】スタイリッシュ";
+	m_tagPicture.sText = "各々秘めている思いがある。";
+	m_tagPicture.vPos.x = 0.0f;
+	m_tagPicture.vPos.y = 0.0f;
+	m_tagPicture.fScale = 1.0f;
+	m_tagPicture.iAlpha = 1.0f;
+}
+
+//+-------------------------------------
+// 設定
+CoolPicture::CoolPicture()
+{
+	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Cool.png");
+	m_tagPictureIcon.sTitle = "【スペシャルイラスト】攻殻機動隊っぽく立ってみた";
+	m_tagPictureIcon.sText = "特別なイラストです。";
+
+	// 隠しトロフィーフラグ
+	m_bRock = false;
+
+	// 値段
+	m_iPrice = 10;
+}
+
+// 実行後の画像の初期化
+void CoolPicture::InitExe()
+{
+	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Cool.png");
+	m_tagPicture.sTitle = "【スペシャルイラスト】攻殻機動隊っぽく立ってみた";
+	m_tagPicture.sText = "イケメン";
+	m_tagPicture.vPos.x = 0.0f;
+	m_tagPicture.vPos.y = 0.0f;
+	m_tagPicture.fScale = 1.0f;
+	m_tagPicture.iAlpha = 1.0f;
+}
+
+//+-------------------------------------
+// 設定
+AlleyPicture::AlleyPicture()
+{
+	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Alley.png");
+	m_tagPictureIcon.sTitle = "【スペシャルイラスト】路地裏";
+	m_tagPictureIcon.sText = "特別なイラストです。";
+
+	// 隠しトロフィーフラグ
+	m_bRock = false;
+
+	// 値段
+	m_iPrice = 10;
+}
+
+// 実行後の画像の初期化
+void AlleyPicture::InitExe()
+{
+	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Alley.png");
+	m_tagPicture.sTitle = "【スペシャルイラスト】路地裏";
+	m_tagPicture.sText = "アイル―は平然と裏切る。";
+	m_tagPicture.vPos.x = 0.0f;
+	m_tagPicture.vPos.y = 0.0f;
+	m_tagPicture.fScale = 1.0f;
+	m_tagPicture.iAlpha = 1.0f;
+}
+
+//+-------------------------------------
+// 設定
+SadPicture::SadPicture()
+{
+	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Sad.png");
+	m_tagPictureIcon.sTitle = "【スペシャルイラスト】雨";
+	m_tagPictureIcon.sText = "特別なイラストです。";
+
+	// 隠しトロフィーフラグ
+	m_bRock = false;
+
+	// 値段
+	m_iPrice = 10;
+}
+
+// 実行後の画像の初期化
+void SadPicture::InitExe()
+{
+	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Sad.png");
+	m_tagPicture.sTitle = "【スペシャルイラスト】雨";
+	m_tagPicture.sText = "かなしそう。";
+	m_tagPicture.vPos.x = 0.0f;
+	m_tagPicture.vPos.y = 0.0f;
+	m_tagPicture.fScale = 1.0f;
+	m_tagPicture.iAlpha = 1.0f;
+}
+
+//+-------------------------------------
+// 設定
+SexyPicture::SexyPicture()
+{
+	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Sexy.png");
+	m_tagPictureIcon.sTitle = "【スペシャルイラスト】目覚めし者";
+	m_tagPictureIcon.sText = "特別なイラストです。";
+
+	// 隠しトロフィーフラグ
+	m_bRock = false;
+
+	// 値段
+	m_iPrice = 10;
+}
+
+// 実行後の画像の初期化
+void SexyPicture::InitExe()
+{
+	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Sexy.png");
+	m_tagPicture.sTitle = "【スペシャルイラスト】目覚めし者";
+	m_tagPicture.sText = "セクシーに愛されたアラミタマ";
+	m_tagPicture.vPos.x = 0.0f;
+	m_tagPicture.vPos.y = 0.0f;
+	m_tagPicture.fScale = 1.0f;
+	m_tagPicture.iAlpha = 1.0f;
+}
+
+//+-------------------------------------
+// 設定
+SeaPicture::SeaPicture()
+{
+	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Sea.png");
+	m_tagPictureIcon.sTitle = "【スペシャルイラスト】海";
+	m_tagPictureIcon.sText = "特別なイラストです。";
+
+	// 隠しトロフィーフラグ
+	m_bRock = false;
+
+	// 値段
+	m_iPrice = 10;
+}
+
+// 実行後の画像の初期化
+void SeaPicture::InitExe()
+{
+	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Sea.png");
+	m_tagPicture.sTitle = "【スペシャルイラスト】海";
+	m_tagPicture.sText = "奈良県には海がない。";
+	m_tagPicture.vPos.x = 0.0f;
+	m_tagPicture.vPos.y = 0.0f;
 	m_tagPicture.fScale = 1.0f;
 	m_tagPicture.iAlpha = 1.0f;
 }

@@ -12,6 +12,7 @@
 #include "../BaseEntity/Message/Message.h"
 #include "../Effect/PanelEffect/PanelEffectManager.h"
 #include "../Effect/UVEffect/UVEffectManager.h"
+#include "../Data/PlayerData.h"
 #include "../Data/SelectData.h"
 #include "../DeferredEx/DeferredEx.h"
 
@@ -25,6 +26,8 @@
 #include "Window\ResultWindow.h"
 
 #include "Fade\Fade.h"
+
+#include "Trophy\TrophyManager.h"
 
 #define USE_EFFECT_CAMERA
 
@@ -200,7 +203,6 @@ bool sceneResult::Initialize()
 	// ★
 	m_bFirstUpdate = true;
 
-
 	return true;
 }
 
@@ -246,6 +248,15 @@ void sceneResult::Update()
 		// ストリーミング初期化
 		m_pStream = bgm->PlayStream("DATA/Sound/BGM/System/Result.ogg");
 		m_pStream->SetVolume(0.6f);
+
+		// 【記録】対戦回数を増やす
+		PlayerDataMgr->m_PlayerInfo.BattleCount++;
+
+		//  対戦回数トロフィーが解放できるかチェック
+		TrophyMgr->CheakBattleCount(PlayerDataMgr->m_PlayerInfo.BattleCount);
+
+		//  最高難易度を撃破トロフィーが解放できるかチェック
+		TrophyMgr->CheakPowerfulEnemyWin(m_tagResultData.eWinnerSide);
 
 		m_bFirstUpdate = false;
 	}
@@ -437,6 +448,11 @@ void sceneResult::Update()
 		break;
 	}
 
+
+
+	// トロフィ
+	TrophyMgr->Update();
+
 	// フェード
 	Fade::Update();
 
@@ -487,6 +503,9 @@ void sceneResult::Render()
 	m_pResultWindow->Redner();
 
 	m_sceneSwitch->Render();
+
+	// トロフィ
+	TrophyMgr->Render();
 
 	// フェード
 	Fade::Render();

@@ -87,3 +87,143 @@ public:
 private:
 
 };
+
+//+---------------------------------
+//	棒人間のイラスト
+//+---------------------------------
+class TekiPicture :public BasePicture
+{
+public:
+	TekiPicture();
+	~TekiPicture() {};
+
+	// ★かなり質の良い画像を読み込むので選択したときに画像をロードさせる
+	void InitExe();
+
+private:
+
+};
+
+//+---------------------------------
+//	∵のイラスト
+//+---------------------------------
+class NazenarabaPicture :public BasePicture
+{
+public:
+	NazenarabaPicture();
+	~NazenarabaPicture() {};
+
+	// ★かなり質の良い画像を読み込むので選択したときに画像をロードさせる
+	void InitExe();
+
+private:
+
+};
+
+
+//+---------------------------------
+//	一枚絵のイラスト
+//+---------------------------------
+class RestPicture :public BasePicture
+{
+public:
+	RestPicture();
+	~RestPicture() {};
+
+	// ★かなり質の良い画像を読み込むので選択したときに画像をロードさせる
+	void InitExe();
+
+private:
+
+};
+
+class GatheringPicture :public BasePicture
+{
+public:
+	GatheringPicture();
+	~GatheringPicture() {};
+
+	// ★かなり質の良い画像を読み込むので選択したときに画像をロードさせる
+	void InitExe();
+
+private:
+
+};
+
+class StylishPicture :public BasePicture
+{
+public:
+	StylishPicture();
+	~StylishPicture() {};
+
+	// ★かなり質の良い画像を読み込むので選択したときに画像をロードさせる
+	void InitExe();
+
+private:
+
+};
+
+class CoolPicture :public BasePicture
+{
+public:
+	CoolPicture();
+	~CoolPicture() {};
+
+	// ★かなり質の良い画像を読み込むので選択したときに画像をロードさせる
+	void InitExe();
+
+private:
+
+};
+
+class AlleyPicture :public BasePicture
+{
+public:
+	AlleyPicture();
+	~AlleyPicture() {};
+
+	// ★かなり質の良い画像を読み込むので選択したときに画像をロードさせる
+	void InitExe();
+
+private:
+
+};
+
+class SadPicture :public BasePicture
+{
+public:
+	SadPicture();
+	~SadPicture() {};
+
+	// ★かなり質の良い画像を読み込むので選択したときに画像をロードさせる
+	void InitExe();
+
+private:
+
+};
+
+class SexyPicture :public BasePicture
+{
+public:
+	SexyPicture();
+	~SexyPicture() {};
+
+	// ★かなり質の良い画像を読み込むので選択したときに画像をロードさせる
+	void InitExe();
+
+private:
+
+};
+
+class SeaPicture :public BasePicture
+{
+public:
+	SeaPicture();
+	~SeaPicture() {};
+
+	// ★かなり質の良い画像を読み込むので選択したときに画像をロードさせる
+	void InitExe();
+
+private:
+
+};

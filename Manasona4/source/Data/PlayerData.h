@@ -10,11 +10,40 @@
 namespace PlayerData
 {
 	// ƒvƒŒƒCî•ñ
-	struct Infomation
+	struct PrevInfomation
 	{
 		unsigned int PlayCount	: 16;	// —V‚ñ‚¾‰ñ”(65535‚Ü‚Å)
 		unsigned int PlayTime	: 32;	// ƒvƒŒƒCŠÔ(4294967295)
 		unsigned int coin		: 20;	// ^‰Äƒpƒ`ƒ“ƒRƒRƒCƒ“(1048575‚Ü‚Å)
+	};
+
+	struct Infomation
+	{
+		union
+		{
+			struct
+			{
+				int PlayCount;	// —V‚ñ‚¾‰ñ”
+				int PlayTime;	// ƒvƒŒƒCŠÔ
+				int coin;		// ^‰Äƒpƒ`ƒ“ƒRƒRƒCƒ“
+				int BattleCount;// ‘Îí‰ñ”
+				int ‹ó‚«˜g0;
+				int ‹ó‚«˜g1;
+				int ‹ó‚«˜g2;
+				int ‹ó‚«˜g3;
+				int ‹ó‚«˜g4;
+				int ‹ó‚«˜g5;
+				int ‹ó‚«˜g6;
+				int ‹ó‚«˜g7;
+				int ‹ó‚«˜g8;
+				int ‹ó‚«˜g9;
+				int ‹ó‚«˜g10;
+				int ‹ó‚«˜g11;
+			};
+
+			int iAllData[16];
+		};
+
 	};
 
 	// İ’è‚Ìî•ñ
@@ -78,9 +107,9 @@ namespace PlayerData
 				int iMaxHpFinish;
 				int iSpeedFinish;
 				int iTrainingTime;
+				int iPowerfulEnemyWin;
+				int iBuyManyContent;
 				int iCompleteTrophy;
-				int ‹ó‚«˜g8;
-				int ‹ó‚«˜g9;
 				int ‹ó‚«˜g10;
 				int ‹ó‚«˜g11;
 				int ‹ó‚«˜g12;

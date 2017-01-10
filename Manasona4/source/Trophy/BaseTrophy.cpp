@@ -263,8 +263,8 @@ MaxHpFinishTrophy::MaxHpFinishTrophy()
 SpeedFinishTrophy::SpeedFinishTrophy()
 {
 	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/timer.png");
-	m_tagTrophy.sTitle = "音速の真夏ファイター";
-	m_tagTrophy.sText = "15秒以内で勝利した。";
+	m_tagTrophy.sTitle = "瞬殺";
+	m_tagTrophy.sText = "20秒以内で勝利した。";
 
 	// 隠しトロフィーフラグ
 	m_bHide = false;
@@ -278,6 +278,32 @@ TrainingTimeTrophy::TrainingTimeTrophy()
 	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/Plactice.png");
 	m_tagTrophy.sTitle = "努力家";
 	m_tagTrophy.sText = "5分以上トレーニングルームで練習した。";
+
+	// 隠しトロフィーフラグ
+	m_bHide = false;
+}
+
+//+---------------------------------
+//	最高難易度でCOMを倒した
+//+---------------------------------
+PowerfulEnemyWinTrophy::PowerfulEnemyWinTrophy()
+{
+	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/medal.png");
+	m_tagTrophy.sTitle = "COMマスター";
+	m_tagTrophy.sText = "最高難易度のCOMに勝った。";
+
+	// 隠しトロフィーフラグ
+	m_bHide = false;
+}
+
+//+---------------------------------
+//	コンテンツをたくさん解放した
+//+---------------------------------
+BuyManyContentTrophy::BuyManyContentTrophy()
+{
+	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/item.png");
+	m_tagTrophy.sTitle = "お金で買えない価値がある";
+	m_tagTrophy.sText = "10種類以上コンテンツを解放した。";
 
 	// 隠しトロフィーフラグ
 	m_bHide = false;

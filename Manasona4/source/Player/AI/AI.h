@@ -70,6 +70,9 @@ public:
 
 	AI_TYPE GetAIType() { return m_eAIType; }
 
+	bool GetDokkoiDush() { return m_bDokkoiDush; }
+	void SetDokkoiDush(bool bFlag) { m_bDokkoiDush = bFlag; }
+
 private:
 	StateMachine<AI>* m_pStateMachine; // ★AIステートマシン
 	BasePlayer* m_pMyBasePlayer;
@@ -94,6 +97,9 @@ private:
 	bool m_bDoublePush;					// 二回押し命令は他の二回押しが終わるまで受付できない。
 	int m_iDoublePushFrame;				// 
 	PLAYER_INPUT m_eDoublePushInput;	// 
+
+	// どっこい追撃走るフラグ
+	bool m_bDokkoiDush;
 
 	//+------------------------------------
 	//	トレーニング用

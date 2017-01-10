@@ -42,8 +42,13 @@ bool PlayerDataManager::LoadPlayerData()
 	if (fopen_s(&fp, "DATA/Save/data.bin", "rb") != 0) return false;
 
 	// プレイヤー基本データ読み込み
+	//PlayerData::PrevInfomation a;
 	fread_s((LPSTR)&m_PlayerInfo, sizeof(PlayerData::Infomation), sizeof(PlayerData::Infomation), 1, fp);
-	m_PlayerInfo.PlayCount++;
+	//ZeroMemory(&m_PlayerInfo, sizeof(PlayerData::Infomation));
+	//m_PlayerInfo.PlayCount = a.PlayCount;
+	//m_PlayerInfo.PlayTime = a.PlayTime;
+	//m_PlayerInfo.coin = a.coin;
+	//m_PlayerInfo.PlayCount++;
 	
 	// コンフィグ
 	fread_s((LPSTR)&m_ConfigData, sizeof(PlayerData::Confing), sizeof(PlayerData::Confing), 1, fp);

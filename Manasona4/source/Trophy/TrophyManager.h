@@ -15,6 +15,8 @@ enum class TROPHY_TYPE
 	MAX_HP_FINISH,		//	最大HP勝利
 	SPEED_FINISH,		//	最速勝利
 	TRAINING_TIME,		//  トレーニングでひたすら練習
+	POWERFUL_ENEMY,		//  最高難易度でCOMを倒した
+	MENY_CONTENT,		//  コンテンツをたくさん解放した
 	COMPLETE_TROPHY,	//  全てのトロフィーを集めた
 	//_6,
 	//_7, _8, _9, _10, _11, _12,
@@ -80,15 +82,24 @@ private:
 	// ロックアイコン
 	tdn2DObj* m_pRockIcon;
 
+	// トロフィーを解放していく順番
+	std::vector<TROPHY_TYPE> m_aActionStack;
+	int m_iIntervalFrame;	//	連続で入手した場合間隔を遅らす用
+
 public:
 	//+---------------------------------------------
 	//	★色々なトロフィーの条件を作っていく
 	//+---------------------------------------------
 	void InitSeceneMain();
+
+	void CheakBattleCount(int iBattleCount);
 	void CheakBigDamage(bool bVS = false);// 対戦フラグ
 	void CheakMaxHpFinish(int iRemainingHP);
 	void CheakSpeedFinish(int iElapsedTime);
 	void CheakTrainingTime();
+	void CheakPowerfulEnemyWin(SIDE eWinnerSide);
+	void CheakBuyManyContent(int iOwnedContent);
+	
 
 private:
 	int m_iTrainingFrame;
