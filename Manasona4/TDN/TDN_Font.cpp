@@ -285,6 +285,7 @@ bool tdnFont::SearchPictograph(char buffer[3], int x, int y, UINT size, DWORD co
 		LEFT = 32 * 4, RIGHT = 32 * 5, UP = 32 * 6, DOWN = 32 * 7,
 		LEFT_DOWN = 32 * 8, RIGHT_DOWN = 32 * 9,
 		L1 = 32 * 10, R1 = 32 * 11, L2 = 32 * 12, R2 = 32 * 13, R3 = 32 * 14,
+		BLUE_RECT = 32 * 15, YELLOW_RECT = 32 * 16, RED_RECT = 32 * 17
 
 	};
 
@@ -369,7 +370,21 @@ bool tdnFont::SearchPictograph(char buffer[3], int x, int y, UINT size, DWORD co
 		m_pPictograph->Render(x, y, size, size, R3, 0, 32, 32, RenderFlag);
 		return false;
 	}
-
+	if (strcmp(buffer, "¡") == 0)
+	{
+		m_pPictograph->Render(x, y, size, size, BLUE_RECT, 0, 32, 32, RenderFlag);
+		return false;
+	}
+	if (strcmp(buffer, "£") == 0)
+	{
+		m_pPictograph->Render(x, y, size, size, YELLOW_RECT, 0, 32, 32, RenderFlag);
+		return false;
+	}
+	if (strcmp(buffer, "œ") == 0)
+	{
+		m_pPictograph->Render(x, y, size, size, RED_RECT, 0, 32, 32, RenderFlag);
+		return false;
+	}
 	// ŠG•¶Žš‚ªŒ©‚Â‚©‚ç‚È‚©‚Á‚½‚Ì‚Å•`‰æ‚µ‚Ä‚æ‚µ
 	return true;
 }

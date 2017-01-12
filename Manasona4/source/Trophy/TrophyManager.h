@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseEntity\Entity\BaseGameEntity.h"
 #include "BaseTrophy.h"
+#include "Data\SelectData.h"
 
 //+--------------------------
 //	トロフィーの管理クラス
@@ -16,6 +17,8 @@ enum class TROPHY_TYPE
 	SPEED_FINISH,		//	最速勝利
 	TRAINING_TIME,		//  トレーニングでひたすら練習
 	POWERFUL_ENEMY,		//  最高難易度でCOMを倒した
+	SS_RANK_WIN,		//  SSランクで倒した
+	SS_POWERFUL_ENEMY,	//  最高難易度でCOM+SSランクで倒した
 	MENY_CONTENT,		//  コンテンツをたくさん解放した
 	COMPLETE_TROPHY,	//  全てのトロフィーを集めた
 	//_6,
@@ -92,12 +95,14 @@ public:
 	//+---------------------------------------------
 	void InitSeceneMain();
 
+	void CheakPlayCount(int iPlayCount);
 	void CheakBattleCount(int iBattleCount);
 	void CheakBigDamage(bool bVS = false);// 対戦フラグ
 	void CheakMaxHpFinish(int iRemainingHP);
 	void CheakSpeedFinish(int iElapsedTime);
 	void CheakTrainingTime();
 	void CheakPowerfulEnemyWin(SIDE eWinnerSide);
+	void CheakRank(SIDE eWinnerSide, RANK_TYPE eRank);
 	void CheakBuyManyContent(int iOwnedContent);
 	
 

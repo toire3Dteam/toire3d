@@ -152,6 +152,32 @@ private:
 
 };
 
+//+--------------------------------------------
+//	SSランクで倒したトロフィー
+//+--------------------------------------------
+class SSRankWinTrophy :public BaseTrophy
+{
+public:
+	SSRankWinTrophy();
+	~SSRankWinTrophy() {};
+
+private:
+
+};
+
+//+--------------------------------------------
+//	最高難易度でCOMを倒した＋SSランクで倒したトロフィー
+//+--------------------------------------------
+class PowerfulEnemySSRankWinTrophy :public BaseTrophy
+{
+public:
+	PowerfulEnemySSRankWinTrophy();
+	~PowerfulEnemySSRankWinTrophy() {};
+
+private:
+
+};
+
 //+-----------------------------------------
 //	コンテンツをたくさん解放したトロフィー
 //+-----------------------------------------

@@ -48,6 +48,14 @@ TrophyManager::TrophyManager() :BaseGameEntity(ENTITY_ID::TROPHY_MGR)	// ƒGƒ“ƒeƒ
 			m_pTrophy[i] = new PowerfulEnemyWinTrophy();
 
 			break;
+		case TROPHY_TYPE::SS_RANK_WIN:
+			m_pTrophy[i] = new SSRankWinTrophy();
+
+			break;
+		case TROPHY_TYPE::SS_POWERFUL_ENEMY:
+			m_pTrophy[i] = new PowerfulEnemySSRankWinTrophy();
+
+			break;
 		case TROPHY_TYPE::MENY_CONTENT:
 			m_pTrophy[i] = new BuyManyContentTrophy();
 
@@ -346,6 +354,23 @@ void TrophyManager::InitSeceneMain()
 	m_iTrainingFrame = 0;
 }
 
+// ƒvƒŒƒCƒJƒEƒ“ƒg
+void TrophyManager::CheakPlayCount(int iPlayCount)
+{
+	// ‚Ü‚¾«‚ÌƒgƒƒtƒB[‚ðŽè‚É“ü‚ê‚Ä‚¢‚È‚©‚Á‚½‚ç
+	if (PlayerDataMgr->m_TrophyData.iFirstPlay == 0)
+	{
+		// «ˆÈãƒvƒŒƒC‚µ‚Ä‚¢‚½‚ç
+		if (iPlayCount >= 1)
+		{
+			TROPHY_TYPE eType = TROPHY_TYPE::FIRST;
+			MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
+		}
+
+	}
+
+}
+
 // ‘Îí‰ñ”
 void TrophyManager::CheakBattleCount(int iBattleCount)
 {
@@ -475,6 +500,53 @@ void TrophyManager::CheakPowerfulEnemyWin(SIDE eWinnerSide)
 			TROPHY_TYPE eType = TROPHY_TYPE::POWERFUL_ENEMY;
 			MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
 
+		}
+
+	}
+}
+
+void TrophyManager::CheakRank(SIDE eWinnerSide, RANK_TYPE eRank)
+{
+	// ‚Ü‚¾«‚ÌƒgƒƒtƒB[‚ðŽè‚É“ü‚ê‚Ä‚¢‚È‚©‚Á‚½‚ç
+	if (PlayerDataMgr->m_TrophyData.iSSRankWin == 0)
+	{
+		// šŸ‚Á‚½‘¤‚ÍƒvƒŒƒCƒ„[‚Å®ŠŽ‚ÂSSƒ‰ƒ“ƒN‚È‚ç
+		if (SelectDataMgr->Get()->tagSideDatas[(int)eWinnerSide].bAI == false &&
+			eRank == RANK_TYPE::SS)
+		{
+
+			TROPHY_TYPE eType = TROPHY_TYPE::SS_RANK_WIN;
+			MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
+
+		}
+
+	}
+
+
+	// •‰‚¯‚½‘¤‚ÌƒTƒCƒh‚ð’m‚é
+	SIDE l_eLoseSide = SIDE::LEFT;
+	if (eWinnerSide == SIDE::LEFT)
+	{
+		l_eLoseSide = SIDE::RIGHT;
+	}
+
+	// ‚Ü‚¾«‚ÌƒgƒƒtƒB[‚ðŽè‚É“ü‚ê‚Ä‚¢‚È‚©‚Á‚½‚ç
+	if (PlayerDataMgr->m_TrophyData.iSSRankPowerfulEnemyWin == 0)
+	{
+		// š•‰‚¯‚½‘¤‚ªAI‚Å®ŠŽ‚ÂÅ‚“ïˆÕ“x‚¾‚Á‚½‚ç
+		if (SelectDataMgr->Get()->tagSideDatas[(int)l_eLoseSide].bAI == true &&
+			SelectDataMgr->Get()->tagSideDatas[(int)l_eLoseSide].eAIType == (AI_TYPE::CPU_YOKOE))
+		{
+
+			// šŸ‚Á‚½‘¤‚ÍƒvƒŒƒCƒ„[‚Å®ŠŽ‚ÂSSƒ‰ƒ“ƒN‚È‚ç
+			if (SelectDataMgr->Get()->tagSideDatas[(int)eWinnerSide].bAI == false &&
+				eRank == RANK_TYPE::SS)
+			{
+
+				TROPHY_TYPE eType = TROPHY_TYPE::SS_POWERFUL_ENEMY;
+				MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
+
+			}
 		}
 
 	}

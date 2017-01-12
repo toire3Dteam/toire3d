@@ -254,9 +254,12 @@ void sceneResult::Update()
 
 		//  対戦回数トロフィーが解放できるかチェック
 		TrophyMgr->CheakBattleCount(PlayerDataMgr->m_PlayerInfo.BattleCount);
-
+		
 		//  最高難易度を撃破トロフィーが解放できるかチェック
 		TrophyMgr->CheakPowerfulEnemyWin(m_tagResultData.eWinnerSide);
+
+		// ランクによるトロフィーが解放できるかチェック
+		TrophyMgr->CheakRank(m_tagResultData.eWinnerSide, m_pScoreUI->GetRankType());
 
 		m_bFirstUpdate = false;
 	}

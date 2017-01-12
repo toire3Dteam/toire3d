@@ -73,23 +73,23 @@ ScoreUI::ScoreUI(ResultData data)
 	int score = CalcRankScore();
 	if (score >= 14)
 	{
-		m_tagRank.iType = RANK_TYPE::SS;
+		m_tagRank.eType = RANK_TYPE::SS;
 	}
 	else if (score >= 11)
 	{
-		m_tagRank.iType = RANK_TYPE::S;
+		m_tagRank.eType = RANK_TYPE::S;
 	}
 	else if (score >= 9)
 	{
-		m_tagRank.iType = RANK_TYPE::A;
+		m_tagRank.eType = RANK_TYPE::A;
 	}
 	else if (score >= 6)
 	{
-		m_tagRank.iType = RANK_TYPE::B;
+		m_tagRank.eType = RANK_TYPE::B;
 	}
 	else 
 	{
-		m_tagRank.iType = RANK_TYPE::C;
+		m_tagRank.eType = RANK_TYPE::C;
 	}
 	
 
@@ -168,8 +168,8 @@ void ScoreUI::Render()
 	}
 
 	// ƒ‰ƒ“ƒN•`‰æ
-	m_tagRank.pRank->Render(m_tagRank.x, m_tagRank.y, 256, 256, m_tagRank.iType * 256 , 0, 256, 256);
-	m_tagRank.pRankRip->Render(m_tagRank.x, m_tagRank.y, 256, 256, m_tagRank.iType * 256, 0, 256, 256, RS::ADD);
+	m_tagRank.pRank->Render(m_tagRank.x, m_tagRank.y, 256, 256, (int)m_tagRank.eType * 256 , 0, 256, 256);
+	m_tagRank.pRankRip->Render(m_tagRank.x, m_tagRank.y, 256, 256, (int)m_tagRank.eType * 256, 0, 256, 256, RS::ADD);
 	m_tagRank.pLight->Render();
 }
 

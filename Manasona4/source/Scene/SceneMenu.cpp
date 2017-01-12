@@ -73,6 +73,8 @@ bool sceneMenu::Initialize()
 		}
 	}
 
+	// 最初の一回目のトロフィの解放確認
+	TrophyMgr->CheakPlayCount(PlayerDataMgr->m_PlayerInfo.PlayCount);
 
 	/* ステートマシン初期化 */
 	m_pStateMachine = new StateMachine<sceneMenu>(this);

@@ -22,6 +22,7 @@ TrainingPauseWindow::TrainingPauseWindow(Vector2 vPos) :BaseWindow(vPos)
 	AddIconData("トレーニング設定", "トレーニングの基本設定を行います。");
 	AddIconData("トレーニングダミー設定", "トレーニングダミーの設定を行います。");
 	AddIconData("ポジションリセット","ポジションを初期状態に戻します。");
+	AddIconData("コマンドリスト", "操作しているキャラクターのコマンドリストを確認します。");
 	AddIconData("サウンド設定", "各種サウンドの設定を行います。");
 	AddIconData("メニュー非表示", "メニュー画面を非表示にします。");
 	AddIconData("キャラクターセレクト", "キャラクターセレクトに戻ります。");

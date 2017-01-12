@@ -101,6 +101,13 @@ public:
 	bool GetHideUI() { return m_bHideUI; }
 	void SetHideUI(bool flag) { m_bHideUI = flag; }
 
+	//
+	int GetPauseDeviceID() { return m_iPauseDeviceID; }
+	void SetPauseDeviceID(int iDeviceID) { m_iPauseDeviceID = iDeviceID; }
+	
+	SIDE GetCommandSide() { return m_eCommandSide; }
+	void SetCommandSide(SIDE eCommand) { m_eCommandSide = eCommand; }
+
 private:
 	int m_iRoundNum;				// ラウンド数
 
@@ -144,5 +151,9 @@ private:
 	// Window類
 	BaseWindow* m_pWindow[(int)BATTLE_WINDOW_TYPE::ARRAY_END];
 	bool m_bPause;
+
+	// ポーズ押した人のデバイスID
+	int m_iPauseDeviceID;
+	SIDE m_eCommandSide;
 
 };

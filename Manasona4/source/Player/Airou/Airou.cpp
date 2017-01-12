@@ -3,6 +3,7 @@
 #include "UI/HeaveHoFinish/HeaveHoFinish.h"
 #include "../../DeferredEx/DeferredEx.h"
 #include "Oshioki.h"
+#include "Window\Player\AirouWindow.h"
 
 static const int SKILL_AERIALDROP_FIRST(4);		// 初段
 static const int SKILL_AERIALDROP_MIDDLE(9);	// 中間(判定無し)
@@ -11,6 +12,22 @@ static const int SKILL_AERIALDROP_FINISH(3);	// とどめ
 Airou::Airou(SIDE side, const SideData &data) :BasePlayer(side, data)
 , m_pOshiokiMgr(nullptr), m_bHeavehoHit(false), m_pAirouEntryEffect(new AirouEntryEffect), m_pAirouEntryCircleEffect(new AirouEntrySircleEffect)
 {
+	// コマンドウィンドウ
+	// 右か左でWindowの場所を変える
+	Vector2 l_vWindowPos;
+	if (side == SIDE::LEFT)
+	{
+		l_vWindowPos.x = 100;
+		l_vWindowPos.y = 100;
+	}
+	else
+	{
+		l_vWindowPos.x = 550;
+		l_vWindowPos.y = 100;
+	}
+	m_pCommandWindow = new AirouWindow(l_vWindowPos);	
+
+
 	// エフェクトカメラID
 	m_tagCharacterParam.eHeaveHoOverFlowCameraID = EFFECT_CAMERA_ID::AIROU_OVERFLOW;
 
@@ -193,7 +210,7 @@ void Airou::InitActionDatas()
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
-	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(.25f, 2.0f);// (.5f, .0f)
+	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(.5f, .0f);// 
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.25f, 1.7f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 4;
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 8;

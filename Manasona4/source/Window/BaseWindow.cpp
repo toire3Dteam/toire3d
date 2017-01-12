@@ -27,6 +27,10 @@ BaseWindow::BaseWindow(Vector2 vPos)
 	m_aIconData.reserve(64);
 	m_iChoiceState = CHOICE_STATE::HOLD;
 
+	// 
+	m_aIconCommandData.clear();
+	m_aIconCommandData.reserve(64);
+
 	// 演出用に
 	m_iAlpha = 0;
 	m_iAddX = 0;
@@ -42,6 +46,7 @@ BaseWindow::~BaseWindow()
 	SAFE_DELETE(m_pSelect);
 	SAFE_DELETE(m_pFontBox);
 	m_aIconData.clear();
+	m_aIconCommandData.clear();
 }
 
 // 下に表記する説明描画
@@ -124,4 +129,26 @@ void BaseWindow::AddIconData(LPSTR string, LPSTR infoString)
 	data.iStringLength = addByte;
 
 	m_aIconData.push_back(data);
+}
+
+void BaseWindow::AddCommandData(LPSTR string, int iWidthSize)
+{
+	IconCommandData data;
+	data.pString = string;
+	data.iWidthSize = iWidthSize;
+
+	// 文字の長さを調べる
+	UINT	myByte = 0;
+	UINT	addByte = 0;
+	//	終端文字までループ
+	for (UINT i = 0; string[i] != '\0'; i += myByte)
+	{
+		//	文字のバイト数を調べる	
+		myByte = _mbclen((BYTE*)&string[i]);
+		addByte += myByte;
+	}
+	data.iStringLength = addByte;
+
+	m_aIconCommandData.push_back(data);
+
 }

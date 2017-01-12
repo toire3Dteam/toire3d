@@ -68,8 +68,18 @@ protected:
 	int m_iAddX;
 	int m_iAddY;
 
+	// ウィンドウの中のコマンド数
+	struct IconCommandData
+	{
+		LPSTR pString;		// 文字
+		int iStringLength;	// 文字数
+		int iWidthSize;		// 間隔 
+	};
+	std::vector<IconCommandData> m_aIconCommandData;
+
 protected:
 	void AddIconData(LPSTR string, LPSTR infoString);
+	void AddCommandData(LPSTR string, int iWidthSize);
 
 
 };

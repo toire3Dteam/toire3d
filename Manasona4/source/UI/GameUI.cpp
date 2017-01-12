@@ -249,6 +249,14 @@ bool GameUIManager::isTimerUp()
 	return m_pTimer->isTimeUp();
 }
 
+void GameUIManager::Reset()
+{
+	TimerReset();
+
+	m_pPersona1P->DownEffectAction();
+	m_pPersona2P->DownEffectAction();
+}
+
 bool GameUIManager::HandleMessage(const Message& msg)
 {
 	// ‚±‚ê‚³‚¦‚ ‚ê‚Î‚È‚ñ‚Å‚à‚Å‚«‚é

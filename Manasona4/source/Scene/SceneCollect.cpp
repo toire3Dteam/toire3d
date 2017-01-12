@@ -20,6 +20,11 @@ sceneCollect::sceneCollect() :BaseGameEntity(ENTITY_ID::SCENE_COLLECT) {}
 
 bool sceneCollect::Initialize()
 {
+	// 動画
+	m_pMovieMgr = new tdnMovie("DATA/UI/Collect/CollectMovie.wmv");
+	m_pBackMovie = new tdn2DObj(m_pMovieMgr->GetTexture());
+	m_pMovieMgr->Play();
+
 	// フェード初期化
 	Fade::Set(Fade::FLAG::FADE_IN, 8);
 
@@ -140,6 +145,9 @@ bool sceneCollect::Initialize()
 
 sceneCollect::~sceneCollect()
 {
+	SAFE_DELETE(m_pMovieMgr);
+	SAFE_DELETE(m_pBackMovie);
+
 	bgm->StopStreamIn();
 	FOR(IMAGE::ARRAY_END) SAFE_DELETE(m_pImages[i]);
 	
@@ -178,6 +186,9 @@ void sceneCollect::Update()
 {
 	static bool bEnd(false);
 	
+	// 動画のループ更新
+	m_pMovieMgr->Update();
+
 	// ヒントカード覧
 	for (int i = 0; i < (int)TIPS_TYPE_COLLECT::ARRAY_END; i++)
 	{
@@ -290,7 +301,8 @@ void sceneCollect::Render()
 	tdnView::Clear();
 
 	// 背景
-	m_pImages[IMAGE::BACK]->Render(0,0);
+	//m_pImages[IMAGE::BACK]->Render(0,0);
+	m_pBackMovie->Render(0, 0);
 
 	// tdnPolygon::Rect((int)(1280 * .25f) / 2, 96, (int)(1280 * .75f), (int)(720 * .75f), RS::COPY, 0xff808080);
 

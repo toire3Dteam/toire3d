@@ -19,6 +19,7 @@ TutorialPauseWindow::TutorialPauseWindow(Vector2 vPos) :BaseWindow(vPos)
 
 	// ポーズウィンドウに存在するアイコンを詰めていく
 	//AddIconData("前のチュートリアルへ", "一つ前のチュートリアルに戻ります。");
+	AddIconData("コマンドリスト", "操作しているキャラクターのコマンドリストを確認します。");
 	AddIconData("メニューに戻る", "メニュー画面に戻ります。");
 	AddIconData("戻る", "このウィンドウを閉じます。");
 

@@ -16,9 +16,9 @@ PauseWindow::PauseWindow(Vector2 vPos) :BaseWindow(vPos)
 	m_iSelectLength = 34;
 
 	// ポーズウィンドウに存在するアイコンを詰めていく
+	AddIconData("コマンドリスト", "操作しているキャラクターのコマンドリストを確認します。");
 	AddIconData("サウンド設定", "各種サウンドの設定を行います。");
 	AddIconData("メニュー非表示", "メニュー画面を非表示にします。");
-
 	AddIconData("キャラクターに戻る", "キャラクター画面に戻ります。");
 	AddIconData("メニューに戻る", "メニュー画面に戻ります。");
 	AddIconData("戻る", "このウィンドウを閉じます。");

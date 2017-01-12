@@ -51,6 +51,8 @@ public:
 	void TimerStop();
 	bool isTimerUp();
 
+	void Reset();
+
 	// BaseGameEntiryサブクラスはメッセージを使って通信する
 	bool  HandleMessage(const Message& msg);
 

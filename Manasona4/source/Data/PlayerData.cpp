@@ -48,7 +48,7 @@ bool PlayerDataManager::LoadPlayerData()
 	//m_PlayerInfo.PlayCount = a.PlayCount;
 	//m_PlayerInfo.PlayTime = a.PlayTime;
 	//m_PlayerInfo.coin = a.coin;
-	//m_PlayerInfo.PlayCount++;
+	m_PlayerInfo.PlayCount++;	// プレイカウント++
 	
 	// コンフィグ
 	fread_s((LPSTR)&m_ConfigData, sizeof(PlayerData::Confing), sizeof(PlayerData::Confing), 1, fp);

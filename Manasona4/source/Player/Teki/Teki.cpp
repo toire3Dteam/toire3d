@@ -4,9 +4,26 @@
 #include "../../DeferredEx/DeferredEx.h"
 #include "../../BaseEntity/Message/MessageDispatcher.h"
 
+#include "Window\Player\TekiWindow.h"
 
 Teki::Teki(SIDE side, const SideData &data) :BasePlayer(side, data)
 {
+	// コマンドウィンドウ
+	// 右と左でWindowの場所を変える
+	Vector2 l_vWindowPos;
+	if (side == SIDE::LEFT)
+	{
+		l_vWindowPos.x = 100;
+		l_vWindowPos.y = 100;
+	}
+	else
+	{
+		l_vWindowPos.x = 550;
+		l_vWindowPos.y = 100;
+	}
+	m_pCommandWindow = new TekiWindow(l_vWindowPos);
+
+
 	// エフェクトカメラID
 	m_tagCharacterParam.eHeaveHoOverFlowCameraID = EFFECT_CAMERA_ID::TEKI_OVERFLOW;
 

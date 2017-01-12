@@ -338,6 +338,8 @@ m_iWinNum(0),
 m_bNotOverDrive(false),
 
 m_pCutinPic(nullptr),
+
+m_pCommandWindow(nullptr),
 m_pName("None")
 {
 	// スタンド
@@ -542,6 +544,7 @@ BasePlayer::~BasePlayer()
 	SAFE_DELETE(m_pFacePic);
 	SAFE_DELETE(m_pSpeedLine);
 	SAFE_DELETE(m_pCutinPic);
+	SAFE_DELETE(m_pCommandWindow);
 }
 
 void BasePlayer::Update(PLAYER_UPDATE flag)
@@ -649,11 +652,7 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 	// ヒットストップが言わるまで動かない
 	else
 	{
-		// ★硬直時間のデクリメント
-		if (m_iRecoveryFrame > 0)
-			m_iRecoveryFrame--;
-		else m_fDamageRate = 1.0f;	// (TODOコンボ切れる1フレームで補正が切れてるのにコンボが入る(アイルー1,2,下,スキル下で3400がでる))コンボ切れたら、ダメージレートを戻す
-
+	
 		// アクションフレームの更新
 		if (isFrameAction())
 		{
@@ -781,6 +780,12 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 		//	tdnStopWatch::End();
 		//	tdnDebug::OutPutLog("プレイヤー%s:\nメッシュUpdate()にかかった時間 %.1lf\n", (m_side == SIDE::LEFT) ? "LEFT" : "RIGHT", tdnStopWatch::GetResult());
 		//}
+
+		// ★★★　一番最後でフレームを更新することで1フレーム猶予がある状態で補正が切れないようにした
+		// ★硬直時間のデクリメント
+		if (m_iRecoveryFrame > 0)
+			m_iRecoveryFrame--;
+		else m_fDamageRate = 1.0f;	// (TODOコンボ切れる1フレームで補正が切れてるのにコンボが入る(アイルー1,2,下,スキル下で3400がでる))コンボ切れたら、ダメージレートを戻す
 
 	}
 

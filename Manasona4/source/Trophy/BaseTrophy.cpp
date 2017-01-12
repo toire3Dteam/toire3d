@@ -297,6 +297,32 @@ PowerfulEnemyWinTrophy::PowerfulEnemyWinTrophy()
 }
 
 //+---------------------------------
+//	SSランクで倒した
+//+---------------------------------
+SSRankWinTrophy::SSRankWinTrophy()
+{
+	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/star.png");
+	m_tagTrophy.sTitle = "完全勝利";
+	m_tagTrophy.sText = "SSランクで勝利した。";
+
+	// 隠しトロフィーフラグ
+	m_bHide = false;
+}
+
+//+---------------------------------
+//	最高難易度でCOM+SSランクを倒した
+//+---------------------------------
+PowerfulEnemySSRankWinTrophy::PowerfulEnemySSRankWinTrophy()
+{
+	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/starMedal.png");
+	m_tagTrophy.sTitle = "最強";
+	m_tagTrophy.sText = "最高難易度のCOMにSSランクで勝利した。";
+
+	// 隠しトロフィーフラグ
+	m_bHide = false;
+}
+
+//+---------------------------------
 //	コンテンツをたくさん解放した
 //+---------------------------------
 BuyManyContentTrophy::BuyManyContentTrophy()

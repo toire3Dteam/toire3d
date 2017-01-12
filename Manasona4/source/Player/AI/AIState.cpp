@@ -461,7 +461,7 @@ bool YokoeTypeChaseBrain(AI * pPerson)
 			}
 		}
 
-		if (tdnRandom::Get(0, 100) <= 15)// ←の確率で飛ぶ
+		if (tdnRandom::Get(0, 100) <= 5)// ←の確率で飛ぶ
 		{
 			// 前回空中崩し攻撃をかましていなかったら
 			if (pPerson->GetFSM()->isPrevState(*AIState::AerialDestructAttack::GetInstance()) != true)
@@ -501,16 +501,16 @@ bool YokoeTypeChaseBrain(AI * pPerson)
 			// ★（難易度に属する物）製作者の慈悲により絶対対空当てるマンを確立に
 
 			// 2分の1の確立で対空攻撃
-			if (tdnRandom::Get(0, 2) == 0)
-			{
+			//if (tdnRandom::Get(0, 2) == 0)
+			//{
 				pPerson->GetFSM()->ChangeState(AIState::SetAnitiAir::GetInstance());
 				return true;
-			}
-			else
-			{
-				pPerson->GetFSM()->ChangeState(AIState::ChaseAir::GetInstance());
-				return true;
-			}
+			//}
+			//else
+			//{
+			//	pPerson->GetFSM()->ChangeState(AIState::ChaseAir::GetInstance());
+			//	return true;
+			//}
 
 		}
 	}
@@ -1571,7 +1571,7 @@ void AIState::Wait::Execute(AI * pPerson)
 		}
 
 		// 空中か地上どちらで追いかけるか
-		if (tdnRandom::Get(0, 100) <= 30)
+		if (tdnRandom::Get(0, 100) <= 20)
 		{
 			// イージーモードなら弱体化
 			if (pPerson->GetAIType() == AI_TYPE::CPU_EASY)
@@ -2415,7 +2415,10 @@ void AIState::RushAttack::Enter(AI * pPerson)
 			break;
 		case AI_TYPE::CPU_YOKOE:
 			// 空中攻撃へ
-			pPerson->GetFSM()->ChangeState(AIState::ChaseAir::GetInstance());
+			//pPerson->GetFSM()->ChangeState(AIState::ChaseAir::GetInstance());
+			//return;
+			// 対空
+			pPerson->GetFSM()->ChangeState(AIState::SetAnitiAir::GetInstance());
 			return;
 			break;
 		default:
@@ -2936,8 +2939,7 @@ void AIState::SetAnitiAir::Execute(AI * pPerson)
 	Vector3 MyPos = MyPlayer->GetPos();
 
 	// 対空範囲内 (自分の攻撃範囲内)
-	enum { ABJUST = 2 };
-	if (abs(TargetPos.x - MyPos.x) < (MyPlayer->AIAttackRange() /ABJUST))
+	if (abs(TargetPos.x - MyPos.x) < (MyPlayer->AIAttackRange() / 1.5f))
 	{
 		// しゃがみ押しっぱなし +
 		// 相手の逆方向レバー
@@ -2973,9 +2975,10 @@ void AIState::SetAnitiAir::Execute(AI * pPerson)
 	// 難易度最高だった場合
 	if (pPerson->GetAIType() == AI_TYPE::CPU_YOKOE)
 	{
-		// 相手の近くにいて＆＆相手が攻撃振ったら
+		// 相手の近くにいて＆＆相手が攻撃振ったら+地面に相手がいてたら
 		if (MyPlayer->AIAttackRange() >= GetRange(pPerson) &&
-			TargetPlayer->isAttackState() == true)
+			TargetPlayer->isAttackState() == true&&
+			TargetPlayer->isLand() == true)
 		{
 			if (tdnRandom::Get(0, 1) == 0)
 			{
@@ -3039,7 +3042,7 @@ void AIState::AnitiAir ::Enter(AI * pPerson)
 	{
 		pPerson->PushInputList(PLAYER_INPUT::LEFT);
 	}
-	pPerson->PushInputList(PLAYER_INPUT::C);
+	pPerson->PushInputList(PLAYER_INPUT::R1);
 }
 
 void AIState::AnitiAir ::Execute(AI * pPerson)
@@ -3115,7 +3118,7 @@ void AIState::SetAerialAttack::Enter(AI * pPerson)
 {
 	// 相手との距離が離れていたら方向キーを入力
 	float l_fXLength = abs(MyPlayer->GetPos().x - TargetPlayer->GetPos().x);
-	if (l_fXLength >= 7) 
+	if (l_fXLength >= 3) 
 	{
 		// 相手の方向へ飛ぶ
 		if (MyPlayer->GetPos().x > TargetPlayer->GetPos().x)
@@ -3182,7 +3185,7 @@ void AIState::SetAerialAttack::Execute(AI * pPerson)
 		// (TODO) 見栄えとかで少し見づらい式になってるので後で直す
 
 		// 自分が落ちてるとき
-		if (MyPlayer->GetMove().y < 0.25f ||
+		if (MyPlayer->GetMove().y < -0.0f ||
 			MyPlayer->isAerialJump() == false&& MyPlayer->GetMove().y < 1.0f)// 二段ジャンプ目なら落下前にキャンセルできます
 		{
 			// ジャンプ・エリアルジャンプモードになってたら

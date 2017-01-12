@@ -292,34 +292,23 @@ void SceneMainState::Main::Execute(sceneMain *pMain)
 	//+--------------------------------------------
 
 	// パッド分更新
-	const int NumDevice(tdnInputManager::GetNumDevice());
+	int NumDevice(tdnInputManager::GetNumDevice());
 
 	// パッド何もささってないとき用
-	if (NumDevice == 0)
+	if (NumDevice == 0)NumDevice = 1;	
+	for (int i = 0; i < NumDevice; i++)
 	{
 		// メニュー切り替え
-		if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, 0) == 3)
+		if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, i) == 3)
 		{
 			// (12/24) ここでメニュー起動
 			//pMain->GetWindow(BATTLE_WINDOW_TYPE::PAUSE)->Action();
+			pMain->SetPauseDeviceID(i);// ★ポーズメニューを押した人保存
 			pMain->GetFSM()->ChangeState(PauseMenu::GetInstance());
 			return;
 		}
-
-	}else
-	{
-		for (int i = 0; i < NumDevice; i++)
-		{
-			// メニュー切り替え
-			if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, i) == 3)
-			{
-				// (12/24) ここでメニュー起動
-				//pMain->GetWindow(BATTLE_WINDOW_TYPE::PAUSE)->Action();
-				pMain->GetFSM()->ChangeState(PauseMenu::GetInstance());
-				return;
-			}
-		}
 	}
+	
 
 }
 void SceneMainState::Main::Exit(sceneMain *pMain)
@@ -385,10 +374,14 @@ bool SceneMainState::Main::OnMessage(sceneMain *pMain, const Message & msg)
 		data.iRemainingHP =GameUIMgr->GetHpGage(KOInfo->WinnerSide)->GetHPPercentage();
 		data.iElapsedTime = GameUIMgr->GetTimer()->GetElapsedTime();
 		
-		// 勝った側のHPを渡す
-		TrophyMgr->CheakMaxHpFinish(data.iRemainingHP);
-		// 経過時間を渡す
-		TrophyMgr->CheakSpeedFinish(data.iElapsedTime);
+		// ★勝った側がAIじゃなかったら
+		if (SelectDataMgr->Get()->tagSideDatas[(int)KOInfo->WinnerSide].bAI == false)
+		{
+			// 勝った側のHPを渡す
+			TrophyMgr->CheakMaxHpFinish(data.iRemainingHP);
+			// 経過時間を渡す
+			TrophyMgr->CheakSpeedFinish(data.iElapsedTime);
+		}
 
 		// ラウンド全部取って勝利確定だったら、フィニッシュの段階でリザルトシーンを読み込む
 		if (KOInfo->iNumWinnerRound == pMain->GetRoundNum() - 1)
@@ -773,6 +766,7 @@ void SceneMainState::TutorialMain::Execute(sceneMain *pMain)
 		{
 			// (12/24) ここでメニュー起動
 			//pMain->GetWindow(BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE)->Action();
+			pMain->SetPauseDeviceID(SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID);// ★ポーズメニューを押した人保存
 			pMain->GetFSM()->ChangeState(TutorialPauseMenu::GetInstance());
 			return;
 		}
@@ -1081,6 +1075,7 @@ void SceneMainState::Training::Execute(sceneMain *pMain)
 			{
 				// (12/24) ここで起動
 				//pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Action();
+				pMain->SetPauseDeviceID(i);// ★ポーズメニューを押した人保存
 				pMain->GetFSM()->ChangeState(TrainingPause::GetInstance());
 				return;
 			}
@@ -1175,7 +1170,7 @@ void SceneMainState::PauseMenu::Enter(sceneMain *pMain)
 	// ポーズウィンドウ起動 
 	pMain->GetWindow(BATTLE_WINDOW_TYPE::PAUSE)->Action();
 	pMain->SetPause(true);
-
+	
 }
 
 // 更新
@@ -1186,21 +1181,15 @@ void SceneMainState::PauseMenu::Execute(sceneMain *pMain)
 	//	ポーズメニューの操作
 	//+--------------------------------------------
 	// パッド分更新
-	const int NumDevice(tdnInputManager::GetNumDevice());
+	 int NumDevice(tdnInputManager::GetNumDevice());
 	// パッド何もささってないとき用
-	if (NumDevice == 0)
-	{
-		// ポーズウィンドウの操作
-		pMain->GetWindow(BATTLE_WINDOW_TYPE::PAUSE)->Ctrl(0);
-	}
-	else
-	{
-		for (int i = 0; i < NumDevice; i++)
-		{
-			// ポーズウィンドウの操作
-			pMain->GetWindow(BATTLE_WINDOW_TYPE::PAUSE)->Ctrl(i);
-		}
-	}
+	 if (NumDevice == 0)NumDevice = 1;
+	 for (int i = 0; i < NumDevice; i++)
+	 {
+		 // ポーズウィンドウの操作
+		 pMain->GetWindow(BATTLE_WINDOW_TYPE::PAUSE)->Ctrl(i);
+	 }
+	
 
 
 
@@ -1233,6 +1222,15 @@ void SceneMainState::PauseMenu::Execute(sceneMain *pMain)
 
 		//}
 
+	}
+
+	// コマンドリストへ
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::PAUSE)->GetChoiceState()
+		== PauseWindow::BATTLE_STATE::COMMAND_LIST)
+	{
+		// 
+		pMain->GetFSM()->ChangeState(CommandMenu::GetInstance());
+		return;
 	}
 
 	// サウンドへ
@@ -1324,21 +1322,15 @@ void SceneMainState::TutorialPauseMenu::Execute(sceneMain *pMain)
 	//	チュートリアルポーズメニューの操作
 	//+--------------------------------------------
 	// パッド分更新
-	const int NumDevice(tdnInputManager::GetNumDevice());
+	int NumDevice(tdnInputManager::GetNumDevice());
 	// パッド何もささってないとき用
-	if (NumDevice == 0)
+	if (NumDevice == 0)NumDevice = 1;
+	for (int i = 0; i < NumDevice; i++)
 	{
 		// ポーズウィンドウの操作
-		pMain->GetWindow(BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE)->Ctrl(0);
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE)->Ctrl(i);
 	}
-	else
-	{
-		for (int i = 0; i < NumDevice; i++)
-		{
-			// ポーズウィンドウの操作
-			pMain->GetWindow(BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE)->Ctrl(i);
-		}
-	}
+	
 
 
 
@@ -1380,6 +1372,14 @@ void SceneMainState::TutorialPauseMenu::Execute(sceneMain *pMain)
 		return;
 	}
 	
+	// コマンドリストへ
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE)->GetChoiceState() == TutorialPauseWindow::TUTORIAL_PAUSE_STATE::COMMAND_LIST)
+	{
+		// コマンドリスト
+		pMain->GetFSM()->ChangeState(SceneMainState::CommandMenu::GetInstance());	
+		return;
+	}
+
 }
 
 void SceneMainState::TutorialPauseMenu::Exit(sceneMain *pMain)
@@ -1484,6 +1484,15 @@ void SceneMainState::TrainingPause::Execute(sceneMain *pMain)
 		// ポーズ終了
 		pMain->SetPause(false);
 		pMain->GetFSM()->ChangeState(Training::GetInstance());	// トレーニングへ戻る
+		return;
+	}
+
+	// コマンドリストへ
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->GetChoiceState()
+		== TrainingPauseWindow::TRAINING_PAUSE_STATE::COMMAND_LIST)
+	{
+		// 
+		pMain->GetFSM()->ChangeState(CommandMenu::GetInstance());
 		return;
 	}
 
@@ -1595,7 +1604,7 @@ void SceneMainState::SoundMenu::Execute(sceneMain *pMain)
 
 void SceneMainState::SoundMenu::Exit(sceneMain *pMain)
 {
-	pMain->GetWindow(BATTLE_WINDOW_TYPE::SOUND)->RednerInfo();
+	
 }
 
 void SceneMainState::SoundMenu::Render(sceneMain *pMain)
@@ -1857,6 +1866,125 @@ void SceneMainState::HideMenu::Render(sceneMain *pMain)
 }
 
 bool SceneMainState::HideMenu::OnMessage(sceneMain *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+
+	//default:
+	//	break;
+	//}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
+
+
+/*******************************************************/
+//				コマンドリスト表示
+/*******************************************************/
+
+void SceneMainState::CommandMenu::Enter(sceneMain *pMain)
+{
+	// コマンド表を選択したプレイヤーのSIDEを保存	
+	pMain->SetCommandSide(PlayerMgr->GetPlayerByDeviceID(pMain->GetPauseDeviceID())->GetSide());
+	
+	// ↑がAIだったらAIは同じデバイスなので変える必要がある
+	if (PlayerMgr->GetPlayer(pMain->GetCommandSide())->isAI() == true)
+	{
+		// SIDEを変えます
+		if (pMain->GetCommandSide() == SIDE::LEFT)
+		{
+			pMain->SetCommandSide(SIDE::RIGHT);
+		}
+		else
+		{
+			pMain->SetCommandSide(SIDE::LEFT);
+		}
+	}
+
+	// ボタンを押した側のコマンド表表示
+	PlayerMgr->GetPlayer(pMain->GetCommandSide())->GetCommandWindow()->Action();
+
+}
+
+void SceneMainState::CommandMenu::Execute(sceneMain *pMain)
+{
+	int l_iDeviceID = pMain->GetPauseDeviceID();
+	
+
+	//+----------------------------------
+	//	このステートでの操作
+	//+----------------------------------
+	// パッド分更新
+	int NumDevice(tdnInputManager::GetNumDevice());
+	// パッド何もささってないとき用
+	if (NumDevice == 0)NumDevice = 1;
+	for (int i = 0; i < NumDevice; i++)
+	{
+
+		// コマンド表切り替え
+		if (KEY(KEY_LEFT, i) == 3||
+			KEY(KEY_RIGHT, i) == 3)
+		{
+			// 現在のコマンドウィンドウを止めます
+			PlayerMgr->GetPlayer(pMain->GetCommandSide())->GetCommandWindow()->Stop();
+
+			// SIDEを変えます
+			if (pMain->GetCommandSide() == SIDE::LEFT)
+			{
+				pMain->SetCommandSide(SIDE::RIGHT);
+			}
+			else
+			{
+				pMain->SetCommandSide(SIDE::LEFT);
+			}
+
+			// 新しいコマンドウィンドウを広げる
+			PlayerMgr->GetPlayer(pMain->GetCommandSide())->GetCommandWindow()->Action();
+
+		}
+
+		// 戻るボタンを押したら
+		if (KEY(KEY_A, i) == 1)
+		{
+			PlayerMgr->GetPlayer(pMain->GetCommandSide())->GetCommandWindow()->Stop();	// ウィンドウを閉じる
+			pMain->GetFSM()->RevertToPreviousState();				// 前のステートへ戻る
+			return;
+		}
+
+	}
+
+	// コマンドウィンドウの操作
+	PlayerMgr->GetPlayer(pMain->GetCommandSide())->GetCommandWindow()->Ctrl(l_iDeviceID);
+
+	// コマンドウィンドウの更新
+	PlayerMgr->GetPlayer(pMain->GetCommandSide())->GetCommandWindow()->Update();
+
+}
+
+void SceneMainState::CommandMenu::Exit(sceneMain *pMain)
+{
+
+}
+
+void SceneMainState::CommandMenu::Render(sceneMain *pMain)
+{
+	// 選択ウィンドウの絵
+	PlayerMgr->GetPlayer(pMain->GetCommandSide())->GetCommandWindow()->Redner();
+
+	// 選択ウィンドウの説明
+	PlayerMgr->GetPlayer(pMain->GetCommandSide())->GetCommandWindow()->RednerInfo();
+
+#ifdef _DEBUG
+
+	tdnText::Draw(0, 0, 0xffffffff, "CommandMenu");
+
+#endif // _DEBUG
+
+}
+
+bool SceneMainState::CommandMenu::OnMessage(sceneMain *pMain, const Message & msg)
 {
 	// メッセージタイプ
 	//switch (msg.Msg)

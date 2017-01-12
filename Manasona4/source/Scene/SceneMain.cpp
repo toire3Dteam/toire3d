@@ -255,6 +255,10 @@ bool sceneMain::Initialize()
 	// BGM流す
 	bgm->PlayStreamIn((LPSTR)BattleMusicMgr->GetMusicFilePath(SelectDataMgr->Get()->iBattleMusicID).c_str());
 
+	// ポーズ押した人のデバイスID
+	m_iPauseDeviceID = 0;
+	m_eCommandSide = SIDE::LEFT;
+
 	return true;
 }
 
@@ -815,7 +819,7 @@ void sceneMain::Reset()
 	CameraMgr->SetPlayersPos();
 	m_pShotMgr->Reset();
 	ParticleManager::Reset();
-	GameUIMgr->TimerReset();
+	GameUIMgr->Reset();
 }
 
 void sceneMain::InitTrainingData()

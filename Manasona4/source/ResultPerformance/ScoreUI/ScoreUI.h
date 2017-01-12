@@ -3,6 +3,7 @@
 #include "Number\Number.h"
 #include "Effect\PanelEffect\PanelEffectManager.h"
 #include "Data\ResultData.h"
+#include "Data\SelectData.h"
 
 //+--------------------------
 //	スコア表示UI
@@ -20,6 +21,8 @@ public:
 	void Action();
 
 	bool GetEnd() { return m_bEnd; };
+
+	RANK_TYPE GetRankType() { return m_tagRank.eType; }
 
 private:
 
@@ -43,16 +46,12 @@ private:
 	SCORE m_tagScore[SCORE_TYPE::ARRAY_END];
 
 	// ランク処理
-	enum RANK_TYPE
-	{
-		SS, S, A, B, C
-	};
 	struct RANK
 	{
 		tdn2DAnim* pRank;	// イラスト
 		tdn2DAnim* pRankRip;	// 波紋用
 		BasePanelEffect* pLight;	// 光の演出
-		RANK_TYPE iType;			// ランクのタイプ
+		RANK_TYPE eType;			// ランクのタイプ
 		int x, y;			// 場所
 	};
 	RANK m_tagRank;

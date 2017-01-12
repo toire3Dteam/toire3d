@@ -132,6 +132,10 @@ private:
 	static int m_iCtrlDevice;
 	static TAG_TYPE m_eTagType;
 
+	// 動画
+	tdn2DObj* m_pBackMovie;
+	tdnMovie*  m_pMovieMgr;
+
 	// 確認用ティップス
 	TipsCard* m_pTips[(int)TIPS_TYPE_COLLECT::ARRAY_END];
 

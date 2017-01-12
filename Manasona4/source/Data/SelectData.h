@@ -56,6 +56,13 @@ enum class ROUND_TIME_TYPE
 	SEC_INFINITY,
 };
 
+// ランク
+enum class RANK_TYPE
+{
+	SS, S, A, B, C
+};
+
+
 //+----------------------
 //	トレーニング用
 //+----------------------

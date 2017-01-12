@@ -24,6 +24,7 @@ public:
 	// バトル用選択状態
 	enum BATTLE_STATE
 	{
+		COMMAND_LIST,
 		SOUND_SETTING,
 		HIDE_MENU,
 		BACK_CHARA_SELECT,

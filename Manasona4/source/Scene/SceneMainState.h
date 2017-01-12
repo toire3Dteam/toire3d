@@ -578,4 +578,35 @@ namespace SceneMainState
 		HideMenu& operator=(const HideMenu&) {}
 	};
 
+	//--------------------コマンドステート
+	class CommandMenu : public State<sceneMain>
+	{
+	public:
+		// this is a シングルトン
+		static CommandMenu* GetInstance() { static CommandMenu state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMain* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMain* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMain* pMain);
+
+		// 描画
+		virtual void Render(sceneMain* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMain* pMain, const Message& msg);
+
+
+	private:
+		CommandMenu() {};
+		~CommandMenu() {};
+
+		CommandMenu(const CommandMenu&) {}
+		CommandMenu& operator=(const CommandMenu&) {}
+	};
+
 }

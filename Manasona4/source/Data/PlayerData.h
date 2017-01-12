@@ -108,10 +108,10 @@ namespace PlayerData
 				int iSpeedFinish;
 				int iTrainingTime;
 				int iPowerfulEnemyWin;
+				int iSSRankWin;
+				int iSSRankPowerfulEnemyWin;
 				int iBuyManyContent;
-				int iCompleteTrophy;
-				int ‹ó‚«˜g10;
-				int ‹ó‚«˜g11;
+				int iCompleteTrophy;	
 				int ‹ó‚«˜g12;
 				int ‹ó‚«˜g13;
 				int ‹ó‚«˜g14;
