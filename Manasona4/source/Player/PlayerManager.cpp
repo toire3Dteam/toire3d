@@ -1,7 +1,8 @@
 #include "PlayerManager.h"
 #include "Airou/Airou.h"
 #include "Nazenara/Nazenara.h"
-#include "Teki\Teki.h"
+#include "Teki/Teki.h"
+#include "Aramitama/Aramitama.h"
 #include "Stage/Stage.h"
 #include "../Sound/SoundManager.h"
 #include "../BaseEntity/Message/MessageDispatcher.h"
@@ -59,6 +60,9 @@ void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage, SideData Side
 			break;
 		case CHARACTER::NAZENARA:
 			m_pPlayers[i] = new Nazenara(side, SideDatas[(int)side]);
+			break;
+		case CHARACTER::ARAMITAMA:
+			m_pPlayers[i] = new Aramitama(side, SideDatas[(int)side]);
 			break;
 		default:
 			m_pPlayers[i] = new Airou(side, SideDatas[(int)side]);

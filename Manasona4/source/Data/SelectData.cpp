@@ -3,8 +3,8 @@
 #include "../Sound/BattleMusic.h"
 
 SideData::SideData() :
-eCharacter(CHARACTER::NAZENARA),	// 選択キャラクター
-ePartner(PARTNER::MAYA),			// 選択パートナー
+eCharacter(CHARACTER::ARAMITAMA),	// 選択キャラクター
+ePartner(PARTNER::MOKOI),			// 選択パートナー
 iDeviceID(0),						// 操作するデバイスID
 bAI(false),							// AIかどうか
 eAIType(AI_TYPE::PRACTICE_LAND)		// AIのタイプ
@@ -22,8 +22,10 @@ eOrderTrainingSide(SIDE::LEFT)				// トレーニングを選んだ側
 	tagSideDatas[(int)SIDE::LEFT].iDeviceID = 0;
 	tagSideDatas[(int)SIDE::RIGHT].iDeviceID = 1;
 
+	tagSideDatas[(int)SIDE::RIGHT].eCharacter = CHARACTER::NAZENARA;
+
 	// 片方AI用
-	//tagSideDatas[(int)SIDE::RIGHT].bAI = true;
+	tagSideDatas[(int)SIDE::RIGHT].bAI = true;
 }
 
 TrainingData::TrainingData():

@@ -23,6 +23,8 @@ const SE_Manager::DATA all_dataS[]
 	{ "ヒット4",					"DATA/Sound/SE/BlazBlue/hit1.wav", 2, false },
 	{ "ヒット5",					"DATA/Sound/SE/BlazBlue/hit2.wav", 2, false },
 	{ "ヒット6",					"DATA/Sound/SE/BlazBlue/hit3.wav", 2, false },
+	{ "斬撃1",						"DATA/Sound/SE/P4U2/cut2.wav", 2, false },
+	{ "斬撃2",						"DATA/Sound/SE/BlazBlue/cut1.wav", 6, false },
 	{ "ぐちょヒット",				"DATA/Sound/SE/Battle/gutyo.wav", 8, false },
 	{ "∵ヒーホーヒット",			"DATA/Sound/SE/Battle/suikomi.wav", 1, false },
 	//{ "空中下攻撃ヒット",			"DATA/Sound/SE/Battle/hit2.wav", 2, false },
@@ -67,6 +69,8 @@ const SE_Manager::DATA all_dataS[]
 	{ "キャンセル1",				"DATA/Sound/SE/P4U2/cancel.wav", 2, false },
 	{ "ステップクリア",				"DATA/Sound/SE/P4U2/gagin.wav", 3, false },
 	{ "オールクリア",				"DATA/Sound/SE/P4U2/clear.wav", 1, false },
+	{ "購入",						"DATA/Sound/SE/P4U2/money.wav", 2, false },
+	{ "トロフィー",						"DATA/Sound/SE/System/trophy.wav", 1, false },
 
 	{ "フェイトイズターニング",		"DATA/Sound/SE/BlazBlue/voice/the_wheel.wav",	1, false },
 	{ "リベル",						"DATA/Sound/SE/BlazBlue/voice/revel.wav",		1, false },

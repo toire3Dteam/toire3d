@@ -9,7 +9,7 @@
 //*****************************************************************************
 
 // キャラクターのタイプ
-enum class CHARACTER { AIROU, TEKI, NAZENARA, END };
+enum class CHARACTER { AIROU, TEKI, NAZENARA, ARAMITAMA, END };
 
 // パートナーのタイプ
 enum class PARTNER { MOKOI, MAYA, END };

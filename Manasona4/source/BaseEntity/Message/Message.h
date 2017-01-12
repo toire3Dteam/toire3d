@@ -98,6 +98,7 @@ struct HIT_DAMAGE_INFO
 	DAMAGE_MOTION DamageMotion;	// 喰らったモーションタイプ
 	float fComboRate;		// コンボ補正
 	int iAttribute;			// 属性
+	float fRepeatAttackRate;// 同技補正値(技ごとに持つことにした)
 	HIT_DAMAGE_INFO(){ ZeroMemory(this, sizeof(this)); }
 };
 

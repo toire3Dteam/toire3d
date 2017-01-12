@@ -104,7 +104,7 @@ namespace OshiokiAirou
 								  DamageInfo.iAttackType = (int)BASE_ACTION_STATE::HEAVEHO_DRIVE;						// 何の攻撃かのタイプ(コンボ中に同じ攻撃を使わせないように)
 								  DamageInfo.HitSE = "ぐちょヒット";
 								  DamageInfo.DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
-
+								  DamageInfo.fRepeatAttackRate = 1;
 
 								  // 最後の1撃だけフィニッシュ判定
 								  DamageInfo.bFinishOK = true;
@@ -126,6 +126,7 @@ namespace OshiokiAirou
 								  DamageInfo.HitSE = "ぐちょヒット";
 								  DamageInfo.bFinishOK = false;
 								  DamageInfo.DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
+								  DamageInfo.fRepeatAttackRate = 1;
 							  }
 							  MsgMgr->Dispatch(0, m_pUser->GetID(), m_pTarget->GetID(), MESSAGE_TYPE::HIT_DAMAGE, &DamageInfo);
 

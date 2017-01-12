@@ -70,7 +70,7 @@ namespace Shot
 		//------------------------------------------------------
 		Vector3 m_vPos;		// 位置
 		Vector3 m_vVec;		// 単位化された向きベクトル
-		Vector3 m_vVelocity;	// 移動量
+		Vector3 m_vVelocity;// 移動量
 		Vector3 m_vAccel;	// 加速度(Moveに足していく)
 
 		//------------------------------------------------------

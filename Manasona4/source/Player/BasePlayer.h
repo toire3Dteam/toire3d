@@ -317,7 +317,7 @@ public:
 	int GuardRecoveryFrame;		// ガードされたときに「ガードしている相手に与える」硬直時間
 	float fGuardKnockBackPower;	// ガードさせたときのけぞり力
 	float fComboRate;			// コンボ補正(0.8なら次の攻撃に0.8倍の補正がかかる、補正は掛け合わされる)
-
+	float fRepeatAttackRate;	// 同技補正値
 
 	// ★★★地上ヒットと空中ヒットで分けたい情報
 	struct
@@ -330,7 +330,22 @@ public:
 		int HitRecoveryFrame;		// 攻撃がヒットした際に「相手に与える」硬直の時間
 		DAMAGE_MOTION DamageMotion;	// 喰らった時のモーション
 	}places[(int)HIT_PLACE::MAX];
-	AttackData() :fComboRate(1), attribute(ATTACK_ATTRIBUTE::STRIKE), HitSE(nullptr), WhiffSE(nullptr), bHit(false), bHitSuccess(false), damage(0), WhiffDelayFrame(0), pierceLV(0), bAntiAir(false), bFinish(true), AntiGuard(ANTIGUARD_ATTACK::NONE), pCollisionShape(new CollisionShape::Square),fGuardKnockBackPower(0){}
+	AttackData() :
+		fRepeatAttackRate(0.75f),
+		fComboRate(1), 
+		attribute(ATTACK_ATTRIBUTE::STRIKE), 
+		HitSE(nullptr),
+		WhiffSE(nullptr),
+		bHit(false),
+		bHitSuccess(false),
+		damage(0),
+		WhiffDelayFrame(0),
+		pierceLV(0),
+		bAntiAir(false),
+		bFinish(true),
+		AntiGuard(ANTIGUARD_ATTACK::NONE),
+		pCollisionShape(new CollisionShape::Square),
+		fGuardKnockBackPower(0){}
 	~AttackData(){ SAFE_DELETE(pCollisionShape); }
 };
 
@@ -564,6 +579,7 @@ public:
 	void SetAngleY(float a){ m_fAngleY = a; }
 	void SetDirAngle(){ m_fAngleY = DIR_ANGLE[(int)m_dir]; }
 	void TurnOverDir(){ m_dir = (m_dir == DIR::LEFT) ? DIR::RIGHT : DIR::LEFT; }
+	float GetDirVecX(){ return (m_dir == DIR::LEFT) ? -1.0f : 1.0f; }
 
 
 	//------------------------------------------------------
@@ -954,6 +970,7 @@ public:
 	static const int	c_WINNER_TIME;			// 勝ちモーション再生時間
 	static const float	c_GUARD_DISTANCE;		// ガードが発動する距離
 	static const int	c_FIRST_HIT_ADD_DAMAGE;	// 初段ヒット加算ダメージ
+	static const int	c_COUNTER_BONUS_DAMAGE;	// カウンターヒット時のボーナス加算値(ダメージ)
 
 protected:
 	//------------------------------------------------------

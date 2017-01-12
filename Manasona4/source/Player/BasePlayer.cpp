@@ -30,6 +30,7 @@ const int BasePlayer::c_THROW_RELEASE_FRAME = 15;	// “Š‚°”²‚¯‚ÅAƒpƒVƒ“‚Ä‚È‚Á‚Ä‚
 const int BasePlayer::c_WINNER_TIME = 180;
 const float BasePlayer::c_GUARD_DISTANCE = 32.0f;
 const int BasePlayer::c_FIRST_HIT_ADD_DAMAGE = 300;	// ‰’iƒqƒbƒg‰ÁZƒ_ƒ[ƒW
+const int BasePlayer::c_COUNTER_BONUS_DAMAGE = 200;	// ƒJƒEƒ“ƒ^[ƒqƒbƒg‰ÁZƒ_ƒ[ƒW
 
 // ƒLƒƒƒ‰ƒNƒ^[Šî–{î•ñ“Ç‚İ‚İ
 void BasePlayer::LoadCharacterParam(LPSTR filename)

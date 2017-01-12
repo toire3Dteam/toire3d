@@ -9,7 +9,7 @@
 #include "../Camera/camera.h"
 
 // 定数
-static const float REPEAT_ATTACK_RATE = 0.75f;		// 同じ攻撃当たるなレート　(12/26) 同技補正を強く
+//static const float REPEAT_ATTACK_RATE = 0.75f;		// 同じ攻撃当たるなレート　(12/26) 同技補正を強く
 
 /*******************************************************/
 //	ファンクション
@@ -322,7 +322,7 @@ bool OverDriveCancel(BasePlayer *pPerson)
 		else
 		{
 			// 覚醒（バースト）キャンセル
-			if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R3, true))
+			if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R3, false))
 			{
 				// 守りのバースト
 				pPerson->GetFSM()->ChangeState(BasePlayerState::OverDrive_Burst::GetInstance());
@@ -815,17 +815,16 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 
 
 									 // ★必殺技中は同技補正を無視(アイルーのやつとかひどいことになるから)
-									 if (!HitDamageInfo->bOverDrive)
+									 //if (!HitDamageInfo->bOverDrive)
 									 {
 										 for (auto it : *pPerson->GetRecoveryDamageCount())
 										 {
 											 if (it == (BASE_ACTION_STATE)HitDamageInfo->iAttackType)
 											 {
-												 RecoveryFrame = (int)(RecoveryFrame * REPEAT_ATTACK_RATE);	// 同技補正
+												 RecoveryFrame = max((int)(RecoveryFrame * HitDamageInfo->fRepeatAttackRate), 1);	// 同技補正
 											 }
 										 }
 									 }
-									 RecoveryFrame = max(RecoveryFrame, 1);		// 絶対1以上！
 									 pPerson->SetRecoveryFrame(RecoveryFrame);
 
 									 // ★コンボUI エフェクト(カウント)発動
@@ -834,7 +833,11 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 // ★初段のみ入るところ
 									 if (pPerson->GetRecoveryDamageCount()->empty())
 									 {
-										 if (isDamageCounterState(pPerson)) comboDesk.bCounter = true;
+										 if (isDamageCounterState(pPerson))
+										 {
+											 comboDesk.bCounter = true;
+											 if(HitDamageInfo->iAttribute != (int)ATTACK_ATTRIBUTE::THROW)damage += BasePlayer::c_COUNTER_BONUS_DAMAGE;
+										 }
 											 damage += BasePlayer::c_FIRST_HIT_ADD_DAMAGE;	// 初段だけダメージを増やす
 									 }
 

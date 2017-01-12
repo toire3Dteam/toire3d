@@ -117,8 +117,6 @@
     <ClCompile Include="source\BaseEntity\Message\MessageDispatcher.cpp" />
     <ClCompile Include="source\Camera\camera.cpp" />
     <ClCompile Include="source\Camera\EffectCamera.cpp" />
-    <ClCompile Include="source\Collect\BasePicture.cpp" />
-    <ClCompile Include="source\Collect\PictureManager.cpp" />
     <ClCompile Include="source\Collision\Collision.cpp" />
     <ClCompile Include="source\Cutin\CutIn.cpp" />
     <ClCompile Include="source\Data\PlayerData.cpp" />
@@ -148,6 +146,7 @@
     <ClCompile Include="source\Player\Airou\Airou.cpp" />
     <ClCompile Include="source\Player\AI\AI.cpp" />
     <ClCompile Include="source\Player\AI\AIState.cpp" />
+    <ClCompile Include="source\Player\Aramitama\Aramitama.cpp" />
     <ClCompile Include="source\Player\BasePlayer.cpp" />
     <ClCompile Include="source\Number\Number.cpp" />
     <ClCompile Include="source\particle_2d\particle_2d.cpp" />
@@ -224,9 +223,6 @@
     <ClCompile Include="source\Window\ParamSetting\Training\SpGageParamSetting.cpp" />
     <ClCompile Include="source\Window\ParamSetting\VoiceParamSetting.cpp" />
     <ClCompile Include="source\Window\PauseWindow.cpp" />
-    <ClCompile Include="source\Window\Player\AirouWindow.cpp" />
-    <ClCompile Include="source\Window\Player\NazenarabaWindow.cpp" />
-    <ClCompile Include="source\Window\Player\TekiWindow.cpp" />
     <ClCompile Include="source\Window\ResultWindow.cpp" />
     <ClCompile Include="source\Window\SoundWindow.cpp" />
     <ClCompile Include="source\Window\TrainingDummyWindow.cpp" />
@@ -291,8 +287,6 @@
     <ClInclude Include="source\BaseEntity\State\StateMachine.h" />
     <ClInclude Include="source\Camera\camera.h" />
     <ClInclude Include="source\Camera\EffectCamera.h" />
-    <ClInclude Include="source\Collect\BasePicture.h" />
-    <ClInclude Include="source\Collect\PictureManager.h" />
     <ClInclude Include="source\Collision\Collision.h" />
     <ClInclude Include="source\Cutin\CutIn.h" />
     <ClInclude Include="source\Data\PlayerData.h" />
@@ -325,6 +319,7 @@
     <ClInclude Include="source\Player\Airou\Oshioki.h" />
     <ClInclude Include="source\Player\AI\AI.h" />
     <ClInclude Include="source\Player\AI\AIState.h" />
+    <ClInclude Include="source\Player\Aramitama\Aramitama.h" />
     <ClInclude Include="source\Player\BasePlayer.h" />
     <ClInclude Include="source\Number\Number.h" />
     <ClInclude Include="source\particle_2d\particle_2d.h" />
@@ -404,9 +399,6 @@
     <ClInclude Include="source\Window\ParamSetting\Training\SpGageParamSetting.h" />
     <ClInclude Include="source\Window\ParamSetting\VoiceParamSetting.h" />
     <ClInclude Include="source\Window\PauseWindow.h" />
-    <ClInclude Include="source\Window\Player\AirouWindow.h" />
-    <ClInclude Include="source\Window\Player\NazenarabaWindow.h" />
-    <ClInclude Include="source\Window\Player\TekiWindow.h" />
     <ClInclude Include="source\Window\ResultWindow.h" />
     <ClInclude Include="source\Window\SoundWindow.h" />
     <ClInclude Include="source\Window\TrainingDummyWindow.h" />

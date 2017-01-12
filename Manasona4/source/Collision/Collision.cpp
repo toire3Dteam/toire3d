@@ -288,6 +288,7 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 				(*OutDamageInfo)->DamageMotion = pAttackData->places[iHitPlace].DamageMotion;
 				(*OutDamageInfo)->fComboRate = pAttackData->fComboRate;
 				(*OutDamageInfo)->iAttribute = (int)pAttackData->attribute;
+				(*OutDamageInfo)->fRepeatAttackRate = pAttackData->fRepeatAttackRate;
 
 				// ★コンボUI エフェクト(カウント)発動
 				// ★★プレイヤーのグローバルステートのダメージのところに移しました
@@ -375,6 +376,7 @@ bool Collision::CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou)
 			HitDamageInfo.DamageMotion = pStandAttackData->places[iHitPlace].DamageMotion;
 			HitDamageInfo.fComboRate = pStandAttackData->fComboRate;
 			HitDamageInfo.iAttribute = (int)pStandAttackData->attribute;
+			HitDamageInfo.fRepeatAttackRate = pStandAttackData->fRepeatAttackRate;
 
 			// コンボ用
 			//COMBO_DESK comboDesk;
@@ -454,6 +456,7 @@ bool Collision::CollisionShot(Shot::Base *shot, BasePlayer *you)
 		HitDamageInfo.fGuardKnockBackPower = pShotAttackData->fGuardKnockBackPower;
 		HitDamageInfo.DamageMotion = pShotAttackData->places[iHitPlace].DamageMotion;
 		HitDamageInfo.iAttribute = (int)pShotAttackData->attribute;
+		HitDamageInfo.fRepeatAttackRate = pShotAttackData->fRepeatAttackRate;
 
 		if (shot->GetVec().x < 0) HitDamageInfo.FlyVector.x *= -1;
 		MsgMgr->Dispatch(0, shot->GetPlayer()->GetID(), you->GetID(), MESSAGE_TYPE::HIT_DAMAGE, &HitDamageInfo);
