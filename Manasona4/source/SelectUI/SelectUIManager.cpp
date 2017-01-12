@@ -87,6 +87,9 @@ SelectUIManager::SelectUIManager()
 		case CHARACTER::NAZENARA:
 			m_pCharacterIcon[i] = new tdn2DAnim("Data/UI/CharacterSelect/Icon/nazenaraba.png");
 			break;
+		case CHARACTER::ARAMITAMA:
+			m_pCharacterIcon[i] = new tdn2DAnim("Data/UI/CharacterSelect/Icon/airou.png");
+			break;
 		default:
 			MyAssert(0,"ÇªÇÒÇ»ÉAÉCÉRÉìÇÕÇ»Ç¢");
 			break;

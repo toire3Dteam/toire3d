@@ -117,6 +117,8 @@
     <ClCompile Include="source\BaseEntity\Message\MessageDispatcher.cpp" />
     <ClCompile Include="source\Camera\camera.cpp" />
     <ClCompile Include="source\Camera\EffectCamera.cpp" />
+    <ClCompile Include="source\Collect\BasePicture.cpp" />
+    <ClCompile Include="source\Collect\PictureManager.cpp" />
     <ClCompile Include="source\Collision\Collision.cpp" />
     <ClCompile Include="source\Cutin\CutIn.cpp" />
     <ClCompile Include="source\Data\PlayerData.cpp" />
@@ -223,6 +225,9 @@
     <ClCompile Include="source\Window\ParamSetting\Training\SpGageParamSetting.cpp" />
     <ClCompile Include="source\Window\ParamSetting\VoiceParamSetting.cpp" />
     <ClCompile Include="source\Window\PauseWindow.cpp" />
+    <ClCompile Include="source\Window\Player\AirouWindow.cpp" />
+    <ClCompile Include="source\Window\Player\NazenarabaWindow.cpp" />
+    <ClCompile Include="source\Window\Player\TekiWindow.cpp" />
     <ClCompile Include="source\Window\ResultWindow.cpp" />
     <ClCompile Include="source\Window\SoundWindow.cpp" />
     <ClCompile Include="source\Window\TrainingDummyWindow.cpp" />
@@ -287,6 +292,8 @@
     <ClInclude Include="source\BaseEntity\State\StateMachine.h" />
     <ClInclude Include="source\Camera\camera.h" />
     <ClInclude Include="source\Camera\EffectCamera.h" />
+    <ClInclude Include="source\Collect\BasePicture.h" />
+    <ClInclude Include="source\Collect\PictureManager.h" />
     <ClInclude Include="source\Collision\Collision.h" />
     <ClInclude Include="source\Cutin\CutIn.h" />
     <ClInclude Include="source\Data\PlayerData.h" />
@@ -399,6 +406,9 @@
     <ClInclude Include="source\Window\ParamSetting\Training\SpGageParamSetting.h" />
     <ClInclude Include="source\Window\ParamSetting\VoiceParamSetting.h" />
     <ClInclude Include="source\Window\PauseWindow.h" />
+    <ClInclude Include="source\Window\Player\AirouWindow.h" />
+    <ClInclude Include="source\Window\Player\NazenarabaWindow.h" />
+    <ClInclude Include="source\Window\Player\TekiWindow.h" />
     <ClInclude Include="source\Window\ResultWindow.h" />
     <ClInclude Include="source\Window\SoundWindow.h" />
     <ClInclude Include="source\Window\TrainingDummyWindow.h" />

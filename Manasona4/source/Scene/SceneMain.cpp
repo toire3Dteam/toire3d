@@ -101,7 +101,7 @@ bool sceneMain::Initialize()
 #ifdef _DEBUG
 	sprintf_s(m_LoadComment, 256, "プレイヤー初期化");
 #endif
-	PlayerMgr->Initialize(2, m_pStage, SelectDataMgr->Get()->tagSideDatas);
+	PlayerMgr->Initialize(2, m_pStage, SelectDataMgr->Get()->tagSideDatas, m_iRoundNum);
 
 	// プレイヤーの座標のアドレスをカメラに渡してあげる(いじることは絶対に無く、ただ参照するだけ)
 	CameraMgr->SetPlayersPos();

@@ -539,6 +539,8 @@ bool SceneCollectState::BuyPictureStep::PadUpdate(sceneCollect *pMain, int Devic
 		pMain->GetFSM()->RevertToPreviousState();
 		bChangedState = true;
 
+		// SE‚ÌÄ¶
+		se->Play("w“ü");
 	}
 	else if (pMain->GetTips(TIPS_TYPE_COLLECT::CONTENT_BUY)->GetSelectState() == TipsCard::CANCEL)
 	{

@@ -28,7 +28,7 @@ m_bHeaveHoDriveOverFlow(false)
 }
 PlayerManager::PlayerManager(const PlayerManager&) :BaseGameEntity(ENTITY_ID::PLAYER_MGR){}
 
-void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage, SideData SideDatas[(int)SIDE::ARRAY_MAX])
+void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage, SideData SideDatas[(int)SIDE::ARRAY_MAX], int iRoundNum)
 {
 	m_NumPlayer = NumPlayer;
 	m_pStage = pStage;
@@ -84,6 +84,12 @@ void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage, SideData Side
 	assert(NumPlayer == 2);
 	m_pPlayers[0]->SetTargetPlayer(m_pPlayers[1]);
 	m_pPlayers[1]->SetTargetPlayer(m_pPlayers[0]);
+
+	if (iRoundNum <= 1)
+	{
+		m_pPlayers[0]->SetLastOneWin();
+		m_pPlayers[1]->SetLastOneWin();
+	}
 
 	FOR(NumPlayer)
 	{

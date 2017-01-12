@@ -1,6 +1,7 @@
 #include "BaseTrophy.h"
 #include "Data\PlayerData.h"
 #include "Data\SelectData.h"
+#include "../Sound/SoundManager.h"
 
 //+------------------------------
 //	基本のトロフィー
@@ -150,6 +151,9 @@ void BaseTrophy::Action(int iDelayFrame)
 	m_pIconRip->Stop();
 
 	m_iDelayFrame = iDelayFrame;
+
+	// SEの再生
+	se->Play("トロフィー");
 }
 
 // 演出を切る

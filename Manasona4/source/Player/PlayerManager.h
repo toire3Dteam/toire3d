@@ -21,7 +21,7 @@ public:
 	}
 
 	~PlayerManager();
-	void Initialize(int NumPlayer, Stage::Base *pStage, SideData aSideDatas[(int)SIDE::ARRAY_MAX]);
+	void Initialize(int NumPlayer, Stage::Base *pStage, SideData aSideDatas[(int)SIDE::ARRAY_MAX], int iNumRound);
 	void Release(){ SAFE_DELETE(pInstance); }
 	void Update(PLAYER_UPDATE flag);
 	void UpdateTraining();

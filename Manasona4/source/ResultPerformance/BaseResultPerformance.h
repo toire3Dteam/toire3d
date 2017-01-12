@@ -98,11 +98,6 @@ private:
 	Pic m_blackInk;
 	Pic m_blackStar;
 	Pic m_whiteSoul;
-
-	// バックムービー
-	tdnMovie*  m_movieMgr;
-	tdn2DObj* m_movieTex;
-
 };
 
 
