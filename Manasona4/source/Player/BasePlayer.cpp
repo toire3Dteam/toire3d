@@ -1436,6 +1436,8 @@ void BasePlayer::Render()
 		tdnText::Draw((int)pos2d.x - 20, (int)pos2d.y - 128, 0xffffffff, "硬直: %d", m_iRecoveryFrame);
 	}
 
+	tdnText::Draw((int)pos2d.x - 20, (int)pos2d.y - 160, 0xffffffff, "F: %d", m_iCurrentActionFrame);
+
 #endif
 
 	// デバッグ

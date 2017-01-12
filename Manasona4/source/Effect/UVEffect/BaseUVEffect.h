@@ -958,3 +958,101 @@ public:
 
 private:
 };
+
+/*******************************/
+//	アラミタマチャージウェーブ
+/*******************************/
+class AramitamaChargeWaveEffect :public BaseUVEffect
+{
+public:
+	AramitamaChargeWaveEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Aramitama/ChargeWave.imo", 0.005f, 0.015f, 20, false, 2, 16);
+	};
+	~AramitamaChargeWaveEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+
+/**********************************/
+//	アラミタマチャージオーラ
+/**********************************/
+class AramitamaChargeAuraEffect :public BaseUVEffect
+{
+public:
+	AramitamaChargeAuraEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Aramitama/ChargeAura.IMO", 0.0f, 0.03f, 20, false, 2, 16);
+	};
+	~AramitamaChargeAuraEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/*************************************/
+//	アラミタマサークル
+/*************************************/
+class AramitamaCircleEffect :public BaseUVEffect
+{
+public:
+	AramitamaCircleEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Aramitama/Circle.imo", 0.0f, 0.0f, 14, false, 2, 8);
+	};
+	~AramitamaCircleEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/*****************************************/
+//	アラミタマキャノン
+/*****************************************/
+class AramitamaCanonEffect :public BaseUVEffect
+{
+public:
+	AramitamaCanonEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Aramitama/Canon.IMO", 0.0f, 0.15f, 180, false, 2, 175);
+	};
+	~AramitamaCanonEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	//void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+
+};
+
+/*****************************************/
+//	アラミタママズルフラッシュ
+/*****************************************/
+class AramitamaNozzleFlashEffect :public BaseUVEffect
+{
+public:
+	AramitamaNozzleFlashEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Aramitama/NozzleFlash.IMO", 0.125f, 0.0f, 180, false, 2, 175);
+	};
+	~AramitamaNozzleFlashEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	//void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+
+};

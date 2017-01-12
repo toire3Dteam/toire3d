@@ -168,7 +168,7 @@ bool SquatCancel(BasePlayer * pPerson)
 bool RushAttackCancel(BasePlayer *pPerson)
 {
 	// 攻撃キャンセル
-	if (isNeutralPOV(pPerson) && pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::C, true) && !pPerson->GetFSM()->isPrevState(*BasePlayerState::RushAttack::GetInstance()))
+	if (!pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN) && pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::C, true) && !pPerson->GetFSM()->isPrevState(*BasePlayerState::RushAttack::GetInstance()))
 	{
 		// 先行入力リセット
 		pPerson->AheadCommandReset();
@@ -559,8 +559,8 @@ bool DokkoiAttackCancel(BasePlayer *pPerson)
 	{
 		if (pPerson->isLand() == true)
 		{
-			// 4入力
-			if (pPerson->isPushInput((pPerson->GetDir() == DIR::LEFT) ? PLAYER_COMMAND_BIT::RIGHT : PLAYER_COMMAND_BIT::LEFT, true))
+			// 4 または 8入力
+			if (pPerson->isPushInput((pPerson->GetDir() == DIR::LEFT) ? PLAYER_COMMAND_BIT::RIGHT : PLAYER_COMMAND_BIT::LEFT, true) || pPerson->isPushInput(PLAYER_COMMAND_BIT::UP, true))
 			{
 				// 対空攻撃
 				pPerson->GetFSM()->ChangeState(BasePlayerState::AntiAirAttack::GetInstance());
@@ -2665,7 +2665,7 @@ void BasePlayerState::RushAttack::Enter(BasePlayer * pPerson)
 void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 {
 	// 攻撃終了してたら
-	if (pPerson->GetActionFrame() == FRAME_STATE::END)
+	if (!pPerson->isFrameAction())
 	{
 		// 待機モーションに戻る
 		ChangeWaitState(pPerson);
@@ -4984,6 +4984,9 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 									 // ★ガード成功してたら！！！
 									 if (pPerson->isGuardSuccess() == true)
 									 {
+										 // 前回の攻撃に対する先行入力を消してあげる
+										 pPerson->AheadCommandReset();
+
 										 // ガードした時にモーションをサッっと変える
 										 /* しゃがみガード */
 										 if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN))
@@ -4998,31 +5001,33 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 
 										 // (A列車)ここにガード成功時のSE、エフェクト
 										 char *seID;
-										 switch (rand() % 3)
+
+										 if (HitDamageInfo->damage < 100)
 										 {
-										 case 0:
 											 seID = "ガード小";
 											 // ガードでゲージ回復（小）
 											 pPerson->AddOverDriveGage(0.35f);
 											 // 攻撃した相手側は防御側よりも多く獲得
-											 pPerson->GetTargetPlayer()->AddOverDriveGage(0.5f);
-											 break;
-										 case 1:
+											 pPerson->GetTargetPlayer()->AddOverDriveGage(0);
+										 }
+
+										 else if (HitDamageInfo->damage < 500)
+										 {
 											 seID = "ガード中";
 											 // ガードでゲージ回復（中）
 											 pPerson->AddOverDriveGage(0.5f);
 											 // 攻撃した相手側は防御側よりも多く獲得
 											 pPerson->GetTargetPlayer()->AddOverDriveGage(0.75f);
-											 break;
-										 case 2:
+										 }
+										 else
+										 {
 											 seID = "ガード強";
 											 // ガードでゲージ回復（強）
 											 pPerson->AddOverDriveGage(1.0f);
 											 // 攻撃した相手側は防御側よりも多く獲得
 											 pPerson->GetTargetPlayer()->AddOverDriveGage(1.0f);
-											 break;
-
 										 }
+
 										 se->Play(seID);
 
 										 // ガードのけぞり
@@ -5152,13 +5157,31 @@ void BasePlayerState::Throw::Render(BasePlayer * pPerson)
 bool BasePlayerState::Throw::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
 	// メッセージタイプ
-	//switch (msg.Msg)
-	//{
-	//	// 攻撃くらったよメッセージ
-	//case MESSAGE_TYPE::HIT_DAMAGE:
-	//	if(pPerson->isActiveFrame()) return true;	// ダメージメッセージガン無視
-	//	break;
-	//}
+	switch (msg.Msg)
+	{
+	case MESSAGE_TYPE::BE_THROWN:
+	{
+		// 投げ始動中に掴まれたら投げ抜け
+		if (pPerson->GetActionFrame() == FRAME_STATE::START)
+		{
+			pPerson->GetFSM()->ChangeState(SuccessThrowRelease::GetInstance());
+
+			// 掴んでるやつに対して投げ抜けしたいとメッセージを送る
+			MsgMgr->Dispatch(0, pPerson->GetID(), pPerson->GetTargetPlayer()->GetID(), MESSAGE_TYPE::CAN_THROW_RELEASE, nullptr);
+			return true;
+		}
+		break;
+	}
+
+	case MESSAGE_TYPE::CAN_THROW_RELEASE:	// 掴んでる人から、投げ抜けしてぇと送られてくるメッセージ
+	{
+		// ★★★固まるバグの原因。これを書いていなかった
+		MsgMgr->Dispatch(0, pPerson->GetID(), msg.Sender, MESSAGE_TYPE::THROW_RELEASE, nullptr);	// 送り主に投げ抜けOKと送り返す
+
+		pPerson->GetFSM()->ChangeState(SuccessThrowRelease::GetInstance());
+		return true;
+	}
+	}
 
 	return false;
 }

@@ -34,9 +34,8 @@ Aramitama::Aramitama(SIDE side, const SideData &data) :BasePlayer(side, data), m
 	// キャラごとの設定を読み込む
 	BasePlayer::LoadCharacterParam("DATA/CHR/Aramitama/param.txt");
 
-	Reset();
 
-	m_pName = "∵";
+	m_pName = "アラミタマ";
 	m_pCutinPic = new tdn2DAnim("DATA/UI/Game/OverDriveCutin/nazenaraba.png");
 	m_pCutinPic->OrderMoveAppeared(8, -400, +200);
 
@@ -45,8 +44,8 @@ Aramitama::Aramitama(SIDE side, const SideData &data) :BasePlayer(side, data), m
 	// ★フレーム独自改造
 	{
 		// コロマル
+		m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL][24] = FRAME_STATE::RECOVERY_HIT;
 		m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL][34] = FRAME_STATE::RECOVERY_HIT;
-		m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL][44] = FRAME_STATE::RECOVERY_HIT;
 
 		// 車輪
 		int ActiveStartFrame;
@@ -75,12 +74,28 @@ Aramitama::Aramitama(SIDE side, const SideData &data) :BasePlayer(side, data), m
 
 	// スピードライン
 	m_pSpeedLine = new SpeedLineGreenEffect;
+
+	// エフェクト
+	m_pAChargeWave		= new AramitamaChargeWaveEffect();
+	m_pAChargeAura		= new AramitamaChargeAuraEffect();
+	m_pACircle			= new AramitamaCircleEffect();
+	m_pACanon			= new AramitamaCanonEffect();
+	m_pANozzleFlash		= new AramitamaNozzleFlashEffect();
+
+	// 最後に初期化
+	Reset();
 }
 
 void Aramitama::Reset()
 {
 	// 必ず書く
 	BasePlayer::Reset();
+
+	m_pAChargeWave->Stop();
+	m_pAChargeAura->Stop();
+	m_pACircle->Stop();
+	m_pACanon->Stop();
+	m_pANozzleFlash->Stop();
 }
 
 void Aramitama::InitActionDatas()
@@ -116,13 +131,15 @@ void Aramitama::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = true;
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(3.25f, 3.0f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(3.25f, 3.0f);
-	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 0;
-	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 0;
+	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 4;
+	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 4;
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 60;
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 60;
+	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
+	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	// 判定形状
-	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->pCollisionShape->width = 18;
-	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->pCollisionShape->height = 17;
+	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->pCollisionShape->width = 20;
+	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->pCollisionShape->height = 20;
 	m_ActionDatas[(int)BASE_ACTION_STATE::OVERDRIVE_BURST].pAttackData->pCollisionShape->pos.Set(0, 3.5f, 0);
 
 
@@ -157,7 +174,7 @@ void Aramitama::InitActionDatas()
 	// 判定形状
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pCollisionShape->width = 7;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pCollisionShape->height = 6;
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pCollisionShape->pos.Set(6, 6.5f, 0);
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pCollisionShape->pos.Set(6, 7.0f, 0);
 
 	//==============================================================================================================
 	//	通常2段
@@ -190,7 +207,7 @@ void Aramitama::InitActionDatas()
 	// 判定形状
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->pCollisionShape->width = 8;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->pCollisionShape->height = 8;
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->pCollisionShape->pos.Set(7, 5.5, 0);
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->pCollisionShape->pos.Set(7, 6.0, 0);
 
 
 	//==============================================================================================================
@@ -452,8 +469,8 @@ void Aramitama::InitActionDatas()
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(-.2f, -.5f);
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(-.2f, -.5f);
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(.2f, 0);
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.2f, 0);
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 2;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 2;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 50;
@@ -624,18 +641,39 @@ void Aramitama::InitActionDatas()
 Aramitama::~Aramitama()
 {
 	FOR((int)SKILL_ACTION_TYPE::MAX) SAFE_DELETE(m_pSkillActions[i])
+
+	SAFE_DELETE(m_pAChargeWave);
+	SAFE_DELETE(m_pAChargeAura);
+	SAFE_DELETE(m_pACircle);
+	SAFE_DELETE(m_pACanon);
+	SAFE_DELETE(m_pANozzleFlash);
 }
 
 void Aramitama::Update(PLAYER_UPDATE flag)
 {
 	// 基底クラスの更新
 	BasePlayer::Update(flag);
+
+	// エフェクト
+	m_pAChargeWave->Update();
+	m_pAChargeAura->Update();
+	m_pACircle->Update();
+	m_pACanon->Update();
+	m_pANozzleFlash->Update();
+
 }
 
 void Aramitama::Render()
 {
 	// 基底クラスの更新
 	BasePlayer::Render();
+
+	// エフェクト
+	m_pAChargeWave->Render();
+	m_pAChargeAura->Render();
+	m_pACircle->Render();
+	m_pACanon->Render();
+	m_pANozzleFlash->Render();
 }
 
 void Aramitama::RenderDrive()
@@ -905,6 +943,11 @@ bool Aramitama::SkillAction::Squat::Execute()
 	if (m_pAramitama->isActiveFrame())
 	{
 		m_pAramitama->m_iWassyoiGauge += 10;
+		
+		// チャージエフェクト発動
+		m_pAramitama->m_pAChargeWave->Action(m_pAramitama->GetPos());
+		m_pAramitama->m_pAChargeAura->Action(m_pAramitama->GetPos());
+
 	}
 	
 
@@ -963,8 +1006,8 @@ bool Aramitama::SkillAction::Aerial::Execute()
 
 	if (m_pAramitama->GetActionFrame() == FRAME_STATE::RECOVERY_HIT)
 	{
-		m_pAramitama->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.x = m_pAramitama->GetDirVecX() * -0.2f;
-		m_pAramitama->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.x = m_pAramitama->GetDirVecX() * -0.2f;
+		//m_pAramitama->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.x = m_pAramitama->GetDirVecX() * -0.2f;
+		//m_pAramitama->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.x = m_pAramitama->GetDirVecX() * -0.2f;
 	}
 
 	if (m_pAramitama->GetAttackData()->bHit)
@@ -1020,6 +1063,22 @@ bool Aramitama::HeavehoDriveUpdate()
 	{
 		// ここに来たら終わり
 		return true;
+	}
+
+	// エフェクト発生時間
+	if (m_iCurrentActionFrame == 49)
+	{
+		// キャノンエフェクト発動
+		m_pACanon->Action(m_vPos);
+		m_pANozzleFlash->Action(m_vPos);
+
+	}
+	// エフェクト終了時間
+	else if (m_iCurrentActionFrame == 155)
+	{
+		// キャノンエフェクト止める
+		m_pACanon->Stop();
+		m_pANozzleFlash->Stop();
 	}
 
 	if (GetAttackData()->bHit)

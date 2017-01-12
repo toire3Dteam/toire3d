@@ -177,6 +177,13 @@ private:
 	void InitActionDatas();
 	void InitMotionDatas();
 
+	// エフェクト
+	AramitamaChargeWaveEffect*	m_pAChargeWave;		// チャージのウェーブ
+	AramitamaChargeAuraEffect*	m_pAChargeAura;		// チャージのオーラ
+	AramitamaCircleEffect*		m_pACircle;			// サークル
+	AramitamaCanonEffect*		m_pACanon;			// 必殺キャノン
+	AramitamaNozzleFlashEffect* m_pANozzleFlash;	// 必殺マズルフラッシュ
+
 	// 烙印
 	int m_iWassyoiGauge;
 };
