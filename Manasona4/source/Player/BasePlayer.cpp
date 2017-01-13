@@ -250,6 +250,7 @@ m_tagOrgCharacterParam(CharacterParam{}),
 m_vPos(0,0,0),
 m_vMove(0,0,0),
 m_bMoveUpdate(true),
+m_bSinkingUpdate(true),
 
 m_fAngleY(0),
 m_dir(DIR::LEFT),
@@ -458,6 +459,7 @@ void BasePlayer::Reset()
 	/* true‚Å‰Šú‰»ƒ][ƒ“ */
 	m_bAerialJump =
 	m_bMoveUpdate =
+	m_bSinkingUpdate =
 	true;
 
 	/* false‚Å‰Šú‰»ƒ][ƒ“ */

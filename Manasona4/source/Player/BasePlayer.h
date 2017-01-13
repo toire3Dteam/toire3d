@@ -566,7 +566,8 @@ public:
 	void SetPos(const Vector3 &v) { m_vPos.Set(v.x, v.y, v.z); }
 	void MoveClampX(float val) { m_vMove.x = Math::Clamp(m_vMove.x, -val, val); }
 	void SetMoveUpdate(bool bMove){ m_bMoveUpdate = bMove; }
-
+	void SetSinkingUpdate(bool bSinking){ m_bSinkingUpdate = bSinking; }
+	bool isSinkingUpdateOK(){ return m_bSinkingUpdate; }
 
 	//------------------------------------------------------
 	//	向き・アングル
@@ -580,7 +581,7 @@ public:
 	void SetDirAngle(){ m_fAngleY = DIR_ANGLE[(int)m_dir]; }
 	void TurnOverDir(){ m_dir = (m_dir == DIR::LEFT) ? DIR::RIGHT : DIR::LEFT; }
 	float GetDirVecX(){ return (m_dir == DIR::LEFT) ? -1.0f : 1.0f; }
-
+	float GetTargetDirVecX(){ return (m_TargetDir == DIR::LEFT) ? -1.0f : 1.0f; }
 
 	//------------------------------------------------------
 	//	プレイヤーアクション・攻撃アクション・ステート
@@ -689,7 +690,11 @@ public:
 	void SetInvincibleTime(int time){ m_iInvincibleTime = time; }
 	void InvincibleOff(){ m_iInvincibleLV = 0; m_iInvincibleTime = 0; }
 	bool isEscape() { return m_bEscape; }
-	void SetEscapeFlag(bool bEscape) { m_bEscape = bEscape; }
+	void SetEscapeFlag(bool bEscape)
+	{
+		m_bEscape = bEscape; 
+		m_bSinkingUpdate = !bEscape;
+	}
 	bool isInvincibleCounterType(){ return m_tagCharacterParam.bInvincibleCoutner; }
 
 	//------------------------------------------------------
@@ -991,10 +996,10 @@ protected:
 	//------------------------------------------------------
 	//	位置・移動量
 	//------------------------------------------------------
-	Vector3 m_vPos;		// 座標
-	Vector3 m_vMove;	// 移動値
-	bool m_bMoveUpdate;	// これがtrueなら、重力とか空気抵抗とかを受ける(アイルードリルとかペルソナとかでfalseにする)
-
+	Vector3 m_vPos;			// 座標
+	Vector3 m_vMove;		// 移動値
+	bool m_bMoveUpdate;		// これがtrueなら、重力とか空気抵抗とかを受ける(アイルードリルとかペルソナとかでfalseにする)
+	bool m_bSinkingUpdate;	// これがtrueなら、キャラとキャラのめり込み判定を行う
 
 	//------------------------------------------------------
 	//	向き・アングル

@@ -211,6 +211,7 @@ private:
 		MushiData(LPSTR filepath, int iCoolTime) :iCoolTime(0), c_COOL_TIME(iCoolTime), pBullet(nullptr), tagpAttackData(nullptr)
 		{
 			pBullet = new iex3DObj(filepath);
+			pBullet->SetMotion(0);
 			tagpAttackData = new AttackData;
 		}
 		~MushiData()

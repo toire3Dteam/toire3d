@@ -3562,7 +3562,7 @@ public:
 	static BOOL SaveObject(LPIEMFILE lpIem, LPSTR filename);
 
 	// slerp : [ 0 < slerp < 1 ] 前フレームの姿勢の影響度
-	void Update(float slerp = 0.0f);
+	void Update(float slerp = 0.0f, bool bUpdate = true);
 	void SetMotion(int motion);
 	inline int GetMotion(){ return Motion; }
 	inline WORD GetMotionOffset(int m){ return M_Offset[m]; }
@@ -3572,8 +3572,8 @@ public:
 
 	void Animation();
 
-	void Render();
-	void Render(DWORD flag, float alpha = -1);
+	void Render(bool bUpdate = true);
+	void Render(RS flag, float alpha = -1, bool bUpdate = true);
 	void Render(tdnShader* shader, char* name);
 
 	inline int GetParam(int n){ return Param[n]; }

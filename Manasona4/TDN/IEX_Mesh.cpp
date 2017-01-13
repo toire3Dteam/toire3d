@@ -688,7 +688,7 @@ BOOL iexMesh::LoadIMO(LPSTR filename)
 		sprintf(temp, "%sL%s", workpath, imo.Texture[i]);
 		lpSpecular[i] = tdnTexture::Load(temp);
 
-		sprintf(temp, "%sM%s", workpath, imo.Texture[i]);
+		sprintf(temp, "%sH%s", workpath, imo.Texture[i]);
 		lpHeight[i] = tdnTexture::Load(temp, 1);
 	}
 	CloseHandle(hfile);
@@ -766,10 +766,10 @@ BOOL	iexMesh::LoadX(LPSTR filename)
 			sprintf(temp, "%sN%s", workpath, d3dxMaterial[i].pTextureFilename);
 			lpNormal[i] = tdnTexture::Load(temp);
 
-			sprintf(temp, "%sL%s", workpath, d3dxMaterial[i].pTextureFilename);
+			sprintf(temp, "%sS%s", workpath, d3dxMaterial[i].pTextureFilename);
 			lpSpecular[i] = tdnTexture::Load(temp);
 
-			sprintf(temp, "%sM%s", workpath, d3dxMaterial[i].pTextureFilename);
+			sprintf(temp, "%sH%s", workpath, d3dxMaterial[i].pTextureFilename);
 			lpHeight[i] = tdnTexture::Load(temp, 1);
 		}
 	}

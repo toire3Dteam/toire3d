@@ -35,7 +35,7 @@ void Collision::PlayerCollision(PlayerManager *pPlayerMgr, ShotManager *pShotMgr
 	}
 
 	// めり込み判定
-	if (!pPlayer1->isEscape() && !pPlayer2->isEscape()) Collision::Sinking(pPlayer1, pPlayer2);
+	if (pPlayer1->isSinkingUpdateOK() && pPlayer2->isSinkingUpdateOK()) Collision::Sinking(pPlayer1, pPlayer2);
 
 	/* プレイヤーVSプレイヤーの攻撃判定 */
 	//if (pPlayer1->GetFSM()->isInState(*BasePlayerState::Throw::GetInstance()))	// 自分が投げモードに入ってたら
@@ -417,7 +417,7 @@ bool Collision::CollisionShot(Shot::Base *shot, BasePlayer *you)
 
 	AttackData *pShotAttackData(shot->GetAttackData());
 
-	if (isPossibleGuardState(you) && isInputGuardCommand(you) && you->isLand())
+	if (isInputGuardCommand(you) && you->isLand())
 	{
 		if (Math::Length(you->GetPos(), shot->GetPos()) < BasePlayer::c_GUARD_DISTANCE)// ガード発動距離
 		{

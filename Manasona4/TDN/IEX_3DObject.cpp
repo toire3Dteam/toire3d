@@ -109,14 +109,15 @@ void iex3DObj::SetMotion(int motion)
 //*****************************************************************************
 //		更新処理
 //*****************************************************************************
-void iex3DObj::Update(float slerp)
+void iex3DObj::Update(float slerp, bool bUpdate)
 {
 	/*	スキンメッシュ更新	*/
 	UpdateSkinMeshFrame((float)dwFrame, slerp);
 	UpdateBoneMatrix();
 	UpdateSkinMesh();
 
-	iexMesh::Update();
+	// ※TransMatrixを直でいじって姿勢制御する場合、この更新で消されてしまうので、bool型で分岐させることにした
+	if(bUpdate)iexMesh::Update();
 	RenderFrame = dwFrame;
 	bChanged = FALSE;
 }
@@ -158,10 +159,10 @@ void iex3DObj::Animation()
 //------------------------------------------------------
 //		固定機能通常描画
 //------------------------------------------------------
-void iex3DObj::Render()
+void iex3DObj::Render(bool bUpdate)
 {
 	//	情報更新
-	if (RenderFrame != dwFrame) Update();
+	if (RenderFrame != dwFrame) Update(0, bUpdate);
 	//	メイン行列設定
 	iexMesh::Render();
 }
@@ -169,10 +170,10 @@ void iex3DObj::Render()
 //------------------------------------------------------
 //		固定機能フラグ指定
 //------------------------------------------------------
-void iex3DObj::Render(DWORD flag, float alpha)
+void iex3DObj::Render(RS flag, float alpha, bool bUpdate)
 {
 	//	情報更新
-	if (RenderFrame != dwFrame) Update();
+	if (RenderFrame != dwFrame) Update(bUpdate);
 	//	メイン行列設定
 	iexMesh::Render(flag, alpha);
 }
@@ -788,7 +789,7 @@ void	IEX_Render3DObject(LPIEX3DOBJ lpObj)
 
 }
 
-void	IEX_Render3DObject(LPIEX3DOBJ lpObj, DWORD flag, float alpha)
+void	IEX_Render3DObject(LPIEX3DOBJ lpObj, RS flag, float alpha)
 {
 	if (!lpObj) return;
 	lpObj->Render(flag, alpha);

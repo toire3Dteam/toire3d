@@ -47,7 +47,7 @@ namespace Shot
 		//------------------------------------------------------
 		//	コンストラクタ・初期化(ショットの情報を引数に、コンストラクタだけにすると、ショットの情報を設定できない)
 		//------------------------------------------------------
-		Base(BasePlayer *pPlayer, AttackData *pAttackData, iex3DObj *pObj);
+		Base(BasePlayer *pPlayer, AttackData *pAttackData, iex3DObj *pObj, bool bAttitude);
 		Base(BasePlayer *pPlayer, AttackData *pAttackData, BaseUVEffect *pObj);
 		void Initialize(const ParamDesc &tagParamDesc){ memcpy_s(&m_tagParamDesc, sizeof(ParamDesc), &tagParamDesc, sizeof(ParamDesc)); }
 
@@ -94,6 +94,7 @@ namespace Shot
 		//------------------------------------------------------
 		BaseUVEffect *m_pUVEffect;	// メッシュの実体(参照するだけ)
 		iex3DObj *m_p3DObj;
+		bool m_bAttitude;			// 姿勢制御フラグ
 
 		//------------------------------------------------------
 		//	プレイヤーの実体(あまり使うことはないが一応、)
@@ -170,10 +171,11 @@ namespace Shot
 			void Update();
 			void Render();
 			//------------------------------------------------------
-			//	滞在時間・移動速度
+			//	滞在時間・移動速度・射程範囲
 			//------------------------------------------------------
 			static const int c_SOJOURN_TIME;
 			static const float c_SPEED;
+			static const float c_RANGE;
 		};
 	};
 }

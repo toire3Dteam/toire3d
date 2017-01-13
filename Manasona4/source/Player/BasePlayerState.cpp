@@ -4133,8 +4133,8 @@ void BasePlayerState::Escape::Enter(BasePlayer * pPerson)
 	// ★エスケープのフレームに設定する
 	pPerson->SetActionState(BASE_ACTION_STATE::ESCAPE);
 	
-	// 逆の向きを向く
-	//pPerson->TurnOverDir();
+	// めり込み判定消す
+	//pPerson->SetSinkingUpdate(false);
 
 	pPerson->SetDirAngle();
 
@@ -4826,10 +4826,10 @@ void BasePlayerState::Guard::Execute(BasePlayer * pPerson)
 		//============================================
 		if (HeaveHoCancel(pPerson)) return;
 
-		//////////////////////////////////////////////
-		//	バクステキャンセル
-		//============================================
-		if (DashCancel(pPerson)) return;
+		////////////////////////////////////////////////
+		////	対空攻撃キャンセル
+		////============================================
+		//if (AntiAirCancel(pPerson)) return;
 
 		//////////////////////////////////////////////
 		//	どっこい攻撃キャンセル

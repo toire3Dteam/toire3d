@@ -7,14 +7,17 @@
 #include "Effect\Particle.h"
 
 Shot::Base::Base(BasePlayer *pPlayer, AttackData *pAttackData,
-	iex3DObj *pObj):
+	iex3DObj *pObj,
+	bool bAttitude):
 	m_pPlayer(pPlayer),
 	m_ptagAttackData(pAttackData),
 	m_p3DObj(pObj),
+	m_bAttitude(bAttitude),
 	m_pUVEffect(nullptr),
 	m_tagParamDesc()
 {
 	pObj->SetFrame(0);
+	pObj->SetAngle(DIR_ANGLE[(int)pPlayer->GetTargetDir()]);
 }
 
 Shot::Base::Base(BasePlayer *pPlayer, AttackData *pAttackData,
@@ -22,6 +25,7 @@ Shot::Base::Base(BasePlayer *pPlayer, AttackData *pAttackData,
 	m_pPlayer(pPlayer),
 	m_ptagAttackData(pAttackData),
 	m_p3DObj(nullptr),
+	m_bAttitude(false),
 	m_pUVEffect(pObj),
 	m_tagParamDesc()
 {
@@ -45,9 +49,19 @@ void Shot::Base::Update()
 	if (m_p3DObj)
 	{
 		m_p3DObj->Animation();
-		Math::SetTransMatrixFrontVec(&m_p3DObj->TransMatrix, m_tagParamDesc.vPos, m_tagParamDesc.vVec);
-		m_p3DObj->SetPos(m_tagParamDesc.vPos);
-		m_p3DObj->Update();
+
+		// 姿勢制御
+		if (m_bAttitude)
+		{
+			// 自分で行列を作る(位置・移動ベクトル情報から)
+			Math::SetTransMatrixFrontVec(&m_p3DObj->TransMatrix, m_tagParamDesc.vPos, m_tagParamDesc.vVec);
+		}
+
+		else
+		{
+			m_p3DObj->SetPos(m_tagParamDesc.vPos);
+			m_p3DObj->Update();
+		}
 	}
 
 	else if (m_pUVEffect)
@@ -67,10 +81,18 @@ void Shot::Base::Update()
 
 void Shot::Base::Render()
 {
-
-	// 自分で行列を作る(位置・移動ベクトル情報から)
-	//Math::SetTransMatrixFrontVec(&m_pObj->TransMatrix, m_vPos, m_vVec);
-	if(m_p3DObj)m_p3DObj->Render();
+	if (m_p3DObj)
+	{
+		if (m_bAttitude)
+		{
+			// TransMatrixを直でいじったので、更新が不要の描画
+			m_p3DObj->Render(false);
+		}
+		else
+		{
+			m_p3DObj->Render();
+		}
+	}
 	if (m_pUVEffect)m_pUVEffect->Render();
 
 #ifdef _DEBUG
@@ -152,12 +174,19 @@ const int Shot::AramitamaMushi::Land::c_ATTACK_FRAME = 8;
 Shot::AramitamaMushi::Land::Land(BasePlayer *pPlayer,
 	AttackData *pAttackData,
 	iex3DObj *pObj) :
-	Base(pPlayer, pAttackData, pObj)
+	Base(pPlayer, pAttackData, pObj, false)
 {
-	const Vector3 l_vApeearPos(pPlayer->GetTargetPlayer()->GetPos());
+	DIR eTargetDir((pPlayer->GetTargetDir() == DIR::LEFT) ? DIR::RIGHT : DIR::LEFT);
+	pObj->SetAngle(DIR_ANGLE[(int)eTargetDir]);
+
+	Vector3 l_vAppearPos(pPlayer->GetTargetPlayer()->GetPos());
+	Vector3 l_vAddMove(pPlayer->GetTargetPlayer()->GetMove() * 1.75f);
+	//if (l_vAppearPos.x + l_vAddMove.x )
+	l_vAppearPos += l_vAddMove;
 
 	ParamDesc l_tagParamDesc;
-	l_tagParamDesc.vPos = l_vApeearPos;					// 出現位置
+	l_tagParamDesc.vPos = l_vAppearPos;					// 出現位置
+	l_tagParamDesc.vVec = Vector3((eTargetDir == DIR::LEFT) ? -1.0f : 1.0f, 0, 0);
 	l_tagParamDesc.iSojournTime = c_SOJOURN_TIME;		// 滞在時間
 	l_tagParamDesc.bPenetration = true;					// 当たっても消えない
 	l_tagParamDesc.bCollisionOK = false;				// 途中から判定が始まる(モーションに合わせてtrueにする)
@@ -197,14 +226,14 @@ const float Shot::AramitamaMushi::Squat::c_SPEED = 3.0f;
 Shot::AramitamaMushi::Squat::Squat(BasePlayer *pPlayer,
 	AttackData *pAttackData,
 	iex3DObj *pObj) :
-	Base(pPlayer, pAttackData, pObj)
+	Base(pPlayer, pAttackData, pObj, true)
 {
-	const Vector3 l_vApeearPos(0, 100, 0);
-	Vector3 l_vTargetVec(pPlayer->GetTargetPlayer()->GetPos() - l_vApeearPos);
+	const Vector3 l_vAppearPos(0, 100, 0);
+	Vector3 l_vTargetVec(pPlayer->GetTargetPlayer()->GetPos() - l_vAppearPos);
 	l_vTargetVec.Normalize();
 
 	ParamDesc l_tagParamDesc;
-	l_tagParamDesc.vPos = l_vApeearPos;					// 出現位置
+	l_tagParamDesc.vPos = l_vAppearPos;					// 出現位置
 	l_tagParamDesc.vVec = l_vTargetVec;					// 移動方向
 	l_tagParamDesc.vVelocity = l_vTargetVec * c_SPEED;	// 移動速度
 	l_tagParamDesc.bPenetration = true;					// 当たっても消えない
@@ -236,19 +265,33 @@ void Shot::AramitamaMushi::Squat::Render()
 //	空中スキル時のD虫ミタマ
 /****************************************************/
 const int	Shot::AramitamaMushi::Aerial::c_SOJOURN_TIME = 270;
-const float Shot::AramitamaMushi::Aerial::c_SPEED = 0.5f;
+const float Shot::AramitamaMushi::Aerial::c_SPEED = 0.75f;
+const float Shot::AramitamaMushi::Aerial::c_RANGE = 60;
 
 Shot::AramitamaMushi::Aerial::Aerial(BasePlayer *pPlayer,
 	AttackData *pAttackData,
 	iex3DObj *pObj) :
-	Base(pPlayer, pAttackData, pObj)
+	Base(pPlayer, pAttackData, pObj, false)
 {
-	const Vector3 l_vApeearPos(pPlayer->GetTargetPlayer()->GetPos().x, 0, 0);
+	pObj->SetAngle(DIR_ANGLE[(pPlayer->GetTargetDir() == DIR::LEFT) ? (int)DIR::RIGHT : (int)DIR::LEFT]);
+
+	const float l_fPlayerX(pPlayer->GetPos().x);
+	const float l_fTargetX(pPlayer->GetTargetPlayer()->GetPos().x + (pPlayer->GetTargetPlayer()->GetMove().x * 3));
+	Vector3 l_vAppearPos(l_fTargetX, 0, 0);
+
+	// 範囲外
+	{
+		const float l_vx(l_fTargetX - l_fPlayerX);
+		if (fabsf(l_vx) > c_RANGE)
+		{
+			l_vAppearPos.x = l_fPlayerX + ((l_vx < 0) ? -1 : 1) * c_RANGE;
+		}
+	}
 	Vector3 l_vTargetVec(0, 1, 0);
 	l_vTargetVec.Normalize();
 
 	ParamDesc l_tagParamDesc;
-	l_tagParamDesc.vPos = l_vApeearPos;					// 出現位置
+	l_tagParamDesc.vPos = l_vAppearPos;					// 出現位置
 	l_tagParamDesc.vVec = l_vTargetVec;					// 移動方向
 	l_tagParamDesc.vVelocity = l_vTargetVec * c_SPEED;	// 移動速度
 	l_tagParamDesc.iSojournTime = c_SOJOURN_TIME;		// 滞在時間
