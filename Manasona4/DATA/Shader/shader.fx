@@ -112,6 +112,8 @@ sampler MultiSamp = sampler_state
 
 	AddressU = Wrap;
 	AddressV = Wrap;
+
+	BorderColor = 0x00000000;
 };
 
 texture ToonShadowMap;	//	トゥーンの影用テクスチャ
@@ -1536,7 +1538,7 @@ technique add_hdrBloom
 float exposure = 0.0f;
 
 // 高輝度
-float3 g_bloomColor = { 0.9f, 0.9f, 0.9f };
+float3 g_bloomColor = { 0.825f, 0.85f, 0.85f };
 
 /***********************************/
 //	高輝度抽出用の構造体
@@ -1684,6 +1686,7 @@ PS_TONEMAP PS_Stage(VS_OUTPUT_FINAL In) : COLOR
 
 	return OUT;
 }
+
 //------------------------------------------------------
 //		ステージ用描画テクニック
 //------------------------------------------------------
@@ -1706,6 +1709,66 @@ technique Stage
 
 		VertexShader = compile vs_3_0 VS_DefaultLighting();
 		PixelShader = compile ps_3_0 PS_Stage();
+	}
+}
+
+
+//------------------------------------------------------
+//		(七里ステージ用)ピクセルシェーダー	
+//------------------------------------------------------
+PS_TONEMAP PS_StageNanasato(VS_OUTPUT_FINAL In) : COLOR
+{
+	PS_TONEMAP	OUT = (PS_TONEMAP)0;
+
+//スクリーン空間をテクスチャ座標に  NDC->UV y反転
+const float2 ScreenTex = In.wvpPos.xy / In.wvpPos.w * float2(0.5, -0.5) + float2(0.5, 0.5);
+
+//	ピクセル色決定
+OUT.color = In.Color * tex2D(DecaleSamp, In.Tex);
+
+float4 lightCol = tex2D(LightSamp, ScreenTex);
+lightCol += tex2D(PLSSamp, ScreenTex);
+OUT.color.rgb *= lightCol;
+OUT.color.rgb += tex2D(SpecSamp, ScreenTex);
+
+// ピクセル色をグロウ用にサンプリング
+const float4 l_fGlowCol = tex2D(MultiSamp, In.Tex);
+OUT.color.rgb += l_fGlowCol.rgb;
+
+
+// 必殺暗転の値
+OUT.color.rgb *= g_OverDriveDim;
+
+//トーンマッピング
+OUT.color.rgb *= exp2(exposure);
+
+OUT.high.rgb = max(float3(0.0f, 0.0f, 0.0f), (OUT.color.rgb - g_bloomColor));
+OUT.high.a = 1.0f;
+
+
+return OUT;
+}
+
+//------------------------------------------------------
+//		(七里ステージ用)ステージ用描画テクニック
+//------------------------------------------------------
+technique StageNanasato
+{
+	pass P0
+	{
+		ZEnable = true;				// 奥行考慮
+		ZWriteEnable = true;		// 奥行を書き込むか
+
+		AlphaBlendEnable = true;	// アルファブレンド考慮
+		BlendOp = Add;				// ブレンド仕様
+		SrcBlend = One;				//1,1,1,1
+		DestBlend = Zero;			//0,0,0,0
+		CullMode = CCW;				// カリングの仕様
+		AlphaRef = 0x00000080;
+		AlphaFunc = GREATEREQUAL;	// αがAlphaRef以上ならOK
+
+		VertexShader = compile vs_3_0 VS_DefaultLighting();
+		PixelShader = compile ps_3_0 PS_StageNanasato();
 	}
 }
 
@@ -1787,7 +1850,7 @@ technique OutLine
 	pass P0
 	{
 		ZEnable = true;				// 奥行考慮
-		ZWriteEnable = false;		// 奥行を書き込むか
+		ZWriteEnable = true;		// 奥行を書き込むか
 
 		AlphaBlendEnable = true;	// アルファブレンド考慮
 		BlendOp = Add;				// ブレンド仕様
@@ -2147,7 +2210,7 @@ OUT.color.rgb *= g_OverDriveDim;
 //トーンマッピング
 OUT.color.rgb *= exp2(exposure);
 //OUT.color.rgb -= float3(0.05f, 0.1f, 0.3f);
-OUT.high.rgb = float3(0.05f, 0.05f, 0.1f)*g_OverDriveDim;// 必殺暗転の値
+OUT.high.rgb = float3(0.035f, 0.045f, 0.075f)*g_OverDriveDim;// 必殺暗転の値
 OUT.high.a = 1.0f;
 
 return OUT;

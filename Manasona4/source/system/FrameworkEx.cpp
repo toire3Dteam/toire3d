@@ -159,6 +159,9 @@ void FrameworkEx::Render()
 	tdnStopWatch::DrawResult(300, 0);
 #endif
 
+	//	フレーム表示
+	//tdnText::Draw(tdnSystem::GetScreenSize().right - 128, tdnSystem::GetScreenSize().bottom - 36, 0xff00ffff, "RFPS %d/%d", m_iFPS, m_iRenderFPS);
+
 	//【描画終了】
 	tdnSystem::EndScene();
 

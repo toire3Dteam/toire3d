@@ -478,7 +478,7 @@ void sceneMain::Update()
 
 void sceneMain::Render()
 {
-	tdnStopWatch::Start();
+	//tdnStopWatch::Start();
 	// カメラ
 	CameraMgr->Activate();
 
@@ -567,6 +567,13 @@ void sceneMain::Render()
 				m_stageScreen->Render(0, 0, shader2D, "MaskEdge");// ※Z値考慮させてない理由は↓の絵を描画するため
 			}
 
+			// 後乗せ(SCREENの情報を使用するオブジェなど)
+			if (m_bOverDriveStageFlag == false)
+			{
+				m_pStage->RenderForward();
+			}
+
+
 			// キャラクターより下に描画するUI
 			if (m_bHideUI == false)
 			{
@@ -584,6 +591,7 @@ void sceneMain::Render()
 
 
 
+
 			// パーティクル (最適化) 50~90->30
 			ParticleManager::Render();
 
@@ -596,7 +604,8 @@ void sceneMain::Render()
 			DeferredManagerEx.FinalEnd();
 		}
 
-
+		// 最終結果のスクリーンを環境マップとしてシェーダ側に送る 
+		DeferredManagerEx.SendFinalScreenEnv();
 
 		// ブルーム (最適化) 80~90-> 40 半分コストダウン
 		DeferredManagerEx.BloomRender();
@@ -613,7 +622,7 @@ void sceneMain::Render()
 		GameUIMgr->RenderBack();
 
 		// ステージ描画
-		m_pStage->Render(shader, "copy");
+		m_pStage->RenderCopy();
 		// プレイヤー
 		PlayerMgr->Render(shader, "copy");
 
@@ -685,7 +694,7 @@ void sceneMain::Render()
 	//{
 	//	v.push_back(i);
 	//}
-	tdnStopWatch::End();
+	//tdnStopWatch::End();
 }
 
 void sceneMain::RenderStage()
@@ -701,11 +710,13 @@ void sceneMain::RenderStage()
 	shaderM->SetValue("g_OverDriveDim", PlayerMgr->GetOverDriveDim());
 
 	// ステージ描画
-	m_pStage->Render(shaderM, "Stage");
-
+	//m_pStage->Render(shaderM, "Stage");
+	m_pStage->Render();
 
 	tdnSystem::GetDevice()->SetRenderTarget(0, save);//レンダーターゲットの復元
 	tdnSystem::GetDevice()->SetRenderTarget(1, nullptr);
+
+
 }
 
 // [1206] (最適化) 200  (TODO)一回焼きこんで消すか？
@@ -740,7 +751,7 @@ void sceneMain::RenderShadow()
 void sceneMain::SurfaceRender()
 {
 	enum {
-		X = 320 , Y = 180 
+		X = 320/2 , Y = 180/2 
 	};
 
 	int texX = 0;

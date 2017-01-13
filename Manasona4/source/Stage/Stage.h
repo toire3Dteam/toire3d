@@ -30,10 +30,12 @@ namespace Stage
 
 		virtual void Initialize(Camera *pCamera){}
 		virtual void Update();
-		virtual void Render(); 
+		virtual void RenderCopy(); 
+		virtual void Render() = 0;// 純粋仮想関数に
 		virtual void Render(tdnShader* shader,char* name);
 		virtual void RenderDeferred();
 		virtual void RenderShadow();
+		virtual void RenderForward() {};
 
 		void ActionWall();
 		void StopWall();
@@ -65,6 +67,7 @@ namespace Stage
 
 	protected:
 		iexMesh *m_pObj;				// メッシュの実体
+		Vector3 m_vStagePos;			// ステージの初期位置 
 		iexMesh *m_pBack;				// スカイドームとか、背景で使う
 		BaseUVEffect *m_pAreWall;		// エリアウォール
 		float m_fWidth;					// ステージの幅
@@ -82,7 +85,7 @@ namespace Stage
 		Sand() :Base(){}
 		void Initialize(Camera *pCamera);
 		//void Update() override;
-		//void Render() override;
+		void Render() override;
 		//void Render_ShadowBuf() override;
 
 		EFFECT_CAMERA_ID GetIntroCameraScriptID(){ return EFFECT_CAMERA_ID::SAND_STAGE_INTRO; }
@@ -95,6 +98,8 @@ namespace Stage
 	public:
 		Sea() :Base() {}
 		void Initialize(Camera *pCamera);
+		void Render() override;
+
 		EFFECT_CAMERA_ID GetIntroCameraScriptID() { return EFFECT_CAMERA_ID::SEA_STAGE_INTRO; }
 	};
 
@@ -104,6 +109,8 @@ namespace Stage
 	public:
 		Garden() :Base() {}
 		void Initialize(Camera *pCamera);
+		void Render() override;
+
 		EFFECT_CAMERA_ID GetIntroCameraScriptID() { return EFFECT_CAMERA_ID::GARDEN_STAGE_INTRO; }
 	};
 
@@ -112,11 +119,24 @@ namespace Stage
 	{
 	public:
 		NanasatoSity() :Base() {}
+		~NanasatoSity();
 		void Initialize(Camera *pCamera);
 		void Update();
+		void Render() override;
 		void Render(tdnShader* shader, char* name);
+		
+		void RenderForward() override;
 
 		EFFECT_CAMERA_ID GetIntroCameraScriptID() { return EFFECT_CAMERA_ID::NANASATO_STAGE_INTRO; }
+	
+	private:
+		float m_fUvWater;
+		float m_fWaterHeight;
+		iexMesh* m_pWater;
+		//Surface*	m_pStencilSurface;	// 奥行
+		//tdn2DObj*	m_pWaterEnvScreen;	// ゲーム画面
+
+
 	};
 
 	// 終点ステージ
@@ -142,7 +162,7 @@ namespace Stage
 		~A(){}
 		void Initialize(Camera *pCamera);
 		//void Update() override;
-		//void Render() override;
+		void Render() override;
 		//void Render_ShadowBuf() override;
 
 		EFFECT_CAMERA_ID GetIntroCameraScriptID(){ return EFFECT_CAMERA_ID::SYUTEN_STAGE_INTRO; }
