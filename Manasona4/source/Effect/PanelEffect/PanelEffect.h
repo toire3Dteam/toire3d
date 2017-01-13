@@ -641,3 +641,23 @@ public:
 
 private:
 };
+
+class StarEffect :public BasePanelEffect
+{
+public:
+	StarEffect()
+	{
+		m_picSize = 256;
+		m_pic = new AnimationPanel("Data/Effect/StarEffect.png", 256, 256, 14, 1, 4, false);
+		//m_pic->GetPic()->SetScale(3.0f);
+		state = RS::ADD;
+		m_pic3DScale = 70;//3DÇÃÉXÉPÅ[Éã
+	};
+	~StarEffect() {};
+
+	void Update() { BasePanelEffect::Update(); };
+	void Render() { BasePanelEffect::Render(); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
+
+private:
+};

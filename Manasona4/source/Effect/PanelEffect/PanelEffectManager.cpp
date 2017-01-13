@@ -360,6 +360,9 @@ PanelEffectManager::PanelEffectManager()
 		case PANEL_EFFECT_TYPE::RED_RIGHT:
 			m_basePanelEffect[i] = new RedLightEffect();
 			break;
+		case PANEL_EFFECT_TYPE::STAR:
+			m_basePanelEffect[i] = new StarEffect();
+			break;
 		default:
 			assert(0);		// "そんなエフェクトはない"
 			break;

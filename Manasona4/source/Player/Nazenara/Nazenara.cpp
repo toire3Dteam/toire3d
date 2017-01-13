@@ -465,7 +465,7 @@ void Nazenara::InitActionDatas()
 	// 判定形状
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->pCollisionShape->width = 10;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->pCollisionShape->height = 10;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->pCollisionShape->pos.Set(38, 20, 0);
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->pCollisionShape->pos.Set(41, 20, 0);
 
 	//==============================================================================================================
 	//	キャラクター固有下攻撃
@@ -535,9 +535,9 @@ void Nazenara::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 
 	// 判定形状								   
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->pCollisionShape->width = 8;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->pCollisionShape->height = 8;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->pCollisionShape->pos.Set(36, -10, 0);
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->pCollisionShape->width = 9;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->pCollisionShape->height = 9;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->pCollisionShape->pos.Set(39, -10, 0);
 
 
 	//==============================================================================================================
@@ -953,6 +953,17 @@ bool Nazenara::SkillAction::Land::Execute()
 		return true;
 	}
 
+	// エフェクト発生時間
+	if (m_pNazenara->m_iCurrentActionFrame == 23)
+	{
+		// 目印用星エフェクト
+		Vector3 l_vStarPos = m_pNazenara->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->pCollisionShape->pos;
+		// 右方向を向いていたらX差表反転
+		if (m_pNazenara->GetDir() == DIR::LEFT) l_vStarPos.x *= -1;
+		m_pNazenara->m_pPanelEffectMGR->AddEffect(m_pNazenara->GetPos() + l_vStarPos, PANEL_EFFECT_TYPE::STAR);
+
+	}
+
 	// 1回でも当たったらフラグ
 	if (m_pNazenara->isHitAttack())
 	{
@@ -1059,6 +1070,17 @@ bool Nazenara::SkillAction::Aerial::Execute()
 	if (!m_pNazenara->isAttackState())
 	{
 		return true;
+	}
+
+	// エフェクト発生時間
+	if (m_pNazenara->m_iCurrentActionFrame == 23)
+	{
+		// 目印用星エフェクト
+		Vector3 l_vStarPos = m_pNazenara->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->pCollisionShape->pos;
+		// 右方向を向いていたらX差表反転
+		if (m_pNazenara->GetDir() == DIR::LEFT) l_vStarPos.x *= -1;
+		m_pNazenara->m_pPanelEffectMGR->AddEffect(m_pNazenara->GetPos() + l_vStarPos, PANEL_EFFECT_TYPE::STAR);
+
 	}
 
 	return false;
