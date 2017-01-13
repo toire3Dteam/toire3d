@@ -650,6 +650,7 @@ BOOL	iex3DObj::LoadObject(char* filename)
 	version = LoadiEM(&iem, filename);
 	if (version <= 0)
 	{
+		MyAssert(0, "エラー: IEMのファイルオープンに失敗\n%s", filename);
 		return FALSE;
 	}
 

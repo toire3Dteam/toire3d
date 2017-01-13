@@ -7,6 +7,35 @@ class BaseUVEffect;
 
 namespace Shot
 {
+	//------------------------------------------------------
+	//	滞在時間なし(時間による消滅がない)
+	//------------------------------------------------------
+	static const int c_NO_SOJOURN_TIME = -1;
+
+	//------------------------------------------------------
+	//	ショットの情報を持つ構造体
+	//------------------------------------------------------
+	struct ParamDesc
+	{
+		//------------------------------------------------------
+		//	位置・向き・移動量など
+		//------------------------------------------------------
+		Vector3 vPos;			// 位置
+		Vector3 vVec;			// 単位化された向きベクトル
+		Vector3 vVelocity;		// 移動量
+		Vector3 vAccel;			// 加速度(Moveに足していく)
+		int		iSojournTime;	// 飛び道具の滞在時間
+
+		//------------------------------------------------------
+		//	フラグ
+		//------------------------------------------------------
+		bool bCollisionOK;	// これがtrueなら判定が有効(貫通弾とか作ったときに多段ヒットしないようにする)
+		bool bPenetration;	// 貫通するかどうか(trueなら壁にぶつかるまで存在する)
+		bool bErase;		// 消去フラグ
+
+		ParamDesc() :vPos(0,0,0), vVec(0,1,0), vVelocity(0,0,0), vAccel(0,0,0), iSojournTime(c_NO_SOJOURN_TIME), bCollisionOK(true), bErase(false), bPenetration(false){}
+		//ParamDesc(const Vector3 &vPos, const Vector3 &vVec, const Vector3 &vVelocity, const Vector3 &vAccel = Vector3(0, 0, 0), int iSojournTime = c_NO_SOJOURN_TIME, bool bPenetration = false, bool bCollisionOK = true) :vPos(vPos), vVec(vVec), vVelocity(vVelocity), vAccel(vAccel), iSojournTime(iSojournTime), bCollisionOK(bCollisionOK), bPenetration(bPenetration), bErase(false){}
+	};
 
 	//------------------------------------------------------
 	//	飛び道具基底クラス
@@ -16,9 +45,11 @@ namespace Shot
 	public:
 
 		//------------------------------------------------------
-		//	コンストラクタ
+		//	コンストラクタ・初期化(ショットの情報を引数に、コンストラクタだけにすると、ショットの情報を設定できない)
 		//------------------------------------------------------
-		Base(BasePlayer *pPlayer, AttackData *pAttackData, BaseUVEffect *pObj, const Vector3 &pos, const Vector3 &vVec, const Vector3 &vVelocity, const Vector3 &vAccel = Vector3(0, 0, 0));
+		Base(BasePlayer *pPlayer, AttackData *pAttackData, iex3DObj *pObj);
+		Base(BasePlayer *pPlayer, AttackData *pAttackData, BaseUVEffect *pObj);
+		void Initialize(const ParamDesc &tagParamDesc){ memcpy_s(&m_tagParamDesc, sizeof(ParamDesc), &tagParamDesc, sizeof(ParamDesc)); }
 
 		//------------------------------------------------------
 		//	デストラクタ
@@ -39,26 +70,30 @@ namespace Shot
 		//------------------------------------------------------
 		//	ゲッター
 		//------------------------------------------------------
-		Vector3 &GetPos(){ return m_vPos; }
-		Vector3 &GetVec(){ return m_vVec; }
-		Vector3 &GetMove(){ return m_vVelocity; }
+		Vector3 &GetPos(){ return m_tagParamDesc.vPos; }
+		Vector3 &GetVec(){ return m_tagParamDesc.vVec; }
+		Vector3 &GetMove(){ return m_tagParamDesc.vVelocity; }
 		BasePlayer *GetPlayer(){ return m_pPlayer; }
-		BaseUVEffect *GetObj() { return m_pObj; }
+		BaseUVEffect *GetUVEffect() { return m_pUVEffect; }
+		iex3DObj *Get3DObj(){ return m_p3DObj; }
 		AttackData *GetAttackData(){ return m_ptagAttackData; }
-		bool EraseOK(){ return m_bErase; }
+		bool EraseOK(){ return m_tagParamDesc.bErase; }
+		bool isPenetration(){ return m_tagParamDesc.bPenetration; }
+		bool isCollisionOK(){ return m_tagParamDesc.bCollisionOK; }
 
 		//------------------------------------------------------
 		//	セッター
 		//------------------------------------------------------
-		void Erase(){ m_bErase = true; }
+		void Erase(){ m_tagParamDesc.bErase = true; }
+		void SetCollisionFlag(bool bCollisionOK){ m_tagParamDesc.bCollisionOK = bCollisionOK; }
 
 	protected:
 
 		//------------------------------------------------------
 		//	メッシュ
 		//------------------------------------------------------
-		BaseUVEffect *m_pObj;	// メッシュの実体(参照するだけ)
-
+		BaseUVEffect *m_pUVEffect;	// メッシュの実体(参照するだけ)
+		iex3DObj *m_p3DObj;
 
 		//------------------------------------------------------
 		//	プレイヤーの実体(あまり使うことはないが一応、)
@@ -68,20 +103,12 @@ namespace Shot
 		//------------------------------------------------------
 		//	位置・向き・移動量などの情報
 		//------------------------------------------------------
-		Vector3 m_vPos;		// 位置
-		Vector3 m_vVec;		// 単位化された向きベクトル
-		Vector3 m_vVelocity;// 移動量
-		Vector3 m_vAccel;	// 加速度(Moveに足していく)
+		ParamDesc m_tagParamDesc;
 
 		//------------------------------------------------------
 		//	判定・攻撃力とかの情報
 		//------------------------------------------------------
 		AttackData *m_ptagAttackData;
-
-		//------------------------------------------------------
-		//	フラグ
-		//------------------------------------------------------
-		bool m_bErase;		// 消去フラグ
 	};
 
 
@@ -94,4 +121,59 @@ namespace Shot
 		void Render();
 	};
 
+	namespace AramitamaMushi
+	{
+		//------------------------------------------------------
+		//	地上固有スキル: トスを上げる
+		//------------------------------------------------------
+		class Land :public Base
+		{
+		public:
+			Land(BasePlayer *pPlayer, AttackData *pAttackData, iex3DObj *pObj);
+			~Land();
+			void Update();
+			void Render();
+
+		private:
+			//------------------------------------------------------
+			//	滞在している時間・攻撃発生時間
+			//------------------------------------------------------
+			static const int c_SOJOURN_TIME;
+			static const int c_ATTACK_FRAME;
+		};
+
+		//------------------------------------------------------
+		//	しゃがみ固有スキル: 隕石のように突撃する
+		//------------------------------------------------------
+		class Squat :public Base
+		{
+		public:
+			Squat(BasePlayer *pPlayer, AttackData *pAttackData, iex3DObj *pObj);
+			~Squat();
+			void Update();
+			void Render();
+		private:
+			//------------------------------------------------------
+			//	移動速度
+			//------------------------------------------------------
+			static const float c_SPEED;
+		};
+
+		//------------------------------------------------------
+		//	空中固有スキル: 回転しながら昇っていく
+		//------------------------------------------------------
+		class Aerial :public Base
+		{
+		public:
+			Aerial(BasePlayer *pPlayer, AttackData *pAttackData, iex3DObj *pObj);
+			~Aerial();
+			void Update();
+			void Render();
+			//------------------------------------------------------
+			//	滞在時間・移動速度
+			//------------------------------------------------------
+			static const int c_SOJOURN_TIME;
+			static const float c_SPEED;
+		};
+	};
 }

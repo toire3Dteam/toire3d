@@ -116,27 +116,26 @@ void Collision::PlayerCollision(PlayerManager *pPlayerMgr, ShotManager *pShotMgr
 
 	/* 玉VS判定 */
 	{
-		SIDE Player1Side(pPlayer1->GetSide());
-		for (auto it : *pShotMgr->GetList(Player1Side))
+		auto CollisionFunction = [](SIDE ePlayerSide, BasePlayer *pYou, ShotManager *pShotMgr)
 		{
-			// 玉VSステージ
-			if(RaypicShot(m_pStage, it)) it->Erase();
+			for (auto it : *pShotMgr->GetList(ePlayerSide))
+			{
+				// 玉VSステージ
+				if (RaypicShot(m_pStage, it)) it->Erase();
 
-			// 玉VSプレイヤー
-			else if (CollisionShot(it,pPlayer2)) it->Erase();
-		}
-	}
+				// 玉VSプレイヤー
+				else if (CollisionShot(it, pYou))
+				{
+					// 貫通段なら、相手にあたっても消えない(代わりに2重ヒット防止用のフラグを立てる)
+					if (it->isPenetration()) it->SetCollisionFlag(false);
 
-	{
-		SIDE Player2Side(pPlayer2->GetSide());
-		for (auto it : *pShotMgr->GetList(Player2Side))
-		{
-			// 玉VSステージ
-			if (RaypicShot(m_pStage, it)) it->Erase();
-
-			// 玉VSプレイヤー
-			else if (CollisionShot(it, pPlayer1)) it->Erase();
-		}
+					// 貫通段ではないので、消えてどうぞ
+					else it->Erase();
+				}
+			}
+		};
+		CollisionFunction(pPlayer1->GetSide(), pPlayer2, pShotMgr);
+		CollisionFunction(pPlayer2->GetSide(), pPlayer1, pShotMgr);
 	}
 
 
@@ -410,11 +409,15 @@ bool Collision::CollisionShot(Shot::Base *shot, BasePlayer *you)
 	// 相手がエスケープ中だよ！
 	if (you->isEscape()) return false;
 
-	if (you->GetInvincibleLV() != 0) return false;									// 相手が無敵じゃない
+	// 相手が無敵ではない
+	if (you->GetInvincibleLV() != 0) return false;	
+
+	// 弾が判定中ではない
+	if (!shot->isCollisionOK()) return false;
 
 	AttackData *pShotAttackData(shot->GetAttackData());
 
-	if (isInputGuardCommand(you))
+	if (isInputGuardCommand(you) && you->isLand())
 	{
 		if (Math::Length(you->GetPos(), shot->GetPos()) < BasePlayer::c_GUARD_DISTANCE)// ガード発動距離
 		{
@@ -432,7 +435,6 @@ bool Collision::CollisionShot(Shot::Base *shot, BasePlayer *you)
 	if (Collision::HitCheck(&AttackShape, &YouShape))
 	{
 		// ヒット時の処理
-		//pAttackData->bHit = true;	// 2重ヒット防止用のフラグをONにする
 
 		/* メッセージ送信 */
 

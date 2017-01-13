@@ -96,6 +96,17 @@ public:
 		private:
 			bool m_bMoved;
 		};
+
+		class AerialDrop :public Base
+		{
+		public:
+			AerialDrop(Aramitama *pAramitama);
+			void Enter();
+			bool Execute();
+			void Exit();
+		private:
+			bool m_bMoved;
+		};
 	};
 
 	SkillAction::Base *m_pSkillActions[(int)SKILL_ACTION_TYPE::MAX];
@@ -185,6 +196,42 @@ private:
 	AramitamaNozzleFlashEffect* m_pANozzleFlash;	// 必殺マズルフラッシュ
 
 	// 烙印
+	bool m_bWassyoi;
 	int m_iWassyoiGauge;
+
+	enum class MUSHI_TYPE
+	{
+		LAND, SQUAT, AERIAL, MAX
+	};
+	class MushiData
+	{
+	public:
+		AttackData *tagpAttackData;
+
+		MushiData(LPSTR filepath, int iCoolTime) :iCoolTime(0), c_COOL_TIME(iCoolTime), pBullet(nullptr), tagpAttackData(nullptr)
+		{
+			pBullet = new iex3DObj(filepath);
+			tagpAttackData = new AttackData;
+		}
+		~MushiData()
+		{
+			SAFE_DELETE(pBullet);
+			SAFE_DELETE(tagpAttackData);
+		}
+		void Update()
+		{
+			// クールタイム更新
+			if (iCoolTime > 0) iCoolTime--;
+		}
+
+		void Action(Aramitama *pAramitama, MUSHI_TYPE type);
+	private:
+		int iCoolTime;
+		const int c_COOL_TIME;
+		iex3DObj *pBullet;
+	};
+	MushiData *m_pMushi[(int)MUSHI_TYPE::MAX];
+
+	void InitMushiDatas();
 };
 

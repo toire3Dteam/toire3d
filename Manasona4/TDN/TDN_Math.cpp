@@ -74,10 +74,10 @@ void	Math::SetTransformMatrixZXY(Matrix *Mat, float posX, float posY, float posZ
 	Mat->_44 = 1.0f;
 }
 
-void Math::SetTransMatrixFrontVec(Matrix *Mat, Vector3 &vPos, Vector3 &vFrontVec)
+void Math::SetTransMatrixFrontVec(Matrix *Mat, Vector3 &vPos, Vector3 &vFrontVec, Vector3 &vUpVec)
 {
 	Matrix m;
-	LookAtLH(m, vPos, vPos + vFrontVec, Vector3(0, 1, 0));
+	LookAtLH(m, vPos, vPos + vFrontVec, vUpVec);
 	Mat->_11 = m._11;
 	Mat->_12 = m._21;
 	Mat->_13 = m._31;

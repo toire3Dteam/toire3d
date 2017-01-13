@@ -529,7 +529,7 @@ namespace Math
 	*@param[in]	vPos		位置
 	*@param[in]	vVec		向く向き
 	*/
-	void SetTransMatrixFrontVec(Matrix *Mat, Vector3 &vPos, Vector3 &vFrontVec);
+	void SetTransMatrixFrontVec(Matrix *Mat, Vector3 &vPos, Vector3 &vFrontVec, Vector3 &vUpVec = Vector3(0, 1, 0));
 
 	/**
 	*@brief						左手座標系ビュー変換行列の生成
