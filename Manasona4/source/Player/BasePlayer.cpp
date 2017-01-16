@@ -756,8 +756,14 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 
 		// メッシュの更新
 		//if (bOutLog) tdnStopWatch::Start();
-		if (!m_pStateMachine->isInState(*BasePlayerState::KnockBack::GetInstance()))m_pObj->Animation();
-		else if (m_iRecoveryFrame < 30)m_pObj->Animation();
+		if (m_pStateMachine->isInState(*BasePlayerState::KnockBack::GetInstance()))
+		{
+			if(m_iRecoveryFrame < 30)m_pObj->Animation();
+		}
+		else if (!m_pStateMachine->isInState(*BasePlayerState::ThrowHold::GetInstance()))
+		{
+			m_pObj->Animation();
+		}
 		//if (bOutLog)
 		//{
 		//	tdnStopWatch::End();
@@ -892,9 +898,9 @@ void BasePlayer::UpdateDrive()
 
 		// メッシュの更新
 		m_pObj->Animation();
-		m_pObj->SetAngle(m_fAngleY);	// (TODO)今は固定
-		m_pObj->SetPos(m_vPos);	// 原点固定
-		m_pObj->Update();
+		//m_pObj->SetAngle(m_fAngleY);	// (TODO)今は固定
+		//m_pObj->SetPos(m_vPos);	// 原点固定
+		//m_pObj->Update();
 	}
 
 	// エフェクトマネージャー更新 (ヒットストップ無視)
@@ -1416,7 +1422,7 @@ void BasePlayer::Render()
 	/* 攻撃判定の描画 */
 	if (isAttackState())
 	{
-		if (isActiveFrame())
+		if (isActiveFrame() || m_ActionFrameList[(int)m_eActionState][m_iCurrentActionFrame] == FRAME_STATE::RECOVERY_HIT)
 		{
 			memcpy_s(&square, sizeof(CollisionShape::Square), GetAttackData()->pCollisionShape, sizeof(CollisionShape::Square));
 			if (m_dir == DIR::LEFT) square.pos.x *= -1;	// このposは絶対+(右)なので、左向きなら逆にする

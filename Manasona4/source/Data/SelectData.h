@@ -169,7 +169,6 @@ struct SelectData
 	STAGE eStage;					// 選んでるステージ
 	bool bTutorial;					// チュートリアルフラグ
 	bool bTraining;					// トレーニングフラグ
-	int iWinRound;					// 勝利ラウンド数
 	int iRoundTime;					// 一試合時間
 	int iBattleMusicID;				// 戦闘曲の番号
 	SIDE eOrderTrainingSide;		// トレーニングを選んだ側

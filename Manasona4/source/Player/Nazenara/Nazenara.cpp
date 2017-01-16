@@ -1287,6 +1287,20 @@ void Nazenara::HeavehoDriveOverFlowSuccessInit()
 
 	// オーバーフロー用の委譲クラスを生成
 	m_pOverFlow = new OverFlow(this);
+
+	// 自分自身の姿勢(毎フレーム呼び出すとなぜかバグる)
+	m_pHHDOFObj->TransMatrix._11 = 1;
+	m_pHHDOFObj->TransMatrix._12 = 0;
+	m_pHHDOFObj->TransMatrix._13 = 0;
+	m_pHHDOFObj->TransMatrix._21 = 0;
+	m_pHHDOFObj->TransMatrix._22 = 1;
+	m_pHHDOFObj->TransMatrix._23 = 0;
+	m_pHHDOFObj->TransMatrix._31 = 0;
+	m_pHHDOFObj->TransMatrix._32 = 0;
+	m_pHHDOFObj->TransMatrix._33 = -1;
+	m_pHHDOFObj->TransMatrix._41 = 0;
+	m_pHHDOFObj->TransMatrix._42 = 0;
+	m_pHHDOFObj->TransMatrix._43 = 0;
 }
 void Nazenara::HeavehoDriveOverFlowSuccessUpdate()
 {
@@ -1306,26 +1320,20 @@ void Nazenara::HeavehoDriveOverFlowSuccessUpdate()
 
 		// マトリックスから位置の部分のみをベクトルとして設定する
 		m_pTargetPlayer->SetPos(Vector3(WorldMat._41, WorldMat._42, WorldMat._43));
-		m_pTargetPlayer->SetAngleY(0);
-		//m_pTarget->GetObj()->TransMatrix._11 = WorldMat._11;
-		//m_pTarget->GetObj()->TransMatrix._12 = WorldMat._12;
-		//m_pTarget->GetObj()->TransMatrix._13 = WorldMat._13;
-		//m_pTarget->GetObj()->TransMatrix._21 = WorldMat._31;
-		//m_pTarget->GetObj()->TransMatrix._22 = WorldMat._32;
-		//m_pTarget->GetObj()->TransMatrix._23 = WorldMat._33;
-		//m_pTarget->GetObj()->TransMatrix._31 = WorldMat._21;
-		//m_pTarget->GetObj()->TransMatrix._32 = WorldMat._22;
-		//m_pTarget->GetObj()->TransMatrix._33 = WorldMat._23;
-		//m_pTarget->GetObj()->TransMatrix._41 = WorldMat._41;
-		//m_pTarget->GetObj()->TransMatrix._42 = WorldMat._42;
-		//m_pTarget->GetObj()->TransMatrix._43 = WorldMat._43;
-
-		//m_pNazenaraPlayer->GetObj()->TransMatrix._31 = 0;
-		//m_pNazenaraPlayer->GetObj()->TransMatrix._32 = 0;
-		//m_pNazenaraPlayer->GetObj()->TransMatrix._33 = 1;
-		//m_pNazenaraPlayer->GetObj()->TransMatrix._41 = 0;
-		//m_pNazenaraPlayer->GetObj()->TransMatrix._42 = 0;
-		//m_pNazenaraPlayer->GetObj()->TransMatrix._43 = 0;
+		//m_pTargetPlayer->SetAngleY(0);
+		m_pTargetPlayer->GetObj()->Update();
+		//m_pTargetPlayer->GetObj()->TransMatrix._11 = WorldMat._11;
+		//m_pTargetPlayer->GetObj()->TransMatrix._12 = WorldMat._12;
+		//m_pTargetPlayer->GetObj()->TransMatrix._13 = WorldMat._13;
+		//m_pTargetPlayer->GetObj()->TransMatrix._21 = WorldMat._31;
+		//m_pTargetPlayer->GetObj()->TransMatrix._22 = WorldMat._32;
+		//m_pTargetPlayer->GetObj()->TransMatrix._23 = WorldMat._33;
+		//m_pTargetPlayer->GetObj()->TransMatrix._31 = WorldMat._21;
+		//m_pTargetPlayer->GetObj()->TransMatrix._32 = WorldMat._22;
+		//m_pTargetPlayer->GetObj()->TransMatrix._33 = WorldMat._23;
+		//m_pTargetPlayer->GetObj()->TransMatrix._41 = WorldMat._41;
+		//m_pTargetPlayer->GetObj()->TransMatrix._42 = WorldMat._42;
+		//m_pTargetPlayer->GetObj()->TransMatrix._43 = WorldMat._43;
 	}
 
 	// コンボ
