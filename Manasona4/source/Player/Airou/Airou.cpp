@@ -1173,6 +1173,20 @@ void Airou::HeavehoDriveOverFlowSuccessInit()
 
 	// スピードラインON
 	m_pSpeedLine->ActionRoop(Vector3(0, 0, 0), 1, 1, Vector3(0, 0, 0), Vector3(0, 0, 0));
+
+	// 自分自身の座標
+	m_pHHDOFObj->TransMatrix._11 = 1;
+	m_pHHDOFObj->TransMatrix._12 = 0;
+	m_pHHDOFObj->TransMatrix._13 = 0;
+	m_pHHDOFObj->TransMatrix._21 = 0;
+	m_pHHDOFObj->TransMatrix._22 = 1;
+	m_pHHDOFObj->TransMatrix._23 = 0;
+	m_pHHDOFObj->TransMatrix._31 = 0;
+	m_pHHDOFObj->TransMatrix._32 = 0;
+	m_pHHDOFObj->TransMatrix._33 = -1;
+	m_pHHDOFObj->TransMatrix._41 = 0;
+	m_pHHDOFObj->TransMatrix._42 = 0;
+	m_pHHDOFObj->TransMatrix._43 = 0;
 }
 void Airou::HeavehoDriveOverFlowSuccessUpdate()
 {
@@ -1192,27 +1206,23 @@ void Airou::HeavehoDriveOverFlowSuccessUpdate()
 		D3DXMATRIX WorldMat = *m_pObj->GetBone(19) * m_pObj->TransMatrix;
 
 		// マトリックスから位置の部分のみをベクトルとして設定する
-		m_pTargetPlayer->SetPos(Vector3(WorldMat._41, WorldMat._42, WorldMat._43));
-		m_pTargetPlayer->SetAngleY(0);
-		//m_pTarget->GetObj()->TransMatrix._11 = WorldMat._11;
-		//m_pTarget->GetObj()->TransMatrix._12 = WorldMat._12;
-		//m_pTarget->GetObj()->TransMatrix._13 = WorldMat._13;
-		//m_pTarget->GetObj()->TransMatrix._21 = WorldMat._31;
-		//m_pTarget->GetObj()->TransMatrix._22 = WorldMat._32;
-		//m_pTarget->GetObj()->TransMatrix._23 = WorldMat._33;
-		//m_pTarget->GetObj()->TransMatrix._31 = WorldMat._21;
-		//m_pTarget->GetObj()->TransMatrix._32 = WorldMat._22;
-		//m_pTarget->GetObj()->TransMatrix._33 = WorldMat._23;
-		//m_pTarget->GetObj()->TransMatrix._41 = WorldMat._41;
-		//m_pTarget->GetObj()->TransMatrix._42 = WorldMat._42;
-		//m_pTarget->GetObj()->TransMatrix._43 = WorldMat._43;
-
-		//m_pAirouPlayer->GetObj()->TransMatrix._31 = 0;
-		//m_pAirouPlayer->GetObj()->TransMatrix._32 = 0;
-		//m_pAirouPlayer->GetObj()->TransMatrix._33 = 1;
-		//m_pAirouPlayer->GetObj()->TransMatrix._41 = 0;
-		//m_pAirouPlayer->GetObj()->TransMatrix._42 = 0;
-		//m_pAirouPlayer->GetObj()->TransMatrix._43 = 0;
+		iex3DObj *p(m_pTargetPlayer->GetDefaultObj());
+		p->SetPos(Vector3(WorldMat._41, WorldMat._42, WorldMat._43));
+		p->SetAngle(0);
+		//p->TransMatrix._41 = WorldMat._41;
+		//p->TransMatrix._42 = WorldMat._42;
+		//p->TransMatrix._43 = WorldMat._43;
+		p->Update();
+		
+		//p->TransMatrix._11 = WorldMat._11;
+		//p->TransMatrix._12 = WorldMat._12;
+		//p->TransMatrix._13 = WorldMat._13;
+		//p->TransMatrix._21 = WorldMat._21;
+		//p->TransMatrix._22 = WorldMat._22;
+		//p->TransMatrix._23 = WorldMat._23;
+		//p->TransMatrix._31 = WorldMat._31;
+		//p->TransMatrix._32 = WorldMat._32;
+		//p->TransMatrix._33 = WorldMat._33;
 	}
 
 	// コンボ
@@ -1227,7 +1237,7 @@ void Airou::HeavehoDriveOverFlowSuccessUpdate()
 		se->Play("通常3段ヒット");
 
 		comboDesk.side = m_pTargetPlayer->GetSide();
-		comboDesk.damage = 4274;
+		comboDesk.damage = 427;
 		comboDesk.recoveryFrame = 10000;
 		MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, ENTITY_ID::UI_MGR, MESSAGE_TYPE::COMBO_COUNT, &comboDesk);
 
@@ -1243,11 +1253,12 @@ void Airou::HeavehoDriveOverFlowSuccessUpdate()
 		se->Play("通常3段ヒット");
 
 		comboDesk.side = m_pTargetPlayer->GetSide();
-		comboDesk.damage = 4274;
+		comboDesk.damage = 427;
 		comboDesk.recoveryFrame = 10000;
 		MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, ENTITY_ID::UI_MGR, MESSAGE_TYPE::COMBO_COUNT, &comboDesk);
 
 		m_pTargetPlayer->SetRecoveryFrame(10000);
+		m_pTargetPlayer->SetMotion(MOTION_TYPE::KNOCKBACK);
 		break;
 
 	case 195:	// 相手が地面にたたき落ちる
@@ -1257,7 +1268,7 @@ void Airou::HeavehoDriveOverFlowSuccessUpdate()
 		se->Play("撃ち落とし");
 
 		comboDesk.side = m_pTargetPlayer->GetSide();
-		comboDesk.damage = 4274;
+		comboDesk.damage = 427;
 		comboDesk.recoveryFrame = 10000;
 		MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, ENTITY_ID::UI_MGR, MESSAGE_TYPE::COMBO_COUNT, &comboDesk);
 
@@ -1275,11 +1286,12 @@ void Airou::HeavehoDriveOverFlowSuccessUpdate()
 
 		// コンボ
 		comboDesk.side = m_pTargetPlayer->GetSide();
-		comboDesk.damage = 4274;
+		comboDesk.damage = 427;
 		comboDesk.recoveryFrame = 10000;
 		MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, ENTITY_ID::UI_MGR, MESSAGE_TYPE::COMBO_COUNT, &comboDesk);
 
 		m_pTargetPlayer->SetRecoveryFrame(10000);
+		m_pTargetPlayer->SetMotion(MOTION_TYPE::KNOCKBACK);
 		break;
 
 	case 710:	// スピードラインの向きを変える
@@ -1293,7 +1305,7 @@ void Airou::HeavehoDriveOverFlowSuccessUpdate()
 
 		// コンボ
 		comboDesk.side = m_pTargetPlayer->GetSide();
-		comboDesk.damage = 114514;
+		comboDesk.damage = 427;
 		comboDesk.recoveryFrame = 10000;
 		MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, ENTITY_ID::UI_MGR, MESSAGE_TYPE::COMBO_COUNT, &comboDesk);
 

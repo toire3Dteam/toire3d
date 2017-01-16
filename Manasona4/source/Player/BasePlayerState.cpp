@@ -428,8 +428,11 @@ bool HeaveHoOverFlowCancel(BasePlayer * pPerson)
 {
 	if (pPerson->isOverDrive() == false)return false;
 
-	// 一撃必殺発動状態じゃなかったらはじく
+#ifdef _DEBUG
+#else
+	// 一撃必殺発動状態じゃなかったらはじく(デバッグなら問答無用でうてるように)
 	if (!pPerson->isHeaveHoDriveOverFlowOK()) return false;
+#endif
 
 	// 超必殺技キャンセル
 	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R3))

@@ -707,7 +707,14 @@ public:
 	//	ƒ‚[ƒVƒ‡ƒ“
 	//------------------------------------------------------
 	void SetMotion(MOTION_TYPE type){ if (m_pObj) m_pObj->SetMotion(m_iMotionNumbers[(int)type]); }
-	void SetMotion(int MotionNo) { if (m_pObj) { if (m_pObj->GetMotion() != MotionNo)m_pObj->SetMotion(MotionNo); } }
+	void SetMotion(int MotionNo)
+	{
+		if (m_pObj)
+		{
+			if (m_pObj->GetMotion() != MotionNo)
+				m_pObj->SetMotion(MotionNo);
+		}
+	}
 
 
 	//------------------------------------------------------

@@ -266,7 +266,7 @@ void Shot::AramitamaMushi::Squat::Render()
 /****************************************************/
 const int	Shot::AramitamaMushi::Aerial::c_SOJOURN_TIME = 90;
 const float Shot::AramitamaMushi::Aerial::c_SPEED = 0.75f;
-const float Shot::AramitamaMushi::Aerial::c_RANGE = 60;
+const float Shot::AramitamaMushi::Aerial::c_RANGE = 200;
 
 Shot::AramitamaMushi::Aerial::Aerial(BasePlayer *pPlayer,
 	AttackData *pAttackData,

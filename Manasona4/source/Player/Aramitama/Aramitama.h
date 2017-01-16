@@ -95,6 +95,7 @@ public:
 			void Exit();
 		private:
 			bool m_bMoved;
+			bool m_bHitCheck;
 		};
 
 		class AerialDrop :public Base
@@ -198,6 +199,27 @@ private:
 	// 烙印
 	bool m_bWassyoi;
 	int m_iWassyoiGauge;
+	static const int c_WASSYOIGAUGE_MAX;			// ゲージ最大値=烙印発動時間
+
+	void AddWassyoiGauge(int iAdd)
+	{
+		// 烙印中は増えない
+		if (m_bWassyoi) return;
+
+		// ゲージ満タンになったら
+		if ((m_iWassyoiGauge += iAdd) >= c_WASSYOIGAUGE_MAX)
+		{
+			// わっしょいモード発動
+			m_iWassyoiGauge = c_WASSYOIGAUGE_MAX;
+			m_bWassyoi = true;
+		}
+	}
+
+	void AddWassyoiGauge(bool bHitSuccess, int iAdd = c_WASSYOIGAUGE_MAX / 8)
+	{
+		// ゲージ増加量(12.5%)
+		AddWassyoiGauge(bHitSuccess ? iAdd * 2 : iAdd);
+	}
 
 	enum class MUSHI_TYPE
 	{
