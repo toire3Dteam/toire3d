@@ -6,7 +6,9 @@
 #include "Window\Player\AirouWindow.h"
 #include "../../Shot/BaseShot.h"
 
-Aramitama::Aramitama(SIDE side, const SideData &data) :BasePlayer(side, data), m_iWassyoiGauge(0), m_bWassyoi(false)
+const int Aramitama::c_WASSYOIGAUGE_MAX = 600;	// ゲージの最大値=烙印発動時間
+
+Aramitama::Aramitama(SIDE side, const SideData &data) :BasePlayer(side, data)
 {
 	// コマンドウィンドウ
 	// 右か左でWindowの場所を変える
@@ -46,6 +48,8 @@ Aramitama::Aramitama(SIDE side, const SideData &data) :BasePlayer(side, data), m
 	{
 		// コロマル
 		m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL][24] = FRAME_STATE::RECOVERY_HIT;
+		m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL][32] = FRAME_STATE::RECOVERY_HIT;
+		m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL][33] = FRAME_STATE::RECOVERY_HIT;
 		m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL][34] = FRAME_STATE::RECOVERY_HIT;
 
 		// 車輪
@@ -94,7 +98,7 @@ void Aramitama::Reset()
 	// 必ず書く
 	BasePlayer::Reset();
 
-	m_bWassyoi = true;
+	m_bWassyoi = false;
 	m_iWassyoiGauge = 0;
 	m_pAChargeWave->Stop();
 	m_pAChargeAura->Stop();
@@ -404,8 +408,8 @@ void Aramitama::InitActionDatas()
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = true;
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = true;
-	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(3.0f, 2.5f);
-	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(3.5f, 2.5f);
+	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(1.0f, 2.5f);
+	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(1.5f, 2.5f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 25;
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 25;
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 60;
@@ -580,9 +584,9 @@ void Aramitama::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	// 判定形状
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->width = 150;
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->height = 20;
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->pos.Set(75, 20, 0);
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->width = 10;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->height = 100;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->pos.Set(0, 100, 0);
 
 	//==============================================================================================================
 	//	ヒーホードライブ_オーバーフロー
@@ -770,6 +774,13 @@ void Aramitama::Update(PLAYER_UPDATE flag)
 {
 	// 基底クラスの更新
 	BasePlayer::Update(flag);
+
+	// わっしょいタイム中
+	if (m_bWassyoi)
+	{
+		// わっしょいゲージを減らしていく(0になったら終了)
+		if (--m_iWassyoiGauge <= 0) m_bWassyoi = false;
+	}
 
 	// 虫更新
 	FOR((int)MUSHI_TYPE::MAX)m_pMushi[i]->Update();
@@ -976,6 +987,16 @@ bool Aramitama::SkillAction::Land::Execute()
 	{
 		// 必殺技キャンセル
 		if (HeaveHoCancel(m_pAramitama)) return false;
+
+		// ゲージ増加処理(最後の一撃に適応)
+		if (m_iHitCount == 2)
+		{
+			// ゲージ増加
+			m_pAramitama->AddWassyoiGauge(m_pAramitama->GetAttackData()->bHitSuccess);
+
+			// 2回はいらないようにする
+			m_iHitCount++;
+		}
 	}
 
 	// 烙印時の処理
@@ -993,24 +1014,27 @@ bool Aramitama::SkillAction::Land::Execute()
 	{
 	case FRAME_STATE::ACTIVE:
 		m_pAramitama->AddMove(Vector3((m_pAramitama->m_dir == DIR::LEFT) ? -1.0f : 1.0f, 0, 0));
-		m_pAramitama->MoveClampX(1.5f);
+		m_pAramitama->MoveClampX(2.0f);
 
 		// アラミタマ自体の横幅を増やす
 		m_pAramitama->m_tagCharacterParam.HitSquare.width = m_pAramitama->m_tagOrgCharacterParam.HitSquare.width * 4;
 		break;
 	case FRAME_STATE::RECOVERY_HIT:
 		m_pAramitama->AddMove(Vector3((m_pAramitama->m_dir == DIR::LEFT) ? -1.0f : 1.0f, 0, 0));
-		m_pAramitama->MoveClampX(1.5f);
+		m_pAramitama->MoveClampX(2.0f);
 
 		// ヒット回数計測
-		if (++m_iHitCount >= 2)
+		if (m_iHitCount < 2)
 		{
-			// 最後の一撃だけ強くする
-			m_pAramitama->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(1.75f, 2.0f);
-			m_pAramitama->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(1.75f, 1.8f);
+			if (++m_iHitCount == 2)
+			{
+				// 最後の一撃だけ強くする
+				m_pAramitama->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(1.75f, 2.0f);
+				m_pAramitama->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(1.75f, 1.8f);
 
-			m_pAramitama->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 12;
-			m_pAramitama->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 12;
+				m_pAramitama->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 12;
+				m_pAramitama->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 12;
+			}
 		}
 
 		// コンボレートを下げないようにする
@@ -1081,12 +1105,12 @@ bool Aramitama::SkillAction::Squat::Execute()
 	// チャージして、わっしょいゲージが増加される瞬間
 	if (m_pAramitama->isActiveFrame())
 	{
-		m_pAramitama->m_iWassyoiGauge += 10;
+		// ゲージ増加
+		m_pAramitama->AddWassyoiGauge(m_pAramitama->c_WASSYOIGAUGE_MAX / 4);	// 25%
 		
 		// チャージエフェクト発動
 		m_pAramitama->m_pAChargeWave->Action(m_pAramitama->GetPos());
 		m_pAramitama->m_pAChargeAura->Action(m_pAramitama->GetPos());
-
 	}
 	
 
@@ -1117,6 +1141,7 @@ void Aramitama::SkillAction::Aerial::Enter()
 	m_pAramitama->SetDirAngle();
 
 	m_bMoved = false;
+	m_bHitCheck = false;
 }
 
 bool Aramitama::SkillAction::Aerial::Execute()
@@ -1127,6 +1152,20 @@ bool Aramitama::SkillAction::Aerial::Execute()
 		m_pAramitama->SetMove(VECTOR_ZERO);
 		m_pAramitama->SetActionState(BASE_ACTION_STATE::NO_ACTION);
 		return true;
+	}
+
+	// 1回でも当たったらフラグ
+	if (m_pAramitama->isHitAttack())
+	{
+		// 必殺技キャンセル
+		if (HeaveHoCancel(m_pAramitama)) return false;
+
+		// ゲージ増加
+		if (!m_bHitCheck)
+		{
+			m_pAramitama->AddWassyoiGauge(m_pAramitama->GetAttackData()->bHitSuccess, m_pAramitama->c_WASSYOIGAUGE_MAX / 32);
+			m_bHitCheck = true;
+		}
 	}
 
 	// 烙印時の処理
@@ -1161,6 +1200,7 @@ bool Aramitama::SkillAction::Aerial::Execute()
 
 	if (m_pAramitama->GetActionFrame() == FRAME_STATE::RECOVERY_HIT)
 	{
+		m_bHitCheck = false;
 		//m_pAramitama->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.x = m_pAramitama->GetTargetDirVecX() * 0.5f;
 		//m_pAramitama->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.x = m_pAramitama->GetTargetDirVecX() * 0.5f;
 	}
