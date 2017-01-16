@@ -152,6 +152,18 @@ struct TrainingData
 	TrainingData();
 };
 
+
+//+-------------------------
+//	キャラクター固有データ
+//+-------------------------
+
+// アラミタマ用デスク
+struct AramitamaDesk
+{
+	int iWassyoiGauge;
+};
+
+
 struct SideData
 {
 	CHARACTER eCharacter;

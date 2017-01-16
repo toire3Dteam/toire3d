@@ -512,6 +512,12 @@ public:
 	virtual void HeavehoDriveOverFlowSuccessInit() = 0;		// 必殺当てて演出中の初期化
 	virtual void HeavehoDriveOverFlowSuccessUpdate() = 0;		// 必殺当てて演出中の更新
 
+	/****************************/
+	//	キャラクター個別のデータ
+	/****************************/
+	virtual void SetCharacterData(void* desk) {};
+
+
 	/*****************/
 	// AIに必要な関数
 	/*****************/
