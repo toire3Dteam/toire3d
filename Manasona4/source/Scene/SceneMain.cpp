@@ -229,6 +229,9 @@ bool sceneMain::Initialize()
 		case BATTLE_WINDOW_TYPE::TRAINING_DUMMY:
 			m_pWindow[i] = new TrainingDummyWindow(Vector2(224, 128));
 			break;
+		case BATTLE_WINDOW_TYPE::TRAINING_CHARACTER:
+			m_pWindow[i] = new TrainingCharacterWindow(Vector2(224, 128));
+			break;
 		default:
 			MyAssert(0, "そんなウィンドウはない");
 			break;
@@ -851,5 +854,7 @@ void sceneMain::InitTrainingData()
 	SelectDataMgr->Get()->tagTrainingDatas.eEnemyThrowTech = (ENEMY_THROW_TECH_TYPE)PlayerDataMgr->m_TrainingData.iEnemyThrowTech;
 	SelectDataMgr->Get()->tagTrainingDatas.iEnemyLv = PlayerDataMgr->m_TrainingData.iEnemyLv;
 
-
+	// キャラクター個別
+	SelectDataMgr->Get()->tagTrainingDatas.eWassyoiType = (WASSYOI_TYPE)PlayerDataMgr->m_TrainingData.iWassyoiGage;
+		
 }

@@ -342,8 +342,13 @@ m_bNotOverDrive(false),
 m_pCutinPic(nullptr),
 
 m_pCommandWindow(nullptr),
-m_pName("None")
+m_pName("None"),
+
+m_eCharacterType(CHARACTER::AIROU)
 {
+	// キャラクタータイプ設定
+	m_eCharacterType = data.eCharacter;
+
 	// スタンド
 	switch (data.ePartner)
 	{
@@ -523,6 +528,8 @@ void BasePlayer::Reset()
 	m_pStand->SetStandGage(0);
 	m_pStand->SetStandStock(0);
 
+	// キャラ毎の初期化情報
+	CharacterDataReset();
 }
 
 void BasePlayer::InitAI(AI_TYPE type)

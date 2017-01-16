@@ -37,6 +37,9 @@ GameUIManager::GameUIManager() :BaseGameEntity(ENTITY_ID::UI_MGR)	// ƒGƒ“ƒeƒBƒeƒ
 	m_pCombo1P = nullptr;
 	m_pCombo2P = nullptr;
 
+	m_pReferencesRightPlayer = nullptr;
+	m_pReferencesLeftPlayer = nullptr;
+
 	m_pTimer = new Timer();
 
 	if (FAILED(tdnSystem::GetDevice()->CreateDepthStencilSurface(1280, 720, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, FALSE, &m_pStencilSurface, NULL)))
@@ -77,6 +80,7 @@ GameUIManager::~GameUIManager()
 
 	SAFE_DELETE(m_pTimer);
 
+
 }
 
 void GameUIManager::InitData(BasePlayer* pLeftPlayer, BasePlayer* pRightPlayer, int iRoundNum, ROUND_TIME_TYPE eRoundTimeType)
@@ -101,6 +105,10 @@ void GameUIManager::InitData(BasePlayer* pLeftPlayer, BasePlayer* pRightPlayer, 
 
 	m_pCombo1P = new ComboUI(pLeftPlayer);
 	m_pCombo2P = new ComboUI(pRightPlayer);
+
+	//
+	m_pReferencesLeftPlayer  = pLeftPlayer;
+	m_pReferencesRightPlayer = pRightPlayer;
 
 	m_pTimer->SetTimerType(eRoundTimeType);
 }
@@ -172,6 +180,10 @@ void GameUIManager::Action()
 
 	// ƒ^ƒCƒ}[
 	m_pTimer->Action();
+
+	// ŒÂ•ÊUI
+	m_pReferencesLeftPlayer->CharacterDataUIAction(26);
+	m_pReferencesRightPlayer->CharacterDataUIAction(26);
 }
 
 void GameUIManager::Render()
@@ -203,6 +215,10 @@ void GameUIManager::Render()
 
 	// ƒ^ƒCƒ}[
 	m_pTimer->Render();
+
+	// ŒÂ•ÊUI•`‰æ
+	m_pReferencesLeftPlayer->CharacterDataUIRender();
+	m_pReferencesRightPlayer->CharacterDataUIRender();
 
 	//tdnText::Draw(350,70,0xffff00ff,"%d", PlayerMgr->GetPointA());
 	//tdnText::Draw(900, 70, 0xffff00ff, "%d", PlayerMgr->GetPointB());

@@ -134,6 +134,24 @@ enum class ENEMY_THROW_TECH_TYPE
 	OK		// なげ抜けする
 };
 
+//+-------------------------
+//	キャラクター固有データ
+//+-------------------------
+
+// アラミタマ用デスク
+struct AramitamaDesk
+{
+	int iWassyoiGauge;
+};
+
+// アラミタマのわっしょいゲージ設定
+enum class WASSYOI_TYPE
+{
+	NO,		// 普通
+	MAX		// 常に最大
+};
+
+
 // トレーニング用データ
 struct TrainingData
 {
@@ -149,19 +167,10 @@ struct TrainingData
 	ENEMY_TECH_TYPE			eEnemyTech;			// 敵の受け身の設定
 	ENEMY_THROW_TECH_TYPE	eEnemyThrowTech;	// 敵のなげ抜けの設定
 	int						iEnemyLv;			// 敵のLV
+	WASSYOI_TYPE			eWassyoiType;		// アラミタマのわっしょいゲージ
 	TrainingData();
 };
 
-
-//+-------------------------
-//	キャラクター固有データ
-//+-------------------------
-
-// アラミタマ用デスク
-struct AramitamaDesk
-{
-	int iWassyoiGauge;
-};
 
 
 struct SideData

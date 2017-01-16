@@ -39,7 +39,8 @@ eEnemyGuard(ENEMY_GUARD_TYPE::NO),					// 敵のガードの設定
 eEnemyGuardSwitch(ENEMY_GUARD_SWITCH_TYPE::NO),		// 敵のガード切り替えの設定
 eEnemyTech(ENEMY_TECH_TYPE::ALL),					// 敵の受け身の設定
 eEnemyThrowTech(ENEMY_THROW_TECH_TYPE::NO),			// 敵のなげ抜けの設定
-iEnemyLv(20)										// 敵のLv
+iEnemyLv(20),										// 敵のLv
+eWassyoiType(WASSYOI_TYPE::NO)						// アラミタマのわっしょいゲージ
 {
 
 }

@@ -963,7 +963,7 @@ void SceneMainState::TrainingIntro::Enter(sceneMain *pMain)
 	// 情報初期化
 	pMain->Reset();
 	
-	// トレーニングデータ適用
+	// ★★★トレーニングデータ適用
 	pMain->InitTrainingData();
 
 	// ゴリ君
@@ -1473,6 +1473,15 @@ void SceneMainState::TrainingPause::Execute(sceneMain *pMain)
 		return;
 	}
 
+	// トレーニングキャラクターへ
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->GetChoiceState()
+		== TrainingPauseWindow::TRAINING_PAUSE_STATE::TRAINING_CHARACTER_SETTING)
+	{
+		// トレーニングキャラクター設定へ
+		pMain->GetFSM()->ChangeState(TrainingCharacterMenu::GetInstance());
+		return;
+	}
+
 	// ポジションリセットボタンを押したら
 	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->GetChoiceState()
 		== TrainingPauseWindow::TRAINING_PAUSE_STATE::POSITION_RESET)
@@ -1765,6 +1774,78 @@ void SceneMainState::TrainingDummyMenu::Render(sceneMain *pMain)
 }
 
 bool SceneMainState::TrainingDummyMenu::OnMessage(sceneMain *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+
+	//default:
+	//	break;
+	//}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
+
+
+/*******************************************************/
+//				トレーニングキャラクターウィンドウ選択
+/*******************************************************/
+
+void SceneMainState::TrainingCharacterMenu::Enter(sceneMain *pMain)
+{
+	// トレーニングオプション起動
+	pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_CHARACTER)->Action();
+}
+
+void SceneMainState::TrainingCharacterMenu::Execute(sceneMain *pMain)
+{
+
+	// 戻るボタンを押したら
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_CHARACTER)->GetChoiceState()
+		== TrainingCharacterWindow::TRAINING_CHARACTER_STATE::BACK)
+	{
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_CHARACTER)->Stop();	// ウィンドウを閉じる
+		pMain->GetFSM()->RevertToPreviousState();		// 前のステートへ戻る
+		return;
+	}
+
+
+
+	//+----------------------------------
+	//	このステートでの操作
+	//+----------------------------------
+	// パッド分更新
+	int NumDevice(tdnInputManager::GetNumDevice());
+	// パッド何もささってないとき用
+	if (NumDevice == 0)NumDevice = 1;
+	for (int i = 0; i < NumDevice; i++)
+	{
+		// ポーズウィンドウの操作
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_CHARACTER)->Ctrl(i);
+	}
+
+
+}
+
+void SceneMainState::TrainingCharacterMenu::Exit(sceneMain *pMain)
+{
+
+}
+
+void SceneMainState::TrainingCharacterMenu::Render(sceneMain *pMain)
+{
+	// 選択ウィンドウの説明
+	pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_CHARACTER)->RednerInfo();
+
+#ifdef _DEBUG
+
+	tdnText::Draw(0, 0, 0xffffffff, "TrainingCharacterMenu");
+#endif // _DEBUG
+
+}
+
+bool SceneMainState::TrainingCharacterMenu::OnMessage(sceneMain *pMain, const Message & msg)
 {
 	// メッセージタイプ
 	//switch (msg.Msg)

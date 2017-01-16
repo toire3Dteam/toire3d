@@ -516,7 +516,9 @@ public:
 	//	キャラクター個別のデータ
 	/****************************/
 	virtual void SetCharacterData(void* desk) {};
-
+	virtual void CharacterDataReset() {};			//	キャラ毎の初期化情報
+	virtual void CharacterDataUIRender() {};			//	キャラ毎の必要なUIの描画
+	virtual void CharacterDataUIAction(int iDelayTimer) {};			//	キャラ毎の必要なUIの起動
 
 	/*****************/
 	// AIに必要な関数
@@ -907,6 +909,11 @@ public:
 	BaseWindow* GetCommandWindow() { return m_pCommandWindow; };
 
 	//------------------------------------------------------
+	//	キャラクターのタイプ
+	//------------------------------------------------------
+	CHARACTER GetCharacterType() { return m_eCharacterType; };
+
+	//------------------------------------------------------
 	//	その他
 	//------------------------------------------------------
 	int GetDeviceID() { return m_iDeviceID; }
@@ -1144,6 +1151,11 @@ protected:
 	//	ウィンドウ用 
 	//------------------------------------------------------
 	BaseWindow* m_pCommandWindow;
+
+	//------------------------------------------------------
+	//	キャラクターのタイプ
+	//------------------------------------------------------
+	CHARACTER m_eCharacterType;
 
 	//------------------------------------------------------
 	//	その他

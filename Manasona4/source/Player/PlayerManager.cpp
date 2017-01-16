@@ -258,7 +258,24 @@ void PlayerManager::UpdateTraining()
 	}
 
 
-	
+	// キャラクター個別の設定
+	FOR(m_NumPlayer)
+	{
+		// もしアラミタマだったら
+		if (m_pPlayers[i]->GetCharacterType() == CHARACTER::ARAMITAMA)
+		{
+			AramitamaDesk l_tagDesk;
+			l_tagDesk.iWassyoiGauge = 0;
+			// 常にわっしょいゲージ最大なら
+			if (SelectDataMgr->Get()->tagTrainingDatas.eWassyoiType == WASSYOI_TYPE::MAX)
+			{
+				l_tagDesk.iWassyoiGauge = Aramitama::c_WASSYOIGAUGE_MAX;
+				m_pPlayers[i]->SetCharacterData((void*)&l_tagDesk);
+			}
+
+
+		}
+	}
 
 
 

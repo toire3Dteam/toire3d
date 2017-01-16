@@ -218,6 +218,7 @@
     <ClCompile Include="source\Window\ParamSetting\Training2\EnemyStateParamSetting.cpp" />
     <ClCompile Include="source\Window\ParamSetting\Training2\TechParamSetting.cpp" />
     <ClCompile Include="source\Window\ParamSetting\Training2\ThrowTechParamSetting.cpp" />
+    <ClCompile Include="source\Window\ParamSetting\Training3\AramitamaWassyoiParamSetting.cpp" />
     <ClCompile Include="source\Window\ParamSetting\Training\Hp1PParamSetting.cpp" />
     <ClCompile Include="source\Window\ParamSetting\Training\Hp2PParamSetting.cpp" />
     <ClCompile Include="source\Window\ParamSetting\Training\HPRecoveryParamSetting.cpp" />
@@ -231,6 +232,7 @@
     <ClCompile Include="source\Window\Player\TekiWindow.cpp" />
     <ClCompile Include="source\Window\ResultWindow.cpp" />
     <ClCompile Include="source\Window\SoundWindow.cpp" />
+    <ClCompile Include="source\Window\TrainingCharacterWindow.cpp" />
     <ClCompile Include="source\Window\TrainingDummyWindow.cpp" />
     <ClCompile Include="source\Window\TrainingOptionWindow.cpp" />
     <ClCompile Include="source\Window\TrainingPauseWindow.cpp" />
@@ -400,6 +402,7 @@
     <ClInclude Include="source\Window\ParamSetting\Training2\EnemyStateParamSetting.h" />
     <ClInclude Include="source\Window\ParamSetting\Training2\TechParamSetting.h" />
     <ClInclude Include="source\Window\ParamSetting\Training2\ThrowTechParamSetting.h" />
+    <ClInclude Include="source\Window\ParamSetting\Training3\AramitamaWassyoiParamSetting.h" />
     <ClInclude Include="source\Window\ParamSetting\Training\Hp1PParamSetting.h" />
     <ClInclude Include="source\Window\ParamSetting\Training\Hp2PParamSetting.h" />
     <ClInclude Include="source\Window\ParamSetting\Training\HPRecoveryParamSetting.h" />
@@ -413,6 +416,7 @@
     <ClInclude Include="source\Window\Player\TekiWindow.h" />
     <ClInclude Include="source\Window\ResultWindow.h" />
     <ClInclude Include="source\Window\SoundWindow.h" />
+    <ClInclude Include="source\Window\TrainingCharacterWindow.h" />
     <ClInclude Include="source\Window\TrainingDummyWindow.h" />
     <ClInclude Include="source\Window\TrainingOptionWindow.h" />
     <ClInclude Include="source\Window\TrainingPauseWindow.h" />

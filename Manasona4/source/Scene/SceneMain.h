@@ -16,6 +16,7 @@
 #include "Window\SoundWindow.h"
 #include "Window\TrainingOptionWindow.h"
 #include "Window\TrainingDummyWindow.h"
+#include "Window\TrainingCharacterWindow.h"
 
 // リザルトデータ
 #include "Data\ResultData.h"
@@ -41,6 +42,7 @@ enum class BATTLE_WINDOW_TYPE
 	SOUND,					// サウンド
 	TRAINING_OPTION,		// トレーニングオプション
 	TRAINING_DUMMY,			// トレーニングダミーオプション
+	TRAINING_CHARACTER,		// トレーニングキャラクターオプション
 	ARRAY_END				// 配列終了
 
 };

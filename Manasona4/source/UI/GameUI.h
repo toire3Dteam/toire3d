@@ -138,6 +138,10 @@ private:
 	// 奥行
 	Surface* m_pStencilSurface;
 
+	// キャラクターのポインタ―保持
+	BasePlayer* m_pReferencesRightPlayer;
+	BasePlayer* m_pReferencesLeftPlayer;
+
 	//struct  HPGage
 	//{
 	//	tdn2DObj* obj;

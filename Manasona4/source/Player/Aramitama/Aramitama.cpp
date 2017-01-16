@@ -89,6 +89,14 @@ Aramitama::Aramitama(SIDE side, const SideData &data) :BasePlayer(side, data)
 	m_pACanon			= new AramitamaCanonEffect();
 	m_pANozzleFlash		= new AramitamaNozzleFlashEffect();
 
+	// わっしょいゲージ
+	m_pWassyoiGage		= new tdn2DAnim("DATA/UI/Game/Aramitama/WassyoiGage.png");
+	m_pWassyoiFrame		= new tdn2DAnim("DATA/UI/Game/Aramitama/WassyoiFrame.png");
+	m_pWassyoiGageRip	= new tdn2DAnim("DATA/UI/Game/Aramitama/WassyoiGage.png");
+	m_pWassyoiGage->OrderShrink(12, 1.0f, 2.0f);
+	m_pWassyoiFrame->OrderShrink(12, 1.0f, 2.0f);
+	m_pWassyoiGageRip->OrderAlphaMove(60, 29, 31);
+
 	// 最後に初期化
 	Reset();
 }
@@ -768,7 +776,10 @@ Aramitama::~Aramitama()
 	SAFE_DELETE(m_pACircle);
 	SAFE_DELETE(m_pACanon);
 	SAFE_DELETE(m_pANozzleFlash);
-}
+
+	SAFE_DELETE(m_pWassyoiGage);
+	SAFE_DELETE(m_pWassyoiFrame);	
+}	
 
 void Aramitama::Update(PLAYER_UPDATE flag)
 {
@@ -790,6 +801,17 @@ void Aramitama::Update(PLAYER_UPDATE flag)
 	m_pACircle->Update();
 	m_pACanon->Update();
 	m_pANozzleFlash->Update();
+
+	// ゲージ
+	m_pWassyoiGage->Update();
+	m_pWassyoiFrame->Update();
+	
+	if (m_pWassyoiGageRip->GetAction()->IsEnd() == true)
+	{
+		m_pWassyoiGageRip->Action();
+	}
+	m_pWassyoiGageRip->Update();
+
 }
 
 void Aramitama::Render()
@@ -1095,7 +1117,7 @@ bool Aramitama::SkillAction::Squat::Execute()
 	if (m_pAramitama->m_bWassyoi)
 	{
 		// 隕石ミタマ出現フレーム
-		if (m_pAramitama->GetCurrentFrame() == 36)
+		if (m_pAramitama->GetCurrentFrame() == 42)
 		{
 			// 発動！
 			m_pAramitama->m_pMushi[(int)MUSHI_TYPE::SQUAT]->Action(m_pAramitama, MUSHI_TYPE::SQUAT);
@@ -1460,6 +1482,70 @@ void Aramitama::HeavehoDriveOverFlowSuccessUpdate()
 		HeaveHoFinishUI->Action();	// ふぃにっしゅ
 		break;
 	}
+
+}
+
+void Aramitama::SetCharacterData(void * desk)
+{
+	AramitamaDesk *l_tagDesk = (AramitamaDesk*)desk;
+
+	// ゲージを↓の値に
+	m_iWassyoiGauge = l_tagDesk->iWassyoiGauge;
+	if (m_iWassyoiGauge >= c_WASSYOIGAUGE_MAX)
+	{
+		m_bWassyoi = true;
+	}
+
+}
+
+// 
+void Aramitama::CharacterDataReset()
+{
+	m_iWassyoiGauge = 0;
+	m_bWassyoi = false;
+}
+
+void Aramitama::CharacterDataUIRender()
+{
+	Vector2 l_vPos = VECTOR2_ZERO;
+	l_vPos.x = 
+	l_vPos.y = 604;
+
+	// ゲージの描画
+	if (m_side == SIDE::LEFT)
+	{
+		l_vPos.x = 220;
+	}
+	else
+	{
+		l_vPos.x = 868;
+	}
+
+	// ゲージ
+	m_pWassyoiFrame->Render((int)l_vPos.x, (int)l_vPos.y);
+	
+	// ゲージの割合
+	float l_fRate = m_iWassyoiGauge / (float)c_WASSYOIGAUGE_MAX;
+
+	// 烙印前
+	if (m_bWassyoi == false)
+	{
+
+		m_pWassyoiGage->Render((int)l_vPos.x + 48, (int)l_vPos.y + 37, (int)(128 * l_fRate) , 16, 0, 0, 128, 16);
+	}
+	else// 烙印後
+	{
+		m_pWassyoiGage->Render((int)l_vPos.x + 48, (int)l_vPos.y + 37, (int)(128 * l_fRate), 16, 0, 16, 128, 16);
+		m_pWassyoiGageRip->Render((int)l_vPos.x + 48, (int)l_vPos.y + 37, (int)(128 * l_fRate), 16, 0, 16, 128, 16, RS::ADD);
+	}
+
+}
+
+void Aramitama::CharacterDataUIAction(int iDelayTimer)
+{
+	m_pWassyoiGage->Action(iDelayTimer);
+	m_pWassyoiFrame->Action(iDelayTimer);
+	m_pWassyoiGageRip->Action(iDelayTimer);
 
 }
 

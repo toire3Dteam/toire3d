@@ -130,6 +130,14 @@ public:
 	void HeavehoDriveOverFlowSuccessUpdate();
 
 	/****************************/
+	//	キャラクター個別のデータ
+	/****************************/
+	void SetCharacterData(void* desk)override;
+	void CharacterDataReset()override;			//	個別初期化情報
+	void CharacterDataUIRender()override;	// 個別UI描画
+	void CharacterDataUIAction(int iDelayTimer)override;	// 個別UI起動
+
+	/****************************/
 	//	AI
 	/****************************/
 	// それぞれのキャラクター毎のAIによる技のボタンを設定！
@@ -184,6 +192,9 @@ public:
 	/****************************/
 	void ChangeColor();
 
+	static const int c_WASSYOIGAUGE_MAX;			// ゲージ最大値=烙印発動時間
+
+
 private:
 	// 純粋仮想関数オーバーライド
 	void InitActionDatas();
@@ -199,7 +210,10 @@ private:
 	// 烙印
 	bool m_bWassyoi;
 	int m_iWassyoiGauge;
-	static const int c_WASSYOIGAUGE_MAX;			// ゲージ最大値=烙印発動時間
+	// ゲージの絵
+	tdn2DAnim* m_pWassyoiGage;
+	tdn2DAnim* m_pWassyoiFrame;
+	tdn2DAnim* m_pWassyoiGageRip;
 
 	void AddWassyoiGauge(int iAdd)
 	{
