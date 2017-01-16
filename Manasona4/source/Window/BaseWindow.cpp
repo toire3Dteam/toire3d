@@ -35,6 +35,9 @@ BaseWindow::BaseWindow(Vector2 vPos)
 	m_iAlpha = 0;
 	m_iAddX = 0;
 	m_iAddY = 0;
+
+	// ˆÊ’u”÷’²®—p
+	m_iAbjustHeight = -1;
 }
 
 BaseWindow::~BaseWindow()

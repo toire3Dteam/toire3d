@@ -77,6 +77,12 @@ protected:
 	};
 	std::vector<IconCommandData> m_aIconCommandData;
 
+	// (1/28) 緊急事態
+	// 他のPCで起動したときMENU画面が描画が
+	// アンチエイリアシングの効果などで見た目が少し変わった
+	// ひとまずは補間を考慮して調整
+	int m_iAbjustHeight;
+
 protected:
 	void AddIconData(LPSTR string, LPSTR infoString);
 	void AddCommandData(LPSTR string, int iWidthSize);

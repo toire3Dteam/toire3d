@@ -1,10 +1,15 @@
 #include "TDNLIB.h"
 #include "system/FrameworkEx.h"
 #include "sceneTitle.h"
+#include "sceneTitleState.h"
 #include "SceneMenu.h"
+#include "../BaseEntity/Message/Message.h"
+#include "../Fade/Fade.h"
 
 //=============================================================================================
 //		初	期	化	と	開	放
+//=============================================================================================
+sceneTitle::sceneTitle() :BaseGameEntity(ENTITY_ID::SCENE_TITLE) {}
 bool sceneTitle::Initialize()
 {
 	// 動画関連初期化
@@ -13,9 +18,20 @@ bool sceneTitle::Initialize()
 
 	// 画像初期化
 	m_pImages[IMAGE::BACK] = new tdn2DObj(m_pMovie->GetTexture());
+	
+	m_pLogo = new tdn2DAnim("Data/Title/logo.png");
+	m_pLogo->OrderMoveAppeared(90, 0, 720 / 4);
+
 	m_fLoadPercentage = .5f;	// ロード割合
+	
+
 
 	m_fLoadPercentage = 1.0f;	// ロード割合
+
+	/* ステートマシン初期化 */
+	m_pStateMachine = new StateMachine<sceneTitle>(this);
+	m_pStateMachine->SetCurrentState(SceneTitleState::Intro::GetInstance());	// ステートの設定
+
 
 	return true;
 }
@@ -23,7 +39,11 @@ bool sceneTitle::Initialize()
 sceneTitle::~sceneTitle()
 {
 	FOR(IMAGE::MAX) delete m_pImages[i];
-	delete m_pMovie;
+	SAFE_DELETE(m_pMovie);
+	SAFE_DELETE(m_pLogo);
+
+	SAFE_DELETE(m_pStateMachine);
+
 }
 //=============================================================================================
 
@@ -32,18 +52,17 @@ sceneTitle::~sceneTitle()
 //		更			新
 void sceneTitle::Update()
 {
-	// テアリング防止の苦肉の策
-	m_pMovie->Update();
+	// フェード更新
+	Fade::Update();
 
-	// エンターキーでスタート
-	FOR(4)
 	{
-		if (KEY(KEY_A, i) == 3 || KEY(KEY_B, 1) == 3 || KEY(KEY_C, 1) == 3 || KEY(KEY_D, 1) == 3)
-		{
-			MainFrameEx->ChangeScene(new sceneMenu);
-			break;
-		}
+		// ★ステートマシン更新(何故ここに書くかというと、中でシーンチェンジの処理を行っているため)
+		m_pStateMachine->Update();
+		return;
 	}
+
+
+
 }
 //
 //=============================================================================================
@@ -56,8 +75,11 @@ void sceneTitle::Render()
 	tdnView::Activate();
 	tdnView::Clear();
 
-	// 動画画像
-	m_pImages[IMAGE::BACK]->Render(0,0);
+	// ★ステートマシン描画
+	m_pStateMachine->Render();
+
+	// フェード
+	Fade::Render();
 
 	//int work;
 	//m_pMovie->GetTextureRenderer()->get_AvgFrameRate(&work);

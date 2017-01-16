@@ -179,6 +179,7 @@
     <ClCompile Include="source\Scene\SceneSelect.cpp" />
     <ClCompile Include="source\Scene\SceneSelectState.cpp" />
     <ClCompile Include="source\Scene\sceneTitle.cpp" />
+    <ClCompile Include="source\Scene\SceneTitleState.cpp" />
     <ClCompile Include="source\Scene\sceneTutorial.cpp" />
     <ClCompile Include="source\SelectUI\SelectUI.cpp" />
     <ClCompile Include="source\SelectUI\SelectUIManager.cpp" />
@@ -359,6 +360,7 @@
     <ClInclude Include="source\Scene\SceneSelect.h" />
     <ClInclude Include="source\Scene\SceneSelectState.h" />
     <ClInclude Include="source\Scene\sceneTitle.h" />
+    <ClInclude Include="source\Scene\SceneTitleState.h" />
     <ClInclude Include="source\Scene\sceneTutorial.h" />
     <ClInclude Include="source\SelectUI\SelectUI.h" />
     <ClInclude Include="source\SelectUI\SelectUIManager.h" />

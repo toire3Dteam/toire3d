@@ -221,7 +221,7 @@ void Shot::AramitamaMushi::Land::Render()
 /****************************************************/
 //	しゃがみスキル時の隕石アラミタマ
 /****************************************************/
-const float Shot::AramitamaMushi::Squat::c_SPEED = 3.0f;
+const float Shot::AramitamaMushi::Squat::c_SPEED = 4.0f;
 
 Shot::AramitamaMushi::Squat::Squat(BasePlayer *pPlayer,
 	AttackData *pAttackData,
@@ -264,7 +264,7 @@ void Shot::AramitamaMushi::Squat::Render()
 /****************************************************/
 //	空中スキル時のD虫ミタマ
 /****************************************************/
-const int	Shot::AramitamaMushi::Aerial::c_SOJOURN_TIME = 270;
+const int	Shot::AramitamaMushi::Aerial::c_SOJOURN_TIME = 90;
 const float Shot::AramitamaMushi::Aerial::c_SPEED = 0.75f;
 const float Shot::AramitamaMushi::Aerial::c_RANGE = 60;
 

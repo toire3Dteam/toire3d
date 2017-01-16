@@ -152,7 +152,7 @@ void Aramitama::InitActionDatas()
 	//	通常1段
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->damage = 140;
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->damage = 220;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->HitSE = "ヒット4";
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->WhiffSE = "空振り5";
@@ -172,8 +172,8 @@ void Aramitama::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.2f, .70f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 12;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 13;
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 20;
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 20;
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 24;
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 24;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_BACK;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	// 判定形状
@@ -185,7 +185,7 @@ void Aramitama::InitActionDatas()
 	//	通常2段
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->damage = 260;
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->damage = 280;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->HitSE = "ヒット5";
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->WhiffSE = "空振り5";
@@ -219,7 +219,7 @@ void Aramitama::InitActionDatas()
 	//	対空攻撃
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->damage = 300;
+	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->damage = 400;
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->HitSE = "ヒット6";
 	m_ActionDatas[(int)BASE_ACTION_STATE::ANTI_AIR].pAttackData->WhiffSE = "空振り5";
@@ -252,7 +252,7 @@ void Aramitama::InitActionDatas()
 	//	中断攻撃(どっこいアタック)
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->damage = 500;
+	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->damage = 600;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->HitSE = "斬撃1";
 	m_ActionDatas[(int)BASE_ACTION_STATE::DOKKOI_ATTACK].pAttackData->WhiffSE = "空振り5";
@@ -389,7 +389,7 @@ void Aramitama::InitActionDatas()
 	//	逆切れ攻撃
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->damage = 240;
+	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->damage = 340;
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->HitSE = "フィニッシュ小";
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->WhiffSE = "空振り5";
@@ -456,7 +456,7 @@ void Aramitama::InitActionDatas()
 	//	キャラクター固有空中攻撃
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->damage = 160;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->damage = 180;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->HitSE = "斬撃2";
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->WhiffSE = "空振り5";
@@ -649,7 +649,7 @@ void Aramitama::InitMushiDatas()
 	//	トスミタマ
 	m_pMushi[(int)MUSHI_TYPE::LAND] = new MushiData("DATA/CHR/Aramitama/aramitama_mushi1.IEM", 40);
 	// 地上ヒットも空中ヒットも共通の情報
-	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->damage = 800;
+	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->damage = 1200;
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->pierceLV = 0;
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->HitSE = "ヒット6";
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->WhiffSE = "空振り1";
@@ -658,7 +658,7 @@ void Aramitama::InitMushiDatas()
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->bAntiAir = true;
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->bFinish = true;
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->AntiGuard = ANTIGUARD_ATTACK::NONE;
-	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->ShakeCameraInfo.Set(.2f, 2);
+	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->ShakeCameraInfo.Set(.4f, 4);
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->GuardRecoveryFrame = 20;
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->fGuardKnockBackPower = .25f;
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->attribute = ATTACK_ATTRIBUTE::BULLET;
@@ -669,8 +669,8 @@ void Aramitama::InitMushiDatas()
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(.75f, 2.5f);
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.75f, 2.5f);
-	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 20;
-	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 20;
+	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 25;
+	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 25;
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 60;
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 60;
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
@@ -685,7 +685,7 @@ void Aramitama::InitMushiDatas()
 	//	隕石ミタマ
 	m_pMushi[(int)MUSHI_TYPE::SQUAT] = new MushiData("DATA/CHR/Aramitama/aramitama_mushi3.IEM", 0);
 	// 地上ヒットも空中ヒットも共通の情報
-	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->damage = 1000;
+	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->damage = 1500;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->pierceLV = 0;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->HitSE = "ヒット1";
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->WhiffSE = "空振り1";
@@ -694,7 +694,7 @@ void Aramitama::InitMushiDatas()
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->bAntiAir = true;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->bFinish = true;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->AntiGuard = ANTIGUARD_ATTACK::NONE;
-	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->ShakeCameraInfo.Set(.2f, 2);
+	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->ShakeCameraInfo.Set(.4f, 4);
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->GuardRecoveryFrame = 20;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->fGuardKnockBackPower = .25f;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->attribute = ATTACK_ATTRIBUTE::BULLET;
@@ -704,11 +704,11 @@ void Aramitama::InitMushiDatas()
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(2.75f, 1.5f);
-	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(1.5f, 1.5f);
-	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 20;
-	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 20;
+	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(0.25f, -3.5f);
+	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 25;
+	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 35;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 60;
-	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 60;
+	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 90;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	// 判定形状
@@ -722,7 +722,7 @@ void Aramitama::InitMushiDatas()
 	//	D虫ミタマ
 	m_pMushi[(int)MUSHI_TYPE::AERIAL] = new MushiData("DATA/CHR/Aramitama/aramitama_mushi2.IEM", Shot::AramitamaMushi::Aerial::c_SOJOURN_TIME);
 	// 地上ヒットも空中ヒットも共通の情報
-	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->damage = 50;
+	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->damage = 450;
 	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->pierceLV = 0;
 	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->HitSE = "斬撃2";
 	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->WhiffSE = "空振り1";
@@ -740,8 +740,8 @@ void Aramitama::InitMushiDatas()
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
-	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(.01f, 0.95f);
-	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.01f, 0.95f);
+	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(.01f, 1.0f);
+	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.01f, 1.0f);
 	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 1;
 	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 1;
 	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 60;

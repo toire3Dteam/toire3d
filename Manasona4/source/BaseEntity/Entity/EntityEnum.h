@@ -17,6 +17,7 @@ namespace GAME_ID
 		SCENE_MENU,					// シーンメニュー
 		SCENE_SELECT,				// シーンキャラセレ
 		SCENE_COLLECT,				// シーンコレクト
+		SCENE_TITLE,				// シーンタイトル
 		PLAYER_MGR,					// マネージャーのID 
 		JUDGE_MNG,					// ジャッジマネージャーID
 		CAMERA_MGR,					// カメラマネージャーID

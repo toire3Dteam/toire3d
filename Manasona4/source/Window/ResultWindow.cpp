@@ -64,7 +64,7 @@ void ResultWindow::Redner()
 
 
 	// 中身をブロック単位で描画
-	int y = (int)(m_vPos.y + 64.0f);
+	int y = (int)(m_vPos.y + 64.0f) + m_iAbjustHeight;
 	int x = (int)m_vPos.x + 18 + (255 - m_iAlpha);
 	for (int i = 0; i < (int)m_aIconData.size(); i++)
 	{
@@ -121,7 +121,7 @@ void ResultWindow::Redner()
 
 
 		// 40ピクセルずらして描画していく
-		y += 40;
+		y += 40 + m_iAbjustHeight;
 	}
 
 	//// 文字
