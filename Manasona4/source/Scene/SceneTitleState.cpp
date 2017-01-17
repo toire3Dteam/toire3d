@@ -241,6 +241,8 @@ void SceneTitleState::TitleStep::Execute(sceneTitle *pMain)
 	
 	pMain->m_pPreaseAnyButton->Update();
 
+	// ‰_‚Ì“®‚«
+	pMain->m_fCloudU -= 0.25f;
 
 
 	// ƒpƒbƒh•ªXV
@@ -275,6 +277,12 @@ void SceneTitleState::TitleStep::Render(sceneTitle *pMain)
 {
 	// ”wŒi
 	pMain->m_pImages[sceneTitle::IMAGE::BG]->Render(0, 0);
+
+	// ‰_1
+	pMain->m_pImages[sceneTitle::IMAGE::CLOUD1]->Render(-100 + (int)pMain->m_fCloudU , 200);
+
+	// ‰_2
+	pMain->m_pImages[sceneTitle::IMAGE::CLOUD2]->Render(750+(int)pMain->m_fCloudU, 150);
 
 	// ƒ^ƒCƒgƒ‹
 	pMain->m_pImages[sceneTitle::IMAGE::TITLE]->Render(0, 0);

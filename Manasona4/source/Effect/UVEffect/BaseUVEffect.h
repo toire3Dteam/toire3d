@@ -921,6 +921,26 @@ private:
 
 };
 
+/*****************************************/
+//	TEKIカウンター
+/*****************************************/
+class TekiCounterEffect :public BaseUVEffect
+{
+public:
+	TekiCounterEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Teki/Counter.IMO", 0.0f, -0.01f, 12, false, 1, 10);
+	};
+	~TekiCounterEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	//void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+
+};
+
 /*************************/
 //	多段ヒットエフェクト
 /*************************/

@@ -55,6 +55,7 @@ void BaseParamSetting::Render(int x, int y, bool selectFlag)
 	m_pLeftArrow->Render(x, y, 32, 32, 0, (32 * selectFlag), 32, 32);	// ¶
 	m_pRightArrow->Render(x + m_iWidthSize , y, 32, 32, 32, (32 * selectFlag), 32, 32);	// ‰E
 
+
 }
 
 void BaseParamSetting::RenderNumber(int x, int y, int num, bool bSelect)

@@ -44,6 +44,8 @@ private:
 		MOVIE,	// ムービー
 		BG,		// 背景
 		TITLE,	// タイトル
+		CLOUD1, // 雲1
+		CLOUD2, // 雲2
 		MAX
 	};
 
@@ -56,6 +58,8 @@ private:
 	// プレスエニーボタンの
 	tdn2DAnim* m_pPreaseAnyButton;
 
+	// 雲のスクロール処理
+	float m_fCloudU;
 
 	// ステートをフレンドクラスへ
 	friend class SceneTitleState::Intro;

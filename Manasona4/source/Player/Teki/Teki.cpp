@@ -78,6 +78,8 @@ Teki::Teki(SIDE side, const SideData &data) :BasePlayer(side, data)
 	// 敵専用エフェクト 
 	m_pUpperLineEffect = new TekiUpperLineEffect();
 	m_pCycloneEffect = new CycloneEffect();
+	m_pCounterEffect = new TekiCounterEffect();
+
 
 	// リセットはなるべく最後に
 	Reset();
@@ -90,6 +92,7 @@ void Teki::Reset()
 
 	m_pUpperLineEffect->Stop();
 	m_pCycloneEffect->Stop();
+	m_pCounterEffect->Stop();
 
 }
 
@@ -440,7 +443,7 @@ void Teki::InitActionDatas()
 	// 判定形状
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->pCollisionShape->width = 12;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->pCollisionShape->height = 6;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->pCollisionShape->pos.Set(9, 8, 0);
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->pCollisionShape->pos.Set(9, 9, 0);
 
 
 	//==============================================================================================================
@@ -666,6 +669,7 @@ Teki::~Teki()
 
 	SAFE_DELETE(m_pUpperLineEffect);
 	SAFE_DELETE(m_pCycloneEffect);
+	SAFE_DELETE(m_pCounterEffect);
 }
 
 void Teki::Update(PLAYER_UPDATE flag)
@@ -676,7 +680,7 @@ void Teki::Update(PLAYER_UPDATE flag)
 	// 専用エフェクト
 	m_pUpperLineEffect->Update();
 	m_pCycloneEffect->Update();
-
+	m_pCounterEffect->Update();
 }
 
 void Teki::Render()
@@ -687,6 +691,8 @@ void Teki::Render()
 	// 専用エフェクト
 	m_pUpperLineEffect->Render();
 	m_pCycloneEffect->Render();
+	m_pCounterEffect->Render();
+
 }
 
 void Teki::RenderDrive()

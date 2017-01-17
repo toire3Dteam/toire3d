@@ -3,7 +3,7 @@
 #include "UI/HeaveHoFinish/HeaveHoFinish.h"
 #include "../../DeferredEx/DeferredEx.h"
 #include "../../BaseEntity/Message/MessageDispatcher.h"
-#include "Window\Player\AirouWindow.h"
+#include "Window\Player\AramitamaWindow.h"
 #include "../../Shot/BaseShot.h"
 #include "Effect\Particle.h"
 
@@ -25,7 +25,7 @@ Aramitama::Aramitama(SIDE side, const SideData &data) :BasePlayer(side, data)
 		l_vWindowPos.x = 550;
 		l_vWindowPos.y = 100;
 	}
-	m_pCommandWindow = new AirouWindow(l_vWindowPos);
+	m_pCommandWindow = new AramitamaWindow(l_vWindowPos);
 
 	// エフェクトカメラID
 	m_tagCharacterParam.eHeaveHoOverFlowCameraID = EFFECT_CAMERA_ID::NAZENARA_OVERFLOW;

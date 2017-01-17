@@ -19,12 +19,16 @@ bool sceneTitle::Initialize()
 	m_pImages[IMAGE::MOVIE] = new tdn2DObj(m_pMovie->GetTexture());
 	m_pImages[IMAGE::BG] = new tdn2DObj("Data/Title/BG.png");
 	m_pImages[IMAGE::TITLE] = new tdn2DObj("Data/Title/Title.png");
+	m_pImages[IMAGE::CLOUD1] = new tdn2DObj("Data/Title/cloud1.png");
+	m_pImages[IMAGE::CLOUD2] = new tdn2DObj("Data/Title/cloud2.png");
 
 	m_pLogo = new tdn2DAnim("Data/Title/logo.png");
 	m_pLogo->OrderMoveAppeared(90, 0, 720 / 4);
 	
 	m_pPreaseAnyButton = new tdn2DAnim("Data/Title/PreaseAnyButton.png");
 	m_pPreaseAnyButton->OrderAlphaMove(150, 70, 80);
+
+	m_fCloudU = 0.0f;
 
 	m_fLoadPercentage = .5f;	// ƒ[ƒhŠ„‡
 	

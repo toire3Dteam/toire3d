@@ -66,6 +66,14 @@ void BGMParamSetting::Render(int x, int y, bool selectFlag)
 	// ”’l
 	RenderNumber(x + m_iWidthSize - 24, y, PlayerDataMgr->m_ConfigData.iBGMVolume, selectFlag);
 
+
+
+//#ifdef _DEBUG
+//
+//	tdnText::Draw(500, 690, 0xffffffff, "‰E‰Ÿ‚µ‚½%d", m_iRightPushFrame);
+//
+//#endif // DEBUG
+
 }
 
 

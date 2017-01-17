@@ -5388,7 +5388,8 @@ void BasePlayerState::ThrowBind::Enter(BasePlayer * pPerson)
 void BasePlayerState::ThrowBind::Execute(BasePlayer * pPerson)
 {
 	// 相手依存なので自分からかえることはできない。多分ダメージステートに行くと信じて。一応自分で解除する手段も用意する
-	if (!pPerson->GetTargetPlayer()->GetFSM()->isInState(*ThrowHold::GetInstance()) &&
+	if (!pPerson->GetTargetPlayer()->GetFSM()->isInState(*Throw::GetInstance()) &&
+		!pPerson->GetTargetPlayer()->GetFSM()->isInState(*ThrowHold::GetInstance()) &&
 		!pPerson->GetTargetPlayer()->GetFSM()->isInState(*ThrowSuccess::GetInstance()) &&
 		!pPerson->GetTargetPlayer()->GetFSM()->isInState(*Skill::GetInstance()) &&
 		!pPerson->GetTargetPlayer()->GetFSM()->isInState(*HeavehoDrive::GetInstance())

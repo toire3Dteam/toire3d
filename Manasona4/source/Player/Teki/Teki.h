@@ -206,7 +206,7 @@ private:
 	// TEKI用のエフェクト
 	TekiUpperLineEffect* m_pUpperLineEffect;
 	BaseUVEffect *m_pCycloneEffect;	// 必殺の風
-
+	TekiCounterEffect* m_pCounterEffect;
 
 
 };
