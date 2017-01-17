@@ -84,6 +84,8 @@ public:
 		return sum;
 	}
 
+	bool isGameStop(){ FOR(m_NumPlayer){ if (m_pPlayers[i]->isGameTimerStopFlag())return true; } return false; }
+
 private:
 	// 1‚Â‚µ‚©‚È‚¢ŽÀ‘Ì
 	static PlayerManager *pInstance;

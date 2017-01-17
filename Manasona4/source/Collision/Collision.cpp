@@ -449,9 +449,9 @@ bool Collision::CollisionShot(Shot::Base *shot, BasePlayer *you)
 		HitDamageInfo.FlyVector = pShotAttackData->places[iHitPlace].FlyVector;			// 吹っ飛びベクトル
 		HitDamageInfo.iHitStopFrame = pShotAttackData->places[iHitPlace].iHitStopFrame;		// ヒットストップ
 		HitDamageInfo.HitRecoveryFrame = pShotAttackData->places[iHitPlace].HitRecoveryFrame;		// 硬直時間
-		HitDamageInfo.GuardRecoveryFrame = pShotAttackData->GuardRecoveryFrame;		// 硬直時間
-		HitDamageInfo.HitEffectType = (int)pShotAttackData->HitEffectType;			// この攻撃のヒットエフェクトを相手に送る
-		HitDamageInfo.iAttackType = (int)BASE_ACTION_STATE::NO_ACTION;	// NO_ACTIONのときは、コンボ継続関連のを無視する
+		HitDamageInfo.GuardRecoveryFrame = pShotAttackData->GuardRecoveryFrame;	// 硬直時間
+		HitDamageInfo.HitEffectType = (int)pShotAttackData->HitEffectType;		// この攻撃のヒットエフェクトを相手に送る
+		HitDamageInfo.iAttackType = (int)shot->GetType();
 		HitDamageInfo.iAntiGuard = (int)pShotAttackData->AntiGuard;				// ガード突き破りタイプ
 		HitDamageInfo.HitSE = pShotAttackData->HitSE;
 		HitDamageInfo.bFinishOK = pShotAttackData->bFinish;

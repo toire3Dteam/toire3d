@@ -822,7 +822,7 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 {
 										 for (auto it : *pPerson->GetRecoveryDamageCount())
 										 {
-											 if (it == (BASE_ACTION_STATE)HitDamageInfo->iAttackType)
+											 if ((int)it == HitDamageInfo->iAttackType)
 											 {
 												 RecoveryFrame = max((int)(RecoveryFrame * HitDamageInfo->fRepeatAttackRate), 1);	// “¯‹Z•â³
 											 }

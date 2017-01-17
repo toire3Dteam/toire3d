@@ -1,7 +1,6 @@
 #include "SoundWindow.h"
 #include "Data\PlayerData.h"
 #include "Data\SelectData.h"
-#include "Sound\SoundManager.h"
 
 //+------------------------
 //  サウンドウィンドウ

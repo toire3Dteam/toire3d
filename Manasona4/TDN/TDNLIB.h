@@ -2839,7 +2839,7 @@ public:
 	/* 各サウンドパラメータ設定・取得関数 */
 	void	SetVolume(int ID, int volume);
 	void	SetVolume(int ID, float volume);	// 0～1
-	void	SetBaseVolume(float volume){ m_fBaseVolume = volume; }
+	void	SetBaseVolume(float volume);
 	int		GetVolume(int ID);
 	void	SetPan(int ID, int pan);
 	int		GetPan(int ID);

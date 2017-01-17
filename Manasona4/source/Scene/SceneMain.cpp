@@ -326,7 +326,6 @@ void sceneMain::Update()
 	// ポーズ中は更新しない
 	if (m_bPause == false)
 	{
-
 		//	com->Update();
 
 		stopTimer++;
@@ -338,8 +337,8 @@ void sceneMain::Update()
 		// カメラ更新(ステートマシンに書いた)
 		//CameraMgr->Update();
 
-		// ショット更新
-		m_pShotMgr->Update();
+		// ショット更新(ゲームが止まってなかったら)
+		if(!PlayerMgr->isGameStop())m_pShotMgr->Update();
 
 		// ステージ更新
 		m_pStage->Update();

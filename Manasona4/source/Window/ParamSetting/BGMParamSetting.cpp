@@ -1,5 +1,6 @@
 #include "BGMParamSetting.h"
 #include "Data\PlayerData.h"
+#include "../../Sound/SoundManager.h"
 
 //+----------------------------
 //	BGMのパラメーター設定
@@ -103,4 +104,6 @@ void BGMParamSetting::Ctrl(int DeviceID)
 	// 100を超えたら0へ 0より下げたら100へ
 	if (PlayerDataMgr->m_ConfigData.iBGMVolume > 100)PlayerDataMgr->m_ConfigData.iBGMVolume = 0;
 	if (PlayerDataMgr->m_ConfigData.iBGMVolume < 0)PlayerDataMgr->m_ConfigData.iBGMVolume = 100;
+
+	bgm->SetBaseVolume(PlayerDataMgr->m_ConfigData.iBGMVolume * 0.01f);
 }

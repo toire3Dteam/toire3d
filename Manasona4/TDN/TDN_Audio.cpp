@@ -1491,7 +1491,7 @@ void tdnSoundSE::Stop(int ID, int no)
 void tdnSoundSE::AllStop()
 {
 	assert(lpDS);
-	for (int i = 0; i < WavNum; i++) for (UINT j = 0; j < data[i].size(); j++)if (data[i][j]->buffer->isPlay())data[i][j]->buffer->Stop();
+	FOR(WavNum) for (auto it : data[i])if (it->buffer->isPlay())it->buffer->Stop();
 }
 //
 //=============================================================================================
@@ -1500,14 +1500,18 @@ void tdnSoundSE::AllStop()
 //		ボリューム(-10000～0)
 void tdnSoundSE::SetVolume(int ID, int volume)
 {
+	if(!lpDS)return;
+	if(data[ID].empty())return;
 	if (data[ID][0]->b3D)return;	// 3Dサウンドに処理を任せているのでこちら側で音はいじれない
-	assert(lpDS);
-	assert(data[ID].size() != 0);
-	for (UINT i = 0; i < data[ID].size(); i++) data[ID][i]->buffer->SetVolume(volume);	// ID分全部設定してるが、各自設定したい場合は、また作ります。
+	for (auto it : data[ID]) it->buffer->SetVolume(volume);	// ID分全部設定してるが、各自設定したい場合は、また作ります。
 }
 void tdnSoundSE::SetVolume(int ID, float volume)
 {
-	SetVolume(ID, (int)(-5000 * volume));
+	SetVolume(ID, (int)(-7500 * volume));
+}
+void tdnSoundSE::SetBaseVolume(float fVolume)
+{
+	FOR(WavNum) SetVolume(i, fVolume);
 }
 int	tdnSoundSE::GetVolume(int ID)
 {

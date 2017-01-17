@@ -1,5 +1,6 @@
 #include "SEParamSetting.h"
 #include "Data\PlayerData.h"
+#include "../../Sound/SoundManager.h"
 
 //+----------------------------
 //	SEのパラメーター設定

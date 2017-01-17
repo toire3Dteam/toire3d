@@ -12,6 +12,14 @@ namespace Shot
 	//------------------------------------------------------
 	static const int c_NO_SOJOURN_TIME = -1;
 
+	enum class TYPE
+	{
+		MAYA  = 100,
+		MUSHI1,
+		MUSHI2,
+		MUSHI3
+	};
+
 	//------------------------------------------------------
 	//	ショットの情報を持つ構造体
 	//------------------------------------------------------
@@ -80,6 +88,7 @@ namespace Shot
 		bool EraseOK(){ return m_tagParamDesc.bErase; }
 		bool isPenetration(){ return m_tagParamDesc.bPenetration; }
 		bool isCollisionOK(){ return m_tagParamDesc.bCollisionOK; }
+		virtual TYPE GetType() = 0;
 
 		//------------------------------------------------------
 		//	セッター
@@ -120,6 +129,8 @@ namespace Shot
 		~Maya();
 		void Update();
 		void Render();
+
+		TYPE GetType(){ return TYPE::MAYA; }
 	};
 
 	namespace AramitamaMushi
@@ -135,6 +146,7 @@ namespace Shot
 			void Update();
 			void Render();
 
+			TYPE GetType(){ return TYPE::MUSHI1; }
 		private:
 			//------------------------------------------------------
 			//	滞在している時間・攻撃発生時間
@@ -153,6 +165,8 @@ namespace Shot
 			~Squat();
 			void Update();
 			void Render();
+
+			TYPE GetType(){ return TYPE::MUSHI2; }
 		private:
 			//------------------------------------------------------
 			//	移動速度
@@ -170,6 +184,9 @@ namespace Shot
 			~Aerial();
 			void Update();
 			void Render();
+
+			TYPE GetType(){ return TYPE::MUSHI3; }
+
 			//------------------------------------------------------
 			//	滞在時間・移動速度・射程範囲
 			//------------------------------------------------------
