@@ -834,14 +834,14 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 COMBO_DESK comboDesk;
 
 									 // ★初段のみ入るところ
-									 if (pPerson->GetRecoveryDamageCount()->empty())
+									 if (pPerson->GetRecoveryDamageCount()->empty() && HitDamageInfo->iAttackType != (int)BASE_ACTION_STATE::OVERDRIVE_BURST)
 									 {
 										 if (isDamageCounterState(pPerson))
 										 {
 											 comboDesk.bCounter = true;
-											 if(HitDamageInfo->iAttribute != (int)ATTACK_ATTRIBUTE::THROW)damage += BasePlayer::c_COUNTER_BONUS_DAMAGE;
+											 if (HitDamageInfo->iAttribute != (int)ATTACK_ATTRIBUTE::THROW)damage += BasePlayer::c_COUNTER_BONUS_DAMAGE;
 										 }
-											 damage += BasePlayer::c_FIRST_HIT_ADD_DAMAGE;	// 初段だけダメージを増やす
+										 damage += BasePlayer::c_FIRST_HIT_ADD_DAMAGE;	// 初段だけダメージを増やす
 									 }
 
 									 // (12/27) ★初段ダメージとかが欲しかったのでこちらに移動
@@ -5243,9 +5243,9 @@ bool BasePlayerState::ThrowHold::OnMessage(BasePlayer * pPerson, const Message &
 	return true;
 	break;
 	// 攻撃くらったよメッセージ
-	//case MESSAGE_TYPE::HIT_DAMAGE:
-	//	if(pPerson->GetAttackData) return true;	// ダメージメッセージガン無視
-	//	break;
+	case MESSAGE_TYPE::HIT_DAMAGE:
+		return true;	// ダメージメッセージガン無視
+		break;
 	}
 
 	return false;
@@ -5387,7 +5387,15 @@ void BasePlayerState::ThrowBind::Enter(BasePlayer * pPerson)
 
 void BasePlayerState::ThrowBind::Execute(BasePlayer * pPerson)
 {
-	// 相手依存なので自分からかえることはできない。多分ダメージステートに行くと信じて
+	// 相手依存なので自分からかえることはできない。多分ダメージステートに行くと信じて。一応自分で解除する手段も用意する
+	if (!pPerson->GetTargetPlayer()->GetFSM()->isInState(*ThrowHold::GetInstance()) &&
+		!pPerson->GetTargetPlayer()->GetFSM()->isInState(*ThrowSuccess::GetInstance()) &&
+		!pPerson->GetTargetPlayer()->GetFSM()->isInState(*Skill::GetInstance()) &&
+		!pPerson->GetTargetPlayer()->GetFSM()->isInState(*HeavehoDrive::GetInstance())
+		)
+	{
+		ChangeWaitState(pPerson);
+	}
 
 	// 投げ抜けボタン
 	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::A))

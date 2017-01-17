@@ -11,7 +11,7 @@ eAIType(AI_TYPE::PRACTICE_LAND)		// AIのタイプ
 {}
 
 SelectData::SelectData():
-eStage(STAGE::SYUTEN),						// ステージ
+eStage(STAGE::SAND),						// ステージ
 bTutorial(false),							// チュートリアルかどうか
 bTraining(false),							// トレーニングかどうか			
 iBattleMusicID(BattleMusicManager::RANDOM),	// 流す曲の番号

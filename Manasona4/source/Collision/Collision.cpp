@@ -417,7 +417,7 @@ bool Collision::CollisionShot(Shot::Base *shot, BasePlayer *you)
 
 	AttackData *pShotAttackData(shot->GetAttackData());
 
-	if (isInputGuardCommand(you) && you->isLand())
+	if (isInputGuardCommand(you) && isPossibleGuardState(you) && you->isLand())
 	{
 		if (Math::Length(you->GetPos(), shot->GetPos()) < BasePlayer::c_GUARD_DISTANCE)// ƒK[ƒh”­“®‹——£
 		{

@@ -132,7 +132,7 @@ Shot::Maya::Maya(BasePlayer *pPlayer,
 {
 	ParamDesc l_tagParamDesc;
 	l_tagParamDesc.vPos = vPos;
-	l_tagParamDesc.vVec;
+	l_tagParamDesc.vVec = vVec;
 	l_tagParamDesc.vVelocity = vVec * 2.0f;
 	Base::Initialize(l_tagParamDesc);
 }

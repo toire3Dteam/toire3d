@@ -492,14 +492,14 @@ void Stand::Maya::Update(bool bControl)
 		}
 
 		// ショットの向き逆
-		if (m_pPlayer->GetDir() == DIR::LEFT) ShotVec.x *= -1;
+		ShotVec.x *= m_pPlayer->GetDirVecX();
 
 		// マズルエフェクト発動！
 		m_pPlayer->AddEffectAction(m_pos + Vector3(0, 4, -2), EFFECT_TYPE::MUZZLE_FLASH, ShotVec);
 
 
 		// 玉の情報を格納
-		Shot::Base *pNewShot(new Shot::Maya(m_pPlayer, m_pAttackData[(int)m_ActionType], m_pBullet, m_pos + Vector3(0, 5, 0), ShotVec));
+		Shot::Base *pNewShot(new Shot::Maya(m_pPlayer, m_pAttackData[(int)m_ActionType], m_pBullet, m_pos + Vector3(-ShotVec.x * 2, 5, 0), ShotVec));
 		MsgMgr->Dispatch(0, m_pPlayer->GetID(), ENTITY_ID::SHOT_MGR, MESSAGE_TYPE::ADD_SHOT, pNewShot);
 	}
 }

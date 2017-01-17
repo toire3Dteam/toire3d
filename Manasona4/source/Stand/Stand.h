@@ -28,7 +28,7 @@ namespace Stand
 		}
 
 		// ゲッター
-		bool isAttackFrame()
+		virtual bool isAttackFrame()
 		{
 			// 攻撃判定出てる
 			return (m_ActionFrameList[(int)m_ActionType][m_CurrentActionFrame] == FRAME_STATE::ACTIVE);
@@ -117,6 +117,7 @@ namespace Stand
 		void Update(bool bControl);
 		// 純粋仮想オーバーライド
 		void Action(SKILL_ACTION_TYPE type);
+		bool isAttackFrame(){ return false; }	// マーヤは判定なし
 	private:
 		BaseUVEffect *m_pBullet;	// 飛び道具のメッシュの実体(玉に参照させる)
 

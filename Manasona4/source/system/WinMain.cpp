@@ -60,8 +60,8 @@ BOOL InitApp(HINSTANCE hInstance, int nCmdShow)									// ƒQ[ƒ€‹N“®Žž‚ÌÅ‰‚Ì
 	//MainFrameEx->ChangeScene(new sceneRenderingTest2); // •`‰æƒeƒXƒgƒV[ƒ“
 	//MainFrameEx->ChangeScene(new sceneResult(SIDE::RIGHT)); // ƒŠƒUƒ‹ƒgƒV[ƒ“
 	//MainFrameEx->ChangeScene(new sceneEffectTool); // 
-	MainFrameEx->ChangeScene(new sceneTitle);
-	//MainFrameEx->ChangeScene(new sceneMenu);
+	//MainFrameEx->ChangeScene(new sceneTitle);
+	MainFrameEx->ChangeScene(new sceneMenu);
 	//MainFrameEx->ChangeScene(new sceneCollect);
 	//MainFrameEx->ChangeScene(new sceneSelect);
 	
