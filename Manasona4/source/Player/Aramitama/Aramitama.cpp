@@ -5,6 +5,8 @@
 #include "../../BaseEntity/Message/MessageDispatcher.h"
 #include "Window\Player\AirouWindow.h"
 #include "../../Shot/BaseShot.h"
+#include "Effect\Particle.h"
+
 
 const int Aramitama::c_WASSYOIGAUGE_MAX = 600;	// ゲージの最大値=烙印発動時間
 
@@ -39,7 +41,7 @@ Aramitama::Aramitama(SIDE side, const SideData &data) :BasePlayer(side, data)
 
 
 	m_pName = "アラミタマ";
-	m_pCutinPic = new tdn2DAnim("DATA/UI/Game/OverDriveCutin/nazenaraba.png");
+	m_pCutinPic = new tdn2DAnim("DATA/UI/Game/OverDriveCutin/aramitama.png");
 	m_pCutinPic->OrderMoveAppeared(8, -400, +200);
 
 	// フレーム読み込み
@@ -73,7 +75,7 @@ Aramitama::Aramitama(SIDE side, const SideData &data) :BasePlayer(side, data)
 	}
 
 	// 顔グラ
-	m_pFacePic = new tdn2DAnim("Data/UI/Game/CharaIcon/nazenarabaIcon.png");
+	m_pFacePic = new tdn2DAnim("Data/UI/Game/CharaIcon/aramitamaIcon.png");
 	//m_pFacePic->OrderNone();
 	m_pFacePic->OrderShrink(8, 1, 1.25f);
 
@@ -566,7 +568,7 @@ void Aramitama::InitActionDatas()
 	//	ヒーホードライブ
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->damage = 60;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->damage = 120;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->HitSE = "斬撃2";
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->WhiffSE = "空振り5";
@@ -583,8 +585,8 @@ void Aramitama::InitActionDatas()
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(0, 0);
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(0, 0);
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(0, 1.15f);
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(0, 1.15f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 60;
@@ -592,7 +594,7 @@ void Aramitama::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	// 判定形状
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->width = 10;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->width = 14;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->height = 100;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->pos.Set(0, 100, 0);
 
@@ -779,6 +781,8 @@ Aramitama::~Aramitama()
 
 	SAFE_DELETE(m_pWassyoiGage);
 	SAFE_DELETE(m_pWassyoiFrame);	
+	SAFE_DELETE(m_pWassyoiGageRip);
+
 }	
 
 void Aramitama::Update(PLAYER_UPDATE flag)
@@ -1365,6 +1369,18 @@ bool Aramitama::HeavehoDriveUpdate()
 		return true;
 	}
 
+	// パーティクル
+	if (50 <= m_iCurrentActionFrame && m_iCurrentActionFrame <= 140)
+	{
+		if (isActiveFrame())
+		{
+			// 飛び散るパーティクル
+			Vector3 l_vVec = Vector3(0, 10, 0);
+			ParticleManager::EffectHit2(m_vPos + Vector3(0, 7, 0), l_vVec);
+
+		}
+	}
+
 	// エフェクト発生時間
 	if (m_iCurrentActionFrame == 49)
 	{
@@ -1380,6 +1396,7 @@ bool Aramitama::HeavehoDriveUpdate()
 		m_pACanon->Stop();
 		m_pANozzleFlash->Stop();
 	}
+	
 
 	if (GetAttackData()->bHit)
 	{

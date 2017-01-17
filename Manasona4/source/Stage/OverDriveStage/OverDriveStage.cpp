@@ -12,8 +12,9 @@ OverDriveStage::OverDriveStage()
 	m_pSpeedLine= new SpeedLineBlueEffect();
 	m_pSpeedLine->ActionRoop(Vector3(0, 0, 300), 2.0f, 2.0f, Vector3(PI / 8, PI / 4 , 0), Vector3(PI / 8, PI / 4, 0));
 
+	m_pSpeedLine2D = new tdn2DObj("Data/UI/Game/OverDriveSpeedLine.png");
+	m_fSpeed = 0.0f;
 
-	
 	// 
 	m_pScreen = new tdn2DObj(1280, 720, TDN2D::RENDERTARGET);
 	if (FAILED(tdnSystem::GetDevice()->CreateDepthStencilSurface(1280, 720, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, FALSE, &m_pStencilSurface, NULL))) 
@@ -27,6 +28,7 @@ OverDriveStage::~OverDriveStage()
 {
 	SAFE_DELETE(m_pBG);
 	SAFE_DELETE(m_pSpeedLine);
+	SAFE_DELETE(m_pSpeedLine2D);
 	SAFE_DELETE(m_pScreen);
 	SAFE_RELEASE(m_pStencilSurface);
 }
@@ -34,7 +36,8 @@ OverDriveStage::~OverDriveStage()
 
 void OverDriveStage::Update()
 {
-
+	// 上下のスピードの速さ
+	m_fSpeed += 100;
 
 	m_pSpeedLine->Update();
 }
@@ -61,6 +64,9 @@ void OverDriveStage::Render()
 		m_pBG->Render(0, 0,RS::COPY_NOZ);
 
 		m_pSpeedLine->Render();
+
+		// 上下の
+		m_pSpeedLine2D->Render(0, 0, 1280, 720, (int)m_fSpeed, 0, 1280, 720, RS::ADD);
 	}
 
 	// お片付け

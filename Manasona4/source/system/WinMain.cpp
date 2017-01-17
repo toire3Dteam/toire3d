@@ -22,7 +22,7 @@
 
 //Framework*	MainFrame = NULL;			// フレームワーク
 
-char*	AppTitle = "真夏(仮)";// ゲームのタイトル 
+char*	AppTitle = "真夏のファイト4";// ゲームのタイトル 
 BOOL	bFullScreen = FALSE;			// フルスクリーンにしますか？
 DWORD	ScreenMode = SCREEN1280x720;	// Windowの画面のサイズ
 

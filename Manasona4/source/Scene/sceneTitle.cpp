@@ -13,14 +13,18 @@ sceneTitle::sceneTitle() :BaseGameEntity(ENTITY_ID::SCENE_TITLE) {}
 bool sceneTitle::Initialize()
 {
 	// ìÆâÊä÷òAèâä˙âª
-	m_pMovie = new tdnMovie("DATA/Title/op.wmv", true);
-	m_pMovie->Play();
+	m_pMovie = new tdnMovie("DATA/Title/op.wmv", true, false);	
 
 	// âÊëúèâä˙âª
-	m_pImages[IMAGE::BACK] = new tdn2DObj(m_pMovie->GetTexture());
-	
+	m_pImages[IMAGE::MOVIE] = new tdn2DObj(m_pMovie->GetTexture());
+	m_pImages[IMAGE::BG] = new tdn2DObj("Data/Title/BG.png");
+	m_pImages[IMAGE::TITLE] = new tdn2DObj("Data/Title/Title.png");
+
 	m_pLogo = new tdn2DAnim("Data/Title/logo.png");
 	m_pLogo->OrderMoveAppeared(90, 0, 720 / 4);
+	
+	m_pPreaseAnyButton = new tdn2DAnim("Data/Title/PreaseAnyButton.png");
+	m_pPreaseAnyButton->OrderAlphaMove(150, 70, 80);
 
 	m_fLoadPercentage = .5f;	// ÉçÅ[ÉhäÑçá
 	
@@ -41,6 +45,7 @@ sceneTitle::~sceneTitle()
 	FOR(IMAGE::MAX) delete m_pImages[i];
 	SAFE_DELETE(m_pMovie);
 	SAFE_DELETE(m_pLogo);
+	SAFE_DELETE(m_pPreaseAnyButton);
 
 	SAFE_DELETE(m_pStateMachine);
 

@@ -266,6 +266,73 @@ void ParticleManager::EffectHit(const Vector3 &pos, const Vector3 &v)
 	}
 }
 
+//*****************************************************************************
+//	攻撃ヒット2
+//*****************************************************************************
+void ParticleManager::EffectHit2(const Vector3 &pos, const Vector3 &v)
+{
+	Vector3 Pos, Move, Power;
+
+	// 攻撃した方向に飛ばす
+	FOR(25)
+	{
+		// 初期位置
+		Pos.x = pos.x + rand() % 10 - 5.0f;
+		Pos.y = pos.y + rand() % 6 - 3.0f;
+		Pos.z = pos.z + rand() % 6 - 3.0f;
+
+
+		// 移動地
+		Vector3 vMoveVec = v;
+		vMoveVec.Normalize();
+
+		if (abs(Move.x) <= 0.5f)
+		{
+			Move.x = (tdnRandom::Get(-4.1f, 4.1f));
+		}
+		else
+		{
+			Move.x = vMoveVec.x * (tdnRandom::Get(3.25f, 6.85f) + 0.5f);
+		}
+
+		if (abs(Move.y) <= 0.5f)
+		{
+			Move.y = (tdnRandom::Get(-4.1f, 4.1f));
+		}
+		else
+		{
+			Move.y = vMoveVec.y * (tdnRandom::Get(3.25f, 6.85f) + 0.5f);
+		}
+
+		//Move.y = v.y * (tdnRandom::Get(0.0f, 0.5f) + 0.5f);
+		//Move.z = v.z * (tdnRandom::Get(0.0f, 0.5f) + 0.5f);
+		Move.z = (tdnRandom::Get(-3.5f, 3.75f));
+
+		//const int M = 32;	
+		//Move.x = (rand() % M - (M / 2))*0.05f;
+		//if (v.x != 0)Move.x = (v.x < 0) ? -abs(Move.x) : abs(Move.x);
+		//Move.y = (rand() % 6 - 3) * 0.1f;	
+		//Move.y = (v.y < 0) ? -Move.y : Move.y;
+		//Move.z = (rand() % M - (M / 2))*0.05f;
+
+		// 重力
+		//Power.x = 0;
+		//Power.y = (v.y < 0) ? -.0001f : -0.015f;
+		//Power.z = 0;
+		Power.x = tdnRandom::Get(-0.0025f, 0.0025f);
+		Power.y = -0.005f;
+		Power.z = tdnRandom::Get(-0.0015f, 0.0015f);
+
+
+		// 勢いよく飛び散る
+		Set(6, 0, 1.0f, 18, .0f, 7, 1.0f, Pos, Move*0.9f, Power, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, tdnRandom::Get(0.85f, 2.0f), RS::ADD);
+		// 威力弱め
+		Set(6, 0, 1.0f, 24, .0f, 10, 1.0f, Pos, Move*0.45f, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, tdnRandom::Get(0.85f, 2.0f), RS::ADD);
+
+	}
+}
+
+
 void ParticleManager::EffectGuard(const Vector3 & pos, const Vector3 & v)
 {
 	Vector3 Pos = VECTOR_ZERO,

@@ -29,5 +29,8 @@ private:
 	// スピード線
 	BaseUVEffect* m_pSpeedLine;
 
+	// 平行線
+	tdn2DObj* m_pSpeedLine2D;
+	float m_fSpeed;
 };
 

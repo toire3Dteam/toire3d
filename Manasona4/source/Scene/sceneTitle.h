@@ -41,7 +41,9 @@ private:
 	enum IMAGE
 	{
 		//LOGO,	// タイトルロゴ
-		BACK,	// 背景
+		MOVIE,	// ムービー
+		BG,		// 背景
+		TITLE,	// タイトル
 		MAX
 	};
 
@@ -50,7 +52,9 @@ private:
 
 	// ロゴ
 	tdn2DAnim* m_pLogo; 
-
+	
+	// プレスエニーボタンの
+	tdn2DAnim* m_pPreaseAnyButton;
 
 
 	// ステートをフレンドクラスへ

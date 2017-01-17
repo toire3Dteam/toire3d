@@ -145,11 +145,23 @@ void SceneTitleState::MovieStep::Enter(sceneTitle *pMain)
 	// フェード初期化
 	Fade::Set(Fade::FLAG::FADE_IN, 8);
 
+	// ムービー再生
+	pMain->m_pMovie->Play();
 }
 void SceneTitleState::MovieStep::Execute(sceneTitle *pMain)
 {
 	// テアリング防止の苦肉の策
 	pMain->m_pMovie->Update();
+	
+	// ムービーが最後まで来たら
+	if (pMain->m_pMovie->isEndPos())
+	{
+		// ムービー止める
+		pMain->m_pMovie->Stop();
+		// メニューへ
+		pMain->GetFSM()->ChangeState(TitleStep::GetInstance());
+		return;
+	}
 	
 
 	// パッド分更新
@@ -160,6 +172,9 @@ void SceneTitleState::MovieStep::Execute(sceneTitle *pMain)
 	{
 		if (KEY(KEY_A, i) == 3 || KEY(KEY_B, i) == 3 || KEY(KEY_C, i) == 3 || KEY(KEY_D, i) == 3)
 		{
+			// ムービー止める
+			pMain->m_pMovie->Stop();
+
 			// 何かボタン押したらメニューへ
 			pMain->GetFSM()->ChangeState(TitleStep::GetInstance());
 			return;
@@ -176,7 +191,7 @@ void SceneTitleState::MovieStep::Exit(sceneTitle *pMain)
 void SceneTitleState::MovieStep::Render(sceneTitle *pMain)
 {
 	// 動画画像
-	pMain->m_pImages[sceneTitle::IMAGE::BACK]->Render(0, 0);
+	pMain->m_pImages[sceneTitle::IMAGE::MOVIE]->Render(0, 0);
 
 #ifdef _DEBUG
 
@@ -210,9 +225,22 @@ void SceneTitleState::TitleStep::Enter(sceneTitle *pMain)
 	Fade::Set(Fade::FLAG::FADE_IN, 8);
 
 
+	// エニーキーのアニメ開始
+	pMain->m_pPreaseAnyButton->Action();
+
 }
 void SceneTitleState::TitleStep::Execute(sceneTitle *pMain)
 {
+
+	// 動き更新
+	if (pMain->m_pPreaseAnyButton->GetAction()->IsEnd() == true)
+	{	
+		// アニメのループ
+		pMain->m_pPreaseAnyButton->Action();
+	}
+	
+	pMain->m_pPreaseAnyButton->Update();
+
 
 
 	// パッド分更新
@@ -245,12 +273,20 @@ void SceneTitleState::TitleStep::Exit(sceneTitle *pMain)
 
 void SceneTitleState::TitleStep::Render(sceneTitle *pMain)
 {
-	
+	// 背景
+	pMain->m_pImages[sceneTitle::IMAGE::BG]->Render(0, 0);
+
+	// タイトル
+	pMain->m_pImages[sceneTitle::IMAGE::TITLE]->Render(0, 0);
+
+	// 何かボタン押して
+	pMain->m_pPreaseAnyButton->Render(448, 576);
+
 
 #ifdef _DEBUG
 	
 	// □
-	tdnPolygon::Rect(200, 200, 400);
+	//tdnPolygon::Rect(200, 200, 400);
 
 	tdnText::Draw(0, 0, 0xffffffff, "TitleStep");
 
