@@ -200,6 +200,39 @@ namespace SceneMenuState
 		bool PadUpdate(sceneMenu* pMain, int DeviceID);
 	};
 
+	//--------------------システムウィンドウ
+	class SystemWindowStep : public State<sceneMenu>
+	{
+	public:
+		// this is a シングルトン
+		static SystemWindowStep* GetInstance() { static SystemWindowStep state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMenu* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMenu* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMenu* pMain);
+
+		// 描画
+		virtual void Render(sceneMenu* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMenu* pMain, const Message& msg);
+
+	private:
+		SystemWindowStep() {};
+		~SystemWindowStep() {};
+
+		SystemWindowStep(const SystemWindowStep&) {}
+		SystemWindowStep& operator=(const SystemWindowStep&) {}
+
+		bool PadUpdate(sceneMenu* pMain, int DeviceID);
+	};
+
+
 	//--------------------ゲームウィンドウ
 	class GameWindowStep : public State<sceneMenu>
 	{

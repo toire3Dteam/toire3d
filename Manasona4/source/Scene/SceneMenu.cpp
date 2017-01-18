@@ -8,6 +8,7 @@
 #include "Window/OptionWindow.h"	// 必要なウィンドウ
 #include "Window/SoundWindow.h"	// 
 #include "Window/GameWindow.h"
+#include "Window/SystemWindow.h"
 #include "../Scene/sceneResult.h"
 #include	"Trophy\TrophyManager.h"
 #include "BaseEntity\Message\MessageDispatcher.h"
@@ -61,6 +62,9 @@ bool sceneMenu::Initialize()
 		case WINDOW_TYPE::OPTION:
 			m_pWindow[i] = new OptionWindow(Vector2(500, 50));
 			break;
+		case WINDOW_TYPE::SYSTEM:
+			m_pWindow[i] = new SystemWindow(Vector2(200, 250));
+			break;
 		case WINDOW_TYPE::GAME:
 			m_pWindow[i] = new GameWindow(Vector2(200, 250));
 			break;
@@ -82,6 +86,10 @@ bool sceneMenu::Initialize()
 
 	// BGMをストリーミング再生
 	bgm->PlayStreamIn("DATA/Sound/BGM/System/ModeSelect.ogg");
+
+	// ポーズ押した人のデバイスID
+	m_iPauseDeviceID = 0;
+	m_eCommandSide = SIDE::LEFT;// 今は使っていない
 
 	return true;
 }

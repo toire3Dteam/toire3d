@@ -17,6 +17,9 @@
 //#define M_UIMgr pMain->GetMenuUIMgr()
 //#define C_UIMgr pMain->GetCtrlSelectUI()
 
+// これを定義するとOPがスキップされる(デバッグ時短用)
+#define OP_SKIP
+
 /*******************************************************/
 //					ゲーム開始ステート
 /*******************************************************/
@@ -32,6 +35,13 @@ void SceneTitleState::Intro::Execute(sceneTitle *pMain)
 	// 最初の選択へ
 	if (Fade::isFadeInCompletion())
 	{
+
+#ifdef OP_SKIP
+
+		pMain->GetFSM()->ChangeState(TitleStep::GetInstance());
+		return;
+#endif
+
 		pMain->GetFSM()->ChangeState(LogoStep::GetInstance());
 		return;
 	}

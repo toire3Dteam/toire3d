@@ -10,6 +10,7 @@
 #include "Data\PlayerData.h"
 #include "Window\OptionWindow.h"	// 必要なウィンドウ
 #include "../Window/GameWindow.h"
+#include "../Window/SystemWindow.h"
 
 //+--------------------
 // 作業効率化
@@ -167,6 +168,7 @@ bool SceneMenuState::FirstStep::PadUpdate(sceneMenu *pMain, int DeviceID)
 			MainFrameEx->ChangeScene(new sceneCollect, true);
 			break;
 		case MENU_ICON_TYPE::OPTION:
+			pMain->SetPauseDeviceID(DeviceID);// ★ポーズメニューを押した人保存
 			pMain->GetFSM()->ChangeState(OptionStep::GetInstance());
 			bChangedState = true;	// ★関数分けしたので、これをtrueにしたらreturnするようにした
 			break;
@@ -722,6 +724,15 @@ void SceneMenuState::OptionStep::Execute(sceneMenu *pMain)
 		pMain->GetFSM()->ChangeState(FirstStep::GetInstance());	// メニューへ戻る
 	}
 
+	// システムでボタンを押したら
+	if (pMain->GetWindow(WINDOW_TYPE::OPTION)->GetChoiceState()
+		== OptionWindow::OPTION_STATE::SYSTEM)
+	{
+		// システムメニューへ
+		pMain->GetFSM()->ChangeState(SystemWindowStep::GetInstance());
+		return;
+	}
+
 	// ゲームでボタンを押したら
 	if (pMain->GetWindow(WINDOW_TYPE::OPTION)->GetChoiceState()
 		== OptionWindow::OPTION_STATE::GAME)
@@ -740,24 +751,21 @@ void SceneMenuState::OptionStep::Execute(sceneMenu *pMain)
 		return;
 	}
 
+	// (1/18) メニューを開いた人だけが動かせる
+	int l_iDeviceID = pMain->GetPauseDeviceID();
+
 	//+----------------------------------
 	//	このステートでの操作
 	//+----------------------------------
 	// パッド分更新
-	const int NumDevice(tdnInputManager::GetNumDevice());
-
+	// int NumDevice(tdnInputManager::GetNumDevice());
 	// パッド何もささってないとき用
-	if (NumDevice == 0)
+	// if (NumDevice == 0)NumDevice = 1;
+	// for (int i = 0; i < NumDevice; i++)
 	{
-		if (PadUpdate(pMain, 0)) return;
+		if (PadUpdate(pMain, l_iDeviceID)) return;
 	}
-	else
-	{
-		for (int i = 0; i < NumDevice; i++)
-		{
-			if (PadUpdate(pMain, i)) return;
-		}
-	}
+
 }
 
 bool SceneMenuState::OptionStep::PadUpdate(sceneMenu *pMain, int DeviceID)
@@ -806,6 +814,83 @@ bool SceneMenuState::OptionStep::OnMessage(sceneMenu *pMain, const Message & msg
 	return false;
 }
 
+/*******************************************************/
+//				システムウィンドウ選択
+/*******************************************************/
+
+void SceneMenuState::SystemWindowStep::Enter(sceneMenu *pMain)
+{
+	// ウィンドウ起動
+	pMain->GetWindow(WINDOW_TYPE::SYSTEM)->Action();
+}
+
+void SceneMenuState::SystemWindowStep::Execute(sceneMenu *pMain)
+{
+	// UI
+	M_UIMgr->Update();
+
+	// 戻るボタンを押したら
+	if (pMain->GetWindow(WINDOW_TYPE::SYSTEM)->GetChoiceState()
+		== SystemWindow::SYSTEM_STATE::BACK)
+	{
+		pMain->GetWindow(WINDOW_TYPE::SYSTEM)->Stop();	// ウィンドウを閉じる
+		pMain->GetFSM()->RevertToPreviousState();		// 前のステートへ戻る
+		return;
+	}
+
+
+
+	// (1/18) メニューを開いた人だけが動かせる
+	int l_iDeviceID = pMain->GetPauseDeviceID();
+
+	//+----------------------------------
+	//	このステートでの操作
+	//+----------------------------------
+	// パッド分更新
+	// int NumDevice(tdnInputManager::GetNumDevice());
+	// パッド何もささってないとき用
+	// if (NumDevice == 0)NumDevice = 1;
+	// for (int i = 0; i < NumDevice; i++)
+	{
+		if (PadUpdate(pMain, l_iDeviceID)) return;
+	}
+
+}
+
+bool SceneMenuState::SystemWindowStep::PadUpdate(sceneMenu *pMain, int DeviceID)
+{
+	bool bChangedState(false);
+
+	// 選択ウィンドウの操作
+	pMain->GetWindow(WINDOW_TYPE::SYSTEM)->Ctrl(DeviceID);
+
+	return bChangedState;
+}
+
+void SceneMenuState::SystemWindowStep::Exit(sceneMenu *pMain)
+{
+
+}
+
+void SceneMenuState::SystemWindowStep::Render(sceneMenu *pMain)
+{
+	// アイコンUI
+	M_UIMgr->Render();
+
+	// 選択ウィンドウの説明
+	pMain->GetWindow(WINDOW_TYPE::SYSTEM)->RednerInfo();
+
+#ifdef _DEBUG
+
+	tdnText::Draw(0, 0, 0xffffffff, "SystemWindowStep");
+#endif // _DEBUG
+}
+
+bool SceneMenuState::SystemWindowStep::OnMessage(sceneMenu *pMain, const Message & msg)
+{
+	return false;
+}
+
 
 /*******************************************************/
 //				ゲームウィンドウ選択
@@ -833,24 +918,21 @@ void SceneMenuState::GameWindowStep::Execute(sceneMenu *pMain)
 
 
 
+	// (1/18) メニューを開いた人だけが動かせる
+	int l_iDeviceID = pMain->GetPauseDeviceID();
+
 	//+----------------------------------
 	//	このステートでの操作
 	//+----------------------------------
 	// パッド分更新
-	const int NumDevice(tdnInputManager::GetNumDevice());
-
+	// int NumDevice(tdnInputManager::GetNumDevice());
 	// パッド何もささってないとき用
-	if (NumDevice == 0)
+	// if (NumDevice == 0)NumDevice = 1;
+	// for (int i = 0; i < NumDevice; i++)
 	{
-		if (PadUpdate(pMain, 0)) return;
+		if (PadUpdate(pMain, l_iDeviceID)) return;
 	}
-	else
-	{
-		for (int i = 0; i < NumDevice; i++)
-		{
-			if (PadUpdate(pMain, i)) return;
-		}
-	}
+	
 }
 
 bool SceneMenuState::GameWindowStep::PadUpdate(sceneMenu *pMain, int DeviceID)
@@ -914,24 +996,21 @@ void SceneMenuState::SoundWindowStep::Execute(sceneMenu *pMain)
 
 
 
+	// (1/18) メニューを開いた人だけが動かせる
+	int l_iDeviceID = pMain->GetPauseDeviceID();
+
 	//+----------------------------------
 	//	このステートでの操作
 	//+----------------------------------
 	// パッド分更新
-	const int NumDevice(tdnInputManager::GetNumDevice());
-
+	// int NumDevice(tdnInputManager::GetNumDevice());
 	// パッド何もささってないとき用
-	if (NumDevice == 0)
+	// if (NumDevice == 0)NumDevice = 1;
+	// for (int i = 0; i < NumDevice; i++)
 	{
-		if (PadUpdate(pMain, 0)) return;
+		if (PadUpdate(pMain, l_iDeviceID)) return;
 	}
-	else
-	{
-		for (int i = 0; i < NumDevice; i++)
-		{
-			if (PadUpdate(pMain, i)) return;
-		}
-	}
+	
 }
 
 bool SceneMenuState::SoundWindowStep::PadUpdate(sceneMenu *pMain, int DeviceID)

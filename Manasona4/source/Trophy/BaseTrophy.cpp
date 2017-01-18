@@ -319,7 +319,7 @@ SSRankWinTrophy::SSRankWinTrophy()
 PowerfulEnemySSRankWinTrophy::PowerfulEnemySSRankWinTrophy()
 {
 	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/starMedal.png");
-	m_tagTrophy.sTitle = "最強";
+	m_tagTrophy.sTitle = "真夏を極めし者";
 	m_tagTrophy.sText = "最高難易度のCOMにSSランクで勝利した。";
 
 	// 隠しトロフィーフラグ

@@ -55,7 +55,8 @@ namespace PlayerData
 		signed int iVoiceVolume		: 8;
 		unsigned int iRoundNumType	: 4;
 		unsigned int iRoundTimeType : 4;
-		unsigned int ‹ó‚«˜g2		: 32;
+		unsigned int iAutoSave		: 1;
+		unsigned int ‹ó‚«˜g2		: 31;
 		unsigned int ‹ó‚«˜g3		: 32;
 		unsigned int ‹ó‚«˜g4		: 32;
 		unsigned int ‹ó‚«˜g5		: 32;

@@ -1176,18 +1176,20 @@ void SceneMainState::PauseMenu::Enter(sceneMain *pMain)
 // 更新
 void SceneMainState::PauseMenu::Execute(sceneMain *pMain)
 {
+	// (1/18) メニューを開いた人だけが動かせる
+	int l_iDeviceID = pMain->GetPauseDeviceID();
 
 	//+--------------------------------------------
 	//	ポーズメニューの操作
 	//+--------------------------------------------
 	// パッド分更新
-	 int NumDevice(tdnInputManager::GetNumDevice());
+	// int NumDevice(tdnInputManager::GetNumDevice());
 	// パッド何もささってないとき用
-	 if (NumDevice == 0)NumDevice = 1;
-	 for (int i = 0; i < NumDevice; i++)
+	// if (NumDevice == 0)NumDevice = 1;
+	// for (int i = 0; i < NumDevice; i++)
 	 {
 		 // ポーズウィンドウの操作
-		 pMain->GetWindow(BATTLE_WINDOW_TYPE::PAUSE)->Ctrl(i);
+		 pMain->GetWindow(BATTLE_WINDOW_TYPE::PAUSE)->Ctrl(l_iDeviceID);
 	 }
 	
 
@@ -1426,17 +1428,20 @@ void SceneMainState::TrainingPause::Enter(sceneMain *pMain)
 void SceneMainState::TrainingPause::Execute(sceneMain *pMain)
 {
 
+	// (1/18) メニューを開いた人だけが動かせる
+	int l_iDeviceID = pMain->GetPauseDeviceID();
+	
 	//+--------------------------------------------
 	//	トレーニングポーズメニューの操作
 	//+--------------------------------------------
 	// パッド分更新
-	int NumDevice(tdnInputManager::GetNumDevice());
+	// int NumDevice(tdnInputManager::GetNumDevice());
 	// パッド何もささってないとき用
-	if (NumDevice == 0)NumDevice = 1;
-	for (int i = 0; i < NumDevice; i++)
+	// if (NumDevice == 0)NumDevice = 1;
+	// for (int i = 0; i < NumDevice; i++)
 	{
 		// ポーズウィンドウの操作
-		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Ctrl(i);
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Ctrl(l_iDeviceID);
 	}
 	
 
@@ -1589,24 +1594,21 @@ void SceneMainState::SoundMenu::Execute(sceneMain *pMain)
 
 
 
+	// (1/18) メニューを開いた人だけが動かせる
+	int l_iDeviceID = pMain->GetPauseDeviceID();
+
 	//+----------------------------------
 	//	このステートでの操作
 	//+----------------------------------
 	// パッド分更新
-	const int NumDevice(tdnInputManager::GetNumDevice());
+	// int NumDevice(tdnInputManager::GetNumDevice());
 	// パッド何もささってないとき用
-	if (NumDevice == 0)
-	{
-		// ポーズウィンドウの操作
-		pMain->GetWindow(BATTLE_WINDOW_TYPE::SOUND)->Ctrl(0);
-	}
-	else
-	{
-		for (int i = 0; i < NumDevice; i++)
-		{
-			// ポーズウィンドウの操作
-			pMain->GetWindow(BATTLE_WINDOW_TYPE::SOUND)->Ctrl(i);
-		}
+	// if (NumDevice == 0)NumDevice = 1;
+	// for (int i = 0; i < NumDevice; i++)
+	{	
+		// ウィンドウの操作
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::SOUND)->Ctrl(l_iDeviceID);
+		
 	}
 
 }
@@ -1668,17 +1670,20 @@ void SceneMainState::TrainingOptionMenu::Execute(sceneMain *pMain)
 
 
 
+	// (1/18) メニューを開いた人だけが動かせる
+	int l_iDeviceID = pMain->GetPauseDeviceID();
+
 	//+----------------------------------
 	//	このステートでの操作
 	//+----------------------------------
 	// パッド分更新
-	int NumDevice(tdnInputManager::GetNumDevice());
+	// int NumDevice(tdnInputManager::GetNumDevice());
 	// パッド何もささってないとき用
-	if (NumDevice == 0)NumDevice = 1;
-	for (int i = 0; i < NumDevice; i++)
+	// if (NumDevice == 0)NumDevice = 1;
+	// for (int i = 0; i < NumDevice; i++)
 	{
-		// ポーズウィンドウの操作
-		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_OPTION)->Ctrl(i);
+		// ウィンドウの操作
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_OPTION)->Ctrl(l_iDeviceID);
 	}
 	
 
@@ -1740,17 +1745,20 @@ void SceneMainState::TrainingDummyMenu::Execute(sceneMain *pMain)
 
 
 
+	// (1/18) メニューを開いた人だけが動かせる
+	int l_iDeviceID = pMain->GetPauseDeviceID();
+
 	//+----------------------------------
 	//	このステートでの操作
 	//+----------------------------------
 	// パッド分更新
-	int NumDevice(tdnInputManager::GetNumDevice());
+	// int NumDevice(tdnInputManager::GetNumDevice());
 	// パッド何もささってないとき用
-	if (NumDevice == 0)NumDevice = 1;
-	for (int i = 0; i < NumDevice; i++)
+	// if (NumDevice == 0)NumDevice = 1;
+	// for (int i = 0; i < NumDevice; i++)
 	{
-		// ポーズウィンドウの操作
-		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_DUMMY)->Ctrl(i);
+		// ウィンドウの操作
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_DUMMY)->Ctrl(l_iDeviceID);
 	}
 
 
@@ -1812,17 +1820,20 @@ void SceneMainState::TrainingCharacterMenu::Execute(sceneMain *pMain)
 
 
 
+	// (1/18) メニューを開いた人だけが動かせる
+	int l_iDeviceID = pMain->GetPauseDeviceID();
+
 	//+----------------------------------
 	//	このステートでの操作
 	//+----------------------------------
 	// パッド分更新
-	int NumDevice(tdnInputManager::GetNumDevice());
+	// int NumDevice(tdnInputManager::GetNumDevice());
 	// パッド何もささってないとき用
-	if (NumDevice == 0)NumDevice = 1;
-	for (int i = 0; i < NumDevice; i++)
+	// if (NumDevice == 0)NumDevice = 1;
+	// for (int i = 0; i < NumDevice; i++)
 	{
 		// ポーズウィンドウの操作
-		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_CHARACTER)->Ctrl(i);
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_CHARACTER)->Ctrl(l_iDeviceID);
 	}
 
 

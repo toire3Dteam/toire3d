@@ -37,6 +37,7 @@ enum class TIPS_TYPE
 enum class WINDOW_TYPE
 {
 	OPTION,		// オプション
+	SYSTEM,		// システム
 	GAME,		// ゲーム
 	SOUND,		// サウンド
 	ARRAY_END	// 配列終了
@@ -78,6 +79,10 @@ public:
 	int GetTrainingCtrlDevice() { return m_iTrainingCtrlDevice; };
 	void SetTrainingCtrlDevice(int DeviceID) { m_iTrainingCtrlDevice= DeviceID; };
 
+	//
+	int GetPauseDeviceID() { return m_iPauseDeviceID; }
+	void SetPauseDeviceID(int iDeviceID) { m_iPauseDeviceID = iDeviceID; }
+
 private:
 
 	// メニューUI
@@ -98,6 +103,9 @@ private:
 
 	StateMachine<sceneMenu> *m_pStateMachine;	// ステートマシン
 												
+	// ポーズ押した人のデバイスID
+	int m_iPauseDeviceID;
+	SIDE m_eCommandSide;
 
 	// ステートをフレンドクラスへ
 	friend class SceneMenuState::FirstStep;	
