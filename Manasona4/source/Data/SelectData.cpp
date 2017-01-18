@@ -14,7 +14,7 @@ SelectData::SelectData():
 eStage(STAGE::SAND),						// ステージ
 bTutorial(false),							// チュートリアルかどうか
 bTraining(false),							// トレーニングかどうか			
-iBattleMusicID(BattleMusicManager::RANDOM),	// 流す曲の番号
+iBattleMusicID(6),							// 流す曲の番号
 iRoundTime(99),								// 一試合の初期時間
 eOrderTrainingSide(SIDE::LEFT)				// トレーニングを選んだ側
 {

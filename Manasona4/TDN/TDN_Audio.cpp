@@ -116,9 +116,11 @@ void tdnSoundBuffer::Create_and_copy(LPDIRECTSOUND8 lpDS, char* filename, bool b
 	else dsbd.dwFlags = DSBCAPS_CTRLPAN | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFX;
 	dsbd.dwBufferBytes = buffers[dst]->size;
 	dsbd.lpwfxFormat = &buffers[dst]->wfx;
-
+	
 	LPDIRECTSOUNDBUFFER lpWork;
 	result_sound = lpDS->CreateSoundBuffer(&dsbd, &lpWork, nullptr);
+
+	MyAssert(result_sound != DSERR_BUFFERTOOSMALL, "CreateSoundBuffer:[DSERR_BUFFER_TOSMALL]\nエラーファイル名:%s\nとりま再生時間を長くしてみて", filename);
 
 	result_sound = lpWork->QueryInterface(IID_IDirectSoundBuffer8, (LPVOID*)&buffers[dst]->lpBuf);	// LPDIRECTSOUNDBUFFER→LPDIRECTSOUNDBUFFER8
 	lpWork->Release();	// 用済み

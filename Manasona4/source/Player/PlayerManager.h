@@ -86,6 +86,13 @@ public:
 
 	bool isGameStop(){ FOR(m_NumPlayer){ if (m_pPlayers[i]->isGameTimerStopFlag())return true; } return false; }
 
+	BasePlayer *GetHPWinner()
+	{
+		const float l_fRateHP0((float)m_pPlayers[0]->GetHP() / m_pPlayers[0]->GetMaxHP()), l_fRateHP1((float)m_pPlayers[1]->GetHP() / m_pPlayers[1]->GetMaxHP());
+		if (l_fRateHP0 > l_fRateHP1) return m_pPlayers[0];
+		else if (l_fRateHP1 > l_fRateHP0) return m_pPlayers[1];
+		else return nullptr;	// ‚ ‚¢‚±
+	}
 private:
 	// 1‚Â‚µ‚©‚È‚¢ŽÀ‘Ì
 	static PlayerManager *pInstance;

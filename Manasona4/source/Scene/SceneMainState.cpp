@@ -22,7 +22,7 @@
 #include "Trophy\TrophyManager.h"
 
 // これを定義するとラウンドコールがスキップされる(デバッグ時短用)
-#define ROUND_SKIP
+//#define ROUND_SKIP
 
 //#ifdef ROUND_SKIP
 #include "../UI/GameUI.h"
@@ -249,11 +249,37 @@ void SceneMainState::Main::Enter(sceneMain *pMain)
 
 void SceneMainState::Main::Execute(sceneMain *pMain)
 {
-	// (TODO) 0秒になったらタイムアップ！！
+	// 0秒になったらタイムアップ！！
 	if (GameUIMgr->isTimerUp())
 	{
+		BasePlayer *l_pWinnePlayer(PlayerMgr->GetHPWinner());
+		if (l_pWinnePlayer)
+		{
+			// タイムアップコールをお願いする
+			pMain->GetRoundCall()->CallTimeUp(l_pWinnePlayer->GetID());
 
-		//return;
+			ResultData data;// リザルトに必要なデータをここで詰める
+			data.eWinnerSide = l_pWinnePlayer->GetSide();
+			data.iMaxDamage = GameUIMgr->GetComboUI((data.eWinnerSide == SIDE::LEFT) ? SIDE::RIGHT : SIDE::LEFT)->GetMaxDamage();
+			data.iRemainingHP = GameUIMgr->GetHpGage(data.eWinnerSide)->GetHPPercentage();
+			data.iElapsedTime = GameUIMgr->GetTimer()->GetElapsedTime();
+
+			// ラウンド全部取って勝利確定だったら、フィニッシュの段階でリザルトシーンを読み込む
+			if (l_pWinnePlayer->GetWinNum() == pMain->GetRoundNum() - 1)
+			{
+				LoadSceneThreadMgr->Initialize(new sceneResult(data));
+			}
+		}
+
+		else
+		{
+			// タイムアップコールをお願いする
+			pMain->GetRoundCall()->CallTimeUp(ENTITY_ID::ID_ERROR);
+		}
+
+		// ステート変更
+		pMain->GetFSM()->ChangeState(Finish::GetInstance());
+		return;
 	}
 
 	// 必殺ステートに誰かが入ったら止める (TODO) KOフラグとかあればifで囲みたい
@@ -525,6 +551,14 @@ bool SceneMainState::Finish::OnMessage(sceneMain *pMain, const Message & msg)
 			else
 			{
 				ENTITY_ID *WinnerID((ENTITY_ID*)msg.ExtraInfo);
+
+				// どっちも勝っていない状態
+				if (*WinnerID == ENTITY_ID::ID_ERROR)
+				{
+					m_bEndCall = true;	// フィニッシュコール終わったよフラグを立てる
+					Fade::Set(Fade::FLAG::FADE_OUT, 8, 0x00000000);
+					return true;
+				}
 
 				// プレイヤー側からは何回勝ったらいいのかわからないので、メッセージで勝利ラウンド数を送る
 				int RoundNum(pMain->GetRoundNum());

@@ -332,3 +332,100 @@ protected:
 	ENTITY_ID m_WinnerID;
 };
 
+// タイムアップコール
+class TimeUpCall :public BaseRoundCall
+{
+public:
+	TimeUpCall();
+	~TimeUpCall();
+
+	void FrameMove();
+	void Update();
+	void Render();
+	void Action(ENTITY_ID WinnerID);
+
+protected:
+
+	// イラストの構造体
+	struct Pic
+	{
+		tdn2DAnim* pic;
+		Vector2 pos;
+		Vector2 uv;
+		float rotate;
+		float scale;
+		void PicClean()
+		{
+			pic = nullptr;
+			pos.x = pos.y = 0.0f;
+			uv.x = uv.y = 0.0f;
+			rotate = 0.0f;
+			scale = 1.0f;
+		}
+	};
+
+	enum { OVER_FINISH_START = 18, OVER_FINISH_END = 138, OVER_END_FRAME = 150 };
+
+	Pic m_pBG;
+	Pic m_pBGRip;
+	Pic m_pFont;
+
+	// 光の線
+	tdn2DAnim* m_pLightLine;
+
+	Pic m_pSircle;
+
+	// 
+	int m_iFrame;
+
+	// 勝ったやつのID
+	ENTITY_ID m_WinnerID;
+};
+
+
+// ドローコール
+class DrawCall :public BaseRoundCall
+{
+public:
+	DrawCall();
+	~DrawCall();
+
+	void FrameMove();
+	void Update();
+	void Render();
+	void Action();
+
+protected:
+
+	// イラストの構造体
+	struct Pic
+	{
+		tdn2DAnim* pic;
+		Vector2 pos;
+		Vector2 uv;
+		float rotate;
+		float scale;
+		void PicClean()
+		{
+			pic = nullptr;
+			pos.x = pos.y = 0.0f;
+			uv.x = uv.y = 0.0f;
+			rotate = 0.0f;
+			scale = 1.0f;
+		}
+	};
+
+	enum { OVER_FINISH_START = 18, OVER_FINISH_END = 138, OVER_END_FRAME = 150 };
+
+	Pic m_pBG;
+	Pic m_pBGRip;
+	Pic m_pFont;
+
+	// 光の線
+	tdn2DAnim* m_pLightLine;
+
+	Pic m_pSircle;
+
+	// 
+	int m_iFrame;
+};

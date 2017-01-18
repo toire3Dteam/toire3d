@@ -924,3 +924,295 @@ void OverDriveFinishCall::Action(ENTITY_ID WinnerID)
 	m_pSircle.pic->Action();
 
 }
+
+
+
+//+-------------------------------
+//	タイムアップコール
+//+-------------------------------
+
+TimeUpCall::TimeUpCall()
+{
+	// 初期化
+	m_iFrame = 0;
+
+	m_pBG.PicClean();
+	m_pBG.pic = new tdn2DAnim("Data/UI/Game/RoundCall/TimeUpBG.png");
+	//m_pBG.pic->OrderAlphaMove(END_FRAME, ACTION_START, ACTION_END);
+	m_pBG.scale = 1.0f;
+
+	//
+	m_pBGRip.PicClean();
+	m_pBGRip.pic = new tdn2DAnim("Data/UI/Game/RoundCall/TimeUpBG.png");
+	m_pBGRip.pic->OrderRipple(60, 1, 0.01f);
+	m_pBGRip.scale = 1.0f;
+
+	// 文字
+	m_pFont.PicClean();
+	m_pFont.pic = new tdn2DAnim("Data/UI/Game/RoundCall/TimeUp.png");
+
+	// 光の線
+	m_pLightLine = new tdn2DAnim("Data/UI/Game/RoundCall/LightBlue2.png");
+	//m_pLightLine->OrderAlphaMove(OVER_END_FRAME, OVER_FINISH_START, OVER_FINISH_END - 8);
+	m_pLightLine->OrderRipple(24, 2, 0.1f);
+
+	// サークル
+	m_pSircle.pic = new tdn2DAnim("Data/UI/Game/RoundCall/OverDriveSircle.png");
+	m_pSircle.pic->OrderRipple(24, 1, 0.1f);
+
+}
+
+TimeUpCall::~TimeUpCall()
+{
+	SAFE_DELETE(m_pBG.pic);
+	SAFE_DELETE(m_pBGRip.pic);
+	SAFE_DELETE(m_pFont.pic);
+	SAFE_DELETE(m_pLightLine);
+	SAFE_DELETE(m_pSircle.pic);
+}
+
+void TimeUpCall::FrameMove()
+{
+
+	if (m_iFrame == OVER_FINISH_START)
+	{
+		m_pFont.pic->SetScale(1);
+		m_pFont.pic->OrderShake(8, 14, 28, 2);
+		m_pFont.pic->Action();
+	}
+
+	if (m_iFrame <= OVER_FINISH_START)
+	{
+	}
+	else if (m_iFrame <= OVER_FINISH_END)// 中間
+	{
+
+	}
+	else // ラスト
+	{
+
+	}
+
+	if (m_iFrame == OVER_FINISH_END)
+	{
+
+		m_pBG.pic->OrderRipple(4, 1, 0.1f);
+		m_pBG.pic->Action();
+
+		m_pFont.pic->OrderRipple(4, 1, 0.1f);
+		m_pFont.pic->Action();
+
+	}
+
+}
+
+void TimeUpCall::Update()
+{
+	if (m_bActionFlag == false) return;
+	m_iFrame++;
+
+	// 終り処理
+	if (m_iFrame >= OVER_END_FRAME)
+	{
+		m_bActionFlag = false;
+
+		// シーンメインに終わったよとメッセージを送る
+		MsgMgr->Dispatch(0, ENTITY_ID::ROUND_CALL_MGR, ENTITY_ID::SCENE_MAIN, MESSAGE_TYPE::END_FINISHCALL, &m_WinnerID);
+		//MsgMgr->Dispatch(0, ENTITY_ID::ROUND_CALL_MGR, m_WinnerID, MESSAGE_TYPE::END_FINISHCALL, nullptr);
+	}
+
+	// フレームによる更新
+	FrameMove();
+
+	// 更新
+	m_pBG.pic->Update();
+	m_pBGRip.pic->Update();
+
+	m_pFont.pic->Update();
+
+	m_pLightLine->Update();
+	m_pSircle.pic->Update();
+
+}
+
+void TimeUpCall::Render()
+{
+	if (m_bActionFlag == false) return;
+
+	m_pBG.pic->Render(0, 0);
+	m_pBGRip.pic->Render(0, 0, RS::ADD);
+
+	m_pLightLine->Render(0, 0, RS::ADD);
+	m_pFont.pic->Render(0, 0);
+	//m_pFont.pic->Render(0, 0, RS::ADD);
+	m_pSircle.pic->Render(128, -96, RS::ADD);
+
+}
+
+void TimeUpCall::Action(ENTITY_ID WinnerID)
+{
+	m_WinnerID = WinnerID;
+
+	m_bActionFlag = true;
+	m_iFrame = 0;
+
+	// 初期設定
+
+	m_pBG.pic->OrderShrink(18, 1, 12);
+	m_pBG.pic->Action();
+
+	m_pBGRip.pic->Action(18);
+
+	m_pFont.pic->OrderShrink(18, 1, 10);
+	m_pFont.pic->Action();
+
+	m_pLightLine->Action();
+
+	m_pSircle.pic->Action();
+
+}
+
+
+//+-------------------------------
+//	ドローコール
+//+-------------------------------
+
+DrawCall::DrawCall()
+{
+	// 初期化
+	m_iFrame = 0;
+
+	m_pBG.PicClean();
+	m_pBG.pic = new tdn2DAnim("Data/UI/Game/RoundCall/DrawBG.png");
+	//m_pBG.pic->OrderAlphaMove(END_FRAME, ACTION_START, ACTION_END);
+	m_pBG.scale = 1.0f;
+
+	//
+	m_pBGRip.PicClean();
+	m_pBGRip.pic = new tdn2DAnim("Data/UI/Game/RoundCall/DrawBG.png");
+	m_pBGRip.pic->OrderRipple(60, 1, 0.01f);
+	m_pBGRip.scale = 1.0f;
+
+	// 文字
+	m_pFont.PicClean();
+	m_pFont.pic = new tdn2DAnim("Data/UI/Game/RoundCall/Draw.png");
+
+	// 光の線
+	m_pLightLine = new tdn2DAnim("Data/UI/Game/RoundCall/LightBlue2.png");
+	//m_pLightLine->OrderAlphaMove(OVER_END_FRAME, OVER_FINISH_START, OVER_FINISH_END - 8);
+	m_pLightLine->OrderRipple(24, 2, 0.1f);
+
+	// サークル
+	m_pSircle.pic = new tdn2DAnim("Data/UI/Game/RoundCall/OverDriveSircle.png");
+	m_pSircle.pic->OrderRipple(24, 1, 0.1f);
+
+}
+
+DrawCall::~DrawCall()
+{
+	SAFE_DELETE(m_pBG.pic);
+	SAFE_DELETE(m_pBGRip.pic);
+	SAFE_DELETE(m_pFont.pic);
+	SAFE_DELETE(m_pLightLine);
+	SAFE_DELETE(m_pSircle.pic);
+}
+
+void DrawCall::FrameMove()
+{
+
+	if (m_iFrame == OVER_FINISH_START)
+	{
+		m_pFont.pic->SetScale(1);
+		m_pFont.pic->OrderShake(8, 14, 28, 2);
+		m_pFont.pic->Action();
+	}
+
+	if (m_iFrame <= OVER_FINISH_START)
+	{
+	}
+	else if (m_iFrame <= OVER_FINISH_END)// 中間
+	{
+
+	}
+	else // ラスト
+	{
+
+	}
+
+	if (m_iFrame == OVER_FINISH_END)
+	{
+
+		m_pBG.pic->OrderRipple(4, 1, 0.1f);
+		m_pBG.pic->Action();
+
+		m_pFont.pic->OrderRipple(4, 1, 0.1f);
+		m_pFont.pic->Action();
+
+	}
+
+}
+
+void DrawCall::Update()
+{
+	if (m_bActionFlag == false) return;
+	m_iFrame++;
+
+	// 終り処理
+	if (m_iFrame >= OVER_END_FRAME)
+	{
+		m_bActionFlag = false;
+
+		// シーンメインに終わったよとメッセージを送る
+		ENTITY_ID l_eNoID = ENTITY_ID::ID_ERROR;
+		MsgMgr->Dispatch(0, ENTITY_ID::ROUND_CALL_MGR, ENTITY_ID::SCENE_MAIN, MESSAGE_TYPE::END_FINISHCALL, &l_eNoID);
+		//MsgMgr->Dispatch(0, ENTITY_ID::ROUND_CALL_MGR, m_WinnerID, MESSAGE_TYPE::END_FINISHCALL, nullptr);
+	}
+
+	// フレームによる更新
+	FrameMove();
+
+	// 更新
+	m_pBG.pic->Update();
+	m_pBGRip.pic->Update();
+
+	m_pFont.pic->Update();
+
+	m_pLightLine->Update();
+	m_pSircle.pic->Update();
+
+}
+
+void DrawCall::Render()
+{
+	if (m_bActionFlag == false) return;
+
+	m_pBG.pic->Render(0, 0);
+	m_pBGRip.pic->Render(0, 0, RS::ADD);
+
+	m_pLightLine->Render(0, 0, RS::ADD);
+	m_pFont.pic->Render(0, 0);
+	//m_pFont.pic->Render(0, 0, RS::ADD);
+	m_pSircle.pic->Render(128, -96, RS::ADD);
+
+}
+
+void DrawCall::Action()
+{
+	m_bActionFlag = true;
+	m_iFrame = 0;
+
+	// 初期設定
+
+	m_pBG.pic->OrderShrink(18, 1, 12);
+	m_pBG.pic->Action();
+
+	m_pBGRip.pic->Action(18);
+
+	m_pFont.pic->OrderShrink(18, 1, 10);
+	m_pFont.pic->Action();
+
+	m_pLightLine->Action();
+
+	m_pSircle.pic->Action();
+
+}

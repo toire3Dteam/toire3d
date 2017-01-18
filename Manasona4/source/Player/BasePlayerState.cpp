@@ -7,6 +7,7 @@
 #include "PlayerManager.h"
 #include "../Cutin/CutIn.h"
 #include "../Camera/camera.h"
+#include "../UI/GameUI.h"
 
 // 定数
 //static const float REPEAT_ATTACK_RATE = 0.75f;		// 同じ攻撃当たるなレート　(12/26) 同技補正を強く
@@ -322,7 +323,7 @@ bool OverDriveCancel(BasePlayer *pPerson)
 		else
 		{
 			// 覚醒（バースト）キャンセル
-			if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R3, false))
+			if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R3, true))
 			{
 				// 守りのバースト
 				pPerson->GetFSM()->ChangeState(BasePlayerState::OverDrive_Burst::GetInstance());
@@ -756,6 +757,9 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 		// 攻撃くらったよメッセージ
 	case MESSAGE_TYPE::HIT_DAMAGE:
 	{
+									 // ★タイムアップのときはダメージなし
+									 if (GameUIMgr->isTimerUp()) return false;
+
 									 // 先行入力リセット
 									 pPerson->AheadCommandReset();
 
@@ -5727,6 +5731,9 @@ void BasePlayerState::Win::Enter(BasePlayer * pPerson)
 
 	// 正面を向く
 	pPerson->SetAngleY(PI);
+
+	// タイムアップとかで、相手が待機中なら、死にモード設定
+	if (!pPerson->GetTargetPlayer()->GetFSM()->isInState(*Die::GetInstance())) pPerson->GetTargetPlayer()->GetFSM()->ChangeState(Die::GetInstance());
 }
 
 void BasePlayerState::Win::Execute(BasePlayer * pPerson)

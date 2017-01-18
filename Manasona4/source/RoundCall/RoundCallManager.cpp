@@ -27,17 +27,19 @@ RoundCallManager::RoundCallManager() :BaseGameEntity(ENTITY_ID::ROUND_CALL_MGR)
 		case ROUND_TYPE::OVERDRIVE_FINISH:
 			m_pRoundCall[i] = new OverDriveFinishCall();
 			break;
+		case ROUND_TYPE::TIME_UP:
+			m_pRoundCall[i] = new TimeUpCall();
+			break;
+		case ROUND_TYPE::DRAW:
+			m_pRoundCall[i] = new DrawCall();
+			break;
 		default:
 			break;
 		}
 	}
 
 	// ディレイ初期化
-	for (int i = 0; i < (int)ROUND_TYPE::ARRAY_END; i++)
-	{
-		m_iDelayTimer[i] = 0;
-	}
-
+	ZeroMemory(m_iDelayTimer, sizeof(m_iDelayTimer));
 }
 
 RoundCallManager::~RoundCallManager()
@@ -120,6 +122,20 @@ void RoundCallManager::CallOverDriveFinish(ENTITY_ID WinnerID)
 	// オーバードライブフィニッシュ
 	m_pRoundCall[(int)ROUND_TYPE::OVERDRIVE_FINISH]->Action(WinnerID);
 	m_iDelayTimer[(int)ROUND_TYPE::OVERDRIVE_FINISH] = 0;
+}
+
+void RoundCallManager::CallTimeUp(ENTITY_ID WinnerID)
+{
+	// オーバードライブフィニッシュ
+	m_pRoundCall[(int)ROUND_TYPE::TIME_UP]->Action(WinnerID);
+	m_iDelayTimer[(int)ROUND_TYPE::TIME_UP] = 0;
+}
+
+void RoundCallManager::CallDraw()
+{
+	// オーバードライブフィニッシュ
+	m_pRoundCall[(int)ROUND_TYPE::DRAW]->Action();
+	m_iDelayTimer[(int)ROUND_TYPE::DRAW] = 0;
 }
 
 bool RoundCallManager::HandleMessage(const Message& msg)

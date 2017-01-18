@@ -14,6 +14,8 @@ enum class ROUND_TYPE
 	ACTION,
 	FINISH,
 	OVERDRIVE_FINISH,
+	TIME_UP,
+	DRAW,
 	ARRAY_END
 };
 
@@ -34,6 +36,8 @@ public:
 	void CallRound(int roundNum);
 	void CallFinish(ENTITY_ID WinnerID);
 	void CallOverDriveFinish(ENTITY_ID WinnerID);
+	void CallTimeUp(ENTITY_ID WinnerID);
+	void CallDraw();
 
 	// BaseGameEntiryサブクラスはメッセージを使って通信する
 	bool HandleMessage(const Message& msg);

@@ -621,6 +621,8 @@ void SceneMenuState::TutorialSelectStep::Execute(sceneMenu *pMain)
 		// トレーニングではない
 		SelectDataMgr->Get()->bTraining = false;
 
+		SelectDataMgr->Get()->eStage = STAGE::SAND;
+
 		//SelectDataMgr->Get()->iWinRound = 0;
 		// トレーニングに登場するキャラクター設定をここで設定する
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].eCharacter = CHARACTER::NAZENARA;
