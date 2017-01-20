@@ -91,6 +91,9 @@ Aramitama::Aramitama(SIDE side, const SideData &data) :BasePlayer(side, data)
 	m_pACanon			= new AramitamaCanonEffect();
 	m_pANozzleFlash		= new AramitamaNozzleFlashEffect();
 	m_pASoulAura		= new AramitamaSoulAuraEffect();
+	m_pAShot			= new AramitamaShotEffect();
+	m_pARipple			= new AramitamaRippleEffect();
+	m_fCircle = 0.0f;
 
 	// わっしょいゲージ
 	m_pWassyoiGage		= new tdn2DAnim("DATA/UI/Game/Aramitama/WassyoiGage.png");
@@ -117,6 +120,8 @@ void Aramitama::Reset()
 	m_pACanon->Stop();
 	m_pANozzleFlash->Stop();
 	m_pASoulAura->Stop();
+	m_pAShot->Stop();
+	m_pARipple->Stop();
 
 }
 
@@ -729,8 +734,8 @@ void Aramitama::InitMushiDatas()
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	// 判定形状
-	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->pCollisionShape->width = 8;
-	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->pCollisionShape->height = 8;
+	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->pCollisionShape->width = 16;
+	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->pCollisionShape->height = 16;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->pCollisionShape->pos.Set(0, 0, 0);
 
 
@@ -782,7 +787,8 @@ Aramitama::~Aramitama()
 	SAFE_DELETE(m_pACanon);
 	SAFE_DELETE(m_pANozzleFlash);
 	SAFE_DELETE(m_pASoulAura);
-
+	SAFE_DELETE(m_pAShot);
+	SAFE_DELETE(m_pARipple);
 
 	SAFE_DELETE(m_pWassyoiGage);
 	SAFE_DELETE(m_pWassyoiFrame);	
@@ -827,6 +833,9 @@ void Aramitama::Update(PLAYER_UPDATE flag)
 	m_pASoulAura->SetPos(GetCenterPos());
 	m_pASoulAura->Update();
 
+	//m_pARipple->Update();
+
+
 	// ゲージ
 	m_pWassyoiGage->Update();
 	m_pWassyoiFrame->Update();
@@ -850,6 +859,7 @@ void Aramitama::Render()
 	m_pACanon->Render();
 	m_pANozzleFlash->Render();
 	m_pASoulAura->Render();
+	//m_pARipple->Render();
 
 }
 
@@ -1209,10 +1219,42 @@ void Aramitama::SkillAction::Aerial::Enter()
 
 	m_bMoved = false;
 	m_bHitCheck = false;
+
+
 }
 
 bool Aramitama::SkillAction::Aerial::Execute()
 {
+	// エフェクト発生フレーム
+	if (m_pAramitama->GetCurrentFrame() == 14)
+	{
+		m_pAramitama->m_fCircle = 0.0f;
+		m_pAramitama->m_pACircle->ActionRoop(m_pAramitama->GetCenterPos(), 3, 4);
+
+	}
+	else if (m_pAramitama->GetCurrentFrame() == 45)
+	{
+
+		// エフェクト終了
+		m_pAramitama->m_pACircle->StopRoop();
+
+	}
+	else
+	{	
+		// エフェクト更新
+		m_pAramitama->m_pACircle->SetPos(m_pAramitama->GetCenterPos());
+		m_pAramitama->m_fCircle += -0.75f;// *m_pAramitama->GetDirVecX();
+		float l_fYAngle = 0.0f;
+		if (m_pAramitama->GetDir() == DIR::LEFT)
+		{
+			l_fYAngle = 3.14f;
+		}
+		m_pAramitama->m_pACircle->SetAngleAnimation(Vector3(0, l_fYAngle, m_pAramitama->m_fCircle), Vector3(0, l_fYAngle, m_pAramitama->m_fCircle));
+
+
+	}
+
+
 	// 着地したら
 	if (m_pAramitama->isLand())
 	{
@@ -1296,6 +1338,10 @@ void Aramitama::SkillAction::Aerial::Exit()
 
 	// めり込みフラグ解除
 	m_pAramitama->SetSinkingUpdate(true);
+
+	// エフェクト終了
+	m_pAramitama->m_pACircle->StopRoop();
+
 }
 
 
@@ -1428,6 +1474,7 @@ bool Aramitama::HeavehoDriveUpdate()
 		// キャノンエフェクト発動
 		m_pACanon->Action(m_vPos);
 		m_pANozzleFlash->Action(m_vPos);
+		//m_pARipple->Action(m_vPos);
 
 	}
 	// エフェクト終了時間
@@ -1436,6 +1483,7 @@ bool Aramitama::HeavehoDriveUpdate()
 		// キャノンエフェクト止める
 		m_pACanon->Stop();
 		m_pANozzleFlash->Stop();
+		//m_pARipple->Stop();
 	}
 	
 
@@ -1621,11 +1669,11 @@ void Aramitama::MushiData::Action(Aramitama *pAramitama, MUSHI_TYPE type)
 	switch (type)
 	{
 	case MUSHI_TYPE::LAND:
-		pNewShot = new Shot::AramitamaMushi::Land(pAramitama, tagpAttackData, pBullet);
+		pNewShot = new Shot::AramitamaMushi::Land(pAramitama, tagpAttackData, pBullet, pAramitama->m_pARipple);
 		break;
 
 	case MUSHI_TYPE::SQUAT:
-		pNewShot = new Shot::AramitamaMushi::Squat(pAramitama, tagpAttackData, pBullet);
+		pNewShot = new Shot::AramitamaMushi::Squat(pAramitama, tagpAttackData, pBullet, pAramitama->m_pAShot);
 		break;
 
 	case MUSHI_TYPE::AERIAL:

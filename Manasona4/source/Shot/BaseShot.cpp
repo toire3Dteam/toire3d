@@ -14,7 +14,8 @@ Shot::Base::Base(BasePlayer *pPlayer, AttackData *pAttackData,
 	m_p3DObj(pObj),
 	m_bAttitude(bAttitude),
 	m_pUVEffect(nullptr),
-	m_tagParamDesc()
+	m_tagParamDesc(),
+	m_iHitStopFrame(0)
 {
 	pObj->SetFrame(0);
 	pObj->SetAngle(DIR_ANGLE[(int)pPlayer->GetTargetDir()]);
@@ -27,13 +28,21 @@ Shot::Base::Base(BasePlayer *pPlayer, AttackData *pAttackData,
 	m_p3DObj(nullptr),
 	m_bAttitude(false),
 	m_pUVEffect(pObj),
-	m_tagParamDesc()
+	m_tagParamDesc(),
+	m_iHitStopFrame(0)
 {
 	m_pUVEffect->ActionRoop(m_tagParamDesc.vPos);
 }
 
 void Shot::Base::Update()
 {
+	// ヒットストップ処理
+	if (m_iHitStopFrame > 0)
+	{
+		m_iHitStopFrame--;
+		return;
+	}
+
 	// 滞在時間ありの飛び道具の場合
 	if (m_tagParamDesc.iSojournTime != c_NO_SOJOURN_TIME)
 	{
@@ -173,7 +182,9 @@ const int Shot::AramitamaMushi::Land::c_ATTACK_FRAME = 8;
 
 Shot::AramitamaMushi::Land::Land(BasePlayer *pPlayer,
 	AttackData *pAttackData,
-	iex3DObj *pObj) :
+	iex3DObj *pObj,
+	AramitamaRippleEffect* pEffect) :
+	m_bHit(false),
 	Base(pPlayer, pAttackData, pObj, false)
 {
 	DIR eTargetDir((pPlayer->GetTargetDir() == DIR::LEFT) ? DIR::RIGHT : DIR::LEFT);
@@ -201,10 +212,22 @@ Shot::AramitamaMushi::Land::Land(BasePlayer *pPlayer,
 	l_tagParamDesc.bPenetration = true;					// 当たっても消えない
 	l_tagParamDesc.bCollisionOK = false;				// 途中から判定が始まる(モーションに合わせてtrueにする)
 	Base::Initialize(l_tagParamDesc);
+
+	// エフェクト
+	//m_pShotEF = new AramitamaShotEffect();
+	m_pRefShot = pEffect;
+
+
+	// 攻撃する向きから角度を変える
+	float l_ZAngle = atan2(-l_tagParamDesc.vVec.x, l_tagParamDesc.vVec.y);
+	m_pRefShot->Action(l_tagParamDesc.vPos, 1, 1, Vector3(0, 0, l_ZAngle), Vector3(0, 0, l_ZAngle));//Vector3(0, 0, l_ZAngle)
+
 }
 
 Shot::AramitamaMushi::Land::~Land()
 {
+	// トスミタマの演出止める
+	//m_pRefShot->StopRoop();
 }
 
 
@@ -214,16 +237,24 @@ void Shot::AramitamaMushi::Land::Update()
 	Base::Update();
 
 	// 攻撃時間になったら、判定をONにする
-	if (m_tagParamDesc.iSojournTime == c_SOJOURN_TIME - c_ATTACK_FRAME) m_tagParamDesc.bCollisionOK = true;
+	if(!m_bHit) if (m_tagParamDesc.iSojournTime == c_SOJOURN_TIME - c_ATTACK_FRAME)
+	{
+		m_tagParamDesc.bCollisionOK = true;
+		m_bHit = true;
+	}
 
 	// トスミタマの演出
-
+	m_pRefShot->SetPos(m_tagParamDesc.vPos + m_tagParamDesc.vVec * 10);
+	m_pRefShot->Update();
 }
 
 void Shot::AramitamaMushi::Land::Render()
 {
 	// 基底クラスの描画
 	Base::Render();
+
+	// トスミタマの演出
+	m_pRefShot->Render();
 }
 
 
@@ -235,7 +266,8 @@ const float Shot::AramitamaMushi::Squat::c_SPEED = 4.25f;
 
 Shot::AramitamaMushi::Squat::Squat(BasePlayer *pPlayer,
 	AttackData *pAttackData,
-	iex3DObj *pObj) :
+	iex3DObj *pObj,
+	AramitamaShotEffect* pEffect) :
 	Base(pPlayer, pAttackData, pObj, true)
 {
 	Vector3 l_vAppearPos = pPlayer->GetPos();
@@ -250,10 +282,22 @@ Shot::AramitamaMushi::Squat::Squat(BasePlayer *pPlayer,
 	l_tagParamDesc.vVelocity = l_vTargetVec * c_SPEED;	// 移動速度
 	l_tagParamDesc.bPenetration = true;					// 当たっても消えない
 	Base::Initialize(l_tagParamDesc);
+
+	// エフェクト
+	//m_pShotEF = new AramitamaShotEffect();
+	m_pRefShot = pEffect;
+	
+	
+	// 攻撃する向きから角度を変える
+	float l_ZAngle = atan2(-l_tagParamDesc.vVec.x, l_tagParamDesc.vVec.y);
+	m_pRefShot->Action(l_tagParamDesc.vPos, 2, 2, Vector3(0, 0, l_ZAngle), Vector3(0, 0, l_ZAngle));//Vector3(0, 0, l_ZAngle)
+
+
 }
 
 Shot::AramitamaMushi::Squat::~Squat()
 {
+	//SAFE_DELETE(m_pShotEF);
 }
 
 
@@ -263,6 +307,9 @@ void Shot::AramitamaMushi::Squat::Update()
 	Base::Update();
 
 	// 隕石ミタマの演出
+	//m_pRefShot->SetAngleAnimation();
+	m_pRefShot->SetPos(m_tagParamDesc.vPos);
+	m_pRefShot->Update();
 
 }
 
@@ -270,6 +317,9 @@ void Shot::AramitamaMushi::Squat::Render()
 {
 	// 基底クラスの描画
 	Base::Render();
+
+	// エフェクトの描画
+	m_pRefShot->Render();
 }
 
 

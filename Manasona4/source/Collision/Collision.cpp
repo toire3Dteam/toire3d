@@ -127,7 +127,10 @@ void Collision::PlayerCollision(PlayerManager *pPlayerMgr, ShotManager *pShotMgr
 				else if (CollisionShot(it, pYou))
 				{
 					// 貫通段なら、相手にあたっても消えない(代わりに2重ヒット防止用のフラグを立てる)
-					if (it->isPenetration()) it->SetCollisionFlag(false);
+					if (it->isPenetration())
+					{
+						it->SetCollisionFlag(false);
+					}
 
 					// 貫通段ではないので、消えてどうぞ
 					else it->Erase();
@@ -440,6 +443,9 @@ bool Collision::CollisionShot(Shot::Base *shot, BasePlayer *you)
 
 		// 相手がヒットしたときの地上にいたか空中にいたか
 		int iHitPlace = (you->isLand()) ? (int)AttackData::HIT_PLACE::LAND : (int)AttackData::HIT_PLACE::AERIAL;
+
+		// 弾に対してヒットストップを掛ける
+		if (shot->isPenetration())shot->SetHitStopFrame(pShotAttackData->places[iHitPlace].iHitStopFrame);
 
 		// そして、ダメージを受けた人に送信
 		HIT_DAMAGE_INFO HitDamageInfo;

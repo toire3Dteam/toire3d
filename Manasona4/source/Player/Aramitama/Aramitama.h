@@ -194,6 +194,8 @@ public:
 
 	static const int c_WASSYOIGAUGE_MAX;			// ゲージ最大値=烙印発動時間
 
+	
+	//AramitamaShotEffect* GetShotEffect() { return m_pAShot; }
 
 private:
 	// 純粋仮想関数オーバーライド
@@ -202,11 +204,14 @@ private:
 
 	// エフェクト
 	AramitamaChargeWaveEffect*	m_pAChargeWave;		// チャージのウェーブ
-	AramitamaChargeAuraEffect*	m_pAChargeAura;		// チャージのオーラ
+	AramitamaChargeAuraEffect*	m_pAChargeAura;		// チャージのオーラ					
 	AramitamaCircleEffect*		m_pACircle;			// サークル
 	AramitamaCanonEffect*		m_pACanon;			// 必殺キャノン
 	AramitamaNozzleFlashEffect* m_pANozzleFlash;	// 必殺マズルフラッシュ
 	AramitamaSoulAuraEffect*	m_pASoulAura;		// 魂オーラ
+	AramitamaShotEffect*		m_pAShot;			// ショット
+	AramitamaRippleEffect*		m_pARipple;			// 波紋
+	float m_fCircle;								// サークルの
 
 	// 烙印
 	bool m_bWassyoi;

@@ -4,6 +4,8 @@
 class AttackData;
 class BasePlayer;
 class BaseUVEffect;
+class AramitamaShotEffect;
+class AramitamaRippleEffect;
 
 namespace Shot
 {
@@ -95,6 +97,7 @@ namespace Shot
 		//------------------------------------------------------
 		void Erase(){ m_tagParamDesc.bErase = true; }
 		void SetCollisionFlag(bool bCollisionOK){ m_tagParamDesc.bCollisionOK = bCollisionOK; }
+		virtual void SetHitStopFrame(int iHitStopFrame) { m_iHitStopFrame = iHitStopFrame; }
 
 	protected:
 
@@ -114,6 +117,7 @@ namespace Shot
 		//	位置・向き・移動量などの情報
 		//------------------------------------------------------
 		ParamDesc m_tagParamDesc;
+		int m_iHitStopFrame;
 
 		//------------------------------------------------------
 		//	判定・攻撃力とかの情報
@@ -141,7 +145,7 @@ namespace Shot
 		class Land :public Base
 		{
 		public:
-			Land(BasePlayer *pPlayer, AttackData *pAttackData, iex3DObj *pObj);
+			Land(BasePlayer *pPlayer, AttackData *pAttackData, iex3DObj *pObj, AramitamaRippleEffect* pEffect);
 			~Land();
 			void Update();
 			void Render();
@@ -153,6 +157,10 @@ namespace Shot
 			//------------------------------------------------------
 			static const int c_SOJOURN_TIME;
 			static const int c_ATTACK_FRAME;
+
+			AramitamaRippleEffect* m_pRefShot;
+
+			bool m_bHit;
 		};
 
 		//------------------------------------------------------
@@ -161,7 +169,7 @@ namespace Shot
 		class Squat :public Base
 		{
 		public:
-			Squat(BasePlayer *pPlayer, AttackData *pAttackData, iex3DObj *pObj);
+			Squat(BasePlayer *pPlayer, AttackData *pAttackData, iex3DObj *pObj, AramitamaShotEffect *pEffect);
 			~Squat();
 			void Update();
 			void Render();
@@ -172,6 +180,11 @@ namespace Shot
 			//	移動速度
 			//------------------------------------------------------
 			static const float c_SPEED;
+
+			// エフェクト
+			//AramitamaShotEffect* m_pShotEF;
+			AramitamaShotEffect* m_pRefShot;
+
 		};
 
 		//------------------------------------------------------
@@ -186,6 +199,7 @@ namespace Shot
 			void Render();
 
 			TYPE GetType(){ return TYPE::MUSHI3; }
+			void SetHitStopFrame(int iHitStopFrame) {}	// ヒットストップを無視する
 
 			//------------------------------------------------------
 			//	滞在時間・移動速度・射程範囲

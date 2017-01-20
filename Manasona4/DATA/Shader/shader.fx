@@ -2451,12 +2451,12 @@ OUT.color = In.Color * tex2D(DecaleSampUV, In.Tex);
 
 In.wvpPos.xyz /= In.wvpPos.w;// NDC
 float RimPower = pow(1.0f - max(0.0f, dot(-In.wvpPos.xyz, In.Normal)), 1.0f);
-RimPower *= 3.0f;
+RimPower *= 2.2f;
 OUT.color.a *= RimPower;
 //OUT.color.rgb += float3(0.3, 0.3, 1.0);
 
-float RimPower2 = pow(max(0.0f, dot(-In.wvpPos.xyz, In.Normal)), 3.0f);
-RimPower2 *= 2.0f;
+float RimPower2 = pow(max(0.0f, dot(-In.wvpPos.xyz, In.Normal)), 2.5f);
+RimPower2 *= 2.5f;
 OUT.color.a *= RimPower2;
 
 //OUT.color.rgb += float3(0.1, 0.0, 0.0);

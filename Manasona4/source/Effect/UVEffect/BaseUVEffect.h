@@ -1086,13 +1086,51 @@ class AramitamaSoulAuraEffect :public BaseUVEffect
 public:
 	AramitamaSoulAuraEffect()
 	{
-		m_pic = new AnimationUV("Data/UVeffect/Aramitama/SoulAura.IMO", 0.002f, -0.0125f, 16, false, 4, 12);
+		m_pic = new AnimationUV("Data/UVeffect/Aramitama/SoulAura.IMO", 0.0022f, -0.0125f, 16, false, 4, 12);
 	};
 	~AramitamaSoulAuraEffect() {};
 
 	void Update() { BaseUVEffect::Update(); };
 	void Render() { BaseUVEffect::RenderSoul(); };
-	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+	//void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/*****************************/
+//	アラミタマ隕石ショットエフェクト
+/*****************************/
+class AramitamaShotEffect :public BaseUVEffect
+{
+public:
+	AramitamaShotEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Aramitama/shot.IMO", 0.08f, 0.0f, 66, false, 2, 60);
+	};
+	~AramitamaShotEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	//void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+/*****************************/
+//	アラミタマ波紋エフェクト
+/*****************************/
+class AramitamaRippleEffect :public BaseUVEffect
+{
+public:
+	AramitamaRippleEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Aramitama/Ripple.IMO", 0.022f, -0.0225f, 90, false, 6, 76);
+	};
+	~AramitamaRippleEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	//void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
 
 private:
 };
