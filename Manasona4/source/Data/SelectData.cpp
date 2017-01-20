@@ -13,8 +13,8 @@ eAIType(AI_TYPE::PRACTICE_LAND)		// AIのタイプ
 SelectData::SelectData():
 eStage(STAGE::SAND),						// ステージ
 bTutorial(false),							// チュートリアルかどうか
-bTraining(true),							// トレーニングかどうか			
-iBattleMusicID(6),							// 流す曲の番号
+bTraining(false),							// トレーニングかどうか			
+iBattleMusicID(BattleMusicManager::RANDOM),	// 流す曲の番号
 iRoundTime(99),								// 一試合の初期時間
 eOrderTrainingSide(SIDE::LEFT)				// トレーニングを選んだ側
 {

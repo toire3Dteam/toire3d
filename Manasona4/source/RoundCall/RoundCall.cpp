@@ -68,14 +68,16 @@ FirstRoundCall::~FirstRoundCall()
 
 void FirstRoundCall::FrameMove()
 {
+	if (m_iFrame == 4)
+	{
+		//#ifdef ROUND_CALL_ON
+		//se->Play("フェイトイズターニング");
+		//#endif
+	}
 	if (m_iFrame == ROLL_START)
 	{
 		// ★ゲームUI発動
 		GameUIMgr->Action();
-		
-#ifdef ROUND_CALL_ON
-		se->Play("フェイトイズターニング");
-#endif
 	}
 
 	// ロールの動き
@@ -139,9 +141,6 @@ void FirstRoundCall::Update()
 	if (m_iFrame >= 132)
 	{
 		m_bActionFlag = false;
-
-		//// ★ここでリベルコールをする
-		//se->Play("リベル");
 	}
 
 	// フレームによる更新
@@ -281,11 +280,9 @@ void RebelCall::FrameMove()
 	if (m_iFrame == 2)
 	{
 		// ★最初ら編でリベルコールをする
-#ifdef ROUND_CALL_ON
-
+//#ifdef ROUND_CALL_ON
 		se->Play("リベル");
-
-#endif
+//#endif
 	}
 
 	// 回転のスピード
@@ -568,9 +565,9 @@ void ActionCall::FrameMove()
 
 	if (m_iFrame == ACTION_START)
 	{
-#ifdef ROUND_CALL_ON
+//#ifdef ROUND_CALL_ON
 		se->Play("アクション");
-#endif
+//#endif
 	}
 	else if (m_iFrame <= ACTION_END)// 中間
 	{

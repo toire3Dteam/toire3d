@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TDNLIB.h"
+#include "../Data/SelectData.h"
 
 class BattleMusicManager
 {
@@ -56,13 +57,36 @@ public:
 	}
 
 	// 引数の番号の曲のファイルパスを返す
-	std::string GetMusicFilePath(int ID)
+	std::string GetMusicFilePath(int ID, STAGE eStage)
 	{
 		assert(ID >= 0 && ID < m_NumMusic);
 		switch (ID)
 		{
 		case AUTO:
-			return std::string("DATA/Sound/BGM/battle/tori.ogg");
+			switch (eStage)
+			{
+			case STAGE::SAND:
+				if(rand () % 2)return std::string("DATA/Sound/BGM/battle/Collision of Elements.ogg");
+				return std::string("DATA/Sound/BGM/battle/Cupola.ogg");
+				break;
+			case STAGE::SYUTEN:
+				return std::string("DATA/Sound/BGM/battle/Ende.ogg");
+				break;
+			case STAGE::SEA:
+				return std::string("DATA/Sound/BGM/battle/Rising Winter.ogg");
+				break;
+			case STAGE::GARDEN:
+				return std::string("DATA/Sound/BGM/battle/Jardin celeste.ogg");
+				break;
+			case STAGE::NANASATO_SITY:
+				if (rand() % 3 == 0)return std::string("DATA/Sound/BGM/battle/Demonic Coaster.ogg");
+				if (rand() % 2 == 0)return std::string("DATA/Sound/BGM/battle/Wizardry Show.ogg");
+				return std::string("DATA/Sound/BGM/battle/盈虚の夜駆け.ogg");
+				break;
+			default:
+				return std::string("DATA/Sound/BGM/battle/tori.ogg");
+				break;
+			}
 			break;
 
 		case RANDOM:

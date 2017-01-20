@@ -622,6 +622,7 @@ void SceneMenuState::TutorialSelectStep::Execute(sceneMenu *pMain)
 		SelectDataMgr->Get()->bTraining = false;
 
 		SelectDataMgr->Get()->eStage = STAGE::SAND;
+		SelectDataMgr->Get()->iBattleMusicID = 6;	// ジャルダンセレステ
 
 		//SelectDataMgr->Get()->iWinRound = 0;
 		// トレーニングに登場するキャラクター設定をここで設定する

@@ -256,7 +256,7 @@ bool sceneMain::Initialize()
 	TrophyMgr->InitSeceneMain();
 
 	// BGM流す
-	bgm->PlayStreamIn((LPSTR)BattleMusicMgr->GetMusicFilePath(SelectDataMgr->Get()->iBattleMusicID).c_str());
+	bgm->PlayStreamIn((LPSTR)BattleMusicMgr->GetMusicFilePath(SelectDataMgr->Get()->iBattleMusicID, SelectDataMgr->Get()->eStage).c_str());
 
 	// ポーズ押した人のデバイスID
 	m_iPauseDeviceID = 0;

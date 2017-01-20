@@ -6,8 +6,7 @@
 #include "../BaseEntity/Message/Message.h"
 #include "../Fade/Fade.h"
 #include "../Sound/SoundManager.h"
-#include "Data\SelectData.h"
-#include "../Sound/BattleMusic.h"
+#include "Data/SelectData.h"
 
 //+--------------------
 // 作業効率化
@@ -37,6 +36,7 @@ void SceneTitleState::Intro::Execute(sceneTitle *pMain)
 	{
 
 #ifdef OP_SKIP
+
 		pMain->GetFSM()->ChangeState(TitleStep::GetInstance());
 		return;
 #endif
@@ -262,6 +262,9 @@ void SceneTitleState::TitleStep::Execute(sceneTitle *pMain)
 	{
 		if (KEY(KEY_A, i) == 3 || KEY(KEY_B, i) == 3 || KEY(KEY_C, i) == 3 || KEY(KEY_D, i) == 3)
 		{
+			// SEの再生
+			se->Play("タイトルスタート");
+
 			// 何かボタン押したらメニューへ
 			pMain->GetFSM()->ChangeState(End::GetInstance());
 			return;
@@ -359,6 +362,17 @@ void SceneTitleState::End::Exit(sceneTitle *pMain)
 
 void SceneTitleState::End::Render(sceneTitle *pMain)
 {
+	// 背景
+	pMain->m_pImages[sceneTitle::IMAGE::BG]->Render(0, 0);
+
+	// 雲1
+	pMain->m_pImages[sceneTitle::IMAGE::CLOUD1]->Render(-100 + (int)pMain->m_fCloudU, 200);
+
+	// 雲2
+	pMain->m_pImages[sceneTitle::IMAGE::CLOUD2]->Render(750 + (int)pMain->m_fCloudU, 150);
+
+	// タイトル
+	pMain->m_pImages[sceneTitle::IMAGE::TITLE]->Render(0, 0);
 
 #ifdef _DEBUG
 

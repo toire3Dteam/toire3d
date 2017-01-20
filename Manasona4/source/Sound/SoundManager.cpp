@@ -31,7 +31,7 @@ const SE_Manager::DATA all_dataS[]
 	//{ "チャージ",					"DATA/Sound/SE/Battle/charge.wav",2, false },
 	//{ "チャージ溜まる",			"DATA/Sound/SE/Battle/fill.wav",2, false },
 	{ "フィニッシュ小",				"DATA/Sound/SE/Battle/finish_base.wav",2, false },
-	{ "フィニッシュ中",				"DATA/Sound/SE/Battle/finish2.wav",	2, false },
+	//{ "フィニッシュ中",				"DATA/Sound/SE/Battle/finish2.wav",	2, false },
 	{ "フィニッシュ大",				"DATA/Sound/SE/Battle/finish3.wav",	2, false },
 	{ "撃ち落とし",					"DATA/Sound/SE/Battle/smack_down.wav",	2, false },
 	{ "ジャンプ",					"DATA/Sound/SE/BlazBlue/jump.wav",	2, false },
@@ -62,6 +62,7 @@ const SE_Manager::DATA all_dataS[]
 	{ "リザルト2",					"DATA/Sound/SE/Result/result2.wav", 1, false },
 	{ "リザルト3",					"DATA/Sound/SE/Result/result3.wav", 1, false },
 
+	{ "タイトルスタート",			"DATA/Sound/SE/System/start.wav", 1, false },
 	{ "カーソル1",					"DATA/Sound/SE/P4U2/cursor.wav", 2, false },
 	{ "カーソル2",					"DATA/Sound/SE/P4U2/cursor2.wav", 2, false },
 	{ "決定1",						"DATA/Sound/SE/P4U2/decide.wav", 2, false },
@@ -69,14 +70,18 @@ const SE_Manager::DATA all_dataS[]
 	{ "ステップクリア",				"DATA/Sound/SE/P4U2/gagin.wav", 3, false },
 	{ "オールクリア",				"DATA/Sound/SE/P4U2/clear.wav", 1, false },
 	{ "購入",						"DATA/Sound/SE/P4U2/money.wav", 2, false },
-	{ "トロフィー",						"DATA/Sound/SE/System/trophy.wav", 1, false },
+	{ "トロフィー",					"DATA/Sound/SE/System/trophy.wav", 1, false },
 
-	{ "フェイトイズターニング",		"DATA/Sound/SE/BlazBlue/voice/the_wheel.wav",	1, false },
-	{ "リベル",						"DATA/Sound/SE/BlazBlue/voice/revel.wav",		1, false },
-	{ "ワン",						"DATA/Sound/SE/BlazBlue/voice/one.wav",			1, false },
-	{ "ツー",						"DATA/Sound/SE/BlazBlue/voice/two.wav",			1, false },
-	{ "スリー",						"DATA/Sound/SE/BlazBlue/voice/three.wav",		1, false },
-	{ "アクション",					"DATA/Sound/SE/BlazBlue/voice/action.wav",		1, false },
+	{ "フェイトイズターニング",		"DATA/Sound/SE/Battle/plasma.wav",				1, false },
+	{ "リベル",						"DATA/Sound/SE/Battle/appear.wav",				1, false },
+	{ "アクション",					"DATA/Sound/SE/Battle/ki-n.wav",				1, false },
+
+	//{ "フェイトイズターニング",		"DATA/Sound/SE/BlazBlue/voice/the_wheel.wav",	1, false },
+	//{ "リベル",						"DATA/Sound/SE/BlazBlue/voice/revel.wav",		1, false },
+	//{ "ワン",						"DATA/Sound/SE/BlazBlue/voice/one.wav",			1, false },
+	//{ "ツー",						"DATA/Sound/SE/BlazBlue/voice/two.wav",			1, false },
+	//{ "スリー",						"DATA/Sound/SE/BlazBlue/voice/three.wav",		1, false },
+	//{ "アクション",					"DATA/Sound/SE/BlazBlue/voice/action.wav",		1, false },
 };
 
 //==============================================================================================

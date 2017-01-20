@@ -81,7 +81,6 @@ void sceneTitle::Update()
 //		描			画
 void sceneTitle::Render()
 {
-	tdnView::Activate();
 	tdnView::Clear();
 
 	// ★ステートマシン描画
