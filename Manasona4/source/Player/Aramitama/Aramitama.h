@@ -14,7 +14,7 @@ public:
 	/****************************/
 	//	キャラクター固有の様々なポジション
 	/****************************/
-	Vector3 GetCenterPos(){ return m_vPos + Vector3(0, 5, 0); };	 // プレイヤーの真ん中の場所
+	Vector3 GetCenterPos(){ return m_vPos + Vector3(0, 7, 0); };	 // プレイヤーの真ん中の場所
 	Vector3 GetFlontPos() { return m_vPos + Vector3((m_dir == DIR::RIGHT) ? 5.0f : -5.0f, 5.0f, 0); };   // つかみの相手の場所
 
 	/****************************/
@@ -206,6 +206,7 @@ private:
 	AramitamaCircleEffect*		m_pACircle;			// サークル
 	AramitamaCanonEffect*		m_pACanon;			// 必殺キャノン
 	AramitamaNozzleFlashEffect* m_pANozzleFlash;	// 必殺マズルフラッシュ
+	AramitamaSoulAuraEffect*	m_pASoulAura;		// 魂オーラ
 
 	// 烙印
 	bool m_bWassyoi;
@@ -215,19 +216,7 @@ private:
 	tdn2DAnim* m_pWassyoiFrame;
 	tdn2DAnim* m_pWassyoiGageRip;
 
-	void AddWassyoiGauge(int iAdd)
-	{
-		// 烙印中は増えない
-		if (m_bWassyoi) return;
-
-		// ゲージ満タンになったら
-		if ((m_iWassyoiGauge += iAdd) >= c_WASSYOIGAUGE_MAX)
-		{
-			// わっしょいモード発動
-			m_iWassyoiGauge = c_WASSYOIGAUGE_MAX;
-			m_bWassyoi = true;
-		}
-	}
+	void AddWassyoiGauge(int iAdd);
 
 	void AddWassyoiGauge(bool bHitSuccess, int iAdd = c_WASSYOIGAUGE_MAX / 8)
 	{

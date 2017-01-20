@@ -297,7 +297,7 @@ void SceneSelectState::StageAndBGM::Render(sceneSelect *pMain)
 	pMain->StageAndBGMRender();
 	tdnText::Draw(0, 0, 0xffffffff, "StageAndBGM");
 	
-	tdnText::Draw(68, 128, 0xffffffff, "m_iSelectStageNo->%d",pMain->m_iSelectStageNo);
+	//tdnText::Draw(68, 128, 0xffffffff, "m_iSelectStageNo->%d",pMain->m_iSelectStageNo);
 	//tdnText::Draw(68, 156, 0xffffffff, "m_iSelectBGMNo->%d",pMain->m_iSelectBGMNo);
 	//tdnText::Draw(68, 256, 0xffffffff, "‹È‚ß‚¢->%s", BattleMusicMgr->GetMusicName(pMain->m_iSelectBGMNo).c_str());
 }

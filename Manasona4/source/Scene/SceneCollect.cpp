@@ -223,6 +223,16 @@ void sceneCollect::Update()
 	m_pStateMachine->Update();
 
 
+	// Yでトロフィーロック
+	if (KeyBoard(KB_Y) == 2)
+	{
+		TrophyMgr->AllReset();
+	}
+
+	if (KeyBoard(KB_I) == 2)
+	{
+		m_pPictureMgr->AllReset();
+	}
 
 #ifdef _DEBUG
 
@@ -241,16 +251,8 @@ void sceneCollect::Update()
 		MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
 
 	}
-	// Yでトロフィーロック
-	if (KeyBoard(KB_Y) == 2)
-	{
-		TrophyMgr->AllReset();
-	}
-	
-	if (KeyBoard(KB_I) == 2)
-	{
-		m_pPictureMgr->AllReset();
-	}
+
+
 	// 
 	if (KeyBoard(KB_O) == 2)
 	{

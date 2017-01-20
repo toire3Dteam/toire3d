@@ -37,7 +37,6 @@ void SceneTitleState::Intro::Execute(sceneTitle *pMain)
 	{
 
 #ifdef OP_SKIP
-
 		pMain->GetFSM()->ChangeState(TitleStep::GetInstance());
 		return;
 #endif

@@ -17,6 +17,7 @@ public:
 	virtual void RenderADD();
 	virtual void RenderADDNOZ();
 	virtual void RenderGuard();
+	virtual void RenderSoul();
 	virtual void RenderAreaWall();// 壁
 
     virtual void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f,
@@ -1075,4 +1076,23 @@ public:
 
 private:
 
+};
+
+/*****************************************/
+//	アラミタマ魂オーラ
+/*****************************************/
+class AramitamaSoulAuraEffect :public BaseUVEffect
+{
+public:
+	AramitamaSoulAuraEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Aramitama/SoulAura.IMO", 0.002f, -0.0125f, 16, false, 4, 12);
+	};
+	~AramitamaSoulAuraEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderSoul(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
 };

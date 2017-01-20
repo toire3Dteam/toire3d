@@ -1014,7 +1014,7 @@ class tdnShader
 
 public:
 	// 初期化・解放
-	tdnShader(char* filename);
+	tdnShader(char* filename, bool iscfx = false);
 	~tdnShader();
 
 	// シェーダー利用開始・終了

@@ -17,7 +17,7 @@
 const float BasePlayer::c_END_MOVE_LINE = .25f;		// 移動が終わって待機に戻る移動値ライン
 const int	BasePlayer::c_RUSH_AHEAD_START = 5;		// ラッシュ中の先行入力受付開始フレーム
 const float BasePlayer::c_GRAVITY = .1f;
-const float BasePlayer::c_MAX_JUMP = 1.9f;
+//const float BasePlayer::c_MAX_JUMP = 1.9f;
 
 const int BasePlayer::c_RECOVERY_FLAME = 32;			// リカバリーステートにいる時間
 
@@ -78,6 +78,10 @@ void BasePlayer::LoadCharacterParam(LPSTR filename)
 	// 最大速度(ダッシュ速度
 	ifs >> skip;
 	ifs >> m_tagCharacterParam.fMaxSpeed;
+
+	// 最大ジャンプ力
+	ifs >> skip;
+	ifs >> m_tagCharacterParam.fMaxJump;
 
 	// 空中ダッシュ速度
 	ifs >> skip;

@@ -661,6 +661,7 @@ public:
 	bool isAerialDash() { return m_bAerialDash; }
 	int  GetAerialDashFrame() { return m_iAerialDashFrame; }
 	float GetAerialDashSpeed(){ return m_tagCharacterParam.fAerialDashSpeed; }
+	float GetMaxJump() { return m_tagCharacterParam.fMaxJump; }
 	Jump *GetJump() { return &m_jump; }
 	void SetLand(bool bLand) { m_bLand = bLand; }
 	void SetSquat(bool bSquat) { m_bSquat = bSquat; }
@@ -985,7 +986,7 @@ public:
 	static const float	c_END_MOVE_LINE;		// 移動が終わって大気に戻る移動値ライン
 	static const int	c_RUSH_AHEAD_START;		// ラッシュ中の先行入力受付開始フレーム
 	static const float	c_GRAVITY;				// 全員が共通で持つ世界の重力
-	static const float	c_MAX_JUMP;				// ジャンプ最大ライン
+	//static const float	c_MAX_JUMP;				// ジャンプ最大ライン
 	static const int	c_RECOVERY_FLAME;		// リカバリ―フレーム
 	static const int	c_OVERDRIVE_MAX_GAGE;	// 覚醒ゲージの最大値
 	static const int	c_OVERDRIVE_MAX_TIME;	// 覚醒が切れるまでの時間
@@ -1005,6 +1006,7 @@ protected:
 	{
 		int iMaxHP;									// 最大HP
 		float fMaxSpeed;							// 最大スピード(実質走る速さ)
+		float fMaxJump;								// 最大ジャンプ力
 		float fAerialDashSpeed;						// 空中ダッシュの速度
 		bool bInvincibleCoutner;					// 無敵攻撃がカウンタータイプか
 		CollisionShape::Square HitSquare;			// 四角判定(ステージ衝突で使う)

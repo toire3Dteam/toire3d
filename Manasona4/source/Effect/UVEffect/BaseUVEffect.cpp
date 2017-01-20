@@ -47,6 +47,13 @@ void BaseUVEffect::RenderGuard()
 	m_pic->Render_Guard();
 }
 
+void BaseUVEffect::RenderSoul()
+{
+	// 魂用描画
+	m_pic->Render_Soul();
+}
+
+
 void BaseUVEffect::RenderAreaWall()
 {
 	// エリアの壁用描画

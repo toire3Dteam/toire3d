@@ -2417,13 +2417,78 @@ technique uvAnime_guard
 		AlphaBlendEnable = true;
 		BlendOp = Add;
 		SrcBlend = SrcAlpha;
-		DestBlend = InvSrcAlpha;
+		DestBlend = ONE;// InvSrcAlpha
 		CullMode = CCW;
 		ZEnable = true;			// このオブジェクトはZバッファを考慮する
 		ZWriteEnable = false;	// このオブジェクトをZバッファに書き込まない
 
 		VertexShader = compile vs_3_0 VS_UvAnime();
 		PixelShader = compile ps_3_0 PS_UvAnime_Guard();
+	}
+}
+
+
+//------------------------------------------------------
+///		魂オーラ用ピクセルシェーダー	
+//------------------------------------------------------
+PS_TONEMAP PS_UvAnime_Soul(VS_OUTPUT_UV In) : COLOR
+{
+	PS_TONEMAP	OUT = (PS_TONEMAP)0;
+
+//スクリーン空間をテクスチャ座標に  NDC->UV y反転
+//const float2 ScreenTex = In.wvpPos.xy / In.wvpPos.w * float2(0.5, -0.5) + float2(0.5, 0.5);
+// 必要な情報を取得
+//const float4 NormalDepth = tex2D(NormalDepthSamp, ScreenTex);
+//const float3 Normal = CalcNormal(NormalDepth.xy*2.0f - 1.0f);
+//const float3 Pos = CalcViewPosition(ScreenTex, NormalDepth.zw);
+
+//	ピクセル色決定
+OUT.color = In.Color * tex2D(DecaleSampUV, In.Tex);
+
+// 目線
+//float3 E = Pos.xyz;
+//	E.normalize();
+
+In.wvpPos.xyz /= In.wvpPos.w;// NDC
+float RimPower = pow(1.0f - max(0.0f, dot(-In.wvpPos.xyz, In.Normal)), 1.0f);
+RimPower *= 3.0f;
+OUT.color.a *= RimPower;
+//OUT.color.rgb += float3(0.3, 0.3, 1.0);
+
+float RimPower2 = pow(max(0.0f, dot(-In.wvpPos.xyz, In.Normal)), 3.0f);
+RimPower2 *= 2.0f;
+OUT.color.a *= RimPower2;
+
+//OUT.color.rgb += float3(0.1, 0.0, 0.0);
+
+//トーンマッピング
+//OUT.color.rgb *= exp2(exposure); 今は考慮はなしで
+
+// 高輝度抽出
+OUT.high.rgb = max(OUT.color.rgb - 0.25f, 0.0f);
+//OUT.high.rgb = float3(0, 0.5, 0);
+OUT.high.a = OUT.color.a;
+
+return OUT;
+}
+
+//------------------------------------------------------
+///		魂用テクニック
+//------------------------------------------------------
+technique uvAnime_soul
+{
+	pass P0
+	{
+		AlphaBlendEnable = true;
+		BlendOp = Add;
+		SrcBlend = SrcAlpha;
+		DestBlend = ONE;// InvSrcAlpha
+		CullMode = CCW;
+		ZEnable = true;			// このオブジェクトはZバッファを考慮する
+		ZWriteEnable = false;	// このオブジェクトをZバッファに書き込まない
+
+		VertexShader = compile vs_3_0 VS_UvAnime();
+		PixelShader = compile ps_3_0 PS_UvAnime_Soul();
 	}
 }
 

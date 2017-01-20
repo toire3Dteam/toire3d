@@ -182,11 +182,21 @@ Shot::AramitamaMushi::Land::Land(BasePlayer *pPlayer,
 	Vector3 l_vAppearPos(pPlayer->GetTargetPlayer()->GetPos());
 	Vector3 l_vAddMove(pPlayer->GetTargetPlayer()->GetMove() * 1.75f);
 	//if (l_vAppearPos.x + l_vAddMove.x )
-	l_vAppearPos += l_vAddMove;
+	//l_vAppearPos += l_vAddMove;
+	l_vAppearPos += Vector3(15 * pPlayer->GetDirVecX() , -15, 0);
+
+
+	Vector3 l_vTargetPos = pPlayer->GetTargetPlayer()->GetPos();
+	l_vTargetPos.x += +(pPlayer->GetTargetPlayer()->GetMove().x * 3);// 相手のMove値考慮
+
+	Vector3 l_vToTargetVec = l_vTargetPos - l_vAppearPos;
+	l_vToTargetVec.Normalize();
+
 
 	ParamDesc l_tagParamDesc;
 	l_tagParamDesc.vPos = l_vAppearPos;					// 出現位置
-	l_tagParamDesc.vVec = Vector3((eTargetDir == DIR::LEFT) ? -1.0f : 1.0f, 0, 0);
+	l_tagParamDesc.vVec = l_vToTargetVec;
+	l_tagParamDesc.vVelocity = l_tagParamDesc.vVec * 2;
 	l_tagParamDesc.iSojournTime = c_SOJOURN_TIME;		// 滞在時間
 	l_tagParamDesc.bPenetration = true;					// 当たっても消えない
 	l_tagParamDesc.bCollisionOK = false;				// 途中から判定が始まる(モーションに合わせてtrueにする)
@@ -221,14 +231,16 @@ void Shot::AramitamaMushi::Land::Render()
 /****************************************************/
 //	しゃがみスキル時の隕石アラミタマ
 /****************************************************/
-const float Shot::AramitamaMushi::Squat::c_SPEED = 4.0f;
+const float Shot::AramitamaMushi::Squat::c_SPEED = 4.25f;
 
 Shot::AramitamaMushi::Squat::Squat(BasePlayer *pPlayer,
 	AttackData *pAttackData,
 	iex3DObj *pObj) :
 	Base(pPlayer, pAttackData, pObj, true)
 {
-	const Vector3 l_vAppearPos(0, 100, 0);
+	Vector3 l_vAppearPos = pPlayer->GetPos();
+	l_vAppearPos += Vector3(50 * -pPlayer->GetDirVecX(), 100, 0);
+
 	Vector3 l_vTargetVec(pPlayer->GetTargetPlayer()->GetPos() - l_vAppearPos);
 	l_vTargetVec.Normalize();
 

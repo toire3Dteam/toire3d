@@ -19,19 +19,39 @@
 **/
 
 /* 初期化・解放 */
-tdnShader::tdnShader(char* filename)
+tdnShader::tdnShader(char* filename, bool iscfx)
 {
 	LPDEVICE lpDevice = tdnSystem::GetDevice();
 
 	// ファイル名チェック
 	char fileName[256];
-	if (filename[strlen(filename) - 3] != '.') sprintf(fileName, "%s.fx", filename);
-	else sprintf(fileName, "%s", filename);
+	if (iscfx)
+	{
+		sprintf(fileName, "%s", filename);
+	}
+	else
+	{
+		if (filename[strlen(filename) - 3] != '.') sprintf(fileName, "%s.fx", filename);
+		else sprintf(fileName, "%s", filename);
+	}
+
+
 
 	// シェーダーの読み込み
 	HRESULT	hr;					// エラー報告
 	LPD3DXBUFFER pErr = NULL;	// コンパイルエラーの詳細を格納
-	hr = D3DXCreateEffectFromFile(lpDevice, fileName, NULL, NULL, 0, NULL, &pShader, &pErr);
+	
+	// コンパイル済みのファイルを読み込む？
+	if (iscfx)
+	{
+		hr = D3DXCreateEffectFromFile(lpDevice, fileName, NULL, NULL, D3DXSHADER_SKIPVALIDATION, NULL, &pShader, &pErr);
+	}
+	else
+	{
+		hr = D3DXCreateEffectFromFile(lpDevice, fileName, NULL, NULL, 0, NULL, &pShader, &pErr);
+
+	}
+
 	if (FAILED(hr))
 	{
 		// ファイル名を間違えていた場合、pErrはNULLになってしまい、アクセス違反が発生してしまうので、対策

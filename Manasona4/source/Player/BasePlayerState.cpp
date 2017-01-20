@@ -2105,7 +2105,7 @@ void BasePlayerState::Jump::Execute(BasePlayer * pPerson)
 			//// しゃがんでる間、ずっと押してたので、最大ジャンプ
 			//if (pPerson->GetJump()->HoldTimer == pPerson->GetJump()->PlayerHoldTimer)
 			{
-				add.y = BasePlayer::c_MAX_JUMP;
+				add.y = pPerson->GetMaxJump(); //BasePlayer::c_MAX_JUMP;
 			}
 			//// そうじゃないので小ジャンプ
 			//else

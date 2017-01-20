@@ -90,6 +90,7 @@ Aramitama::Aramitama(SIDE side, const SideData &data) :BasePlayer(side, data)
 	m_pACircle			= new AramitamaCircleEffect();
 	m_pACanon			= new AramitamaCanonEffect();
 	m_pANozzleFlash		= new AramitamaNozzleFlashEffect();
+	m_pASoulAura		= new AramitamaSoulAuraEffect();
 
 	// わっしょいゲージ
 	m_pWassyoiGage		= new tdn2DAnim("DATA/UI/Game/Aramitama/WassyoiGage.png");
@@ -115,6 +116,8 @@ void Aramitama::Reset()
 	m_pACircle->Stop();
 	m_pACanon->Stop();
 	m_pANozzleFlash->Stop();
+	m_pASoulAura->Stop();
+
 }
 
 void Aramitama::InitActionDatas()
@@ -387,7 +390,7 @@ void Aramitama::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(.5f, .0f);
-	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.45f, 1.45f);
+	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.45f, 1.9f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 7;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 7;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 35;
@@ -397,7 +400,7 @@ void Aramitama::InitActionDatas()
 	// 判定形状
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->pCollisionShape->width = 8;
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->pCollisionShape->height = 12;
-	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->pCollisionShape->pos.Set(6, 14, 0);
+	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->pCollisionShape->pos.Set(6, 12, 0);
 
 	//==============================================================================================================
 	//	逆切れ攻撃
@@ -585,8 +588,8 @@ void Aramitama::InitActionDatas()
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(0, 1.15f);
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(0, 1.15f);
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(0.01f, 0.8f);
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(0.01f, 0.8f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 60;
@@ -778,6 +781,8 @@ Aramitama::~Aramitama()
 	SAFE_DELETE(m_pACircle);
 	SAFE_DELETE(m_pACanon);
 	SAFE_DELETE(m_pANozzleFlash);
+	SAFE_DELETE(m_pASoulAura);
+
 
 	SAFE_DELETE(m_pWassyoiGage);
 	SAFE_DELETE(m_pWassyoiFrame);	
@@ -793,8 +798,21 @@ void Aramitama::Update(PLAYER_UPDATE flag)
 	// わっしょいタイム中
 	if (m_bWassyoi)
 	{
+		// オーラエフェクトがまだ発動されていなかったら
+		if (m_pASoulAura->GetUV()->IsAction() == false)
+		{
+			// 魂オーラ発動
+			m_pASoulAura->ActionRoop();
+		}
+
 		// わっしょいゲージを減らしていく(0になったら終了)
-		if (--m_iWassyoiGauge <= 0) m_bWassyoi = false;
+		if (--m_iWassyoiGauge <= 0)
+		{
+			m_bWassyoi = false;
+
+			// 魂オーラストップ
+			m_pASoulAura->Stop();
+		}
 	}
 
 	// 虫更新
@@ -805,6 +823,9 @@ void Aramitama::Update(PLAYER_UPDATE flag)
 	m_pACircle->Update();
 	m_pACanon->Update();
 	m_pANozzleFlash->Update();
+
+	m_pASoulAura->SetPos(GetCenterPos());
+	m_pASoulAura->Update();
 
 	// ゲージ
 	m_pWassyoiGage->Update();
@@ -828,6 +849,8 @@ void Aramitama::Render()
 	m_pACircle->Render();
 	m_pACanon->Render();
 	m_pANozzleFlash->Render();
+	m_pASoulAura->Render();
+
 }
 
 void Aramitama::RenderDrive()
@@ -886,6 +909,24 @@ void Aramitama::InitMotionDatas()
 	m_iMotionNumbers[(int)MOTION_TYPE::WIN] = 36;
 }
 
+// ゲージ発動時の処理
+void Aramitama::AddWassyoiGauge(int iAdd)
+{
+	// 烙印中は増えない
+	if (m_bWassyoi) return;
+
+	// ゲージ満タンになったら
+	if ((m_iWassyoiGauge += iAdd) >= c_WASSYOIGAUGE_MAX)
+	{
+		// わっしょいモード発動
+		m_iWassyoiGauge = c_WASSYOIGAUGE_MAX;
+		m_bWassyoi = true;
+
+		// 魂オーラ発動！
+		m_pASoulAura->ActionRoop();
+
+	}
+}
 
 void Aramitama::KakeaiInit()
 {
@@ -1357,7 +1398,7 @@ void Aramitama::HeavehoDriveInit()
 
 	// ストップタイマー
 	SetGameTimerStopFlag(true);
-	m_iHeavehoStopTimer = 97;
+	m_iHeavehoStopTimer = 48;
 }
 
 bool Aramitama::HeavehoDriveUpdate()
