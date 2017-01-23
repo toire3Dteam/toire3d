@@ -1225,6 +1225,8 @@ namespace AnimAction
 		// Get
 		bool IsAction() { return m_bActionFlag; }
 		bool IsEnd() { return m_bEndFlag; }
+		int  GetDelayFrame() { return m_iDelayFrame; }
+
 	protected:
 		// アクションフラグ	 
 		bool m_bActionFlag;

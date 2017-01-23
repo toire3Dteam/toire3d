@@ -9,6 +9,8 @@
 #include "Window/SoundWindow.h"	// 
 #include "Window/GameWindow.h"
 #include "Window/SystemWindow.h"
+#include "Window/ChallengeWindow.h"
+#include "Window/ChallengeSelectWindow.h"
 #include "../Scene/sceneResult.h"
 #include	"Trophy\TrophyManager.h"
 #include "BaseEntity\Message\MessageDispatcher.h"
@@ -70,6 +72,12 @@ bool sceneMenu::Initialize()
 			break;
 		case WINDOW_TYPE::SOUND:
 			m_pWindow[i] = new SoundWindow(Vector2(200, 250));
+			break;
+		case WINDOW_TYPE::CHALLENGE:
+			m_pWindow[i] = new ChallengeWindow(Vector2(500, 50));
+			break;
+		case WINDOW_TYPE::CHALLENGE_SELECT:
+			m_pWindow[i] = new ChallengeSelectWindow(Vector2(200, 250));
 			break;
 		default:
 			MyAssert(0, "そんなウィンドウはない");

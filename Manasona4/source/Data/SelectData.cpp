@@ -11,12 +11,15 @@ eAIType(AI_TYPE::PRACTICE_LAND)		// AIのタイプ
 {}
 
 SelectData::SelectData():
-eStage(STAGE::SAND),						// ステージ
+eStage(STAGE::SYUTEN),						// ステージ
 bTutorial(false),							// チュートリアルかどうか
-bTraining(true),							// トレーニングかどうか			
+bTraining(false),							// トレーニングかどうか	
+bChallenge(true),							// チャレンジかどうか	
 iBattleMusicID(BattleMusicManager::RANDOM),	// 流す曲の番号
 iRoundTime(99),								// 一試合の初期時間
-eOrderTrainingSide(SIDE::LEFT)				// トレーニングを選んだ側
+eOrderTrainingSide(SIDE::LEFT),				// トレーニングを選んだ側
+iTutorialType(0),							// 選択しているチュートリアル
+iChallengeType(0)							// 選択しているチャレンジ
 {
 	tagSideDatas[(int)SIDE::LEFT].iDeviceID = 0;
 	tagSideDatas[(int)SIDE::RIGHT].iDeviceID = 1;

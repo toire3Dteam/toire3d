@@ -77,6 +77,10 @@ void BaseTutorial::Init(int iDeviceID)
 
 	m_iDeviceID = iDeviceID;
 
+	// 前回の演出を消す
+	m_pClearPic->Stop();
+	m_pClearPicRip->Stop();
+
 	// 初期の状況設定
 	// 必要な状況があるなら各自書き換える
 	SelectDataMgr->Get()->tagTrainingDatas.eHpRecovery = HP_RECOVERY_TYPE::AUTO_RECOVERY;
@@ -793,52 +797,57 @@ void RushTutorial::TaskUpdate(BasePlayer * pPerson)
 	};
 
 	// 待機に戻ると最初からやり直し
-	if (pPerson->GetFSM()->isInState(*BasePlayerState::Wait::GetInstance())||
-		pPerson->GetFSM()->isInState(*BasePlayerState::Jump::GetInstance()))
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::Wait::GetInstance()) ||
+		pPerson->GetFSM()->isInState(*BasePlayerState::Jump::GetInstance()) )
+		//pPerson->GetTargetPlayer()->GetRecoveryFrame() <= 0)
 	{
 		Init(m_iDeviceID);// デバイスは自分自身と同じ
 	}
-
-
-	// 一段目を当てたらクリア
-	if (pPerson->GetFSM()->isInState(*BasePlayerState::RushAttack::GetInstance()) &&
-		pPerson->GetRushStep() == 0)
+	else
 	{
-		if (pPerson->isHitAttack() == true)
+
+
+		// 一段目を当てたらクリア
+		if (pPerson->GetFSM()->isInState(*BasePlayerState::RushAttack::GetInstance()) &&
+			pPerson->GetRushStep() == 0)
 		{
-			TaskSuccess(ATTACK);
+			if (pPerson->isHitAttack() == true)
+			{
+				TaskSuccess(ATTACK);
+			}
+
 		}
 
-	}
-
-	// 二段目を当てたらクリア
-	if (pPerson->GetFSM()->isInState(*BasePlayerState::RushAttack::GetInstance()) &&
-		pPerson->GetRushStep() == 1)
-	{
-		if (pPerson->isHitAttack() == true)
+		// 二段目を当てたらクリア
+		if (pPerson->GetFSM()->isInState(*BasePlayerState::RushAttack::GetInstance()) &&
+			pPerson->GetRushStep() == 1)
 		{
-			TaskSuccess(ATTACK2);
+			if (pPerson->isHitAttack() == true)
+			{
+				TaskSuccess(ATTACK2);
+			}
+
 		}
 
-	}
-
-	// 三段目を当てたらクリア
-	if (pPerson->GetFSM()->isInState(*BasePlayerState::RushAttack::GetInstance()) &&
-		pPerson->GetRushStep() == 2)
-	{
-		if (pPerson->isHitAttack() == true)
+		// 三段目を当てたらクリア
+		if (pPerson->GetFSM()->isInState(*BasePlayerState::RushAttack::GetInstance()) &&
+			pPerson->GetRushStep() == 2)
 		{
-			TaskSuccess(SKIL);
+			if (pPerson->isHitAttack() == true)
+			{
+				TaskSuccess(SKIL);
+			}
+
 		}
 
-	}
-
-	// 必殺技ステートにいたらクリア
-	if (pPerson->GetFSM()->isInState(*BasePlayerState::HeavehoDrive::GetInstance()))
-	{
-		if (pPerson->isHitAttack() == true)
+		// 必殺技ステートにいたらクリア
+		if (pPerson->GetFSM()->isInState(*BasePlayerState::HeavehoDrive::GetInstance()))
 		{
-			TaskSuccess(OVER_DRIVE);
+			if (pPerson->isHitAttack() == true)
+			{
+				TaskSuccess(OVER_DRIVE);
+			}
+
 		}
 
 	}
@@ -1407,8 +1416,10 @@ void PartnerTutorial::TaskUpdate(BasePlayer * pPerson)
 	// パートナー発動でクリア
 	if (pPerson->GetFSM()->isInState(*BasePlayerState::StandAction::GetInstance()))
 	{
-
-		TaskSuccess(PARTNER_ATTACK);	
+		if (pPerson->GetStand()->isHit() == true)
+		{
+			TaskSuccess(PARTNER_ATTACK);
+		}
 	
 	}
 
@@ -1466,7 +1477,7 @@ void DokkoiTutorial::TaskUpdate(BasePlayer * pPerson)
 		DOKKOI = 0, DUSH_CHANCEL = 1
 	};
 
-	// パートナー発動でクリア
+	// 中段技
 	if (pPerson->GetFSM()->isInState(*BasePlayerState::DokkoiAttack::GetInstance()))
 	{
 		if (pPerson->isHitAttack() == true)
@@ -1507,12 +1518,12 @@ DownAttackTutorial::DownAttackTutorial(int iTitleNo) : BaseTutorial(iTitleNo)
 	m_pTaskTitle.iStingLength = addByte;
 
 	// Tips
-	m_pIntroTips = new TipsCard("しゃがんだ状態で▽ボタンを押すと「足払い」になります。");
+	m_pIntroTips = new TipsCard("相手方向しゃがみで▽ボタンを押すと「足払い」になります。");
 	m_pClearTips = new TipsCard("よくできました！\n「足払い」は相手を必ずダウンさせられる【下段技】です。\n上手くダウンさせることでバトルの流れを呼び込みましょう。");
 
 
 	// タスクセット
-	AddTaskData("足払い－↓+▽");
+	AddTaskData("足払い－＼+▽");
 
 	Init();
 }

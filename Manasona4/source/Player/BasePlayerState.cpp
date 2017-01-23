@@ -561,26 +561,27 @@ bool DokkoiAttackCancel(BasePlayer *pPerson)
 	// ‚Ç‚Á‚±‚¢UŒ‚ƒLƒƒƒ“ƒZƒ‹
 	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R1, true))
 	{
+		// 3“ü—Í‚Å‘«•¥‚¢
 		if (pPerson->isLand() == true)
 		{
-			// 4 ‚Ü‚½‚Í 8“ü—Í
-			if (pPerson->isPushInput((pPerson->GetDir() == DIR::LEFT) ? PLAYER_COMMAND_BIT::RIGHT : PLAYER_COMMAND_BIT::LEFT, true) || pPerson->isPushInput(PLAYER_COMMAND_BIT::UP, true))
-			{
-				// ‘Î‹óUŒ‚
-				pPerson->GetFSM()->ChangeState(BasePlayerState::AntiAirAttack::GetInstance());
-			}
-			else if (/*pPerson->isSquat() == false*/
-				pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN, true))
+			if (/*pPerson->isSquat() == false*/
+				pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN, true) &&
+				pPerson->isPushInput((pPerson->GetDir() == DIR::LEFT) ? PLAYER_COMMAND_BIT::LEFT : PLAYER_COMMAND_BIT::RIGHT, true))
 			{
 				// ‚µ‚á‚ª‚Ý
 				pPerson->GetFSM()->ChangeState(BasePlayerState::DownAttack::GetInstance());
+			}
+			// 4 ‚Ü‚½‚Í 8“ü—Í
+			else if (pPerson->isPushInput((pPerson->GetDir() == DIR::LEFT) ? PLAYER_COMMAND_BIT::RIGHT : PLAYER_COMMAND_BIT::LEFT, true) || pPerson->isPushInput(PLAYER_COMMAND_BIT::UP, true) || pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN, true))
+			{
+				// ‘Î‹óUŒ‚
+				pPerson->GetFSM()->ChangeState(BasePlayerState::AntiAirAttack::GetInstance());
 			}
 			else
 			{
 				// ’Êí
 				pPerson->GetFSM()->ChangeState(BasePlayerState::DokkoiAttack::GetInstance());
 			}
-
 		}
 		else
 		{

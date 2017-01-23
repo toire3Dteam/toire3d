@@ -183,6 +183,45 @@ struct TrainingData
 };
 
 
+//+---------------------------
+//	チュートリアルタイプ
+//+---------------------------
+enum class TUTORIAL_TYPE
+{
+	WALK,
+	SQUAT,
+	JUMP,
+	ATTACK,
+	SKILL,
+	OVER_DRIVE,
+	RUSH,
+	STAND_GUARD,
+	SQUAT_GUARD,
+	DUSH,
+	BACK_STEP,
+	PARTNER,
+	INVINCIBLE,
+	THROW,
+	ESCAPE,
+	DOKKOI,
+	DOWN_ATTACK,
+	OD_ONEMORE,
+	OD_BURST,
+	ARRAY_END
+};
+
+
+//+-----------------------------------------
+//	チャレンジモードの種類　（全キャラ共通）
+//+-----------------------------------------
+enum class CHALLENGE_TYPE
+{
+	MISSION_1,
+	MISSION_2,
+	MISSION_3,
+	ARRAY_END
+};
+
 
 struct SideData
 {
@@ -201,10 +240,13 @@ struct SelectData
 	STAGE eStage;					// 選んでるステージ
 	bool bTutorial;					// チュートリアルフラグ
 	bool bTraining;					// トレーニングフラグ
+	bool bChallenge;				// チャレンジフラグ
 	int iRoundTime;					// 一試合時間
 	int iBattleMusicID;				// 戦闘曲の番号
 	SIDE eOrderTrainingSide;		// トレーニングを選んだ側
 	TrainingData tagTrainingDatas;	// トレーニングのデータ
+	int iTutorialType;				// 選択しているチュートリアル 
+	int iChallengeType;				// 選択しているチャレンジ
 	SelectData();
 	//SelectData &operator=(const SelectData &data) { tagSideDatas[(int)SIDE::LEFT] = data.tagSideDatas[(int)SIDE::LEFT], tagSideDatas[(int)SIDE::RIGHT] = data.tagSideDatas[(int)SIDE::RIGHT], stage = data.stage, bTutorial = data.bTutorial, iWinRound = data.iWinRound, iBattleMusicID = data.iBattleMusicID; return *this; }
 };

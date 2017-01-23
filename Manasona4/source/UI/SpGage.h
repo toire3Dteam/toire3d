@@ -29,7 +29,7 @@ private:
 	int m_iGageWidth;
 	int m_iGageHeight;
 
-	tdn2DObj* m_pGageFlash;
+	tdn2DAnim* m_pGageFlash;
 	int m_iAlpha;
 	bool m_bAlphaReturnFlag;
 	int m_iAlphaPow;

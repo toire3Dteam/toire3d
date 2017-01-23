@@ -14,7 +14,7 @@
 #include	"../Effect/Particle.h"
 #include    "../MenuUI/TutorialManager.h"
 #include	"Trophy\TrophyManager.h"
-
+#include    "../Challenge/ChallengeManagerManager.h"
 
 //*****************************/
 //		WinMain
@@ -55,12 +55,12 @@ BOOL InitApp(HINSTANCE hInstance, int nCmdShow)									// ƒQ[ƒ€‹N“®‚ÌÅ‰‚Ì
 	SYSTEM_Initialize();
 
 	//MainFrameEx = new Framework();			 // ƒƒCƒ“ƒtƒŒ[ƒ€ƒ[ƒN¶¬
-	MainFrameEx->ChangeScene(new sceneMain); // ‰ŠúƒV[ƒ“
+	//MainFrameEx->ChangeScene(new sceneMain); // ‰ŠúƒV[ƒ“
 	//MainFrameEx->ChangeScene(new sceneRenderingTest); // •`‰æƒeƒXƒgƒV[ƒ“
 	//MainFrameEx->ChangeScene(new sceneRenderingTest2); // •`‰æƒeƒXƒgƒV[ƒ“
 	//MainFrameEx->ChangeScene(new sceneResult(SIDE::RIGHT)); // ƒŠƒUƒ‹ƒgƒV[ƒ“
 	//MainFrameEx->ChangeScene(new sceneEffectTool); // 
-	//MainFrameEx->ChangeScene(new sceneTitle);
+	MainFrameEx->ChangeScene(new sceneTitle);
 	//MainFrameEx->ChangeScene(new sceneMenu);
 	//MainFrameEx->ChangeScene(new sceneCollect);
 	//MainFrameEx->ChangeScene(new sceneSelect);
@@ -81,6 +81,7 @@ BOOL EndApp()																	// ‚±‚Ì’†‚ÅƒVƒXƒeƒ€‚àŠÜ‚ß‚½‘S‚Ä‚ÌŒãˆ—‚ğ‚·‚é‚Ì‚Åƒ
 	SYSTEM_Release();
 	TrophyMgr->Rerease();
 	TutorialMgr->Rerease();
+	ChallengeMgrMgr->Rerease();
 	// ƒ‰ƒCƒuƒ‰ƒŠ[ŠÖŒW‚ÍÅŒã‚ÉÁ‚·
 	tdnFont::Release();
 	tdnSystem::Release();

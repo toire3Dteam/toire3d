@@ -8,17 +8,18 @@
 
 TutorialPauseWindow::TutorialPauseWindow(Vector2 vPos) :BaseWindow(vPos)
 {
-	m_pWindow = new tdn2DObj("Data/UI/Window/PauseWindow.png");
+	m_pWindow = new tdn2DObj("Data/UI/Window/TutorialPauseWindow.png");
 	//m_pTop =    new tdn2DAnim("Data/UI/Window/PauseWindow.png");
 	//m_pMiddle = new tdn2DAnim("");
 	//m_pBottom = new tdn2DAnim("");
 	//m_pSelect = new tdn2DAnim("");
 
 	//選択アイコンの長さ
-	m_iSelectLength = 34;
+	m_iSelectLength = 65;
 
 	// ポーズウィンドウに存在するアイコンを詰めていく
 	//AddIconData("前のチュートリアルへ", "一つ前のチュートリアルに戻ります。");
+	AddIconData("チュートリアルセレクト", "チュートリアルを変更できます。");
 	AddIconData("コマンドリスト", "操作しているキャラクターのコマンドリストを確認します。");
 	AddIconData("メニューに戻る", "メニュー画面に戻ります。");
 	AddIconData("戻る", "このウィンドウを閉じます。");
@@ -30,6 +31,9 @@ TutorialPauseWindow::TutorialPauseWindow(Vector2 vPos) :BaseWindow(vPos)
 
 	m_pInfoPlate = new InformationPlate();
 
+	m_TutorialSelectParam = new TutorialSelectParamSetting(1, 350);
+
+
 	// 二回戻り防止
 	m_bBackPush = false;
 }
@@ -37,6 +41,8 @@ TutorialPauseWindow::TutorialPauseWindow(Vector2 vPos) :BaseWindow(vPos)
 TutorialPauseWindow::~TutorialPauseWindow()
 {
 	SAFE_DELETE(m_pInfoPlate);
+
+	SAFE_DELETE(m_TutorialSelectParam);
 
 }
 
@@ -62,6 +68,8 @@ bool TutorialPauseWindow::Update()
 	m_pFontBox->SetAlpha(m_iAlpha);			// 透明度更新
 	m_pSelect->SetAlpha(m_iAlpha);			// 透明度更新
 
+	// パラメータ更新
+	m_TutorialSelectParam->Update();
 
 	return true;// 起動中
 }
@@ -117,15 +125,37 @@ void TutorialPauseWindow::Redner()
 
 		//+-----------------------
 		// 枠
-		for (int j = 0; j < m_aIconData[i].iStringLength; j++)
+		//+------------------------------------------------	
+		if (i == TutorialPauseWindow::TUTORIAL_PAUSE_STATE::SELECT_TUTORIAL)
 		{
-			m_pFontBox->Render(x + (j * 11) - 4, y, 32, 32, 0, 0, 32, 32);
-
-			// 選択しているタスクなら
-			if (m_iSelectNo == i)
+			// パラメータ調整系のWindowなので枠は均等に
+			for (int j = 0; j < 25; j++)
 			{
-				m_pFontBox->Render(x + (j * 11) - 4, y,
-					32, 32, 0, 32, 32, 32);
+				m_pFontBox->Render(x + (j * 11) - 4, y, 32, 32, 0, 0, 32, 32);
+
+				// 選択しているタスクなら
+				if (m_iSelectNo == i)
+				{
+					m_pFontBox->Render(x + (j * 11) - 4, y,
+						32, 32, 0, 32, 32, 32);
+				}
+
+			}
+		}
+		else
+		{
+			// 戻るなどはいつも通り文字分の枠に　逐一記入
+			for (int j = 0; j < m_aIconData[i].iStringLength; j++)
+			{
+				m_pFontBox->Render(x + (j * 11) - 4, y, 32, 32, 0, 0, 32, 32);
+
+				// 選択しているタスクなら
+				if (m_iSelectNo == i)
+				{
+					m_pFontBox->Render(x + (j * 11) - 4, y,
+						32, 32, 0, 32, 32, 32);
+				}
+
 			}
 
 		}
@@ -135,6 +165,10 @@ void TutorialPauseWindow::Redner()
 		//if (m_iSelectNo == i)fontCol = 0xff030a58;
 		tdnFont::RenderString(m_aIconData[i].pString, "HGｺﾞｼｯｸE",// HGP創英ﾌﾟﾚｾﾞﾝｽEB
 			24, x, y + 2, ARGB(m_iAlpha, 3, 10, 88), RS::COPY);
+
+		
+		// パラメーター関連の描画
+		RenderParamSetting(i, x + 300, y);
 
 
 		// 40ピクセルずらして描画していく
@@ -234,6 +268,8 @@ bool  TutorialPauseWindow::Ctrl(int DeviceID)
 
 	}
 
+	// 選択してるパラメータの操作
+	CtrlParamSetting(m_iSelectNo, DeviceID);
 
 	return false;
 
@@ -267,3 +303,42 @@ void TutorialPauseWindow::Stop()
 	// 二回戻り防止
 	m_bBackPush = false;
 }
+
+
+void TutorialPauseWindow::RenderParamSetting(int No, int x, int y)
+{
+	bool bSelect = false;
+	if (No == m_iSelectNo)bSelect = true;
+
+
+	switch ((TUTORIAL_PAUSE_STATE)No)
+	{
+	case TUTORIAL_PAUSE_STATE::SELECT_TUTORIAL:
+		m_TutorialSelectParam->Render(x, y, bSelect);
+		break;
+	case TUTORIAL_PAUSE_STATE::BACK:
+		
+		break;
+	default:
+		break;
+	}
+
+
+}
+
+void TutorialPauseWindow::CtrlParamSetting(int SelectNo, int DeviceID)
+{
+	switch ((TUTORIAL_PAUSE_STATE)SelectNo)
+	{
+	case TUTORIAL_PAUSE_STATE::SELECT_TUTORIAL:
+		m_TutorialSelectParam->Ctrl(DeviceID);
+		break;
+	case TUTORIAL_PAUSE_STATE::BACK:
+
+		break;
+	default:
+		break;
+	}
+
+}
+

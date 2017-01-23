@@ -200,6 +200,70 @@ namespace SceneMenuState
 		bool PadUpdate(sceneMenu* pMain, int DeviceID);
 	};
 
+	//--------------------チャレンジウィンドウ
+	class ChallengeStep : public State<sceneMenu>
+	{
+	public:
+		// this is a シングルトン
+		static ChallengeStep* GetInstance() { static ChallengeStep state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMenu* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMenu* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMenu* pMain);
+
+		// 描画
+		virtual void Render(sceneMenu* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMenu* pMain, const Message& msg);
+
+	private:
+		ChallengeStep() {};
+		~ChallengeStep() {};
+
+		ChallengeStep(const ChallengeStep&) {}
+		ChallengeStep& operator=(const ChallengeStep&) {}
+
+		bool PadUpdate(sceneMenu* pMain, int DeviceID);
+	};
+
+	//--------------------チャレンジナンバーウィンドウ
+	class ChallengeNoStep : public State<sceneMenu>
+	{
+	public:
+		// this is a シングルトン
+		static ChallengeNoStep* GetInstance() { static ChallengeNoStep state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMenu* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMenu* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMenu* pMain);
+
+		// 描画
+		virtual void Render(sceneMenu* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMenu* pMain, const Message& msg);
+
+	private:
+		ChallengeNoStep() {};
+		~ChallengeNoStep() {};
+
+		ChallengeNoStep(const ChallengeNoStep&) {}
+		ChallengeNoStep& operator=(const ChallengeNoStep&) {}
+
+		bool PadUpdate(sceneMenu* pMain, int DeviceID);
+	};
+
 	//--------------------システムウィンドウ
 	class SystemWindowStep : public State<sceneMenu>
 	{

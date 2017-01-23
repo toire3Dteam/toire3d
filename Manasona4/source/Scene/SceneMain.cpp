@@ -28,6 +28,7 @@
 #include "RoundCall\RoundCallManager.h"
 #include "Stage\OverDriveStage\OverDriveStage.h"
 #include "Trophy\TrophyManager.h"
+#include "Challenge\ChallengeManagerManager.h"
 
 
 //BaseEffect* g_eff;
@@ -47,7 +48,8 @@ bool sceneMain::Initialize()
 	// (TODO)[11/4]ラウンド数が0の時はラウンドコールを抜く処理がしたい
 	// トレーニングやチュートリアルのため
 	if (SelectDataMgr->Get()->bTutorial == false &&
-		SelectDataMgr->Get()->bTraining == false)
+		SelectDataMgr->Get()->bTraining == false && 
+		SelectDataMgr->Get()->bChallenge== false)
 	{
 
 		//m_iRoundNum = SelectDataMgr->Get()->iWinRound;
@@ -173,9 +175,12 @@ bool sceneMain::Initialize()
 
 	//（TODO）チュートリアル・トレーニングだったら分岐
 	m_bTutorialFlag = SelectDataMgr->Get()->bTutorial;
-	m_eSelectTutorial = (TUTORIAL_TYPE)0;// (TODO)選んだチュートリアルを設定してあげる 					 
+	//m_eSelectTutorial = (TUTORIAL_TYPE)0;// (TODO)選んだチュートリアルを設定してあげる 					 
+	TutorialMgr->SetSelectType(TUTORIAL_TYPE::WALK);// 初期化
 
 	m_bTrainingFlag = SelectDataMgr->Get()->bTraining;
+
+	m_bChallengeFlag = SelectDataMgr->Get()->bChallenge; // チャレンジ
 
 
 	if (m_bTutorialFlag == true)
@@ -192,6 +197,16 @@ bool sceneMain::Initialize()
 		GameUIMgr->Action();
 		// トレーニング用の対戦
 		m_pStateMachine->SetCurrentState(SceneMainState::Training::GetInstance());
+	}
+	else if (m_bChallengeFlag == true)
+	{
+		// ★ここへ来る前に取得した番号を格納
+		ChallengeMgrMgr->GetSelectMgr()->SetSelectType(SelectDataMgr->Get()->iChallengeType);
+
+		// UIを最初の一回だけ起動
+		GameUIMgr->Action();
+		// チャレンジ用の対戦
+		m_pStateMachine->SetCurrentState(SceneMainState::ChallengeIntro::GetInstance());
 	}
 	else
 	{
@@ -215,10 +230,13 @@ bool sceneMain::Initialize()
 			m_pWindow[i] = new PauseWindow(Vector2(424, 128));
 			break;
 		case BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE:
-			m_pWindow[i] = new TutorialPauseWindow(Vector2(424, 128));
+			m_pWindow[i] = new TutorialPauseWindow(Vector2(324, 128));
 			break;
 		case BATTLE_WINDOW_TYPE::TRAINING_PAUSE:
 			m_pWindow[i] = new TrainingPauseWindow(Vector2(424, 128));
+			break;
+		case BATTLE_WINDOW_TYPE::CHALLENGE_PAUSE:
+			m_pWindow[i] = new ChallengePauseWindow(Vector2(324, 128));
 			break;
 		case BATTLE_WINDOW_TYPE::SOUND:
 			m_pWindow[i] = new SoundWindow(Vector2(324, 228));

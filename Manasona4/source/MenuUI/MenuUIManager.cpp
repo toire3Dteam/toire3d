@@ -30,6 +30,9 @@ MenuUIManager::MenuUIManager(int iSelectNo)
 		case MENU_ICON_TYPE::TRAINING:
 			m_pIcon[i] = new TrainingIcon();
 			break;
+		case MENU_ICON_TYPE::CHALLENGE:
+			m_pIcon[i] = new ChallengeIcon();
+			break;
 		case MENU_ICON_TYPE::COLLECT:
 			m_pIcon[i] = new CollectIcon();
 			break;

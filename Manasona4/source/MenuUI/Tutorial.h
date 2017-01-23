@@ -1,6 +1,7 @@
 #pragma once
 #include "TDNLIB.h"
 #include "Player\BasePlayer.h"
+#include "Stand\Stand.h"
 #include "MenuUI\TipsCard.h"
 
 //+-----------------
@@ -41,8 +42,6 @@
 // 説明文・クリア条件・クリア後の説明（ウェイト付き）　
 // AIの設定　自分の状態
 
-
-// ←↑の文字はまたTutoのステートでビョウガしたｈぽうがいいな、理由ふくざつだから　ぽりもでできｒのものではない」
 
 //+-----------------------------
 //	ベース
@@ -85,6 +84,9 @@ public:
 
 	void titleTaskClear() { m_pTaskTitle.bClear = true; };
 
+	// タイトル名
+	std::string GetTitleString() { return m_pTaskTitle.pString; }
+
 protected:
 	int m_iWaitFrame;// クリアからどれくらいでエンドTipsへ移行するか
 	int m_iWaitFrameMAX;// 最大ウェイト数
@@ -92,7 +94,7 @@ protected:
 
 	int m_iDeviceID;   // 操作しているデバイス
 
-	// 最初のTips・最後のTips TODO羊のTipsみたいなペッちゃんこになる演出
+	// 最初のTips・最後のTips 
 	TipsCard* m_pIntroTips;
 	TipsCard* m_pClearTips;
 

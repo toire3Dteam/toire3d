@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseWindow.h"
 #include "MenuUI\InformationPlate\InformationPlate.h"
+#include "ParamSetting\Tutorial\TutorialSelectParamSetting.h"
 
 //+-------------------------------
 // チュートリアルポーズウィンドウ
@@ -21,10 +22,15 @@ public:
 	void Action();	// Windowを出す
 	void Stop();	// 止める
 
+	// パラメータ設定用に
+	void RenderParamSetting(int No, int x, int y);
+	void CtrlParamSetting(int SelectNo, int DeviceID);
+
 	// チュートリアル用選択状態
 	enum TUTORIAL_PAUSE_STATE
 	{
 		//BACK_PREV_TUTORIAL,
+		SELECT_TUTORIAL,
 		COMMAND_LIST,
 		BACK_MENU_SELECT,
 		BACK
@@ -32,7 +38,7 @@ public:
 
 
 private:
-	static const int SizeX = 432;
+	static const int SizeX = 768;
 
 	// このウィンドウの演出のために色々作ろう
 	//int m_iAlpha;
@@ -41,6 +47,8 @@ private:
 
 	// 説明のプレート
 	InformationPlate* m_pInfoPlate;
+
+	TutorialSelectParamSetting* m_TutorialSelectParam;
 
 	// 二回戻り防止
 	bool m_bBackPush;

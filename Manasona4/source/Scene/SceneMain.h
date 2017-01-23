@@ -17,6 +17,7 @@
 #include "Window\TrainingOptionWindow.h"
 #include "Window\TrainingDummyWindow.h"
 #include "Window\TrainingCharacterWindow.h"
+#include "Window\ChallengePauseWindow.h"
 
 // リザルトデータ
 #include "Data\ResultData.h"
@@ -39,6 +40,7 @@ enum class BATTLE_WINDOW_TYPE
 	PAUSE,					// ポーズ
 	TUTORIAL_PAUSE,			// チュートリアルポーズ
 	TRAINING_PAUSE,			// トレーニングポーズ
+	CHALLENGE_PAUSE,		// チャレンジポーズ
 	SOUND,					// サウンド
 	TRAINING_OPTION,		// トレーニングオプション
 	TRAINING_DUMMY,			// トレーニングダミーオプション
@@ -89,8 +91,8 @@ public:
 	void OverDriveAction();
 	void OverDriveEnd();
 
-	TUTORIAL_TYPE GetSelectTutorial() { return m_eSelectTutorial; }
-	void SetSelectTutorial(TUTORIAL_TYPE tutorial) { m_eSelectTutorial = tutorial; }
+	//TUTORIAL_TYPE GetSelectTutorial() { return m_eSelectTutorial; }
+	//void SetSelectTutorial(TUTORIAL_TYPE tutorial) { m_eSelectTutorial = tutorial; }
 
 	BaseWindow* GetWindow(BATTLE_WINDOW_TYPE type) { return m_pWindow[(int)type]; }
 
@@ -141,10 +143,13 @@ private:
 
 	// チュートリアルかどうか
 	bool m_bTutorialFlag;
-	TUTORIAL_TYPE m_eSelectTutorial;		// 選択してるチュートリアル
+	//TUTORIAL_TYPE m_eSelectTutorial;		// 選択してるチュートリアル
 
 	// トレーニングかどうか
 	bool m_bTrainingFlag;
+
+	// チャレンジかどうか
+	bool m_bChallengeFlag;
 
 	// メニュー非表示用
 	tdn2DAnim* m_pHideInfo;

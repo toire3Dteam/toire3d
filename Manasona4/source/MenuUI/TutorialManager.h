@@ -1,33 +1,10 @@
 #pragma once
 #include "Tutorial.h"
+#include "Data\SelectData.h"
 
 //+----------------------------
 // チュートリアルマネージャー
 //+----------------------------
-
-enum class TUTORIAL_TYPE
-{
-	WALK,
-	SQUAT,
-	JUMP,
-	ATTACK,
-	SKILL,
-	OVER_DRIVE,
-	RUSH,
-	STAND_GUARD,
-	SQUAT_GUARD,
-	DUSH,
-	BACK_STEP,
-	PARTNER,
-	INVINCIBLE,
-	THROW,
-	ESCAPE,
-	DOKKOI,
-	DOWN_ATTACK,
-	OD_ONEMORE,
-	OD_BURST,
-	ARRAY_END
-};
 
 enum class TUTORIAL_BUSY_TYPE
 {
@@ -73,6 +50,7 @@ public:
 
 	// 初期化
 	void Init(TUTORIAL_TYPE type,int DeviceID);
+	void Init(int DeviceID);
 	void Update();
 	void TaskUpdate(BasePlayer* pPerson);
 	void Render();
@@ -88,6 +66,17 @@ public:
 	bool isBusy() { return m_bBusy; }
 	void SetBusy(bool flag) { m_bBusy = flag; }
 	BaseTutorial* GetTutorialBusy() { return m_pBusyTutorial[(int)m_eBusyType]; };
+
+	// 選択しているチュートリアルを設定する
+	TUTORIAL_TYPE GetSelectType() { return m_eType; }
+	void SetSelectType(TUTORIAL_TYPE eSelectType) { m_eType = eSelectType; }
+	int GetSelectNo() { return (int)m_eType; }	
+	void NectStep();
+	void BackStep();
+
+	// タイトル名
+	std::string GetTitleString();
+	std::string GetTitleString(int iNo);
 
 private:
 	// それぞれのチュートリアル

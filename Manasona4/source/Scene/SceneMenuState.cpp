@@ -11,6 +11,9 @@
 #include "Window\OptionWindow.h"	// 必要なウィンドウ
 #include "../Window/GameWindow.h"
 #include "../Window/SystemWindow.h"
+#include "../Window/ChallengeWindow.h"
+#include "../Window/ChallengeSelectWindow.h"
+#include "Challenge\ChallengeManagerManager.h"
 
 //+--------------------
 // 作業効率化
@@ -160,6 +163,11 @@ bool SceneMenuState::FirstStep::PadUpdate(sceneMenu *pMain, int DeviceID)
 			pMain->GetFSM()->ChangeState(TrainingControllerSelectStep::GetInstance());
 			// ★ここで決定したデバイスを保存
 			pMain->SetTrainingCtrlDevice(DeviceID);
+			bChangedState = true;	// ★関数分けしたので、これをtrueにしたらreturnするようにした
+			break;
+		case MENU_ICON_TYPE::CHALLENGE:
+			pMain->SetPauseDeviceID(DeviceID);// ★ポーズメニューを押した人保存
+			pMain->GetFSM()->ChangeState(ChallengeStep::GetInstance());
 			bChangedState = true;	// ★関数分けしたので、これをtrueにしたらreturnするようにした
 			break;
 		case MENU_ICON_TYPE::COLLECT:
@@ -332,6 +340,9 @@ bool SceneMenuState::BattleControllerSelectStep::PadUpdate(sceneMenu *pMain, int
 
 			// トレーニングでもない
 			SelectDataMgr->Get()->bTraining = false;
+
+			// チャレンジでもない
+			SelectDataMgr->Get()->bChallenge= false;
 
 			// (TODO) ラウンド数設定 [12/1] ここでラウンドの設定はしない
 			//SelectDataMgr->Get()->iWinRound = 2;
@@ -530,6 +541,9 @@ bool SceneMenuState::TrainingControllerSelectStep::PadUpdate(sceneMenu *pMain, i
 			// トレーニングです
 			SelectDataMgr->Get()->bTraining = true;
 
+			// チャレンジではない
+			SelectDataMgr->Get()->bChallenge= false;
+
 			// (TODO) ラウンド数設定 [12/1] ここでラウンドの設定はしない
 			//SelectDataMgr->Get()->iWinRound = 2;
 
@@ -620,6 +634,9 @@ void SceneMenuState::TutorialSelectStep::Execute(sceneMenu *pMain)
 		
 		// トレーニングではない
 		SelectDataMgr->Get()->bTraining = false;
+
+		// チャレンジではない
+		SelectDataMgr->Get()->bChallenge = false;
 
 		SelectDataMgr->Get()->eStage = STAGE::SAND;
 		SelectDataMgr->Get()->iBattleMusicID = 6;	// ジャルダンセレステ
@@ -816,6 +833,280 @@ bool SceneMenuState::OptionStep::OnMessage(sceneMenu *pMain, const Message & msg
 	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
 	return false;
 }
+
+
+/*******************************************************/
+//				チャレンジ選択
+/*******************************************************/
+
+void SceneMenuState::ChallengeStep::Enter(sceneMenu *pMain)
+{
+	// ウィンドウ起動
+	pMain->GetWindow(WINDOW_TYPE::CHALLENGE)->Action();
+}
+
+void SceneMenuState::ChallengeStep::Execute(sceneMenu *pMain)
+{
+	// UI
+	M_UIMgr->Update();
+
+	// 戻るボタンを押したら
+	if (pMain->GetWindow(WINDOW_TYPE::CHALLENGE)->GetChoiceState()
+		== ChallengeWindow::CHALLENGE_STATE::BACK)
+	{
+		pMain->GetWindow(WINDOW_TYPE::CHALLENGE)->Stop();// ウィンドウを閉じる
+		pMain->GetFSM()->ChangeState(FirstStep::GetInstance());	// メニューへ戻る
+	}
+
+	//+--------------------------------------------
+	// 各キャラクターでボタンを押したら
+	//+--------------------------------------------
+	if (pMain->GetWindow(WINDOW_TYPE::CHALLENGE)->GetChoiceState()
+		== ChallengeWindow::CHALLENGE_STATE::AIROU)
+	{
+		// キャラクターの設定
+		ChallengeMgrMgr->SetSelectCharaType(CHARACTER::AIROU);
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].eCharacter = CHARACTER::AIROU;
+
+		// ナンバーセレクトへ
+		pMain->GetFSM()->ChangeState(ChallengeNoStep::GetInstance());	
+		return;
+	}
+
+	if (pMain->GetWindow(WINDOW_TYPE::CHALLENGE)->GetChoiceState()
+		== ChallengeWindow::CHALLENGE_STATE::TEKI)
+	{
+		// キャラクターの設定
+		ChallengeMgrMgr->SetSelectCharaType(CHARACTER::TEKI);
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].eCharacter = CHARACTER::TEKI;
+
+		// ナンバーセレクトへ
+		pMain->GetFSM()->ChangeState(ChallengeNoStep::GetInstance());
+		return;
+	}
+
+	if (pMain->GetWindow(WINDOW_TYPE::CHALLENGE)->GetChoiceState()
+		== ChallengeWindow::CHALLENGE_STATE::NAZENARABA)
+	{
+		// キャラクターの設定
+		ChallengeMgrMgr->SetSelectCharaType(CHARACTER::NAZENARA);
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].eCharacter = CHARACTER::NAZENARA;
+
+		// ナンバーセレクトへ
+		pMain->GetFSM()->ChangeState(ChallengeNoStep::GetInstance());
+		return;
+	}
+
+	if (pMain->GetWindow(WINDOW_TYPE::CHALLENGE)->GetChoiceState()
+		== ChallengeWindow::CHALLENGE_STATE::ARAMITAMA)
+	{
+		// キャラクターの設定
+		ChallengeMgrMgr->SetSelectCharaType(CHARACTER::ARAMITAMA);
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].eCharacter = CHARACTER::ARAMITAMA;
+
+		// ナンバーセレクトへ
+		pMain->GetFSM()->ChangeState(ChallengeNoStep::GetInstance());
+		return;
+	}
+
+
+	// (1/18) メニューを開いた人だけが動かせる
+	int l_iDeviceID = pMain->GetPauseDeviceID();
+
+	//+----------------------------------
+	//	このステートでの操作
+	//+----------------------------------
+	{
+		if (PadUpdate(pMain, l_iDeviceID)) return;
+	}
+
+}
+
+bool SceneMenuState::ChallengeStep::PadUpdate(sceneMenu *pMain, int DeviceID)
+{
+	bool bChangedState(false);
+
+	// ウィンドウの操作
+	pMain->GetWindow(WINDOW_TYPE::CHALLENGE)->Ctrl(DeviceID);
+
+	return bChangedState;
+}
+
+void SceneMenuState::ChallengeStep::Exit(sceneMenu *pMain)
+{
+	// ★ウィンドウはExitで消してはいけない
+}
+
+void SceneMenuState::ChallengeStep::Render(sceneMenu *pMain)
+{
+	// アイコンUI
+	M_UIMgr->Render();
+
+	// 黒い板
+	//tdnPolygon::Rect(0, 0, 1280, 720, RS::COPY, 0xaa000000);
+
+	// 選択ウィンドウの説明
+	pMain->GetWindow(WINDOW_TYPE::CHALLENGE)->RednerInfo();
+
+#ifdef _DEBUG
+
+	tdnText::Draw(0, 0, 0xffffffff, "ChallengeStep");
+#endif // _DEBUG
+}
+
+bool SceneMenuState::ChallengeStep::OnMessage(sceneMenu *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+
+	//default:
+	//	break;
+	//}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
+
+
+
+/*******************************************************/
+//				チャレンジナンバー選択
+/*******************************************************/
+
+void SceneMenuState::ChallengeNoStep::Enter(sceneMenu *pMain)
+{
+	// ウィンドウ起動
+	pMain->GetWindow(WINDOW_TYPE::CHALLENGE_SELECT)->Action();
+}
+
+void SceneMenuState::ChallengeNoStep::Execute(sceneMenu *pMain)
+{
+	// UI
+	M_UIMgr->Update();
+
+	// フェード
+	if (Fade::isFadeOutCompletion() == false)
+	{
+		if (Fade::GetMode() != Fade::FLAG::FADE_OUT)
+		{
+
+			// 戻るボタンを押したら
+			if (pMain->GetWindow(WINDOW_TYPE::CHALLENGE_SELECT)->GetChoiceState()
+				== ChallengeSelectWindow::CHALLENGE_SELECT_STATE::BACK)
+			{
+				pMain->GetWindow(WINDOW_TYPE::CHALLENGE_SELECT)->Stop();// ウィンドウを閉じる
+				pMain->GetFSM()->ChangeState(ChallengeStep::GetInstance());	// メニューへ戻る
+			}
+
+			//+--------------------------------------------
+			// 決定ボタンを押したら
+			//+--------------------------------------------
+			if (pMain->GetWindow(WINDOW_TYPE::CHALLENGE_SELECT)->GetChoiceState()
+				== ChallengeSelectWindow::CHALLENGE_SELECT_STATE::SELECT_CHALLENGE)
+			{
+				// ★メインへ
+				// フェードアウト
+				Fade::Set(Fade::FLAG::FADE_OUT, 16, 0x00000000);
+				return;
+			}
+
+
+
+			// (1/18) メニューを開いた人だけが動かせる
+			int l_iDeviceID = pMain->GetPauseDeviceID();
+
+			//+----------------------------------
+			//	このステートでの操作
+			//+----------------------------------
+			{
+				if (PadUpdate(pMain, l_iDeviceID)) return;
+			}
+
+		}
+
+	}
+	else 
+	{
+		//+--------------------------------------------
+		//		フェード後
+		//+--------------------------------------------
+
+		// トレーニング・チュートリアルではない
+		SelectDataMgr->Get()->bTraining = false;
+		SelectDataMgr->Get()->bTutorial = false;
+
+		// チャレンジです
+		SelectDataMgr->Get()->bChallenge = true;
+
+		SelectDataMgr->Get()->eStage = STAGE::SAND;
+		SelectDataMgr->Get()->iBattleMusicID = 6;	// ジャルダンセレステ
+		
+		// チャレンジに登場するキャラクター設定をここで設定する
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].eCharacter = CHARACTER::TEKI;
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].ePartner = PARTNER::MOKOI;
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].ePartner = PARTNER::MOKOI;
+
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = false;
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = true;
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].eAIType = AI_TYPE::PRACTICE_LAND;
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = pMain->GetCtrlDevice();
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = pMain->GetCtrlDevice();
+
+		MainFrameEx->ChangeScene(new sceneMain());
+
+		return;
+
+	}
+
+}
+
+bool SceneMenuState::ChallengeNoStep::PadUpdate(sceneMenu *pMain, int DeviceID)
+{
+	bool bChangedState(false);
+
+	// ウィンドウの操作
+	pMain->GetWindow(WINDOW_TYPE::CHALLENGE_SELECT)->Ctrl(DeviceID);
+
+	return bChangedState;
+}
+
+void SceneMenuState::ChallengeNoStep::Exit(sceneMenu *pMain)
+{
+	// ★ウィンドウはExitで消してはいけない
+}
+
+void SceneMenuState::ChallengeNoStep::Render(sceneMenu *pMain)
+{
+	// アイコンUI
+	M_UIMgr->Render();
+
+	// 黒い板
+	//tdnPolygon::Rect(0, 0, 1280, 720, RS::COPY, 0xaa000000);
+
+	// 選択ウィンドウの説明
+	pMain->GetWindow(WINDOW_TYPE::CHALLENGE_SELECT)->RednerInfo();
+
+#ifdef _DEBUG
+
+	tdnText::Draw(0, 0, 0xffffffff, "ChallengeNoStep");
+#endif // _DEBUG
+}
+
+bool SceneMenuState::ChallengeNoStep::OnMessage(sceneMenu *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+
+	//default:
+	//	break;
+	//}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
+
 
 /*******************************************************/
 //				システムウィンドウ選択

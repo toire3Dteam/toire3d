@@ -20,6 +20,7 @@
 #include "SceneSelect.h"
 #include "Data\/SelectData.h"
 #include "Trophy\TrophyManager.h"
+#include "Challenge\ChallengeManagerManager.h"
 
 // これを定義するとラウンドコールがスキップされる(デバッグ時短用)
 //#define ROUND_SKIP
@@ -656,7 +657,13 @@ void SceneMainState::TutorialIntro::Enter(sceneMain *pMain)
 	Fade::Set(Fade::FLAG::FADE_IN, 16, 0x00000000);
 
 	// 毎回チュートリアル設定！
-	TutorialMgr->Init(pMain->GetSelectTutorial(), SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID);
+	//TutorialMgr->Init(pMain->GetSelectTutorial(), SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID);
+	
+	// ★現在のチュートリアルを変更
+	SelectDataMgr->Get()->iTutorialType = TutorialMgr->GetSelectNo();
+	
+	// (1/21) マネージャーの中だけで完結させた	
+	TutorialMgr->Init(SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID);
 	TutorialMgr->GetTutorial()->ActionIntroTips();// イントロのTipsを用意
 
 
@@ -692,7 +699,7 @@ void SceneMainState::TutorialIntro::Execute(sceneMain *pMain)
 	TutorialMgr->Update();
 
 	// プレイヤー更新
-	PlayerMgr->Update(PLAYER_UPDATE::NO_FSM);
+	PlayerMgr->Update(PLAYER_UPDATE::NO_FSM);// NO_FSM
 	PlayerMgr->UpdatePos();
 
 	// カメラ更新
@@ -764,8 +771,16 @@ void SceneMainState::TutorialMain::Execute(sceneMain *pMain)
 	}
 	else
 	{
-		// 通常
-		PlayerMgr->Update(PLAYER_UPDATE::CONTROL_OK);
+		if (Fade::GetMode() != Fade::FLAG::FADE_OUT)
+		{
+			// 通常
+			PlayerMgr->Update(PLAYER_UPDATE::CONTROL_OK);
+		}
+		else
+		{
+			// フェード中は操作を受け付けない
+			PlayerMgr->Update(PLAYER_UPDATE::CONTROL_NO);
+		}
 
 		// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
 		Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager());
@@ -805,17 +820,20 @@ void SceneMainState::TutorialMain::Execute(sceneMain *pMain)
 			return;
 		}
 
-		// セレクトでもう一度イントロへ戻る
-		if (tdnInput::KeyGet(KEYCODE::KEY_SELECT, SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID) == 3)
+		// クリア表記中はリスタートできない
+		if (TutorialMgr->GetTutorial()->isClear() == false)
 		{
-			// フェードアウト
-			Fade::Set(Fade::FLAG::FADE_OUT, 16, 0x00000000);
+			// セレクトでもう一度イントロへ戻る
+			if (tdnInput::KeyGet(KEYCODE::KEY_SELECT, SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID) == 3)
+			{
+				// フェードアウト
+				Fade::Set(Fade::FLAG::FADE_OUT, 16, 0x00000000);
 
-			// (TODO)必殺の時にワープするとバグる
-			
-			return;
+				// (TODO)必殺の時にワープするとバグる
+
+				return;
+			}
 		}
-
 	}
 
 	// フェードアウト完了後
@@ -826,6 +844,16 @@ void SceneMainState::TutorialMain::Execute(sceneMain *pMain)
 		return;
 	}
 	/********************************************/
+
+#ifdef _DEBUG
+
+	if (KeyBoardTRG(KB_E))
+	{
+		TutorialMgr->SetSelectType(TUTORIAL_TYPE::OD_ONEMORE);
+	}
+
+#endif // _DEBUG
+
 }
 
 void SceneMainState::TutorialMain::Exit(sceneMain *pMain) 
@@ -893,7 +921,8 @@ void SceneMainState::TutorialClear::Enter(sceneMain *pMain)
 	// 次のチュートリアルへ
 	// (TODO)ここで配列の最後まできたらメニューに戻る処理
 	// お疲れ様でした！とかは最後のクリアティップスで書こう。
-	pMain->SetSelectTutorial(TUTORIAL_TYPE((int)pMain->GetSelectTutorial() + 1));
+	//pMain->SetSelectTutorial(TUTORIAL_TYPE((int)pMain->GetSelectTutorial() + 1));
+
 
 
 }
@@ -901,9 +930,6 @@ void SceneMainState::TutorialClear::Enter(sceneMain *pMain)
 // 更新
 void SceneMainState::TutorialClear::Execute(sceneMain *pMain)
 {
-
-	// チュートリアル更新
-	TutorialMgr->Update();
 
 	// プレイヤー更新
 	PlayerMgr->Update(PLAYER_UPDATE::CONTROL_NO);
@@ -914,6 +940,10 @@ void SceneMainState::TutorialClear::Execute(sceneMain *pMain)
 
 	if (Fade::isFadeOutCompletion() == false)
 	{
+
+		// チュートリアル更新
+		TutorialMgr->Update();
+
 		if (Fade::GetMode() != Fade::FLAG::FADE_OUT)
 		{
 			// ヒントカードを読み終えたら
@@ -926,21 +956,27 @@ void SceneMainState::TutorialClear::Execute(sceneMain *pMain)
 				// フェードアウト
 				Fade::Set(Fade::FLAG::FADE_OUT, 16, 0x00000000);
 
+
 			}
 		}
 
 	}else// フェードアウト完了後	
 	{
+
+		// (1/21) ★次のチュートリアルへ
+		TutorialMgr->NectStep();
+
+
 		// 忙しい人はここで終り
 		if (TutorialMgr->isBusy() == true && 
-			pMain->GetSelectTutorial() == TUTORIAL_TYPE::PARTNER)
+			TutorialMgr->GetSelectType() == TUTORIAL_TYPE::PARTNER)
 		{
 			MainFrameEx->ChangeScene(new sceneMenu());
 			return;
 		}
 
 		// (TODO)ここで配列の最後まできたらメニューに戻る処理
-		if (pMain->GetSelectTutorial() == TUTORIAL_TYPE::ARRAY_END)
+		if (TutorialMgr->GetSelectType() == TUTORIAL_TYPE::ARRAY_END)
 		{
 			MainFrameEx->ChangeScene(new sceneMenu());
 			return;
@@ -963,7 +999,10 @@ void SceneMainState::TutorialClear::Exit(sceneMain *pMain)
 
 void SceneMainState::TutorialClear::Render(sceneMain *pMain)
 {
-	TutorialMgr->Render();
+	if (Fade::isFadeOutCompletion() == false)
+	{
+		TutorialMgr->Render();
+	}
 }
 
 bool SceneMainState::TutorialClear::OnMessage(sceneMain *pMain, const Message & msg)
@@ -980,6 +1019,365 @@ bool SceneMainState::TutorialClear::OnMessage(sceneMain *pMain, const Message & 
 	return false;
 }
 
+
+
+/*******************************************************/
+//					チャレンジ開始ステート
+/*******************************************************/
+
+void SceneMainState::ChallengeIntro::Enter(sceneMain *pMain)
+{
+	// フェード初期化
+	Fade::Set(Fade::FLAG::FADE_IN, 16, 0x00000000);
+
+	// ★現在のチャレンジを変更
+	SelectDataMgr->Get()->iChallengeType = ChallengeMgrMgr->GetSelectMgr()->GetSelectType();
+
+	// (1/21) マネージャーの中だけで完結させた	
+	ChallengeMgrMgr->GetSelectMgr()->Init(SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID);
+	ChallengeMgrMgr->GetSelectMgr()->GetChallenge()->ActionIntroTips();// イントロのTipsを用意
+
+
+												  // 情報初期化
+	pMain->Reset();
+
+	// ゴリ君
+	// SPゲージも初期化
+	PlayerMgr->GetPlayer(SIDE::LEFT)->SetOverDriveGage(0);
+	PlayerMgr->GetPlayer(SIDE::RIGHT)->SetOverDriveGage(0);
+
+	//  チャレンジ毎に必要な設定をここでもする
+	// 相手との距離は基本近づける
+	PlayerMgr->GetPlayer(SIDE::LEFT)->SetPos(Vector3(-7, 0, 0));
+	PlayerMgr->GetPlayer(SIDE::RIGHT)->SetPos(Vector3(7, 0, 0));
+	//if (pMain->GetSelectChallenge() == Challenge_TYPE::STAND_GUARD)
+	//{
+	//	PlayerMgr->GetPlayer(SIDE::LEFT)->SetPos(Vector3(-97.5, 0, 0));
+	//	PlayerMgr->GetPlayer(SIDE::RIGHT)->SetPos(Vector3(-60, 0, 0));
+	//}
+
+
+}
+
+// 更新
+void SceneMainState::ChallengeIntro::Execute(sceneMain *pMain)
+{
+	//#ifdef ROUND_SKIP
+	//	pMain->GetFSM()->ChangeState(Main::GetInstance());
+	//#endif
+
+	// チャレンジ更新
+	ChallengeMgrMgr->GetSelectMgr()->Update();
+
+	// プレイヤー更新
+	PlayerMgr->Update(PLAYER_UPDATE::NO_FSM);// NO_FSM
+	PlayerMgr->UpdatePos();
+
+	// カメラ更新
+	CameraMgr->Update();
+
+	// ヒントカードを読み終えたら
+	if (ChallengeMgrMgr->GetSelectMgr()->GetChallenge()->
+		GetIntroTipsCard()->GetSelectState() == TipsCard::SELECT_STATE::OK)
+	{
+		pMain->GetFSM()->ChangeState(ChallengeMain::GetInstance());
+		return;
+	}
+}
+
+void SceneMainState::ChallengeIntro::Exit(sceneMain *pMain)
+{
+	// イントロのTipsを閉じる
+	ChallengeMgrMgr->GetSelectMgr()->GetChallenge()->StopIntroTips();
+
+}
+
+void SceneMainState::ChallengeIntro::Render(sceneMain *pMain)
+{
+	ChallengeMgrMgr->GetSelectMgr()->Render();
+}
+
+bool SceneMainState::ChallengeIntro::OnMessage(sceneMain *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+	//case MESSAGE_TYPE::END_ROUNDCALL:	// ラウンドコールが終わったというメッセージが届いたら
+	//	pMain->GetFSM()->ChangeState(Main::GetInstance());
+	//	break;
+	//}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
+
+
+/*******************************************************/
+//			チャレンジメインステート
+/*******************************************************/
+
+void SceneMainState::ChallengeMain::Enter(sceneMain *pMain)
+{
+
+	// ★TODO　ボタン　が履歴が残ったままなので　はいを選択したらそのまま攻撃してしまう
+
+}
+
+void SceneMainState::ChallengeMain::Execute(sceneMain *pMain)
+{
+	// ★★★　(12/28)チャレンジでも更新
+	PlayerMgr->UpdateTraining();
+
+	// プレイヤー更新
+	if (ChallengeMgrMgr->GetSelectMgr()->GetChallenge()->isClear())
+	{
+		// クリアしたので動きを止める
+		PlayerMgr->Update(PLAYER_UPDATE::CONTROL_NO);
+
+		// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
+		Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager());
+
+		// プレイヤー位置確定
+		PlayerMgr->UpdatePos();
+	}
+	else
+	{
+		if (Fade::GetMode() != Fade::FLAG::FADE_OUT)
+		{
+			// 通常
+			PlayerMgr->Update(PLAYER_UPDATE::CONTROL_OK);
+		}
+		else
+		{
+			// フェード中は操作を受け付けない
+			PlayerMgr->Update(PLAYER_UPDATE::CONTROL_NO);
+		}
+
+		// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
+		Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager());
+
+		// プレイヤー位置確定
+		PlayerMgr->UpdatePos();
+	}
+
+	// カメラ更新
+	CameraMgr->Update();
+
+	// 1Pの操作しているプレイヤーの情報を確認しクリア判定を出す！
+	ChallengeMgrMgr->GetSelectMgr()->TaskUpdate(PlayerMgr->GetPlayer(0));
+
+	// チャレンジ更新
+	ChallengeMgrMgr->GetSelectMgr()->Update();
+
+	// タスクを全てクリアして指定した時間が過ぎればクリアステートへ
+	if (ChallengeMgrMgr->GetSelectMgr()->GetChallenge()->EndTipsStart())
+	{
+		pMain->GetFSM()->ChangeState(ChallengeClear::GetInstance());
+		return;
+	}
+
+	/********************************************/
+	// 自分リスタート
+	if (Fade::GetMode() != Fade::FLAG::FADE_OUT)
+	{
+
+		// ポーズでチャレンジ専用のポーズメニューへ
+		if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID) == 3)
+		{
+			// (12/24) ここでメニュー起動
+			//pMain->GetWindow(BATTLE_WINDOW_TYPE::Challenge_PAUSE)->Action();
+			pMain->SetPauseDeviceID(SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID);// ★ポーズメニューを押した人保存
+			pMain->GetFSM()->ChangeState(ChallengePauseMenu::GetInstance());
+			return;
+		}
+
+		// クリア表記中はリスタートできない
+		if (ChallengeMgrMgr->GetSelectMgr()->GetChallenge()->isClear() == false)
+		{
+			// セレクトでもう一度イントロへ戻る
+			if (tdnInput::KeyGet(KEYCODE::KEY_SELECT, SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID) == 3)
+			{
+				// フェードアウト
+				Fade::Set(Fade::FLAG::FADE_OUT, 16, 0x00000000);
+
+				// (TODO)必殺の時にワープするとバグる
+
+				return;
+			}
+		}
+	}
+
+	// フェードアウト完了後
+	if (Fade::isFadeOutCompletion())
+	{
+		// チャレンジのイントロへ
+		pMain->GetFSM()->ChangeState(ChallengeIntro::GetInstance());
+		return;
+	}
+	/********************************************/
+
+#ifdef _DEBUG
+
+
+
+#endif // _DEBUG
+
+}
+
+void SceneMainState::ChallengeMain::Exit(sceneMain *pMain)
+{
+
+}
+
+void SceneMainState::ChallengeMain::Render(sceneMain *pMain)
+{
+	ChallengeMgrMgr->GetSelectMgr()->Render();
+}
+
+bool SceneMainState::ChallengeMain::OnMessage(sceneMain *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	switch (msg.Msg)
+	{
+	case MESSAGE_TYPE::OVER_DRIVE_STAGE:
+	{
+		bool *bAction = (bool*)msg.ExtraInfo;
+		if (*bAction)
+			pMain->OverDriveAction();
+		else
+			pMain->OverDriveEnd();
+		return true;
+	}
+	break;
+	// カットイン発動する瞬間
+	case MESSAGE_TYPE::HEAVE_HO_OVERFLOW_START:
+		// BGMのクロスフェード(超必殺BGMを流す)
+		//pMain->GetMyMusicManager()->PlayHeaveHo();
+		bgm->StopStreamIn();
+		bgm->PlayStreamIn("DATA/Sound/BGM/HeaveHo/HeaveHo.ogg");
+		break;
+		// カットイン終わったらって感じ
+	case MESSAGE_TYPE::HEAVE_HO_OVER_DRIVE_HIT:
+		pMain->GetFSM()->ChangeState(HeaveHoDriveOverFlowSuccess::GetInstance());
+		return true;
+		break;
+	case MESSAGE_TYPE::KO:	// 誰かのHPが0になったら切り替え
+	{
+		FINISH_TYPE *type = (FINISH_TYPE*)msg.ExtraInfo;
+		pMain->GetFSM()->ChangeState(Finish::GetInstance());
+		if (*type == FINISH_TYPE::NORMAL)pMain->GetRoundCall()->CallFinish(msg.Sender);
+		else if (*type == FINISH_TYPE::OVER_DRIVE) pMain->GetRoundCall()->CallOverDriveFinish(msg.Sender);
+
+		return true;
+	}
+	break;
+	}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
+
+/*******************************************************/
+//			チャレンジクリア(エンド)ステート
+/*******************************************************/
+
+void SceneMainState::ChallengeClear::Enter(sceneMain *pMain)
+{
+	// クリア後のTipsを用意
+	ChallengeMgrMgr->GetSelectMgr()->GetChallenge()->ActionClearTips();
+
+	// 次のチャレンジへ
+	// (TODO)ここで配列の最後まできたらメニューに戻る処理
+	// お疲れ様でした！とかは最後のクリアティップスで書こう。
+	//pMain->SetSelectChallenge(Challenge_TYPE((int)pMain->GetSelectChallenge() + 1));
+
+
+
+}
+
+// 更新
+void SceneMainState::ChallengeClear::Execute(sceneMain *pMain)
+{
+
+	// プレイヤー更新
+	PlayerMgr->Update(PLAYER_UPDATE::CONTROL_NO);
+	PlayerMgr->UpdatePos();
+
+	// カメラ更新
+	CameraMgr->Update();
+
+	if (Fade::isFadeOutCompletion() == false)
+	{
+
+		// チャレンジ更新
+		ChallengeMgrMgr->GetSelectMgr()->Update();
+
+		if (Fade::GetMode() != Fade::FLAG::FADE_OUT)
+		{
+			// ヒントカードを読み終えたら
+			if (ChallengeMgrMgr->GetSelectMgr()->GetChallenge()->
+				GetClearTipsCard()->GetSelectState() == TipsCard::SELECT_STATE::OK)
+			{
+				// クリア後のTipsを閉じる
+				ChallengeMgrMgr->GetSelectMgr()->GetChallenge()->StopClearTips();
+
+				// フェードアウト
+				Fade::Set(Fade::FLAG::FADE_OUT, 16, 0x00000000);
+
+
+			}
+		}
+
+	}
+	else// フェードアウト完了後	
+	{
+
+		// (1/21) ★次のチャレンジへ
+		ChallengeMgrMgr->GetSelectMgr()->NectStep();
+
+		// (TODO)ここで配列の最後まできたらメニューに戻る処理
+		if ((CHALLENGE_TYPE)ChallengeMgrMgr->GetSelectMgr()->GetSelectType() == CHALLENGE_TYPE::ARRAY_END)
+		{
+			MainFrameEx->ChangeScene(new sceneMenu());
+			return;
+		}
+		else
+		{
+			// チャレンジのイントロへ
+			pMain->GetFSM()->ChangeState(ChallengeIntro::GetInstance());
+			return;
+		}
+
+	}
+
+}
+
+void SceneMainState::ChallengeClear::Exit(sceneMain *pMain)
+{
+
+}
+
+void SceneMainState::ChallengeClear::Render(sceneMain *pMain)
+{
+	if (Fade::isFadeOutCompletion() == false)
+	{
+		ChallengeMgrMgr->GetSelectMgr()->Render();
+	}
+}
+
+bool SceneMainState::ChallengeClear::OnMessage(sceneMain *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+	//case MESSAGE_TYPE::END_ROUNDCALL:	// ラウンドコールが終わったというメッセージが届いたら
+	//	pMain->GetFSM()->ChangeState(Main::GetInstance());
+	//	break;
+	//}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
 
 
 /*******************************************************/
@@ -1386,6 +1784,25 @@ void SceneMainState::TutorialPauseMenu::Execute(sceneMain *pMain)
 	//	pMain->GetFSM()->ChangeState(TutorialIntro::GetInstance());	
 
 	//}
+	
+
+	// チュートリアルセレクトを押したら
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE)->GetChoiceState()
+		== TutorialPauseWindow::TUTORIAL_PAUSE_STATE::SELECT_TUTORIAL)
+	{
+		// ポーズウィンドウ止める
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE)->Stop();
+		// ポーズ終了
+		pMain->SetPause(false);
+
+		// ★現在のチュートリアルを変更
+		TutorialMgr->SetSelectType((TUTORIAL_TYPE)SelectDataMgr->Get()->iTutorialType);
+
+		pMain->GetFSM()->ChangeState(TutorialIntro::GetInstance());	// チュートリアルへ戻る
+
+		return;
+	}
+
 
 	// 戻るボタンを押したら
 	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE)->GetChoiceState() == TutorialPauseWindow::TUTORIAL_PAUSE_STATE::BACK)
@@ -1394,6 +1811,9 @@ void SceneMainState::TutorialPauseMenu::Execute(sceneMain *pMain)
 		pMain->GetWindow(BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE)->Stop();
 		// ポーズ終了
 		pMain->SetPause(false);
+
+		// ★セレクトチュートリアルを変更したけど決定を押さなかった時今選択しているチュートリアルへもどる
+		SelectDataMgr->Get()->iTutorialType = TutorialMgr->GetSelectNo();
 
 		pMain->GetFSM()->ChangeState(TutorialMain::GetInstance());	// チュートリアルへ戻る
 
@@ -1425,7 +1845,8 @@ void SceneMainState::TutorialPauseMenu::Exit(sceneMain *pMain)
 
 void SceneMainState::TutorialPauseMenu::Render(sceneMain *pMain)
 {
-	// ★★★Exitではウィンドウは止めない
+	// 
+	pMain->GetWindow(BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE)->RednerInfo();
 }
 
 bool SceneMainState::TutorialPauseMenu::OnMessage(sceneMain *pMain, const Message & msg)
@@ -1442,6 +1863,163 @@ bool SceneMainState::TutorialPauseMenu::OnMessage(sceneMain *pMain, const Messag
 	return false;
 }
 
+
+/*******************************************************/
+//			チャレンジポーズメニューステート
+/*******************************************************/
+
+void SceneMainState::ChallengePauseMenu::Enter(sceneMain *pMain)
+{
+
+	pMain->GetWindow(BATTLE_WINDOW_TYPE::CHALLENGE_PAUSE)->Action();
+	pMain->SetPause(true);
+
+}
+
+// 更新
+void SceneMainState::ChallengePauseMenu::Execute(sceneMain *pMain)
+{
+
+	//+--------------------------------------------
+	//	チャレンジポーズメニューの操作
+	//+--------------------------------------------
+	// パッド分更新
+	int NumDevice(tdnInputManager::GetNumDevice());
+	// パッド何もささってないとき用
+	if (NumDevice == 0)NumDevice = 1;
+	for (int i = 0; i < NumDevice; i++)
+	{
+		// ポーズウィンドウの操作
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::CHALLENGE_PAUSE)->Ctrl(i);
+	}
+
+
+
+
+	// プレイヤー更新を止める
+	//PlayerMgr->Update(PLAYER_UPDATE::CONTROL_NO);
+	//PlayerMgr->UpdatePos();
+
+	// カメラ更新
+	//CameraMgr->Update();
+
+	// 一つ前のチャレンジへ戻るボタンを押したら
+	//if (pMain->GetWindow(BATTLE_WINDOW_TYPE::CHALLENGE_PAUSE)->GetChoiceState() == TutorialPauseWindow::CHALLENGE_PAUSE_STATE::BACK_PREV_TUTORIAL)
+	//{
+	//	// ポーズウィンドウ止める
+	//	pMain->GetWindow(BATTLE_WINDOW_TYPE::CHALLENGE_PAUSE)->Stop();
+
+	//	pMain->GetFSM()->ChangeState(TutorialIntro::GetInstance());	
+
+	//}
+
+
+	// チャレンジセレクトを押したら
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::CHALLENGE_PAUSE)->GetChoiceState()
+		== ChallengePauseWindow::CHALLENGE_PAUSE_STATE::SELECT_CHALLENGE)
+	{
+		// ポーズウィンドウ止める
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::CHALLENGE_PAUSE)->Stop();
+		// ポーズ終了
+		pMain->SetPause(false);
+
+		// ★現在のチャレンジを変更
+		ChallengeMgrMgr->GetSelectMgr()->SetSelectType(SelectDataMgr->Get()->iChallengeType);
+
+		pMain->GetFSM()->ChangeState(ChallengeIntro::GetInstance());	// チャレンジへ戻る
+
+		return;
+	}
+
+	// ポジションリセットボタンを押したら
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::CHALLENGE_PAUSE)->GetChoiceState()
+		== ChallengePauseWindow::CHALLENGE_PAUSE_STATE::POSITION_RESET)
+	{
+		// ポーズウィンドウ止める
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::CHALLENGE_PAUSE)->Stop();
+		// フェードアウト(ポジションリセット効果の引きがね)
+		Fade::Set(Fade::FLAG::FADE_OUT, 14, 0x00000000);
+		// ポーズ終了
+		pMain->SetPause(false);
+		pMain->GetFSM()->ChangeState(ChallengeIntro::GetInstance());	// 戻る
+		return;
+	}
+
+	// サウンドへ
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::CHALLENGE_PAUSE)->GetChoiceState()
+		== ChallengePauseWindow::CHALLENGE_PAUSE_STATE::SOUND_SETTING)
+	{
+		// サウンド設定へ
+		pMain->GetFSM()->ChangeState(SoundMenu::GetInstance());
+		return;
+	}
+
+	// メニュー非表示へ
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::CHALLENGE_PAUSE)->GetChoiceState() 
+		== ChallengePauseWindow::CHALLENGE_PAUSE_STATE::HIDE_MENU)
+	{
+		pMain->GetFSM()->ChangeState(HideMenu::GetInstance());
+		return;
+	}
+
+	// 戻るボタンを押したら
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::CHALLENGE_PAUSE)->GetChoiceState() == ChallengePauseWindow::CHALLENGE_PAUSE_STATE::BACK)
+	{
+		// ポーズウィンドウ止める
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::CHALLENGE_PAUSE)->Stop();
+		// ポーズ終了
+		pMain->SetPause(false);
+
+		// ★セレクトチャレンジを変更したけど決定を押さなかった時今選択しているチャレンジへもどる
+		SelectDataMgr->Get()->iChallengeType = ChallengeMgrMgr->GetSelectMgr()->GetSelectType();
+
+		pMain->GetFSM()->ChangeState(ChallengeMain::GetInstance());	// チャレンジへ戻る
+
+	}
+
+	// メニューへ
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::CHALLENGE_PAUSE)->GetChoiceState() == ChallengePauseWindow::CHALLENGE_PAUSE_STATE::BACK_MENU_SELECT)
+	{
+		// ポーズウィンドウ止める
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::CHALLENGE_PAUSE)->Stop();
+		MainFrameEx->ChangeScene(new sceneMenu());
+		return;
+	}
+
+	// コマンドリストへ
+	if (pMain->GetWindow(BATTLE_WINDOW_TYPE::CHALLENGE_PAUSE)->GetChoiceState() == ChallengePauseWindow::CHALLENGE_PAUSE_STATE::COMMAND_LIST)
+	{
+		// コマンドリスト
+		pMain->GetFSM()->ChangeState(SceneMainState::CommandMenu::GetInstance());
+		return;
+	}
+
+}
+
+void SceneMainState::ChallengePauseMenu::Exit(sceneMain *pMain)
+{
+
+}
+
+void SceneMainState::ChallengePauseMenu::Render(sceneMain *pMain)
+{
+	// 
+	pMain->GetWindow(BATTLE_WINDOW_TYPE::CHALLENGE_PAUSE)->RednerInfo();
+}
+
+bool SceneMainState::ChallengePauseMenu::OnMessage(sceneMain *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+	//case MESSAGE_TYPE::END_ROUNDCALL:	// ラウンドコールが終わったというメッセージが届いたら
+	//	pMain->GetFSM()->ChangeState(Main::GetInstance());
+	//	break;
+	//}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
 
 
 /*******************************************************/
@@ -1923,6 +2501,10 @@ void SceneMainState::HideMenu::Enter(sceneMain *pMain)
 	if (pMain->GetFSM()->isPrevState(*SceneMainState::TutorialPauseMenu::GetInstance()))
 	{
 		pMain->GetWindow(BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE)->Stop();
+	}
+	if (pMain->GetFSM()->isPrevState(*SceneMainState::ChallengePauseMenu::GetInstance()))
+	{
+		pMain->GetWindow(BATTLE_WINDOW_TYPE::CHALLENGE_PAUSE)->Stop();
 	}
 
 	// 非表示インフォ開始

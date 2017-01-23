@@ -70,12 +70,17 @@ void FirstRoundCall::FrameMove()
 {
 	if (m_iFrame == 4)
 	{
-		//#ifdef ROUND_CALL_ON
-		//se->Play("フェイトイズターニング");
-		//#endif
+#ifdef ROUND_CALL_ON
+#else
+		se->Play("フェイトイズターニング");
+#endif
 	}
 	if (m_iFrame == ROLL_START)
 	{
+		#ifdef ROUND_CALL_ON
+		se->Play("フェイトイズターニング");
+		#endif
+
 		// ★ゲームUI発動
 		GameUIMgr->Action();
 	}

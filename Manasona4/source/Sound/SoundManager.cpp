@@ -72,9 +72,9 @@ const SE_Manager::DATA all_dataS[]
 	{ "購入",						"DATA/Sound/SE/P4U2/money.wav", 2, false },
 	{ "トロフィー",					"DATA/Sound/SE/System/trophy.wav", 1, false },
 
-	{ "フェイトイズターニング",		"DATA/Sound/SE/Battle/plasma.wav",				1, false },
+	{ "フェイトイズターニング",		"DATA/Sound/SE/BlazBlue/aerial_dash.wav",				1, false },
 	{ "リベル",						"DATA/Sound/SE/Battle/appear.wav",				1, false },
-	{ "アクション",					"DATA/Sound/SE/Battle/ki-n.wav",				1, false },
+	{ "アクション",					"DATA/Sound/SE/Battle/fill.wav",				1, false },
 
 	//{ "フェイトイズターニング",		"DATA/Sound/SE/BlazBlue/voice/the_wheel.wav",	1, false },
 	//{ "リベル",						"DATA/Sound/SE/BlazBlue/voice/revel.wav",		1, false },

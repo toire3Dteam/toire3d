@@ -5,7 +5,7 @@
 #include "PointLight\PointLight.h"
 #include "DeferredEx\DeferredEx.h"
 
-Stage::Base::Base() : m_pObj(nullptr), m_pBack(nullptr), m_fBottom(0), m_fWidth(200)
+Stage::Base::Base() : m_pObj(nullptr), m_pBack(nullptr), m_pBack2(nullptr), m_fBottom(0), m_fWidth(200)
 {
 	// ステージの場所
 	m_vStagePos = VECTOR_ZERO;
@@ -28,6 +28,7 @@ Stage::Base::~Base()
 {
 	SAFE_DELETE(m_pObj);
 	SAFE_DELETE(m_pBack);
+	SAFE_DELETE(m_pBack2);
 	SAFE_DELETE(m_pAreWall);
 }
 
@@ -133,9 +134,17 @@ void Stage::Sand::Initialize(Camera *pCamera)
 	m_pBack = new iexMesh("DATA/Stage/Senjo/Skydome.IMO");
 	m_pBack->SetPos(Vector3(0, 0, 300));
 	m_pBack->SetScale(3.5f);
+
 	//m_pBack->SetPos(Vector3(0, 0, 300));
 	//m_pBack->SetScale(5.5f);
 	m_pBack->Update();
+
+	m_pBack2 = new iexMesh("DATA/Stage/SkyDome/Skydome.IMO");
+	//m_pBack2->SetScale(3.5f);
+	m_pBack2->SetPos(Vector3(0, 0, 300));
+	m_pBack2->Update();
+
+
 	m_fBottom = 0;
 	m_fWidth = 200;
 
@@ -145,7 +154,10 @@ void Stage::Sand::Initialize(Camera *pCamera)
 
 void Stage::Sand::Render()
 {
-	if (m_pBack) m_pBack->Render(shaderM, "sky");
+	m_pBack2->Render(shaderM, "sky");
+	m_pBack->Render(shaderM, "sky");
+	
+
 	m_pObj->Render(shaderM,"Stage");
 	m_pAreWall->RenderAreaWall();// 壁
 }
@@ -160,7 +172,7 @@ void Stage::Sea::Initialize(Camera *pCamera)
 	m_pObj->Update();
 
 	m_pBack = new iexMesh("DATA/Stage/Senjo/Skydome.IMO");
-	m_pBack->SetPos(Vector3(0, 0, 300));
+	m_pBack->SetPos(Vector3(0, -40, 300));
 	m_pBack->SetScale(3.5f);
 	m_pBack->Update();
 	m_fBottom = 0;
@@ -171,6 +183,7 @@ void Stage::Sea::Initialize(Camera *pCamera)
 	m_tagShaderParam.vDirLightColor = Vector3(0.8f, 0.72f, 0.72f);
 	m_tagShaderParam.vSkyColor = Vector3(0.6f, 0.5f, 0.5f);
 	m_tagShaderParam.vGroundColor = Vector3(0.45f, 0.43f, 0.43f);
+
 
 	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
 	pCamera->SetStageCameraInfo("DATA/Stage/Sister/camera.txt");
@@ -194,11 +207,17 @@ void Stage::Garden::Initialize(Camera *pCamera)
 	m_pObj->Update();
 
 	m_pBack = new iexMesh("DATA/Stage/Senjo/Skydome.IMO");
-	m_pBack->SetPos(Vector3(0, 0, 300));
+	m_pBack->SetPos(Vector3(0, -85, 300));
 	m_pBack->SetScale(3.5f);
 	m_pBack->Update();
 	m_fBottom = 0;
 	m_fWidth = 200;
+
+	m_pBack2 = new iexMesh("DATA/Stage/SkyDome/Skydome.IMO");
+	//m_pBack2->SetScale(3.5f);
+	m_pBack2->SetPos(Vector3(0, 0, 300));
+	m_pBack2->Update();
+
 
 	// ステージ毎にシェーダに渡すパラメーター
 	m_tagShaderParam.vDirLightVec = Vector3(-0.84f, -0.99f, -0.53f);
@@ -212,7 +231,8 @@ void Stage::Garden::Initialize(Camera *pCamera)
 
 void Stage::Garden::Render()
 {
-	if (m_pBack) m_pBack->Render(shaderM, "sky");
+	m_pBack2->Render(shaderM, "sky");
+	m_pBack->Render(shaderM, "sky");
 	m_pObj->Render(shaderM, "Stage");
 	m_pAreWall->RenderAreaWall();// 壁
 }
@@ -377,38 +397,132 @@ void Stage::NanasatoSity::RenderForward()
 //+------------------------------------------------------
 void Stage::Syuten::Initialize(Camera *pCamera)
 {
-	m_pObj = new iexMesh("DATA/Stage/Syuten/final_point.IMO");
+	m_pObj = new iexMesh("DATA/Stage/nanasato/NanasatoSity.IMO");//= new iexMesh("DATA/Stage/Syuten/final_point.IMO");
+	m_pObj->SetAngle(-1.57f / 24);
 	m_pObj->SetPos(m_vStagePos);
 	m_pObj->Update();
 
-	m_pBack = new iexMesh("DATA/Stage/Syuten/Skydome.IMO");
-	m_pBack->SetPos(Vector3(0, -50, 0));
+	//m_pBack = new iexMesh("DATA/Stage/Syuten/Skydome.IMO");
+	//m_pBack->SetPos(Vector3(0, -50, 0));
+	//m_pBack->Update();
+
+	m_pBack = new iexMesh("DATA/Stage/Senjo/Skydome.IMO");
+	m_pBack->SetPos(Vector3(0, 0, 300));
+	m_pBack->SetScale(3.5f);
 	m_pBack->Update();
 	m_fBottom = 0;
 	m_fWidth = 200;
+
+	// 水
+	m_fUvWater = 0.0f;
+	m_fWaterHeight = -24;
+	m_pWater = new iexMesh("Data/Water/water2.imo");// nanasato/stage
+
+													// ステージ毎にシェーダに渡すパラメーター
+	m_tagShaderParam.vDirLightVec = Vector3(0.84f, -0.99f, -0.53f);
+	m_tagShaderParam.vDirLightColor = Vector3(0.8f, 0.72f, 0.72f);
+	m_tagShaderParam.vSkyColor = Vector3(0.64f, 0.5f, 0.5f);
+	m_tagShaderParam.vGroundColor = Vector3(0.48f, 0.43f, 0.43f);
 
 	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
 	pCamera->SetStageCameraInfo("DATA/Stage/Syuten/camera.txt");
 }
 
+Stage::Syuten::~Syuten()
+{
+	SAFE_DELETE(m_pWater);
+	//SAFE_RELEASE(m_pStencilSurface);
+	//SAFE_DELETE(m_pWaterEnvScreen);
+}
 
 void Stage::Syuten::Update()
 {
-	if (m_pBack)
-	{
-		static float a = .0f;
-		m_pBack->SetAngle((a += .001f));
-		m_pBack->Update();
-	}
+	//if (m_pBack)
+	//{
+	//	static float a = .0f;
+	//	m_pBack->SetAngle((a += .001f));
+	//	m_pBack->Update();
+	//}
+
+	// 水
+	m_fUvWater += 0.001f;
+	shaderM->SetValue("g_fUvWater", m_fUvWater);
+
+	//m_pWater->SetAngle(Vector3(0, 0, 1));
+	m_pWater->SetPos(Vector3(0, m_fWaterHeight, 100));
+	m_pWater->Update();
 }
 
 void Stage::Syuten::Render()
 {
-	if (m_pBack) m_pBack->Render(shaderM, "sky");
+	m_pBack->Render(shaderM, "sky");
 	m_pObj->Render(shaderM, "Stage");
+	
 	m_pAreWall->RenderAreaWall();// 壁
 }
 
+void Stage::Syuten::RenderForward()
+{
+	//Surface* saveBuffer;
+	//Surface* saveZ;
+	//// 現在のサーフェイスを一時保管
+	//tdnSystem::GetDevice()->GetRenderTarget(0, &saveBuffer);
+	//// 現在のステンシルバッファを一時保管
+	//tdnSystem::GetDevice()->GetDepthStencilSurface(&saveZ);
+	//// Zバッファを切り替え
+	//tdnSystem::GetDevice()->SetDepthStencilSurface(m_pStencilSurface);
+	//// レンダーターゲット切り替え
+	//m_pWaterEnvScreen->RenderTarget();
+
+	////　画面クリア
+	//tdnSystem::GetDevice()->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, 0);
+
+
+	//// オブジェクト反転
+
+	//// 水の高さ
+	//m_fWaterHeight;
+	//// シェーダ
+	//shaderM->SetValue("g_fWaterHeight", m_fWaterHeight);
+
+	//// 現在のプレイヤー高さと水の幅
+	//float l_vPPHY = m_vStagePos.y - m_fWaterHeight;
+
+	//// まずは水の高さまで引きづり落とす
+	//Vector3 l_vNextPos = m_vStagePos;
+	//l_vNextPos.y = m_fWaterHeight - (m_vStagePos.y - m_fWaterHeight);
+	//Vector3 l_vPrevPos = m_vStagePos;
+
+
+	//// オブジェを水の元へ
+	//m_pObj->SetPos(l_vNextPos);
+	//m_pObj->Update();
+	//
+	//// (01/13) Fpsを安定させるため今はステージを反射させない
+	//// m_pObj->Render(shaderM, "CrystalWaterReflect");
+	//m_pBack->Render(shaderM, "CrystalWaterReflect");
+
+	//// オブジェの位置を元の場所へ
+	//m_pObj->SetPos(l_vPrevPos);
+	//m_pObj->Update();
+
+	////レンダーターゲットの復元
+	//tdnSystem::GetDevice()->SetRenderTarget(0, saveBuffer);
+
+	////ステンシルバッファの復元
+	//tdnSystem::GetDevice()->SetDepthStencilSurface(saveZ);
+
+	//// 生成したリフレクションマップをシェーダに
+	//shaderM->SetValue("WaterReflectBuf", m_pWaterEnvScreen);
+
+
+	tdnStopWatch::Start();
+
+	m_pWater->Render(shaderM, "CrystalWater");// 水描画
+
+	tdnStopWatch::End();
+
+}
 //void Stage::Syuten::Render()
 //{
 //	if (m_pBack) m_pBack->Render();

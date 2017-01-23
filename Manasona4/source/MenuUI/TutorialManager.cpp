@@ -160,9 +160,20 @@ void TutorialManager::Init(TUTORIAL_TYPE type, int DeviceID)
 
 }
 
+// 初期化
+void TutorialManager::Init(int DeviceID)
+{
+	if (m_eType == TUTORIAL_TYPE::ARRAY_END) { MyAssert(0, "配列の最後まで到達しました。"); return; }
+
+	m_pTutorial[(int)m_eType]->Init(DeviceID);// 操作するデバイス設定
+
+}
+
 // 更新
 void TutorialManager::Update()
 {
+	if (m_eType == TUTORIAL_TYPE::ARRAY_END)return;
+
 	// チュートリアル更新
 	m_pTutorial[(int)m_eType]->Update();
 
@@ -179,6 +190,8 @@ void TutorialManager::TaskUpdate(BasePlayer * pPerson)
 // 描画
 void TutorialManager::Render()
 {
+	if (m_eType == TUTORIAL_TYPE::ARRAY_END)return;
+
 	// チュートリアル描画
 	m_pTutorial[(int)m_eType]->Render();
 }
@@ -215,4 +228,33 @@ void TutorialManager::RenderBusy()
 {
 	// チュートリアル描画
 	m_pBusyTutorial[(int)m_eBusyType]->Render();
+}
+
+// 次のチュートリアルへ
+void TutorialManager::NectStep()
+{
+	int l_iNectNo = (int)m_eType + 1;
+	m_eType = (TUTORIAL_TYPE)l_iNectNo;
+
+}
+
+void TutorialManager::BackStep()
+{
+	int l_iNectNo = (int)m_eType - 1;
+	m_eType = (TUTORIAL_TYPE)l_iNectNo;
+
+}
+
+std::string TutorialManager::GetTitleString()
+{
+
+	return m_pTutorial[(int)m_eType]->GetTitleString();
+
+}
+
+std::string TutorialManager::GetTitleString(int iNo)
+{
+
+	return m_pTutorial[iNo]->GetTitleString();
+
 }

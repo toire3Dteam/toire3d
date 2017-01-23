@@ -296,6 +296,99 @@ namespace SceneMainState
 	};
 
 
+	//--------------------チャレンジ（イントロ）ステート
+	class ChallengeIntro : public State<sceneMain>
+	{
+	public:
+		// this is a シングルトン
+		static ChallengeIntro* GetInstance() { static ChallengeIntro state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMain* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMain* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMain* pMain);
+
+		// 描画
+		virtual void Render(sceneMain* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMain* pMain, const Message& msg);
+
+
+	private:
+		ChallengeIntro() {};
+		~ChallengeIntro() {};
+
+		ChallengeIntro(const ChallengeIntro&) {}
+		ChallengeIntro& operator=(const ChallengeIntro&) {}
+	};
+
+	//--------------------チャレンジ（メイン）ステート
+	class ChallengeMain : public State<sceneMain>
+	{
+	public:
+		// this is a シングルトン
+		static ChallengeMain* GetInstance() { static ChallengeMain state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMain* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMain* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMain* pMain);
+
+		// 描画
+		virtual void Render(sceneMain* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMain* pMain, const Message& msg);
+
+
+	private:
+		ChallengeMain() {};
+		~ChallengeMain() {};
+
+		ChallengeMain(const ChallengeMain&) {}
+		ChallengeMain& operator=(const ChallengeMain&) {}
+	};
+
+
+	//--------------------チャレンジ（クリア）ステート
+	class ChallengeClear : public State<sceneMain>
+	{
+	public:
+		// this is a シングルトン
+		static ChallengeClear* GetInstance() { static ChallengeClear state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMain* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMain* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMain* pMain);
+
+		// 描画
+		virtual void Render(sceneMain* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMain* pMain, const Message& msg);
+
+
+	private:
+		ChallengeClear() {};
+		~ChallengeClear() {};
+
+		ChallengeClear(const ChallengeClear&) {}
+		ChallengeClear& operator=(const ChallengeClear&) {}
+	};
 
 	//--------------------トレーニングイントロ　ステート
 	class TrainingIntro : public State<sceneMain>
@@ -420,6 +513,37 @@ namespace SceneMainState
 
 		TutorialPauseMenu(const TutorialPauseMenu&) {}
 		TutorialPauseMenu& operator=(const TutorialPauseMenu&) {}
+	};
+
+	//--------------------チャレンジポーズメニューステート
+	class ChallengePauseMenu : public State<sceneMain>
+	{
+	public:
+		// this is a シングルトン
+		static ChallengePauseMenu* GetInstance() { static ChallengePauseMenu state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMain* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMain* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMain* pMain);
+
+		// 描画
+		virtual void Render(sceneMain* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMain* pMain, const Message& msg);
+
+
+	private:
+		ChallengePauseMenu() {};
+		~ChallengePauseMenu() {};
+
+		ChallengePauseMenu(const ChallengePauseMenu&) {}
+		ChallengePauseMenu& operator=(const ChallengePauseMenu&) {}
 	};
 
 	//--------------------トレーニングポーズ　ステート

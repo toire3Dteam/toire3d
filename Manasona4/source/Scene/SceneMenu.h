@@ -36,11 +36,13 @@ enum class TIPS_TYPE
 // メニューのウィンドウの種類
 enum class WINDOW_TYPE
 {
-	OPTION,		// オプション
-	SYSTEM,		// システム
-	GAME,		// ゲーム
-	SOUND,		// サウンド
-	ARRAY_END	// 配列終了
+	OPTION,				// オプション
+	SYSTEM,				// システム
+	GAME,				// ゲーム
+	SOUND,				// サウンド
+	CHALLENGE,			// チャレンジ
+	CHALLENGE_SELECT,   // チャレンジセレクト
+	ARRAY_END			// 配列終了
 
 };
 

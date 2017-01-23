@@ -2551,6 +2551,15 @@ void AIState::RushAttack::Execute(AI * pPerson)
 				{
 					// ‘«•¥‚¢
 					pPerson->PushInputList(PLAYER_INPUT::DOWN);
+					// ‘ŠŽè‚Ì•ûŒüƒŒƒo[
+					if (MyPlayer->GetPos().x < TargetPlayer->GetPos().x)
+					{
+						pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+					}
+					else
+					{
+						pPerson->PushInputList(PLAYER_INPUT::LEFT);
+					}
 					pPerson->PushInputList(PLAYER_INPUT::R1);
 					return;
 				}

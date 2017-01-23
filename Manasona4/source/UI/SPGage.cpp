@@ -17,7 +17,8 @@ SpGage::SpGage(BasePlayer * pPlayer)
 	m_pSpNum = new tdn2DAnim("Data/UI/Game/SPNum.png");
 	m_pSpNum->OrderShrink(12, 1, 1.1f);
 	
-	m_pGageFlash = new tdn2DObj("Data/UI/Game/SPGageAdd.png");
+	m_pGageFlash = new tdn2DAnim("Data/UI/Game/SPGageAdd.png");
+	m_pGageFlash->OrderNone();
 	//m_pGageFlash->OrderShrink(12, 1, 1.1f);
 	m_iAlpha = 0;
 	m_bAlphaReturnFlag = false;
@@ -87,7 +88,12 @@ void SpGage::Update()
 			if (m_iGageLevel != GAGE_LEVEL::MAX)
 			{
 				m_iGageLevel = GAGE_LEVEL::MAX;
-				m_pGageRip->Action();
+				
+				if (m_pGage->GetAction()->IsAction() == true &&
+					m_pGage->GetAction()->GetDelayFrame() <= 0)
+				{
+					m_pGageRip->Action();
+				}
 
 				m_iAlpha = 0;
 				m_bAlphaReturnFlag = false;
@@ -100,7 +106,11 @@ void SpGage::Update()
 			if (m_iGageLevel != GAGE_LEVEL::HARF)
 			{
 				m_iGageLevel = GAGE_LEVEL::HARF;
-				m_pGageRip->Action();	
+				if (m_pGage->GetAction()->IsAction() == true &&
+					m_pGage->GetAction()->GetDelayFrame() <= 0)
+				{
+					m_pGageRip->Action();
+				}
 
 				m_iAlpha = 0;
 				m_bAlphaReturnFlag = false;
@@ -156,7 +166,7 @@ void SpGage::Update()
 	//animekese
 	m_iAlpha = (int)Math::Clamp((float)m_iAlpha, 0, 255);
 	m_pGageFlash->SetAlpha(m_iAlpha);
-	//m_pGageFlash->Update();
+	m_pGageFlash->Update();
 }
 
 void SpGage::Render()
@@ -317,7 +327,7 @@ void SpGage::Action(int delayTimer)
 {
 
 	m_pGage->Action(delayTimer);
-	//m_pGageFlash->Action(delayTimer);
+	m_pGageFlash->Action(delayTimer);
 	m_pSpNum->Action(delayTimer);
 	m_pSpGetting->Action(delayTimer);
 	m_iAlpha = 0;

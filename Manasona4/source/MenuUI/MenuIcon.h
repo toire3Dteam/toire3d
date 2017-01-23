@@ -109,6 +109,22 @@ protected:
 };
 
 
+//+--------------------------
+//	チャレンジアイコン
+//+--------------------------
+
+class ChallengeIcon :public BaseMenuIcon
+{
+public:
+	ChallengeIcon();
+	~ChallengeIcon();
+
+	void Update();
+	void Render();
+
+protected:
+
+};
 
 //+--------------------------
 //	コレクションアイコン

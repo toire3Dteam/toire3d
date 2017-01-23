@@ -185,6 +185,35 @@ void TrainingIcon::Render()
 
 
 //+-------------------------
+//	チャレンジアイコン
+//+-------------------------
+
+ChallengeIcon::ChallengeIcon()
+{
+	m_pIcon = new tdn2DAnim("Data/UI/Menu/Icon/ChallengeIcon.png");	// アイコン画像
+	m_pIcon->OrderMoveAppeared(10, (int)m_vPos.x, (int)m_vPos.y + 128);
+
+	m_pInfo = new tdn2DAnim("Data/UI/Menu/Info/ChallengeInfo.png");
+	m_pInfo->OrderMoveAppeared(10, (int)m_vInfoPos.x + 128, (int)m_vInfoPos.y);
+
+
+}
+
+ChallengeIcon::~ChallengeIcon()
+{
+}
+
+void ChallengeIcon::Update()
+{
+	BaseMenuIcon::Update();
+}
+
+void ChallengeIcon::Render()
+{
+	BaseMenuIcon::Render();
+}
+
+//+-------------------------
 //	コレクションアイコン
 //+-------------------------
 
