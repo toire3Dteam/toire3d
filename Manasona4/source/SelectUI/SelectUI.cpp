@@ -60,8 +60,16 @@ SelectUI::SelectUI(SIDE side, ENTITY_ID id, int DeviceID, bool bAI) :BaseGameEnt
 			m_tagCharaInfo[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Info/aramitama.png");
 			m_tagCharaName[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/name/aramitama.png");
 			m_pCharaIconRip[i] = new tdn2DAnim("Data/UI/CharacterSelect/icon/aramitama.png");
-
 			break;
+
+		case CHARACTER::ANIKI:
+			m_tagCharaPic[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Character/aramitama.png");
+			m_tagCharaPicRip[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Character/aramitama.png");
+			m_tagCharaInfo[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Info/aramitama.png");
+			m_tagCharaName[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/name/aramitama.png");
+			m_pCharaIconRip[i] = new tdn2DAnim("Data/UI/CharacterSelect/icon/aramitama.png");
+			break;
+
 		default:
 			MyAssert(0, "ÇªÇÒÇ»ÉfÅ[É^ÇÕÇ»Ç¢");
 			break;

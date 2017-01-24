@@ -101,6 +101,11 @@ bool sceneResult::Initialize()
 		m_ResultPerformance = new AramitamaResultPerformance();
 		break;
 
+	case CHARACTER::ANIKI:
+		m_WinPlayer = new iex3DObj("DATA/CHR/Aramitama/aramitama_test.IEM");
+		m_ResultPerformance = new AramitamaResultPerformance();
+		break;
+
 	default:
 		MyAssert(0, "ÇªÇÒÇ»ÉLÉÉÉâÇÕë∂ç›ÇµÇ»Ç¢");
 		break;
@@ -133,6 +138,11 @@ bool sceneResult::Initialize()
 	case CHARACTER::ARAMITAMA:
 		m_LosePlayer = new iex3DObj("DATA/CHR/Aramitama/aramitama.IEM");
 		m_iLoseMotion = 33;
+		break;
+
+	case CHARACTER::ANIKI:
+		m_LosePlayer = new iex3DObj("DATA/CHR/Aniki/Aniki.IEM");
+		m_iLoseMotion = 34;
 		break;
 
 	default:

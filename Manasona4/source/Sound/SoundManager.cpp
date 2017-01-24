@@ -22,6 +22,8 @@ const SE_Manager::DATA all_dataS[]
 	{ "ヒット4",					"DATA/Sound/SE/BlazBlue/hit1.wav", 2, false },
 	{ "ヒット5",					"DATA/Sound/SE/BlazBlue/hit2.wav", 2, false },
 	{ "ヒット6",					"DATA/Sound/SE/BlazBlue/hit3.wav", 2, false },
+	{ "ケツドラム1",				"DATA/Sound/SE/Battle/Aniki/dram1.wav", 8, false },
+	{ "トスミタマ",		"DATA/Sound/SE/Battle/plasma.wav",				1, false },
 	{ "斬撃1",						"DATA/Sound/SE/P4U2/cut2.wav", 2, false },
 	{ "斬撃2",						"DATA/Sound/SE/BlazBlue/cut1.wav", 6, false },
 	{ "ぐちょヒット",				"DATA/Sound/SE/Battle/gutyo.wav", 8, false },

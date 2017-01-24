@@ -122,6 +122,7 @@ void BasePlayer::LoadAttackFrameList(LPSTR filename)
 		{ "[[逆切れ攻撃]]", BASE_ACTION_STATE::INVINCIBLE_ATTACK },
 		{ "[[キャラ固有地上ニュートラル]]", BASE_ACTION_STATE::SKILL },
 		{ "[[キャラ固有2]]", BASE_ACTION_STATE::SKILL2 },
+		{ "[[キャラ固有3]]", BASE_ACTION_STATE::SKILL3 },
 		{ "[[キャラ固有地上しゃがみ]]", BASE_ACTION_STATE::SKILL_SQUAT },
 		{ "[[キャラ固有空中ニュートラル]]", BASE_ACTION_STATE::SKILL_AERIAL },
 		{ "[[キャラ固有空中下]]", BASE_ACTION_STATE::SKILL_AERIALDROP },

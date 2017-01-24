@@ -30,7 +30,7 @@ bool DokkoiAttackCancel(BasePlayer *pPerson);
 bool isInputGuardCommand(BasePlayer *pPerson);
 bool GuardUpdate(BasePlayer *pPerson);
 bool isPossibleGuardState(BasePlayer *pPerson);
-
+void ChangeWaitState(BasePlayer *pPerson);
 
 namespace BasePlayerState
 {

@@ -839,7 +839,7 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 COMBO_DESK comboDesk;
 
 									 // ★初段のみ入るところ
-									 if (pPerson->GetRecoveryDamageCount()->empty() && HitDamageInfo->iAttackType != (int)BASE_ACTION_STATE::OVERDRIVE_BURST)
+									 if (pPerson->GetRecoveryDamageCount()->empty() && HitDamageInfo->damage != 0)
 									 {
 										 if (isDamageCounterState(pPerson))
 										 {
@@ -3695,55 +3695,22 @@ bool BasePlayerState::AntiAirAttack::OnMessage(BasePlayer * pPerson, const Messa
 
 void BasePlayerState::DownAttack::Enter(BasePlayer * pPerson)
 {
-	// 待機モーションに変える
-	pPerson->SetMotion(MOTION_TYPE::DOWN_ATTACK);
-
-	// ★攻撃ステートを2段目に設定する　↓でHITフラグを消している
-	pPerson->SetActionState(BASE_ACTION_STATE::DOWN_ATTACK);
-
-	pPerson->SetDirAngle();
+	pPerson->DownAttackInit();
 }
 
 void BasePlayerState::DownAttack::Execute(BasePlayer * pPerson)
 {
-	// 攻撃終了してたら
-	if (!pPerson->isAttackState())
+	// 終わったら
+	if (pPerson->DownAttackUpdate())
 	{
 		// 待機モーションに戻る
 		ChangeWaitState(pPerson);
-		return;
 	}
-
-	// HITしていたらキャンセルできる
-	if (pPerson->GetAttackData()->bHit == true)
-	{
-		//////////////////////////////////////////////
-		//	スキルキャンセル
-		//============================================
-		if (SkillCancel(pPerson)) return;
-
-		//////////////////////////////////////////////
-		//	スタンドキャンセル
-		//============================================
-		if (StandCancel(pPerson)) return;
-
-		//////////////////////////////////////////////
-		//	フィニッシュ攻撃ボタン
-		//============================================
-		if (InvincibleAttackCancel(pPerson)) return;
-
-		//////////////////////////////////////////////
-		//	ヒーホードライブキャンセル
-		//============================================
-		if (HeaveHoCancel(pPerson)) return;
-	}
-
 }
 
 void BasePlayerState::DownAttack::Exit(BasePlayer * pPerson)
 {
-	// 先行入力リセット
-	pPerson->AheadCommandReset();
+	pPerson->DownAttackExit();
 }
 
 void BasePlayerState::DownAttack::Render(BasePlayer * pPerson)
@@ -5541,6 +5508,9 @@ void BasePlayerState::HeavehoDrive::Exit(BasePlayer * pPerson)
 	// 背景変更
 	bool bDriveStage(false);
 	MsgMgr->Dispatch(0, pPerson->GetID(), ENTITY_ID::SCENE_MAIN, MESSAGE_TYPE::OVER_DRIVE_STAGE, &bDriveStage);
+
+	// せんこうにゅうりょくりせっと
+	pPerson->AheadCommandReset();
 }
 
 void BasePlayerState::HeavehoDrive::Render(BasePlayer * pPerson)

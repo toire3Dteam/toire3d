@@ -659,6 +659,7 @@ void Aramitama::InitActionDatas()
 	// スキルアクションの初期化(★★★ここに書くのは、この中でAttackDataを参照するから)
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::LAND] = new SkillAction::Land(this);
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::LAND2] = nullptr;
+	m_pSkillActions[(int)SKILL_ACTION_TYPE::LAND3] = nullptr;
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::SQUAT] = new SkillAction::Squat(this);
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::AERIAL] = new SkillAction::Aerial(this);
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::AERIAL2] = nullptr;
@@ -673,7 +674,7 @@ void Aramitama::InitMushiDatas()
 	// 地上ヒットも空中ヒットも共通の情報
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->damage = 1200;
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->pierceLV = 0;
-	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->HitSE = "ヒット6";
+	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->HitSE = "トスミタマ";
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->WhiffSE = "空振り1";
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->HitEffectType = EFFECT_TYPE::DAMAGE;
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->WhiffEffectType = EFFECT_TYPE::WHIFF;

@@ -70,7 +70,8 @@ public:
 				return std::string("DATA/Sound/BGM/battle/Cupola.ogg");
 				break;
 			case STAGE::SYUTEN:
-				return std::string("DATA/Sound/BGM/battle/Ende.ogg");
+				if(rand () % 2)return std::string("DATA/Sound/BGM/battle/Ende.ogg");
+				return std::string("DATA/Sound/BGM/battle/Wizardry Show.ogg");
 				break;
 			case STAGE::SEA:
 				return std::string("DATA/Sound/BGM/battle/Rising Winter.ogg");
@@ -79,8 +80,7 @@ public:
 				return std::string("DATA/Sound/BGM/battle/Jardin celeste.ogg");
 				break;
 			case STAGE::NANASATO_SITY:
-				if (rand() % 3 == 0)return std::string("DATA/Sound/BGM/battle/Demonic Coaster.ogg");
-				if (rand() % 2 == 0)return std::string("DATA/Sound/BGM/battle/Wizardry Show.ogg");
+				if (rand() % 2)return std::string("DATA/Sound/BGM/battle/Demonic Coaster.ogg");
 				return std::string("DATA/Sound/BGM/battle/‰m‹•‚Ì–é‹ì‚¯.ogg");
 				break;
 			default:

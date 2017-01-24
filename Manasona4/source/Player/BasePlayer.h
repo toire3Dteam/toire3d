@@ -155,6 +155,7 @@ enum class BASE_ACTION_STATE
 	INVINCIBLE_ATTACK,	// フィニッシュアーツ→無敵技
 	SKILL,				// 地上キャラクター固有技
 	SKILL2,				// 地上キャラクター固有技2
+	SKILL3,				// 地上キャラクター固有技3
 	SKILL_SQUAT,		// しゃがみキャラクター固有技
 	SKILL_AERIAL,		// 空中下キャラクター固有技
 	SKILL_AERIALDROP,	// 空中下キャラクター固有技
@@ -176,6 +177,7 @@ enum class SKILL_ACTION_TYPE
 
 	// 追加はここに。ここ以前に書くとスタンドがおかしくなる
 	LAND2,
+	LAND3,
 	AERIAL2,
 	MAX
 };
@@ -206,11 +208,12 @@ enum class MOTION_TYPE
 	//AERIALDROP_ATTACK,
 	AERIAL_DASH,			// 空中ダッシュ
 	PERSONA,				// ペルソナ発動
-	SKILL_LAND,		// キャラ固有地上
-	SKILL_SQUAT,	// キャラ固有しゃがみ
-	SKILL_AERIAL,	// キャラ固有空中
-	SKILL_AERIALDROP,// キャラ固有空中下
-	SKILL2,			// スキル枠2
+	SKILL_LAND,				// キャラ固有地上
+	SKILL_SQUAT,			// キャラ固有しゃがみ
+	SKILL_AERIAL,			// キャラ固有空中
+	SKILL_AERIALDROP,		// キャラ固有空中下
+	SKILL2,					// スキル枠2
+	SKILL3,					// スキル枠3
 	HEAVEHO_DRIVE,			// DD
 	BURST,					// バースト
 	HEAVEHO_DRIVE_OVERFLOW,	// AH
@@ -477,6 +480,58 @@ public:
 	virtual void ThirdRushInit() = 0;		// スキル発動時に呼び出す
 	virtual void ThirdRushExit() = 0;
 	virtual void ThirdRushUpdate() = 0;//
+
+	/****************************/
+	//	足払い(兄貴用)
+	/****************************/
+	virtual void DownAttackInit()
+	{
+		// 足払いモーションに変える
+		SetMotion(MOTION_TYPE::DOWN_ATTACK);
+
+		// ★攻撃ステートを2段目に設定する　↓でHITフラグを消している
+		SetActionState(BASE_ACTION_STATE::DOWN_ATTACK);
+
+		SetDirAngle();
+	}
+	virtual void DownAttackExit()
+	{
+		// 先行入力リセット
+		AheadCommandReset();
+	}
+	virtual bool DownAttackUpdate()
+	{
+		// 攻撃終了してたら
+		if (!isAttackState())
+		{
+			return true;
+		}
+
+		// HITしていたらキャンセルできる
+		if (GetAttackData()->bHit == true)
+		{
+			//////////////////////////////////////////////
+			//	スキルキャンセル
+			//============================================
+			if (SkillCancel(this)) return true;
+
+			//////////////////////////////////////////////
+			//	スタンドキャンセル
+			//============================================
+			if (StandCancel(this)) return true;
+
+			//////////////////////////////////////////////
+			//	フィニッシュ攻撃ボタン
+			//============================================
+			if (InvincibleAttackCancel(this)) return true;
+
+			//////////////////////////////////////////////
+			//	ヒーホードライブキャンセル
+			//============================================
+			if (HeaveHoCancel(this)) return true;
+		}
+		return false;
+	}
 
 	/****************************/
 	//	無敵攻撃カウンター成功したときのイベント
