@@ -73,3 +73,31 @@ public:
 private:
 
 };
+
+//+-------------------------------
+// (∵)チャレンジマネージャー
+//+-------------------------------
+
+class NazenarabaChallengeManager :public BaseChallengeManager
+{
+public:
+	NazenarabaChallengeManager();
+	~NazenarabaChallengeManager() {};
+
+private:
+
+};
+
+//+-------------------------------
+// アラミタマチャレンジマネージャー
+//+-------------------------------
+
+class AramitamaChallengeManager :public BaseChallengeManager
+{
+public:
+	AramitamaChallengeManager();
+	~AramitamaChallengeManager() {};
+
+private:
+
+};

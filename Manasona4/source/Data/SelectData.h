@@ -78,6 +78,14 @@ enum class AUTO_SAVE_TYPE
 //	トレーニング用
 //+----------------------
 
+// 初期のポジション
+enum class START_POSITION
+{
+	MIDDLE,		// 真ん中から
+	LEFT,		// 左から
+	RIGHT,		// 右から
+};
+
 // 自動回復するかしないか
 enum class HP_RECOVERY_TYPE
 {
@@ -145,6 +153,7 @@ enum class ENEMY_THROW_TECH_TYPE
 	OK		// なげ抜けする
 };
 
+
 //+-------------------------
 //	キャラクター固有データ
 //+-------------------------
@@ -166,6 +175,7 @@ enum class WASSYOI_TYPE
 // トレーニング用データ
 struct TrainingData
 {
+	START_POSITION			eStartPosition;		// 初期ポジション
 	HP_RECOVERY_TYPE		eHpRecovery;		// 自動回復するかしないか
 	int						iHp1P;				// 1PのHP
 	int						iHp2P;				// 1PのHP
@@ -204,6 +214,7 @@ enum class TUTORIAL_TYPE
 	THROW,
 	ESCAPE,
 	DOKKOI,
+	ANTI_AIR,
 	DOWN_ATTACK,
 	OD_ONEMORE,
 	OD_BURST,

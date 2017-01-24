@@ -875,3 +875,62 @@ void sceneMain::InitTrainingData()
 	SelectDataMgr->Get()->tagTrainingDatas.eWassyoiType = (WASSYOI_TYPE)PlayerDataMgr->m_TrainingData.iWassyoiGage;
 		
 }
+
+//	開始座標
+void sceneMain::StartPosition()
+{
+	// 初期ポジションを変更する
+	switch (SelectDataMgr->Get()->tagTrainingDatas.eStartPosition)
+	{
+	case START_POSITION::MIDDLE:
+		PlayerMgr->GetPlayer(SIDE::LEFT)->SetPos(Vector3(-20, 0, 0));
+		PlayerMgr->GetPlayer(SIDE::RIGHT)->SetPos(Vector3(20, 0, 0));
+
+		break;
+	case START_POSITION::LEFT:
+		PlayerMgr->GetPlayer(SIDE::LEFT)->SetPos(Vector3(-97.5, 0, 0));
+		PlayerMgr->GetPlayer(SIDE::RIGHT)->SetPos(Vector3(-60, 0, 0));
+
+		break;
+	case START_POSITION::RIGHT:
+		PlayerMgr->GetPlayer(SIDE::LEFT)->SetPos(Vector3(60, 0, 0));
+		PlayerMgr->GetPlayer(SIDE::RIGHT)->SetPos(Vector3(97.5, 0, 0));
+
+		break;
+	default:
+		MyAssert(0,"そのタイプはないです")
+		break;
+	}
+	
+
+}
+
+
+//	チャレンジ開始座標
+void sceneMain::StartChallengePosition()
+{
+	// 初期ポジションを変更する
+	switch (SelectDataMgr->Get()->tagTrainingDatas.eStartPosition)
+	{
+	case START_POSITION::MIDDLE:
+		PlayerMgr->GetPlayer(SIDE::LEFT)->SetPos(Vector3(-11.0f, 0, 0));
+		PlayerMgr->GetPlayer(SIDE::RIGHT)->SetPos(Vector3(11.0f, 0, 0));
+
+		break;
+	case START_POSITION::LEFT:
+		PlayerMgr->GetPlayer(SIDE::LEFT)->SetPos(Vector3(-97.5f, 0, 0));
+		PlayerMgr->GetPlayer(SIDE::RIGHT)->SetPos(Vector3(-76.5f, 0, 0));
+
+		break;
+	case START_POSITION::RIGHT:
+		PlayerMgr->GetPlayer(SIDE::LEFT)->SetPos(Vector3(76.5f, 0, 0));
+		PlayerMgr->GetPlayer(SIDE::RIGHT)->SetPos(Vector3(97.5f, 0, 0));
+
+		break;
+	default:
+		MyAssert(0, "そのタイプはないです")
+			break;
+	}
+
+
+}

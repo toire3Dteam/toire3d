@@ -1,6 +1,8 @@
 #include "BaseChallengeManager.h"
 #include "AirouChallenge.h"
 #include "TekiChallenge.h"
+#include "NazenarabaChallenge.h"
+#include "AramitamaChallenge.h"
 
 //+----------------------------
 //	ベースチャレンジマネージャー
@@ -190,10 +192,10 @@ AirouChallengeManager::AirouChallengeManager()
 			m_pChallenge[i] = new AirouChallenge1(l_iNo);
 			break;
 		case CHALLENGE_TYPE::MISSION_2:
-			m_pChallenge[i] = new AirouChallenge1(l_iNo);
+			m_pChallenge[i] = new AirouChallenge2(l_iNo);
 			break;
 		case CHALLENGE_TYPE::MISSION_3:
-			m_pChallenge[i] = new AirouChallenge1(l_iNo);
+			m_pChallenge[i] = new AirouChallenge3(l_iNo);
 			break;
 		default:
 			MyAssert(0, "そのタイプはない");
@@ -221,10 +223,72 @@ TekiChallengeManager::TekiChallengeManager()
 			m_pChallenge[i] = new TekiChallenge1(l_iNo);
 			break;
 		case CHALLENGE_TYPE::MISSION_2:
-			m_pChallenge[i] = new AirouChallenge1(l_iNo);
+			m_pChallenge[i] = new TekiChallenge2(l_iNo);
 			break;
 		case CHALLENGE_TYPE::MISSION_3:
-			m_pChallenge[i] = new AirouChallenge1(l_iNo);
+			m_pChallenge[i] = new TekiChallenge3(l_iNo);
+			break;
+		default:
+			MyAssert(0, "そのタイプはない");
+			break;
+		}
+	}
+
+}
+
+
+//+---------------------------------
+// (∵)チャレンジマネージャー
+//+---------------------------------
+
+NazenarabaChallengeManager::NazenarabaChallengeManager()
+{
+	// チャレンジデータ設定
+	for (int i = 0; i < (int)CHALLENGE_TYPE::ARRAY_END; i++)
+	{
+		int l_iNo = i + 1;
+
+		switch ((CHALLENGE_TYPE)i)
+		{
+		case CHALLENGE_TYPE::MISSION_1:
+			m_pChallenge[i] = new NazenarabaChallenge1(l_iNo);
+			break;
+		case CHALLENGE_TYPE::MISSION_2:
+			m_pChallenge[i] = new NazenarabaChallenge2(l_iNo);
+			break;
+		case CHALLENGE_TYPE::MISSION_3:
+			m_pChallenge[i] = new NazenarabaChallenge3(l_iNo);
+			break;
+		default:
+			MyAssert(0, "そのタイプはない");
+			break;
+		}
+	}
+
+}
+
+
+//+---------------------------------
+// アラミタマチャレンジマネージャー
+//+---------------------------------
+
+AramitamaChallengeManager::AramitamaChallengeManager()
+{
+	// チャレンジデータ設定
+	for (int i = 0; i < (int)CHALLENGE_TYPE::ARRAY_END; i++)
+	{
+		int l_iNo = i + 1;
+
+		switch ((CHALLENGE_TYPE)i)
+		{
+		case CHALLENGE_TYPE::MISSION_1:
+			m_pChallenge[i] = new AramitamaChallenge1(l_iNo);
+			break;
+		case CHALLENGE_TYPE::MISSION_2:
+			m_pChallenge[i] = new AramitamaChallenge2(l_iNo);
+			break;
+		case CHALLENGE_TYPE::MISSION_3:
+			m_pChallenge[i] = new AramitamaChallenge3(l_iNo);
 			break;
 		default:
 			MyAssert(0, "そのタイプはない");

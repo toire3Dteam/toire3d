@@ -83,6 +83,7 @@ void BaseTutorial::Init(int iDeviceID)
 
 	// 初期の状況設定
 	// 必要な状況があるなら各自書き換える
+	SelectDataMgr->Get()->tagTrainingDatas.eStartPosition = START_POSITION::MIDDLE;
 	SelectDataMgr->Get()->tagTrainingDatas.eHpRecovery = HP_RECOVERY_TYPE::AUTO_RECOVERY;
 	SelectDataMgr->Get()->tagTrainingDatas.iHp1P=100;
 	SelectDataMgr->Get()->tagTrainingDatas.iHp2P=100;
@@ -1491,6 +1492,70 @@ void DokkoiTutorial::TaskUpdate(BasePlayer * pPerson)
 	{
 		TaskSuccess(DUSH_CHANCEL);
 	}
+}
+
+
+
+//+------------------------------------------------------
+//	対空説明
+//+------------------------------------------------------
+
+AntiAirTutorial::AntiAirTutorial(int iTitleNo) : BaseTutorial(iTitleNo)
+{
+	// タイトル名
+	m_pTaskTitle.pString += "対空攻撃";
+
+	// クリアから終りまで
+	m_iWaitFrameMAX = 60;
+
+	// 文字の長さを調べる
+	UINT	myByte = 0; UINT	addByte = 0;
+	// 終端文字までループ
+	for (UINT i = 0; m_pTaskTitle.pString[i] != '\0'; i += myByte)
+	{
+		//	文字のバイト数を調べる	
+		myByte = _mbclen((BYTE*)&m_pTaskTitle.pString[i]);
+		addByte += myByte;
+	}
+	m_pTaskTitle.iStingLength = addByte;
+
+	// Tips
+	m_pIntroTips = new TipsCard("しゃがみ状態で▽ボタンを押すと「対空攻撃」になります。\n「対空攻撃」は空中の相手に対して【無敵状態】の攻撃です。");
+	m_pClearTips = new TipsCard("よくできました！\n空中にいる相手に「対空攻撃」を当てると浮かせる事ができ、\n「ジャンプ」などで追いかけ追撃をする事も可能です。");
+
+
+	// タスクセット
+	AddTaskData("対空攻撃－↓+▽");
+
+	Init();
+}
+
+void AntiAirTutorial::Init(int iDeviceID)
+{
+	// ★共通
+	BaseTutorial::Init(iDeviceID);
+
+	SelectDataMgr->Get()->tagTrainingDatas.eEnemyState = ENEMY_STATE_TYPE::JUMP;
+}
+
+// それぞれのクリア処理
+void AntiAirTutorial::TaskUpdate(BasePlayer * pPerson)
+{
+	//ここで色々クリア処理頑張る！
+	enum
+	{
+		ANTI_AIR = 0,
+	};
+
+	// 対空発動でクリア
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::AntiAirAttack::GetInstance()))
+	{
+		if (pPerson->isHitAttack() == true)
+		{
+			TaskSuccess(ANTI_AIR);
+		}
+	}
+
 }
 
 

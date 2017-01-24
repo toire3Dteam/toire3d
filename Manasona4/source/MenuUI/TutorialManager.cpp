@@ -64,6 +64,9 @@ TutorialManager::TutorialManager()
 		case TUTORIAL_TYPE::DOKKOI:
 			m_pTutorial[i] = new DokkoiTutorial(no);// 
 			break;
+		case TUTORIAL_TYPE::ANTI_AIR:
+			m_pTutorial[i] = new AntiAirTutorial(no);// 
+			break;
 		case TUTORIAL_TYPE::DOWN_ATTACK:
 			m_pTutorial[i] = new DownAttackTutorial(no);// 
 			break;

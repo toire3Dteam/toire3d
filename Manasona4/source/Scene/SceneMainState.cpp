@@ -1046,16 +1046,18 @@ void SceneMainState::ChallengeIntro::Enter(sceneMain *pMain)
 	PlayerMgr->GetPlayer(SIDE::LEFT)->SetOverDriveGage(0);
 	PlayerMgr->GetPlayer(SIDE::RIGHT)->SetOverDriveGage(0);
 
-	//  チャレンジ毎に必要な設定をここでもする
-	// 相手との距離は基本近づける
-	PlayerMgr->GetPlayer(SIDE::LEFT)->SetPos(Vector3(-7, 0, 0));
-	PlayerMgr->GetPlayer(SIDE::RIGHT)->SetPos(Vector3(7, 0, 0));
+	////  チャレンジ毎に必要な設定をここでもする
+	//// 相手との距離は基本近づける
+	//PlayerMgr->GetPlayer(SIDE::LEFT)->SetPos(Vector3(-7, 0, 0));
+	//PlayerMgr->GetPlayer(SIDE::RIGHT)->SetPos(Vector3(7, 0, 0));
 	//if (pMain->GetSelectChallenge() == Challenge_TYPE::STAND_GUARD)
 	//{
 	//	PlayerMgr->GetPlayer(SIDE::LEFT)->SetPos(Vector3(-97.5, 0, 0));
 	//	PlayerMgr->GetPlayer(SIDE::RIGHT)->SetPos(Vector3(-60, 0, 0));
 	//}
 
+	// 初期ポジションの変更(右からスタートとか真ん中からとか)
+	pMain->StartChallengePosition();
 
 }
 
@@ -1403,31 +1405,8 @@ void SceneMainState::TrainingIntro::Enter(sceneMain *pMain)
 	PlayerMgr->GetPlayer(SIDE::LEFT)->SetOverDriveGage(0);
 	PlayerMgr->GetPlayer(SIDE::RIGHT)->SetOverDriveGage(0);
 
-	// 十字キーおしっぱで初期位置を変える
-	// パッド分更新
-	// スティックの取得
-	float x, y;
-	int NumDevice(tdnInputManager::GetNumDevice());
-	if (NumDevice == 0)NumDevice = 1;// デバイスがなかったら仮想で1つ追加
-	for (int i = 0; i < NumDevice; i++)
-	{
-		// 
-		tdnInput::GetAxisXYf(&x, &y, i);
-		static const float gosa(.2f);
-		if (x > .5f - gosa||
-			tdnInput::KeyGet(KEYCODE::KEY_RIGHT, i) == 1)
-		{
-			PlayerMgr->GetPlayer(SIDE::LEFT)->SetPos(Vector3(60, 0, 0));
-			PlayerMgr->GetPlayer(SIDE::RIGHT)->SetPos(Vector3(97.5, 0, 0));
-		}
-		else if (x < -.5f + gosa ||
-			tdnInput::KeyGet(KEYCODE::KEY_LEFT, i) == 1)
-		{
-			PlayerMgr->GetPlayer(SIDE::LEFT)->SetPos(Vector3(-97.5, 0, 0));
-			PlayerMgr->GetPlayer(SIDE::RIGHT)->SetPos(Vector3(-60, 0, 0));
-		}
-	}
-
+	// 初期ポジションの変更(右からスタートとか真ん中からとか)
+	pMain->StartPosition();
 
 	// トレーニングへ
 	pMain->GetFSM()->ChangeState(Training::GetInstance());
@@ -1523,6 +1502,37 @@ void SceneMainState::Training::Execute(sceneMain *pMain)
 		}
 
 
+	}
+	else
+	{
+		// 十字キーおしっぱで初期位置を変える
+		// パッド分更新
+		// スティックの取得
+		float x, y;
+		int NumDevice(tdnInputManager::GetNumDevice());
+		if (NumDevice == 0)NumDevice = 1;// デバイスがなかったら仮想で1つ追加
+		for (int i = 0; i < NumDevice; i++)
+		{
+			// 
+			tdnInput::GetAxisXYf(&x, &y, i);
+			static const float gosa(.2f);
+			if (x > .5f - gosa ||
+				tdnInput::KeyGet(KEYCODE::KEY_RIGHT, i) == 1)
+			{
+				SelectDataMgr->Get()->tagTrainingDatas.eStartPosition = START_POSITION::RIGHT;
+			}
+			else if (x < -.5f + gosa ||
+				tdnInput::KeyGet(KEYCODE::KEY_LEFT, i) == 1)
+			{
+				SelectDataMgr->Get()->tagTrainingDatas.eStartPosition = START_POSITION::LEFT;
+			}
+			else if (y < -.5f + gosa ||
+				tdnInput::KeyGet(KEYCODE::KEY_DOWN, i) == 1)
+			{
+				SelectDataMgr->Get()->tagTrainingDatas.eStartPosition = START_POSITION::MIDDLE;
+			}
+
+		}
 	}
 
 	// フェードアウト完了後

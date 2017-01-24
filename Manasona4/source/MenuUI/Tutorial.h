@@ -428,6 +428,24 @@ private:
 };
 
 //+-----------------------------
+//	対空説明
+//+-----------------------------
+class  AntiAirTutorial :public BaseTutorial
+{
+public:
+	AntiAirTutorial(int iTitleNo);
+	~AntiAirTutorial() {};
+
+	void Init(int iDeviceID = 0);
+
+	// それぞれのタスクをここで作る
+	void TaskUpdate(BasePlayer* pPerson); //★一つずつbClearを点灯させていく
+
+private:
+
+};
+
+//+-----------------------------
 //	足払い説明
 //+-----------------------------
 class  DownAttackTutorial :public BaseTutorial

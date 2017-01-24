@@ -68,6 +68,9 @@ public:
 	
 	void InitTrainingData();	// ★トレーニングデータを適用
 
+	void StartPosition();				//	開始座標
+	void StartChallengePosition();		//	チャレンジ開始座標
+
 
 	// ステートマシン取得
 	StateMachine<sceneMain> *GetFSM(){ return m_pStateMachine; }

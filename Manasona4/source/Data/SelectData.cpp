@@ -31,6 +31,7 @@ iChallengeType(0)							// 選択しているチャレンジ
 }
 
 TrainingData::TrainingData():
+eStartPosition(START_POSITION::MIDDLE),				// 初期のポジション
 eHpRecovery(HP_RECOVERY_TYPE::AUTO_RECOVERY),		// 自動回復するかしないか
 iHp1P(100),											// 1PのHP
 iHp2P(100),											// 1PのHP

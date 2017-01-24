@@ -21,10 +21,10 @@ ChallengeManagerManager::ChallengeManagerManager()
 			m_pChallengeManager[i] = new TekiChallengeManager();
 			break;
 		case CHARACTER::NAZENARA:
-			m_pChallengeManager[i] = new AirouChallengeManager();
+			m_pChallengeManager[i] = new NazenarabaChallengeManager();
 			break;
 		case CHARACTER::ARAMITAMA:
-			m_pChallengeManager[i] = new AirouChallengeManager();
+			m_pChallengeManager[i] = new AramitamaChallengeManager();
 			break;
 		default:
 			MyAssert(0, "ÇªÇÃÉ^ÉCÉvÇÕë∂ç›ÇµÇ»Ç¢");

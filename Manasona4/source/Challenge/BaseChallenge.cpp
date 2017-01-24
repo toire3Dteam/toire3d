@@ -83,6 +83,7 @@ void BaseChallenge::Init(int iDeviceID)
 
 	// ‰Šú‚Ìó‹µÝ’è
 	// •K—v‚Èó‹µ‚ª‚ ‚é‚È‚çŠeŽ©‘‚«Š·‚¦‚é
+	SelectDataMgr->Get()->tagTrainingDatas.eStartPosition = START_POSITION::MIDDLE;
 	SelectDataMgr->Get()->tagTrainingDatas.eHpRecovery = HP_RECOVERY_TYPE::AUTO_RECOVERY;
 	SelectDataMgr->Get()->tagTrainingDatas.iHp1P = 100;
 	SelectDataMgr->Get()->tagTrainingDatas.iHp2P = 100;
@@ -95,7 +96,7 @@ void BaseChallenge::Init(int iDeviceID)
 	SelectDataMgr->Get()->tagTrainingDatas.eEnemyTech = ENEMY_TECH_TYPE::ALL;
 	SelectDataMgr->Get()->tagTrainingDatas.eEnemyThrowTech = ENEMY_THROW_TECH_TYPE::NO;
 	SelectDataMgr->Get()->tagTrainingDatas.iEnemyLv = 20;
-
+	SelectDataMgr->Get()->tagTrainingDatas.eWassyoiType = WASSYOI_TYPE::NO;
 }
 
 void BaseChallenge::Update()

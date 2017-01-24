@@ -978,6 +978,10 @@ void SceneMenuState::ChallengeNoStep::Enter(sceneMenu *pMain)
 {
 	// ウィンドウ起動
 	pMain->GetWindow(WINDOW_TYPE::CHALLENGE_SELECT)->Action();
+
+	// ★選択している番号は0番に初期化
+	SelectDataMgr->Get()->iChallengeType = 0;
+
 }
 
 void SceneMenuState::ChallengeNoStep::Execute(sceneMenu *pMain)

@@ -118,9 +118,11 @@
     <ClCompile Include="source\Camera\camera.cpp" />
     <ClCompile Include="source\Camera\EffectCamera.cpp" />
     <ClCompile Include="source\Challenge\AirouChallenge.cpp" />
+    <ClCompile Include="source\Challenge\AramitamaChallenge.cpp" />
     <ClCompile Include="source\Challenge\BaseChallenge.cpp" />
     <ClCompile Include="source\Challenge\BaseChallengeManager.cpp" />
     <ClCompile Include="source\Challenge\ChallengeManagerManager.cpp" />
+    <ClCompile Include="source\Challenge\NazenarabaChallenge.cpp" />
     <ClCompile Include="source\Challenge\TekiChallenge.cpp" />
     <ClCompile Include="source\Collect\BasePicture.cpp" />
     <ClCompile Include="source\Collect\PictureManager.cpp" />
@@ -309,9 +311,11 @@
     <ClInclude Include="source\Camera\camera.h" />
     <ClInclude Include="source\Camera\EffectCamera.h" />
     <ClInclude Include="source\Challenge\AirouChallenge.h" />
+    <ClInclude Include="source\Challenge\AramitamaChallenge.h" />
     <ClInclude Include="source\Challenge\BaseChallenge.h" />
     <ClInclude Include="source\Challenge\BaseChallengeManager.h" />
     <ClInclude Include="source\Challenge\ChallengeManagerManager.h" />
+    <ClInclude Include="source\Challenge\NazenarabaChallenge.h" />
     <ClInclude Include="source\Challenge\TekiChallenge.h" />
     <ClInclude Include="source\Collect\BasePicture.h" />
     <ClInclude Include="source\Collect\PictureManager.h" />
