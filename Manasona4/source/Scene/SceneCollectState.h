@@ -140,7 +140,7 @@ namespace SceneCollectState
 
 	};
 
-	//--------------------コンテンツ購入確認
+	//--------------------コンテンツ購入確認(イラスト)
 	class BuyPictureStep : public State<sceneCollect>
 	{
 	public:
@@ -170,6 +170,140 @@ namespace SceneCollectState
 		BuyPictureStep& operator=(const BuyPictureStep&) {}
 
 		bool PadUpdate(sceneCollect* pMain, int DeviceID);
+	};
+
+
+	//--------------------ムービーの選択
+	class MovieStep : public State<sceneCollect>
+	{
+	public:
+		// this is a シングルトン
+		static MovieStep* GetInstance() { static MovieStep state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneCollect* pMain);
+
+		// 実行します
+		virtual void Execute(sceneCollect* pMain);
+
+		// 帰る
+		virtual void Exit(sceneCollect* pMain);
+
+		// 描画
+		virtual void Render(sceneCollect* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneCollect* pMain, const Message& msg);
+
+	private:
+		MovieStep() {};
+		~MovieStep() {};
+
+		MovieStep(const MovieStep&) {}
+		MovieStep& operator=(const MovieStep&) {}
+
+		bool PadUpdate(sceneCollect* pMain, int DeviceID);
+
+	};
+
+	//--------------------ムービー鑑賞
+	class MovieWatch : public State<sceneCollect>
+	{
+	public:
+		// this is a シングルトン
+		static MovieWatch* GetInstance() { static MovieWatch state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneCollect* pMain);
+
+		// 実行します
+		virtual void Execute(sceneCollect* pMain);
+
+		// 帰る
+		virtual void Exit(sceneCollect* pMain);
+
+		// 描画
+		virtual void Render(sceneCollect* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneCollect* pMain, const Message& msg);
+
+	private:
+		MovieWatch() {};
+		~MovieWatch() {};
+
+		MovieWatch(const MovieWatch&) {}
+		MovieWatch& operator=(const MovieWatch&) {}
+
+		bool PadUpdate(sceneCollect* pMain, int DeviceID);
+
+	};
+
+	//--------------------コンテンツ購入確認(ムービー)
+	class BuyMovieStep : public State<sceneCollect>
+	{
+	public:
+		// this is a シングルトン
+		static BuyMovieStep* GetInstance() { static BuyMovieStep state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneCollect* pMain);
+
+		// 実行します
+		virtual void Execute(sceneCollect* pMain);
+
+		// 帰る
+		virtual void Exit(sceneCollect* pMain);
+
+		// 描画
+		virtual void Render(sceneCollect* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneCollect* pMain, const Message& msg);
+
+	private:
+		BuyMovieStep() {};
+		~BuyMovieStep() {};
+
+		BuyMovieStep(const BuyMovieStep&) {}
+		BuyMovieStep& operator=(const BuyMovieStep&) {}
+
+		bool PadUpdate(sceneCollect* pMain, int DeviceID);
+	};
+
+
+	//--------------------レコードの選択
+	class RecordStep : public State<sceneCollect>
+	{
+	public:
+		// this is a シングルトン
+		static RecordStep* GetInstance() { static RecordStep state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneCollect* pMain);
+
+		// 実行します
+		virtual void Execute(sceneCollect* pMain);
+
+		// 帰る
+		virtual void Exit(sceneCollect* pMain);
+
+		// 描画
+		virtual void Render(sceneCollect* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneCollect* pMain, const Message& msg);
+
+	private:
+		RecordStep() {};
+		~RecordStep() {};
+
+		RecordStep(const RecordStep&) {}
+		RecordStep& operator=(const RecordStep&) {}
+
+		bool PadUpdate(sceneCollect* pMain, int DeviceID);
+
+
 	};
 
 	//--------------------バックメニュー選択

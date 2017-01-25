@@ -363,6 +363,9 @@ PanelEffectManager::PanelEffectManager()
 		case PANEL_EFFECT_TYPE::STAR:
 			m_basePanelEffect[i] = new StarEffect();
 			break;
+		case PANEL_EFFECT_TYPE::THROW:
+			m_basePanelEffect[i] = new ThrowEffect();
+			break;
 		default:
 			assert(0);		// "そんなエフェクトはない"
 			break;

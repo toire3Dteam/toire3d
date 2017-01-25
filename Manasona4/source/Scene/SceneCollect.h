@@ -17,6 +17,9 @@
 // イラスト用
 #include "Collect\PictureManager.h"
 
+// ムービー用
+#include "Collect\MovieManager.h"
+
 // 前方宣言
 class MyMusicManager;
 class Camera;
@@ -29,7 +32,8 @@ enum class TAG_TYPE
 {
 	TROPHY,
 	PICTURE,
-
+	MOVIE,
+	RECORD
 };
 
 // ヒントカードの種類
@@ -91,6 +95,26 @@ public:
 	void PictureCtrl(int iDeviceID);
 
 	//------------------------------------------------------
+	//	ムービー
+	//------------------------------------------------------
+	void MovieInit();
+	void MovieFirstAction();
+	void MovieUpdate();
+	void MovieRender();
+		 
+	void MovieInitExe();
+	void MovieRenderExe();
+	void MovieCtrl(int iDeviceID);
+
+	//------------------------------------------------------
+	//	レコード
+	//------------------------------------------------------
+	void RecordInit();
+	void RecordFirstAction();
+	void RecordUpdate();
+	void RecordRender();
+
+	//------------------------------------------------------
 	//	アクセサー
 	//------------------------------------------------------
 	// ステートマシン取得
@@ -113,10 +137,15 @@ public:
 		INFO_PLATE_WATCH,
 		TAG_TROPHY,
 		TAG_PICTURE,
+		TAG_MOVIE,
+		TAG_RECORD,
 		TROPHY_COMP_PERCENT,
 		PRICE_PLATE,
 		NUMBER,
 		NUMBER_TROPHY,
+		RECORD_PLATE,
+		ARROW_LEFT,
+		ARROW_RIGHT,
 		ARRAY_END
 	};
 
@@ -126,7 +155,7 @@ public:
 	void SetTagType(TAG_TYPE eTagType) { m_eTagType = eTagType; }
 
 	PictureManager* GetPictureMgr() { return m_pPictureMgr; }
-
+	MovieManager* GetMovieMgr() { return m_pMovieMgr; }
 
 private:
 	static int m_iCtrlDevice;
@@ -134,7 +163,7 @@ private:
 
 	// 動画
 	tdn2DObj* m_pBackMovie;
-	tdnMovie*  m_pMovieMgr;
+	tdnMovie*  m_pMovie;
 
 	// 確認用ティップス
 	TipsCard* m_pTips[(int)TIPS_TYPE_COLLECT::ARRAY_END];
@@ -223,11 +252,19 @@ private:
 	PictureManager* m_pPictureMgr;
 	IconDesc m_tagPI;
 
+	// ★ムービーマネージャー
+	MovieManager* m_pMovieMgr;
+	IconDesc m_tagMI;
+
 	// ステートをフレンドクラスへ
 	friend class SceneCollectState::TrophyStep;
 	friend class SceneCollectState::PictureStep;
 	friend class SceneCollectState::PictureWatch;
 	friend class SceneCollectState::BuyPictureStep;
+	friend class SceneCollectState::MovieStep;
+	friend class SceneCollectState::MovieWatch;
+	friend class SceneCollectState::BuyMovieStep;
+	friend class SceneCollectState::RecordStep;
 	friend class SceneCollectState::BackMenuStep;
 
 

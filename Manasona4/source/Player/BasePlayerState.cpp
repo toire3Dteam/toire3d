@@ -5169,6 +5169,7 @@ bool BasePlayerState::Throw::OnMessage(BasePlayer * pPerson, const Message & msg
 void BasePlayerState::ThrowHold::Enter(BasePlayer * pPerson)
 {
 	pPerson->GetTargetPlayer()->GetThrowMark()->Action();
+	pPerson->GetTargetPlayer()->AddEffectAction(pPerson->GetTargetPlayer()->GetPos(), EFFECT_TYPE::THROW_HOLD);
 
 	pPerson->SetActionState(BASE_ACTION_STATE::FRAMECOUNT);
 }

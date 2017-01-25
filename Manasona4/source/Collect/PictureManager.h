@@ -25,25 +25,7 @@ enum class PICTURE_TYPE
 
 class PictureManager : public BaseGameEntity
 {
-//private:
-	//PictureManager();
-	//~PictureManager();
-	//PictureManager(const PictureManager&);
-	//PictureManager &operator=(const PictureManager&) {}
-
-	//// 1‚Â‚µ‚©‚È‚¢ŽÀ‘Ì
-	//static PictureManager *m_pInstance;
-
 public:
-	//// ŽÀ‘ÌŽæ“¾
-	//static PictureManager *GetInstance()
-	//{
-	//	if (!m_pInstance) m_pInstance = new PictureManager();
-	//	return m_pInstance;
-	//}
-	//static void Rerease() {
-	//	SAFE_DELETE(m_pInstance);
-	//}
 
 	PictureManager();
 	~PictureManager();

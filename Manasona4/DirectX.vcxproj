@@ -124,7 +124,9 @@
     <ClCompile Include="source\Challenge\ChallengeManagerManager.cpp" />
     <ClCompile Include="source\Challenge\NazenarabaChallenge.cpp" />
     <ClCompile Include="source\Challenge\TekiChallenge.cpp" />
+    <ClCompile Include="source\Collect\BaseMovie.cpp" />
     <ClCompile Include="source\Collect\BasePicture.cpp" />
+    <ClCompile Include="source\Collect\MovieManager.cpp" />
     <ClCompile Include="source\Collect\PictureManager.cpp" />
     <ClCompile Include="source\Collision\Collision.cpp" />
     <ClCompile Include="source\Cutin\CutIn.cpp" />
@@ -155,6 +157,7 @@
     <ClCompile Include="source\Player\Airou\Airou.cpp" />
     <ClCompile Include="source\Player\AI\AI.cpp" />
     <ClCompile Include="source\Player\AI\AIState.cpp" />
+    <ClCompile Include="source\Player\Aniki\Aniki.cpp" />
     <ClCompile Include="source\Player\Aramitama\Aramitama.cpp" />
     <ClCompile Include="source\Player\BasePlayer.cpp" />
     <ClCompile Include="source\Number\Number.cpp" />
@@ -317,7 +320,9 @@
     <ClInclude Include="source\Challenge\ChallengeManagerManager.h" />
     <ClInclude Include="source\Challenge\NazenarabaChallenge.h" />
     <ClInclude Include="source\Challenge\TekiChallenge.h" />
+    <ClInclude Include="source\Collect\BaseMovie.h" />
     <ClInclude Include="source\Collect\BasePicture.h" />
+    <ClInclude Include="source\Collect\MovieManager.h" />
     <ClInclude Include="source\Collect\PictureManager.h" />
     <ClInclude Include="source\Collision\Collision.h" />
     <ClInclude Include="source\Cutin\CutIn.h" />
@@ -351,6 +356,8 @@
     <ClInclude Include="source\Player\Airou\Oshioki.h" />
     <ClInclude Include="source\Player\AI\AI.h" />
     <ClInclude Include="source\Player\AI\AIState.h" />
+    <ClInclude Include="source\Player\Aniki\Aniki.h" />
+    <ClInclude Include="source\Player\Aniki\Ketsudram.h" />
     <ClInclude Include="source\Player\Aramitama\Aramitama.h" />
     <ClInclude Include="source\Player\BasePlayer.h" />
     <ClInclude Include="source\Number\Number.h" />

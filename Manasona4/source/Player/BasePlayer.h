@@ -266,6 +266,7 @@ enum class EFFECT_TYPE
 	DROP_IMPACT_SUPER,	// てきの衝撃波
 	CYCLONE_RUN,		// 竜巻を起こして走る
 	MULTIPLE_HIT_BLOW,	// 多段ヒット（物理）
+	THROW_HOLD,			// 掴まえた時
 };
 
 // ガードの種類

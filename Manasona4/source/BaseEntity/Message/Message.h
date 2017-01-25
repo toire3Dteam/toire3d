@@ -34,6 +34,7 @@ enum MESSAGE_TYPE
 	BACK_MENU,			// メニュー画面にもどりたいです。
 	TROPHY_GET,			// トロフィーゲット
 	PICTURE_GET,		// イラストゲット
+	MOVIE_GET,			// ムービーゲット
 	OTHER				// その他。
 };
 

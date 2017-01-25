@@ -21,9 +21,9 @@ sceneCollect::sceneCollect() :BaseGameEntity(ENTITY_ID::SCENE_COLLECT) {}
 bool sceneCollect::Initialize()
 {
 	// 動画
-	m_pMovieMgr = new tdnMovie("DATA/UI/Collect/CollectMovie.wmv");
-	m_pBackMovie = new tdn2DObj(m_pMovieMgr->GetTexture());
-	m_pMovieMgr->Play();
+	m_pMovie = new tdnMovie("DATA/UI/Collect/CollectMovie.wmv");
+	m_pBackMovie = new tdn2DObj(m_pMovie->GetTexture());
+	m_pMovie->Play();
 
 	// フェード初期化
 	Fade::Set(Fade::FLAG::FADE_IN, 8);
@@ -63,11 +63,16 @@ bool sceneCollect::Initialize()
 	m_pImages[IMAGE::INFO_PLATE] = new tdn2DAnim("DATA/UI/Collect/Information.png");
 	m_pImages[IMAGE::INFO_PLATE_WATCH] = new tdn2DAnim("DATA/UI/Collect/InformationWatch.png");
 	m_pImages[IMAGE::TAG_TROPHY] = new tdn2DAnim("DATA/UI/Collect/TagTrophy.png");
-	m_pImages[IMAGE::TAG_PICTURE] = new tdn2DAnim("DATA/UI/Collect/TagCollect.png");
+	m_pImages[IMAGE::TAG_PICTURE] = new tdn2DAnim("DATA/UI/Collect/TagPicture.png");
+	m_pImages[IMAGE::TAG_MOVIE] = new tdn2DAnim("DATA/UI/Collect/TagMovie.png");
+	m_pImages[IMAGE::TAG_RECORD] = new tdn2DAnim("DATA/UI/Collect/TagRecord.png");
 	m_pImages[IMAGE::TROPHY_COMP_PERCENT] = new tdn2DAnim("DATA/UI/Collect/CompleteTrophyPercent.png");
 	m_pImages[IMAGE::PRICE_PLATE] = new tdn2DAnim("DATA/UI/Collect/Price.png");
 	m_pImages[IMAGE::NUMBER] = new tdn2DAnim("DATA/UI/Collect/Number.png");
 	m_pImages[IMAGE::NUMBER_TROPHY] = new tdn2DAnim("DATA/UI/Collect/TrophyNumber.png");
+	m_pImages[IMAGE::RECORD_PLATE] = new tdn2DAnim("DATA/UI/Collect/RecordPlate.png");
+	m_pImages[IMAGE::ARROW_LEFT] = new tdn2DAnim("DATA/UI/Collect/ArrowL.png");
+	m_pImages[IMAGE::ARROW_RIGHT] = new tdn2DAnim("DATA/UI/Collect/ArrowR.png");
 
 	for (int i = 0; i < IMAGE::ARRAY_END; i++)
 	{
@@ -80,12 +85,18 @@ bool sceneCollect::Initialize()
 	m_pImages[IMAGE::INFO_PLATE_WATCH]->Action();
 	m_pImages[IMAGE::TAG_TROPHY]->OrderMoveAppeared(12, (int)m_vTagPos.x - 100 , (int)m_vTagPos.y);
 	m_pImages[IMAGE::TAG_PICTURE]->OrderMoveAppeared(12, (int)m_vTagPos.x - 100, (int)m_vTagPos.y);
+	m_pImages[IMAGE::TAG_MOVIE]->OrderMoveAppeared(12, (int)m_vTagPos.x - 100, (int)m_vTagPos.y);
+	m_pImages[IMAGE::TAG_RECORD]->OrderMoveAppeared(12, (int)m_vTagPos.x - 100, (int)m_vTagPos.y);
+
 	m_pImages[IMAGE::TROPHY_COMP_PERCENT]->OrderMoveAppeared(12, (int)m_vTrophyPercentPos.x , (int)m_vTrophyPercentPos.y);
 
 	m_pImages[IMAGE::PRICE_PLATE]->OrderNone();
 	m_pImages[IMAGE::PRICE_PLATE]->Action();
 	m_pImages[IMAGE::NUMBER]->OrderNone();
 	m_pImages[IMAGE::NUMBER]->Action();
+
+	m_pImages[IMAGE::ARROW_LEFT]->OrderShrink(8, 1, 2);
+	m_pImages[IMAGE::ARROW_RIGHT]->OrderShrink(8, 1, 2);
 
 	m_pImages[IMAGE::NUMBER_TROPHY]->OrderShrink(8, 1 , 1.5f);
 
@@ -110,6 +121,12 @@ bool sceneCollect::Initialize()
 	m_pPictureMgr = new PictureManager();
 	// イラストアイコン
 	PictureInit();
+
+	//+-------------------------------
+	//	ムービーで必要な変数の初期化
+	m_pMovieMgr = new MovieManager();
+	// ムービーアイコン
+	MovieInit();
 
 	// 画像鑑賞前の黒いフェード
 	m_bBlackRect = false;
@@ -145,7 +162,7 @@ bool sceneCollect::Initialize()
 
 sceneCollect::~sceneCollect()
 {
-	SAFE_DELETE(m_pMovieMgr);
+	SAFE_DELETE(m_pMovie);
 	SAFE_DELETE(m_pBackMovie);
 
 	bgm->StopStreamIn();
@@ -158,6 +175,9 @@ sceneCollect::~sceneCollect()
 
 	SAFE_DELETE(m_tagPI.pSelectMark);
 	SAFE_DELETE(m_tagPI.pSelectMarkEdge);
+
+	SAFE_DELETE(m_tagMI.pSelectMark);
+	SAFE_DELETE(m_tagMI.pSelectMarkEdge);
 
 	// ヒントカード覧
 	for (int i = 0; i < (int)TIPS_TYPE_COLLECT::ARRAY_END; i++)
@@ -174,6 +194,15 @@ sceneCollect::~sceneCollect()
 	}
 	SAFE_DELETE(m_pPictureMgr);
 
+	// 鑑賞中に切られた場合
+	if (m_pStateMachine->
+		isInState(*SceneCollectState::MovieWatch::GetInstance()))
+	{
+		// 鑑賞中用画像解放
+		m_pMovieMgr->RereaseExe();
+	}
+	SAFE_DELETE(m_pMovieMgr);
+
 	// ★ステートマシンは最後に
 	SAFE_DELETE(m_pStateMachine);
 }
@@ -187,7 +216,7 @@ void sceneCollect::Update()
 	static bool bEnd(false);
 	
 	// 動画のループ更新
-	m_pMovieMgr->Update();
+	m_pMovie->Update();
 
 	// ヒントカード覧
 	for (int i = 0; i < (int)TIPS_TYPE_COLLECT::ARRAY_END; i++)
@@ -197,6 +226,7 @@ void sceneCollect::Update()
 
 	// コンテンツ所持数
 	int l_iOwnedContent = m_pPictureMgr->GetPictureOwned();// イラスト
+	l_iOwnedContent+= m_pMovieMgr->GetMovieOwned();// ムービーも含めて
 
 	// コンテンツ所持数トロフィーが解除できるか確認
 	TrophyMgr->CheakBuyManyContent(l_iOwnedContent);
@@ -232,6 +262,11 @@ void sceneCollect::Update()
 	if (KeyBoard(KB_I) == 2)
 	{
 		m_pPictureMgr->AllReset();
+	}
+
+	if (KeyBoard(KB_K) == 2)
+	{
+		m_pMovieMgr->AllReset();
 	}
 
 #ifdef _DEBUG
@@ -308,18 +343,8 @@ void sceneCollect::Render()
 
 	// tdnPolygon::Rect((int)(1280 * .25f) / 2, 96, (int)(1280 * .75f), (int)(720 * .75f), RS::COPY, 0xff808080);
 
-	// プレイ回数
-	tdnText::Draw(700, 350, 0xffffffff, "プレイ回数: %d", m_pPlayerInfo->PlayCount);
-
-	// プレイ時間
-	const int minutes(m_pPlayerInfo->PlayTime % 60), hour(m_pPlayerInfo->PlayTime / 60);
-	tdnText::Draw(700, 380, 0xffffffff, "プレイ時間: %d時間 %d分", hour, minutes);
-
-	// コイン
-	tdnText::Draw(700, 410, 0xffffffff, "コイン: %d", m_pPlayerInfo->coin);
-	
-	// 対戦回数
-	tdnText::Draw(700, 440, 0xffffffff, "対戦回数: %d", m_pPlayerInfo->BattleCount);
+	m_pImages[IMAGE::ARROW_LEFT]->Render(377, 53);
+	m_pImages[IMAGE::ARROW_RIGHT]->Render(839, 53);
 
 	// 
 	//tdnText::Draw(400, 720, 0xffffffff, "下げてる値: %.1f", m_iScrollPosY);
@@ -578,6 +603,8 @@ void sceneCollect::TrophyFirstAction()
 {
 	// タグのアニメ
 	m_pImages[IMAGE::TAG_TROPHY]->Action();
+	m_pImages[IMAGE::ARROW_LEFT]->Action(8);
+	m_pImages[IMAGE::ARROW_RIGHT]->Action(8);
 
 	// %のアニメ+数字
 	m_pImages[IMAGE::TROPHY_COMP_PERCENT]->Action();
@@ -761,12 +788,6 @@ void sceneCollect::TrophyRender()
 
 }
 
-// 今日はここまで
-// あしたは裏の動画作ったり
-// トロフィーの演出シーン変わったら消したり
-// 残りのユーザーインターフェースやる
-// ×でアイコンが出てきてメニューに戻るとかのシーンステート関連
-
 void sceneCollect::TrophyCtrl(int iDeviceID)
 {
 	// 基本ぴぴぴ操作
@@ -939,6 +960,8 @@ void sceneCollect::PictureFirstAction()
 {
 	// タグのアニメ
 	m_pImages[IMAGE::TAG_PICTURE]->Action();
+	m_pImages[IMAGE::ARROW_LEFT]->Action(8);
+	m_pImages[IMAGE::ARROW_RIGHT]->Action(8);
 
 	m_pCoinUI->Action();
 	// %のアニメ
@@ -1208,6 +1231,429 @@ void sceneCollect::PictureCtrl(int iDeviceID)
 		// 移動演出
 		m_tagPI.pSelectMark->Action();
 	}
+
+}
+
+
+
+//------------------------------------------------------
+//	ムービー
+//------------------------------------------------------
+void sceneCollect::MovieInit()
+{
+	//　初期の先頭
+	m_tagMI.iTop = 0;
+	m_tagMI.iBottom = 3;
+
+	// 何列かを設定
+	m_tagMI.iRowNum = 5;
+	// 数分に↑列を合わせた結果、縦幅の大きさを調べる
+	int l_iCount = 0;
+	m_tagMI.iMaxHeight = 1;// ★まず最低限1はある
+
+						   // スクロール間隔
+	m_tagMI.iScrollAddX = 154 + 32;
+	m_tagMI.iScrollAddY = 92 + 32;
+
+	// +アイコンの初期位置も決める
+	Vector2 l_vIconPos = VECTOR2_ZERO;
+	for (int i = 0; i < (int)MOVIE_TYPE::ARRAY_END; i++)
+	{
+		// カウントが列を超えた時
+		if (l_iCount >= m_tagMI.iRowNum)
+		{
+			m_tagMI.iMaxHeight++;// 最大幅更新			
+			l_iCount = 0;
+
+			l_vIconPos.y += m_tagMI.iScrollAddY;
+			l_vIconPos.x = 0;
+		}
+
+		// ポジション設定！！
+		m_pMovieMgr->GetMovie(i)->SetIconPos(l_vIconPos);
+
+		// 横にずらす
+		l_vIconPos.x += m_tagMI.iScrollAddX;
+
+		l_iCount++;
+	}
+
+	// 次に初期に選択している番号
+	m_tagMI.iSelectNo = 0;
+	// ★↑その選択している番号から初期ポジション取得
+	m_tagMI.vSelectPos = m_pMovieMgr->GetMovie(m_tagMI.iSelectNo)->GetMovieIcon().vPos;
+	m_tagMI.vNextPos = m_pMovieMgr->GetMovie(m_tagMI.iSelectNo)->GetMovieIcon().vPos;
+
+	// マーク絵
+	m_tagMI.pSelectMark = new tdn2DAnim("Data/UI/Collect/Icon/Select.png");
+	//m_tagMI.pSelectMark->OrderRipple(42, 1.0f, 0.015f);
+	m_tagMI.pSelectMark->OrderAlphaMove(210, 90, 120);
+	//m_tagMI.pSelectMark->OrderNone();
+	m_tagMI.pSelectMark->Action();
+
+	m_tagMI.pSelectMarkEdge = new tdn2DAnim("Data/UI/Collect/Icon/SelectEdge.png");
+	//m_tagMI.pSelectMark->OrderRipple(42, 1.0f, 0.015f);
+	m_tagMI.pSelectMarkEdge->OrderNone();
+	m_tagMI.pSelectMarkEdge->Action();
+
+	// スクロール初期位置
+	m_tagMI.vScrollPos = VECTOR2_ZERO;
+	m_tagMI.vScrollNextPos = VECTOR2_ZERO;
+
+}
+
+// ムービーの最初の演出
+void sceneCollect::MovieFirstAction()
+{
+	// タグのアニメ
+	m_pImages[IMAGE::TAG_MOVIE]->Action();
+	m_pImages[IMAGE::ARROW_LEFT]->Action(8);
+	m_pImages[IMAGE::ARROW_RIGHT]->Action(8);
+
+	m_pCoinUI->Action();
+	// %のアニメ
+	//m_pImages[IMAGE::TROPHY_COMP_PERCENT]->Action();
+
+}
+
+void sceneCollect::MovieUpdate()
+{
+	// 選択しているアイコンの同期
+	if (m_pMovieMgr->GetSelectType() != (MOVIE_TYPE)m_tagMI.iSelectNo)
+	{
+		m_pMovieMgr->SetSelectType((MOVIE_TYPE)m_tagMI.iSelectNo);
+	}
+
+
+	// 選択アイコンの画像の動く処理
+
+	// 目的地更新
+	m_tagMI.vNextPos = m_pMovieMgr->GetMovie(m_tagMI.iSelectNo)->GetMovieIcon().vPos;
+
+	// 場所補間の更新
+	m_tagMI.vSelectPos = m_tagMI.vNextPos * 0.5f + m_tagMI.vSelectPos  * 0.5f;
+
+	// 0.1以下の誤差は無くす処理
+	if (0.9f >= abs(m_tagMI.vSelectPos.x - m_tagMI.vNextPos.x) &&
+		0.9f >= abs(m_tagMI.vSelectPos.y - m_tagMI.vNextPos.y))
+	{
+		m_tagMI.vSelectPos = m_tagMI.vNextPos;
+	}
+
+	//+------------------------------
+	//	スクロール処理
+	//+------------------------------
+	// 現在の選択してるトロフィーの高さ
+	int l_iNowHeight = m_tagMI.iSelectNo / m_tagMI.iRowNum;
+
+	// 上と同じ場所・それ以上なら
+	if (l_iNowHeight <= m_tagMI.iTop)
+	{
+		// 一番上以外なら上へ
+		if (m_tagMI.iTop >= 1)
+		{
+			m_tagMI.iTop--;
+		}
+
+	}
+
+	// 下へと同じ場所・それ以上なら
+	// ★現在のボトムを取得
+	int m_iNowBottom = m_tagMI.iTop + m_tagMI.iBottom;
+
+	if (l_iNowHeight >= m_iNowBottom)
+	{
+		// 一番下以外なら
+		if (m_tagMI.iTop < m_tagMI.iMaxHeight - (m_tagMI.iBottom + 1))
+		{
+			m_tagMI.iTop++;
+		}
+	}
+
+	// 目的地更新
+	m_tagMI.vScrollNextPos.y = (float)(m_tagMI.iTop *  m_tagMI.iScrollAddY);
+
+	// 場所補間の更新
+	m_tagMI.vScrollPos = m_tagMI.vScrollNextPos * 0.5f + m_tagMI.vScrollPos* 0.5f;
+
+	// 0.1以下の誤差は無くす処理
+	if (0.9f >= abs(m_tagMI.vScrollPos.x - m_tagMI.vScrollNextPos.x) &&
+		0.9f >= abs(m_tagMI.vScrollPos.y - m_tagMI.vScrollNextPos.y))
+	{
+		m_tagMI.vScrollPos = m_tagMI.vScrollNextPos;
+	}
+
+	// 選択アイコン
+	m_tagMI.pSelectMark->Update();
+	if (m_tagMI.pSelectMark->GetAction()->IsEnd() == true)
+	{
+		m_tagMI.pSelectMark->Action();
+	}
+
+	m_tagMI.pSelectMarkEdge->Update();
+
+}
+
+void sceneCollect::MovieRender()
+{
+	// アイコンの絵
+	int l_iX = 150;
+	int l_iY = 100 - (int)m_tagMI.vScrollPos.y;
+
+	// アイコンの描画
+	for (int i = 0; i < (int)MOVIE_TYPE::ARRAY_END; i++)
+	{
+		m_pMovieMgr->RenderIcon(i, l_iX, l_iY);
+	}
+
+	// セレクトアイコン
+	m_tagMI.pSelectMark->Render((int)m_tagMI.vSelectPos.x + l_iX, (int)m_tagMI.vSelectPos.y + l_iY, RS::ADD);
+	m_tagMI.pSelectMarkEdge->Render((int)m_tagMI.vSelectPos.x + l_iX, (int)m_tagMI.vSelectPos.y + l_iY, RS::ADD);
+
+	// 説明用プレート
+	m_pImages[IMAGE::INFO_PLATE]->Render(0, 592 - 128);
+
+	// アイコンのタイトルと説明
+	m_pMovieMgr->RenderIconInfo(m_tagMI.iSelectNo, 60, 580);
+
+	// ★アイコン用のスクロールバー
+	enum { ABUJ = 1 };// 最大の高さを＋１しているので
+	float l_fArrowRate = (float)(m_tagMI.iBottom + ABUJ) / (float)(m_tagMI.iMaxHeight);
+
+	// スクロールする必要があるならスクロールバーを描画
+	if (l_fArrowRate < 1.0f)
+	{
+		float l_iScrollY = 384 * (float)(m_tagMI.iTop) / (float)(m_tagMI.iMaxHeight);
+
+		m_pImages[sceneCollect::IMAGE::SCROLL_BAR]->Render((int)m_vScrollPos.x, (int)m_vScrollPos.y);
+		m_pImages[sceneCollect::IMAGE::SCROLL_ARROW]->Render((int)m_vScrollPos.x, (int)m_vScrollPos.y + (int)l_iScrollY,
+			32, (int)(384 * l_fArrowRate), 0, 0, 32, 384);
+	}
+
+	// タグ
+	m_pImages[IMAGE::TAG_MOVIE]->Render(448, 48);
+
+	// ★値段
+	// まだ手に入れてなくてロックされていなかったら
+	if (PlayerDataMgr->m_SecretData.iAllMovie[m_tagMI.iSelectNo] == 0 &&
+		GetMovieMgr()->GetMovie(m_tagMI.iSelectNo)->isRock() == false)
+	{
+		m_pImages[IMAGE::PRICE_PLATE]->Render(910, 516);
+
+		int number = GetMovieMgr()->GetMovie(m_tagMI.iSelectNo)->GetPrice();
+
+		for (int count = 0;; ++count)
+		{
+			int digitNum = number % 10;	// 一番小さい桁を入手
+			number = (int)(number / 10);// 数値の一番小さい桁を消す
+
+			m_pImages[IMAGE::NUMBER]->Render(1148 - ((count * (36 / 2))), 525, 32, 32, digitNum * 32, 0, 32, 32);// 数字描画
+
+			if (number <= 0)break;// 数値が０以下になったらさよなら
+		}
+	}
+
+
+	// ★コイン
+	m_pCoinUI->Render();
+
+}
+
+void sceneCollect::MovieInitExe()
+{
+	// 画像鑑賞前の黒いフェード
+	m_bBlackRect = false;
+
+	// 画像の初期化
+	GetMovieMgr()->InitExe((MOVIE_TYPE)m_tagMI.iSelectNo);
+
+	// 説明文あり
+	m_bWatchInfo = true;
+
+
+}
+
+void sceneCollect::MovieRenderExe()
+{
+	// 画像
+	GetMovieMgr()->RenderExe();
+
+	if (m_bWatchInfo == true)
+	{
+		// 説明用プレート
+		m_pImages[IMAGE::INFO_PLATE_WATCH]->Render(0, 592 - 128);
+		// 画像の説明
+		GetMovieMgr()->RenderExeInfo(m_tagMI.iSelectNo, 50, 580 + 14);
+	}
+}
+
+void sceneCollect::MovieCtrl(int iDeviceID)
+{
+	// 基本ぴぴぴ操作
+	PiPiPiCtrl(iDeviceID);
+
+	// 左押してたら
+	if (m_bLeftPush)
+	{
+		m_tagMI.iSelectNo--;
+		if (m_tagMI.iSelectNo < 0)
+		{
+			m_tagMI.iSelectNo = m_pMovieMgr->GetMaxMovieNum() - 1;
+		}
+
+		// 移動演出
+		m_tagMI.pSelectMark->Action();
+
+	}
+	// 右押してたら
+	if (m_bRightPush)
+	{
+		m_tagMI.iSelectNo++;
+		if (m_tagMI.iSelectNo >= m_pMovieMgr->GetMaxMovieNum())
+		{
+			m_tagMI.iSelectNo = 0;
+		}
+
+		// 移動演出
+		m_tagMI.pSelectMark->Action();
+
+	}
+	// 上押してたら
+	if (m_bUpPush)
+	{
+		int l_iNo = m_tagMI.iSelectNo - m_tagMI.iRowNum;
+		if (l_iNo < 0)
+		{
+			// 貫通した場合
+			// 列を調べる
+			int l_iColumn = m_tagMI.iSelectNo%m_tagMI.iRowNum;
+
+			// 列文まわす
+			int l_iJumpNo = m_pMovieMgr->GetMaxMovieNum() - 1;// 一番最後の数字取得
+			for (int i = 0; i < m_tagMI.iRowNum; i++)
+			{
+				// 列が同じか調べる
+				if (l_iColumn == l_iJumpNo%m_tagMI.iRowNum)
+				{
+					// 同じならばその列の場所へ飛ばす
+					m_tagMI.iSelectNo = l_iJumpNo;
+				}
+
+				// なければ次の場所へ
+				l_iJumpNo--;
+
+			}
+
+		}
+		else
+		{
+			// 列分増減
+			m_tagMI.iSelectNo -= m_tagMI.iRowNum;
+		}
+
+		// 移動演出
+		m_tagMI.pSelectMark->Action();
+
+	}
+	// 下押してたら
+	if (m_bDownPush)
+	{
+		int l_iNo = m_tagMI.iSelectNo + m_tagMI.iRowNum;
+		if (l_iNo >= m_pMovieMgr->GetMaxMovieNum())
+		{
+			// 貫通した場合
+			// 列を調べる
+			int l_iColumn = m_tagMI.iSelectNo%m_tagMI.iRowNum;
+			// その列の場所へワープ
+			m_tagMI.iSelectNo = l_iColumn;
+
+		}
+		else
+		{
+
+			// 列分増減
+			m_tagMI.iSelectNo += m_tagMI.iRowNum;
+		}
+
+		// 移動演出
+		m_tagMI.pSelectMark->Action();
+	}
+
+}
+
+
+//------------------------------------------------------
+//	レコード
+//------------------------------------------------------
+
+void sceneCollect::RecordInit()
+{
+
+
+}
+
+// レコードルームの最初の演出
+void sceneCollect::RecordFirstAction()
+{
+	// タグのアニメ
+	m_pImages[IMAGE::TAG_RECORD]->Action();
+	m_pImages[IMAGE::ARROW_LEFT]->Action(8);
+	m_pImages[IMAGE::ARROW_RIGHT]->Action(8);
+
+	// %のアニメ+数字
+	m_pImages[IMAGE::TROPHY_COMP_PERCENT]->Action();
+	m_pImages[IMAGE::NUMBER_TROPHY]->Action();
+
+}
+
+void sceneCollect::RecordUpdate()
+{
+
+}
+
+void sceneCollect::RecordRender()
+{
+	// レコードプレート
+	m_pImages[IMAGE::RECORD_PLATE]->Render(0, 0);
+
+	// レコード内容描画
+
+	int l_iY = 0;
+
+	// プレイ回数
+	tdnText::Draw(256, 144, 0xffffffff, "プレイ回数: %d", m_pPlayerInfo->PlayCount);
+
+	l_iY += 30;
+
+	// プレイ時間
+	const int minutes(m_pPlayerInfo->PlayTime % 60), hour(m_pPlayerInfo->PlayTime / 60);
+	tdnText::Draw(256  , 144 + l_iY, 0xffffffff, "プレイ時間: %d時間 %d分", hour, minutes);
+
+	l_iY += 30;
+
+	// コイン
+	tdnText::Draw(256 , 144 + l_iY, 0xffffffff, "コイン: %d", m_pPlayerInfo->coin);
+
+	l_iY += 30;
+
+	// 対戦回数
+	tdnText::Draw(256 , 144 + l_iY, 0xffffffff, "対戦回数: %d", m_pPlayerInfo->BattleCount);
+
+
+	// 説明用プレート
+	m_pImages[IMAGE::INFO_PLATE]->Render(0, 592 - 128);
+
+	// タイトル
+	tdnFont::RenderString("これまでの記録を確認します。", "HGｺﾞｼｯｸE",
+		22, 50, 580 , 0xffffffff, RS::COPY);
+	
+	// 説明
+	//tdnFont::RenderString("これまでの記録を確認します。", "HGｺﾞｼｯｸE",
+	//	19, iX, iY + 30, 0xffffffff, RS::COPY);
+
+	// タグ
+	m_pImages[IMAGE::TAG_RECORD]->Render(448, 48);
+
 
 }
 

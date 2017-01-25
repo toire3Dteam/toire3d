@@ -174,7 +174,7 @@ namespace PlayerData
 						int Movie‹ó‚«˜g7;
 						int Movie‹ó‚«˜g8;
 					};
-					int AllMovie[8];
+					int iAllMovie[8];
 				};
 				union
 				{

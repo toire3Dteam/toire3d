@@ -26,6 +26,9 @@ ChallengeManagerManager::ChallengeManagerManager()
 		case CHARACTER::ARAMITAMA:
 			m_pChallengeManager[i] = new AramitamaChallengeManager();
 			break;
+		case CHARACTER::ANIKI:
+			m_pChallengeManager[i] = new AramitamaChallengeManager();
+			break;
 		default:
 			MyAssert(0, "ÇªÇÃÉ^ÉCÉvÇÕë∂ç›ÇµÇ»Ç¢");
 			break;

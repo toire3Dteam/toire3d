@@ -2119,6 +2119,13 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 		ParticleManager::EffectHitMultiple(pos + (vVec * 2.5f), -vVec);
 
 	}	break;
+	case EFFECT_TYPE::THROW_HOLD:
+	{
+		// 掴まえた時のエフェクト
+		m_pPanelEffectMGR->AddEffect
+			(GetCenterPos() + Vector3(0, 2.5, -4), PANEL_EFFECT_TYPE::THROW, 0);
+
+	}	break;
 	default:
 		MyAssert(0,"そんなエフェクトは存在しない ");	// そんなエフェクトは存在しない AddEffectAction()
 		break;
