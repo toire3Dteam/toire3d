@@ -545,7 +545,7 @@ void Aniki::InitActionDatas()
 	// ”»’èŒ`ó
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->pCollisionShape->width = 4;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->pCollisionShape->height = 2;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->pCollisionShape->pos.Set(4, 8, 0);
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->pCollisionShape->pos.Set(4, 12, 0);
 
 	//==============================================================================================================
 	//	‹ó’†ƒXƒLƒ‹UŒ‚(‹ó’†’Í‚ñ‚¾Œã)

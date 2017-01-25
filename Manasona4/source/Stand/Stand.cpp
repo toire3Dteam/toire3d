@@ -129,7 +129,7 @@ void Stand::Base::StandGageUpdate()
 		}
 
 	}
-
+	else m_standGage = m_standGageMAX;
 }
 
 void Stand::Base::Render(tdnShader* shader, char* name)

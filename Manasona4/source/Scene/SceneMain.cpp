@@ -29,7 +29,7 @@
 #include "Stage\OverDriveStage\OverDriveStage.h"
 #include "Trophy\TrophyManager.h"
 #include "Challenge\ChallengeManagerManager.h"
-
+#include "../Data/CommandData.h"
 
 //BaseEffect* g_eff;
 //EffectManager;
@@ -269,6 +269,9 @@ bool sceneMain::Initialize()
 
 	// プレイヤーの読み込みが終わるまで待機
 	//PlayerLoadThread->join();
+
+	// コマンドセーブ
+	CommandMgr->Initialize();
 	
 	// トロフィー
 	TrophyMgr->InitSeceneMain();
@@ -319,6 +322,8 @@ sceneMain::~sceneMain()
 	// トロフィー
 	//TrophyMgr->Stop();
 
+	// コマンドセーブ
+	CommandMgr->Release();
 }
 
 //******************************************************************
@@ -395,21 +400,21 @@ void sceneMain::Update()
 		}
 
 
-		if (KeyBoardTRG(KB_N))
-		{
-			// UIにメッセージを送る
-			SIDE side = SIDE::LEFT;
-			MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
-				MESSAGE_TYPE::APP_WIN_ICON, &side);
-		}
-		if (KeyBoardTRG(KB_M))
-		{
-			// UIにメッセージを送る
-			CUTIN_TYPE_NAME data = CUTIN_TYPE_NAME::AIROU;
-			MsgMgr->Dispatch(0, ENTITY_ID::CUTIN_MGR, ENTITY_ID::CUTIN_MGR,
-				MESSAGE_TYPE::CUTIN_ACTION, &data);
-
-		}
+		//if (KeyBoardTRG(KB_N))
+		//{
+		//	// UIにメッセージを送る
+		//	SIDE side = SIDE::LEFT;
+		//	MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
+		//		MESSAGE_TYPE::APP_WIN_ICON, &side);
+		//}
+		//if (KeyBoardTRG(KB_M))
+		//{
+		//	// UIにメッセージを送る
+		//	CUTIN_TYPE_NAME data = CUTIN_TYPE_NAME::AIROU;
+		//	MsgMgr->Dispatch(0, ENTITY_ID::CUTIN_MGR, ENTITY_ID::CUTIN_MGR,
+		//		MESSAGE_TYPE::CUTIN_ACTION, &data);
+		//
+		//}
 
 		// 
 		if (KeyBoardTRG(KB_H))

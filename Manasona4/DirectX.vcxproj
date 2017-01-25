@@ -130,6 +130,7 @@
     <ClCompile Include="source\Collect\PictureManager.cpp" />
     <ClCompile Include="source\Collision\Collision.cpp" />
     <ClCompile Include="source\Cutin\CutIn.cpp" />
+    <ClCompile Include="source\Data\CommandData.cpp" />
     <ClCompile Include="source\Data\PlayerData.cpp" />
     <ClCompile Include="source\Data\SelectData.cpp" />
     <ClCompile Include="source\DeferredEx\DeferredEx.cpp" />
@@ -326,6 +327,7 @@
     <ClInclude Include="source\Collect\PictureManager.h" />
     <ClInclude Include="source\Collision\Collision.h" />
     <ClInclude Include="source\Cutin\CutIn.h" />
+    <ClInclude Include="source\Data\CommandData.h" />
     <ClInclude Include="source\Data\PlayerData.h" />
     <ClInclude Include="source\Data\ResultData.h" />
     <ClInclude Include="source\Data\SelectData.h" />

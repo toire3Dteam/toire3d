@@ -10,6 +10,7 @@
 #include "../PointLight/PointLight.h"
 #include "../DeferredEx/DeferredEx.h"
 #include "../Data/SelectData.h"
+#include "../Data/CommandData.h"
 
 //_/_/_/_/_/_/__/_/__/_/__/_/__
 // ’è”
@@ -642,7 +643,20 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 		m_wCommandHistory[0] &= 0;
 
 		if (m_bAI)	AIControl();
-		else		Control();
+		else if (CommandMgr->isAction())
+		{
+			// š•Û‘¶‚µ‚½ƒRƒ}ƒ“ƒh‚ð“ü—Í‚·‚é
+			CommandMgr->Update();
+			m_wCommandHistory[0] |=CommandMgr->GetCommand();
+		}
+		else
+		{
+			Control();
+			//if (KeyBoardTRG(KB_N)) CommandMgr->SaveStart(this);
+			//if (KeyBoardTRG(KB_M)) CommandMgr->SaveEnd();
+			//if (KeyBoardTRG(KB_COMMA)) CommandMgr->Action("DATA/Save/Command.bin");
+			//CommandMgr->SaveUpdate();
+		}
 	}
 	else
 	{

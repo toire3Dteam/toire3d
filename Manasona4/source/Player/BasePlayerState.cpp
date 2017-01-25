@@ -4551,7 +4551,6 @@ void BasePlayerState::OverDrive_OneMore::Enter(BasePlayer * pPerson)
 
 	// (12/26) インフレ化しているので調整を試み中
 	pPerson->GetTargetPlayer()->AddDamageRate(0.35f);
-
 }
 
 void BasePlayerState::OverDrive_OneMore::Execute(BasePlayer * pPerson)
@@ -4572,6 +4571,9 @@ void BasePlayerState::OverDrive_OneMore::Execute(BasePlayer * pPerson)
 
 		// 動きを止める
 		pPerson->SetMove(Vector3(0, 0, 0));
+
+		// スタンドゲージ全回復
+		pPerson->GetStand()->SetStandGage(114514);
 	}
 	if (pPerson->GetActionFrame() == FRAME_STATE::FOLLOW)
 	{
