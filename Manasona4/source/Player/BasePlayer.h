@@ -514,22 +514,22 @@ public:
 			//////////////////////////////////////////////
 			//	スキルキャンセル
 			//============================================
-			if (SkillCancel(this)) return true;
+			if (SkillCancel(this)) return false;
 
 			//////////////////////////////////////////////
 			//	スタンドキャンセル
 			//============================================
-			if (StandCancel(this)) return true;
+			if (StandCancel(this)) return false;
 
 			//////////////////////////////////////////////
 			//	フィニッシュ攻撃ボタン
 			//============================================
-			if (InvincibleAttackCancel(this)) return true;
+			if (InvincibleAttackCancel(this)) return false;
 
 			//////////////////////////////////////////////
 			//	ヒーホードライブキャンセル
 			//============================================
-			if (HeaveHoCancel(this)) return true;
+			if (HeaveHoCancel(this)) return false;
 		}
 		return false;
 	}

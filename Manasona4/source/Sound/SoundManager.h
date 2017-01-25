@@ -142,17 +142,19 @@ public:
 	void SetListener(const Vector2 &pos, const Vector2 &move);											// ƒŠƒXƒi[î•ñ
 	tdnStreamSound *PlayStream(LPSTR filename){ return play_manager->PlayStream(filename); }
 	tdnStreamSound *PlayStream(LPSTR filename, BYTE mode, int param){ return play_manager->PlayStream(filename, mode, param); }
-	void PlayStreamIn(LPSTR filename)
+	void PlayStreamIn(LPSTR filename, bool bFadeIn = false)
 	{
 		if (m_bPlayStream) m_pStreamSound->Stop();
-		m_pStreamSound = play_manager->PlayStream(filename);
+		if (bFadeIn)m_pStreamSound = play_manager->PlayStream(filename, STR_FADEIN, 8);
+		else m_pStreamSound = play_manager->PlayStream(filename);
 		m_bPlayStream = true;
 	}
-	void StopStreamIn()
+	void StopStreamIn(bool bFadeOut = false)
 	{
 		if (m_bPlayStream)
 		{
-			m_pStreamSound->Stop();
+			if (bFadeOut)m_pStreamSound->SetMode(STR_FADEOUT, 16);
+			else m_pStreamSound->Stop();
 			m_bPlayStream = false;
 		}
 	}

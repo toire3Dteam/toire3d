@@ -836,6 +836,8 @@ void SceneCollectState::MovieWatch::Enter(sceneCollect *pMain)
 	// 鑑賞用毎回初期化
 	pMain->MovieInitExe();
 
+	// BGMフェードアウト
+	bgm->StopStreamIn(true);
 }
 
 void SceneCollectState::MovieWatch::Execute(sceneCollect *pMain)
@@ -935,6 +937,8 @@ void SceneCollectState::MovieWatch::Exit(sceneCollect *pMain)
 	// 画像の解放
 	pMain->GetMovieMgr()->RereaseExe();
 
+	// BGMフェードイン
+	bgm->PlayStreamIn("DATA/Sound/BGM/System/Collect.ogg");
 }
 
 void SceneCollectState::MovieWatch::Render(sceneCollect *pMain)

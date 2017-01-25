@@ -147,15 +147,15 @@ namespace OshiokiAirou
 		}
 		void Render(iex3DObj *pObj)
 		{
-			// 向き&作成
-			Math::SetTransMatrixFrontVec(&pObj->TransMatrix, m_vPos, m_vMoveVec);
-
 			//MyAssert(pObj->GetPos().x != 0 && pObj->GetPos().y != 0 && pObj->GetPos().z != 0, "おしおきアイルーが原点にいる");
 
 			// 描画
-			//pObj->SetPos(m_vPos);
+			pObj->SetPos(m_vPos);
 			//pObj->SetAngle(m_fAngleX, m_fAngleY, 0);
-			//pObj->Update();
+			pObj->Update();
+
+			// 向き&作成
+			Math::SetTransMatrixFrontVec(&pObj->TransMatrix, m_vPos, m_vMoveVec);
 
 			// TransMatrixを直でいじったので、更新が不要の描画
 			pObj->Render(RS::COPY, m_fAlpha, false);
