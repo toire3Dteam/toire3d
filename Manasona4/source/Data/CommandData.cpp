@@ -10,9 +10,8 @@ void CommandSaver::Start(BasePlayer *pPlayer)
 	m_pRefPlayer = pPlayer;
 }
 
-void CommandSaver::End()
+void CommandSaver::End(LPCSTR lpcFileName)
 {
-	// 参照をオフにする
 	m_pRefPlayer = nullptr;
 
 	// 何も入ってなかったら出ていけぇ！！
@@ -21,11 +20,8 @@ void CommandSaver::End()
 	time_t now = time(NULL);
 	struct tm *pnow = localtime(&now);
 
-	char buff[MAX_PATH] = "";
-	sprintf(buff, "DATA/Save/command.bin");
-
 	FILE *fp;
-	MyAssert(fopen_s(&fp, buff, "wb") == 0, "デデドン(絶望)\nセーブデータ書き出しに失敗した！");	// まず止まることはないと思うが…
+	MyAssert(fopen_s(&fp, lpcFileName, "wb") == 0, "デデドン(絶望)\nセーブデータ書き出しに失敗した！");	// まず止まることはないと思うが…
 
 	// フレーム数書き出し
 	const int l_ciNumCommand((int)m_vCommandBuffer.size());

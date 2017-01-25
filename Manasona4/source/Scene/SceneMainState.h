@@ -390,6 +390,68 @@ namespace SceneMainState
 		ChallengeClear& operator=(const ChallengeClear&) {}
 	};
 
+	////--------------------チャレンジ（リプレイ最初）ステート
+	//class ChallengeReplayIntro : public State<sceneMain>
+	//{
+	//public:
+	//	// this is a シングルトン
+	//	static ChallengeReplayIntro* GetInstance() { static ChallengeReplayIntro state; return &state; }
+
+	//	// 入る
+	//	virtual void Enter(sceneMain* pMain);
+
+	//	// 実行します
+	//	virtual void Execute(sceneMain* pMain);
+
+	//	// 帰る
+	//	virtual void Exit(sceneMain* pMain);
+
+	//	// 描画
+	//	virtual void Render(sceneMain* pMain);
+
+	//	// エージェントからのメッセージを受信した場合、これが実行される
+	//	virtual bool OnMessage(sceneMain* pMain, const Message& msg);
+
+
+	//private:
+	//	ChallengeReplayIntro() {};
+	//	~ChallengeReplayIntro() {};
+
+	//	ChallengeReplayIntro(const ChallengeReplayIntro&) {}
+	//	ChallengeReplayIntro& operator=(const ChallengeReplayIntro&) {}
+	//};
+
+	//--------------------チャレンジ（リプレイ）ステート
+	class ChallengeReplay : public State<sceneMain>
+	{
+	public:
+		// this is a シングルトン
+		static ChallengeReplay* GetInstance() { static ChallengeReplay state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMain* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMain* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMain* pMain);
+
+		// 描画
+		virtual void Render(sceneMain* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMain* pMain, const Message& msg);
+
+
+	private:
+		ChallengeReplay() {};
+		~ChallengeReplay() {};
+
+		ChallengeReplay(const ChallengeReplay&) {}
+		ChallengeReplay& operator=(const ChallengeReplay&) {}
+	};
+
 	//--------------------トレーニングイントロ　ステート
 	class TrainingIntro : public State<sceneMain>
 	{

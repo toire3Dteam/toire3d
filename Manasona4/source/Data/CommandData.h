@@ -15,7 +15,7 @@ public:
 	//	コマンド計測・終了
 	//------------------------------------------------------
 	void Start(BasePlayer *pPlayer);
-	void End();
+	void End(LPCSTR lpcFileName);
 
 	//------------------------------------------------------
 	//	初期化
@@ -36,6 +36,7 @@ public:
 	//------------------------------------------------------
 	// 計測フレーム数取得
 	unsigned int GetFrame(){ return m_vCommandBuffer.size(); }
+	bool isAction() { return (m_pRefPlayer != nullptr); }
 
 private:
 
@@ -115,6 +116,16 @@ public:
 		}
 	}
 
+
+	//------------------------------------------------------
+	//	停止
+	//------------------------------------------------------
+	void Stop()
+	{
+		m_bAction = false;
+		m_bEnd = false;
+	}
+
 	//------------------------------------------------------
 	//	ゲッター
 	//------------------------------------------------------
@@ -129,7 +140,8 @@ public:
 	//------------------------------------------------------
 	void SaveUpdate(){ m_pCommandSaver->Update(); }
 	void SaveStart(BasePlayer *pPlayer){ m_pCommandSaver->Start(pPlayer); }
-	void SaveEnd(){ m_pCommandSaver->End(); }
+	void SaveEnd(LPCSTR lpcFilename){ m_pCommandSaver->End(lpcFilename); }
+	bool SaveIsAction() { return m_pCommandSaver->isAction(); }
 	int GetSaveFrame(){ return m_pCommandSaver->GetFrame(); }
 
 private:

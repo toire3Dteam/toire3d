@@ -20,6 +20,7 @@ ChallengePauseWindow::ChallengePauseWindow(Vector2 vPos) :BaseWindow(vPos)
 	// ポーズウィンドウに存在するアイコンを詰めていく
 	//AddIconData("前のチュートリアルへ", "一つ前のチュートリアルに戻ります。");
 	AddIconData("チャレンジセレクト", "チャレンジ状態を変更できます。");
+	AddIconData("チャレンジリプレイ", "チャレンジリプレイを鑑賞します。");
 	AddIconData("ポジションリセット", "ポジションを初期状態に戻します。");
 	AddIconData("コマンドリスト", "操作しているキャラクターのコマンドリストを確認します。");
 	AddIconData("サウンド設定", "各種サウンドの設定を行います。");

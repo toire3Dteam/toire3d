@@ -28,6 +28,9 @@ TekiChallenge1::TekiChallenge1(int iTitleNo) : BaseChallenge(iTitleNo)
 	m_pIntroTips = new TipsCard("テキは近距離や画面端での攻撃が非常に強いキャラクターです。\nまずは相手を画面端に追い込む【コンボ】を覚えましょう。");
 	m_pClearTips = new TipsCard("よくできました！\n攻撃や移動速度が優秀な分、HPが少し低く打たれ弱いです。\n相手に主導権を握らせない立ち回りを心がけましょう。");
 
+	// リプレイデータの名前
+	m_strReplayDataName = "Data/ChallengeData/Teki/1.bin";
+
 	// タスクセット
 	AddTaskData("足払い－＼+▽");
 	AddTaskData("キルラッシュ－△");
@@ -130,6 +133,9 @@ TekiChallenge2::TekiChallenge2(int iTitleNo) : BaseChallenge(iTitleNo)
 	// Tips
 	m_pIntroTips = new TipsCard("空中にいる相手を地面に落とす【コンボ】を覚えましょう。\n");
 	m_pClearTips = new TipsCard("よくできました！\n空中コンボは大きいダメージを与えれるので\n積極的に狙っていきましょう。");
+
+	// リプレイデータの名前
+	m_strReplayDataName = "Data/ChallengeData/Teki/2.bin";
 
 	// タスクセット
 	AddTaskData("対空攻撃－↓+▽");
@@ -263,6 +269,9 @@ TekiChallenge3::TekiChallenge3(int iTitleNo) : BaseChallenge(iTitleNo)
 	// Tips
 	m_pIntroTips = new TipsCard("相手を浮かし空中コンボへ繋げる【コンボ】を覚えましょう。\n");
 	m_pClearTips = new TipsCard("よくできました！\n難しいですが下段技の足払いから\n相手に大きいダメージを与えれるので非常に強力です。");
+
+	// リプレイデータの名前
+	m_strReplayDataName = "Data/ChallengeData/Teki/3.bin";
 
 	// タスクセット
 	AddTaskData("足払い－＼+▽");

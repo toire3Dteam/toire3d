@@ -495,6 +495,13 @@ void sceneMain::Update()
 	}
 	// ★ステートマシン更新(何故ここに書くかというと、中でシーンチェンジの処理を行っているため)
 	m_pStateMachine->Update();
+
+//#ifdef _DEBUG
+//	if (KeyBoardTRG(KB_N)) CommandMgr->SaveStart(PlayerMgr->GetPlayer(ENTITY_ID::ID_PLAYER_FIRST));
+//	if (KeyBoardTRG(KB_M)) CommandMgr->SaveEnd();
+//	if (KeyBoardTRG(KB_COMMA)) CommandMgr->Action("DATA/Save/Command.bin");
+//	CommandMgr->SaveUpdate();
+//#endif
 }
 
 //******************************************************************
@@ -709,6 +716,12 @@ void sceneMain::Render()
 	tdnText::Draw(0, 30, 0xffffffff, "CameraPos    : %.1f %.1f %.1f", CameraMgr->m_ViewData.pos.x, CameraMgr->m_ViewData.pos.y, CameraMgr->m_ViewData.pos.z);
 	tdnText::Draw(0, 60, 0xffffffff, "CameraTarget : %.1f %.1f %.1f", CameraMgr->m_ViewData.target.x, CameraMgr->m_ViewData.target.y, CameraMgr->m_ViewData.target.z);
 	tdnText::Draw(0, 90, 0xffffffff, "CameraEvent  : %d", CameraMgr->GetEventFrame());
+
+	if (CommandMgr->SaveIsAction())
+	{
+		tdnFont::RenderStringCentering("●REC", "メイリオ", 50, 640, 360, 0xffff0000, RS::COPY);
+		tdnText::Draw(640, 480, 0xffff0000, "%d", CommandMgr->GetSaveFrame());
+	}
 #endif
 
 

@@ -36,6 +36,9 @@ AirouChallenge1::AirouChallenge1(int iTitleNo) : BaseChallenge(iTitleNo)
 	AddTaskData("スキル－□");
 	AddTaskData("必殺技－□");
 
+	// リプレイデータの名前
+	m_strReplayDataName = "Data/ChallengeData/Airou/1.bin";
+
 	Init();
 }
 
@@ -166,6 +169,9 @@ AirouChallenge2::AirouChallenge2(int iTitleNo) : BaseChallenge(iTitleNo)
 	// Tips
 	m_pIntroTips = new TipsCard("空中の相手に有効な\n対空攻撃からの【コンボ】を覚えましょう。\n");
 	m_pClearTips = new TipsCard("よくできました！\nしっかり相手の動きを見て攻撃をけん制するのも大事です。");
+
+	// リプレイデータの名前
+	m_strReplayDataName = "Data/ChallengeData/Airou/2.bin";
 
 	// タスクセット
 	AddTaskData("対空攻撃－↓+▽");
@@ -298,6 +304,9 @@ AirouChallenge3::AirouChallenge3(int iTitleNo) : BaseChallenge(iTitleNo)
 	// Tips
 	m_pIntroTips = new TipsCard("投げからの【コンボ】を覚えましょう。\n壁＝画面端の事");
 	m_pClearTips = new TipsCard("よくできました！\n壁際により普段では繋がらない強力なコンボができました。\n投げる以外にも壁際でできるコンボは沢山あります。\n是非自分だけのコンボを見つけましょう。");
+
+	// リプレイデータの名前
+	m_strReplayDataName = "Data/ChallengeData/Airou/3.bin";
 
 	// タスクセット
 	AddTaskData("投げ－×");

@@ -28,6 +28,9 @@ AramitamaChallenge1::AramitamaChallenge1(int iTitleNo) : BaseChallenge(iTitleNo)
 	m_pIntroTips = new TipsCard("アラミタマはスキルを当てることで魂ゲージが増加します。\n魂ゲージが溜まるとスキルの終りに仲間が相手を攻撃します。\n仲間と協力する【コンボ】を覚えましょう。");
 	m_pClearTips = new TipsCard("よくできました！\nアラミタマは魂ゲージが溜まるまでは弱いですが。\n魂ゲージが溜まった後は最強です。");
 
+	// リプレイデータの名前
+	m_strReplayDataName = "Data/ChallengeData/Aramitama/1.bin";
+
 	// タスクセット
 	AddTaskData("スキル－△");
 	AddTaskData("空中攻撃－空中で□");
@@ -131,6 +134,9 @@ AramitamaChallenge2::AramitamaChallenge2(int iTitleNo) : BaseChallenge(iTitleNo)
 	m_pIntroTips = new TipsCard("補助技だった技は魂ゲージを溜まれば仲間を使い\n攻撃技になります。挑戦してみましょう。\n");
 	m_pClearTips = new TipsCard("よくできました！\n上手く使い相手を翻弄しましょう。");
 
+	// リプレイデータの名前
+	m_strReplayDataName = "Data/ChallengeData/Aramitama/2.bin";
+
 	// タスクセット
 	AddTaskData("スキル－△");
 	AddTaskData("空中回避－空中で↓+△");
@@ -226,6 +232,9 @@ AramitamaChallenge3::AramitamaChallenge3(int iTitleNo) : BaseChallenge(iTitleNo)
 	// Tips
 	m_pIntroTips = new TipsCard("仲間達と協力する複雑な【コンボ】を覚えましょう。\n");
 	m_pClearTips = new TipsCard("よくできました！\n魂ゲージを溜め驚異の破壊力で相手を圧倒しましょう。");
+
+	// リプレイデータの名前
+	m_strReplayDataName = "Data/ChallengeData/Aramitama/3.bin";
 
 	// タスクセット
 	AddTaskData("スキル－△");

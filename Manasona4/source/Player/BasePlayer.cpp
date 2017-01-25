@@ -652,10 +652,6 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 		else
 		{
 			Control();
-			//if (KeyBoardTRG(KB_N)) CommandMgr->SaveStart(this);
-			//if (KeyBoardTRG(KB_M)) CommandMgr->SaveEnd();
-			//if (KeyBoardTRG(KB_COMMA)) CommandMgr->Action("DATA/Save/Command.bin");
-			//CommandMgr->SaveUpdate();
 		}
 	}
 	else

@@ -48,6 +48,12 @@ public:
 	// タイトル名
 	std::string GetTitleString() { return m_pTaskTitle.pString; }
 
+	bool isReplay() { return m_bReplay; }
+	void SetReplay(bool flag) { m_bReplay = flag; }
+
+	// リプレイデータの名前
+	std::string GetReplayDataName() { return m_strReplayDataName; }	
+
 protected:
 	int m_iWaitFrame;// クリアからどれくらいでエンドTipsへ移行するか
 	int m_iWaitFrameMAX;// 最大ウェイト数
@@ -82,4 +88,8 @@ protected:
 
 	tdn2DAnim* m_pClearPic;
 	tdn2DAnim* m_pClearPicRip;
+
+	bool m_bReplay;// リプレイかどうか
+
+	std::string m_strReplayDataName;// リプレイの呼び出す名前
 };

@@ -48,6 +48,10 @@ BaseChallenge::BaseChallenge(int iTitleNo)
 	m_pClearPicRip->OrderRipple(14, 1, 0.025f);
 
 	m_iDeviceID = 0;
+
+	m_bReplay = false;
+
+	m_strReplayDataName = "Data/ChallengeData/なし.bin";
 }
 
 BaseChallenge::~BaseChallenge()
@@ -63,6 +67,7 @@ BaseChallenge::~BaseChallenge()
 
 void BaseChallenge::Init(int iDeviceID)
 {
+
 	m_iWaitFrame = m_iWaitFrameMAX;
 	m_bClearFlag = false;
 
@@ -207,7 +212,11 @@ void BaseChallenge::StopClearTips()
 
 void BaseChallenge::ActionClear()
 {
-	m_bClearFlag = true;
+	// リプレイならクリアさせない
+	if (m_bReplay == false)
+	{
+
+	m_bClearFlag = true;	
 
 	// ↓でクリア演出
 	m_pClearPic->Action();
@@ -215,6 +224,8 @@ void BaseChallenge::ActionClear()
 
 	// SE
 	se->Play("オールクリア");
+
+	}
 }
 
 

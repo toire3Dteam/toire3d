@@ -28,6 +28,9 @@ NazenarabaChallenge1::NazenarabaChallenge1(int iTitleNo) : BaseChallenge(iTitleN
 	m_pIntroTips = new TipsCard("(∵)は中距離の立ち回りが非常に強いキャラクターです。\nまずは中距離から繋がる【コンボ】を覚えましょう。");
 	m_pClearTips = new TipsCard("よくできました！\n(∵)は近距離での戦いは苦手です。\n相手を寄せ付けない立ち回りを心がけましょう。");
 
+	// リプレイデータの名前
+	m_strReplayDataName = "Data/ChallengeData/Nazenaraba/1.bin";
+
 	// タスクセット
 	AddTaskData("相手を浮かす－↓+△");
 	AddTaskData("浮いてる相手を引っ張る－△");
@@ -172,6 +175,9 @@ NazenarabaChallenge2::NazenarabaChallenge2(int iTitleNo) : BaseChallenge(iTitleN
 	m_pIntroTips = new TipsCard("投げ【コンボ】を覚えましょう。\n");
 	m_pClearTips = new TipsCard("よくできました！\n近づいてきた相手は投げて\n自分の得意な距離に持っていきましょう。");
 
+	// リプレイデータの名前
+	m_strReplayDataName = "Data/ChallengeData/Nazenaraba/2.bin";
+
 	// タスクセット
 	AddTaskData("投げ－×");
 
@@ -315,6 +321,9 @@ NazenarabaChallenge3::NazenarabaChallenge3(int iTitleNo) : BaseChallenge(iTitleN
 	// Tips
 	m_pIntroTips = new TipsCard("スキルから空中コンボへ繋げる【コンボ】を覚えましょう。\n");
 	m_pClearTips = new TipsCard("よくできました！\n相手に大きいダメージを与えれる\n【コンボ】なので非常に強力です。");
+
+	// リプレイデータの名前
+	m_strReplayDataName = "Data/ChallengeData/Nazenaraba/3.bin";
 
 	// タスクセット
 	AddTaskData("相手を浮かす－↓+△");
