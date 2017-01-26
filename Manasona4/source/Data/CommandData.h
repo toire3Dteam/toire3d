@@ -102,7 +102,7 @@ public:
 	//------------------------------------------------------
 	//	解放
 	//------------------------------------------------------
-	void Release()
+	~CommandManager()
 	{
 		FOR((int)SIDE::ARRAY_MAX)
 		{
@@ -144,6 +144,8 @@ public:
 	// コマンド再生の終了フラグ
 	bool isAction(){ return m_bAction; }
 	bool isEnd(){ return m_bEnd; }
+	bool isReplay() { return m_bReplay; }
+	void SetReplayFlag(bool bReplay) { m_bReplay = bReplay; }
 
 	//------------------------------------------------------
 	//	コマンドのセーブ関連
@@ -218,13 +220,14 @@ private:
 	}m_tagDatas[(int)SIDE::ARRAY_MAX];
 	bool m_bAction;
 	bool m_bEnd;
+	bool m_bReplay;
 
 	CommandSaver *m_pCommandSaver[(int)SIDE::ARRAY_MAX];	// コマンドをセーブするやつの実体
 
 	//------------------------------------------------------
 	//	シングルトンの作法
 	//------------------------------------------------------
-	CommandManager()
+	CommandManager():m_bReplay(false)
 	{
 		m_pCommandSaver[0] = nullptr;
 		m_pCommandSaver[1] = nullptr;

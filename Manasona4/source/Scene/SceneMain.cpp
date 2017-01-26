@@ -322,8 +322,12 @@ sceneMain::~sceneMain()
 	// トロフィー
 	//TrophyMgr->Stop();
 
+
+	// ★★★コマンド計測を止める
+	if (CommandMgr->SaveIsAction(SIDE::LEFT)) CommandMgr->SaveEnd(SIDE::LEFT);
+	if (CommandMgr->SaveIsAction(SIDE::RIGHT))CommandMgr->SaveEnd(SIDE::RIGHT);
 	// コマンドセーブ
-	CommandMgr->Release();
+	//CommandMgr->Release();
 }
 
 //******************************************************************

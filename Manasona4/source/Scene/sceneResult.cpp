@@ -26,7 +26,7 @@
 #include "Window\ResultWindow.h"
 
 #include "Fade\Fade.h"
-
+#include "Data/CommandData.h"
 #include "Trophy\TrophyManager.h"
 
 #define USE_EFFECT_CAMERA
@@ -203,9 +203,6 @@ bool sceneResult::Initialize()
 	m_wavePic = new tdn2DObj("Data/Result/waveScreen.png");
 	m_waveScreen = new tdn2DObj(1280, 720, TDN2D::RENDERTARGET);
 	m_waveTU = 0.0f;
-
-	// スコア表示のUI
-	m_pScoreUI = new ScoreUI(m_tagResultData);
 	
 	m_pInfoPlate = new tdn2DAnim("Data/UI/Menu/Information.png");
 	m_pInfoPlate->OrderMoveAppeared(12,0, 592 + 128);
@@ -263,6 +260,9 @@ void sceneResult::Update()
 		// ストリーミング初期化
 		m_pStream = bgm->PlayStream("DATA/Sound/BGM/System/Result.ogg");
 		m_pStream->SetVolume(0.6f);
+
+		// スコア表示のUI
+		m_pScoreUI = new ScoreUI(m_tagResultData);
 
 		// 【記録】対戦回数を増やす
 		PlayerDataMgr->m_PlayerInfo.BattleCount++;
@@ -474,6 +474,46 @@ void sceneResult::Update()
 	// フェード
 	Fade::Update();
 
+#ifdef _DEBUG
+	if (KeyBoardTRG(KB_R))
+	{
+		CommandMgr->SaveWrite("DATA/Replay/LeftSide.bin", SIDE::LEFT);
+		CommandMgr->SaveWrite("DATA/Replay/RightSide.bin", SIDE::RIGHT);
+
+		// バイナリかきだし
+		FILE *fp;
+		MyAssert(fopen_s(&fp, "DATA/Replay/SelectData.bin", "wb") == 0, "デデドン(絶望)\nセーブデータ書き出しに失敗した！");	// まず止まることはないと思うが…
+
+		// ラウンド数
+		const int l_iRoundNum(PlayerDataMgr->m_ConfigData.iRoundNumType);
+		fwrite((LPSTR)&l_iRoundNum, 1, sizeof(int), fp);
+
+		// 制限時間
+		const int l_iRoundTime((int)SelectDataMgr->Get()->iRoundTime);
+		fwrite((LPSTR)&l_iRoundTime, 1, sizeof(int), fp);
+
+		// ステージ
+		const int l_iStage((int)SelectDataMgr->Get()->eStage);
+		fwrite((LPSTR)&l_iStage, 1, sizeof(int), fp);
+
+		// 曲の番号
+		const int l_iBattleMusicID(SelectDataMgr->Get()->iBattleMusicID);
+		fwrite((LPSTR)&l_iBattleMusicID, 1, sizeof(int), fp);
+
+		FOR((int)SIDE::ARRAY_MAX)
+		{
+			// 使用きゃら
+			const int l_iCharacter((int)SelectDataMgr->Get()->tagSideDatas[i].eCharacter);
+			fwrite((LPSTR)&l_iCharacter, 1, sizeof(int), fp);
+			// 使用パートナー
+			const int l_iPartner((int)SelectDataMgr->Get()->tagSideDatas[i].ePartner);
+			fwrite((LPSTR)&l_iPartner, 1, sizeof(int), fp);
+		}
+
+		// ファイル閉じる
+		fclose(fp);
+	}
+#endif
 }
 
 //******************************************************************
@@ -482,6 +522,7 @@ void sceneResult::Update()
 
 void sceneResult::Render()
 {
+	if (m_bFirstUpdate) return;
 
 	// BackBufferの保存
 	tdnSystem::GetDevice()->GetRenderTarget(0, &m_pBackBuffer);

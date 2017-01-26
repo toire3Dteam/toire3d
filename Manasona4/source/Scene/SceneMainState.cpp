@@ -22,7 +22,7 @@
 #include "Trophy\TrophyManager.h"
 #include "Challenge\ChallengeManagerManager.h"
 #include "Data\CommandData.h"
-
+#include "../Data/CommandData.h"
 
 // これを定義するとラウンドコールがスキップされる(デバッグ時短用)
 //#define ROUND_SKIP
@@ -222,7 +222,10 @@ void SceneMainState::Round::Execute(sceneMain *pMain)
 	// カメラ更新
 	CameraMgr->Update();
 }
-void SceneMainState::Round::Exit(sceneMain *pMain){}
+void SceneMainState::Round::Exit(sceneMain *pMain)
+{
+
+}
 void SceneMainState::Round::Render(sceneMain *pMain){}
 
 bool SceneMainState::Round::OnMessage(sceneMain *pMain, const Message & msg)
@@ -248,6 +251,26 @@ void SceneMainState::Main::Enter(sceneMain *pMain)
 {
 	// タイマー始動
 	GameUIMgr->TimerStart();
+
+	// 初回のみ
+	if (PlayerMgr->GetRoundNumber() == 0)
+	{
+		if (!pMain->GetFSM()->isPrevState(*SceneMainState::PauseMenu::GetInstance()))
+		{
+			if (CommandMgr->isReplay())
+			{
+				// リプレイを再生する
+				CommandMgr->Action("DATA/Replay/LeftSide.bin", SIDE::LEFT);
+				CommandMgr->Action("DATA/Replay/RightSide.bin", SIDE::RIGHT);
+			}
+			else
+			{
+				// 計測開始する
+				CommandMgr->SaveStart(PlayerMgr->GetPlayer(SIDE::LEFT), SIDE::LEFT);
+				CommandMgr->SaveStart(PlayerMgr->GetPlayer(SIDE::RIGHT), SIDE::RIGHT);
+			}
+		}
+	}
 }
 
 void SceneMainState::Main::Execute(sceneMain *pMain)
@@ -296,6 +319,13 @@ void SceneMainState::Main::Execute(sceneMain *pMain)
 		GameUIMgr->TimerStart();
 	}
 
+	// ★保存したコマンドを入力する
+	if (CommandMgr->isAction())
+	{
+		CommandMgr->Update(SIDE::LEFT);
+		CommandMgr->Update(SIDE::RIGHT);
+	}
+
 	// プレイヤー更新
 	PlayerMgr->Update(PLAYER_UPDATE::CONTROL_OK);
 
@@ -338,7 +368,9 @@ void SceneMainState::Main::Execute(sceneMain *pMain)
 		}
 	}
 	
-
+	// スタートボタン押してないときにセーブ更新
+	CommandMgr->SaveUpdate(SIDE::LEFT);
+	CommandMgr->SaveUpdate(SIDE::RIGHT);
 }
 void SceneMainState::Main::Exit(sceneMain *pMain)
 {

@@ -645,8 +645,6 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 		if (m_bAI)	AIControl();
 		else if (CommandMgr->isAction())
 		{
-			// š•Û‘¶‚µ‚½ƒRƒ}ƒ“ƒh‚ð“ü—Í‚·‚é
-			CommandMgr->Update(m_side);
 			m_wCommandHistory[0] |=CommandMgr->GetCommand(m_side);
 		}
 		else

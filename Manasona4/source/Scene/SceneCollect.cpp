@@ -343,9 +343,6 @@ void sceneCollect::Render()
 
 	// tdnPolygon::Rect((int)(1280 * .25f) / 2, 96, (int)(1280 * .75f), (int)(720 * .75f), RS::COPY, 0xff808080);
 
-	m_pImages[IMAGE::ARROW_LEFT]->Render(377, 53);
-	m_pImages[IMAGE::ARROW_RIGHT]->Render(839, 53);
-
 	// 
 	//tdnText::Draw(400, 720, 0xffffffff, "下げてる値: %.1f", m_iScrollPosY);
 
@@ -729,6 +726,9 @@ void sceneCollect::TrophyRender()
 	// タグ
 	m_pImages[IMAGE::TAG_TROPHY]->Render(448, 48);
 
+	m_pImages[IMAGE::ARROW_LEFT]->Render(377, 53);
+	m_pImages[IMAGE::ARROW_RIGHT]->Render(839, 53);
+
 	// トロフィーコンプ率
 	m_pImages[IMAGE::TROPHY_COMP_PERCENT]->Render((int)m_vTrophyPercentPos.x, (int)m_vTrophyPercentPos.y);
 	
@@ -1085,7 +1085,10 @@ void sceneCollect::PictureRender()
 
 	// タグ
 	m_pImages[IMAGE::TAG_PICTURE]->Render(448, 48);
-	
+
+	m_pImages[IMAGE::ARROW_LEFT]->Render(377, 53);
+	m_pImages[IMAGE::ARROW_RIGHT]->Render(839, 53);
+
 	// ★値段
 	// まだ手に入れてなくてロックされていなかったら
 	if (PlayerDataMgr->m_SecretData.iAllPic[m_tagPI.iSelectNo] == 0 && 
@@ -1433,6 +1436,9 @@ void sceneCollect::MovieRender()
 	// タグ
 	m_pImages[IMAGE::TAG_MOVIE]->Render(448, 48);
 
+	m_pImages[IMAGE::ARROW_LEFT]->Render(377, 53);
+	m_pImages[IMAGE::ARROW_RIGHT]->Render(839, 53);
+
 	// ★値段
 	// まだ手に入れてなくてロックされていなかったら
 	if (PlayerDataMgr->m_SecretData.iAllMovie[m_tagMI.iSelectNo] == 0 &&
@@ -1653,6 +1659,9 @@ void sceneCollect::RecordRender()
 
 	// タグ
 	m_pImages[IMAGE::TAG_RECORD]->Render(448, 48);
+
+	m_pImages[IMAGE::ARROW_LEFT]->Render(377, 53);
+	m_pImages[IMAGE::ARROW_RIGHT]->Render(839, 53);
 
 
 }
