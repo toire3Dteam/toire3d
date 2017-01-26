@@ -1,6 +1,6 @@
 ﻿#include "TDNLIB.h"
-#include "CommandData.h"
 #include "../Player/BasePlayer.h"
+#include "CommandData.h"
 
 void CommandSaver::Start(BasePlayer *pPlayer)
 {
@@ -10,15 +10,16 @@ void CommandSaver::Start(BasePlayer *pPlayer)
 	m_pRefPlayer = pPlayer;
 }
 
-void CommandSaver::End(LPCSTR lpcFileName)
+void CommandSaver::End()
 {
+	// 参照をオフにする
 	m_pRefPlayer = nullptr;
+}
 
+void CommandSaver::Write(LPCSTR lpcFileName)
+{
 	// 何も入ってなかったら出ていけぇ！！
 	if (m_vCommandBuffer.empty()) return;
-
-	time_t now = time(NULL);
-	struct tm *pnow = localtime(&now);
 
 	FILE *fp;
 	MyAssert(fopen_s(&fp, lpcFileName, "wb") == 0, "デデドン(絶望)\nセーブデータ書き出しに失敗した！");	// まず止まることはないと思うが…

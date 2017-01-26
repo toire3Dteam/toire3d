@@ -646,8 +646,8 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 		else if (CommandMgr->isAction())
 		{
 			// š•Û‘¶‚µ‚½ƒRƒ}ƒ“ƒh‚ð“ü—Í‚·‚é
-			CommandMgr->Update();
-			m_wCommandHistory[0] |=CommandMgr->GetCommand();
+			CommandMgr->Update(m_side);
+			m_wCommandHistory[0] |=CommandMgr->GetCommand(m_side);
 		}
 		else
 		{
