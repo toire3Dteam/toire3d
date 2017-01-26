@@ -153,7 +153,7 @@ public:
 	{
 		if (m_bPlayStream)
 		{
-			if (bFadeOut)m_pStreamSound->SetMode(STR_FADEOUT, 16);
+			if (bFadeOut)m_pStreamSound->SetMode(STR_FADEOUT, 48);
 			else m_pStreamSound->Stop();
 			m_bPlayStream = false;
 		}

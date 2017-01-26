@@ -326,7 +326,7 @@ void Shot::AramitamaMushi::Squat::Render()
 /****************************************************/
 //	空中スキル時のD虫ミタマ
 /****************************************************/
-const int	Shot::AramitamaMushi::Aerial::c_SOJOURN_TIME = 90;
+const int	Shot::AramitamaMushi::Aerial::c_SOJOURN_TIME = 80;
 const float Shot::AramitamaMushi::Aerial::c_SPEED = 0.75f;
 const float Shot::AramitamaMushi::Aerial::c_RANGE = 200;
 

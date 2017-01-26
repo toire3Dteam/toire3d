@@ -833,11 +833,12 @@ bool SceneCollectState::MovieStep::OnMessage(sceneCollect *pMain, const Message 
 
 void SceneCollectState::MovieWatch::Enter(sceneCollect *pMain)
 {
+	// BGMフェードアウト
+	bgm->StopStreamIn(true);
+
 	// 鑑賞用毎回初期化
 	pMain->MovieInitExe();
 
-	// BGMフェードアウト
-	bgm->StopStreamIn(true);
 }
 
 void SceneCollectState::MovieWatch::Execute(sceneCollect *pMain)

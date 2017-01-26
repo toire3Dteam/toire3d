@@ -50,6 +50,10 @@ bool sceneSelect::Initialize()
 	m_pPic[PIC_TYPE::SECOND_SELECT_INFO] = new tdn2DAnim("DATA/UI/CharacterSelect/info/SecondSelectinfo.png");
 	m_pPic[PIC_TYPE::SECOND_SELECT_INFO]->OrderMoveAppeared(8, 1280/3, 592 + 10);
 	
+	// 背景
+	m_pMovie	= new tdnMovie("DATA/UI/CharacterSelect/SelectBG.wmv");
+	m_pSelectBG = new tdn2DObj(m_pMovie->GetTexture());
+	m_pMovie->Play();
 
 	m_iRectAlpha = 0;
 
@@ -104,6 +108,9 @@ sceneSelect::~sceneSelect()
 		SAFE_DELETE(m_pPic[i]);
 	}
 
+	SAFE_DELETE(m_pMovie);
+	SAFE_DELETE(m_pSelectBG);
+
 	bgm->StopStreamIn();
 	SAFE_DELETE(m_pSelectUIMgr);
 	//SAFE_DELETE(m_pCtrlSelectUI);
@@ -134,6 +141,9 @@ void sceneSelect::Update()
 	{
 		m_pPic[i]->Update();
 	}
+
+	// 動画のループ更新
+	m_pMovie->Update();
 
 	// セレクトマネージャー
 	bool bCtrl = true;
@@ -170,7 +180,8 @@ void sceneSelect::Render()
 	tdnView::Activate();
 	tdnView::Clear();
 
-	m_pPic[PIC_TYPE::BG]->Render(0, 0);
+	//m_pPic[PIC_TYPE::BG]->Render(0, 0);
+	m_pSelectBG->Render(0, 0);
 
 	// 立ち絵を後ろの方に描画
 	m_pSelectUIMgr->RenderCharacter();

@@ -79,6 +79,9 @@ private:
 		ARRAY_END,
 	};
 	tdn2DAnim* m_pPic[PIC_TYPE::ARRAY_END];
+	
+	tdnMovie* m_pMovie;
+	tdn2DObj* m_pSelectBG;
 
 	int m_iRectAlpha;
 

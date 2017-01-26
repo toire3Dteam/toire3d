@@ -48,7 +48,7 @@ bool sceneMenu::Initialize()
 		switch ((TIPS_TYPE)i)
 		{
 		case TIPS_TYPE::TUTORIAL:
-			m_pTips[i] = new TipsCard("チュートリアルを始めますか？", true);
+			m_pTips[i] = new TipsCard("チュートリアルを始めますか？", true, true);
 			break;
 		default:
 			MyAssert(0, "そんなヒントはない");
@@ -74,10 +74,10 @@ bool sceneMenu::Initialize()
 			m_pWindow[i] = new SoundWindow(Vector2(200, 250));
 			break;
 		case WINDOW_TYPE::CHALLENGE:
-			m_pWindow[i] = new ChallengeWindow(Vector2(500, 50));
+			m_pWindow[i] = new ChallengeWindow(Vector2(450, 50));
 			break;
 		case WINDOW_TYPE::CHALLENGE_SELECT:
-			m_pWindow[i] = new ChallengeSelectWindow(Vector2(200, 250));
+			m_pWindow[i] = new ChallengeSelectWindow(Vector2(150, 250));
 			break;
 		default:
 			MyAssert(0, "そんなウィンドウはない");

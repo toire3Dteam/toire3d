@@ -15,6 +15,9 @@ bool sceneTitle::Initialize()
 	// “®‰æŠÖ˜A‰Šú‰»
 	m_pMovie = new tdnMovie("DATA/Title/op.wmv", true, false);	
 
+	m_pMovieBGLine = new tdnMovie("DATA/Title/titleBG2.wmv");
+	m_pBGLine = new tdn2DObj(m_pMovieBGLine->GetTexture());
+
 	// ‰æ‘œ‰Šú‰»
 	m_pImages[IMAGE::MOVIE] = new tdn2DObj(m_pMovie->GetTexture());
 	m_pImages[IMAGE::BG] = new tdn2DObj("Data/Title/BG.png");
@@ -52,6 +55,9 @@ sceneTitle::~sceneTitle()
 	SAFE_DELETE(m_pPreaseAnyButton);
 
 	SAFE_DELETE(m_pStateMachine);
+
+	SAFE_DELETE(m_pMovieBGLine);
+	SAFE_DELETE(m_pBGLine);
 
 }
 //=============================================================================================

@@ -52,6 +52,11 @@ private:
 	tdn2DObj *m_pImages[IMAGE::MAX];	// ‰æ‘œ
 	tdnMovie *m_pMovie;			// “®‰æ	
 
+	// ”wŒi—p
+	tdnMovie* m_pMovieBGLine;
+	tdn2DObj* m_pBGLine;
+
+
 	// ƒƒS
 	tdn2DAnim* m_pLogo; 
 	

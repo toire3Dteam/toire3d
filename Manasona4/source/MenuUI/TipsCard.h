@@ -58,5 +58,8 @@ private:
 	STEP m_eStep;
 	SELECT_STATE m_eSelectState;
 
+	tdn2DObj* m_pChoiceFlash;
+	int m_iChoiceAlpha;
+	bool m_bChoiceAlphaUp;
 };
 

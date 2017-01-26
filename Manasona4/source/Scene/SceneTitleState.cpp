@@ -237,9 +237,14 @@ void SceneTitleState::TitleStep::Enter(sceneTitle *pMain)
 	// エニーキーのアニメ開始
 	pMain->m_pPreaseAnyButton->Action();
 
+	// BGムービー再生
+	pMain->m_pMovieBGLine->Play();
+
 }
 void SceneTitleState::TitleStep::Execute(sceneTitle *pMain)
 {
+	// テアリング防止
+	pMain->m_pMovieBGLine->Update();
 
 	// 動き更新
 	if (pMain->m_pPreaseAnyButton->GetAction()->IsEnd() == true)
@@ -289,6 +294,9 @@ void SceneTitleState::TitleStep::Render(sceneTitle *pMain)
 {
 	// 背景
 	pMain->m_pImages[sceneTitle::IMAGE::BG]->Render(0, 0);
+
+	// ライン
+	pMain->m_pBGLine->Render(0, 0, RS::ADD);
 
 	// 雲1
 	pMain->m_pImages[sceneTitle::IMAGE::CLOUD1]->Render(-100 + (int)pMain->m_fCloudU , 200);
