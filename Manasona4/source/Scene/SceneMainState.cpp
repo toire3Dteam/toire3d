@@ -193,6 +193,26 @@ void SceneMainState::Round::Enter(sceneMain *pMain)
 		// 初回なら
 		if (RoundNumber == 0)pMain->GetRoundCall()->CallFirstGameRound();
 		else pMain->GetRoundCall()->CallRound(RoundNumber + 1);
+
+		// 初回のみ
+		if (PlayerMgr->GetRoundNumber() == 0)
+		{
+			if (!pMain->GetFSM()->isPrevState(*SceneMainState::PauseMenu::GetInstance()))
+			{
+				if (CommandMgr->isReplay())
+				{
+					// リプレイを再生する
+					CommandMgr->Action("DATA/Replay/LeftSide.bin", SIDE::LEFT);
+					CommandMgr->Action("DATA/Replay/RightSide.bin", SIDE::RIGHT);
+				}
+				else
+				{
+					// 計測開始する
+					CommandMgr->SaveStart(PlayerMgr->GetPlayer(SIDE::LEFT), SIDE::LEFT);
+					CommandMgr->SaveStart(PlayerMgr->GetPlayer(SIDE::RIGHT), SIDE::RIGHT);
+				}
+			}
+		}
 	}
 	else
 	{
@@ -217,10 +237,26 @@ void SceneMainState::Round::Execute(sceneMain *pMain)
 
 	// プレイヤー更新
 	PlayerMgr->Update(PLAYER_UPDATE::NO_FSM);
+
+	// ★保存したコマンドを入力する
+	if (CommandMgr->isAction())
+	{
+		CommandMgr->Update(SIDE::LEFT);
+		CommandMgr->Update(SIDE::RIGHT);
+	}
+
 	PlayerMgr->UpdatePos();
+
 
 	// カメラ更新
 	CameraMgr->Update();
+
+	// スタートボタン押してないときにセーブ更新
+	if (CommandMgr->SaveIsAction())
+	{
+		CommandMgr->SaveUpdate(SIDE::LEFT);
+		CommandMgr->SaveUpdate(SIDE::RIGHT);
+	}
 }
 void SceneMainState::Round::Exit(sceneMain *pMain)
 {
@@ -251,26 +287,6 @@ void SceneMainState::Main::Enter(sceneMain *pMain)
 {
 	// タイマー始動
 	GameUIMgr->TimerStart();
-
-	// 初回のみ
-	if (PlayerMgr->GetRoundNumber() == 0)
-	{
-		if (!pMain->GetFSM()->isPrevState(*SceneMainState::PauseMenu::GetInstance()))
-		{
-			if (CommandMgr->isReplay())
-			{
-				// リプレイを再生する
-				CommandMgr->Action("DATA/Replay/LeftSide.bin", SIDE::LEFT);
-				CommandMgr->Action("DATA/Replay/RightSide.bin", SIDE::RIGHT);
-			}
-			else
-			{
-				// 計測開始する
-				CommandMgr->SaveStart(PlayerMgr->GetPlayer(SIDE::LEFT), SIDE::LEFT);
-				CommandMgr->SaveStart(PlayerMgr->GetPlayer(SIDE::RIGHT), SIDE::RIGHT);
-			}
-		}
-	}
 }
 
 void SceneMainState::Main::Execute(sceneMain *pMain)
@@ -319,15 +335,17 @@ void SceneMainState::Main::Execute(sceneMain *pMain)
 		GameUIMgr->TimerStart();
 	}
 
+
+
+	// プレイヤー更新
+	PlayerMgr->Update(PLAYER_UPDATE::CONTROL_OK);
+
 	// ★保存したコマンドを入力する
 	if (CommandMgr->isAction())
 	{
 		CommandMgr->Update(SIDE::LEFT);
 		CommandMgr->Update(SIDE::RIGHT);
 	}
-
-	// プレイヤー更新
-	PlayerMgr->Update(PLAYER_UPDATE::CONTROL_OK);
 
 	// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
 	Collision::PlayerCollision(PlayerMgr, pMain->GetShotManager());
@@ -369,8 +387,11 @@ void SceneMainState::Main::Execute(sceneMain *pMain)
 	}
 	
 	// スタートボタン押してないときにセーブ更新
-	CommandMgr->SaveUpdate(SIDE::LEFT);
-	CommandMgr->SaveUpdate(SIDE::RIGHT);
+	if (CommandMgr->SaveIsAction())
+	{
+		CommandMgr->SaveUpdate(SIDE::LEFT);
+		CommandMgr->SaveUpdate(SIDE::RIGHT);
+	}
 }
 void SceneMainState::Main::Exit(sceneMain *pMain)
 {

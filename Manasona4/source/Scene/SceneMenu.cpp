@@ -100,6 +100,9 @@ bool sceneMenu::Initialize()
 	m_iPauseDeviceID = 0;
 	m_eCommandSide = SIDE::LEFT;// 今は使っていない
 
+	// (TODO)仮
+	CommandMgr->SetReplayFlag(false);
+
 	return true;
 }
 
@@ -153,6 +156,67 @@ void sceneMenu::Update()
 		// ★ステートマシン更新(何故ここに書くかというと、中でシーンチェンジの処理を行っているため)
 		m_pStateMachine->Update();
 
+
+		if (KeyBoardTRG(KB_SPACE))
+		{
+			CommandMgr->SetReplayFlag(true);
+
+			// バイナリ
+			FILE *fp;
+			MyAssert(fopen_s(&fp, "DATA/Replay/SelectData.bin", "rb") == 0, "デデドン(絶望)\nセーブデータ読み込みに失敗した！");	// まず止まることはないと思うが…
+
+																											// ラウンド数
+			int l_iRoundNum;
+			fread_s((LPSTR)&l_iRoundNum, sizeof(int), sizeof(int), 1, fp);
+			PlayerDataMgr->m_ConfigData.iRoundNumType = l_iRoundNum;
+
+			// 制限時間
+			int l_iRoundTime;
+			fread_s((LPSTR)&l_iRoundTime, sizeof(int), sizeof(int), 1, fp);
+			SelectDataMgr->Get()->iRoundTime = l_iRoundTime;
+
+			// ステージ
+			int l_iStage;
+			fread_s((LPSTR)&l_iStage, sizeof(int), sizeof(int), 1, fp);
+			SelectDataMgr->Get()->eStage = (STAGE)l_iStage;
+
+			// 曲の番号
+			int l_iBattleMusicID;
+			fread_s((LPSTR)&l_iBattleMusicID, sizeof(int), sizeof(int), 1, fp);
+			SelectDataMgr->Get()->iBattleMusicID = l_iBattleMusicID;
+
+			FOR((int)SIDE::ARRAY_MAX)
+			{
+				// 使用きゃら
+				int l_iCharacter;
+				fread_s((LPSTR)&l_iCharacter, sizeof(int), sizeof(int), 1, fp);
+				SelectDataMgr->Get()->tagSideDatas[i].eCharacter = (CHARACTER)l_iCharacter;
+				// 使用パートナー
+				int l_iPartner;
+				fread_s((LPSTR)&l_iPartner, sizeof(int), sizeof(int), 1, fp);
+				SelectDataMgr->Get()->tagSideDatas[i].ePartner = (PARTNER)l_iPartner;
+			}
+
+			// ファイル閉じる
+			fclose(fp);
+
+			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].bAI = false;
+			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].bAI = false;
+			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = 0;
+			SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = 1;
+
+			// チュートリアルではない
+			SelectDataMgr->Get()->bTutorial = false;
+
+			// トレーニングでもない
+			SelectDataMgr->Get()->bTraining = false;
+
+			// チャレンジでもない
+			SelectDataMgr->Get()->bChallenge = false;
+			MainFrameEx->ChangeScene(new sceneMain);
+			return;
+		}
+
 #ifdef DEBUG
 		// エンターでワープ
 		if (KeyBoard(KB_ENTER) == 2)
@@ -167,7 +231,7 @@ void sceneMenu::Update()
 			return;
 		}
 
-		else if (KeyBoardTRG(KB_SPACE))
+		if (KeyBoardTRG(KB_SPACE))
 		{
 			CommandMgr->SetReplayFlag(true);
 
