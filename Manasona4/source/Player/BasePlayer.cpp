@@ -18,7 +18,7 @@
 const float BasePlayer::c_END_MOVE_LINE = .25f;		// 移動が終わって待機に戻る移動値ライン
 const int	BasePlayer::c_RUSH_AHEAD_START = 5;		// ラッシュ中の先行入力受付開始フレーム
 const float BasePlayer::c_GRAVITY = .1f;
-//const float BasePlayer::c_MAX_JUMP = 1.9f;
+const float BasePlayer::c_GRAVITY_MAX = 3.75f;
 
 const int BasePlayer::c_RECOVERY_FLAME = 32;			// リカバリーステートにいる時間
 
@@ -130,6 +130,7 @@ void BasePlayer::LoadAttackFrameList(LPSTR filename)
 		{ "[[掴み]]", BASE_ACTION_STATE::THROW },
 		{ "[[投げ成功]]", BASE_ACTION_STATE::THROW_SUCCESS },
 		{ "[[必殺技]]", BASE_ACTION_STATE::HEAVEHO_DRIVE },
+		{ "[[必殺技2]]", BASE_ACTION_STATE::HEAVEHO_DRIVE2 },
 		{ "[[超必殺技]]", BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW }
 	};
 
@@ -965,7 +966,7 @@ void BasePlayer::MoveUpdate()
 	{	// ペルソナ発動中じゃなかったら移動
 		m_vMove.y -= c_GRAVITY;
 		//if (m_vMove.y <= -3.0f) { m_vMove.y = -3.0f; } // 落ちる速度を抑制
-		m_vMove.y = max(-2.75f, m_vMove.y);// 落ちる速度を抑制
+		m_vMove.y = max(-c_GRAVITY_MAX, m_vMove.y);// 落ちる速度を抑制
 
 		// 空気抵抗(xの値を徐々に減らしていく)
 		if (m_bLand)

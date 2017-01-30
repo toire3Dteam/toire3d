@@ -141,6 +141,41 @@ public:
 
 	SkillAction::Base *m_pSkillActions[(int)SKILL_ACTION_TYPE::MAX];
 
+	class HeaveHoAction
+	{
+	public:
+		class Base
+		{
+		public:
+			Base(Aniki *pAniki) :m_pAniki(pAniki){}
+			virtual void Enter() = 0;
+			virtual bool Execute() = 0;
+			virtual void Exit() = 0;
+		protected:
+			Aniki *m_pAniki;
+		};
+
+		class Strike:public Base
+		{
+		public:
+			Strike(Aniki *pAniki);
+			void Enter();
+			bool Execute();
+			void Exit();
+		};
+
+		class Throw:public Base
+		{
+		public:
+			Throw(Aniki *pAniki);
+			void Enter();
+			bool Execute();
+			void Exit();
+		};
+	};
+
+	HeaveHoAction::Base *m_pHeaveHoActions[2];
+
 	/****************************/
 	//	ヒーホードライブ
 	/****************************/

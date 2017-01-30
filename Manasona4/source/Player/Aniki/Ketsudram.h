@@ -100,7 +100,7 @@ namespace Ketsudram
 
 				MsgMgr->Dispatch(0, m_pAniki->GetID(), m_pTarget->GetID(), MESSAGE_TYPE::HIT_DAMAGE, &DamageInfo);
 			}
-			if (l_ciMotionFrame > c_iMOTIONFRAME + 8)
+			if (l_ciMotionFrame > c_iMOTIONFRAME + 8 || l_ciMotionFrame < c_iMOTIONFRAME)
 			{
 				//if (m_pAniki->isPushInputTRG(PLAYER_COMMAND_BIT::A, false) || m_pAniki->isPushInputTRG(PLAYER_COMMAND_BIT::B, false) || m_pAniki->isPushInputTRG(PLAYER_COMMAND_BIT::C, false) || m_pAniki->isPushInputTRG(PLAYER_COMMAND_BIT::D, false))
 				{

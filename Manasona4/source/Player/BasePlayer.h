@@ -162,6 +162,7 @@ enum class BASE_ACTION_STATE
 	THROW,				// 投げ
 	THROW_SUCCESS,		// 投げ成功
 	HEAVEHO_DRIVE,		// ヒーホードライブ
+	HEAVEHO_DRIVE2,		// ヒーホードライブ2
 	HEAVEHO_DRIVE_OVERFLOW,// ヒーホードライブ_オーバーフロー
 	FRAMECOUNT,			// ★とりあえず一定フレーム計りたいというときに、今使っているのは(投げ失敗の間だったり、投げ抜けの間だったり。)
 	END					// 何もなし　(A列車)名前
@@ -215,6 +216,7 @@ enum class MOTION_TYPE
 	SKILL2,					// スキル枠2
 	SKILL3,					// スキル枠3
 	HEAVEHO_DRIVE,			// DD
+	HEAVEHO_DRIVE2,			// DD2
 	BURST,					// バースト
 	HEAVEHO_DRIVE_OVERFLOW,	// AH
 	THROW,					// 投げ
@@ -1042,6 +1044,7 @@ public:
 	static const float	c_END_MOVE_LINE;		// 移動が終わって大気に戻る移動値ライン
 	static const int	c_RUSH_AHEAD_START;		// ラッシュ中の先行入力受付開始フレーム
 	static const float	c_GRAVITY;				// 全員が共通で持つ世界の重力
+	static const float	c_GRAVITY_MAX;			// 重力の最大値
 	//static const float	c_MAX_JUMP;				// ジャンプ最大ライン
 	static const int	c_RECOVERY_FLAME;		// リカバリ―フレーム
 	static const int	c_OVERDRIVE_MAX_GAGE;	// 覚醒ゲージの最大値
