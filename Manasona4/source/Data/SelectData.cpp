@@ -14,7 +14,7 @@ SelectData::SelectData():
 eStage(STAGE::SYUTEN),						// ステージ
 bTutorial(false),							// チュートリアルかどうか
 bTraining(false),							// トレーニングかどうか	
-bChallenge(true),							// チャレンジかどうか	
+bChallenge(false),							// チャレンジかどうか	
 iBattleMusicID(BattleMusicManager::RANDOM),	// 流す曲の番号
 iRoundTime(99),								// 一試合の初期時間
 eOrderTrainingSide(SIDE::LEFT),				// トレーニングを選んだ側
@@ -24,10 +24,10 @@ iChallengeType(0)							// 選択しているチャレンジ
 	tagSideDatas[(int)SIDE::LEFT].iDeviceID = 0;
 	tagSideDatas[(int)SIDE::RIGHT].iDeviceID = 1;
 
-	tagSideDatas[(int)SIDE::RIGHT].eCharacter = CHARACTER::AIROU;
+	//tagSideDatas[(int)SIDE::RIGHT].eCharacter = CHARACTER::AIROU;
 
 	// 片方AI用
-	tagSideDatas[(int)SIDE::RIGHT].bAI = true;
+	//tagSideDatas[(int)SIDE::RIGHT].bAI = true;
 }
 
 TrainingData::TrainingData():

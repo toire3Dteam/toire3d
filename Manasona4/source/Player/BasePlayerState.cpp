@@ -119,7 +119,8 @@ bool isThrownState(BasePlayer *pPerson)
 		// ダメージ系のステート以外だったら
 		!pPerson->GetFSM()->isInState(*BasePlayerState::KnockBack::GetInstance()) &&
 		!pPerson->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) &&
-		!pPerson->GetFSM()->isInState(*BasePlayerState::LandRecovery::GetInstance())
+		!pPerson->GetFSM()->isInState(*BasePlayerState::LandRecovery::GetInstance()) &&
+		!pPerson->GetFSM()->isInState(*BasePlayerState::Jump::GetInstance())
 		);
 }
 
@@ -3210,7 +3211,7 @@ void BasePlayerState::LandRecovery::Enter(BasePlayer * pPerson)
 #ifdef GUARD_ON
 		114514
 #else
-		40
+		BasePlayer::c_RECOVERY_FLAME
 #endif
 		, 1);	// 1031 無敵時間を12→40にした
 
@@ -3253,7 +3254,7 @@ void BasePlayerState::LandRecovery::Execute(BasePlayer * pPerson)
 
 void BasePlayerState::LandRecovery::Exit(BasePlayer * pPerson)
 {
-	pPerson->SetInvincible(0, 0);
+	//pPerson->SetInvincible(0, 0);
 }
 
 void BasePlayerState::LandRecovery::Render(BasePlayer * pPerson)
@@ -3264,6 +3265,12 @@ void BasePlayerState::LandRecovery::Render(BasePlayer * pPerson)
 bool BasePlayerState::LandRecovery::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
 	// メッセージタイプ
+	switch (msg.Msg)
+	{
+	case HIT_DAMAGE:
+		return true;
+		break;
+	}
 	return false;
 }
 
@@ -3343,7 +3350,13 @@ void BasePlayerState::AerialRecovery::Render(BasePlayer * pPerson)
 bool BasePlayerState::AerialRecovery::OnMessage(BasePlayer * pPerson, const Message & msg)
 {
 	// メッセージタイプ
-		return false;
+	switch (msg.Msg)
+	{
+	case HIT_DAMAGE:
+		return true;
+		break;
+	}
+	return false;
 }
 
 
@@ -4424,6 +4437,10 @@ bool BasePlayerState::InvincibleAttack::OnMessage(BasePlayer * pPerson, const Me
 											 // グローバルステートに行かないようにする！
 											 return true;
 										 }
+									 }
+									 else
+									 {
+										 if (pPerson->GetActionFrame() == FRAME_STATE::START || pPerson->GetActionFrame() == FRAME_STATE::ACTIVE) return true;
 									 }
 	}
 	}
