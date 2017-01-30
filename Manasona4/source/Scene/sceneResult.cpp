@@ -102,8 +102,8 @@ bool sceneResult::Initialize()
 		break;
 
 	case CHARACTER::ANIKI:
-		m_WinPlayer = new iex3DObj("DATA/CHR/Aramitama/aramitama_test.IEM");
-		m_ResultPerformance = new AramitamaResultPerformance();
+		m_WinPlayer = new iex3DObj("DATA/CHR/Aniki/result.IEM");
+		m_ResultPerformance = new AnikiResultPerformance();
 		break;
 
 	default:

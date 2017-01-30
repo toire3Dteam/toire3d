@@ -222,7 +222,7 @@ void sceneMenu::Update()
 		if (KeyBoard(KB_ENTER) == 2)
 		{
 			ResultData data;
-			data.eWinnerSide = SIDE::RIGHT;
+			data.eWinnerSide = SIDE::LEFT;
 			data.iMaxDamage = 2500;
 			data.iRemainingHP = 80;
 			data.iElapsedTime = 35;

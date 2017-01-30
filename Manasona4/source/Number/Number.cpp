@@ -112,7 +112,7 @@ void Number::Render()
 
 }
 
-void Number::Render(int x, int y, int num, NUM_KIND kind)
+void Number::Render(int x, int y, int num, NUM_KIND kind,RS lpRs)
 {
 	int number = num;
 
@@ -136,7 +136,7 @@ void Number::Render(int x, int y, int num, NUM_KIND kind)
 			int digitNum = number % 10;	// àÍî‘è¨Ç≥Ç¢åÖÇì¸éË
 			number = (int)(number / 10);// êîílÇÃàÍî‘è¨Ç≥Ç¢åÖÇè¡Ç∑
 
-			m_pic->Render(x - ((count * (m_picSize /2))*m_picScale), y, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize);// êîéöï`âÊ
+			m_pic->Render(x - ((count * (m_picSize /2))*m_picScale), y, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize, lpRs);// êîéöï`âÊ
 
 			if (number <= 0)break;// êîílÇ™ÇOà»â∫Ç…Ç»Ç¡ÇΩÇÁÇ≥ÇÊÇ»ÇÁ
 		}
@@ -147,7 +147,7 @@ void Number::Render(int x, int y, int num, NUM_KIND kind)
 			int digitNum = number % 10;	// àÍî‘è¨Ç≥Ç¢åÖÇì¸éË
 			number = (int)(number / 10);// êîílÇÃàÍî‘è¨Ç≥Ç¢åÖÇè¡Ç∑
 
-			m_pic->Render(x - ((count *32)*m_picScale), y, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize);// êîéöï`âÊ
+			m_pic->Render(x - ((count *32)*m_picScale), y, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize,lpRs);// êîéöï`âÊ
 
 			if (number <= 0)break;// êîílÇ™ÇOà»â∫Ç…Ç»Ç¡ÇΩÇÁÇ≥ÇÊÇ»ÇÁ
 		}
@@ -164,13 +164,13 @@ void Number::Render(int x, int y, int num, NUM_KIND kind)
 			int digitNum = number % 10;	// àÍî‘è¨Ç≥Ç¢åÖÇì¸éË
 			number = (int)(number / 10);// êîílÇÃàÍî‘è¨Ç≥Ç¢åÖÇè¡Ç∑
 
-			m_pic->Render(x - ((count * (int)(32* PiccScale))*m_picScale), y, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize);// êîéöï`âÊ
+			m_pic->Render(x - ((count * (int)(32* PiccScale))*m_picScale), y, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize, lpRs);// êîéöï`âÊ
 
 			if (number <= 0)break;// êîílÇ™ÇOà»â∫Ç…Ç»Ç¡ÇΩÇÁÇ≥ÇÊÇ»ÇÁ
 		}
 
-		m_pic->Render(x - ((++count * (34 * (int)PiccScale))*m_picScale)+8, y, m_picSize*m_picScale, m_picSize*m_picScale, 10 * m_picSize, 0, m_picSize, m_picSize);// êîéöï`âÊ
-		m_pic->Render(x - ((++count * (36 * (int)PiccScale))*m_picScale)+8, y, m_picSize*m_picScale, m_picSize*m_picScale, 11 * m_picSize, 0, m_picSize, m_picSize);// êîéöï`âÊ
+		m_pic->Render(x - ((++count * (34 * (int)PiccScale))*m_picScale)+8, y, m_picSize*m_picScale, m_picSize*m_picScale, 10 * m_picSize, 0, m_picSize, m_picSize, lpRs);// êîéöï`âÊ
+		m_pic->Render(x - ((++count * (36 * (int)PiccScale))*m_picScale)+8, y, m_picSize*m_picScale, m_picSize*m_picScale, 11 * m_picSize, 0, m_picSize, m_picSize, lpRs);// êîéöï`âÊ
 
 
 		break;
@@ -187,7 +187,7 @@ void Number::Render(int x, int y, int num, NUM_KIND kind)
 			int digitNum = number % 10;	// àÍî‘è¨Ç≥Ç¢åÖÇì¸éË
 			number = (int)(number / 10);// êîílÇÃàÍî‘è¨Ç≥Ç¢åÖÇè¡Ç∑
 
-			m_pic->Render(x - ((count * (int)(32 * PiccScale))*m_picScale), y, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize);// êîéöï`âÊ
+			m_pic->Render(x - ((count * (int)(32 * PiccScale))*m_picScale), y, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize, lpRs);// êîéöï`âÊ
 
 			if (number <= 0)break;// êîílÇ™ÇOà»â∫Ç…Ç»Ç¡ÇΩÇÁÇ≥ÇÊÇ»ÇÁ
 		}
@@ -205,7 +205,7 @@ void Number::Render(int x, int y, int num, NUM_KIND kind)
 			number = (int)(number / 10);// êîílÇÃàÍî‘è¨Ç≥Ç¢åÖÇè¡Ç∑
 
 			m_pic->SetAngle(0.3f);
-			m_pic->Render(x - ((count * (m_picSize / 2))*m_picScale), y + count*20, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize);// êîéöï`âÊ
+			m_pic->Render(x - ((count * (m_picSize / 2))*m_picScale), y + count*20, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize, lpRs);// êîéöï`âÊ
 
 			if (number <= 0)break;// êîílÇ™ÇOà»â∫Ç…Ç»Ç¡ÇΩÇÁÇ≥ÇÊÇ»ÇÁ
 		}
@@ -219,7 +219,7 @@ void Number::Render(int x, int y, int num, NUM_KIND kind)
 			int digitNum = number % 10;	// àÍî‘è¨Ç≥Ç¢åÖÇì¸éË
 			number = (int)(number / 10);// êîílÇÃàÍî‘è¨Ç≥Ç¢åÖÇè¡Ç∑
 
-			m_pic->Render(x - ((count * (int)(m_picSize / 1.5f))*m_picScale), y, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize);// êîéöï`âÊ
+			m_pic->Render(x - ((count * (int)(m_picSize / 1.5f))*m_picScale), y, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize, lpRs);// êîéöï`âÊ
 
 			if (number <= 0)break;// êîílÇ™ÇOà»â∫Ç…Ç»Ç¡ÇΩÇÁÇ≥ÇÊÇ»ÇÁ
 		}
@@ -229,19 +229,52 @@ void Number::Render(int x, int y, int num, NUM_KIND kind)
 		m_pic->SetAngle(0.0f);
 		int count = 0;
 
-		m_pic->Render(x + (((m_picSize / 2))*m_picScale)+4, y, m_picSize*m_picScale, m_picSize*m_picScale, (15 * m_picSize) , 0, m_picSize, m_picSize);// %
+		m_pic->Render(x + (((int)((float)m_picSize / 1.75f))*m_picScale)+4, y, m_picSize*m_picScale, m_picSize*m_picScale, (15 * m_picSize) , 0, m_picSize, m_picSize, lpRs);// %
 
 		for (;; ++count)
 		{
 			int digitNum = number % 10;	// àÍî‘è¨Ç≥Ç¢åÖÇì¸éË
 			number = (int)(number / 10);// êîílÇÃàÍî‘è¨Ç≥Ç¢åÖÇè¡Ç∑
 
-			m_pic->Render(x - ((count * (m_picSize / 2))*m_picScale), y, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize);// êîéöï`âÊ
+			m_pic->Render(x - ((count * (int)((float)m_picSize / 1.75f))*m_picScale), y, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize, lpRs);// êîéöï`âÊ
 
 			if (number <= 0)break;// êîílÇ™ÇOà»â∫Ç…Ç»Ç¡ÇΩÇÁÇ≥ÇÊÇ»ÇÁ
 		}
 
 	
+
+	}	break;
+	case Number::NUM_KIND::RESULT:
+		m_pic->SetAngle(0.0f);
+
+		for (int count = 0;; ++count)
+		{
+			int digitNum = number % 10;	// àÍî‘è¨Ç≥Ç¢åÖÇì¸éË
+			number = (int)(number / 10);// êîílÇÃàÍî‘è¨Ç≥Ç¢åÖÇè¡Ç∑
+
+			m_pic->Render(x - ((count * (int)((float)m_picSize / 1.75f))*m_picScale), y, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize, lpRs);// êîéöï`âÊ
+
+			if (number <= 0)break;// êîílÇ™ÇOà»â∫Ç…Ç»Ç¡ÇΩÇÁÇ≥ÇÊÇ»ÇÁ
+		}
+		break;
+	case Number::NUM_KIND::SECOND:
+	{
+		m_pic->SetAngle(0.0f);
+		int count = 0;
+
+		m_pic->Render(x + ((((int)((float)m_picSize / 1.75f)))*m_picScale) + 4, y, m_picSize*m_picScale, m_picSize*m_picScale, (14 * m_picSize), 0, m_picSize, m_picSize, lpRs);// ïb
+
+		for (;; ++count)
+		{
+			int digitNum = number % 10;	// àÍî‘è¨Ç≥Ç¢åÖÇì¸éË
+			number = (int)(number / 10);// êîílÇÃàÍî‘è¨Ç≥Ç¢åÖÇè¡Ç∑
+
+			m_pic->Render(x - ((count * (int)((float)m_picSize / 1.75f))*m_picScale), y, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize, lpRs);// êîéöï`âÊ
+
+			if (number <= 0)break;// êîílÇ™ÇOà»â∫Ç…Ç»Ç¡ÇΩÇÁÇ≥ÇÊÇ»ÇÁ
+		}
+
+
 
 	}	break;
 	default:

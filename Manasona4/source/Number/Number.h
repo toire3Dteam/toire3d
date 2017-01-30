@@ -21,7 +21,7 @@ public:
 	// 数字の色のタイプ
 	enum class NUM_KIND
 	{
-		NORMAL, HEAL, COMBO, TIMER, BIG, DAMAGE_SCORE,PARSENT
+		NORMAL, HEAL, COMBO, TIMER, BIG, DAMAGE_SCORE,PARSENT,RESULT,SECOND,
 	};
 
 	// 実体
@@ -37,7 +37,7 @@ public:
 	// 更新・描画
 	void Update();
 	void Render();
-	void Render(int x, int y, int num, NUM_KIND kind = NUM_KIND::NORMAL);
+	void Render(int x, int y, int num, NUM_KIND kind = NUM_KIND::NORMAL, RS lpRs = RS::COPY);
 
 	// アクション
 	void Action(int derayTime = 0);

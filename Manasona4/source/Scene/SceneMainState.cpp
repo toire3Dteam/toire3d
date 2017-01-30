@@ -1597,6 +1597,10 @@ void SceneMainState::ChallengeReplay::Execute(sceneMain *pMain)
 				return;
 			}
 		}
+		
+		// リプレイ更新
+		CommandMgr->Update(SIDE::LEFT);
+
 
 		// コマンドの再生が終わったら戻る
 		if (CommandMgr->isEnd())

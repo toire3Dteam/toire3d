@@ -244,5 +244,58 @@ private:
 
 };
 
-//tdn2DobjwoAnimnisuru 
-//SpaeadとかいみわからんｍにゃちうのなんまえをScareとかにもこのさいｓかえる
+
+//+-------------------------------
+//	兄貴の演出
+//+-------------------------------
+class AnikiResultPerformance : public BaseResultPerformance
+{
+public:
+	AnikiResultPerformance();
+	~AnikiResultPerformance();
+
+	void Update();
+	void BackRender();
+	void FrontRender();
+	void Action();
+
+private:
+	// 必要なやつ
+	Pic m_winner;
+	Pic m_winnerDon;
+	Pic m_edge;
+	Pic m_back;
+	Pic m_cloud;
+
+	Pic m_font;
+	int m_iFontAnimFrame;
+	//Pic m_fontKill;
+
+	Pic m_petal;
+	Pic m_pFlontRing;
+	Pic m_pBackRing;
+
+	Pic m_blackInk;
+	Pic m_whiteSoul;
+
+	Pic m_pRose;// 
+
+	static const int NORT_MAX = 3;
+	Pic m_pNort[NORT_MAX];
+
+	static const int STAR_MAX = 4;
+	Pic m_pStar[STAR_MAX];
+
+	static const int HART_MAX = 4;
+	Pic m_pHart[HART_MAX];
+
+	// 
+	//Pic m_pNort2; // 
+	//Pic m_pNort3; // 
+
+
+	// バックムービー
+	tdnMovie*  m_movieMgr;
+	tdn2DObj* m_movieTex;
+
+};

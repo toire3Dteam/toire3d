@@ -37,11 +37,13 @@ private:
 	// 得点
 	struct SCORE
 	{
-		tdn2DAnim* pFont;	// フォントのイラスト
-		Number* pNumber;	// 数値表示のイラスト
-		int x, y;			// 場所
-		int iAddNumX;		// 数字の場所
-		int iPoint;			// 表示する得点
+		tdn2DAnim* pFont;		// フォントのイラスト
+		Number* pNumber;		// 数値表示のイラスト
+		Number* pFlashNumber;	// 点滅用数値表示のイラスト
+		int x, y;				// 場所
+		int iAddNumX, iAddNumY;	// 数字の場所
+		int iPoint;				// 表示する得点
+		CloudEffect* pEffect;	// 出現エフェクト
 	};
 	SCORE m_tagScore[SCORE_TYPE::ARRAY_END];
 

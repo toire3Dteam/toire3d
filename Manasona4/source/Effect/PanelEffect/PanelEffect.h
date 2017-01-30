@@ -680,3 +680,20 @@ public:
 
 private:
 };
+
+class CloudEffect :public BasePanelEffect
+{
+public:
+	CloudEffect()
+	{
+		m_picSize = 256;
+		m_pic = new AnimationPanel("Data/Effect/CloudEffect.png", 256, 256, 15, 1, 4, false);
+	};
+	~CloudEffect() {};
+
+	void Update() { BasePanelEffect::Update(); };
+	void Render() { BasePanelEffect::Render(); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
+
+private:
+};

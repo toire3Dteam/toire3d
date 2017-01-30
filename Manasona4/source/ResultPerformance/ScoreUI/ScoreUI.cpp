@@ -1,6 +1,8 @@
 #include "ScoreUI.h"
 #include "Data\SelectData.h"
 #include "Data\PlayerData.h"
+#include "Effect\PanelEffect\PanelEffect.h"
+
 //+--------------------------
 //	スコア表示UI
 //+--------------------------
@@ -11,33 +13,62 @@ ScoreUI::ScoreUI(ResultData data)
 	// スコア初期化
 	for (int i = 0; i < SCORE_TYPE::ARRAY_END; i++)
 	{
-		// 場所
-		m_tagScore[i].x = 50;
-		m_tagScore[i].y = (i * 128) + 96;
-		m_tagScore[i].iAddNumX = 448;
 
 		// スコアを入れる
 		switch ((SCORE_TYPE)i)
 		{
 		case ScoreUI::DAMAGE:
+			// 場所
+			m_tagScore[i].x = 150;
+			m_tagScore[i].iAddNumX = 396;
+			m_tagScore[i].iAddNumY = 100;
+			m_tagScore[i].y = 24;
+
 			m_tagScore[i].iPoint = data.iMaxDamage;
+			m_tagScore[i].pFont = new tdn2DAnim("Data/Result/MaxDamage.png");
+			//m_tagScore[i].pFont->OrderMoveAppeared(14, 1280, 24);
+		
 			break;
 		case ScoreUI::HP:
+			// 場所
+			m_tagScore[i].x = 25;
+			m_tagScore[i].iAddNumX = 198;
+			m_tagScore[i].iAddNumY = 100;
+			m_tagScore[i].y = 230;
+
 			m_tagScore[i].iPoint = data.iRemainingHP;
+			m_tagScore[i].pFont = new tdn2DAnim("Data/Result/Life.png");
+			//m_tagScore[i].pFont->OrderMoveAppeared(14, 1280, 230);
+		
 			break;
 		case ScoreUI::TIME:
+			// 場所
+			m_tagScore[i].x = 300;
+			m_tagScore[i].iAddNumX = 256;
+			m_tagScore[i].iAddNumY = 100;
+			m_tagScore[i].y = 420;
+
 			m_tagScore[i].iPoint = data.iElapsedTime;
+			m_tagScore[i].pFont = new tdn2DAnim("Data/Result/Time.png");
+			//m_tagScore[i].pFont->OrderMoveAppeared(14, 1280, 420);
+		
 			break;
 		default:
 			break;
 		}
+		m_tagScore[i].pFont->OrderShrink(12, 1, 2.5f);
 
 
-		m_tagScore[i].pFont = new tdn2DAnim("Data/Result/Font.png");
-		m_tagScore[i].pFont->OrderMoveAppeared(14, 1280, m_tagScore[i].y);
+		m_tagScore[i].pEffect = new CloudEffect();
+		m_tagScore[i].pEffect->GetPanel()->GetPic()->SetScale(3.0f);
 
-		m_tagScore[i].pNumber = new Number(); // (TODO)後で引数でデザインの合う数字に
-		m_tagScore[i].pNumber->GetAnim()->OrderMoveAppeared(14, 1280+ m_tagScore[i].iAddNumX, m_tagScore[i].y);
+		m_tagScore[i].pNumber = new Number("Data/Number/Number5.png", 64, Number::NUM_KIND::RESULT); 
+		//m_tagScore[i].pNumber->GetAnim()->OrderMoveAppeared(14, 1280+ m_tagScore[i].iAddNumX, m_tagScore[i].y);
+		m_tagScore[i].pNumber->GetAnim()->OrderShrink(12, 1, 2.5f);
+		
+		m_tagScore[i].pFlashNumber = new Number("Data/Number/Number6.png", 64, Number::NUM_KIND::RESULT);
+		m_tagScore[i].pFlashNumber->GetAnim()->OrderAlphaMove(90, 44, 45);
+
 
 		switch ((SCORE_TYPE)i)
 		{
@@ -109,6 +140,8 @@ ScoreUI::~ScoreUI()
 	{
 		SAFE_DELETE(m_tagScore[i].pFont);
 		SAFE_DELETE(m_tagScore[i].pNumber);
+		SAFE_DELETE(m_tagScore[i].pFlashNumber);
+		SAFE_DELETE(m_tagScore[i].pEffect);
 	}
 
 	// ランク解放
@@ -138,6 +171,13 @@ void ScoreUI::Update()
 	{
 		m_tagScore[i].pFont->Update();
 		m_tagScore[i].pNumber->Update();
+
+		if (m_tagScore[i].pFlashNumber->GetAnim()->GetAction()->IsEnd() == true)
+		{
+			m_tagScore[i].pFlashNumber->GetAnim()->Action();
+		}
+		m_tagScore[i].pFlashNumber->Update();
+		m_tagScore[i].pEffect->Update();
 	}
 
 	// ランク更新
@@ -153,18 +193,41 @@ void ScoreUI::Render()
 	// スコア描画
 	for (int i = 0; i < SCORE_TYPE::ARRAY_END; i++)
 	{
-		m_tagScore[i].pFont->Render(m_tagScore[i].x , m_tagScore[i].y, 512, 64, 0, 64 * (SCORE_TYPE)i, 512, 64);
+		m_tagScore[i].pFont->Render(m_tagScore[i].x , m_tagScore[i].y);
 		
+
+		// エフェクト
+		m_tagScore[i].pEffect->Render();
+
 		if (i== SCORE_TYPE::HP)
 		{
 			// %あり
-			m_tagScore[i].pNumber->Render(m_tagScore[i].x + m_tagScore[i].iAddNumX, m_tagScore[i].y, m_tagScore[i].iPoint,Number::NUM_KIND::PARSENT);
+			m_tagScore[i].pNumber->Render(m_tagScore[i].x + m_tagScore[i].iAddNumX,
+				m_tagScore[i].y + m_tagScore[i].iAddNumY, m_tagScore[i].iPoint,Number::NUM_KIND::PARSENT);
+
+			m_tagScore[i].pFlashNumber->Render(m_tagScore[i].x + m_tagScore[i].iAddNumX,
+				m_tagScore[i].y + m_tagScore[i].iAddNumY, m_tagScore[i].iPoint, Number::NUM_KIND::PARSENT, RS::ADD);
+
+		}
+		else if (i == SCORE_TYPE::TIME)
+		{
+			// 秒あり
+			m_tagScore[i].pNumber->Render(m_tagScore[i].x + m_tagScore[i].iAddNumX,
+				m_tagScore[i].y + m_tagScore[i].iAddNumY, m_tagScore[i].iPoint, Number::NUM_KIND::SECOND);
+
+			m_tagScore[i].pFlashNumber->Render(m_tagScore[i].x + m_tagScore[i].iAddNumX,
+				m_tagScore[i].y + m_tagScore[i].iAddNumY, m_tagScore[i].iPoint, Number::NUM_KIND::SECOND, RS::ADD);
 		}
 		else
 		{
-			m_tagScore[i].pNumber->Render(m_tagScore[i].x + m_tagScore[i].iAddNumX, m_tagScore[i].y, m_tagScore[i].iPoint);
+			m_tagScore[i].pNumber->Render(m_tagScore[i].x + m_tagScore[i].iAddNumX, 
+				m_tagScore[i].y+ m_tagScore[i].iAddNumY, m_tagScore[i].iPoint, Number::NUM_KIND::RESULT);
 
+			m_tagScore[i].pFlashNumber->Render(m_tagScore[i].x + m_tagScore[i].iAddNumX,
+				m_tagScore[i].y + m_tagScore[i].iAddNumY, m_tagScore[i].iPoint, Number::NUM_KIND::RESULT, RS::ADD);
 		}
+
+		
 	}
 
 	// ランク描画
@@ -178,8 +241,12 @@ void ScoreUI::Action()
 	// スコア演出開始
 	for (int i = 0; i < SCORE_TYPE::ARRAY_END; i++)
 	{
-		m_tagScore[i].pFont->Action((i * 8));
-		m_tagScore[i].pNumber->GetAnim()->Action((i * 8));
+		m_tagScore[i].pFont->Action((i * 10));
+		m_tagScore[i].pNumber->GetAnim()->Action((i * 10));
+		m_tagScore[i].pEffect->Action(m_tagScore[i].x + 156, m_tagScore[i].y + 128, i * 10);
+
+		// 共通
+		m_tagScore[i].pFlashNumber->GetAnim()->Action(40);
 	}
 
 	// ランク演出開始
