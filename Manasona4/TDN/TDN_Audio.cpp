@@ -1421,7 +1421,7 @@ int tdnSoundSE::Play(int ID, bool loop)
 		// 再生してないからいつでも514状態の人を検索
 		if (!data[ID][play_no]->buffer->isPlay())
 		{	// 見つかった！
-			data[ID][play_no]->buffer->SetVolume((int)(m_fBaseVolume * 10000) - 10000);// ★基本ボリュームを設定
+			//data[ID][play_no]->buffer->SetVolume((int)(m_fBaseVolume * 10000) - 10000);// ★基本ボリュームを設定
 			data[ID][play_no]->buffer->Play(loop);
 			return play_no;
 		}
@@ -1509,11 +1509,15 @@ void tdnSoundSE::SetVolume(int ID, int volume)
 }
 void tdnSoundSE::SetVolume(int ID, float volume)
 {
-	SetVolume(ID, (int)(-7500 * volume));
+	SetVolume(ID, (int)(-5000 * (1-volume)));
 }
 void tdnSoundSE::SetBaseVolume(float fVolume)
 {
-	FOR(WavNum) SetVolume(i, fVolume);
+	FOR(WavNum)
+	{
+		if (data[i].empty()) continue;
+		SetVolume(i, fVolume);
+	}
 }
 int	tdnSoundSE::GetVolume(int ID)
 {

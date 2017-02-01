@@ -243,6 +243,8 @@ public:
 	//	ˆ		—
 	//===============================================
 	void Play(VOICE_TYPE eType, CHARACTER eCharacter);
+	void SetBaseVolume(float volume) { m_pPlayManager->SetBaseVolume(volume); }
+	bool isPlay(VOICE_TYPE eType, CHARACTER eCharacter, int no=0);
 };
 
 

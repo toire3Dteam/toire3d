@@ -1,6 +1,7 @@
 #include "SoundWindow.h"
 #include "Data\PlayerData.h"
 #include "Data\SelectData.h"
+#include "../Sound/SoundManager.h"
 
 //+------------------------
 //  サウンドウィンドウ
@@ -220,6 +221,11 @@ bool  SoundWindow::Ctrl(int DeviceID)
 				PlayerDataMgr->m_ConfigData.iBGMVolume = 75;
 				PlayerDataMgr->m_ConfigData.iSEVolume= 75;
 				PlayerDataMgr->m_ConfigData.iVoiceVolume= 75;
+
+				// それぞれ設定
+				se->SetBaseVolume(0.75f);
+				bgm->SetBaseVolume(0.75f);
+				voice->SetBaseVolume(0.75f);
 			}
 
 			return true;

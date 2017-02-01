@@ -46,6 +46,9 @@ darashine.wav
 [[キャラ固有3]]
 shikatanai.wav
 
+[[キャラ固有4]]
+darashine.wav
+
 [[キャラ固有地上しゃがみ]]
 an.wav
 

@@ -156,6 +156,7 @@ enum class BASE_ACTION_STATE
 	SKILL,				// 地上キャラクター固有技
 	SKILL2,				// 地上キャラクター固有技2
 	SKILL3,				// 地上キャラクター固有技3
+	SKILL4,				// 地上キャラクター固有技3
 	SKILL_SQUAT,		// しゃがみキャラクター固有技
 	SKILL_AERIAL,		// 空中下キャラクター固有技
 	SKILL_AERIALDROP,	// 空中下キャラクター固有技
@@ -179,6 +180,7 @@ enum class SKILL_ACTION_TYPE
 	// 追加はここに。ここ以前に書くとスタンドがおかしくなる
 	LAND2,
 	LAND3,
+	LAND4,
 	AERIAL2,
 	MAX
 };
@@ -215,6 +217,7 @@ enum class MOTION_TYPE
 	SKILL_AERIALDROP,		// キャラ固有空中下
 	SKILL2,					// スキル枠2
 	SKILL3,					// スキル枠3
+	SKILL4,					// スキル枠4
 	HEAVEHO_DRIVE,			// DD
 	HEAVEHO_DRIVE2,			// DD2
 	BURST,					// バースト

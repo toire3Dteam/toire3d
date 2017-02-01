@@ -154,7 +154,7 @@ void SoundManager::SetBaseVolume(int BGMVol, int SEVol, int VoiceVol)
 	// 基本ボリューム設定
 	bgm->SetBaseVolume(BGMVol * .01f);
 	se->SetBaseVolume(SEVol * .01f);
-	// (TODO) ボイス
+	voice->SetBaseVolume(VoiceVol * .01f);
 }
 
 
@@ -474,6 +474,7 @@ void VOICE_Manager::Load(CHARACTER eCharacter)
 		{ "[[キャラ固有地上ニュートラル]]", VOICE_TYPE::SKILL_LAND },
 		{ "[[キャラ固有2]]",				VOICE_TYPE::SKILL2 },
 		{ "[[キャラ固有3]]",				VOICE_TYPE::SKILL3 },
+		{ "[[キャラ固有4]]",				VOICE_TYPE::SKILL4 },
 		{ "[[キャラ固有地上しゃがみ]]",		VOICE_TYPE::SKILL_SQUAT },
 		{ "[[キャラ固有空中ニュートラル]]", VOICE_TYPE::SKILL_AERIAL },
 		{ "[[キャラ固有空中下]]",			VOICE_TYPE::SKILL_AERIALDROP },
@@ -551,6 +552,13 @@ void VOICE_Manager::Play(VOICE_TYPE eType, CHARACTER eCharacter)
 
 	// 再生
 	PlayIn(m_mID[(int)eCharacter][eType]);
+}
+bool VOICE_Manager::isPlay(VOICE_TYPE eType, CHARACTER eCharacter, int no)
+{
+	// ロードされていなければ抜ける
+	if (m_mID[(int)eCharacter].count(eType) == 0) return false;
+
+	return m_pPlayManager->isPlay(m_mID[(int)eCharacter][eType], no);
 }
 //
 //=============================================================================================

@@ -1,5 +1,6 @@
 #include "VoiceParamSetting.h"
 #include "Data\PlayerData.h"
+#include "../../Sound/SoundManager.h"
 
 //+----------------------------
 //	Voiceのパラメーター設定
@@ -88,6 +89,16 @@ void VoiceParamSetting::Ctrl(int DeviceID)
 		PlayerDataMgr->m_ConfigData.iVoiceVolume++;
 	}
 
+	if (m_bRightPush || m_bLeftPush)
+	{
+		// 100を超えたら0へ 0より下げたら100へ
+		if (PlayerDataMgr->m_ConfigData.iVoiceVolume > 100)PlayerDataMgr->m_ConfigData.iVoiceVolume = 0;
+		if (PlayerDataMgr->m_ConfigData.iVoiceVolume < 0)PlayerDataMgr->m_ConfigData.iVoiceVolume = 100;
+
+		// 音量設定
+		voice->SetBaseVolume(PlayerDataMgr->m_ConfigData.iVoiceVolume * 0.01f);
+	}
+
 	// ★100または0まで来たら一度完全に止めて、もう一度押し込むまでパラメータを変更できない
 	if (PlayerDataMgr->m_ConfigData.iVoiceVolume == 100||
 		PlayerDataMgr->m_ConfigData.iVoiceVolume == 0)
@@ -100,7 +111,6 @@ void VoiceParamSetting::Ctrl(int DeviceID)
 	// 0~100の間に止める
 	//PlayerDataMgr->m_ConfigData.iVoiceVolume = min(100, max(0, PlayerDataMgr->m_ConfigData.iVoiceVolume));
 
-	// 100を超えたら0へ 0より下げたら100へ
-	if (PlayerDataMgr->m_ConfigData.iVoiceVolume > 100)PlayerDataMgr->m_ConfigData.iVoiceVolume = 0;
-	if (PlayerDataMgr->m_ConfigData.iVoiceVolume < 0)PlayerDataMgr->m_ConfigData.iVoiceVolume = 100;
+	// テストあんかけチャーハン
+	if (!voice->isPlay(VOICE_TYPE::DOWN_ATTACK, CHARACTER::ANIKI)) voice->Play(VOICE_TYPE::DOWN_ATTACK, CHARACTER::ANIKI);
 }

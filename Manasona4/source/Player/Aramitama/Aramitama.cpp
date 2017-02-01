@@ -660,6 +660,7 @@ void Aramitama::InitActionDatas()
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::LAND] = new SkillAction::Land(this);
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::LAND2] = nullptr;
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::LAND3] = nullptr;
+	m_pSkillActions[(int)SKILL_ACTION_TYPE::LAND4] = nullptr;
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::SQUAT] = new SkillAction::Squat(this);
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::AERIAL] = new SkillAction::Aerial(this);
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::AERIAL2] = nullptr;

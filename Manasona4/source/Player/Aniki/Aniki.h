@@ -105,9 +105,6 @@ public:
 			void Enter();
 			bool Execute();
 			void Exit();
-		private:
-			int m_iHitFrame;
-			bool m_bKetudoramed;
 		};
 
 		// 対空掴んだ後
@@ -118,9 +115,16 @@ public:
 			void Enter();
 			bool Execute();
 			void Exit();
-		private:
-			int m_iHitFrame;
-			bool m_bKetudoramed;
+		};
+
+		// 〆ケツドラム
+		class Land4 :public Base
+		{
+		public:
+			Land4(Aniki *pAniki);
+			void Enter();
+			bool Execute();
+			void Exit();
 		};
 
 		class Aerial :public Base
@@ -180,7 +184,9 @@ public:
 		};
 	};
 
-	HeaveHoAction::Base *m_pHeaveHoActions[2];
+	enum class HEAVEHO_TYPE { STRIKE, THROW, MAX }m_eHeaveHoType;
+
+	HeaveHoAction::Base *m_pHeaveHoActions[(int)HEAVEHO_TYPE::MAX];
 
 	/****************************/
 	//	ヒーホードライブ

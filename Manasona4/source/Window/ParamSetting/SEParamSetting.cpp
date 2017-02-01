@@ -89,6 +89,16 @@ void SEParamSetting::Ctrl(int DeviceID)
 		PlayerDataMgr->m_ConfigData.iSEVolume++;
 	}
 
+	if (m_bRightPush || m_bLeftPush)
+	{
+		// 100を超えたら0へ 0より下げたら100へ
+		if (PlayerDataMgr->m_ConfigData.iSEVolume > 100)PlayerDataMgr->m_ConfigData.iSEVolume = 0;
+		if (PlayerDataMgr->m_ConfigData.iSEVolume < 0)PlayerDataMgr->m_ConfigData.iSEVolume = 100;
+
+		// 設定
+		se->SetBaseVolume(PlayerDataMgr->m_ConfigData.iSEVolume * 0.01f);
+	}
+
 	// ★100または0まで来たら一度完全に止めて、もう一度押し込むまでパラメータを変更できない
 	if (PlayerDataMgr->m_ConfigData.iSEVolume == 100||
 		PlayerDataMgr->m_ConfigData.iSEVolume == 0)
@@ -100,8 +110,4 @@ void SEParamSetting::Ctrl(int DeviceID)
 
 	// 0~100の間に止める
 	//PlayerDataMgr->m_ConfigData.iSEVolume = min(100, max(0, PlayerDataMgr->m_ConfigData.iSEVolume));
-
-	// 100を超えたら0へ 0より下げたら100へ
-	if (PlayerDataMgr->m_ConfigData.iSEVolume > 100)PlayerDataMgr->m_ConfigData.iSEVolume = 0;
-	if (PlayerDataMgr->m_ConfigData.iSEVolume < 0)PlayerDataMgr->m_ConfigData.iSEVolume = 100;
 }
