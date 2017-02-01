@@ -21,13 +21,13 @@ char tdnFile::strFile[256] = "";		// ダイアログとかでのパス
 //		ファイル関係で便利になりそうなのをまとめるクラス
 //*****************************************************
 
-int tdnFile::CreateFolder(char *path)
+int tdnFile::CreateFolder(LPCSTR path)
 {
 	// ディレクトリ作成&結果を返す(-1なら失敗、0なら成功)
 	return _mkdir(path);
 }
 
-void tdnFile::EnumDirectory(char *path, DirectoryInfo *out, bool bExt)
+void tdnFile::EnumDirectory(LPCSTR path, DirectoryInfo *out, bool bExt)
 {
 	sys::path p(path); // 列挙の起点
 
@@ -65,7 +65,7 @@ void tdnFile::EnumDirectory(char *path, DirectoryInfo *out, bool bExt)
 	}
 }
 
-std::string tdnFile::GetFileExtention(char *path)
+std::string tdnFile::GetFileExtention(LPCSTR path)
 {
 	sys::path p(path);
 
@@ -77,7 +77,7 @@ std::string tdnFile::GetFileExtention(char *path)
 #endif
 }
 
-std::string tdnFile::GetFileName(char *path, bool bExt)
+std::string tdnFile::GetFileName(LPCSTR path, bool bExt)
 {
 	sys::path p(path);
 
@@ -89,7 +89,7 @@ std::string tdnFile::GetFileName(char *path, bool bExt)
 #endif
 }
 
-std::string tdnFile::GetDirectoryPath(char *path)
+std::string tdnFile::GetDirectoryPath(LPCSTR path)
 {
 	sys::path p(path);
 	std::string ret;
@@ -115,7 +115,7 @@ std::string tdnFile::GetDirectoryPath(char *path)
 	return ret;
 }
 
-std::string tdnFile::OpenFileDialog(char *filter)
+std::string tdnFile::OpenFileDialog(LPCSTR filter)
 {
 	LPCTSTR str_filter = TEXT(filter);
 
@@ -156,7 +156,7 @@ std::string tdnFile::OpenFileDialog(char *filter)
 	return std::string("");
 }
 
-std::string tdnFile::SaveFileDialog(char *filter)
+std::string tdnFile::SaveFileDialog(LPCSTR filter)
 {
 	LPCTSTR str_filter = TEXT(filter);
 

@@ -43,7 +43,13 @@ Aniki::Aniki(SIDE side, const SideData &data) :BasePlayer(side, data), m_pKetsud
 	// フレーム読み込み
 	BasePlayer::LoadAttackFrameList("DATA/CHR/Aniki/FrameList.txt");
 	// ★フレーム独自改造
-	//{}
+	{
+		// 地上投げの後のケツドラム〆
+		m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL2][125] = FRAME_STATE::RECOVERY_HIT;
+
+		// 対空投げの後のケツドラム〆
+		m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL3][125] = FRAME_STATE::RECOVERY_HIT;
+	}
 	// 兄貴メッシュ
 	m_pObj = m_pDefaultObj;
 
@@ -436,10 +442,10 @@ void Aniki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(.1f, .0f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.15f, .325f);
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 3;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 4;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 20;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 20;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 0;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 0;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 200;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 200;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	// 判定形状
@@ -472,8 +478,8 @@ void Aniki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(-.1f, -.5f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 8;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 5;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 40;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 40;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 200;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 200;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 
@@ -502,10 +508,10 @@ void Aniki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL3].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL3].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(-.1f, .0f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL3].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(-.05f, .325f);
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL3].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 3;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL3].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 4;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL3].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 20;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL3].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 20;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL3].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 0;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL3].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 0;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL3].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 200;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL3].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 200;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL3].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL3].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	// 判定形状
@@ -871,6 +877,9 @@ void Aniki::ThirdRushInit()
 {
 	// 足払い
 	DownAttackInit();
+
+	// 攻撃ボイスを再生する
+	voice->Play(VOICE_TYPE::DOWN_ATTACK, CHARACTER::ANIKI);
 }
 
 void Aniki::ThirdRushUpdate()
@@ -937,6 +946,8 @@ Aniki::SkillAction::Base::Base(Aniki *pAniki, BASE_ACTION_STATE state) :m_pAniki
 
 		m_OrgDamage = pAniki->m_ActionDatas[(int)state].pAttackData->damage;
 		m_fOrgComboRate = pAniki->m_ActionDatas[(int)state].pAttackData->fComboRate;
+		m_lpcOrgHitSE = pAniki->m_ActionDatas[(int)state].pAttackData->HitSE;
+		m_iOrgRecoveryFrame = pAniki->m_ActionDatas[(int)state].pAttackData->places[1].HitRecoveryFrame;
 		m_OrgFlyVector[(int)AttackData::HIT_PLACE::LAND] = pAniki->m_ActionDatas[(int)state].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector;
 		m_OrgFlyVector[(int)AttackData::HIT_PLACE::AERIAL] = pAniki->m_ActionDatas[(int)state].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector;
 	}
@@ -952,6 +963,9 @@ void Aniki::SkillAction::Land::Enter()
 
 	// アクションステート変更
 	m_pAniki->SetActionState(BASE_ACTION_STATE::SKILL);
+
+	// スキルボイスを再生する
+	voice->Play(VOICE_TYPE::SKILL_LAND, CHARACTER::ANIKI);
 
 	// 向き設定
 	m_pAniki->SetDirAngle();
@@ -994,6 +1008,9 @@ void Aniki::SkillAction::Land2::Enter()
 	// アクションステート変更
 	m_pAniki->SetActionState(BASE_ACTION_STATE::SKILL2);
 
+	// スキルボイスを再生する
+	voice->Play(VOICE_TYPE::SKILL2, CHARACTER::ANIKI);
+
 	// 向き変更
 	m_pAniki->SetDirAngle();
 
@@ -1001,6 +1018,17 @@ void Aniki::SkillAction::Land2::Enter()
 	const int l_ciHitStopFrame(m_pAniki->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame);
 	m_pAniki->SetHitStopFrame(l_ciHitStopFrame);
 	m_pAniki->GetTargetPlayer()->SetHitStopFrame(l_ciHitStopFrame);
+
+	m_iHitFrame = 0;
+	m_bKetudoramed = false;
+
+	// オーバードライブ不可
+	m_pAniki->SetNotOverDrive(true);
+
+	// 元の攻撃データ
+	m_pAniki->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->damage = m_OrgDamage;
+	m_pAniki->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->HitSE = m_lpcOrgHitSE;
+	m_pAniki->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->places[1].HitRecoveryFrame = m_iOrgRecoveryFrame;
 }
 
 bool Aniki::SkillAction::Land2::Execute()
@@ -1010,6 +1038,28 @@ bool Aniki::SkillAction::Land2::Execute()
 	{
 		return true;
 	}
+
+	// ケツドラムフラグ中
+	if (m_bKetudoramed)
+	{
+		// ★★★強制起き上がらせ
+		if (++m_iHitFrame == 8) m_pAniki->GetTargetPlayer()->GetFSM()->ChangeState(BasePlayerState::LandRecovery::GetInstance());
+	}
+
+	// ケツドラム〆
+	if (m_pAniki->GetActionFrame() == FRAME_STATE::RECOVERY_HIT)
+	{
+		// ケツドラム〆のデータ
+		m_pAniki->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->damage = 200;
+		m_pAniki->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->HitSE = "ケツドラム1";
+		m_pAniki->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->places[1].HitRecoveryFrame = 20;
+		// ケツドラムフラグ
+		m_bKetudoramed = true;
+
+		// オーバードライブ可能
+		m_pAniki->SetNotOverDrive(false);
+	}
+
 	return false;
 }
 
@@ -1017,6 +1067,9 @@ void Aniki::SkillAction::Land2::Exit()
 {
 	// 先行入力リセット
 	m_pAniki->AheadCommandReset();
+
+	// オーバードライブ可能
+	m_pAniki->SetNotOverDrive(false);
 }
 
 
@@ -1030,6 +1083,9 @@ void Aniki::SkillAction::Squat::Enter()
 
 	// モーションセット
 	m_pAniki->SetMotion(MOTION_TYPE::SKILL_SQUAT);
+
+	// スキルボイスを再生する
+	voice->Play(VOICE_TYPE::SKILL_SQUAT, CHARACTER::ANIKI);
 
 	// 走るエフェクト
 	m_pAniki->AddEffectAction(m_pAniki->GetPos(), EFFECT_TYPE::RUN);
@@ -1067,13 +1123,27 @@ void Aniki::SkillAction::Land3::Enter()
 	// アクションステート変更
 	m_pAniki->SetActionState(BASE_ACTION_STATE::SKILL3);
 
+	// スキルボイスを再生する
+	voice->Play(VOICE_TYPE::SKILL3, CHARACTER::ANIKI);
+
 	// 向き変更
 	m_pAniki->SetDirAngle();
+
+	m_iHitFrame = 0;
+	m_bKetudoramed = false;
 
 	// 分かりやすいようにお互いヒットストップをかける
 	const int l_ciHitStopFrame(m_pAniki->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame);
 	m_pAniki->SetHitStopFrame(l_ciHitStopFrame);
 	m_pAniki->GetTargetPlayer()->SetHitStopFrame(l_ciHitStopFrame);
+
+	// 元の攻撃データ
+	m_pAniki->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL3].pAttackData->damage = m_OrgDamage;
+	m_pAniki->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL3].pAttackData->HitSE = m_lpcOrgHitSE;
+	m_pAniki->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL3].pAttackData->places[1].HitRecoveryFrame = m_iOrgRecoveryFrame;
+
+	// オーバードライブ不可
+	m_pAniki->SetNotOverDrive(true);
 }
 
 bool Aniki::SkillAction::Land3::Execute()
@@ -1082,6 +1152,28 @@ bool Aniki::SkillAction::Land3::Execute()
 	if (!m_pAniki->isAttackState())
 	{
 		return true;
+	}
+
+	// ケツドラムフラグ中
+	if (m_bKetudoramed)
+	{
+		// ★★★強制起き上がらせ
+		if (++m_iHitFrame == 8) m_pAniki->GetTargetPlayer()->GetFSM()->ChangeState(BasePlayerState::LandRecovery::GetInstance());
+	}
+
+	// ケツドラム〆
+	if (m_pAniki->GetActionFrame() == FRAME_STATE::RECOVERY_HIT)
+	{
+		// ケツドラム〆のデータ
+		m_pAniki->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL3].pAttackData->damage = 200;
+		m_pAniki->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL3].pAttackData->HitSE = "ケツドラム1";
+		m_pAniki->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL3].pAttackData->places[1].HitRecoveryFrame = 20;
+
+		// ケツドラムフラグ
+		m_bKetudoramed = true;
+
+		// オーバードライブ可能
+		m_pAniki->SetNotOverDrive(false);
 	}
 
 	// ボーン追従
@@ -1098,6 +1190,9 @@ void Aniki::SkillAction::Land3::Exit()
 {
 	// 先行入力リセット
 	m_pAniki->AheadCommandReset();
+
+	// オーバードライブ可能
+	m_pAniki->SetNotOverDrive(false);
 }
 
 
@@ -1111,6 +1206,9 @@ void Aniki::SkillAction::Aerial::Enter()
 
 	// アクションステート変更
 	m_pAniki->SetActionState(BASE_ACTION_STATE::SKILL_AERIAL);
+
+	// スキルボイスを再生する
+	voice->Play(VOICE_TYPE::SKILL_AERIAL, CHARACTER::ANIKI);
 
 	// フレーム初期化
 	m_ActiveFrame = 0;
@@ -1150,6 +1248,9 @@ void Aniki::SkillAction::AerialDrop::Enter()
 	// アクションステート変更
 	m_pAniki->SetActionState(BASE_ACTION_STATE::SKILL_AERIALDROP);
 
+	// スキルボイスを再生する
+	voice->Play(VOICE_TYPE::SKILL_AERIALDROP, CHARACTER::ANIKI);
+
 	// 重力無視
 	m_pAniki->SetMoveUpdate(false);
 	// 移動量を消す
@@ -1159,6 +1260,9 @@ void Aniki::SkillAction::AerialDrop::Enter()
 	const int l_ciHitStopFrame(m_pAniki->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame);
 	m_pAniki->SetHitStopFrame(l_ciHitStopFrame);
 	m_pAniki->GetTargetPlayer()->SetHitStopFrame(l_ciHitStopFrame);
+
+	// オーバードライブ不可
+	m_pAniki->SetNotOverDrive(true);
 }
 
 bool Aniki::SkillAction::AerialDrop::Execute()
@@ -1176,10 +1280,11 @@ bool Aniki::SkillAction::AerialDrop::Execute()
 		m_pAniki->GetTargetPlayer()->SetPos(Vector3(WorldMat._41, WorldMat._42, WorldMat._43));
 	}
 
-	//if (m_pAniki->GetCurrentFrame() > 10)
-	//{
-	//	//m_pAniki->SetMove(Vector3(0, -3.5f, 0));
-	//}
+	// ケツドラム〆のデータ
+	if (m_pAniki->GetActionFrame() == FRAME_STATE::RECOVERY_HIT)
+	{
+		
+	}
 
 	// 常に相手の座標を操作する
 	//const Vector3 l_vAnikiPos(m_pAniki->GetPos());
@@ -1195,7 +1300,10 @@ bool Aniki::SkillAction::AerialDrop::Execute()
 }
 
 void Aniki::SkillAction::AerialDrop::Exit()
-{}
+{
+	// オーバードライブ可能
+	m_pAniki->SetNotOverDrive(false);
+}
 
 
 
@@ -1254,6 +1362,9 @@ void Aniki::HeaveHoAction::Strike::Enter()
 	// アクションステート変更
 	m_pAniki->SetActionState(BASE_ACTION_STATE::HEAVEHO_DRIVE);
 
+	// 必殺ボイスを再生する
+	voice->Play(VOICE_TYPE::HEAVEHO_DRIVE, CHARACTER::ANIKI);
+
 	m_pAniki->m_iHeavehoStopTimer = 10;
 }
 
@@ -1303,6 +1414,9 @@ void Aniki::HeaveHoAction::Throw::Enter()
 
 	// アクションステート変更
 	m_pAniki->SetActionState(BASE_ACTION_STATE::HEAVEHO_DRIVE2);
+
+	// 必殺ボイスを再生する
+	voice->Play(VOICE_TYPE::HEAVEHO_DRIVE2, CHARACTER::ANIKI);
 
 	m_pAniki->m_iHeavehoStopTimer = 10;
 }

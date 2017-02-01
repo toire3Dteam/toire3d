@@ -17,10 +17,10 @@ const int tdnSoundBuffer::READBYTE = 1024;	// ここの値が大きくなるにつれて読み込
 //**************************************************************************************************************
 //
 //**************************************************************************************************************
-tdnSoundBuffer::tdnSoundBuffer(LPDIRECTSOUND8 lpDS, char* filename, bool b3D)
+tdnSoundBuffer::tdnSoundBuffer(LPDIRECTSOUND8 lpDS, LPCSTR filename, bool b3D)
 {
 	/*	WAVファイルのロード	*/
-	lpWBuf = LoadFile(filename, &size, &wfx);
+	lpWBuf = LoadFile((char*)filename, &size, &wfx);
 	/*	ロード失敗	*/
 	if (lpWBuf == nullptr){
 		return;
@@ -91,7 +91,7 @@ void tdnSoundBuffer::Initialize(LPDIRECTSOUND8 lpDS, unsigned char* data, DWORD 
 	format = wfx;
 }
 
-void tdnSoundBuffer::Create_and_copy(LPDIRECTSOUND8 lpDS, char* filename, bool b3D, tdnSoundBuffer **buffers, int dst, int count)
+void tdnSoundBuffer::Create_and_copy(LPDIRECTSOUND8 lpDS, LPCSTR filename, bool b3D, tdnSoundBuffer **buffers, int dst, int count)
 {
 	DSBUFFERDESC	dsbd{};
 	LPVOID			lpbuf1, lpbuf2;
@@ -227,13 +227,13 @@ tdnSoundBuffer::~tdnSoundBuffer()
 LPBYTE tdnSoundBuffer::LoadFile(LPSTR fname, LPDWORD size, LPWAVEFORMATEX wfx)
 {
 	//	ファイル読み込み
-	char*	ext = &fname[lstrlen(fname) - 4];
+	char* ext = &fname[lstrlen(fname) - 4];
 	if (lstrcmpi(ext, ".wav") == 0) return LoadWAV(fname, size, wfx);
 	else if (lstrcmpi(ext, ".owd") == 0) return LoadOWD(fname, size, wfx);
 	else return nullptr;
 }
 
-LPBYTE tdnSoundBuffer::LoadWAV(LPSTR fname, LPDWORD size, LPWAVEFORMATEX wfx)
+LPBYTE tdnSoundBuffer::LoadWAV(LPCSTR fname, LPDWORD size, LPWAVEFORMATEX wfx)
 {
 	// バイナリ読み込み
 	std::ifstream infs(fname, std::ios::binary);
@@ -345,7 +345,7 @@ LPBYTE tdnSoundBuffer::LoadWAV(LPSTR fname, LPDWORD size, LPWAVEFORMATEX wfx)
 	return buf;
 }
 
-LPBYTE tdnSoundBuffer::LoadOWD(LPSTR fname, LPDWORD size, LPWAVEFORMATEX wfx)
+LPBYTE tdnSoundBuffer::LoadOWD(LPCSTR fname, LPDWORD size, LPWAVEFORMATEX wfx)
 {
 	// バイナリ読み込み
 	std::ifstream infs(fname, std::ios::binary);
@@ -392,7 +392,7 @@ LPBYTE tdnSoundBuffer::LoadOWD(LPSTR fname, LPDWORD size, LPWAVEFORMATEX wfx)
 //-------------------------------------------------------------
 //	MP3
 //-------------------------------------------------------------
-LPBYTE tdnSoundBuffer::LoadMP3(LPSTR fname, LPDWORD size, LPWAVEFORMATEX wfx)
+LPBYTE tdnSoundBuffer::LoadMP3(LPCSTR fname, LPDWORD size, LPWAVEFORMATEX wfx)
 {
 	// バイナリ読み込み
 	std::ifstream infs(fname, std::ios::binary);
@@ -1368,7 +1368,7 @@ tdnSoundSE::~tdnSoundSE()
 
 //=============================================================================================
 //		waveファイルセット
-void tdnSoundSE::Set(int ID, int num_of_play_simultaneously, char* filename, bool b3D)
+void tdnSoundSE::Set(int ID, int num_of_play_simultaneously, LPCSTR filename, bool b3D)
 {
 	//	初期化チェック
 	assert(lpDS);

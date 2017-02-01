@@ -72,8 +72,8 @@ public:
 			float m_fOrgComboRate;
 			CollisionShape::Square m_OrgHitSquare;
 			Vector2 m_OrgFlyVector[2];
-
-			void SetOrgInfo(BASE_ACTION_STATE state);
+			LPCSTR m_lpcOrgHitSE;
+			int m_iOrgRecoveryFrame;
 		};
 
 		class Land :public Base
@@ -105,6 +105,9 @@ public:
 			void Enter();
 			bool Execute();
 			void Exit();
+		private:
+			int m_iHitFrame;
+			bool m_bKetudoramed;
 		};
 
 		// ‘Î‹ó’Í‚ñ‚¾Œã
@@ -115,6 +118,9 @@ public:
 			void Enter();
 			bool Execute();
 			void Exit();
+		private:
+			int m_iHitFrame;
+			bool m_bKetudoramed;
 		};
 
 		class Aerial :public Base

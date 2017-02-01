@@ -276,6 +276,10 @@ bool sceneMain::Initialize()
 	// トロフィー
 	TrophyMgr->InitSeceneMain();
 
+	// キャラのボイスのロード
+	voice->InitializeCharacterVoice(SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].eCharacter);
+	voice->InitializeCharacterVoice(SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].eCharacter);
+
 	// BGM流す
 	bgm->PlayStreamIn((LPSTR)BattleMusicMgr->GetMusicFilePath(SelectDataMgr->Get()->iBattleMusicID, SelectDataMgr->Get()->eStage).c_str());
 

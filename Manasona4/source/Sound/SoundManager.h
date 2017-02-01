@@ -1,4 +1,5 @@
 #pragma once
+#include "../Data/SelectData.h"
 
 //********************************************************************************************************************
 //
@@ -20,7 +21,6 @@ public:
 	static void SetBaseVolume(int BGMVol, int SEVol, int VoiceVol);
 };
 
-class iexSoundBase;
 class tdnSoundSE;
 class tdnSoundBGM;
 
@@ -161,6 +161,91 @@ public:
 };
 
 
+enum class VOICE_TYPE
+{
+	INTRO,
+	RUSH1,
+	RUSH2,
+	RUSH3,
+	INVINCIBLE_ATTACK,
+	SQUAT_ATTACK,
+	DOKKOI_ATTACK,
+	ANTI_AIR,
+	DOWN_ATTACK,
+	AERIAL_ATTACK,
+	HEAVEHO_DRIVE,
+	HEAVEHO_DRIVE2,
+	OVERDRIVE_BURST,
+	OVERDRIVE_ONEMORE,
+	HEAVEHO_DRIVE_OVERFLOW,
+	SKILL_LAND,
+	SKILL_SQUAT,
+	SKILL_AERIAL,
+	SKILL_AERIALDROP,
+	SKILL2,
+	SKILL3,
+	SKILL4,
+	SKILL5,
+	STAND,
+	KNOCK_BACK,
+	KNOCK_BACK2,
+	KNOCK_DOWN,
+	KNOCK_DOWN2,
+	DOWN_FALL,
+	DIE,
+	REVERSAL,
+	ESCAPE,
+	THROW,
+	THROW_SUCCESS,
+	WIN,
+	OTHER1,
+	OTHER2,
+	OTHER3,
+	OTHER4,
+	OTHER5,
+	OTHER6,
+	OTHER7,
+	OTHER8,
+	OTHER9,
+	MAX,
+};
+
+class VOICE_Manager
+{
+private:
+	std::map<VOICE_TYPE, int> m_mID[(int)CHARACTER::END];	// VOICE_TYPE型で番号を振り分ける
+	std::unique_ptr<tdnSoundSE> m_pPlayManager;
+
+	void PlayIn(int data_num);
+	void Load(CHARACTER eCharacter);
+
+public:
+
+	//===============================================
+	//	音データ
+	//===============================================
+	struct	DATA{
+		CHARACTER id;					// 呼び出す際に使用する識別コード
+		LPSTR file_name;			// ファイルパス
+		int play_simultaneously;	// 同一の音を複数再生する最大値
+	};
+
+
+	//===============================================
+	//	初期化と解放
+	//===============================================
+	VOICE_Manager(){}
+	void Initialize();
+	void InitializeCharacterVoice(CHARACTER eCharacter);
+
+
+	//===============================================
+	//	処		理
+	//===============================================
+	void Play(VOICE_TYPE eType, CHARACTER eCharacter);
+};
+
+
 enum class MY_MUSIC_ID
 {
 	SELECT,		// セレクト
@@ -204,3 +289,4 @@ private:
 //===============================================
 extern SE_Manager *se;
 extern BGM_Manager *bgm;
+extern VOICE_Manager *voice;

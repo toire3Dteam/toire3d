@@ -62,7 +62,7 @@ private:
 		//------------------------------------------------------
 		//	ƒXƒŒƒbƒhˆ—‚­‚ñ
 		//------------------------------------------------------
-		std::thread m_thread;
+		std::unique_ptr<std::thread> m_pThread;
 	};
 
 	LoadSceneThread *m_pLoadSceneThread;

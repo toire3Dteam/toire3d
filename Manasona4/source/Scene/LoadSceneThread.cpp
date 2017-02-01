@@ -10,7 +10,7 @@ LoadSceneThreadManager::LoadSceneThread::LoadSceneThread(BaseScene *pNewScene) :
 m_pNewScene(pNewScene),
 
 // ★コンストラクタでスレッドを生成 ※メンバ関数を指定する場合は、第二引数にthisを入れること。
-m_thread(&LoadSceneThreadManager::LoadSceneThread::ThreadFunction, this, pNewScene),
+m_pThread(new std::thread(&LoadSceneThreadManager::LoadSceneThread::ThreadFunction, this, pNewScene)),
 
 // スレッドフラグ
 m_bThread(true)
@@ -28,10 +28,10 @@ LoadSceneThreadManager::LoadSceneThread::~LoadSceneThread()
 	if (m_bThread)
 	{
 		//MessageBoxA(0, "スレッド読み込み中にプログラムが停止しました。スレッドが終わるまで待機します。", "意図せぬ終了", MB_OK);
-		m_thread.join();
+		m_pThread->join();
 		//MessageBoxA(0, "待機終了。プログラムは正常に解放されます。多分", "アイルーは神", MB_OK);
 	}
-	else m_thread.join();	// 読み込みスレッド自体は完了しているので、detach(普通にスレッド落とす)でもいいけど、念のためにjoin(スレッドが完全に終了するまで待機してから落とす)にする
+	else m_pThread->join();	// 読み込みスレッド自体は完了しているので、detach(普通にスレッド落とす)でもいいけど、念のためにjoin(スレッドが完全に終了するまで待機してから落とす)にする
 }
 //=============================================================================================
 

@@ -89,10 +89,11 @@ const SE_Manager::DATA all_dataS[]
 //==============================================================================================
 //				B	G	M
 //==============================================================================================
-BGM_Manager::DATA all_dataB[]
+const BGM_Manager::DATA all_dataB[]
 {
 	{ "END", nullptr, false }
 };
+
 
 
 //**************************************************************************************************************
@@ -108,6 +109,8 @@ void SoundManager::Initialize()
 	se->Initialize();
 	bgm = new BGM_Manager;
 	bgm->Initialize();
+	voice = new VOICE_Manager;
+	voice->Initialize();
 
 	// ボリュームの読み込み
 	//std::ifstream ifs("DATA/Sound/volume.txt");
@@ -127,6 +130,7 @@ void SoundManager::Release()
 {
 	SAFE_DELETE(se);
 	SAFE_DELETE(bgm);
+	SAFE_DELETE(voice);
 }
 
 //=============================================================================================
@@ -427,10 +431,139 @@ void BGM_Manager::SetListener(const Vector2 &pos, const Vector2 &move)
 
 
 
+
+//**************************************************************************************************************
+//
+//		VOICE管理クラス
+//
+//**************************************************************************************************************
+
+void VOICE_Manager::Load(CHARACTER eCharacter)
+{
+	// ファイルパス分岐
+	std::string l_sFileName("");
+	switch (eCharacter)
+	{
+	case CHARACTER::ANIKI:
+		l_sFileName = "DATA/Sound/Voice/Aniki/list.txt";
+	default:
+		break;
+	}
+
+	// キャラクターのボイス情報をロードする
+	if (l_sFileName == "") return;
+
+	std::ifstream ifs(l_sFileName);
+	MyAssert(ifs, "ボイスのテキスト入ってない");
+
+	static const std::map<std::string, VOICE_TYPE> IDList
+	{
+		{ "[[エスケープ]]",					VOICE_TYPE::ESCAPE },
+		{ "[[ワンモア覚醒]]",				VOICE_TYPE::OVERDRIVE_ONEMORE },
+		{ "[[スタンド発動]]",				VOICE_TYPE::STAND },
+		{ "[[バースト覚醒]]",				VOICE_TYPE::OVERDRIVE_BURST },
+		{ "[[通常攻撃1段目]]",				VOICE_TYPE::RUSH1 },
+		{ "[[通常攻撃2段目]]",				VOICE_TYPE::RUSH2 },
+		{ "[[通常攻撃3段目]]",				VOICE_TYPE::RUSH3 },
+		{ "[[対空攻撃]]",					VOICE_TYPE::ANTI_AIR },
+		{ "[[中段攻撃]]",					VOICE_TYPE::DOKKOI_ATTACK },
+		{ "[[しゃがみ下段攻撃]]",			VOICE_TYPE::SQUAT_ATTACK },
+		{ "[[あしばらい攻撃]]",				VOICE_TYPE::DOWN_ATTACK },
+		{ "[[空中攻撃]]",					VOICE_TYPE::AERIAL_ATTACK },
+		{ "[[逆切れ攻撃]]",					VOICE_TYPE::INVINCIBLE_ATTACK },
+		{ "[[キャラ固有地上ニュートラル]]", VOICE_TYPE::SKILL_LAND },
+		{ "[[キャラ固有2]]",				VOICE_TYPE::SKILL2 },
+		{ "[[キャラ固有3]]",				VOICE_TYPE::SKILL3 },
+		{ "[[キャラ固有地上しゃがみ]]",		VOICE_TYPE::SKILL_SQUAT },
+		{ "[[キャラ固有空中ニュートラル]]", VOICE_TYPE::SKILL_AERIAL },
+		{ "[[キャラ固有空中下]]",			VOICE_TYPE::SKILL_AERIALDROP },
+		{ "[[掴み]]",						VOICE_TYPE::THROW },
+		{ "[[投げ成功]]",					VOICE_TYPE::THROW_SUCCESS },
+		{ "[[必殺技]]",						VOICE_TYPE::HEAVEHO_DRIVE },
+		{ "[[必殺技2]]",					VOICE_TYPE::HEAVEHO_DRIVE2 },
+		{ "[[超必殺技]]",					VOICE_TYPE::HEAVEHO_DRIVE_OVERFLOW },
+		{ "[[起き上がり]]",					VOICE_TYPE::REVERSAL },
+		{ "[[ノックバック]]",				VOICE_TYPE::KNOCK_BACK },
+		{ "[[ノックバック2]]",				VOICE_TYPE::KNOCK_BACK2 },
+		{ "[[ノックダウン]]",				VOICE_TYPE::KNOCK_DOWN },
+		{ "[[ノックダウン2]]",				VOICE_TYPE::KNOCK_DOWN2 },
+		{ "[[足払いくらい]]",				VOICE_TYPE::DOWN_FALL },
+		{ "[[死に]]",						VOICE_TYPE::DIE },
+		{ "[[掛け合い]]",					VOICE_TYPE::INTRO },
+		{ "[[勝利]]",						VOICE_TYPE::WIN }
+	};
+
+	int i(0);
+
+	while (!ifs.eof())
+	{
+		// ID読み込み
+		char read[64];
+		ifs >> read;
+
+		// エラーチェック
+		MyAssert(read[0] == '[', "ボイスデータのテキストがずれてる");
+
+		std::string ID(read);
+		m_mID[(int)eCharacter][IDList.at(ID)] = i;
+
+		// ファイル名読み込み
+		char szFileName[MAX_PATH];
+		ifs >> szFileName;
+
+		// SEをセットする
+		m_pPlayManager->Set(i, 2, (tdnFile::GetDirectoryPath(l_sFileName.c_str()) + "/" + szFileName).c_str());
+
+		i++;
+	}
+}
+
+//=============================================================================================
+//		初	期	化
+void VOICE_Manager::Initialize()
+{
+	m_pPlayManager = std::make_unique<tdnSoundSE>();
+
+	FOR((int)CHARACTER::END) m_mID[i].clear();
+}
+void VOICE_Manager::InitializeCharacterVoice(CHARACTER eCharacter)
+{
+	// 既に初期化済み
+	if (!m_mID[(int)eCharacter].empty()) return;
+
+	// キャラクターのボイス情報をロードする
+	Load(eCharacter);
+}
+//
+//=============================================================================================
+
+//=============================================================================================
+//		処		理
+void VOICE_Manager::PlayIn(int data_num)
+{
+	m_pPlayManager->Play(data_num);
+}
+
+void VOICE_Manager::Play(VOICE_TYPE eType, CHARACTER eCharacter)
+{
+	// ロードされていなければ抜ける
+	if (m_mID[(int)eCharacter].count(eType) == 0) return;
+
+	// 再生
+	PlayIn(m_mID[(int)eCharacter][eType]);
+}
+//
+//=============================================================================================
+
+
+
+
+
 //=============================================================================================
 //		実		体
 SE_Manager *se;
 BGM_Manager *bgm;
+VOICE_Manager *voice;
 //
 //=============================================================================================
 

@@ -116,9 +116,13 @@ bool isThrownState(BasePlayer *pPerson)
 	return (
 		pPerson->isLand() &&	// 地上にいて
 
+		// 硬直中は不可
+		pPerson->GetRecoveryFrame() <= 0 &&
+
 		// ダメージ系のステート以外だったら
 		!pPerson->GetFSM()->isInState(*BasePlayerState::KnockBack::GetInstance()) &&
 		!pPerson->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) &&
+		!pPerson->GetFSM()->isInState(*BasePlayerState::DownFall::GetInstance()) &&
 		!pPerson->GetFSM()->isInState(*BasePlayerState::LandRecovery::GetInstance()) &&
 		!pPerson->GetFSM()->isInState(*BasePlayerState::Jump::GetInstance())
 		);
@@ -626,16 +630,18 @@ bool GuardUpdate(BasePlayer *pPerson)
 	{
 		BasePlayer *target(pPerson->GetTargetPlayer());
 		bool bAttackState(false);
+		bool bStandAttack(false);
 		// ★相手が何かしらの攻撃をしていたら、
 		if (target->isAttackState()) if (target->GetAttackData()->attribute != ATTACK_ATTRIBUTE::THROW) bAttackState = true;
 
 		// スタンド
-		if (target->GetStand()->isActive() && target->GetStand()->GetAttackData()) bAttackState = true;
+		if (target->GetStand()->isActive() && target->GetStand()->GetAttackData()) bStandAttack = true;
 
-		if (bAttackState)
+		if (bAttackState || bStandAttack)
 		{
 			// 距離
-			if (Math::Length(pPerson->GetPos(), target->GetPos()) > BasePlayer::c_GUARD_DISTANCE) return false;	// ガード発動距離
+			if(bAttackState) if (Math::Length(pPerson->GetPos(), target->GetPos()) > BasePlayer::c_GUARD_DISTANCE) return false;				// ガード発動距離
+			if (bStandAttack) if (Math::Length(pPerson->GetStand()->GetPos(), target->GetPos()) > BasePlayer::c_GUARD_DISTANCE) return false;	// 対スタンドのガード発動距離(へて用)
 
 			// ガード条件を満たしたのでガード
 			pPerson->GetFSM()->ChangeState(BasePlayerState::Guard::GetInstance());
@@ -2650,6 +2656,9 @@ void BasePlayerState::RushAttack::Enter(BasePlayer * pPerson)
 	// 攻撃ステートを1段目に設定する
 	pPerson->SetActionState(BASE_ACTION_STATE::RUSH1);
 
+	// 攻撃ボイスを再生する
+	voice->Play(VOICE_TYPE::RUSH1, pPerson->GetCharacterType());
+
 	// 初速度の設定
 
 	// もし走っている状態で攻撃をしたら　ダッシュ攻撃っぽく攻撃
@@ -2751,6 +2760,9 @@ void BasePlayerState::RushAttack::Execute(BasePlayer * pPerson)
 
 					// 攻撃ステートを2段目に設定する
 					pPerson->SetActionState(BASE_ACTION_STATE::RUSH2);
+
+					// 攻撃ボイスを再生する
+					voice->Play(VOICE_TYPE::RUSH2, pPerson->GetCharacterType());
 
 					// Switch文を次に進める
 					pPerson->AddRushStep();
@@ -2908,6 +2920,8 @@ void BasePlayerState::KnockBack::Enter(BasePlayer * pPerson)
 	// ダメージモーションに変える
 	pPerson->SetMotion(MOTION_TYPE::KNOCKBACK);
 
+	// ダメージボイスを再生する
+	voice->Play((rand() % 2) ? VOICE_TYPE::KNOCK_BACK : VOICE_TYPE::KNOCK_BACK2, pPerson->GetCharacterType());
 }
 
 void BasePlayerState::KnockBack::Execute(BasePlayer * pPerson)
@@ -2968,6 +2982,9 @@ void BasePlayerState::DownFall::Enter(BasePlayer * pPerson)
 
 	// ダウンフラグを立てる
 	pPerson->SetDown(true);
+
+	// ダメージボイスを再生する
+	voice->Play(VOICE_TYPE::DOWN_FALL, pPerson->GetCharacterType());
 }
 
 void BasePlayerState::DownFall::Execute(BasePlayer * pPerson)
@@ -3064,9 +3081,8 @@ void BasePlayerState::KnockDown::Enter(BasePlayer * pPerson)
 	// ★やっぱりここで無敵時間設定(GlobalのMessageで書きます)
 	//pPerson->SetInvincible(90,1);
 
-	// 仮
-	//pPerson->SetRecoveryFrame(120);
-
+	// ダメージボイスを再生する
+	voice->Play((rand() % 2) ? VOICE_TYPE::KNOCK_DOWN : VOICE_TYPE::KNOCK_DOWN2, pPerson->GetCharacterType());
 }
 
 void BasePlayerState::KnockDown::Execute(BasePlayer * pPerson)
@@ -3167,6 +3183,9 @@ void BasePlayerState::Die::Enter(BasePlayer * pPerson)
 {
 	// 死にモーションに変える
 	pPerson->SetMotion(MOTION_TYPE::KNOCKDOWN);
+
+	// 死にボイスを再生する
+	voice->Play(VOICE_TYPE::DIE, pPerson->GetCharacterType());
 }
 
 void BasePlayerState::Die::Execute(BasePlayer * pPerson)
@@ -3217,6 +3236,14 @@ void BasePlayerState::LandRecovery::Enter(BasePlayer * pPerson)
 
 	// エフェクト発動」
 	pPerson->AddEffectAction(pPerson->GetPos() + Vector3(0, 5, -3), EFFECT_TYPE::RECOVERY);
+
+	// 喰らったカウントリセット
+	pPerson->GetRecoveryDamageCount()->clear();
+	// ダメージ補正リセット
+	pPerson->ResetDamageRate();
+
+	// 復帰ボイスを再生する
+	voice->Play(VOICE_TYPE::REVERSAL, pPerson->GetCharacterType());
 }
 
 void BasePlayerState::LandRecovery::Execute(BasePlayer * pPerson)
@@ -3319,6 +3346,9 @@ void BasePlayerState::AerialRecovery::Enter(BasePlayer * pPerson)
 
 	// エフェクト発動」
 	pPerson->AddEffectAction(pPerson->GetPos() + Vector3(0, 5, -3) , EFFECT_TYPE::RECOVERY);
+
+	// 復帰ボイスを再生する
+	voice->Play(VOICE_TYPE::REVERSAL, pPerson->GetCharacterType());
 }
 
 void BasePlayerState::AerialRecovery::Execute(BasePlayer * pPerson)
@@ -3469,6 +3499,9 @@ void BasePlayerState::SquatAttack::Enter(BasePlayer * pPerson)
 	pPerson->SetActionState(BASE_ACTION_STATE::SQUAT_ATTACK);
 
 	pPerson->SetDirAngle();
+
+	// 攻撃ボイスを再生する
+	voice->Play(VOICE_TYPE::SQUAT_ATTACK, pPerson->GetCharacterType());
 }
 
 void BasePlayerState::SquatAttack::Execute(BasePlayer * pPerson)
@@ -3603,10 +3636,10 @@ void BasePlayerState::AntiAirAttack::Enter(BasePlayer * pPerson)
 	//	// 慣性を消す
 	//	pPerson->SetMove(Vector3(0, 0, 0));
 	//}
-
-	
-
 	pPerson->SetDirAngle();
+
+	// 攻撃ボイスを再生する
+	voice->Play(VOICE_TYPE::ANTI_AIR, pPerson->GetCharacterType());
 }
 
 void BasePlayerState::AntiAirAttack::Execute(BasePlayer * pPerson)
@@ -3708,6 +3741,9 @@ bool BasePlayerState::AntiAirAttack::OnMessage(BasePlayer * pPerson, const Messa
 
 void BasePlayerState::DownAttack::Enter(BasePlayer * pPerson)
 {
+	// 攻撃ボイスを再生する
+	voice->Play(VOICE_TYPE::DOWN_ATTACK, pPerson->GetCharacterType());
+
 	pPerson->DownAttackInit();
 }
 
@@ -3765,6 +3801,9 @@ void BasePlayerState::DokkoiAttack::Enter(BasePlayer * pPerson)
 	pPerson->AddEffectAction(pPerson->GetPos(), EFFECT_TYPE::DOKKOI);
 
 	pPerson->SetDirAngle();
+
+	// 攻撃ボイスを再生する
+	voice->Play(VOICE_TYPE::DOKKOI_ATTACK, pPerson->GetCharacterType());
 }
 
 void BasePlayerState::DokkoiAttack::Execute(BasePlayer * pPerson)
@@ -3884,6 +3923,9 @@ void BasePlayerState::AerialAttack::Enter(BasePlayer * pPerson)
 	//{
 	//	pPerson->SetDir(DIR::LEFT);
 	//}
+
+	// 攻撃ボイスを再生する
+	voice->Play(VOICE_TYPE::AERIAL_ATTACK, pPerson->GetCharacterType());
 }
 
 void BasePlayerState::AerialAttack::Execute(BasePlayer * pPerson)
@@ -4131,6 +4173,9 @@ void BasePlayerState::Escape::Enter(BasePlayer * pPerson)
 
 	// SE再生
 	se->Play("エスケープ");
+
+	// 回避ボイスを再生する
+	voice->Play(VOICE_TYPE::ESCAPE, pPerson->GetCharacterType());
 }
 
 void BasePlayerState::Escape::Execute(BasePlayer * pPerson)
@@ -4248,6 +4293,9 @@ void BasePlayerState::StandAction::Enter(BasePlayer * pPerson)
 
 	// SE再生
 	se->Play("ペルソナ召喚");
+
+	// 召喚ボイスを再生する
+	voice->Play(VOICE_TYPE::STAND, pPerson->GetCharacterType());
 
 	// ペルソナ発動エフェクト！
 	pPerson->AddEffectAction(pPerson->GetPos(),EFFECT_TYPE::PERSONA);
@@ -4380,6 +4428,9 @@ void BasePlayerState::InvincibleAttack::Enter(BasePlayer * pPerson)
 
 	// SE再生
 	//se->Play("ペルソナ召喚");
+
+	// 攻撃ボイスを再生する
+	voice->Play(VOICE_TYPE::INVINCIBLE_ATTACK, pPerson->GetCharacterType());
 }
 
 void BasePlayerState::InvincibleAttack::Execute(BasePlayer * pPerson)
@@ -4547,6 +4598,9 @@ void BasePlayerState::OverDrive_OneMore::Enter(BasePlayer * pPerson)
 	// SE再生
 	se->Play("オーバードライブ開始");
 
+	// ドライブボイスを再生する
+	voice->Play(VOICE_TYPE::OVERDRIVE_ONEMORE, pPerson->GetCharacterType());
+
 	// 上に浮く
 	pPerson->SetMove(Vector3(0, 1, 0));
 
@@ -4706,7 +4760,8 @@ void BasePlayerState::OverDrive_Burst::Enter(BasePlayer * pPerson)
 	// SE再生
 	se->Play("バースト");
 
-
+	// ドライブボイスを再生する
+	voice->Play(VOICE_TYPE::OVERDRIVE_BURST, pPerson->GetCharacterType());
 }
 
 void BasePlayerState::OverDrive_Burst::Execute(BasePlayer * pPerson)
@@ -5121,6 +5176,9 @@ void BasePlayerState::Throw::Enter(BasePlayer * pPerson)
 
 	// SE再生
 	se->Play("掴み");
+
+	// 投げボイスを再生する
+	voice->Play(VOICE_TYPE::THROW, pPerson->GetCharacterType());
 }
 
 void BasePlayerState::Throw::Execute(BasePlayer * pPerson)
@@ -5255,6 +5313,9 @@ void BasePlayerState::ThrowSuccess::Enter(BasePlayer * pPerson)
 
 	// アクションを成功モードに
 	pPerson->SetActionState(BASE_ACTION_STATE::THROW_SUCCESS);
+
+	// 投げボイスを再生する
+	voice->Play(VOICE_TYPE::THROW_SUCCESS, pPerson->GetCharacterType());
 
 	BasePlayer *you(pPerson->GetTargetPlayer());
 
@@ -5722,6 +5783,9 @@ void BasePlayerState::Win::Enter(BasePlayer * pPerson)
 
 	// 正面を向く
 	pPerson->SetAngleY(PI);
+
+	// 勝ちボイスを再生する
+	voice->Play(VOICE_TYPE::WIN, pPerson->GetCharacterType());
 
 	// タイムアップとかで、相手が待機中なら、死にモード設定
 	if (!pPerson->GetTargetPlayer()->GetFSM()->isInState(*Die::GetInstance())) pPerson->GetTargetPlayer()->GetFSM()->ChangeState(Die::GetInstance());

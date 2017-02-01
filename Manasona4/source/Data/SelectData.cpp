@@ -24,10 +24,10 @@ iChallengeType(0)							// 選択しているチャレンジ
 	tagSideDatas[(int)SIDE::LEFT].iDeviceID = 0;
 	tagSideDatas[(int)SIDE::RIGHT].iDeviceID = 1;
 
-	//tagSideDatas[(int)SIDE::RIGHT].eCharacter = CHARACTER::AIROU;
+	tagSideDatas[(int)SIDE::RIGHT].eCharacter = CHARACTER::AIROU;
 
 	// 片方AI用
-	//tagSideDatas[(int)SIDE::RIGHT].bAI = true;
+	tagSideDatas[(int)SIDE::RIGHT].bAI = true;
 }
 
 TrainingData::TrainingData():

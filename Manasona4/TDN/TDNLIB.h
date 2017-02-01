@@ -2637,9 +2637,9 @@ protected:
 	LPDIRECTSOUNDBUFFER8	lpBuf;
 	LPDIRECTSOUND3DBUFFER8	lpBuf3D;
 	LPBYTE LoadFile(LPSTR fname, LPDWORD size, LPWAVEFORMATEX wfx);
-	LPBYTE LoadWAV(LPSTR fname, LPDWORD size, LPWAVEFORMATEX wfx);
-	LPBYTE LoadOWD(LPSTR fname, LPDWORD size, LPWAVEFORMATEX wfx);	// Owataso Wave Data
-	LPBYTE LoadMP3(LPSTR fname, LPDWORD size, LPWAVEFORMATEX wfx);
+	LPBYTE LoadWAV(LPCSTR fname, LPDWORD size, LPWAVEFORMATEX wfx);
+	LPBYTE LoadOWD(LPCSTR fname, LPDWORD size, LPWAVEFORMATEX wfx);	// Owataso Wave Data
+	LPBYTE LoadMP3(LPCSTR fname, LPDWORD size, LPWAVEFORMATEX wfx);
 
 	DWORD PlayCursor;
 	DWORD BufferSize;
@@ -2656,13 +2656,13 @@ protected:
 	static const int READBYTE;
 
 public:
-	tdnSoundBuffer(LPDIRECTSOUND8 lpDS, char* filename, bool b3D);
+	tdnSoundBuffer(LPDIRECTSOUND8 lpDS, LPCSTR filename, bool b3D);
 	void Initialize(LPDIRECTSOUND8 lpDS, unsigned char* data, DWORD size, LPWAVEFORMATEX fmt, bool b3D);
 	tdnSoundBuffer(){}
 	~tdnSoundBuffer();
 
 	// 同じのを複数読み込みたいときに使う
-	static void Create_and_copy(LPDIRECTSOUND8 lpDS, char* filename, bool b3D, tdnSoundBuffer **buffers, int dst, int count);
+	static void Create_and_copy(LPDIRECTSOUND8 lpDS, LPCSTR filename, bool b3D, tdnSoundBuffer **buffers, int dst, int count);
 
 	LPDIRECTSOUNDBUFFER8 GetBuf(){ return lpBuf; }
 	void Play(bool loop, DWORD cursor = 0);
@@ -2829,7 +2829,7 @@ public:
 	*@param[in]		filename					音源ファイルへのファイルパス
 	*@param[in]		b3D							3Dサウンドフラグ
 	*/
-	void Set(int ID, int NumOfPlaySimultaneously, char* filename, bool b3D = false);
+	void Set(int ID, int NumOfPlaySimultaneously, LPCSTR filename, bool b3D = false);
 
 	/* 再生 */
 	int Play(int ID, bool loop = false);
@@ -3060,7 +3060,7 @@ public:
 	*@param[in]		*path	example…"DATA/CHR/Airou"ならCHRフォルダにAirouというフォルダが作られる
 	*@return		成功したら「0」フォルダが既に作られていたりして失敗したら「-1」が返る
 	*/
-	static int CreateFolder(char *path);
+	static int CreateFolder(LPCSTR path);
 
 	/**
 	*@brief					ディレクトリの列挙
@@ -3068,40 +3068,40 @@ public:
 	*@param[in]		*out	列挙したファイル名をフォルダー名を格納する構造体へのアドレス
 	*@param[in]		bExt	ファイル名の場合、拡張子をつけるかつけないか
 	*/
-	static void EnumDirectory(char *path, DirectoryInfo *out, bool bExt = true);
+	static void EnumDirectory(LPCSTR path, DirectoryInfo *out, bool bExt = true);
 
 	/**
 	*@brief					ファイルの拡張子を返す("tdn.txt"なら.txtが返る)
 	*@param[in]		*path	ファイルパス
 	*/
-	static std::string GetFileExtention(char *path);
+	static std::string GetFileExtention(LPCSTR path);
 
 	/**
 	*@brief					ファイルパスからファイル名を返す("DATA/Text/tdn.txt"ならtdn.txtが返る)
 	*@param[in]		*path	ファイルパス
 	*@param[in]		bExt	拡張子をくっつけるか　[true: return tdn.txt]　[false: return tdn]
 	*/
-	static std::string GetFileName(char *path, bool bExt = true);
+	static std::string GetFileName(LPCSTR path, bool bExt = true);
 
 	/**
 	*@brief					ファイルパスからそのファイルのあるディレクトリを返す("DATA/Text/tdn.txt"ならDATA/Textが返る)
 	*@param[in]		*path	ファイルパス
 	*/
-	static std::string GetDirectoryPath(char *path);
+	static std::string GetDirectoryPath(LPCSTR path);
 
 	/**
 	*@brief					ファイルを開くダイアログを作成
 	*@param[in]		*filter	拡張子フィルター example:"TEXT DATA(*.txt)\0 *.txt\0\0"
 	*@return				成功したらダイアログで選択された絶対パスを返す、失敗したら""(空の文字列)
 	*/
-	static std::string OpenFileDialog(char *filter = "すべてのファイル(*.*)\0 * .*\0\0");
+	static std::string OpenFileDialog(LPCSTR filter = "すべてのファイル(*.*)\0 * .*\0\0");
 
 	/**
 	*@brief					ファイルを保存するダイアログを作成
 	*@param[in]		*filter	拡張子フィルター example:"TEXT DATA(*.txt)\0 *.txt\0\0"
 	*@return				成功したらダイアログで選択された絶対パスを返す、失敗したら""(空の文字列)
 	*/
-	static std::string SaveFileDialog(char *filter = "すべてのファイル(*.*)\0 * .*\0\0");
+	static std::string SaveFileDialog(LPCSTR filter = "すべてのファイル(*.*)\0 * .*\0\0");
 private:
 	static char strFile[256];			// ダイアログを開くときに、前のパスを残したいときとかに
 };

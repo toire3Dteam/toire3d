@@ -5,7 +5,6 @@
 #include "Aramitama/Aramitama.h"
 #include "Aniki/Aniki.h"
 #include "Stage/Stage.h"
-#include "../Sound/SoundManager.h"
 #include "../BaseEntity/Message/MessageDispatcher.h"
 #include "../Stand/Stand.h"
 #include "../Number/Number.h"
