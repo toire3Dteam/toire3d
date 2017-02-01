@@ -5,6 +5,7 @@
 #include "../../BaseEntity/Message/MessageDispatcher.h"
 #include "Ketsudram.h"
 #include "Window/Player/TekiWindow.h"
+#include "Stand\Stand.h"
 
 Aniki::Aniki(SIDE side, const SideData &data) :BasePlayer(side, data), m_pKetsudram(nullptr)
 {
@@ -794,8 +795,23 @@ void Aniki::Update(PLAYER_UPDATE flag)
 
 void Aniki::Render()
 {
-	// 基底クラスの更新
-	BasePlayer::Render();
+	// スタンド描画
+	m_pStand->Render(shaderM, "Persona");
+
+	// シェーダへ送るデータ
+	ShaderSendParam();
+
+	// 
+	m_pObj->Render(shaderM, "PlayerToonNoRim");
+
+	// エフェクトマネージャー描画
+	m_pPanelEffectMGR->Render3D();
+	m_pUVEffectMGR->Render();
+	m_pPanelEffectMGR->Render();
+	Vector2 vScreenPos = Math::WorldToScreen(m_vPos);// (TODO)頭のポジションの座標を使う
+	m_pThrowMark->Render((int)vScreenPos.x - 56, (int)vScreenPos.y - 324, RS::COPY_NOZ);
+
+
 }
 
 void Aniki::RenderDrive()

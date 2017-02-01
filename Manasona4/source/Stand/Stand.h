@@ -52,6 +52,11 @@ namespace Stand
 		//パートナーの種類
 		PARTNER GetPartnerType() { return m_ePartnerType; }
 
+		// 中心の座標
+		virtual Vector3 GetCenterPos() { return m_pos + Vector3(0, 7.5f, 0); };
+
+
+
 	protected:
 		BasePlayer *m_pPlayer;	// 自分の実体を持っているプレイヤーへのポインタ
 		iex3DObj *m_pObj;		// 3D実体
@@ -63,6 +68,7 @@ namespace Stand
 
 		// エフェクト
 		SummonEffect* m_pSummonEffect;
+		SummonWaveEffect* m_pSummonWaveEffect;
 		ExitEffect*	  m_pExitEffect;
 
 		// アイコン

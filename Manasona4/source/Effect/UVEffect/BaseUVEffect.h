@@ -1155,6 +1155,24 @@ private:
 
 
 /*****************************************/
+//	サモンウェーブ
+/*****************************************/
+class SummonWaveEffect :public BaseUVEffect
+{
+public:
+	SummonWaveEffect();
+	~SummonWaveEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADDNOZ(); };
+	//void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+
+};
+
+
+/*****************************************/
 //	ペルソナ帰宅
 /*****************************************/
 class ExitEffect :public BaseUVEffect

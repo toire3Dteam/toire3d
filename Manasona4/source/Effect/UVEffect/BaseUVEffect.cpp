@@ -141,6 +141,11 @@ SummonEffect::SummonEffect()
 	m_pic = new AnimationUV("Data/UVeffect/Stand/Summon.IMO", 0.0f, 0.06f, 12, false, 3, 8);
 }
 
+SummonWaveEffect::SummonWaveEffect()
+{
+	m_pic = new AnimationUV("Data/UVeffect/Stand/SummonWave.IMO", 0.0f, 0.0f, 12, false, 1, 8);
+}
+
 ExitEffect::ExitEffect()
 {
 	m_pic = new AnimationUV("Data/UVeffect/Stand/Exit.IMO", 0.0f, -0.04f, 12, false, 3, 10);

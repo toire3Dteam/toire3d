@@ -866,7 +866,16 @@ void sceneMain::OverDriveAction()
 
 void sceneMain::OverDriveEnd()
 {
-	m_bOverDriveStageFlag = false;
+	// ‚Ç‚¿‚ç‚à•KŽE‹Z‚ðs‚Á‚Ä‚¢‚È‚©‚Á‚½‚ç
+	if (PlayerMgr->GetPlayer(SIDE::LEFT)->GetFSM()->isInState(*BasePlayerState::HeavehoDrive::GetInstance()) == true &&
+		PlayerMgr->GetPlayer(SIDE::RIGHT)->GetFSM()->isInState(*BasePlayerState::HeavehoDrive::GetInstance()) == true)
+	{
+		return;
+	}
+
+		m_bOverDriveStageFlag = false;
+	
+
 }
 
 void sceneMain::Reset()

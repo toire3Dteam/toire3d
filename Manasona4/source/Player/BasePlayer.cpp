@@ -598,12 +598,6 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 	// 根性値発動用の更新
 	WillPowerUpdate(flag);
 
-	// 1more覚醒していたらスタンドの動きを止める
-	if (GetFSM()->isInState(*BasePlayerState::OverDrive_OneMore::GetInstance()) == false)
-	{
-		// スタンド更新
-		m_pStand->Update((flag == PLAYER_UPDATE::CONTROL_OK));
-	}
 
 	// 無敵時間の更新
 	if (KeyBoardTRG(KB_H))
@@ -769,6 +763,8 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 		// 入力受付後にステートマシン更新
 		if (flag != PLAYER_UPDATE::NO_FSM) m_pStateMachine->Update();
 
+
+
 		//if (bOutLog)
 		//{
 		//	tdnStopWatch::End();
@@ -820,6 +816,13 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 			m_iRecoveryFrame--;
 		else m_fDamageRate = 1.0f;	// (TODOコンボ切れる1フレームで補正が切れてるのにコンボが入る(アイルー1,2,下,スキル下で3400がでる))コンボ切れたら、ダメージレートを戻す
 
+	}
+
+	// 1more覚醒していたらスタンドの動きを止める
+	if (GetFSM()->isInState(*BasePlayerState::OverDrive_OneMore::GetInstance()) == false)
+	{
+		// スタンド更新
+		m_pStand->Update((flag == PLAYER_UPDATE::CONTROL_OK));
 	}
 
 	//if (bOutLog) tdnStopWatch::Start();

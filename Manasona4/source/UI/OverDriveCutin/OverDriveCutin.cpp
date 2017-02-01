@@ -216,3 +216,9 @@ void OverDriveCutin::Action()
 	m_pFont3.vPos = VECTOR2_ZERO;
 
 }
+
+void OverDriveCutin::Stop()
+{
+	m_iFrame = 0;
+	m_bRender = false;
+}

@@ -271,6 +271,9 @@ void GameUIManager::Reset()
 
 	m_pPersona1P->DownEffectAction();
 	m_pPersona2P->DownEffectAction();
+
+	m_pOverDriveCutin1P->Stop();
+	m_pOverDriveCutin2P->Stop();
 }
 
 bool GameUIManager::HandleMessage(const Message& msg)

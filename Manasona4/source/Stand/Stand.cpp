@@ -52,10 +52,12 @@ m_dir(DIR::LEFT),
 m_ePartnerType(PARTNER::MOKOI),
 m_fScale(1.0f),
 m_pSummonEffect(nullptr),
+m_pSummonWaveEffect(nullptr),
 m_pExitEffect(nullptr),
 m_pos(Vector3(0,0,0))
 {
 	m_pSummonEffect = new SummonEffect();
+	m_pSummonWaveEffect = new SummonWaveEffect();
 	m_pExitEffect = new ExitEffect();
 
 	FOR((int)SKILL_ACTION_TYPE::MAX) m_pAttackData[i] = nullptr;
@@ -70,6 +72,7 @@ Stand::Base::~Base()
 	SAFE_DELETE(m_pIconRip);
 
 	SAFE_DELETE(m_pSummonEffect);
+	SAFE_DELETE(m_pSummonWaveEffect);
 	SAFE_DELETE(m_pExitEffect);
 
 
@@ -137,7 +140,7 @@ void Stand::Base::Update(bool bControl)
 			m_bActive = false;
 
 			// 帰宅エフェクト
-			m_pExitEffect->Action(m_pos + Vector3(0, 0, -10), 1.5f, 0.5f);
+			m_pExitEffect->Action(m_pos + Vector3(0, 0, -10), 1.25f, 0.25f);
 		}
 
 	}// 出ていけ
@@ -151,6 +154,7 @@ void Stand::Base::Update(bool bControl)
 
 	// エフェクト更新
 	m_pSummonEffect->Update();
+	m_pSummonWaveEffect->Update();
 	m_pExitEffect->Update();
 }
  
@@ -182,6 +186,7 @@ void Stand::Base::Render(tdnShader* shader, char* name)
 {
 	// エフェクト描画
 	m_pSummonEffect->Render();
+	m_pSummonWaveEffect->Render();
 	m_pExitEffect->Render();
 
 	// アクティブじゃなかったら出ていけぇ！！
@@ -247,6 +252,8 @@ void Stand::Base::Action(SKILL_ACTION_TYPE type)
 	m_pObj->Update();
 
 	//m_pSummonEffect->Action(m_pos + Vector3(0, 0, -10), 1, 1);
+	m_pSummonWaveEffect->Action(GetCenterPos(), 0.5f, 2.0f);
+
 }
 
 // ペルソナブレイク
@@ -256,7 +263,7 @@ void Stand::Base::Break()
 	{
 		// ここにブレイクの音とかエフェクトとか
 		// 帰宅エフェクト
-		m_pExitEffect->Action(m_pos + Vector3(0, 0, -10), 1.5f, 0.5f);
+		m_pExitEffect->Action(m_pos + Vector3(0, 0, -10), 1.25f, 0.25f);
 		m_bActive = false;
 	}
 }

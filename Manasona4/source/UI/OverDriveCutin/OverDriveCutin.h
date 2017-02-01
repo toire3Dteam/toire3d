@@ -16,6 +16,7 @@ public:
 	void Render();
 
 	void Action();
+	void Stop();
 
 private:
 	// îwåi

@@ -111,6 +111,22 @@ void SelectUIState::FirstStep::Execute(SelectUI *pMain)
 			pMain->GetFSM()->ChangeState(MiddleStep::GetInstance());
 			return;
 		}
+
+		// △でランダムセレクト
+		if (tdnInput::KeyGet(KEYCODE::KEY_D, pMain->m_iDeviceID) == 3)
+		{
+			pMain->m_iSelectCharacterNo = tdnRandom::Get(0, (int)(CHARACTER::END) - 1);
+			
+			// 演出(キャラの名前とか)
+			pMain->ActionChara();
+
+			// SEの再生
+			se->Play("決定1");
+
+			pMain->GetFSM()->ChangeState(MiddleStep::GetInstance());
+			return;
+		}
+
 	}
 
 		// メニューに戻りたいプレイヤーがいることを
@@ -291,6 +307,21 @@ void SelectUIState::SecondStep::Execute(SelectUI *pMain)
 		return;
 	}
 	
+	// △でランダムセレクト
+	if (tdnInput::KeyGet(KEYCODE::KEY_D, pMain->m_iDeviceID) == 3)
+	{
+		pMain->m_iSelectPartnerNo = tdnRandom::Get(0, (int)(PARTNER::END) - 1);
+		
+		// 演出(パートナーの名前)
+		pMain->ActionPartner();
+
+		// SEの再生
+		se->Play("決定1");
+
+		pMain->GetFSM()->ChangeState(SecondToOKStep::GetInstance());
+		return;
+	}
+
 	// 戻る
 	if (tdnInput::KeyGet(KEYCODE::KEY_A, pMain->m_iDeviceID) == 3)
 	{
