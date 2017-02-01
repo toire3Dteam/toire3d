@@ -132,6 +132,7 @@ void BasePlayer::LoadAttackFrameList(LPSTR filename)
 		{ "[[投げ成功]]", BASE_ACTION_STATE::THROW_SUCCESS },
 		{ "[[必殺技]]", BASE_ACTION_STATE::HEAVEHO_DRIVE },
 		{ "[[必殺技2]]", BASE_ACTION_STATE::HEAVEHO_DRIVE2 },
+		{ "[[必殺技3]]", BASE_ACTION_STATE::HEAVEHO_DRIVE3 },
 		{ "[[超必殺技]]", BASE_ACTION_STATE::HEAVEHO_DRIVE_OVERFLOW }
 	};
 
@@ -1512,7 +1513,17 @@ void BasePlayer::Render(tdnShader* shader, char* name)
 	m_pPanelEffectMGR->Render3D();
 	m_pUVEffectMGR->Render();
 
-#ifdef _DEBUG
+	// デバッグ
+	//tdnText::Draw(32 + m_deviceID * 250, 560, 0xff00ff80, "CollectScore : %d", m_CollectScore);
+	//tdnText::Draw(32 + m_deviceID * 250, 600, 0xffff8000, "Score : %d", m_score);
+
+	//tdnText::Draw(32 + m_deviceID * 250, 630, 0xff00ff80, "スタンドゲージ : %d", m_pStand->GetStandGage());
+	//tdnText::Draw(32 + m_deviceID * 250, 660, 0xffff8000, "スタンドストック: %d", m_pStand->GetStandStock());
+
+}
+
+void BasePlayer::RenderDebug()
+{
 	// 判定の描画
 	CollisionShape::Square square;
 
@@ -1548,14 +1559,8 @@ void BasePlayer::Render(tdnShader* shader, char* name)
 		}
 	}
 
-#endif
-
-	// デバッグ
-	//tdnText::Draw(32 + m_deviceID * 250, 560, 0xff00ff80, "CollectScore : %d", m_CollectScore);
-	//tdnText::Draw(32 + m_deviceID * 250, 600, 0xffff8000, "Score : %d", m_score);
-
-	//tdnText::Draw(32 + m_deviceID * 250, 630, 0xff00ff80, "スタンドゲージ : %d", m_pStand->GetStandGage());
-	//tdnText::Draw(32 + m_deviceID * 250, 660, 0xffff8000, "スタンドストック: %d", m_pStand->GetStandStock());
+	Vector2 pos2d = Math::WorldToScreen(m_vPos);
+	tdnText::Draw((int)pos2d.x - 20, (int)pos2d.y - 160, 0xffffffff, "F: %d", m_iCurrentActionFrame);
 
 }
 

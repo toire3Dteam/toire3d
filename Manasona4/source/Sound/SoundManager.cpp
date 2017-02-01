@@ -482,6 +482,7 @@ void VOICE_Manager::Load(CHARACTER eCharacter)
 		{ "[[投げ成功]]",					VOICE_TYPE::THROW_SUCCESS },
 		{ "[[必殺技]]",						VOICE_TYPE::HEAVEHO_DRIVE },
 		{ "[[必殺技2]]",					VOICE_TYPE::HEAVEHO_DRIVE2 },
+		{ "[[必殺技3]]",					VOICE_TYPE::HEAVEHO_DRIVE3 },
 		{ "[[超必殺技]]",					VOICE_TYPE::HEAVEHO_DRIVE_OVERFLOW },
 		{ "[[起き上がり]]",					VOICE_TYPE::REVERSAL },
 		{ "[[ノックバック]]",				VOICE_TYPE::KNOCK_BACK },

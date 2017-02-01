@@ -182,9 +182,18 @@ public:
 			bool Execute();
 			void Exit();
 		};
+
+		class ThrowSuccess :public Base
+		{
+		public:
+			ThrowSuccess(Aniki *pAniki);
+			void Enter();
+			bool Execute();
+			void Exit();
+		};
 	};
 
-	enum class HEAVEHO_TYPE { STRIKE, THROW, MAX }m_eHeaveHoType;
+	enum class HEAVEHO_TYPE { STRIKE, THROW, THROW_SUCCESS, MAX }m_eHeaveHoType;
 
 	HeaveHoAction::Base *m_pHeaveHoActions[(int)HEAVEHO_TYPE::MAX];
 

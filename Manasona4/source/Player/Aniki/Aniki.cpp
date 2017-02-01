@@ -716,7 +716,7 @@ void Aniki::InitActionDatas()
 	//	ヒーホードライブ(投げ必殺)
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE2].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE2].pAttackData->damage = 114;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE2].pAttackData->damage = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE2].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE2].pAttackData->HitSE = "掴み成功";
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE2].pAttackData->WhiffSE = "空振り5";
@@ -728,7 +728,7 @@ void Aniki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE2].pAttackData->ShakeCameraInfo.Set(.5f, 10);
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE2].pAttackData->GuardRecoveryFrame = 18;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE2].pAttackData->attribute = ATTACK_ATTRIBUTE::THROW;
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE2].pAttackData->fComboRate = 0.85f;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE2].pAttackData->fComboRate = 1.0f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE2].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE2].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
@@ -744,6 +744,40 @@ void Aniki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE2].pAttackData->pCollisionShape->width = 6;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE2].pAttackData->pCollisionShape->height = 4;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE2].pAttackData->pCollisionShape->pos.Set(6, 4, 0);
+
+
+	//==============================================================================================================
+	//	ヒーホードライブ(投げ必殺成功後)
+	// 地上ヒットも空中ヒットも共通の情報
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].InstanceAttackData();	// アタックデータ作成
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->damage = 4545;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->pierceLV = 0;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->HitSE = "フィニッシュ大";
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->WhiffSE = "空振り5";
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->HitEffectType = EFFECT_TYPE::FINISH_HIT;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->WhiffEffectType = EFFECT_TYPE::WHIFF;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->bAntiAir = false;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->bFinish = true;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->AntiGuard = ANTIGUARD_ATTACK::ALL_BREAK;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->ShakeCameraInfo.Set(1.0f, 20);
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->GuardRecoveryFrame = 18;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->attribute = ATTACK_ATTRIBUTE::STRIKE;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->fComboRate = 0.85f;
+	// 地上ヒットと空中ヒットで挙動が変わるもの
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(7, 2);
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(7, 2);
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 20;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 20;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 90;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 90;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
+	// 判定形状
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->pCollisionShape->width = 16;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->pCollisionShape->height = 14;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->pCollisionShape->pos.Set(6, 4, 0);
 
 
 	//==============================================================================================================
@@ -807,6 +841,7 @@ void Aniki::InitActionDatas()
 
 	m_pHeaveHoActions[(int)HEAVEHO_TYPE::STRIKE] = new HeaveHoAction::Strike(this);
 	m_pHeaveHoActions[(int)HEAVEHO_TYPE::THROW] = new HeaveHoAction::Throw(this);
+	m_pHeaveHoActions[(int)HEAVEHO_TYPE::THROW_SUCCESS] = new HeaveHoAction::ThrowSuccess(this);
 }
 
 Aniki::~Aniki()
@@ -890,7 +925,8 @@ void Aniki::InitMotionDatas()
 	m_iMotionNumbers[(int)MOTION_TYPE::SKILL_AERIALDROP] = 24;
 	m_iMotionNumbers[(int)MOTION_TYPE::HEAVEHO_DRIVE] = 7;
 	m_iMotionNumbers[(int)MOTION_TYPE::HEAVEHO_DRIVE2] = 39;
-	m_iMotionNumbers[(int)MOTION_TYPE::HEAVEHO_DRIVE_OVERFLOW] = 25;
+	m_iMotionNumbers[(int)MOTION_TYPE::HEAVEHO_DRIVE3] = 25;
+	m_iMotionNumbers[(int)MOTION_TYPE::HEAVEHO_DRIVE_OVERFLOW] = 39;
 	m_iMotionNumbers[(int)MOTION_TYPE::THROW] = 26;
 	m_iMotionNumbers[(int)MOTION_TYPE::THROW_SUCCESS] = 27;
 	m_iMotionNumbers[(int)MOTION_TYPE::THROW_DRAW] = 28;
@@ -1387,10 +1423,10 @@ void Aniki::HeavehoDriveInit()
 
 	// ヒーホーのタイプ
 	m_eHeaveHoType = (
-		m_pStateMachine->isPrevState(*BasePlayerState::Wait::GetInstance()) &&
-		m_pStateMachine->isPrevState(*BasePlayerState::Walk::GetInstance()) &&
-		m_pStateMachine->isPrevState(*BasePlayerState::BackWalk::GetInstance()) &&
-		m_pStateMachine->isPrevState(*BasePlayerState::Run::GetInstance()) &&
+		m_pStateMachine->isPrevState(*BasePlayerState::Wait::GetInstance()) ||
+		m_pStateMachine->isPrevState(*BasePlayerState::Walk::GetInstance()) ||
+		m_pStateMachine->isPrevState(*BasePlayerState::BackWalk::GetInstance()) ||
+		m_pStateMachine->isPrevState(*BasePlayerState::Run::GetInstance()) ||
 		m_pStateMachine->isPrevState(*BasePlayerState::BackStep::GetInstance())
 		) ?
 		HEAVEHO_TYPE::THROW : HEAVEHO_TYPE::STRIKE;
@@ -1498,10 +1534,82 @@ void Aniki::HeaveHoAction::Throw::Enter()
 
 bool Aniki::HeaveHoAction::Throw::Execute()
 {
-	return true;
+	// 投げモーション終わったら
+	if (!m_pAniki->isAttackState())
+	{
+		return true;
+	}
+
+	// 移動
+	if (m_pAniki->isActiveFrame())
+	{
+		m_pAniki->AddMove(Vector3(m_pAniki->GetDirVecX(), 0, 0));
+	}
+
+	// 掴み成功したら
+	if (m_pAniki->isHitAttack())
+	{
+		// 掴み成功演出へ
+		m_pAniki->m_eHeaveHoType = HEAVEHO_TYPE::THROW_SUCCESS;
+		m_pAniki->m_pHeaveHoActions[(int)HEAVEHO_TYPE::THROW_SUCCESS]->Enter();
+	}
+
+	return false;
 }
 
 void Aniki::HeaveHoAction::Throw::Exit()
+{
+}
+
+
+Aniki::HeaveHoAction::ThrowSuccess::ThrowSuccess(Aniki * pAniki) :Base(pAniki)
+{}
+
+void Aniki::HeaveHoAction::ThrowSuccess::Enter()
+{
+	// モーションに変える
+	m_pAniki->SetMotion(MOTION_TYPE::HEAVEHO_DRIVE3);
+
+	// アクションステート変更
+	m_pAniki->SetActionState(BASE_ACTION_STATE::HEAVEHO_DRIVE3);
+
+	// 必殺ボイスを再生する
+	voice->Play(VOICE_TYPE::HEAVEHO_DRIVE3, CHARACTER::ANIKI);
+
+	// 兄貴の動きを止める
+	m_pAniki->SetMove(VECTOR_ZERO);
+
+	// 上に打ち上げる
+	m_pAniki->GetTargetPlayer()->SetMove(Vector3(m_pAniki->GetDirVecX() * .01f, 6, 0));
+
+	// アイルーみたいに座標をいじる
+	m_pAniki->SetPos(VECTOR_ZERO);
+	m_pAniki->GetTargetPlayer()->SetPos(Vector3(m_pAniki->GetDirVecX() * 5, 0, 0));
+}
+
+bool Aniki::HeaveHoAction::ThrowSuccess::Execute()
+{
+	// 攻撃終わったら
+	if (!m_pAniki->isAttackState())
+	{
+		return true;
+	}
+
+	// 落ちてくるやつ制御する
+	const Vector3 l_vTargetMove(m_pAniki->GetTargetPlayer()->GetMove());
+	if(l_vTargetMove.y < 0) m_pAniki->GetTargetPlayer()->SetMove(l_vTargetMove * 0.9725f);
+
+	// 判定発生フレーム
+	if (m_pAniki->isActiveFrame())
+	{
+		// アッーーーー
+		voice->Play(VOICE_TYPE::DIE, CHARACTER::ANIKI);
+	}
+
+	return false;
+}
+
+void Aniki::HeaveHoAction::ThrowSuccess::Exit()
 {
 }
 

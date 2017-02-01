@@ -70,6 +70,9 @@ hoihoi.wav
 [[•KŽE‹Z2]]
 yugami.wav
 
+[[•KŽE‹Z3]]
+darashine.wav
+
 [[’´•KŽE‹Z]]
 aaaa.wav
 

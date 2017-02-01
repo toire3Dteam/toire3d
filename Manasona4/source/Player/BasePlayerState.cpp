@@ -5416,7 +5416,7 @@ void BasePlayerState::ThrowBind::Enter(BasePlayer * pPerson)
 	pPerson->SetMove(VECTOR_ZERO);
 
 	// 重力とか無視する
-	pPerson->SetMoveUpdate(false);
+	//pPerson->SetMoveUpdate(false);
 
 	// ペルソナブレイク
 	pPerson->GetStand()->Break();

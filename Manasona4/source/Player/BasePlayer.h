@@ -164,6 +164,7 @@ enum class BASE_ACTION_STATE
 	THROW_SUCCESS,		// 投げ成功
 	HEAVEHO_DRIVE,		// ヒーホードライブ
 	HEAVEHO_DRIVE2,		// ヒーホードライブ2
+	HEAVEHO_DRIVE3,		// ヒーホードライブ3
 	HEAVEHO_DRIVE_OVERFLOW,// ヒーホードライブ_オーバーフロー
 	FRAMECOUNT,			// ★とりあえず一定フレーム計りたいというときに、今使っているのは(投げ失敗の間だったり、投げ抜けの間だったり。)
 	END					// 何もなし　(A列車)名前
@@ -220,6 +221,7 @@ enum class MOTION_TYPE
 	SKILL4,					// スキル枠4
 	HEAVEHO_DRIVE,			// DD
 	HEAVEHO_DRIVE2,			// DD2
+	HEAVEHO_DRIVE3,			// DD3
 	BURST,					// バースト
 	HEAVEHO_DRIVE_OVERFLOW,	// AH
 	THROW,					// 投げ
@@ -454,7 +456,8 @@ public:
 	virtual void RenderDeferred();
 	virtual void RenderUI();
 	virtual void ShaderSendParam();
-	virtual void RenderCommandFrame(int x,int y);
+	void RenderCommandFrame(int x, int y);
+	void RenderDebug();
 
 	//------------------------------------------------------
 	//	継承してるやつに強制的に呼ばせる系

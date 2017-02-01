@@ -309,9 +309,13 @@ void PlayerManager::Render()
 	{
 		if(m_bHeaveHoDriveOverFlow)
 			m_pPlayers[i]->RenderDrive();
-		else 
+		else
+		{
 			m_pPlayers[i]->Render();
-
+#ifdef _DEBUG
+			m_pPlayers[i]->RenderDebug();
+#endif
+		}
 	}
 }
 
