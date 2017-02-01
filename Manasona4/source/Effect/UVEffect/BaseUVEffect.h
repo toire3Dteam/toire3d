@@ -1134,3 +1134,39 @@ public:
 
 private:
 };
+
+
+/*****************************************/
+//	サモン
+/*****************************************/
+class SummonEffect :public BaseUVEffect
+{
+public:
+	SummonEffect();
+	~SummonEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	//void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+
+};
+
+
+/*****************************************/
+//	ペルソナ帰宅
+/*****************************************/
+class ExitEffect :public BaseUVEffect
+{
+public:
+	ExitEffect();
+	~ExitEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	//void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+
+};

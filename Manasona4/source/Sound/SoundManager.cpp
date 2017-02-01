@@ -217,8 +217,8 @@ int SE_Manager::Play_in(int data_num, bool loop)
 {
 	if (data_num != TDNSOUND_PLAY_NONE)
 	{
-		play_manager->SetPan(data_num, DSBPAN_CENTER);
-		play_manager->SetVolume(data_num, DSBVOLUME_MAX);
+		//play_manager->SetPan(data_num, DSBPAN_CENTER);
+		//play_manager->SetVolume(data_num, DSBVOLUME_MAX);
 		play_manager->Play(data_num, loop);
 	}
 	return TDNSOUND_PLAY_NONE;

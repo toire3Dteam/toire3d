@@ -610,7 +610,7 @@ void sceneResult::CameraRender()
 	// Ÿ‚Á‚½ƒvƒŒƒCƒ„[•`‰æ
 	if (m_bPerformanceFlag == false)
 	{
-		m_WinPlayer->Render();
+		m_WinPlayer->Render(shaderM,"copy");
 	}
 
 	m_grand->Render(/*shaderM,"black"*/);

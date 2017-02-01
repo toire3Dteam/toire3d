@@ -17,15 +17,7 @@ namespace Stand
 		virtual void Action(SKILL_ACTION_TYPE type);
 
 		// ペルソナブレイク
-		void Break()
-		{
-			if (m_bActive)
-			{
-				// ここにブレイクの音とかエフェクトとか
-
-				m_bActive = false;
-			}
-		}
+		void Break();
 
 		// ゲッター
 		virtual bool isAttackFrame()
@@ -67,6 +59,11 @@ namespace Stand
 		Vector3 m_move;			// 移動値
 		DIR m_dir;				// 向き
 		bool m_bActive;			// 出てるかどうか
+		float m_fScale;			// 拡大縮小
+
+		// エフェクト
+		SummonEffect* m_pSummonEffect;
+		ExitEffect*	  m_pExitEffect;
 
 		// アイコン
 		tdn2DAnim* m_pIcon;
@@ -79,7 +76,7 @@ namespace Stand
 		int m_standGage;		// スタンドゲージ
 
 
-		FRAME_STATE m_ActionFrameList[(int)SKILL_ACTION_TYPE::MAX][FRAME_MAX];
+		FRAME_STATE m_ActionFrameList[(int)SKILL_ACTION_TYPE::MAX][FRAME_MAX * 2];// ★スタンドだけフレーム長く
 		SKILL_ACTION_TYPE m_ActionType;	// アクションの種類(↑の左の添え字の中身)
 		int m_CurrentActionFrame;	// アクションフレームリストの中を再生しているフレーム(↑↑の右の添え字の中身)
 
@@ -122,4 +119,18 @@ namespace Stand
 		BaseUVEffect *m_pBullet;	// 飛び道具のメッシュの実体(玉に参照させる)
 
 	};
+
+	/**************************/
+	//		ヘテ
+	class Hete : public Base
+	{
+	public:
+		Hete(BasePlayer *pPlayer);
+		//~Mokoi();
+		void Update(bool bControl);
+
+		// 純粋仮想オーバーライド
+		void Action(SKILL_ACTION_TYPE type);
+	};
+
 }

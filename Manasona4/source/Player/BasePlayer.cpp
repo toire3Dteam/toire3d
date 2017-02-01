@@ -365,8 +365,11 @@ m_eCharacterType(CHARACTER::AIROU)
 	case PARTNER::MAYA:
 		m_pStand = new Stand::Maya(this);
 		break;
+	case PARTNER::HETE:
+		m_pStand = new Stand::Hete(this);
+		break;
 	default:
-		assert(0);
+		MyAssert(0,"そのスタンドのタイプ存在しない");
 		break;
 	}
 

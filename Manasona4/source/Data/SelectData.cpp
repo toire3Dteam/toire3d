@@ -4,7 +4,7 @@
 
 SideData::SideData() :
 eCharacter(CHARACTER::ANIKI),	// 選択キャラクター
-ePartner(PARTNER::MOKOI),			// 選択パートナー
+ePartner(PARTNER::HETE),			// 選択パートナー
 iDeviceID(0),						// 操作するデバイスID
 bAI(false),							// AIかどうか
 eAIType(AI_TYPE::PRACTICE_LAND)		// AIのタイプ

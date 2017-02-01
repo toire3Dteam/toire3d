@@ -12,7 +12,7 @@
 enum class CHARACTER { AIROU, TEKI, NAZENARA, ARAMITAMA, ANIKI, END };
 
 // パートナーのタイプ
-enum class PARTNER { MOKOI, MAYA, END };
+enum class PARTNER { MOKOI, MAYA, HETE, END };
 
 // ステージのタイプ
 enum class STAGE { SAND, SYUTEN, SEA, GARDEN, NANASATO_SITY, MAX };

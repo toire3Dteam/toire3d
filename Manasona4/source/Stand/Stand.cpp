@@ -49,8 +49,15 @@ m_pIconRip(nullptr),
 m_ActionType(SKILL_ACTION_TYPE::NO_ACTION),
 m_CurrentActionFrame(0),
 m_dir(DIR::LEFT),
-m_ePartnerType(PARTNER::MOKOI)
+m_ePartnerType(PARTNER::MOKOI),
+m_fScale(1.0f),
+m_pSummonEffect(nullptr),
+m_pExitEffect(nullptr),
+m_pos(Vector3(0,0,0))
 {
+	m_pSummonEffect = new SummonEffect();
+	m_pExitEffect = new ExitEffect();
+
 	FOR((int)SKILL_ACTION_TYPE::MAX) m_pAttackData[i] = nullptr;
 }
 
@@ -61,6 +68,11 @@ Stand::Base::~Base()
 
 	SAFE_DELETE(m_pIcon);
 	SAFE_DELETE(m_pIconRip);
+
+	SAFE_DELETE(m_pSummonEffect);
+	SAFE_DELETE(m_pExitEffect);
+
+
 }
 
 void Stand::Base::Update(bool bControl)
@@ -68,44 +80,78 @@ void Stand::Base::Update(bool bControl)
 	// スタンドゲージ更新
 	if(bControl)StandGageUpdate();
 
-	// アクティブじゃなかったら出ていけぇ！！
-	if (!m_bActive) return;
-
-	// フレームリスト更新
-	// アクションフレームの更新
-	// 攻撃データがあるなら
-	if (m_pAttackData[(int)m_ActionType] != nullptr)
+	// スケール調整
+	if (m_bActive == true) 
 	{
-		// 今の経過時間とディレイフレームになったら
-		if (m_pAttackData[(int)m_ActionType]->WhiffDelayFrame == m_CurrentActionFrame)
+		m_fScale += 0.25f;
+	}
+	else
+	{
+		m_fScale -= 0.25f;
+	}
+
+	// クランプ
+	m_fScale = Math::Clamp(m_fScale, 0.0f, 1.0f);
+
+
+	// アクティブじゃなかったら出ていけぇ！！
+	if (m_bActive == true)
+	{
+		// フレームリスト更新
+		// アクションフレームの更新
+		// 攻撃データがあるなら
+		if (m_pAttackData[(int)m_ActionType] != nullptr)
 		{
-			// (A列車)ここで攻撃判定が発動した瞬間を取ってきてる
-
-			// 振りエフェクト発動（仮）！
-			m_pPlayer->AddEffectAction(m_pos + Vector3(0, 5, -3), m_pAttackData[(int)m_ActionType]->WhiffEffectType);
-
-			LPCSTR SE_ID(m_pAttackData[(int)m_ActionType]->WhiffSE);
-			// 空振りSE入ってたら
-			if (SE_ID)
+			// 今の経過時間とディレイフレームになったら
+			if (m_pAttackData[(int)m_ActionType]->WhiffDelayFrame == m_CurrentActionFrame)
 			{
-				// ディレイフレーム経過したら再生
-				se->Play((LPSTR)SE_ID);
+				// (A列車)ここで攻撃判定が発動した瞬間を取ってきてる
+
+				// 振りエフェクト発動（仮）！
+				m_pPlayer->AddEffectAction(m_pos + Vector3(0, 5, -3), m_pAttackData[(int)m_ActionType]->WhiffEffectType);
+
+				LPCSTR SE_ID(m_pAttackData[(int)m_ActionType]->WhiffSE);
+				// 空振りSE入ってたら
+				if (SE_ID)
+				{
+					// ディレイフレーム経過したら再生
+					se->Play((LPSTR)SE_ID);
+				}
+			}
+
+
+			// 判定復活フレーム
+			if (m_ActionFrameList[(int)m_ActionType][m_CurrentActionFrame] == FRAME_STATE::RECOVERY_HIT)
+			{
+				// 判定リセット
+				GetAttackData()->bHit = GetAttackData()->bHitSuccess = false;
 			}
 		}
-	}
 
-	// フレーム最後まで再生したら
-	if (m_ActionFrameList[(int)m_ActionType][m_CurrentActionFrame++] == FRAME_STATE::END)
-	{
-		// ★アクティブをオフ(本来だったら半透明フェードアウトを使う)
-		m_bActive = false;
-	}
+
+
+		// フレーム最後まで再生したら
+		if (m_ActionFrameList[(int)m_ActionType][m_CurrentActionFrame++] == FRAME_STATE::END)
+		{
+			// ★アクティブをオフ(本来だったら半透明フェードアウトを使う)
+			m_bActive = false;
+
+			// 帰宅エフェクト
+			m_pExitEffect->Action(m_pos + Vector3(0, 0, -10), 1.5f, 0.5f);
+		}
+
+	}// 出ていけ
 
 	// 3Dオブジェクトの更新
 	m_pObj->Animation();
 	m_pObj->SetAngle(DIR_ANGLE[(int)m_dir]);
 	m_pObj->SetPos(m_pos);
+	m_pObj->SetScale(m_fScale, 1.0f, m_fScale);
 	m_pObj->Update();
+
+	// エフェクト更新
+	m_pSummonEffect->Update();
+	m_pExitEffect->Update();
 }
  
 // スタンドゲージ更新
@@ -134,12 +180,16 @@ void Stand::Base::StandGageUpdate()
 
 void Stand::Base::Render(tdnShader* shader, char* name)
 {
+	// エフェクト描画
+	m_pSummonEffect->Render();
+	m_pExitEffect->Render();
 
 	// アクティブじゃなかったら出ていけぇ！！
-	if (!m_bActive) return;
+	if (m_bActive == false && m_fScale <= 0.0f) return;
 
 	// 3Dオブジェクトの描画
 	m_pObj->Render(shader,name);
+
 
 #ifdef _DEBUG
 	// 判定の描画
@@ -191,6 +241,24 @@ void Stand::Base::Action(SKILL_ACTION_TYPE type)
 
 	// プレイヤーの向きをもらう
 	m_dir = m_pPlayer->GetDir();
+
+	m_fScale = 0.0f;
+	m_pObj->SetScale(m_fScale, 1.0f, m_fScale);
+	m_pObj->Update();
+
+	//m_pSummonEffect->Action(m_pos + Vector3(0, 0, -10), 1, 1);
+}
+
+// ペルソナブレイク
+void Stand::Base::Break()
+{
+	if (m_bActive)
+	{
+		// ここにブレイクの音とかエフェクトとか
+		// 帰宅エフェクト
+		m_pExitEffect->Action(m_pos + Vector3(0, 0, -10), 1.5f, 0.5f);
+		m_bActive = false;
+	}
 }
 
 /******************************/
@@ -266,8 +334,6 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 
 void Stand::Mokoi::Action(SKILL_ACTION_TYPE type)
 {
-	// 基底クラスのアクション	★今は全部地上の攻撃扱いにする
-	Base::Action(SKILL_ACTION_TYPE::LAND);
 
 	// とりあえず、プレイヤーと同じ座標
 	m_pos = m_pPlayer->GetPos();
@@ -281,6 +347,10 @@ void Stand::Mokoi::Action(SKILL_ACTION_TYPE type)
 
 	// 空中ジャンプ復活
 	m_pPlayer->SetAerialJump(true);
+
+	// 基底クラスのアクション	★今は全部地上の攻撃扱いにする
+	Base::Action(SKILL_ACTION_TYPE::LAND);
+
 }
 
 
@@ -506,9 +576,6 @@ void Stand::Maya::Update(bool bControl)
 
 void Stand::Maya::Action(SKILL_ACTION_TYPE type)
 {
-	// 基底クラスのアクション(全員共通系)
-	Base::Action(type);
-
 	// とりあえず、プレイヤーと同じ座標
 	m_pos = m_pPlayer->GetPos();
 	Vector3 v(0.5f, 0.0f, 1.0f);
@@ -518,4 +585,158 @@ void Stand::Maya::Action(SKILL_ACTION_TYPE type)
 	m_pObj->SetMotion(0);
 	m_pObj->SetPos(m_pos);
 	m_pObj->Update();
+
+	// 基底クラスのアクション(全員共通系)
+	Base::Action(type);
+
+
+}
+
+
+
+
+/******************************/
+//		ヘテ
+/******************************/
+Stand::Hete::Hete(BasePlayer *pPlayer) :Base(pPlayer)
+{
+	// モコイの実体
+	m_pObj = new iex3DObj("DATA/CHR/Stand/Hete/hete.IEM");
+
+	// タイプ設定
+	m_ePartnerType = PARTNER::HETE;
+
+	// アクションフレームロードする
+	LoadActionFrameList("DATA/CHR/Stand/Hete/FrameList.txt");
+
+	// 多段用
+	for (int i = 0; i < 8; i++)
+	{
+		m_ActionFrameList[(int)SKILL_ACTION_TYPE::LAND][20 + (i * 16)] = FRAME_STATE::RECOVERY_HIT;
+	}
+
+	//m_ActionFrameList[(int)SKILL_ACTION_TYPE::LAND][20 + 13] = FRAME_STATE::RECOVERY_HIT;
+	//m_ActionFrameList[(int)SKILL_ACTION_TYPE::LAND][20 + 19] = FRAME_STATE::RECOVERY_HIT;
+
+	/*****************************/
+	// 基本ステータス
+	m_standStockMAX = 1;
+	m_standGageMAX = 10 * 8;
+
+	/*****************************/
+	// そのキャラクターのアイコン
+	m_pIcon = new tdn2DAnim("Data/UI/Game/PersonaIcon/hete.png");
+	m_pIconRip = new tdn2DAnim("Data/UI/Game/PersonaIcon/hete.png");
+
+	//==============================================================================================================
+	//	地上ニュートラル
+	// 地上ヒットも空中ヒットも共通の情報
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND] = new AttackData;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->damage = 160;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pierceLV = 0;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->HitSE = "ヒット6";
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->WhiffSE = "空振り1";
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->HitEffectType = EFFECT_TYPE::MULTIPLE_HIT_BLOW;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->WhiffEffectType = EFFECT_TYPE::WHIFF;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->bAntiAir = true;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->bFinish = true;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->AntiGuard = ANTIGUARD_ATTACK::NONE;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->ShakeCameraInfo.Set(.2f, 2);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->GuardRecoveryFrame = 20;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->fGuardKnockBackPower = 0.8f;	//	大めで
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->fComboRate = 0.99f;
+	// 地上ヒットと空中ヒットで挙動が変わるもの
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(1.4f, 0.0f);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(1.4f, 0.0f);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 6;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 6;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 60;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 60;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_BACK;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_BACK;
+	// 判定形状
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pCollisionShape->width = 8;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pCollisionShape->height = 12;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pCollisionShape->pos.Set(7.5f, 17, 0);
+
+	// 判定発動した瞬間に空振りSEを再生してみる
+	FOR((int)SKILL_ACTION_TYPE::MAX)
+	{
+		if (!m_pAttackData[i]) continue;	// newされてなかったらスルー
+											//for (int place = 0; place < (int)AttackData::HIT_PLACE::MAX; place++) MyAssert((m_pAttackData[i]->places[place].FlyVector.x >= 0), "Xの値が-になることは絶対ない");
+		MyAssert((m_pAttackData[i]->pCollisionShape->pos.x >= 0), "Xの値が-になることは絶対ない");
+		m_pAttackData[i]->bHit = false;
+		for (int frame = 0;; frame++)if (m_ActionFrameList[i][frame] == FRAME_STATE::ACTIVE) { m_pAttackData[i]->WhiffDelayFrame = frame; break; }
+	}
+
+	// アッパーの空振りフレーム調整
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->WhiffDelayFrame -= 8;
+}
+
+
+void Stand::Hete::Update(bool bControl)
+{
+	// 基底クラスの更新
+	Base::Update(bControl);
+
+	// アクティブじゃなかったら出ていけぇ！！
+	if (!m_bActive) return;
+
+	// キャラクターの移動
+	if (m_dir == DIR::LEFT)
+	{
+		m_pos.x -= 0.5f;
+	}
+	else
+	{
+		m_pos.x += 0.5f;
+	}
+
+
+	// キルラッシュ
+	if (m_ActionType == SKILL_ACTION_TYPE::LAND)
+	{
+		//// 走り終わってたら
+		////if (m_ActionType[(int)SKILL_ACTION_TYPE::LAND]->Execute())
+		////{
+		////	 無理やり走るのを終わらせる
+		////		m_ActionType(SKILL_ACTION_TYPE::NO_ACTION);
+		////	return;
+		////}
+
+		// ヒット回数計測
+		if (m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL][m_CurrentActionFrame]
+			== FRAME_STATE::RECOVERY_HIT)
+		{
+			//// 最後の一撃だけ強くする
+			//if (++m_iHitCount >= 3)
+			//{
+			//	m_pTeki->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(1.5f, 0);
+			//	m_pTeki->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.85f, 1.65f);
+			//}
+
+			// コンボレートを下げないようにする
+			//m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->fComboRate = 1.0f;
+		}
+	}
+}
+
+void Stand::Hete::Action(SKILL_ACTION_TYPE type)
+{
+
+	// とりあえず、プレイヤーと同じ座標
+	m_pos = m_pPlayer->GetPos();
+	Vector3 v(0.5f, 0.0f, 0.5f);
+	if (m_dir == DIR::LEFT)v.x *= -1;
+	//v.z *= 1.;
+	m_pos += v * 5.0f;
+	m_pObj->SetMotion(0);
+	m_pObj->SetPos(m_pos);
+	m_pObj->Update();
+
+	// 基底クラスのアクション	★今は全部地上の攻撃扱いにする
+	Base::Action(SKILL_ACTION_TYPE::LAND);
+
 }

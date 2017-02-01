@@ -134,3 +134,14 @@ BurstBallEffect::BurstBallEffect()
 {
 	m_pic = new AnimationUV("Data/UVeffect/Burst/burstBallEffect.IMO", 0.05f, 0.01f, 40, false, 1, 24);
 };
+
+
+SummonEffect::SummonEffect()
+{
+	m_pic = new AnimationUV("Data/UVeffect/Stand/Summon.IMO", 0.0f, 0.06f, 12, false, 3, 8);
+}
+
+ExitEffect::ExitEffect()
+{
+	m_pic = new AnimationUV("Data/UVeffect/Stand/Exit.IMO", 0.0f, -0.04f, 12, false, 3, 10);
+}
