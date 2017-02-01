@@ -121,6 +121,11 @@ protected:
 
 	tdn2DAnim* m_pClearPic;
 	tdn2DAnim* m_pClearPicRip;
+
+	tdn2DAnim* m_pArrow;		// –îˆó
+
+	tdn2DAnim* m_pTaskIconFlash;
+
 };
 
 //+-----------------------------

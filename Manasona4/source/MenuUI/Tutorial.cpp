@@ -36,8 +36,6 @@ BaseTutorial::BaseTutorial(int iTitleNo)
 	m_vTaskPos.x = 50;
 	m_vTaskPos.y = 250;
 
-
-
 	// セレクトナンバー
 	m_iSelectTask = 0;
 
@@ -48,6 +46,15 @@ BaseTutorial::BaseTutorial(int iTitleNo)
 	m_pClearPicRip->OrderRipple(14, 1, 0.025f);
 
 	m_iDeviceID = 0;
+
+	m_pArrow = new tdn2DAnim("Data/UI/Tutorial/Arrow.png");
+	m_pArrow->OrderShake(25 , 8.0f, 0.0f, 10);// 8 
+	m_pArrow->Action();
+
+	m_pTaskIconFlash = new tdn2DAnim("Data/UI/Tutorial/TaskIconFlash.png");
+	m_pTaskIconFlash->OrderAlphaMove(120, 60, 61);
+
+
 }
 
 BaseTutorial::~BaseTutorial()
@@ -57,6 +64,8 @@ BaseTutorial::~BaseTutorial()
 	SAFE_DELETE(m_pClearTips);
 	SAFE_DELETE(m_pClearPic);
 	SAFE_DELETE(m_pClearPicRip);
+	SAFE_DELETE(m_pArrow);
+	SAFE_DELETE(m_pTaskIconFlash);
 
 	m_aTask.clear();	
 }
@@ -80,6 +89,12 @@ void BaseTutorial::Init(int iDeviceID)
 	// 前回の演出を消す
 	m_pClearPic->Stop();
 	m_pClearPicRip->Stop();
+
+	//m_pArrow->Stop();
+
+	// フラッシュ
+	m_pTaskIconFlash->Action();
+
 
 	// 初期の状況設定
 	// 必要な状況があるなら各自書き換える
@@ -142,6 +157,20 @@ void BaseTutorial::Update()
 	m_pClearPic->Update();
 	m_pClearPicRip->Update();
 
+	// 
+	if (m_pArrow->GetAction()->IsEnd() == true)
+	{
+		m_pArrow->Action();
+	}
+	m_pArrow->Update();
+
+	
+	if (m_pTaskIconFlash->GetAction()->IsEnd() == true)
+	{
+		m_pTaskIconFlash->Action();
+	}
+	m_pTaskIconFlash->Update();
+
 }
 
 void BaseTutorial::Render()
@@ -165,6 +194,9 @@ void BaseTutorial::Render()
 			{
 				m_pTaskIcon->Render((int)m_vTaskPos.x + (j * 11) - 8, (int)m_vTaskPos.y + (i * 40) - 4,
 					32, 32, 0, 32, 32, 32);
+
+				m_pTaskIconFlash->Render((int)m_vTaskPos.x + (j * 11) - 8, (int)m_vTaskPos.y + (i * 40) - 4, RS::ADD);
+
 			}
 		
 		}
@@ -181,6 +213,14 @@ void BaseTutorial::Render()
 	// クリア演出用
 	m_pClearPic->Render(0, 0);
 	m_pClearPicRip->Render(0, 0, RS::ADD);
+
+	// 矢印
+	if (m_bClearFlag == false)
+	{
+		m_pArrow->Render((int)m_vTaskPos.x - 46, (int)(m_vTaskPos.y - 2) + (m_iSelectTask * 40));
+	}
+
+
 }
 
 void BaseTutorial::ActionIntroTips()
@@ -269,6 +309,9 @@ void BaseTutorial::TaskSuccess(int select)
 
 		// SE
 		se->Play("ステップクリア");
+
+		// フラッシュ
+		m_pTaskIconFlash->Action();
 	}
 }
 
@@ -1478,20 +1521,35 @@ void DokkoiTutorial::TaskUpdate(BasePlayer * pPerson)
 		DOKKOI = 0, DUSH_CHANCEL = 1
 	};
 
-	// 中段技
-	if (pPerson->GetFSM()->isInState(*BasePlayerState::DokkoiAttack::GetInstance()))
+	// 待機に戻ると最初からやり直し
+	if (pPerson->GetFSM()->isInState(*BasePlayerState::Wait::GetInstance()) ||
+		pPerson->GetFSM()->isInState(*BasePlayerState::Jump::GetInstance()))
+		//pPerson->GetTargetPlayer()->GetRecoveryFrame() <= 0)
 	{
-		if (pPerson->isHitAttack() == true)
+		if (m_bClearFlag == false)
 		{
-			TaskSuccess(DOKKOI);
+			Init(m_iDeviceID);// デバイスは自分自身と同じ
 		}
 	}
-
-	// ダッシュキャンセル
-	if (pPerson->GetActionState() == BASE_ACTION_STATE::FRAMECOUNT)
+	else
 	{
-		TaskSuccess(DUSH_CHANCEL);
+		// 中段技
+		if (pPerson->GetFSM()->isInState(*BasePlayerState::DokkoiAttack::GetInstance()))
+		{
+			if (pPerson->isHitAttack() == true)
+			{
+				TaskSuccess(DOKKOI);
+			}
+		}
+
+		// ダッシュキャンセル
+		if (pPerson->GetActionState() == BASE_ACTION_STATE::FRAMECOUNT)
+		{
+			TaskSuccess(DUSH_CHANCEL);
+		}
+
 	}
+
 }
 
 
