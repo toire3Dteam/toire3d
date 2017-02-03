@@ -98,10 +98,19 @@ namespace Stage
 	{
 	public:
 		Sea() :Base() {}
+		~Sea();
 		void Initialize(Camera *pCamera);
+		void Update() override;
 		void Render() override;
+		void RenderForward() override;
 
 		EFFECT_CAMERA_ID GetIntroCameraScriptID() { return EFFECT_CAMERA_ID::SEA_STAGE_INTRO; }
+
+	private:
+		float		m_fUvSea;
+		iexMesh*	m_pSea;
+		tdn2DObj*	m_pEnvSea;
+
 	};
 
 	// 庭ステージ

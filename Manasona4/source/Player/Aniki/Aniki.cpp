@@ -38,7 +38,7 @@ Aniki::Aniki(SIDE side, const SideData &data) :BasePlayer(side, data), m_pKetsud
 	BasePlayer::LoadCharacterParam("DATA/CHR/Aniki/param.txt");
 
 	m_pName = "Aniki";
-	m_pCutinPic = new tdn2DAnim("DATA/UI/Game/OverDriveCutin/teki.png");
+	m_pCutinPic = new tdn2DAnim("DATA/UI/Game/OverDriveCutin/aniki.png");
 	m_pCutinPic->OrderMoveAppeared(8, -400, +200);
 
 	// フレーム読み込み
@@ -55,7 +55,7 @@ Aniki::Aniki(SIDE side, const SideData &data) :BasePlayer(side, data), m_pKetsud
 	m_pObj = m_pDefaultObj;
 
 	// 顔グラ
-	m_pFacePic = new tdn2DAnim("Data/UI/Game/CharaIcon/TekiIcon.png");
+	m_pFacePic = new tdn2DAnim("Data/UI/Game/CharaIcon/AnikiIcon.png");
 	//m_pFacePic->OrderNone();
 	m_pFacePic->OrderShrink(8, 1, 1.25f);
 
@@ -750,7 +750,7 @@ void Aniki::InitActionDatas()
 	//	ヒーホードライブ(投げ必殺成功後)
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->damage = 4545;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->damage = 4000;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->HitSE = "フィニッシュ大";
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->WhiffSE = "空振り5";
@@ -1290,6 +1290,9 @@ void Aniki::SkillAction::Land4::Exit()
 {
 	// 先行入力リセット
 	m_pAniki->AheadCommandReset();
+
+	// オーバードライブ可能
+	m_pAniki->GetTargetPlayer()->SetNotOverDrive(false);
 }
 
 

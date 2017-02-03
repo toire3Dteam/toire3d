@@ -40,6 +40,10 @@ Vector3	g_vPlayerPos;
 
 iexMesh* g_pTarget;
 
+// 海
+iexMesh* g_pSea;
+tdn2DObj* g_pEnv;
+
 float g_fY = 0;;
 
 //+-------------
@@ -87,6 +91,10 @@ bool sceneRenderingTest2::Initialize()
 
 	g_pSoundWindow = new SoundWindow(Vector2(500, 100));
 
+	// 海
+	g_pSea = new iexMesh("Data/Stage/Sister/Water/Water.imo");
+	g_pEnv = new tdn2DObj("Data/Stage/Sister/Water/EnvSky.png");
+	shaderM->SetValue("EnvMap", g_pEnv);
 
 	// 奥行・スクリーン
 	if (FAILED(tdnSystem::GetDevice()->CreateDepthStencilSurface(1280, 720, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, FALSE, &m_pStencilSurface, NULL)))
@@ -114,7 +122,9 @@ sceneRenderingTest2::~sceneRenderingTest2()
 	SAFE_DELETE(g_pStage);
 	SAFE_DELETE(g_pSky);
 	SAFE_DELETE(g_tagWater.pObj);
-	
+	SAFE_DELETE(g_pSea);
+	SAFE_DELETE(g_pEnv);
+
 	//SAFE_DELETE(m_pStencilSurface);
 	SAFE_RELEASE(m_pStencilSurface);
 	SAFE_DELETE(m_pWaterEnvScreen);
@@ -228,6 +238,9 @@ void sceneRenderingTest2::Update()
 	g_tagWater.pObj->SetPos(g_tagWater.vPos);
 	g_tagWater.pObj->Update();
 
+	g_pSea->SetPos(g_tagWater.vPos + Vector3(0, 10, 0));
+	g_pSea->Update();
+
 	// 他のウィンドウを触っているときに別ウィンドウを動かしたくないときは
 	// m_iChoiceStateをつかうといいかも
 
@@ -271,6 +284,9 @@ void sceneRenderingTest2::Update()
 	m_pAniki->Animation();
 	m_pAniki->Update();
 
+	static float uvWater = 0;
+	uvWater += 0.00025f;
+	shaderM->SetValue("uvSea", uvWater);
 }
 
 //******************************************************************
@@ -312,14 +328,16 @@ void sceneRenderingTest2::Render()
 		//g_tagWater.pObj->Render(shaderM, "G_Buffer");
 		g_pTarget->Render(shaderM, "G_Buffer");
 
+
+
 		// シェーダ終わり
 		DeferredManagerEx.G_End();
 
 
-		DeferredManagerEx.DirLight(m_dirLight, Vector3(0.4f, 0.32f, 0.72f));
-		DeferredManagerEx.HemiLight(Vector3(0.3f, 0.1f, 0.1f), Vector3(0.35f, 0.23f, 0.23f));
-		//DeferredManagerEx.AllLight(m_dirLight, Vector3(0.8f, 0.72f, 0.72f)
-		//	, Vector3(0.6f, 0.5f, 0.5f), Vector3(0.45f, 0.43f, 0.43f));
+		//DeferredManagerEx.DirLight(m_dirLight, Vector3(0.4f, 0.32f, 0.72f));
+		//DeferredManagerEx.HemiLight(Vector3(0.3f, 0.1f, 0.1f), Vector3(0.35f, 0.23f, 0.23f));
+		DeferredManagerEx.AllLight(m_dirLight, Vector3(0.8f, 0.72f, 0.72f)
+			, Vector3(0.6f, 0.5f, 0.5f), Vector3(0.45f, 0.43f, 0.43f));
 
 		// ポイントライト描画
 		DeferredManagerEx.GpuPointLightRender();
@@ -336,6 +354,9 @@ void sceneRenderingTest2::Render()
 			// ターゲット
 			g_pTarget->Render(shaderM, "DefaultLighting");
 
+			// 海
+			g_pSea->Render(shaderM, "DefaultLighting");
+
 			// パーティクル
 			ParticleManager::Render();
 
@@ -350,6 +371,10 @@ void sceneRenderingTest2::Render()
 		shaderM->SetValue("g_fUvWater", g_fUvWater);
 		g_tagWater.pObj->Render(shaderM, "CrystalWater");//CrystalWater
 	
+
+		// 海
+		g_pSea->Render(shaderM, "Sea");
+
 		// ブルーム
 		DeferredManagerEx.BloomRender();
 

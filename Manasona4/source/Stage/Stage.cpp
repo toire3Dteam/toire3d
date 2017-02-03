@@ -162,6 +162,7 @@ void Stage::Sand::Render()
 	m_pAreWall->RenderAreaWall();// 壁
 }
 
+
 //+------------------------------------------------------
 //		海
 //+------------------------------------------------------
@@ -179,7 +180,7 @@ void Stage::Sea::Initialize(Camera *pCamera)
 	m_fWidth = 200;
 
 	// ステージ毎にシェーダに渡すパラメーター
-	m_tagShaderParam.vDirLightVec = Vector3(0.84f, -0.99f, -0.53f);
+	m_tagShaderParam.vDirLightVec = Vector3(-0.86f, -0.97f, -0.53f);
 	m_tagShaderParam.vDirLightColor = Vector3(0.8f, 0.72f, 0.72f);
 	m_tagShaderParam.vSkyColor = Vector3(0.6f, 0.5f, 0.5f);
 	m_tagShaderParam.vGroundColor = Vector3(0.45f, 0.43f, 0.43f);
@@ -187,6 +188,33 @@ void Stage::Sea::Initialize(Camera *pCamera)
 
 	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
 	pCamera->SetStageCameraInfo("DATA/Stage/Sister/camera.txt");
+
+	m_fUvSea = 0.0f;
+	m_pSea = new iexMesh("Data/Stage/Sister/Water/water.IMO");
+	m_pSea->SetScale(1.5f);
+	m_pSea->SetPos(0, -40, 0);
+	m_pSea->SetAngle(-0.02f,0,0);
+	m_pSea->Update();
+
+	m_pEnvSea = new tdn2DObj("Data/Stage/Sister/Water/EnvSky.png");
+	shaderM->SetValue("EnvMap", m_pEnvSea);
+
+}
+Stage::Sea::~Sea()
+{
+	SAFE_DELETE(m_pSea);
+	SAFE_DELETE(m_pEnvSea);
+}
+
+
+
+void Stage::Sea::Update()
+{
+
+	m_fUvSea += 0.00025f;
+	shaderM->SetValue("uvSea", m_fUvSea);
+
+
 }
 
 void Stage::Sea::Render()
@@ -194,6 +222,12 @@ void Stage::Sea::Render()
 	if (m_pBack) m_pBack->Render(shaderM, "sky");
 	m_pObj->Render(shaderM, "Stage");
 	m_pAreWall->RenderAreaWall();// 壁
+}
+
+void Stage::Sea::RenderForward()
+{
+	// 海
+	m_pSea->Render(shaderM,"Sea");
 }
 
 //+------------------------------------------------------

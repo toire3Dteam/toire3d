@@ -3121,3 +3121,292 @@ technique CrystalWater
 
 
 
+//**************************************************************************************************
+//
+//		海
+//
+//**************************************************************************************************
+
+//------------------------------------------------------
+//		頂点フォーマット
+//------------------------------------------------------
+struct VS_OUTPUT_SEA
+{
+	float4 Pos		: POSITION;
+	float4 Color	: COLOR0;
+	float2 Tex1		: TEXCOORD0;
+	float2 Tex2		: TEXCOORD1;
+
+	//行列
+	float4 wPos		: TEXCOORD2;//	ピクセルに送る情報にワールドからのポジション追加
+	float4 RocalPos	: TEXCOORD3;//	ピクセルに送る情報にゲーム画面ラストのポジション追加
+
+	//ライティング
+	//float4 Light	: COLOR1;
+	float4 Ambient	: COLOR2;
+	float3 Normal : COLOR3;
+	float3 vLight	: TEXCOORD4;
+	float3 vE		: TEXCOORD5;
+
+	//追加　座標系
+	float4 ProjectionPos : TEXCOORD6;
+};
+
+
+struct VS_INPUT_SEA
+{
+	float4 Pos    : POSITION;
+	float3 Normal : NORMAL;
+	float2 Tex	  : TEXCOORD0;
+};
+
+////------------------------------------------------------
+////		フォグ関連
+////------------------------------------------------------
+//float	AlphaNear = 10.0f;
+//float	AlphaFar = 200.0f;
+//float	SeaAlpha = 0.0f;//
+
+float uvSea = 0.0f;
+//float3 SeaColor = { 0.2f, 0.8f, 1.7f };
+float3 SeaColor = { 0.3f, 0.65f, 1.1f };
+
+
+inline float4 CalcHemiLight(float3 normal)//　上下の環境光を分ける
+{
+	float4 color;
+	float rate = (normal.y*0.5f) + 0.5f;
+	color.rgb = SkyColor * rate;
+	color.rgb += GroundColor * (1 - rate);
+	color.a = 1.0f;
+
+	return color;
+}
+
+inline float3 CalcDirLight(float3 dir, float3 normal)//　ライトの向きで光の色の強さを返す
+{
+	float3 light;
+	float rate = max(0.0f, dot(-dir, normal));//　光の計算　内積で光の反射を求める
+	light = LightColor * rate;//
+
+	return light;
+}
+
+//------------------------------------------------------
+//	環境マップ用　周りの風景が映りこむマップ
+//------------------------------------------------------
+texture EnvMap;		//	環境テクスチャ
+sampler EnvSamp = sampler_state
+{
+	Texture = <EnvMap>;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+	MipFilter = NONE;
+
+	AddressU = Wrap;
+	AddressV = Wrap;
+};
+//　EnvSamp　はここを通して使用↓　　
+inline float4 CalcEnvironment(float3 normal)
+{
+	float4	color;
+
+	float2	uv;
+	uv.x = normal.x*0.5f + 0.5f;
+	uv.y = normal.y*0.5f + 0.5f;
+
+	color = tex2D(EnvSamp, uv);
+	return color;
+}
+
+
+VS_OUTPUT_SEA VS_Sea(VS_INPUT_SEA In)
+{
+	VS_OUTPUT_SEA Out = (VS_OUTPUT_SEA)0;
+
+	//ローカル座標系上での頂点の座標
+	Out.RocalPos = In.Pos;
+
+	Out.Pos = mul(In.Pos, WVPMatrix);//プロジェクション行列と合成
+	Out.ProjectionPos = Out.Pos;
+
+	Out.Color = 1.0f;//In.Color;
+	Out.Tex1 = In.Tex + float2(-uvSea*1.5, -uvSea * 1.5);
+	Out.Tex2 = In.Tex + float2(uvSea, uvSea*1.5);
+
+
+	float4 P = mul(In.Pos, WMatrix);//ワールド座標に持っていく
+	Out.wPos = mul(In.Pos, WMatrix);//
+	float3x3	mat = WMatrix;//float4x4のTransMatrixの行列を　float3x3のmatに
+								  //法線ベクトル
+	Out.Normal = mul(In.Normal, mat);//
+	Out.Normal = normalize(Out.Normal);//
+
+									   // 半球ライティング
+	//Out.Ambient.rgb = CalcHemiLight(Out.Normal);
+
+	// 頂点ローカル座標系算出
+	float3	vx;
+	float3	vy = { 0, 1, 0.001f };
+	vx = cross(vy, Out.Normal);
+	vx = normalize(vx);
+	vy = cross(vx, Out.Normal);
+	vy = normalize(vy);
+
+	//	ライトベクトル補正 ライトが当たった時の角度
+	Out.vLight.x = dot(vx, g_vWLightVec);			// ライトベクトルを頂点座標系に変換する
+	Out.vLight.y = dot(vy, g_vWLightVec);			// ライトベクトルを頂点座標系に変換する
+	Out.vLight.z = dot(Out.Normal, g_vWLightVec);	// ライトベクトルを頂点座標系に変換する
+	Out.vLight = normalize(Out.vLight);
+
+	// 視線ベクトル補正
+	float3 E = P - ViewPos;			 // 視線ベクトル
+	Out.vE.x = dot(vx, E);			 // 視線ベクトルを頂点座標系に変換する
+	Out.vE.y = dot(vy, E);			 // 視線ベクトルを頂点座標系に変換する
+	Out.vE.z = dot(Out.Normal, E);   // 視線ベクトルを頂点座標系に変換する
+	Out.vE = normalize(Out.vE);//目線
+
+							   ////	フォグ計算
+							   //Out.Ambient.a = (AlphaFar - Out.Pos.z) / (AlphaFar - AlphaNear);
+							   //Out.Ambient.a = saturate(Out.Ambient.a);//指定された値を 0 ～ 1 の範囲にクランプします
+
+	return Out;
+}
+
+float4 PS_Sea(VS_OUTPUT_SEA In) : COLOR
+{
+	float4	OUT;
+//UV２つ作成
+float2 UV1 = In.Tex1;
+float2 UV2 = In.Tex2;
+
+//**********************************************************
+// 視差マッピング
+//**********************************************************  
+// 高さマップを参照し、高さを取得する
+float h = tex2D(MultiSamp, UV1).r - 0.5f;
+h += tex2D(MultiSamp, UV2).r - 0.5f;
+h *= 0.5;//　二つサンプリングしてるから平均を取ってくる
+
+		 // テクセルを頂点座標系での視線ベクトル方向に重みをつけてずらす。
+float3 E = normalize(In.vE);// 目線
+UV2 -= 0.02f * h * E.xy + uvSea;
+UV1 -= 0.02f * h * E.xy + uvSea;// あとで数値上げる
+
+/*************************/
+//	視差適用後に 法線取得
+/*************************/
+//法線マップを参照し、法線を取得する
+float3 NMap = (tex2D(NormalSamp, UV1).rgb - 0.5f)*2.0f;
+NMap += (tex2D(NormalSamp, UV2).rgb - 0.5f)*2.0f;
+NMap *= 0.5f;
+
+////	ライト計算はしない！　今はじかうち
+In.vLight = normalize(In.vLight);
+//float3 light = CalcDirLight(In.vLight, NMap);
+//light *= 0.5f;
+
+//In.Color.rgb = light;//Ambient=環境光＋
+////	ピクセル色決定
+//OUT *= In.Color;
+
+OUT = tex2D(DecaleSamp, UV1) + tex2D(DecaleSamp, UV2);
+OUT *= 0.5;//　二つサンプリングしてるから平均を取ってくる
+OUT.rgb *= SeaColor;// +light;// 海の色指定
+OUT.a = 1.0f;// 透明度
+
+/*************************/
+//	スペキュラマップ取得
+/*************************/
+float4 sp_tex = tex2D(LightSamp, UV1);
+sp_tex += tex2D(LightSamp, UV2);
+sp_tex *= 0.5;//　二つサンプリングしてるから平均を取ってきてる
+
+			  //	視線反射ベクトル
+float3 R = reflect(-E, NMap);
+//	スペキュラ
+float3 S;
+S = pow(max(0, dot(R, In.vLight)), 60) * (sp_tex);
+
+//************************************************************
+//　屈折
+//************************************************************
+//ゆがみ量の計算
+//水の厚みが薄くなるほど屈折しないようにする
+//float4 Offset = float4((Nmap - E).xy * 20, 0.0f, 0.0f);
+//　射影テクスチャ用
+//float3 wvpNormal = normalize(mul(Nmap, (float3x3)Projection));
+//float2 TexCoord;
+//TexCoord = (In.Pos.xy + wvpNormal.xy * 1) / In.Pos.z;
+//TexCoord = TexCoord * float2(0.5f, -0.5f) + 0.5f;
+
+//海底の色
+//float3 SeabedCol;
+//SeabedCol = tex2Dproj(TEXSamp, TexCoord );
+//OUT.rgb *= SeabedCol;
+
+//	環境マップ　Rを入れ反射マップに
+float3 env = CalcEnvironment(R) * (0.75f - sp_tex.a);
+OUT.rgb = OUT.rgb * env + OUT.rgb;
+//*********************************************************************************************************
+//フレネル効果
+//*********************************************************************************************************
+//頂点 → 視点ベクトル と 法線ベクトルの内積を計算
+//float3 pos = In.Pos;
+//float fresnel = dot(normalize(-E - In.RocalPos), normalize(In.Normal));
+
+//////内積の結果が 0.0f に近いほど反射マップの色が強くなり、 1.0f に近いほど海底マップの色が強くなるように線形合成する
+//float4 Col;
+//float3 ReflectCol = float3(0.8, 0.5, 0.8);
+//float3 SeabedCol = float3(0.0, 0.9, 0.2);
+//
+//Col.rgb = lerp(ReflectCol, SeabedCol, fresnel);
+////Col.rgb = Col.rgb * Diffuse * WaterCol + S;
+//OUT.rgb = Col.rgb;
+
+//*********************************************************************************************************
+//透明度
+//*********************************************************************************************************  
+//水の厚みを計算する
+//float Z = SeabedZ - In.PosWVP.z / m_ZF;
+//Ｚ値が小さくなるほど透明度を高くする（注意１）
+//Z = min(Z * 20.0f, 1.0f);
+//Col.rgb = lerp(SeabedCol, Col.rgb, Z);
+
+OUT.rgb += S;
+
+//　射影テクスチャ用
+//float3 wvpNormal = normalize(mul(In.Normal, (float3x3)Projection));
+//	ref = (In.wPos.xy + wvpNormal.xy * 1) / In.wPos.z;
+//output.TexCoord = output.TexCoord * float2(0.5f, -0.5f) + 0.5f;
+
+////リフレクトマップ
+//float2 ref = (In.ProjectionPos.xy / In.ProjectionPos.w)*0.5f + 0.5f;
+//ref.y = -ref.y;
+//float3 Env = tex2D(RefSamp, ref - 0.2f * h * E.xy/*←+目線*/) * (OUT.rgb);
+//Env *= 0.35f;
+//OUT.rgb += Env;// lerp(Env, OUT.rgb, 0.3f);
+
+			   //	フォグ採用
+			   //OUT.a = ((1 - In.Ambient.a));
+
+
+return OUT;
+}
+
+technique Sea
+{
+	pass P0
+	{
+		AlphaBlendEnable = true;
+		BlendOp = Add;
+		SrcBlend = SrcAlpha;
+		DestBlend = InvSrcAlpha;
+		CullMode = CCW;
+		ZEnable = true;
+
+		VertexShader = compile vs_3_0 VS_Sea();
+		PixelShader = compile ps_3_0 PS_Sea();
+	}
+}
+

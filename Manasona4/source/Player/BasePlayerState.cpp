@@ -641,7 +641,7 @@ bool GuardUpdate(BasePlayer *pPerson)
 		{
 			// 距離
 			if(bAttackState) if (Math::Length(pPerson->GetPos(), target->GetPos()) > BasePlayer::c_GUARD_DISTANCE) return false;				// ガード発動距離
-			if (bStandAttack) if (Math::Length(pPerson->GetStand()->GetPos(), target->GetPos()) > BasePlayer::c_GUARD_DISTANCE) return false;	// 対スタンドのガード発動距離(へて用)
+			if (bStandAttack) if (Math::Length(target->GetStand()->GetPos(), pPerson->GetPos()) > BasePlayer::c_GUARD_DISTANCE) return false;	// 対スタンドのガード発動距離(へて用)
 
 			// ガード条件を満たしたのでガード
 			pPerson->GetFSM()->ChangeState(BasePlayerState::Guard::GetInstance());

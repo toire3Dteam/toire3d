@@ -103,11 +103,11 @@ SelectUI::SelectUI(SIDE side, ENTITY_ID id, int DeviceID, bool bAI) :BaseGameEnt
 
 			break;
 		case PARTNER::HETE:
-			m_tagPartnerPic[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Partner/Maya.png");
-			m_tagPartnerPicRip[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Partner/Maya.png");
-			m_tagPartnerInfo[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Info/maya.png");
-			m_tagPartnerName[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Name/maya.png");
-			m_tagPartneSirclePic[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Partner/MayaSircle.png");
+			m_tagPartnerPic[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Partner/Hete.png");
+			m_tagPartnerPicRip[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Partner/hete.png");
+			m_tagPartnerInfo[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Info/hete.png");
+			m_tagPartnerName[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Name/hete.png");
+			m_tagPartneSirclePic[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Partner/heteSircle.png");
 
 			break;
 		default:

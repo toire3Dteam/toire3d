@@ -344,7 +344,7 @@ void Stand::Mokoi::Action(SKILL_ACTION_TYPE type)
 
 	// とりあえず、プレイヤーと同じ座標
 	m_pos = m_pPlayer->GetPos();
-	Vector3 v(0.5f, 0.0f, 0.5f);
+	Vector3 v(0.5f, 0.0f, 0.75f);
 	if (m_dir == DIR::LEFT)v.x *= -1;
 	//v.z *= 1.;
 	m_pos += v * 5.0f;
@@ -655,8 +655,8 @@ Stand::Hete::Hete(BasePlayer *pPlayer) :Base(pPlayer)
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
-	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(1.4f, 0.0f);
-	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(1.4f, 0.0f);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(1.35f, 0.0f);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(1.35f, 0.0f);
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 6;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 6;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 60;
@@ -664,9 +664,9 @@ Stand::Hete::Hete(BasePlayer *pPlayer) :Base(pPlayer)
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_BACK;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_BACK;
 	// 判定形状
-	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pCollisionShape->width = 8;
-	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pCollisionShape->height = 12;
-	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pCollisionShape->pos.Set(7.5f, 17, 0);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pCollisionShape->width = 6.5;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pCollisionShape->height = 8;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pCollisionShape->pos.Set(0.5f, 6, 0);
 
 	// 判定発動した瞬間に空振りSEを再生してみる
 	FOR((int)SKILL_ACTION_TYPE::MAX)
@@ -691,16 +691,21 @@ void Stand::Hete::Update(bool bControl)
 	// アクティブじゃなかったら出ていけぇ！！
 	if (!m_bActive) return;
 
-	// キャラクターの移動
-	if (m_dir == DIR::LEFT)
+	// 判定が出た瞬間動く
+	if (m_ActionFrameList[(int)m_ActionType][m_CurrentActionFrame] == FRAME_STATE::ACTIVE)
 	{
-		m_pos.x -= 0.5f;
-	}
-	else
-	{
-		m_pos.x += 0.5f;
-	}
 
+		// キャラクターの移動
+		if (m_dir == DIR::LEFT)
+		{
+			m_pos.x -= 0.65f;
+		}
+		else
+		{
+			m_pos.x += 0.65f;
+		}
+
+	}
 
 	// キルラッシュ
 	if (m_ActionType == SKILL_ACTION_TYPE::LAND)
@@ -735,10 +740,10 @@ void Stand::Hete::Action(SKILL_ACTION_TYPE type)
 
 	// とりあえず、プレイヤーと同じ座標
 	m_pos = m_pPlayer->GetPos();
-	Vector3 v(0.5f, 0.0f, 0.5f);
-	if (m_dir == DIR::LEFT)v.x *= -1;
+	Vector3 v(0.5f, 0.0f, .75f);
+	if (m_pPlayer->GetDir() == DIR::LEFT)v.x *= -1;
 	//v.z *= 1.;
-	m_pos += v * 5.0f;
+	m_pos += v * 11.0f;
 	m_pObj->SetMotion(0);
 	m_pObj->SetPos(m_pos);
 	m_pObj->Update();

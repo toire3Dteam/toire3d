@@ -115,7 +115,6 @@ bool SearchNearInvinciblePlayer(AI * pPerson)
 				targetNo = i;
 			}
 		
-
 	}
 
 	if (targetNo == NOT_TARGET)
@@ -138,6 +137,25 @@ float GetRange(AI * pPerson)
 {
 	return abs(TargetPlayer->GetPos().x - MyPlayer->GetPos().x);
 }
+
+// 相手スタンドと自分のXの距離
+float GetRangeVsStand(AI * pPerson)
+{
+	float l_fRange = 0.0f;
+
+	if (TargetPlayer->GetStand()->isActive() == true)
+	{
+		l_fRange = TargetPlayer->GetStand()->GetPos().x;
+
+	}else
+	{
+		l_fRange = 0.0f;
+	}
+
+	return abs(l_fRange - MyPlayer->GetPos().x);
+
+}
+
 
 // 難易度が低い追いかけるステート　ものすごくしょぼい
 bool EasyTypeChaseBrain(AI * pPerson)
@@ -697,7 +715,7 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 			pPerson->m_bPracticeGuardFlag = false;
 			pPerson->m_iPracticeGuardFrame = 0;
 		}
-
+		
 		// 相手が攻撃振ったらかつ
 		// 	相手の技が近くにきたら
 		if (TargetPlayer->isAttackState() == true &&
@@ -737,10 +755,52 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 				}
 
 
+			}// 中段か下段か
+
+		}// プレイヤーに対するガード
+
+
+		// 相手のスタンドが発動してたら	
+		if (TargetPlayer->GetStand()->isActive() &&
+			30 >= GetRangeVsStand(pPerson))//
+		{
+			// ★設定によりガードを切り替えるか変えないか設定する
+			if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch == ENEMY_GUARD_SWITCH_TYPE::OK)
+			{
+				// 相手と逆方向レバーを押す
+				if (MyPlayer->GetDir() == DIR::LEFT)
+				{
+					pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+				}
+				else
+				{
+					pPerson->PushInputList(PLAYER_INPUT::LEFT);
+				}
+
+				// 下段なら
+				if (TargetPlayer->GetStand()->GetAttackData()->AntiGuard == ANTIGUARD_ATTACK::DOWN_ATTACK)
+				{
+					pPerson->PushInputList(PLAYER_INPUT::DOWN);
+				}
+
 			}
+			else
+			{
 
-		}
+				// 相手と逆方向レバーを押す
+				if (MyPlayer->GetDir() == DIR::LEFT)
+				{
+					pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+				}
+				else
+				{
+					pPerson->PushInputList(PLAYER_INPUT::LEFT);
+				}
 
+
+			}// 中段か下段か
+
+		}// 相手スタンドに対するガード
 	}
 
 }
@@ -4050,9 +4110,9 @@ void AIState::PartnerAttack::Enter(AI * pPerson)
 			pPerson->PushInputList(PLAYER_INPUT::L1);
 			l_bActionFlag = true;
 			break;
-		case PARTNER::END:
-			break;
 		default:
+			pPerson->PushInputList(PLAYER_INPUT::L1);
+			l_bActionFlag = true;
 			break;
 		}
 

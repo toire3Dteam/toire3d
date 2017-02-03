@@ -216,6 +216,7 @@ class VOICE_Manager
 private:
 	std::map<VOICE_TYPE, int> m_mID[(int)CHARACTER::END];	// VOICE_TYPEŒ^‚Å”Ô†‚ğU‚è•ª‚¯‚é
 	std::unique_ptr<tdnSoundSE> m_pPlayManager;
+	float m_fBaseVolume;
 
 	void PlayIn(int data_num);
 	void Load(CHARACTER eCharacter);
@@ -235,7 +236,7 @@ public:
 	//===============================================
 	//	‰Šú‰»‚Æ‰ğ•ú
 	//===============================================
-	VOICE_Manager(){}
+	VOICE_Manager() :m_fBaseVolume(1){}
 	void Initialize();
 	void InitializeCharacterVoice(CHARACTER eCharacter);
 
@@ -244,7 +245,7 @@ public:
 	//	ˆ		—
 	//===============================================
 	void Play(VOICE_TYPE eType, CHARACTER eCharacter);
-	void SetBaseVolume(float volume) { m_pPlayManager->SetBaseVolume(volume); }
+	void SetBaseVolume(float volume) { m_fBaseVolume = volume; m_pPlayManager->SetBaseVolume(volume); }
 	bool isPlay(VOICE_TYPE eType, CHARACTER eCharacter, int no=0);
 };
 

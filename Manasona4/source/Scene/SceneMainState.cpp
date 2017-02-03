@@ -25,7 +25,7 @@
 #include "../Data/CommandData.h"
 
 // これを定義するとラウンドコールがスキップされる(デバッグ時短用)
-#define ROUND_SKIP
+//#define ROUND_SKIP
 
 //#ifdef ROUND_SKIP
 #include "../UI/GameUI.h"

@@ -518,6 +518,9 @@ void VOICE_Manager::Load(CHARACTER eCharacter)
 
 		i++;
 	}
+
+	// セットし終わった後に、音量を設定
+	m_pPlayManager->SetBaseVolume(m_fBaseVolume);
 }
 
 //=============================================================================================
