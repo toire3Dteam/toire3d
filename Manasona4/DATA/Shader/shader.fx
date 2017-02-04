@@ -1946,7 +1946,7 @@ PS_TONEMAP PS_ToonPlayer(VS_OUTPUT_FINAL In) : COLOR
 	OUT.color = In.Color * tex2D(DecaleSamp, In.Tex);
 
 	//float4 lightCol = tex2D(LightSamp, ScreenTex);
-	float4 PLlightCol = tex2D(PLSSamp, ScreenTex);
+	//float4 PLlightCol = tex2D(PLSSamp, ScreenTex);
 	//OUT.color.rgb += PLlightCol.rgb;
 	//OUT.color.rgb *= lightCol;
 	//OUT.color.rgb += tex2D(SpecSamp, ScreenTex);
@@ -3390,6 +3390,9 @@ OUT.rgb += S;
 			   //	フォグ採用
 			   //OUT.a = ((1 - In.Ambient.a));
 
+
+// 必殺暗転の値
+OUT.rgb *= g_OverDriveDim;
 
 return OUT;
 }

@@ -464,6 +464,26 @@ bool YokoeTypeChaseBrain(AI * pPerson)
 		}
 	}
 
+	// 相手のスタンドが発動してたら	
+	if (TargetPlayer->GetStand()->isActive() &&
+		30 >= GetRangeVsStand(pPerson))//
+	{
+		int l_iRam = tdnRandom::Get(0, 100);
+		if (l_iRam <= 35)
+		{
+			// 回避ステート
+			pPerson->GetFSM()->ChangeState(AIState::Escape::GetInstance());
+			return true;
+		}
+		else
+		{
+			// ガード
+			pPerson->GetFSM()->ChangeState(AIState::Guard::GetInstance());
+			return true;
+		}
+
+	}
+
 	// 相手が無敵じゃなかったら
 	if (TargetPlayer->GetInvincibleTime() <= 0)
 	{
@@ -721,41 +741,47 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 		if (TargetPlayer->isAttackState() == true &&
 			30 >= GetRange(pPerson))// (TODO)
 		{
-			// ★設定によりガードを切り替えるか変えないか設定する
-			if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch == ENEMY_GUARD_SWITCH_TYPE::OK)
+			// 投げだったらハジク(投げに対して移動してしまうため)
+			if (TargetPlayer->GetActionState() != BASE_ACTION_STATE::THROW)
 			{
-				// 相手と逆方向レバーを押す
-				if (MyPlayer->GetDir() == DIR::LEFT)
+
+				// ★設定によりガードを切り替えるか変えないか設定する
+				if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch == ENEMY_GUARD_SWITCH_TYPE::OK)
 				{
-					pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+					// 相手と逆方向レバーを押す
+					if (MyPlayer->GetDir() == DIR::LEFT)
+					{
+						pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+					}
+					else
+					{
+						pPerson->PushInputList(PLAYER_INPUT::LEFT);
+					}
+
+					// 下段なら
+					if (TargetPlayer->GetAttackData()->AntiGuard == ANTIGUARD_ATTACK::DOWN_ATTACK)
+					{
+						pPerson->PushInputList(PLAYER_INPUT::DOWN);
+					}
+
 				}
 				else
 				{
-					pPerson->PushInputList(PLAYER_INPUT::LEFT);
-				}
 
-				// 下段なら
-				if (TargetPlayer->GetAttackData()->AntiGuard == ANTIGUARD_ATTACK::DOWN_ATTACK)
-				{
-					pPerson->PushInputList(PLAYER_INPUT::DOWN);
-				}
-
-			}
-			else
-			{
-
-				// 相手と逆方向レバーを押す
-				if (MyPlayer->GetDir() == DIR::LEFT)
-				{
-					pPerson->PushInputList(PLAYER_INPUT::RIGHT);
-				}
-				else
-				{
-					pPerson->PushInputList(PLAYER_INPUT::LEFT);
-				}
+					// 相手と逆方向レバーを押す
+					if (MyPlayer->GetDir() == DIR::LEFT)
+					{
+						pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+					}
+					else
+					{
+						pPerson->PushInputList(PLAYER_INPUT::LEFT);
+					}
 
 
-			}// 中段か下段か
+				}// 中段か下段か
+
+			}// 投げだったらハジク
 
 		}// プレイヤーに対するガード
 
@@ -2004,7 +2030,9 @@ void AIState::Guard::Execute(AI * pPerson)
 	
 	//	（TODO）フォローの値が欲しい
 	// 相手が攻撃していなかったら
-	if (pPerson->GetTargetPlayer()->isAttackState() == false)
+	// かつスタンドも出していなかったら解除(2/4)
+	if (pPerson->GetTargetPlayer()->isAttackState() == false &&
+		TargetPlayer->GetStand()->isActive() == false)
 	{
 		// ↑より少ない一定フレームで終了
 		if (pPerson->m_iGuardFrame >= 10)
@@ -2104,6 +2132,66 @@ void AIState::Guard::Execute(AI * pPerson)
 		}
 	}
 
+	// スタンドパートナーに対するガード
+	if (pPerson->m_eAIType == AI_TYPE::CPU_YOKOE)
+	{
+
+		// 相手のスタンドが発動してたら	
+		if (TargetPlayer->GetStand()->isActive() &&
+			30 >= GetRangeVsStand(pPerson))//
+		{
+			if (l_iRamdom <= 20) // ←の確率で完全ガード
+			{
+				// 相手と逆方向レバーを押す
+				if (MyPlayer->GetDir() == DIR::LEFT)
+				{
+					pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+				}
+				else
+				{
+					pPerson->PushInputList(PLAYER_INPUT::LEFT);
+				}
+
+				// 下段なら
+				if (TargetPlayer->GetStand()->GetAttackData()->AntiGuard == ANTIGUARD_ATTACK::DOWN_ATTACK)
+				{
+					pPerson->PushInputList(PLAYER_INPUT::DOWN);
+				}
+			}
+			else  if (l_iRamdom <= 50)
+			{
+				// しゃがみガード
+				// 相手と逆方向レバーを押す
+				if (MyPlayer->GetDir() == DIR::LEFT)
+				{
+					pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+				}
+				else
+				{
+					pPerson->PushInputList(PLAYER_INPUT::LEFT);
+				}
+
+				if (TargetPlayer->GetStand()->GetAttackData()->AntiGuard == ANTIGUARD_ATTACK::DOWN_ATTACK)
+				{
+					pPerson->PushInputList(PLAYER_INPUT::DOWN);
+				}
+			}
+			else
+			{
+				// 立ちガード
+				// 相手と逆方向レバーを押す
+				if (MyPlayer->GetDir() == DIR::LEFT)
+				{
+					pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+				}
+				else
+				{
+					pPerson->PushInputList(PLAYER_INPUT::LEFT);
+				}
+			}
+
+		}// 相手スタンドに対するガード
+	}
 
 }
 

@@ -105,7 +105,7 @@ namespace Stand
 	public:
 		Mokoi(BasePlayer *pPlayer);
 		//~Mokoi();
-
+		void Update(bool bControl);
 		// 純粋仮想オーバーライド
 		void Action(SKILL_ACTION_TYPE type);
 	};

@@ -102,6 +102,7 @@ namespace Stage
 		void Initialize(Camera *pCamera);
 		void Update() override;
 		void Render() override;
+		void RenderDeferred()override;
 		void RenderForward() override;
 
 		EFFECT_CAMERA_ID GetIntroCameraScriptID() { return EFFECT_CAMERA_ID::SEA_STAGE_INTRO; }
@@ -111,6 +112,21 @@ namespace Stage
 		iexMesh*	m_pSea;
 		tdn2DObj*	m_pEnvSea;
 
+		struct Ship
+		{
+			iex3DObj* pObj;
+			Vector3 vPos;
+			float fAngle;
+			float fTurnStartAngle;
+			bool bTurn;
+
+			Ship();
+			~Ship() { SAFE_DELETE(pObj); }
+			void Update();
+			void Render(tdnShader *shader, char *name) { pObj->Render(shader, name); }
+		};
+		Ship   m_tagShip;
+		
 	};
 
 	// 庭ステージ

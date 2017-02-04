@@ -321,9 +321,9 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	// 判定形状
-	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pCollisionShape->width = 14;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pCollisionShape->width = 15;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pCollisionShape->height = 18;
-	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pCollisionShape->pos.Set(7.5f, 17, 0);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pCollisionShape->pos.Set(5.5f, 17, 0);
 
 	// 判定発動した瞬間に空振りSEを再生してみる
 	FOR((int)SKILL_ACTION_TYPE::MAX)
@@ -339,13 +339,37 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->WhiffDelayFrame -= 8;
 }
 
+void Stand::Mokoi::Update(bool bControl)
+{
+	// 基底クラスの更新
+	Base::Update(bControl);
+
+	// アクティブじゃなかったら出ていけぇ！！
+	if (!m_bActive) return;
+
+	// 判定が出た瞬間動く
+	if (m_ActionFrameList[(int)m_ActionType][m_CurrentActionFrame] == FRAME_STATE::START)
+	{
+		// キャラクターの移動
+		if (m_dir == DIR::LEFT)
+		{
+			m_pos.x -= 0.5f;
+		}
+		else
+		{
+			m_pos.x += 0.5f;
+		}
+
+	}
+}
+
 void Stand::Mokoi::Action(SKILL_ACTION_TYPE type)
 {
 
 	// とりあえず、プレイヤーと同じ座標
 	m_pos = m_pPlayer->GetPos();
-	Vector3 v(0.5f, 0.0f, 0.75f);
-	if (m_dir == DIR::LEFT)v.x *= -1;
+	Vector3 v(0.5f, 0.0f, 0.95f);
+	if (m_pPlayer->GetDir() == DIR::LEFT)v.x *= -1;
 	//v.z *= 1.;
 	m_pos += v * 5.0f;
 	m_pObj->SetMotion(0);
@@ -359,7 +383,6 @@ void Stand::Mokoi::Action(SKILL_ACTION_TYPE type)
 	Base::Action(SKILL_ACTION_TYPE::LAND);
 
 }
-
 
 /******************************/
 //		マーヤ
@@ -620,6 +643,7 @@ Stand::Hete::Hete(BasePlayer *pPlayer) :Base(pPlayer)
 	for (int i = 0; i < 8; i++)
 	{
 		m_ActionFrameList[(int)SKILL_ACTION_TYPE::LAND][20 + (i * 16)] = FRAME_STATE::RECOVERY_HIT;
+		m_ActionFrameList[(int)SKILL_ACTION_TYPE::SQUAT][20 + (i * 16)] = FRAME_STATE::RECOVERY_HIT;
 	}
 
 	//m_ActionFrameList[(int)SKILL_ACTION_TYPE::LAND][20 + 13] = FRAME_STATE::RECOVERY_HIT;
@@ -628,7 +652,7 @@ Stand::Hete::Hete(BasePlayer *pPlayer) :Base(pPlayer)
 	/*****************************/
 	// 基本ステータス
 	m_standStockMAX = 1;
-	m_standGageMAX = 10 * 8;
+	m_standGageMAX = 60 * 8;
 
 	/*****************************/
 	// そのキャラクターのアイコン
@@ -650,13 +674,13 @@ Stand::Hete::Hete(BasePlayer *pPlayer) :Base(pPlayer)
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->AntiGuard = ANTIGUARD_ATTACK::NONE;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->ShakeCameraInfo.Set(.2f, 2);
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->GuardRecoveryFrame = 20;
-	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->fGuardKnockBackPower = 0.8f;	//	大めで
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->fGuardKnockBackPower = 0.5f;	//	大めで
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->fComboRate = 0.99f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
-	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(1.35f, 0.0f);
-	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(1.35f, 0.0f);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(0.9f, 0.0f);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(0.9f, 0.0f);
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 6;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 6;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 60;
@@ -667,6 +691,39 @@ Stand::Hete::Hete(BasePlayer *pPlayer) :Base(pPlayer)
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pCollisionShape->width = 6.5;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pCollisionShape->height = 8;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::LAND]->pCollisionShape->pos.Set(0.5f, 6, 0);
+
+	//==============================================================================================================
+	//	地上しゃがみ
+	// 地上ヒットも空中ヒットも共通の情報
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT] = new AttackData;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->damage = 160;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->pierceLV = 0;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->HitSE = "ヒット6";
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->WhiffSE = "空振り1";
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->HitEffectType = EFFECT_TYPE::MULTIPLE_HIT_BLOW;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->WhiffEffectType = EFFECT_TYPE::WHIFF;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->bAntiAir = true;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->bFinish = true;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->AntiGuard = ANTIGUARD_ATTACK::NONE;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->ShakeCameraInfo.Set(.2f, 2);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->GuardRecoveryFrame = 20;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->fGuardKnockBackPower = 0.5f;	//	大めで
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->fComboRate = 0.99f;
+	// 地上ヒットと空中ヒットで挙動が変わるもの
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(0.9f, 0.0f);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(0.9f, 0.0f);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 6;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 6;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 60;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 60;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_BACK;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_BACK;
+	// 判定形状
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->pCollisionShape->width = 6.5;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->pCollisionShape->height = 8;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->pCollisionShape->pos.Set(0.5f, 6, 0);
 
 	// 判定発動した瞬間に空振りSEを再生してみる
 	FOR((int)SKILL_ACTION_TYPE::MAX)
@@ -691,25 +748,27 @@ void Stand::Hete::Update(bool bControl)
 	// アクティブじゃなかったら出ていけぇ！！
 	if (!m_bActive) return;
 
-	// 判定が出た瞬間動く
-	if (m_ActionFrameList[(int)m_ActionType][m_CurrentActionFrame] == FRAME_STATE::ACTIVE)
-	{
 
-		// キャラクターの移動
-		if (m_dir == DIR::LEFT)
-		{
-			m_pos.x -= 0.65f;
-		}
-		else
-		{
-			m_pos.x += 0.65f;
-		}
 
-	}
-
-	// キルラッシュ
+	// 前方向に進む
 	if (m_ActionType == SKILL_ACTION_TYPE::LAND)
 	{
+		// 判定が出た瞬間動く
+		if (m_ActionFrameList[(int)m_ActionType][m_CurrentActionFrame] == FRAME_STATE::ACTIVE)
+		{
+
+			// キャラクターの移動
+			if (m_dir == DIR::LEFT)
+			{
+				m_pos.x -= 0.43f;
+			}
+			else
+			{
+				m_pos.x += 0.43f;
+			}
+
+		}
+
 		//// 走り終わってたら
 		////if (m_ActionType[(int)SKILL_ACTION_TYPE::LAND]->Execute())
 		////{
@@ -740,15 +799,43 @@ void Stand::Hete::Action(SKILL_ACTION_TYPE type)
 
 	// とりあえず、プレイヤーと同じ座標
 	m_pos = m_pPlayer->GetPos();
-	Vector3 v(0.5f, 0.0f, .75f);
+	Vector3 v(0.5f, 0.0f, .675f);
 	if (m_pPlayer->GetDir() == DIR::LEFT)v.x *= -1;
 	//v.z *= 1.;
 	m_pos += v * 11.0f;
-	m_pObj->SetMotion(0);
+
+	// (TODO)2/4 今はここでモーションを設定
+	if (type == SKILL_ACTION_TYPE::LAND)
+	{
+		m_pObj->SetMotion(0);
+	}
+	else //if (type == SKILL_ACTION_TYPE::SQUAT)
+	{
+		if (m_pPlayer->GetDir() == DIR::LEFT)
+		{
+			m_pos.x += -2.5f;
+		}
+		else
+		{
+			m_pos.x += +2.5f;
+		}
+
+		m_pObj->SetMotion(1);
+	}
 	m_pObj->SetPos(m_pos);
 	m_pObj->Update();
 
-	// 基底クラスのアクション	★今は全部地上の攻撃扱いにする
-	Base::Action(SKILL_ACTION_TYPE::LAND);
+	// 基底クラスのアクション
+	// 空中はすべてしゃがみ技に
+	if (type == SKILL_ACTION_TYPE::AERIAL ||
+		type == SKILL_ACTION_TYPE::AERIALDROP)
+	{
+		Base::Action(SKILL_ACTION_TYPE::SQUAT);
+	}
+	else
+	{
+		Base::Action(type);
+	}
+
 
 }

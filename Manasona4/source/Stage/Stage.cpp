@@ -192,12 +192,14 @@ void Stage::Sea::Initialize(Camera *pCamera)
 	m_fUvSea = 0.0f;
 	m_pSea = new iexMesh("Data/Stage/Sister/Water/water.IMO");
 	m_pSea->SetScale(1.5f);
-	m_pSea->SetPos(0, -40, 0);
+	m_pSea->SetPos(0, -40, -100);
 	m_pSea->SetAngle(-0.02f,0,0);
 	m_pSea->Update();
 
 	m_pEnvSea = new tdn2DObj("Data/Stage/Sister/Water/EnvSky.png");
 	shaderM->SetValue("EnvMap", m_pEnvSea);
+
+	m_tagShip.pObj = new iex3DObj("DATA/Stage/Sister/Ship/ship.IEM");
 
 }
 Stage::Sea::~Sea()
@@ -206,14 +208,54 @@ Stage::Sea::~Sea()
 	SAFE_DELETE(m_pEnvSea);
 }
 
+Stage::Sea::Ship::Ship() :pObj(nullptr), vPos(0, -35, 800), fAngle(PI * 0.5f), bTurn(false)
+{
 
+}
+
+// 船の動き
+void Stage::Sea::Ship::Update()
+{
+	// 移動処理
+	{
+		static const float l_cfSpeed(0.3f);
+		vPos += Vector3(sinf(fAngle), 0, cosf(fAngle)) * l_cfSpeed;
+
+		if (bTurn)
+		{
+			static const float l_cfAngleSpeed(.025f);
+			fAngle += l_cfAngleSpeed;
+			if (fabs(fAngle - fTurnStartAngle) > PI)
+			{
+				bTurn = false;
+			}
+		}
+		else
+		{
+			if (fabs(vPos.x) > 200)
+			{
+				bTurn = true;
+				fTurnStartAngle = fAngle;
+			}
+		}
+	}
+
+	// オブジェクトの更新
+	pObj->SetScale(3.5f);
+	pObj->SetPos(vPos);
+	pObj->SetAngle(fAngle);
+	pObj->Animation();
+	pObj->Update();
+}
 
 void Stage::Sea::Update()
 {
 
 	m_fUvSea += 0.00025f;
 	shaderM->SetValue("uvSea", m_fUvSea);
-
+	
+	// 更新
+	m_tagShip.Update();
 
 }
 
@@ -221,13 +263,25 @@ void Stage::Sea::Render()
 {
 	if (m_pBack) m_pBack->Render(shaderM, "sky");
 	m_pObj->Render(shaderM, "Stage");
-	m_pAreWall->RenderAreaWall();// 壁
+
+	m_tagShip.Render(shaderM, "Stage");// 船
+
+	
+}
+
+void Stage::Sea::RenderDeferred()
+{
+	m_pObj->Render(shaderM, "G_Buffer");
+	m_tagShip.Render(shaderM, "G_Buffer");// 船
+
 }
 
 void Stage::Sea::RenderForward()
 {
 	// 海
 	m_pSea->Render(shaderM,"Sea");
+
+	m_pAreWall->RenderAreaWall();// 壁
 }
 
 //+------------------------------------------------------
