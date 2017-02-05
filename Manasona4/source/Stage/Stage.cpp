@@ -250,9 +250,10 @@ void Stage::Sea::Ship::Update()
 
 void Stage::Sea::Update()
 {
+	m_pAreWall->Update();
 
 	m_fUvSea += 0.00025f;
-	shaderM->SetValue("uvSea", m_fUvSea);
+	shaderM->SetValue("m_fUvSea", m_fUvSea);
 	
 	// XV
 	m_tagShip.Update();
@@ -532,6 +533,8 @@ void Stage::Syuten::Update()
 	//	m_pBack->Update();
 	//}
 
+	m_pAreWall->Update();
+
 	// …
 	m_fUvWater += 0.001f;
 	shaderM->SetValue("g_fUvWater", m_fUvWater);
@@ -618,9 +621,9 @@ void Stage::Syuten::RenderForward()
 //	static float v = 0;
 //	v += 0.01f;
 //	if (v > 1.0f)v -= 1.0f;
-//	shader->SetValue("tuAnime", 0.0f);
-//	shader->SetValue("tvAnime", v);
-//	shader->SetValue("alphaUV", 1.0f);
+//	shader->SetValue("m_fTuAnime", 0.0f);
+//	shader->SetValue("m_fTvAnime", v);
+//	shader->SetValue("m_fAlphaUV", 1.0f);
 //
 //	m_pObj->Render(shader,"uvAnime");
 //}

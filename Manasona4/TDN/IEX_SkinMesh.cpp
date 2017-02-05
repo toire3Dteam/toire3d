@@ -94,7 +94,7 @@ void iex3DObj::UpdateBoneMatrix()
 	}
 	for (i = 0; i<NumBone; i++)
 	{
-		lpMatrix[i] = lpOffsetMatrix[i] * lpBoneMatrix[i];
+		lg_mPMatrix[i] = lpOffsetMatrix[i] * lpBoneMatrix[i];
 	}
 }
 
@@ -107,7 +107,7 @@ void	iex3DObj::UpdateSkinMesh()
 	//	メッシュ更新
 	void*	pVertex;
 	lpMesh->LockVertexBuffer(D3DLOCK_DISCARD, &pVertex);
-	lpSkinInfo->UpdateSkinnedMesh(lpMatrix, NULL, lpVertex, pVertex);
+	lpSkinInfo->UpdateSkinnedMesh(lg_mPMatrix, NULL, lpVertex, pVertex);
 	lpMesh->UnlockVertexBuffer();
 }
 

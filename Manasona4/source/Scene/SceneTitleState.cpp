@@ -17,7 +17,7 @@
 //#define C_UIMgr pMain->GetCtrlSelectUI()
 
 // これを定義するとOPがスキップされる(デバッグ時短用)
-#define OP_SKIP
+//#define OP_SKIP
 
 /*******************************************************/
 //					ゲーム開始ステート

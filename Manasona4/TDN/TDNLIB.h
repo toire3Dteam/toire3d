@@ -3529,7 +3529,7 @@ protected:
 	LPWORD			BoneParent;
 	Matrix*			lpBoneMatrix;
 	Matrix*			lpOffsetMatrix;
-	Matrix*			lpMatrix;
+	Matrix*			lg_mPMatrix;
 
 	Quaternion*		orgPose;
 	Vector3*		orgPos;

@@ -31,7 +31,7 @@ iex3DObj::~iex3DObj()
 		delete[] BoneParent;
 		delete[] lpBoneMatrix;
 		delete[] lpOffsetMatrix;
-		delete[] lpMatrix;
+		delete[] lg_mPMatrix;
 
 		delete[] orgPose;
 		delete[] orgPos;
@@ -393,7 +393,7 @@ BOOL iex3DObj::CreateFromIEM(char* path, LPIEMFILE lpIem)
 	BoneParent = new WORD[NumBone];
 	lpBoneMatrix = new Matrix[NumBone];
 	lpOffsetMatrix = new Matrix[NumBone];
-	lpMatrix = new Matrix[NumBone];
+	lg_mPMatrix = new Matrix[NumBone];
 
 	orgPose = new Quaternion[NumBone];
 	orgPos = new Vector3[NumBone];

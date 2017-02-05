@@ -274,9 +274,9 @@ void AnimationUV::Render()
 
 	// 描画の前に情報を送る
 	//　シェーダーに描画毎UV座標を送る
-	shaderM->SetValue("tuAnime", tu);
-	shaderM->SetValue("tvAnime", tv);
-	shaderM->SetValue("alphaUV", alpha);// 透明度
+	shaderM->SetValue("m_fTuAnime", tu);
+	shaderM->SetValue("m_fTvAnime", tv);
+	shaderM->SetValue("m_fAlphaUV", alpha);// 透明度
 
 	// 描画
 	obj->Render(shaderM, "uvAnime");
@@ -290,9 +290,9 @@ void AnimationUV::Render_ADD()
 
 	// 描画の前に情報を送る
 	//　シェーダーに描画毎UV座標を送る
-	shaderM->SetValue("tuAnime", tu);
-	shaderM->SetValue("tvAnime", tv);
-	shaderM->SetValue("alphaUV", alpha);// 透明度
+	shaderM->SetValue("m_fTuAnime", tu);
+	shaderM->SetValue("m_fTvAnime", tv);
+	shaderM->SetValue("m_fAlphaUV", alpha);// 透明度
 
 	// 描画
 	obj->Render(shaderM, "uvAnime_add");
@@ -305,9 +305,9 @@ void AnimationUV::Render_ADD_NOZ()
 
 	// 描画の前に情報を送る
 	//　シェーダーに描画毎UV座標を送る
-	shaderM->SetValue("tuAnime", tu);
-	shaderM->SetValue("tvAnime", tv);
-	shaderM->SetValue("alphaUV", alpha);// 透明度
+	shaderM->SetValue("m_fTuAnime", tu);
+	shaderM->SetValue("m_fTvAnime", tv);
+	shaderM->SetValue("m_fAlphaUV", alpha);// 透明度
 
 	// 描画
 	obj->Render(shaderM, "uvAnime_add_noz");
@@ -321,9 +321,9 @@ void AnimationUV::Render_Guard()
 
 	// 描画の前に情報を送る
 	//　シェーダーに描画毎UV座標を送る
-	shaderM->SetValue("tuAnime", tu);
-	shaderM->SetValue("tvAnime", tv);
-	shaderM->SetValue("alphaUV", alpha);// 透明度
+	shaderM->SetValue("m_fTuAnime", tu);
+	shaderM->SetValue("m_fTvAnime", tv);
+	shaderM->SetValue("m_fAlphaUV", alpha);// 透明度
 
 	// 描画
 	obj->Render(shaderM, "uvAnime_guard");
@@ -336,9 +336,9 @@ void AnimationUV::Render_Soul()
 
 	// 描画の前に情報を送る
 	//　シェーダーに描画毎UV座標を送る
-	shaderM->SetValue("tuAnime", tu);
-	shaderM->SetValue("tvAnime", tv);
-	shaderM->SetValue("alphaUV", alpha);// 透明度
+	shaderM->SetValue("m_fTuAnime", tu);
+	shaderM->SetValue("m_fTvAnime", tv);
+	shaderM->SetValue("m_fAlphaUV", alpha);// 透明度
 
 	// 描画
 	obj->Render(shaderM, "uvAnime_soul");
@@ -351,9 +351,9 @@ void AnimationUV::Render_AreaWall()
 
 	 // 描画の前に情報を送る
 	 //　シェーダーに描画毎UV座標を送る
-	shaderM->SetValue("tuAnime", tu);
-	shaderM->SetValue("tvAnime", tv);
-	shaderM->SetValue("alphaUV", alpha);// 透明度
+	shaderM->SetValue("m_fTuAnime", tu);
+	shaderM->SetValue("m_fTvAnime", tv);
+	shaderM->SetValue("m_fAlphaUV", alpha);// 透明度
 
 										// 描画
 	obj->Render(shaderM, "uvAnime_areaWall");

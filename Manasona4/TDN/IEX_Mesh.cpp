@@ -254,7 +254,7 @@ void iexMesh::Render(tdnShader* shader, char* name)
 
 	// ƒ[ƒJƒ‹-ŽË‰e•ÏŠ·s—ñ
 	Matrix m = TransMatrix * matView * matProjection;
-	shader->SetValue("WMatrix", TransMatrix);
+	shader->SetValue("g_mWMatrix", TransMatrix);
 	shader->SetWVPMatrix(&m);
 
 	for (u32 p = 0; p<pass; p++)

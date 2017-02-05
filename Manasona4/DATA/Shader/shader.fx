@@ -1,41 +1,40 @@
 //------------------------------------------------------
 //		•ÏŠ·s—ñ
 //------------------------------------------------------
-float4x4 WMatrix;		// ƒ[ƒ‹ƒh•ÏŠ·s—ñ
-float4x4 VMatrix;		// ƒrƒ…[•ÏŠ·s—ñ
-float4x4 PMatrix;		// ƒvƒƒWƒFƒNƒVƒ‡ƒ“•ÏŠ·s—ñ
+float4x4 g_mWMatrix;		// ƒ[ƒ‹ƒh•ÏŠ·s—ñ
+float4x4 g_mVMatrix;		// ƒrƒ…[•ÏŠ·s—ñ
+float4x4 g_mPMatrix;		// ƒvƒƒWƒFƒNƒVƒ‡ƒ“•ÏŠ·s—ñ
 
-float4x4 WVPMatrix;		// “Š‰e•ÏŠ·s—ñ
-float4x4 VPMatrix;		// ƒ[ƒ‹ƒhÀ•W‚©‚ç¨ƒvƒƒWƒFƒNƒVƒ‡ƒ“À•W‚Ö‚Á‚Ä‚¢‚­s—ñ
+float4x4 g_mWVPMatrix;		// “Š‰e•ÏŠ·s—ñ
+float4x4 g_mVPMatrix;		// ƒ[ƒ‹ƒhÀ•W‚©‚ç¨ƒvƒƒWƒFƒNƒVƒ‡ƒ“À•W‚Ö‚Á‚Ä‚¢‚­s—ñ
 
-float4x4 InvPMatrix;	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“À•W ->ViewÀ•W@‚Ö–ß‚·‹ts—ñ
-float4x4 InvVMatrix;	// ViewÀ•W ->ƒ[ƒ‹ƒhÀ•W@‚Ö–ß‚·‹ts—ñ
-float4x4 InvVPMatrix;	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“À•W -> ƒ[ƒ‹ƒhÀ•W ‚Ö–ß‚·‹ts—ñ
+float4x4 g_mInvPMatrix;	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“À•W ->ViewÀ•W@‚Ö–ß‚·‹ts—ñ
+float4x4 g_mInvVMatrix;	// ViewÀ•W ->ƒ[ƒ‹ƒhÀ•W@‚Ö–ß‚·‹ts—ñ
+float4x4 g_mInvVPMatrix;	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“À•W -> ƒ[ƒ‹ƒhÀ•W ‚Ö–ß‚·‹ts—ñ
 
-float4x4 ShadowProjection; // ‰e
+float4x4 g_mShadowProjection; // ‰e
 
 //------------------------------------------------------
 //		ŠÂ‹«ŠÖ˜A
 //------------------------------------------------------
-float3	ViewPos;		// ƒ[ƒ‹ƒhÀ•W‚Ì–Ú‚Ìƒ|ƒWƒVƒ‡ƒ“
+float3	g_vViewPos;		// ƒ[ƒ‹ƒhÀ•W‚Ì–Ú‚Ìƒ|ƒWƒVƒ‡ƒ“
 
 float3 g_vWLightVec = { 1.0f, -1.0f, 1.0f };// ƒ[ƒ‹ƒh‹óŠÔ‚Å‚Ì•½sŒõ‚ÌŒü‚«
 
-float3 LightVec;		// •½sŒõ‚ÌŒü‚«
-float3 ViewLightVec;	// ƒrƒ…[À•W‚Å‚ÌŒõ‚è‚ÌŒü‚«
-float3 LightColor = { 1.0f, 1.0f, 1.0f };
+//float3 LightVec;		// •½sŒõ‚ÌŒü‚«
+float3 g_vViewLightVec;	// ƒrƒ…[À•W‚Å‚ÌŒõ‚è‚ÌŒü‚«
+float3 g_vLightColor = { 1.0f, 1.0f, 1.0f };
 
-float3 SkyColor = { .4f, .6f, .6f };
-float3 GroundColor = { .6f, .4f, .4f };
+float3 g_vSkyColor = { .4f, .6f, .6f };
+float3 g_vGroundColor = { .6f, .4f, .4f };
 
-float RimPowerRate = 2.0f;		 // ƒŠƒ€ƒ‰ƒCƒg‚ÌŒõ‚Ì• 
-float EmissivePowerRate = 2.0f;// ƒGƒ~ƒbƒVƒu‚Ì• ƒGƒ~ƒbƒVƒu‚ª‚¢‚ç‚È‚¢‚ÍƒeƒNƒX’ƒ‚ğ•Ï‚¦‚¸‚±‚Ì”’l‚ğ‰º‚°‚é
+float g_fRimPowerRate = 2.0f;		 // ƒŠƒ€ƒ‰ƒCƒg‚ÌŒõ‚Ì• 
+float g_fEmissivePowerRate = 2.0f;// ƒGƒ~ƒbƒVƒu‚Ì• ƒGƒ~ƒbƒVƒu‚ª‚¢‚ç‚È‚¢‚ÍƒeƒNƒX’ƒ‚ğ•Ï‚¦‚¸‚±‚Ì”’l‚ğ‰º‚°‚é
 // ¡‚Í0‚É
 
-float FogNear = 514.0f;
-float FogFar = 1024.0f;
-
-float3 FogColor = { 100.0f, 100.0f, 100.0f };
+float g_fFogNear = 128.0f;
+float g_fFogFar = 512.0f;
+float3 g_vFogColor = { 0.2f, 0.3f, 0.35f };
 
 /***************************/
 //	Å‰‚Ì’¸“_ƒf[ƒ^
@@ -151,13 +150,13 @@ VSINPUT VS(VSINPUT In)
 {
 	VSINPUT Out = (VSINPUT)0;
 
-	Out.Pos = mul(In.Pos, WMatrix);
+	Out.Pos = mul(In.Pos, g_mWMatrix);
 	Out.Pos += In.worldPos;
 
-	//float4x4 VPMatrix;
-	//VPMatrix = mul(VMatrix, PMatrix);
+	//float4x4 g_mVPMatrix;
+	//g_mVPMatrix = mul(g_mVMatrix, g_mPMatrix);
 
-	Out.Pos = mul(Out.Pos, VPMatrix);
+	Out.Pos = mul(Out.Pos, g_mVPMatrix);
 
 	Out.UV = In.UV;
 	Out.Normal = In.Normal;
@@ -213,9 +212,9 @@ VS_OUTPUT VS_Basic(VS_INPUT In)
 {
 	VS_OUTPUT Out = (VS_OUTPUT)0;
 	//TransMatrix‚ÆPos‚ğ‡¬‚µ‚ÄwPos‚Ìî•ñ¶¬
-	Out.wPos = mul(In.Pos, WMatrix);
+	Out.wPos = mul(In.Pos, g_mWMatrix);
 
-	Out.Pos = mul(In.Pos, WVPMatrix);
+	Out.Pos = mul(In.Pos, g_mWVPMatrix);
 	Out.Tex = In.Tex;
 	Out.Color = 1.0f;
 
@@ -371,7 +370,7 @@ VS_DEFERRED VS_G_Buffer(VS_INPUT In)
 {
 	VS_DEFERRED Out = (VS_DEFERRED)0;
 
-	Out.Pos = mul(In.Pos, WVPMatrix);
+	Out.Pos = mul(In.Pos, g_mWVPMatrix);
 	Out.Tex = In.Tex;
 	Out.Color = In.Color;
 
@@ -379,7 +378,7 @@ VS_DEFERRED VS_G_Buffer(VS_INPUT In)
 	Out.Depth = Out.Pos;
 
 	// –@üî•ñ‚ÌC³
-	float3x3 WVmat = (float3x3)mul(WMatrix, VMatrix); // ƒ‚ƒfƒ‹¨ƒ[ƒ‹ƒh¨ƒrƒ…[‹óŠÔ‚Ö‚Ì•ÏŠ·s—ñ
+	float3x3 WVmat = (float3x3)mul(g_mWMatrix, g_mVMatrix); // ƒ‚ƒfƒ‹¨ƒ[ƒ‹ƒh¨ƒrƒ…[‹óŠÔ‚Ö‚Ì•ÏŠ·s—ñ
 
 	// ƒrƒ…[s—ñ‚Ì–@ü‚ª‚Å‚«‚ ‚ª‚é
 	float3 N = mul(In.Normal, WVmat);// 
@@ -543,7 +542,7 @@ float3 CalcViewPosition(float2 UV, float2 zw)
 	proj.zw = zw;	// Z‚ÆW‚Í‚»‚Ì‚Ü‚Ü“ü‚ê‚é
 
 	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“‹ts—ñ‚Åƒrƒ…[À•WŒn‚É•ÏŠ·@Proj->View
-	float4 viewPos = mul(proj, InvPMatrix);
+	float4 viewPos = mul(proj, g_mInvPMatrix);
 	//viewPos.xyz /= viewPos.w;		// W‚ÅŠ„‚Á‚Ä‚Í‚¢‚¯‚È‚¢B‚È‚ºH
 
 	return viewPos.xyz;
@@ -622,7 +621,7 @@ VS_SHADOW VS_ShadowBuf(float4 Pos : POSITION, float2 Tex : TEXCOORD0)
 	VS_SHADOW Out;
 
 	// À•W•ÏŠ·@‘¾—z‚©‚ç‚İ‚½‹óŠÔ‚É
-	float4x4	mat = mul(WMatrix, ShadowProjection);
+	float4x4	mat = mul(g_mWMatrix, g_mShadowProjection);
 		Out.Pos = mul(Pos, mat);
 
 	Out.ZW = Out.Pos.zw;
@@ -682,18 +681,18 @@ PS_LIGHT PS_DirLight(float2 Tex:TEXCOORD0)
 	const float3 Pos = CalcViewPosition(Tex, NormalDepth.zw);
 
 	// ƒ‰ƒCƒg—¦(ƒn[ƒtƒ‰ƒ“ƒo[ƒg)
-	float rate = (dot(Normal, -ViewLightVec));
+	float rate = (dot(Normal, -g_vViewLightVec));
 	float3 HalfLambert = pow((rate + 1.0f)*0.5f, 2);	// HalfLambert
 	float3 Lambert = max(0, rate);				// Lambert
 
 	// ƒsƒNƒZƒ‹‚ÌF
-	OUT.color.rgb = (HalfLambert * LightColor);
+	OUT.color.rgb = (HalfLambert * g_vLightColor);
 	OUT.color.a = 1.0f;
 
 	//@ƒXƒyƒLƒ…ƒ‰ƒŒ[ƒgæ“¾
-	float sp = CalcSpecular(Pos, Normal, ViewLightVec, 80);
+	float sp = CalcSpecular(Pos, Normal, g_vViewLightVec, 80);
 	// ƒXƒyƒLƒ…ƒ‰‚ÌF‚ğ‚Ç‚ê‚­‚ç‚¢æ‚¹‚é‚©
-	OUT.spec.rgb = sp*LightColor;
+	OUT.spec.rgb = sp*g_vLightColor;
 	OUT.spec.a = 1.0f;
 
 	return OUT;
@@ -727,18 +726,18 @@ PS_LIGHT PS_DirLightShadow(float2 Tex:TEXCOORD0)
 	const float2 RoughnessLightMap = tex2D(RoughnessLightMapSamp, Tex).rg;
 
 	// ƒ‰ƒCƒg—¦(ƒn[ƒtƒ‰ƒ“ƒo[ƒg)
-	float rate = (dot(Normal, -ViewLightVec));
+	float rate = (dot(Normal, -g_vViewLightVec));
 	float3 HalfLambert = pow((rate + 1.0f)*0.5f, 2);	// HalfLambert
 	//float3 Lambert = max(0, rate);				// Lambert
 
 	// ƒsƒNƒZƒ‹‚ÌF
-	OUT.color.rgb = (HalfLambert * LightColor);
+	OUT.color.rgb = (HalfLambert * g_vLightColor);
 	OUT.color.a = 1.0f;
 
 	//@ƒXƒyƒLƒ…ƒ‰ƒŒ[ƒgæ“¾
-	float specRate = CalcSpecular(Pos, Normal, ViewLightVec, RoughnessLightMap.g * 255);
+	float specRate = CalcSpecular(Pos, Normal, g_vViewLightVec, RoughnessLightMap.g * 255);
 	// ƒXƒyƒLƒ…ƒ‰‚ÌF‚ğ‚Ç‚ê‚­‚ç‚¢æ‚¹‚é‚©
-	OUT.spec.rgb = (specRate*LightColor)*RoughnessLightMap.r;
+	OUT.spec.rgb = (specRate*g_vLightColor)*RoughnessLightMap.r;
 	OUT.spec.a = 1.0f;
 
 	float4 ShadowTex;
@@ -747,7 +746,7 @@ PS_LIGHT PS_DirLightShadow(float2 Tex:TEXCOORD0)
 
 	{
 		// ‘¾—z‹“_‚©‚çŒ©‚½ƒvƒƒWƒFƒNƒVƒ‡ƒ“À•W‚ÌƒIƒuƒWƒF
-		ShadowTex = mul(mul(float4(Pos, 1), InvVMatrix), ShadowProjection);
+		ShadowTex = mul(mul(float4(Pos, 1), g_mInvVMatrix), g_mShadowProjection);
 		ShadowTex.xy = ShadowTex.xy / ShadowTex.w;
 		ShadowTex.y = -ShadowTex.y;
 		ShadowTex.xy = 0.5f * ShadowTex.xy + 0.5f;
@@ -842,8 +841,8 @@ float4 PS_HemiLight(float2 Tex: TEXCOORD0) :COLOR
 
 	//”¼‹…ˆ—
 	float rate = Normal.y * 0.5f + 0.5f;
-	OUT.rgb = SkyColor * rate;
-	OUT.rgb += GroundColor * (1.0f - rate);
+	OUT.rgb = g_vSkyColor * rate;
+	OUT.rgb += g_vGroundColor * (1.0f - rate);
 	//OUT.rgb *= AO;
 	OUT.a = 1;
 
@@ -879,18 +878,18 @@ PS_LIGHT PS_AllLight(float2 Tex:TEXCOORD0)
 	const float2 RoughnessLightMap = tex2D(RoughnessLightMapSamp, Tex).rg;
 
 	// ƒ‰ƒCƒg—¦(ƒn[ƒtƒ‰ƒ“ƒo[ƒg)
-	float rate = (dot(Normal, -ViewLightVec));
+	float rate = (dot(Normal, -g_vViewLightVec));
 	float3 HalfLambert = pow((rate + 1.0f)*0.5f, 2);	// HalfLambert
 														//float3 Lambert = max(0, rate);				// Lambert
 
 														// ƒsƒNƒZƒ‹‚ÌF
-	OUT.color.rgb = (HalfLambert * LightColor);
+	OUT.color.rgb = (HalfLambert * g_vLightColor);
 	OUT.color.a = 1.0f;
 
 	//@ƒXƒyƒLƒ…ƒ‰ƒŒ[ƒgæ“¾
-	float specRate = CalcSpecular(Pos, Normal, ViewLightVec, RoughnessLightMap.g * 255);
+	float specRate = CalcSpecular(Pos, Normal, g_vViewLightVec, RoughnessLightMap.g * 255);
 	// ƒXƒyƒLƒ…ƒ‰‚ÌF‚ğ‚Ç‚ê‚­‚ç‚¢æ‚¹‚é‚©
-	OUT.spec.rgb = (specRate*LightColor)*RoughnessLightMap.r;
+	OUT.spec.rgb = (specRate*g_vLightColor)*RoughnessLightMap.r;
 	OUT.spec.a = 1.0f;
 
 	float4 ShadowTex;
@@ -899,7 +898,7 @@ PS_LIGHT PS_AllLight(float2 Tex:TEXCOORD0)
 
 	{
 		// ‘¾—z‹“_‚©‚çŒ©‚½ƒvƒƒWƒFƒNƒVƒ‡ƒ“À•W‚ÌƒIƒuƒWƒF
-		ShadowTex = mul(mul(float4(Pos, 1), InvVMatrix), ShadowProjection);
+		ShadowTex = mul(mul(float4(Pos, 1), g_mInvVMatrix), g_mShadowProjection);
 		ShadowTex.xy = ShadowTex.xy / ShadowTex.w;
 		ShadowTex.y = -ShadowTex.y;
 		ShadowTex.xy = 0.5f * ShadowTex.xy + 0.5f;
@@ -958,8 +957,13 @@ PS_LIGHT PS_AllLight(float2 Tex:TEXCOORD0)
 
 	//”¼‹…ˆ—
 	float HemiRate = Normal.y * 0.5f + 0.5f;
-	OUT.color.rgb += SkyColor * HemiRate;
-	OUT.color.rgb += GroundColor * (1.0f - HemiRate);
+	OUT.color.rgb += g_vSkyColor * HemiRate;
+	OUT.color.rgb += g_vGroundColor * (1.0f - HemiRate);
+
+
+	//// ƒtƒHƒO‚Ì’l‚ğ“ü‚ê‚é
+	//float fogRate = smoothstep(g_fFogFar, g_fFogNear, Pos.z);
+	//OUT.color.rgb += g_vFogColor * (1.0f - fogRate);
 
 	//if (tex2D(ShadowSamp, ShadowTex.xy).r < ShadowTex.z - 0.005f)
 	//{
@@ -1004,10 +1008,10 @@ struct VS_POINTLIGHT
 };
 
 // ƒOƒ[ƒoƒ‹À•W
-float3 PLSpos;		// ¦ViewÀ•WŒn‚É•ÏŠ·‚µ‚Ä‚¨‚­‚±‚Æ
-float  PLSrange = 30.0f;
-float3 PLScolor = float3(300, 600, 300);// ƒJƒ‰[
-float  PLSpower = 2.0f;// ƒpƒ[
+float3 g_vPLSpos;		// ¦ViewÀ•WŒn‚É•ÏŠ·‚µ‚Ä‚¨‚­‚±‚Æ
+float  g_fPLSrange = 30.0f;
+float3 g_vPLScolor = float3(300, 600, 300);// ƒJƒ‰[
+float  g_fPLSpower = 2.0f;// ƒpƒ[
 
 //------------------------------------------------------
 //		PointLightSphere‚Ì’¸“_ƒVƒF[ƒ_[
@@ -1017,10 +1021,10 @@ VS_POINTLIGHT VS_PointLightSphere(VS_INPUT In)
 	VS_POINTLIGHT Out = (VS_POINTLIGHT)0;
 
 	// ƒXƒP[ƒ‹‚ğ–@ü‚É‚µ‚½‚ª‚Á‚ÄŠg‘å ƒŒƒ“ƒW•ª
-	In.Pos.xyz += In.Normal*PLSrange;
+	In.Pos.xyz += In.Normal*g_fPLSrange;
 	// â‘Î‚É‘—‚é•K—v‚ª‚ ‚é@ƒ{[ƒ‹‚Ìƒ|ƒWƒVƒ‡ƒ“
-	Out.Pos = mul(In.Pos, WVPMatrix);
-	Out.WPos = mul(In.Pos, WMatrix);
+	Out.Pos = mul(In.Pos, g_mWVPMatrix);
+	Out.WPos = mul(In.Pos, g_mWMatrix);
 
 	//@ƒtƒFƒbƒ`—p
 	Out.wvpPos = Out.Pos;
@@ -1045,14 +1049,14 @@ DEF_POINTLIGHT PS_PointLightSphere(VS_POINTLIGHT In)
 	const float3 Pos = CalcViewPosition(ScreenTex, NormalDepth.zw);
 
 	// PL‚ÌPos‚Æ‚±‚ÌƒsƒNƒZƒ‹‚ÌˆÊ’u‚Å©ƒ|ƒWƒVƒ‡ƒ“•‹——£
-	float3 ViewLightVec = PLSpos.xyz - (Pos.xyz);
-	float dist = pow(max(0.0f, 1.0f - (length(ViewLightVec) / PLSrange)), 2);//©”’l‚ğ‚¢‚¶‚èi‚é
+	float3 g_vViewLightVec = g_vPLSpos.xyz - (Pos.xyz);
+	float dist = pow(max(0.0f, 1.0f - (length(g_vViewLightVec) / g_fPLSrange)), 2);//©”’l‚ğ‚¢‚¶‚èi‚é
 
 	// –@üƒ}ƒbƒv‚©‚ç‰A‰eÕ’f
-	ViewLightVec = normalize(ViewLightVec);// Œõ<-êŠƒxƒNƒgƒ‹‚Ö
-	float rate = max(0, dot(Normal.xyz, ViewLightVec.xyz));
+	g_vViewLightVec = normalize(g_vViewLightVec);// Œõ<-êŠƒxƒNƒgƒ‹‚Ö
+	float rate = max(0, dot(Normal.xyz, g_vViewLightVec.xyz));
 
-	OUT.color.rgb = (PLScolor*(dist*rate))*PLSpower;
+	OUT.color.rgb = (g_vPLScolor*(dist*rate))*g_fPLSpower;
 	OUT.color.a = 1.0f;
 
 	return OUT;
@@ -1216,8 +1220,8 @@ sampler GaussianSamp = sampler_state
 
 
 // ‰æ–ÊƒTƒCƒY‚ğUV‚É‡‚í‚¹‚é
-float TU = 1.0f / 1280.0f, TV = 1.0f / 720.0f;
-float BlurValue = 1.0f;
+float g_fTU = 1.0f / 1280.0f, g_fTV = 1.0f / 720.0f;
+float g_fBlurValue = 1.0f;
 
 /***************************************/
 /*		ƒKƒEƒVƒAƒ“ƒuƒ‰[			@ */
@@ -1225,17 +1229,17 @@ float4 PS_gaussX(float2 Tex : TEXCOORD0) : COLOR
 {
 
 	////ƒeƒNƒZƒ‹‚ğæ“¾   
-	//float2 Texel0 = Tex + float2(-TU * 1 * BlurValue, 0.0f);
-	//float2 Texel1 = Tex + float2(-TU * 2 * BlurValue, 0.0f);
-	//float2 Texel2 = Tex + float2(-TU * 3 * BlurValue, 0.0f);
-	//float2 Texel3 = Tex + float2(-TU * 4 * BlurValue, 0.0f);
-	//float2 Texel4 = Tex + float2(-TU * 5 * BlurValue, 0.0f);
+	//float2 Texel0 = Tex + float2(-g_fTU * 1 * g_fBlurValue, 0.0f);
+	//float2 Texel1 = Tex + float2(-g_fTU * 2 * g_fBlurValue, 0.0f);
+	//float2 Texel2 = Tex + float2(-g_fTU * 3 * g_fBlurValue, 0.0f);
+	//float2 Texel3 = Tex + float2(-g_fTU * 4 * g_fBlurValue, 0.0f);
+	//float2 Texel4 = Tex + float2(-g_fTU * 5 * g_fBlurValue, 0.0f);
 
-	//float2 Texel5 = Tex + float2(TU * 1 * BlurValue, 0.0f);
-	//float2 Texel6 = Tex + float2(TU * 2 * BlurValue, 0.0f);
-	//float2 Texel7 = Tex + float2(TU * 3 * BlurValue, 0.0f);
-	//float2 Texel8 = Tex + float2(TU * 4 * BlurValue, 0.0f);
-	//float2 Texel9 = Tex + float2(TU * 5 * BlurValue, 0.0f);
+	//float2 Texel5 = Tex + float2(g_fTU * 1 * g_fBlurValue, 0.0f);
+	//float2 Texel6 = Tex + float2(g_fTU * 2 * g_fBlurValue, 0.0f);
+	//float2 Texel7 = Tex + float2(g_fTU * 3 * g_fBlurValue, 0.0f);
+	//float2 Texel8 = Tex + float2(g_fTU * 4 * g_fBlurValue, 0.0f);
+	//float2 Texel9 = Tex + float2(g_fTU * 5 * g_fBlurValue, 0.0f);
 
 	////æ“¾‚µ‚½ƒeƒNƒZƒ‹ˆÊ’u‚ÌƒJƒ‰[î•ñ‚ğæ“¾‚·‚éB
 	////‚»‚ê‚¼‚ê‚ÌƒJƒ‰[’l‚Éd‚İ‚ğ‚©‚¯‚Ä‚¢‚éB‚±‚Ìd‚İ’l‚Í‚·‚×‚Ä‚Ì‡Œv‚ª 1.0f ‚É‚È‚é‚æ‚¤‚É’²®‚·‚éB
@@ -1258,17 +1262,17 @@ float4 PS_gaussX(float2 Tex : TEXCOORD0) : COLOR
 
 	float4 Out = tex2D(GaussianSamp, Tex)*0.20f;
 
-	Out += tex2D(GaussianSamp, Tex + float2(-TU * 1 * BlurValue, 0.0f))*0.12f;
-	Out += tex2D(GaussianSamp, Tex + float2(-TU * 2 * BlurValue, 0.0f))*0.10f;
-	Out += tex2D(GaussianSamp, Tex + float2(-TU * 3 * BlurValue, 0.0f))*0.08f;
-	Out += tex2D(GaussianSamp, Tex + float2(-TU * 4 * BlurValue, 0.0f))*0.06f;
-	Out += tex2D(GaussianSamp, Tex + float2(-TU * 5 * BlurValue, 0.0f))*0.04f;
+	Out += tex2D(GaussianSamp, Tex + float2(-g_fTU * 1 * g_fBlurValue, 0.0f))*0.12f;
+	Out += tex2D(GaussianSamp, Tex + float2(-g_fTU * 2 * g_fBlurValue, 0.0f))*0.10f;
+	Out += tex2D(GaussianSamp, Tex + float2(-g_fTU * 3 * g_fBlurValue, 0.0f))*0.08f;
+	Out += tex2D(GaussianSamp, Tex + float2(-g_fTU * 4 * g_fBlurValue, 0.0f))*0.06f;
+	Out += tex2D(GaussianSamp, Tex + float2(-g_fTU * 5 * g_fBlurValue, 0.0f))*0.04f;
 
-	Out += tex2D(GaussianSamp, Tex + float2(TU * 1 * BlurValue, 0.0f))*0.12f;
-	Out += tex2D(GaussianSamp, Tex + float2(TU * 2 * BlurValue, 0.0f))*0.10f;
-	Out += tex2D(GaussianSamp, Tex + float2(TU * 3 * BlurValue, 0.0f))*0.08f;
-	Out += tex2D(GaussianSamp, Tex + float2(TU * 4 * BlurValue, 0.0f))*0.06f;
-	Out += tex2D(GaussianSamp, Tex + float2(TU * 5 * BlurValue, 0.0f))*0.04f;
+	Out += tex2D(GaussianSamp, Tex + float2(g_fTU * 1 * g_fBlurValue, 0.0f))*0.12f;
+	Out += tex2D(GaussianSamp, Tex + float2(g_fTU * 2 * g_fBlurValue, 0.0f))*0.10f;
+	Out += tex2D(GaussianSamp, Tex + float2(g_fTU * 3 * g_fBlurValue, 0.0f))*0.08f;
+	Out += tex2D(GaussianSamp, Tex + float2(g_fTU * 4 * g_fBlurValue, 0.0f))*0.06f;
+	Out += tex2D(GaussianSamp, Tex + float2(g_fTU * 5 * g_fBlurValue, 0.0f))*0.04f;
 
 	return Out;
 
@@ -1278,17 +1282,17 @@ float4 PS_gaussY(float2 Tex : TEXCOORD0) : COLOR
 {
 
 	////ƒeƒNƒZƒ‹‚ğæ“¾   
-	//float2 Texel0 = Tex + float2(0.0, -TV * 1 * BlurValue);
-	//float2 Texel1 = Tex + float2(0.0, -TV * 2 * BlurValue);
-	//float2 Texel2 = Tex + float2(0.0, -TV * 3 * BlurValue);
-	//float2 Texel3 = Tex + float2(0.0, -TV * 4 * BlurValue);
-	//float2 Texel4 = Tex + float2(0.0, -TV * 5 * BlurValue);
+	//float2 Texel0 = Tex + float2(0.0, -g_fTV * 1 * g_fBlurValue);
+	//float2 Texel1 = Tex + float2(0.0, -g_fTV * 2 * g_fBlurValue);
+	//float2 Texel2 = Tex + float2(0.0, -g_fTV * 3 * g_fBlurValue);
+	//float2 Texel3 = Tex + float2(0.0, -g_fTV * 4 * g_fBlurValue);
+	//float2 Texel4 = Tex + float2(0.0, -g_fTV * 5 * g_fBlurValue);
 
-	//float2 Texel5 = Tex + float2(0.0, TV * 1 * BlurValue);
-	//float2 Texel6 = Tex + float2(0.0, TV * 2 * BlurValue);
-	//float2 Texel7 = Tex + float2(0.0, TV * 3 * BlurValue);
-	//float2 Texel8 = Tex + float2(0.0, TV * 4 * BlurValue);
-	//float2 Texel9 = Tex + float2(0.0, TV * 5 * BlurValue);
+	//float2 Texel5 = Tex + float2(0.0, g_fTV * 1 * g_fBlurValue);
+	//float2 Texel6 = Tex + float2(0.0, g_fTV * 2 * g_fBlurValue);
+	//float2 Texel7 = Tex + float2(0.0, g_fTV * 3 * g_fBlurValue);
+	//float2 Texel8 = Tex + float2(0.0, g_fTV * 4 * g_fBlurValue);
+	//float2 Texel9 = Tex + float2(0.0, g_fTV * 5 * g_fBlurValue);
 
 	/////æ“¾‚µ‚½ƒeƒNƒZƒ‹ˆÊ’u‚ÌƒJƒ‰[î•ñ‚ğæ“¾‚·‚éB
 	/////‚»‚ê‚¼‚ê‚ÌƒJƒ‰[’l‚Éd‚İ‚ğ‚©‚¯‚Ä‚¢‚éB‚±‚Ìd‚İ’l‚Í‚·‚×‚Ä‚Ì‡Œv‚ª 1.0f ‚É‚È‚é‚æ‚¤‚É’²®‚·‚éB
@@ -1311,17 +1315,17 @@ float4 PS_gaussY(float2 Tex : TEXCOORD0) : COLOR
 
 	float4 Out = tex2D(GaussianSamp, Tex)*0.20f;
 
-	Out += tex2D(GaussianSamp, Tex + float2(0.0f,-TV * 1 * BlurValue))*0.12f;
-	Out += tex2D(GaussianSamp, Tex + float2(0.0f,-TV * 2 * BlurValue))*0.10f;
-	Out += tex2D(GaussianSamp, Tex + float2(0.0f,-TV * 3 * BlurValue))*0.08f;
-	Out += tex2D(GaussianSamp, Tex + float2(0.0f,-TV * 4 * BlurValue))*0.06f;
-	Out += tex2D(GaussianSamp, Tex + float2(0.0f,-TV * 5 * BlurValue))*0.04f;
+	Out += tex2D(GaussianSamp, Tex + float2(0.0f,-g_fTV * 1 * g_fBlurValue))*0.12f;
+	Out += tex2D(GaussianSamp, Tex + float2(0.0f,-g_fTV * 2 * g_fBlurValue))*0.10f;
+	Out += tex2D(GaussianSamp, Tex + float2(0.0f,-g_fTV * 3 * g_fBlurValue))*0.08f;
+	Out += tex2D(GaussianSamp, Tex + float2(0.0f,-g_fTV * 4 * g_fBlurValue))*0.06f;
+	Out += tex2D(GaussianSamp, Tex + float2(0.0f,-g_fTV * 5 * g_fBlurValue))*0.04f;
 
-	Out += tex2D(GaussianSamp, Tex + float2(0.0f, TV * 1 * BlurValue))*0.12f;
-	Out += tex2D(GaussianSamp, Tex + float2(0.0f, TV * 2 * BlurValue))*0.10f;
-	Out += tex2D(GaussianSamp, Tex + float2(0.0f, TV * 3 * BlurValue))*0.08f;
-	Out += tex2D(GaussianSamp, Tex + float2(0.0f, TV * 4 * BlurValue))*0.06f;
-	Out += tex2D(GaussianSamp, Tex + float2(0.0f, TV * 5 * BlurValue))*0.04f;
+	Out += tex2D(GaussianSamp, Tex + float2(0.0f, g_fTV * 1 * g_fBlurValue))*0.12f;
+	Out += tex2D(GaussianSamp, Tex + float2(0.0f, g_fTV * 2 * g_fBlurValue))*0.10f;
+	Out += tex2D(GaussianSamp, Tex + float2(0.0f, g_fTV * 3 * g_fBlurValue))*0.08f;
+	Out += tex2D(GaussianSamp, Tex + float2(0.0f, g_fTV * 4 * g_fBlurValue))*0.06f;
+	Out += tex2D(GaussianSamp, Tex + float2(0.0f, g_fTV * 5 * g_fBlurValue))*0.04f;
 
 	return Out;
 }
@@ -1383,11 +1387,11 @@ technique gaussY
 //		•úËƒuƒ‰\
 //********************************************************************
 
-float CenterX = 0.0f;
-float CenterY = 0.0f;
+float g_fCenterX = 0.0f;
+float g_fCenterY = 0.0f;
 
-float BlurPower = 1.0f;
-const float IMAGE_SIZE = 512.0f;
+float g_fBlurPower = 1.0f;
+const float g_cIMAGE_SIZE = 512.0f;
 
 //------------------------------------------------------
 //		ƒsƒNƒZƒ‹ƒVƒF[ƒ_[	
@@ -1404,10 +1408,10 @@ float4 PS_RadialBlur(float2 Tex:TEXCOORD0) : COLOR
 	/*******************************************/
 	
 	//@•úË’†S
-	float2 ss_center = float2((CenterX + 1.0f) * 0.5f, (-CenterY + 1.0f) * 0.5f);
+	float2 ss_center = float2((g_fCenterX + 1.0f) * 0.5f, (-g_fCenterY + 1.0f) * 0.5f);
 
 	//@ƒIƒtƒZƒbƒg
-	float2 uvOffset = (ss_center - Tex) * (BlurPower / IMAGE_SIZE);
+	float2 uvOffset = (ss_center - Tex) * (g_fBlurPower / g_cIMAGE_SIZE);
 
 	//@ƒTƒ“ƒvƒŠƒ“ƒO”‚Ì‹t” @for•¶‚Å‰ñ‚·‰ñ”•¶F‚ğŒ¸‚ç‚µ@Š®¬‚µ‚½‚Æ‚«‚ÉŒ³‚ÌF‚É‚·‚éB
 	float InvSampling = 1.0f / 8.0f;
@@ -1448,9 +1452,9 @@ technique RadialBlur
 //		ˆÚ“®ƒuƒ‰\
 //********************************************************************
 
-float DirectionalX = 1.0f;
-float DirectionalY = 0.0f;
-float DirectionalBlurPower = 0.015f;
+float g_fDirectionalX = 1.0f;
+float g_fDirectionalY = 0.0f;
+float g_fDirectionalBlurPower = 0.015f;
 //------------------------------------------------------
 //		ƒsƒNƒZƒ‹ƒVƒF[ƒ_[	
 //------------------------------------------------------
@@ -1464,7 +1468,7 @@ float4 PS_DirectionalBlur(float2 Tex:TEXCOORD0) : COLOR
 	/*******************************************/
 
 	//@ƒIƒtƒZƒbƒg
-	float2 uvOffset = float2(DirectionalX, DirectionalY) *(DirectionalBlurPower);
+	float2 uvOffset = float2(g_fDirectionalX, g_fDirectionalY) *(g_fDirectionalBlurPower);
 
 	//@ƒTƒ“ƒvƒŠƒ“ƒO”‚Ì‹t” @for•¶‚Å‰ñ‚·‰ñ”•¶F‚ğŒ¸‚ç‚µ@Š®¬‚µ‚½‚Æ‚«‚ÉŒ³‚ÌF‚É‚·‚éB
 	float InvSampling = 1.0f / 16.0f;
@@ -1535,10 +1539,10 @@ technique add_hdrBloom
 /****************************/
 
 /*˜IŒõ“x*/
-float exposure = 0.0f;
+float g_fExposure = 0.0f;
 
 // ‚‹P“x
-float3 g_bloomColor = { 0.825f, 0.85f, 0.85f };
+float3 g_vBloomColor = { 0.825f, 0.85f, 0.85f };
 
 /***********************************/
 //	‚‹P“x’Šo—p‚Ì\‘¢‘Ì
@@ -1583,9 +1587,9 @@ VS_OUTPUT_FINAL VS_DefaultLighting(VS_INPUT In)
 {
 	VS_OUTPUT_FINAL Out = (VS_OUTPUT_FINAL)0;
 	//TransMatrix‚ÆPos‚ğ‡¬‚µ‚ÄwPos‚Ìî•ñ¶¬
-	Out.wPos = mul(In.Pos, WMatrix);
+	Out.wPos = mul(In.Pos, g_mWMatrix);
 
-	Out.wvpPos = Out.Pos = mul(In.Pos, WVPMatrix);
+	Out.wvpPos = Out.Pos = mul(In.Pos, g_mWVPMatrix);
 	Out.Tex = In.Tex;
 	Out.Color = 1.0f;
 
@@ -1616,9 +1620,9 @@ PS_TONEMAP PS_DefaultLighting(VS_OUTPUT_FINAL In) : COLOR
 	//OUT.color.g += 0.5;
 
 	//ƒg[ƒ“ƒ}ƒbƒsƒ“ƒO
-	OUT.color.rgb *= exp2(exposure);
+	OUT.color.rgb *= exp2(g_fExposure);
 	
-	OUT.high.rgb = max(float3(0.0f, 0.0f, 0.0f), (OUT.color.rgb - g_bloomColor));
+	OUT.high.rgb = max(float3(0.0f, 0.0f, 0.0f), (OUT.color.rgb - g_vBloomColor));
 	OUT.high.a = 1.0f;
 
 	return OUT;
@@ -1655,7 +1659,7 @@ technique DefaultLighting
 // ƒXƒe[ƒW‚É•K—v‚È•Ï”
 /*************************************/
 
-float    g_OverDriveDim = 1.0f;
+float    g_fOverDriveDim = 1.0f;
 
 //------------------------------------------------------
 //		ƒsƒNƒZƒ‹ƒVƒF[ƒ_[	
@@ -1676,12 +1680,12 @@ PS_TONEMAP PS_Stage(VS_OUTPUT_FINAL In) : COLOR
 	OUT.color.rgb += tex2D(SpecSamp, ScreenTex);
 	
 	// •KEˆÃ“]‚Ì’l
-	OUT.color.rgb *= g_OverDriveDim;
+	OUT.color.rgb *= g_fOverDriveDim;
 
 	//ƒg[ƒ“ƒ}ƒbƒsƒ“ƒO
-	OUT.color.rgb *= exp2(exposure);
+	OUT.color.rgb *= exp2(g_fExposure);
 
-	OUT.high.rgb = max(float3(0.0f, 0.0f, 0.0f), (OUT.color.rgb - g_bloomColor));
+	OUT.high.rgb = max(float3(0.0f, 0.0f, 0.0f), (OUT.color.rgb - g_vBloomColor));
 	OUT.high.a = 1.0f;
 
 	return OUT;
@@ -1737,12 +1741,12 @@ OUT.color.rgb += l_fGlowCol.rgb;
 
 
 // •KEˆÃ“]‚Ì’l
-OUT.color.rgb *= g_OverDriveDim;
+OUT.color.rgb *= g_fOverDriveDim;
 
 //ƒg[ƒ“ƒ}ƒbƒsƒ“ƒO
-OUT.color.rgb *= exp2(exposure);
+OUT.color.rgb *= exp2(g_fExposure);
 
-OUT.high.rgb = max(float3(0.0f, 0.0f, 0.0f), (OUT.color.rgb - g_bloomColor));
+OUT.high.rgb = max(float3(0.0f, 0.0f, 0.0f), (OUT.color.rgb - g_vBloomColor));
 OUT.high.a = 1.0f;
 
 
@@ -1784,14 +1788,14 @@ float g_OverDriveColRate = 0.0f;//
 float g_WillPowerRate = 0.0f;//  ª«’l
 
 // [1206] Å“K‰»‚Ì‚½‚ßƒŒ[ƒg‚Ì‘—‚é‰ñ”‚ğŒ¸‚ç‚·‚½‚ßd•û‚È‚­ŒÅ‚ß‚é‚±‚Æ‚É
-float3 g_PlayerColDesc;		//	Ô->“_–Å Â->ƒIƒŒƒ“ƒW —Î->ƒ}ƒ[ƒ“ƒ^
-float3 g_PlayerColDesc2;	//  Ô->ƒI[ƒo[ƒhƒ‰ƒCƒu@Â->ŠoÁ @—Î->ƒGƒbƒW‚ªÔ‚©Â‚©
+float3 g_vPlayerColDesc;		//	Ô->“_–Å Â->ƒIƒŒƒ“ƒW —Î->ƒ}ƒ[ƒ“ƒ^
+float3 g_vPlayerColDesc2;	//  Ô->ƒI[ƒo[ƒhƒ‰ƒCƒu@Â->ŠoÁ @—Î->ƒGƒbƒW‚ªÔ‚©Â‚©
 
 /*************************************/
 // ƒAƒEƒgƒ‰ƒCƒ“‚É•K—v‚È•Ï”
 /*************************************/
-float    g_OutlineSize = 0.005f;
-float3   g_EdgeColor = float3(0.0f, 0.0f, 0.0f);
+float    g_fOutlineSize = 0.005f;
+float3   g_vEdgeColor = float3(0.0f, 0.0f, 0.0f);
 //------------------------------------------------------
 //		’¸“_ƒtƒH[ƒ}ƒbƒg
 //------------------------------------------------------
@@ -1811,8 +1815,8 @@ VS_OUTPUT_OUTLINE VS_OutLine(VS_INPUT In) //:POSITION ƒeƒNƒXƒR[ƒh‚Ìî•ñ‚ª‚È‚­‚È
 
 	VS_OUTPUT_OUTLINE OUT = (VS_OUTPUT_OUTLINE)0;
 
-	OUT.Pos = mul(In.Pos, WVPMatrix);
-	OUT.Pos.xy += normalize(mul(mul(float4(In.Normal, 0), WMatrix), VPMatrix).xy) * OUT.Pos.z * g_OutlineSize;
+	OUT.Pos = mul(In.Pos, g_mWVPMatrix);
+	OUT.Pos.xy += normalize(mul(mul(float4(In.Normal, 0), g_mWMatrix), g_mVPMatrix).xy) * OUT.Pos.z * g_fOutlineSize;
 	OUT.Pos.z += 0.001f;
 
 	OUT.Tex = In.Tex;
@@ -1832,9 +1836,9 @@ PS_TONEMAP PS_OutLine(VS_OUTPUT_OUTLINE In)
 
 	//OUT.color.rgb = col.rgb - float3(0.25,0.5,0.5);// ‚Ó‚¿‚Í­‚µˆÃ‚­	
 	// [11/27] ‘€ì‚µ‚Ä‚¢‚éƒLƒƒƒ‰ƒNƒ^[‚ğŒ©¸‚¤‚Æ‚ÌˆÓŒ©‚ª­‚µ‚ ‚Á‚½‚Ì‚Å•£‚ÌF‚ğ•Ï‚¦‚éH•v‚ğ‚µ‚Ä‚İ‚Ü‚·B
-	//OUT.color.rgb = g_EdgeColor;
-	OUT.color.rgb = float3(0.95f, 0.1f, 0.0f)*g_PlayerColDesc2.b;
-	OUT.color.rgb += float3(0.0f, 0.65f, 1.0f)*(1.0f - g_PlayerColDesc2.b);
+	//OUT.color.rgb = g_vEdgeColor;
+	OUT.color.rgb = float3(0.95f, 0.1f, 0.0f)*g_vPlayerColDesc2.b;
+	OUT.color.rgb += float3(0.0f, 0.65f, 1.0f)*(1.0f - g_vPlayerColDesc2.b);
 	OUT.color.a = 1.0f;
 
 	OUT.high = col - 1;
@@ -1892,9 +1896,9 @@ PS_TONEMAP PS_Player(VS_OUTPUT_FINAL In) : COLOR
 
 
 	//ƒg[ƒ“ƒ}ƒbƒsƒ“ƒO
-	OUT.color.rgb *= exp2(exposure);
+	OUT.color.rgb *= exp2(g_fExposure);
 
-	OUT.high.rgb = max(float3(0.0f, 0.0f, 0.0f), (OUT.color.rgb - g_bloomColor));
+	OUT.high.rgb = max(float3(0.0f, 0.0f, 0.0f), (OUT.color.rgb - g_vBloomColor));
 	OUT.high.a = 1.0f;
 
 	//‚‹P“x’ŠoŒã‚É‚µ‚È‚¢‚ÆHDR‚ÅŒõ‚Á‚Ä‚µ‚Ü‚¤‚Ì‚ÅÅŒã‚É
@@ -1953,7 +1957,7 @@ PS_TONEMAP PS_ToonPlayer(VS_OUTPUT_FINAL In) : COLOR
 	//OUT.color.rgb += tex2D(PLSSamp, ScreenTex);
 
 	// ƒ‰ƒCƒg—¦(ƒn[ƒtƒ‰ƒ“ƒo[ƒg)
-	float rate = (dot(Normal, -ViewLightVec));
+	float rate = (dot(Normal, -g_vViewLightVec));
 	float HalfLambert = pow((rate + 1.0f)*0.5f, 2);	// HalfLambert
 	float3 toonShadowCol = tex2D(ToonShadowSamp, float2(HalfLambert, 0.0f));
 		OUT.color.rgb *= toonShadowCol;
@@ -1962,12 +1966,12 @@ PS_TONEMAP PS_ToonPlayer(VS_OUTPUT_FINAL In) : COLOR
 	float3 E = Pos.xyz;// ƒrƒ…[‚Ì–Úü
 		E = normalize(E);
 	float RimPower = pow(1.0f - max(0.0f, dot(-E, Normal)), 4.0f);
-	float RimLightPower = max(.0f, dot(-E, ViewLightVec));
+	float RimLightPower = max(.0f, dot(-E, g_vViewLightVec));
 
 	//ƒg[ƒ“ƒ}ƒbƒsƒ“ƒO
-	OUT.color.rgb *= exp2(exposure);
+	OUT.color.rgb *= exp2(g_fExposure);
 
-	OUT.high.rgb = max(float3(0.0f, 0.0f, 0.0f), (OUT.color.rgb - g_bloomColor));
+	OUT.high.rgb = max(float3(0.0f, 0.0f, 0.0f), (OUT.color.rgb - g_vBloomColor));
 	OUT.high.a = 1.0f;
 
 	// ƒLƒƒƒTƒŠƒ“‚Á‚Û‚¢”’‚¢ƒŠƒ€
@@ -1975,13 +1979,13 @@ PS_TONEMAP PS_ToonPlayer(VS_OUTPUT_FINAL In) : COLOR
 
 	// ƒI[ƒo[ƒhƒ‰ƒCƒu—p
 	//float RimPower2 = pow(1.0f - max(0.0f, dot(-E, Normal)), 1.0f);
-	OUT.high.rgb += float3(0.8, 0.5, 0.0)*g_PlayerColDesc.g/*g_OrangeColRate*/;
-	OUT.high.rgb += float3(0.7, 0.0, 0.4)*g_PlayerColDesc.b/*g_MagentaColRate*/;
-	OUT.high.rgb += float3(0.0, 0.1, 0.4)*g_PlayerColDesc2.r/*g_OverDriveColRate*/;
-	OUT.high.rgb += float3(0.25f, 0.0, 0.0)*g_PlayerColDesc2.g/*g_WillPowerRate*/;
+	OUT.high.rgb += float3(0.8, 0.5, 0.0)*g_vPlayerColDesc.g/*g_OrangeColRate*/;
+	OUT.high.rgb += float3(0.7, 0.0, 0.4)*g_vPlayerColDesc.b/*g_MagentaColRate*/;
+	OUT.high.rgb += float3(0.0, 0.1, 0.4)*g_vPlayerColDesc2.r/*g_OverDriveColRate*/;
+	OUT.high.rgb += float3(0.25f, 0.0, 0.0)*g_vPlayerColDesc2.g/*g_WillPowerRate*/;
 
 	//‚‹P“x’ŠoŒã‚É‚µ‚È‚¢‚ÆHDR‚ÅŒõ‚Á‚Ä‚µ‚Ü‚¤‚Ì‚ÅÅŒã‚É
-	OUT.color.rgb += g_PlayerColDesc.r/*g_InvincibleColRate*/;
+	OUT.color.rgb += g_vPlayerColDesc.r/*g_InvincibleColRate*/;
 
 	return OUT;
 }
@@ -2048,7 +2052,7 @@ OUT.color = In.Color * tex2D(DecaleSamp, In.Tex);
 //OUT.color.rgb += tex2D(PLSSamp, ScreenTex);
 
 // ƒ‰ƒCƒg—¦(ƒn[ƒtƒ‰ƒ“ƒo[ƒg)
-float rate = (dot(Normal, -ViewLightVec));
+float rate = (dot(Normal, -g_vViewLightVec));
 float HalfLambert = pow((rate + 1.0f)*0.5f, 2);	// HalfLambert
 float3 toonShadowCol = tex2D(ToonShadowSamp, float2(HalfLambert, 0.0f));
 OUT.color.rgb *= toonShadowCol;
@@ -2057,23 +2061,23 @@ OUT.color.rgb *= toonShadowCol;
 float3 E = Pos.xyz;// ƒrƒ…[‚Ì–Úü
 E = normalize(E);
 float RimPower = pow(1.0f - max(0.0f, dot(-E, Normal)), 4.0f);
-float RimLightPower = max(.0f, dot(-E, ViewLightVec));
+float RimLightPower = max(.0f, dot(-E, g_vViewLightVec));
 
 //ƒg[ƒ“ƒ}ƒbƒsƒ“ƒO
-OUT.color.rgb *= exp2(exposure);
+OUT.color.rgb *= exp2(g_fExposure);
 
-OUT.high.rgb = max(float3(0.0f, 0.0f, 0.0f), (OUT.color.rgb - g_bloomColor));
+OUT.high.rgb = max(float3(0.0f, 0.0f, 0.0f), (OUT.color.rgb - g_vBloomColor));
 OUT.high.a = 1.0f;
 
 // ƒI[ƒo[ƒhƒ‰ƒCƒu—p
 //float RimPower2 = pow(1.0f - max(0.0f, dot(-E, Normal)), 1.0f);
-OUT.high.rgb += float3(0.8, 0.5, 0.0)*g_PlayerColDesc.g/*g_OrangeColRate*/;
-OUT.high.rgb += float3(0.7, 0.0, 0.4)*g_PlayerColDesc.b/*g_MagentaColRate*/;
-OUT.high.rgb += float3(0.0, 0.1, 0.4)*g_PlayerColDesc2.r/*g_OverDriveColRate*/;
-OUT.high.rgb += float3(0.25f, 0.0, 0.0)*g_PlayerColDesc2.g/*g_WillPowerRate*/;
+OUT.high.rgb += float3(0.8, 0.5, 0.0)*g_vPlayerColDesc.g/*g_OrangeColRate*/;
+OUT.high.rgb += float3(0.7, 0.0, 0.4)*g_vPlayerColDesc.b/*g_MagentaColRate*/;
+OUT.high.rgb += float3(0.0, 0.1, 0.4)*g_vPlayerColDesc2.r/*g_OverDriveColRate*/;
+OUT.high.rgb += float3(0.25f, 0.0, 0.0)*g_vPlayerColDesc2.g/*g_WillPowerRate*/;
 
 //‚‹P“x’ŠoŒã‚É‚µ‚È‚¢‚ÆHDR‚ÅŒõ‚Á‚Ä‚µ‚Ü‚¤‚Ì‚ÅÅŒã‚É
-OUT.color.rgb += g_PlayerColDesc.r/*g_InvincibleColRate*/;
+OUT.color.rgb += g_vPlayerColDesc.r/*g_InvincibleColRate*/;
 
 return OUT;
 }
@@ -2139,13 +2143,13 @@ PS_TONEMAP PS_Persona(VS_OUTPUT_FINAL In) : COLOR
 	OUT.color.rgb += tex2D(SpecSamp, ScreenTex);
 
 	// ƒ‰ƒCƒg—¦(ƒn[ƒtƒ‰ƒ“ƒo[ƒg)
-	//float rate = (dot(Normal, -ViewLightVec));
+	//float rate = (dot(Normal, -g_vViewLightVec));
 	//float HalfLambert = pow((rate + 1.0f)*0.5f, 2);	// HalfLambert
 	//float3 toonShadowCol = tex2D(ToonShadowSamp, float2(HalfLambert, 0.0f));
 	//	OUT.color.rgb *= toonShadowCol;
 
 		// ƒsƒNƒZƒ‹‚ÌF
-		//OUT.color.rgb = (HalfLambert * LightColor);
+		//OUT.color.rgb = (HalfLambert * g_vLightColor);
 	
 
 	// Â‚¢ƒŠƒ€ƒ‰ƒCƒeƒBƒ“ƒO
@@ -2158,9 +2162,9 @@ PS_TONEMAP PS_Persona(VS_OUTPUT_FINAL In) : COLOR
 	OUT.color.rgb += RimPower * float3(0, 0.4, 2.5);
 
 	//ƒg[ƒ“ƒ}ƒbƒsƒ“ƒO
-	OUT.color.rgb *= exp2(exposure);
+	OUT.color.rgb *= exp2(g_fExposure);
 
-	OUT.high.rgb = max(float3(0.0f, 0.0f, 0.0f), (OUT.color.rgb - g_bloomColor));
+	OUT.high.rgb = max(float3(0.0f, 0.0f, 0.0f), (OUT.color.rgb - g_vBloomColor));
 
 	// ƒyƒ‹ƒ\ƒi‚ÌÂ‚¢Œõ
 	//OUT.high.rgb += RimPower * float3(0,1.3, 1.5);
@@ -2228,9 +2232,9 @@ VS_OUTPUT_FINAL VS_Sky(VS_INPUT In)
 {
 	VS_OUTPUT_FINAL Out = (VS_OUTPUT_FINAL)0;
 	//TransMatrix‚ÆPos‚ğ‡¬‚µ‚ÄwPos‚Ìî•ñ¶¬
-	Out.wPos = mul(In.Pos, WMatrix);
+	Out.wPos = mul(In.Pos, g_mWMatrix);
 
-	Out.Pos = mul(In.Pos, WVPMatrix);
+	Out.Pos = mul(In.Pos, g_mWVPMatrix);
 	Out.Tex = In.Tex;
 	Out.Color = 1.0f;
 
@@ -2252,12 +2256,12 @@ PS_TONEMAP PS_Sky(VS_OUTPUT_FINAL In) : COLOR
 	OUT.color = In.Color * tex2D(DecaleSamp, In.Tex);
 
 	// •KEˆÃ“]‚Ì’l
-	OUT.color.rgb *= g_OverDriveDim;
+	OUT.color.rgb *= g_fOverDriveDim;
 
 	//ƒg[ƒ“ƒ}ƒbƒsƒ“ƒO
-	OUT.color.rgb *= exp2(exposure);
+	OUT.color.rgb *= exp2(g_fExposure);
 	//OUT.color.rgb -= float3(0.05f, 0.1f, 0.3f);
-	OUT.high.rgb = float3(0.05f, 0.1f, 0.3f)*g_OverDriveDim;// •KEˆÃ“]‚Ì’l
+	OUT.high.rgb = float3(0.05f, 0.1f, 0.3f)*g_fOverDriveDim;// •KEˆÃ“]‚Ì’l
 	OUT.high.a = 1.0f;
 
 	return OUT;
@@ -2298,12 +2302,12 @@ PS_TONEMAP PS_NightSky(VS_OUTPUT_FINAL In) : COLOR
 OUT.color = In.Color * tex2D(DecaleSamp, In.Tex);
 
 // •KEˆÃ“]‚Ì’l
-OUT.color.rgb *= g_OverDriveDim;
+OUT.color.rgb *= g_fOverDriveDim;
 
 //ƒg[ƒ“ƒ}ƒbƒsƒ“ƒO
-OUT.color.rgb *= exp2(exposure);
+OUT.color.rgb *= exp2(g_fExposure);
 //OUT.color.rgb -= float3(0.05f, 0.1f, 0.3f);
-OUT.high.rgb = float3(0.035f, 0.045f, 0.075f)*g_OverDriveDim;// •KEˆÃ“]‚Ì’l
+OUT.high.rgb = float3(0.035f, 0.045f, 0.075f)*g_fOverDriveDim;// •KEˆÃ“]‚Ì’l
 OUT.high.a = 1.0f;
 
 return OUT;
@@ -2368,22 +2372,22 @@ struct VS_OUTPUT_UV
 };
 
 // UV
-float tuAnime = 0.0f;
-float tvAnime = 0.0f;
-float alphaUV = 1.0f;
+float m_fTuAnime = 0.0f;
+float m_fTvAnime = 0.0f;
+float m_fAlphaUV = 1.0f;
 
 VS_OUTPUT_UV VS_UvAnime(VS_INPUT_UV In)
 {
 	VS_OUTPUT_UV Out = (VS_OUTPUT_UV)0;
 
-	Out.Pos = mul(In.Pos, WVPMatrix);
+	Out.Pos = mul(In.Pos, g_mWVPMatrix);
 	Out.wvpPos = Out.Pos;
 	Out.Normal = In.Normal;
 	Out.Color = In.Color;// ’¸“_ƒJƒ‰[æ“¾
-	Out.Tex = In.Tex + float2(tuAnime, tvAnime);//À•W
+	Out.Tex = In.Tex + float2(m_fTuAnime, m_fTvAnime);//À•W
 
 	Out.Color.rgb = 1.0f;
-	Out.Color.a *= alphaUV; //@“§–¾“x
+	Out.Color.a *= m_fAlphaUV; //@“§–¾“x
 
 	return Out;
 }
@@ -2400,7 +2404,7 @@ PS_TONEMAP PS_UvAnime(VS_OUTPUT_UV In) : COLOR
 	OUT.color = In.Color * tex2D(DecaleSampUV, In.Tex);
 	
 	//ƒg[ƒ“ƒ}ƒbƒsƒ“ƒO
-	//OUT.color.rgb *= exp2(exposure); ¡‚Íl—¶‚Í‚È‚µ‚Å
+	//OUT.color.rgb *= exp2(g_fExposure); ¡‚Íl—¶‚Í‚È‚µ‚Å
 	
 	// ‚‹P“x’Šo
 	OUT.high.rgb = max(OUT.color.rgb - 0.45f,0.0f);
@@ -2490,7 +2494,7 @@ PS_TONEMAP PS_UvAnime_Guard(VS_OUTPUT_UV In) : COLOR
 	OUT.color.rgb += float3(0.3, 0.3, 1.0);
 
 	//ƒg[ƒ“ƒ}ƒbƒsƒ“ƒO
-	//OUT.color.rgb *= exp2(exposure); ¡‚Íl—¶‚Í‚È‚µ‚Å
+	//OUT.color.rgb *= exp2(g_fExposure); ¡‚Íl—¶‚Í‚È‚µ‚Å
 
 	// ‚‹P“x’Šo
 	OUT.high.rgb = max(OUT.color.rgb - 0.5f, 0.0f);
@@ -2555,7 +2559,7 @@ OUT.color.a *= RimPower2;
 //OUT.color.rgb += float3(0.1, 0.0, 0.0);
 
 //ƒg[ƒ“ƒ}ƒbƒsƒ“ƒO
-//OUT.color.rgb *= exp2(exposure); ¡‚Íl—¶‚Í‚È‚µ‚Å
+//OUT.color.rgb *= exp2(g_fExposure); ¡‚Íl—¶‚Í‚È‚µ‚Å
 
 // ‚‹P“x’Šo
 OUT.high.rgb = max(OUT.color.rgb - 0.25f, 0.0f);
@@ -2622,14 +2626,14 @@ VS_OUTPUT_UV_WALL VS_UvAnime_AreaWall(VS_INPUT_UV In)
 {
 	VS_OUTPUT_UV_WALL Out = (VS_OUTPUT_UV_WALL)0;
 
-	Out.Pos = mul(In.Pos, WVPMatrix);
+	Out.Pos = mul(In.Pos, g_mWVPMatrix);
 	Out.wvpPos = Out.Pos;
 	Out.Normal = In.Normal;
 	Out.Color = In.Color;// ’¸“_ƒJƒ‰[æ“¾
-	Out.Tex = In.Tex + float2(tuAnime, tvAnime);//À•W
+	Out.Tex = In.Tex + float2(m_fTuAnime, m_fTvAnime);//À•W
 	Out.MaskTex = In.Tex;
 	Out.Color.rgb = 1.0f;
-	Out.Color.a *= alphaUV; //@“§–¾“x
+	Out.Color.a *= m_fAlphaUV; //@“§–¾“x
 
 	return Out;
 }
@@ -2656,7 +2660,7 @@ PS_TONEMAP PS_UvAnime_AreaWall(VS_OUTPUT_UV_WALL In) : COLOR
 	OUT.color.b += 0.2f;
 
 	//ƒg[ƒ“ƒ}ƒbƒsƒ“ƒO
-	//OUT.color.rgb *= exp2(exposure); ¡‚Íl—¶‚Í‚È‚µ‚Å
+	//OUT.color.rgb *= exp2(g_fExposure); ¡‚Íl—¶‚Í‚È‚µ‚Å
 
 	// ‚‹P“x’Šo
 	OUT.high.rgb = max(OUT.color.rgb - 0.45f, 0.0f);
@@ -2730,14 +2734,14 @@ VS_OUTPUT_WATER_REFLECT VS_WATER_REFLECT(VS_INPUT_WATER_REFLECT In)
 	In.Pos.y *= -1.0f;
 
 	//TransMatrix‚ÆPos‚ğ‡¬‚µ‚ÄwPos‚Ìî•ñ¶¬
-	Out.wPos = mul(In.Pos, WMatrix);
+	Out.wPos = mul(In.Pos, g_mWMatrix);
 
 	// ‚±‚±‚Å…‚Ì‚‚³‚ğl—¶‚µ‚½À•W‚Ì”½“]‚ğs‚¤
 	//Out.wPos.y = g_fWaterHeight - (Out.wPos.y - g_fWaterHeight);
 
 	Out.wPos.y += 1;
 
-	Out.Pos = mul(Out.wPos, VPMatrix);
+	Out.Pos = mul(Out.wPos, g_mVPMatrix);
 
 	Out.Tex = In.Tex;
 	Out.Color = 1.0f;
@@ -2761,10 +2765,10 @@ float4 PS_WATER_REFLECT(VS_OUTPUT_WATER_REFLECT In) : COLOR
 	OUT = In.Color * tex2D(DecaleSamp, In.Tex);
 
 	// •KEˆÃ“]‚Ì’l
-	//OUT.color.rgb *= g_OverDriveDim;
+	//OUT.color.rgb *= g_fOverDriveDim;
 
 	//ƒg[ƒ“ƒ}ƒbƒsƒ“ƒO
-	//OUT.color.rgb *= exp2(exposure);
+	//OUT.color.rgb *= exp2(g_fExposure);
 	//OUT.color.rgb -= float3(0.05f, 0.1f, 0.3f);
 	//OUT.high.rgb = float3(0.05f, 0.1f, 0.3f)*;// •KEˆÃ“]‚Ì’l
 	//OUT.high.a = 1.0f;
@@ -2814,7 +2818,7 @@ float3 CalcWorldPosition(float2 UV, float2 zw)
 	proj.zw = zw;	// Z‚ÆW‚Í‚»‚Ì‚Ü‚Ü“ü‚ê‚é
 
 					// ƒvƒƒWƒFƒNƒVƒ‡ƒ“‹ts—ñ‚Åƒrƒ…[À•WŒn‚É•ÏŠ·@Proj->View
-	float4 worldPos = mul(proj, InvVPMatrix);
+	float4 worldPos = mul(proj, g_mInvVPMatrix);
 	//worldPos.xyz /= worldPos.w;		// ƒ[ƒ‹ƒh‹óŠÔ‚Ö‚ÍW‚ÅŠ„‚é•K—v‚ª‚ ‚é
 
 	return worldPos.xyz;
@@ -2878,11 +2882,11 @@ VS_OUTPUT_WATER VS_WATER(VS_INPUT_WATER In)
 {
 	VS_OUTPUT_WATER Out = (VS_OUTPUT_WATER)0;
 	//WMatrix‚ÆPos‚ğ‡¬‚µ‚ÄwPos‚Ìî•ñ¶¬
-	Out.wPos = mul(In.Pos, WMatrix);
-	Out.vPos = mul(In.Pos, VMatrix);
+	Out.wPos = mul(In.Pos, g_mWMatrix);
+	Out.vPos = mul(In.Pos, g_mWMatrix);
 	
 	//  ƒvƒƒWƒFƒNƒVƒ‡ƒ“‹óŠÔ‚ÌÀ•W‚ğ“n‚µ‚Ü‚·
-	Out.Pos = Out.wvpPos = mul(In.Pos, WVPMatrix);
+	Out.Pos = Out.wvpPos = mul(In.Pos, g_mWVPMatrix);
 	//Out.wvpPos = Out.Pos;
 
 	// …‚Ì”g—p‚É2‚ÂƒeƒNƒXƒ`ƒƒ[À•W‚É
@@ -2893,7 +2897,7 @@ VS_OUTPUT_WATER VS_WATER(VS_INPUT_WATER In)
 	Out.Color = 1.0f;
 
 	//	–@ü•ÏŠ·	
-	float3x3 mat = WMatrix;			// «‚Ì‰‰Z‚ğ‚·‚é‚½‚ß3x3‚É•ÏX
+	float3x3 mat = g_mWMatrix;			// «‚Ì‰‰Z‚ğ‚·‚é‚½‚ß3x3‚É•ÏX
 	float3 N = mul(In.Normal, mat);	//	ƒ[ƒJƒ‹‚Ì–@ü‚Æƒ[ƒ‹ƒhs—ñŠ|‚¯‡‚í‚¹‚Äƒ[ƒ‹ƒh‹óŠÔ‚Ì–@üì‚è‚Ü‚·
 	Out.Normal = normalize(N);		// ³‹K‰»‚µ‚Æ‚«‚Ü‚·B
 	
@@ -2916,7 +2920,7 @@ VS_OUTPUT_WATER VS_WATER(VS_INPUT_WATER In)
 
 
 										// ‹üƒxƒNƒgƒ‹‚ğÚ‹óŠÔ‚Ö
-	float3 E = Out.wPos - ViewPos;		// ‹üƒxƒNƒgƒ‹
+	float3 E = Out.wPos - g_vViewPos;		// ‹üƒxƒNƒgƒ‹
 	Out.vE.x = dot(T, E);				// “¯‚¶‚­Ú‹óŠÔ‚Ì‚w²‚ğì‚é
 	Out.vE.y = dot(B, E);				// “¯‚¶‚­Ú‹óŠÔ‚Ì‚x²‚ğì‚é
 	Out.vE.z = dot(N, E);				// “¯‚¶‚­Ú‹óŠÔ‚Ì‚y²‚ğì‚é
@@ -2945,8 +2949,8 @@ float4 PS_WATER(VS_OUTPUT_WATER In) : COLOR
 
 	// ƒeƒNƒZƒ‹‚ğ’¸“_À•WŒn‚Å‚Ì‹üƒxƒNƒgƒ‹•ûŒü‚Éd‚İ‚ğ‚Â‚¯‚Ä‚¸‚ç‚·B
 	float3 E = normalize(In.vE);//–Úü‚ÌƒxƒNƒgƒ‹
-	UV1 -= 0.02f * h * E.xy /*+ uvSea*/;//‚ ‚Æ‚Å”’lã‚°‚é
-	UV2 -= 0.02f * h * E.xy /*+ uvSea*/;
+	UV1 -= 0.02f * h * E.xy /*+ m_fUvSea*/;//‚ ‚Æ‚Å”’lã‚°‚é
+	UV2 -= 0.02f * h * E.xy /*+ m_fUvSea*/;
 
 	/*************************/
 	//	‹·“K—pŒã‚É –@üæ“¾
@@ -2996,17 +3000,17 @@ float4 PS_WATER(VS_OUTPUT_WATER In) : COLOR
 	////proj.xy = (G_Fetch*float2(2.0f, -2.0f) + float2(-1.0f, 1.0f))* NormalDepth.zw.y;
 	////proj.zw = NormalDepth.zw;	// Z‚ÆW‚Í‚»‚Ì‚Ü‚Ü“ü‚ê‚é
 	//// ƒvƒƒWƒFƒNƒVƒ‡ƒ“‹ts—ñ‚Åƒrƒ…[À•WŒn‚É•ÏŠ·@Proj->View
-	////float4 worldPos = mul(proj, InvVPMatrix);
+	////float4 worldPos = mul(proj, g_mInvVPMatrix);
 	////worldPos.xyz /= worldPos.w;		// ƒ[ƒ‹ƒh‹óŠÔ‚Ö‚ÍW‚ÅŠ„‚é•K—v‚ª‚ ‚é
 
 
 	////ZPos.xyz /= ZPos.w;
 	//// PL‚ÌPos‚Æ‚±‚ÌƒsƒNƒZƒ‹‚ÌˆÊ’u‚Å©ƒ|ƒWƒVƒ‡ƒ“•‹——£
-	////float3 ViewLightVec = PLSpos.xyz - (Pos.xyz);
-	////float dist = pow(max(0.0f, 1.0f - (length(ViewLightVec) / PLSrange)), 2);//©”’l‚ğ‚¢‚¶‚èi‚é
+	////float3 g_vViewLightVec = g_vPLSpos.xyz - (Pos.xyz);
+	////float dist = pow(max(0.0f, 1.0f - (length(g_vViewLightVec) / g_fPLSrange)), 2);//©”’l‚ğ‚¢‚¶‚èi‚é
 
 	//// ‚‚³‚Ì‚İ
-	//float waterLen = length(ViewPos.y - g_fWaterHeight);
+	//float waterLen = length(g_vViewPos.y - g_fWaterHeight);
 
 	//float vLen = length(envPos-In.vPos.xyz);
 
@@ -3048,7 +3052,7 @@ float4 PS_WATER(VS_OUTPUT_WATER In) : COLOR
 	proj.xy = (G_Fetch*float2(2.0f, -2.0f) + float2(-1.0f, 1.0f))* NormalDepth.zw.y;
 	proj.zw = NormalDepth.zw;	// Z‚ÆW‚Í‚»‚Ì‚Ü‚Ü“ü‚ê‚é
 	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“‹ts—ñ‚Åƒrƒ…[À•WŒn‚É•ÏŠ·@Proj->View
-	float4 worldPos = mul(proj, InvVPMatrix);
+	float4 worldPos = mul(proj, g_mInvVPMatrix);
 	worldPos.xyz /= worldPos.w;		// ƒ[ƒ‹ƒh‹óŠÔ‚Ö‚ÍW‚ÅŠ„‚é•K—v‚ª‚ ‚é
 	
 	// (TODO) Œã‚Å
@@ -3073,7 +3077,7 @@ float4 PS_WATER(VS_OUTPUT_WATER In) : COLOR
 	//******************************************************
 
 	// …‚Ì–@üƒxƒNƒgƒ‹‚Æn“_ƒxƒNƒgƒ‹‚Å“àÏ@
-	float fresnel = dot(normalize(ViewPos - In.wPos), In.Normal);
+	float fresnel = dot(normalize(g_vViewPos - In.wPos), In.Normal);
 
 	// üŒ`•âŠÔ
 	//float3 RefCol = { -0.1f, -0.08f, -0.0f };
@@ -3167,17 +3171,17 @@ struct VS_INPUT_SEA
 //float	AlphaFar = 200.0f;
 //float	SeaAlpha = 0.0f;//
 
-float uvSea = 0.0f;
-//float3 SeaColor = { 0.2f, 0.8f, 1.7f };
-float3 SeaColor = { 0.3f, 0.65f, 1.1f };
+float m_fUvSea = 0.0f;
+//float3 m_fSeaColor = { 0.2f, 0.8f, 1.7f };
+float3 m_fSeaColor = { 0.3f, 0.65f, 1.1f };
 
 
 inline float4 CalcHemiLight(float3 normal)//@ã‰º‚ÌŠÂ‹«Œõ‚ğ•ª‚¯‚é
 {
 	float4 color;
 	float rate = (normal.y*0.5f) + 0.5f;
-	color.rgb = SkyColor * rate;
-	color.rgb += GroundColor * (1 - rate);
+	color.rgb = g_vSkyColor * rate;
+	color.rgb += g_vGroundColor * (1 - rate);
 	color.a = 1.0f;
 
 	return color;
@@ -3187,7 +3191,7 @@ inline float3 CalcDirLight(float3 dir, float3 normal)//@ƒ‰ƒCƒg‚ÌŒü‚«‚ÅŒõ‚ÌF‚Ì‹
 {
 	float3 light;
 	float rate = max(0.0f, dot(-dir, normal));//@Œõ‚ÌŒvZ@“àÏ‚ÅŒõ‚Ì”½Ë‚ğ‹‚ß‚é
-	light = LightColor * rate;//
+	light = g_vLightColor * rate;//
 
 	return light;
 }
@@ -3227,17 +3231,17 @@ VS_OUTPUT_SEA VS_Sea(VS_INPUT_SEA In)
 	//ƒ[ƒJƒ‹À•WŒnã‚Å‚Ì’¸“_‚ÌÀ•W
 	Out.RocalPos = In.Pos;
 
-	Out.Pos = mul(In.Pos, WVPMatrix);//ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚Æ‡¬
+	Out.Pos = mul(In.Pos, g_mWVPMatrix);//ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚Æ‡¬
 	Out.ProjectionPos = Out.Pos;
 
 	Out.Color = 1.0f;//In.Color;
-	Out.Tex1 = In.Tex + float2(-uvSea*1.5, -uvSea * 1.5);
-	Out.Tex2 = In.Tex + float2(uvSea, uvSea*1.5);
+	Out.Tex1 = In.Tex + float2(-m_fUvSea*1.5, -m_fUvSea * 1.5);
+	Out.Tex2 = In.Tex + float2(m_fUvSea, m_fUvSea*1.5);
 
 
-	float4 P = mul(In.Pos, WMatrix);//ƒ[ƒ‹ƒhÀ•W‚É‚Á‚Ä‚¢‚­
-	Out.wPos = mul(In.Pos, WMatrix);//
-	float3x3	mat = WMatrix;//float4x4‚ÌTransMatrix‚Ìs—ñ‚ğ@float3x3‚Ìmat‚É
+	float4 P = mul(In.Pos, g_mWMatrix);//ƒ[ƒ‹ƒhÀ•W‚É‚Á‚Ä‚¢‚­
+	Out.wPos = mul(In.Pos, g_mWMatrix);//
+	float3x3	mat = g_mWMatrix;//float4x4‚ÌTransMatrix‚Ìs—ñ‚ğ@float3x3‚Ìmat‚É
 								  //–@üƒxƒNƒgƒ‹
 	Out.Normal = mul(In.Normal, mat);//
 	Out.Normal = normalize(Out.Normal);//
@@ -3260,7 +3264,7 @@ VS_OUTPUT_SEA VS_Sea(VS_INPUT_SEA In)
 	Out.vLight = normalize(Out.vLight);
 
 	// ‹üƒxƒNƒgƒ‹•â³
-	float3 E = P - ViewPos;			 // ‹üƒxƒNƒgƒ‹
+	float3 E = P - g_vViewPos;			 // ‹üƒxƒNƒgƒ‹
 	Out.vE.x = dot(vx, E);			 // ‹üƒxƒNƒgƒ‹‚ğ’¸“_À•WŒn‚É•ÏŠ·‚·‚é
 	Out.vE.y = dot(vy, E);			 // ‹üƒxƒNƒgƒ‹‚ğ’¸“_À•WŒn‚É•ÏŠ·‚·‚é
 	Out.vE.z = dot(Out.Normal, E);   // ‹üƒxƒNƒgƒ‹‚ğ’¸“_À•WŒn‚É•ÏŠ·‚·‚é
@@ -3290,8 +3294,8 @@ h *= 0.5;//@“ñ‚ÂƒTƒ“ƒvƒŠƒ“ƒO‚µ‚Ä‚é‚©‚ç•½‹Ï‚ğæ‚Á‚Ä‚­‚é
 
 		 // ƒeƒNƒZƒ‹‚ğ’¸“_À•WŒn‚Å‚Ì‹üƒxƒNƒgƒ‹•ûŒü‚Éd‚İ‚ğ‚Â‚¯‚Ä‚¸‚ç‚·B
 float3 E = normalize(In.vE);// –Úü
-UV2 -= 0.02f * h * E.xy + uvSea;
-UV1 -= 0.02f * h * E.xy + uvSea;// ‚ ‚Æ‚Å”’lã‚°‚é
+UV2 -= 0.02f * h * E.xy + m_fUvSea;
+UV1 -= 0.02f * h * E.xy + m_fUvSea;// ‚ ‚Æ‚Å”’lã‚°‚é
 
 /*************************/
 //	‹·“K—pŒã‚É –@üæ“¾
@@ -3312,7 +3316,7 @@ In.vLight = normalize(In.vLight);
 
 OUT = tex2D(DecaleSamp, UV1) + tex2D(DecaleSamp, UV2);
 OUT *= 0.5;//@“ñ‚ÂƒTƒ“ƒvƒŠƒ“ƒO‚µ‚Ä‚é‚©‚ç•½‹Ï‚ğæ‚Á‚Ä‚­‚é
-OUT.rgb *= SeaColor;// +light;// ŠC‚ÌFw’è
+OUT.rgb *= m_fSeaColor;// +light;// ŠC‚ÌFw’è
 OUT.a = 1.0f;// “§–¾“x
 
 /*************************/
@@ -3392,7 +3396,7 @@ OUT.rgb += S;
 
 
 // •KEˆÃ“]‚Ì’l
-OUT.rgb *= g_OverDriveDim;
+OUT.rgb *= g_fOverDriveDim;
 
 return OUT;
 }

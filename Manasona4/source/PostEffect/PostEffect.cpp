@@ -76,8 +76,8 @@ void PostEffect::SetRadialBlur(Vector2 pos, float power)
 	shader2D->SetValue("BluePower", m_bluePower);
 
 	// êŠ
-	shader2D->SetValue("CenterX", pos.x);
-	shader2D->SetValue("CenterY", pos.y);
+	shader2D->SetValue("g_fCenterX", pos.x);
+	shader2D->SetValue("g_fCenterY", pos.y);
 }
 
 void PostEffect::BloomBigin()
@@ -105,7 +105,7 @@ void PostEffect::Update()
 	Ctrl();
 	BlueUpdate();
 
-	shader2D->SetValue("BlurValue", m_blurValue);
+	shader2D->SetValue("g_fBlurValue", m_blurValue);
 }
 
 void PostEffect::BloomRender()

@@ -1661,11 +1661,11 @@ void BasePlayer::ShaderSendParam()
 		//vEdgeCol = Vector3(0.0f, 0.65f, 1.0f);
 		l_vColDesc2.z = 0.0f;
 	}
-	//shaderM->SetValue("g_EdgeColor", vEdgeCol);
+	//shaderM->SetValue("g_vEdgeColor", vEdgeCol);
 
 	// まとめてシェーダへ
-	shaderM->SetValue("g_PlayerColDesc", l_vColDesc);
-	shaderM->SetValue("g_PlayerColDesc2", l_vColDesc2);
+	shaderM->SetValue("g_vPlayerColDesc", l_vColDesc);
+	shaderM->SetValue("g_vPlayerColDesc2", l_vColDesc2);
 
 }
 

@@ -565,7 +565,7 @@ void sceneRenderingTest::RenderShadow()
 {
 	if (DeferredManagerEx.GetShadowFlag() == false)return;
 
-	DeferredManagerEx.CreateShadowMatrix
+	DeferredManagerEx.CreateShadog_mWMatrix
 		(m_dirLight, Vector3(0, 0, 0), Vector3(0, 0, 1), 400);
 
 	{

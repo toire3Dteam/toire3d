@@ -171,36 +171,36 @@ void DeferredEx::G_End()
 
 // ※このUpdateはレンダーで呼んでください
 // Deferredの更新
-void DeferredEx::G_Update(const Vector3 ViewPos)
+void DeferredEx::G_Update(const Vector3 g_vViewPos)
 {
 	// トーンマッピング操作
 	CtrlExposure();
 
 	// 目線
-	m_vViewPos = ViewPos;
-	shaderM->SetValue("ViewPos", m_vViewPos);
+	m_vViewPos = g_vViewPos;
+	shaderM->SetValue("g_vViewPos", m_vViewPos);
 
 	//プロジェクション逆行列生成
 	Matrix invproj = matProjection;
 	D3DXMatrixInverse(&invproj, nullptr, &invproj);
-	shaderM->SetValue("InvPMatrix", invproj);
+	shaderM->SetValue("g_mInvPMatrix", invproj);
 
 	//プロジェクション→ワールド逆行列生成
 	Matrix invview = matView;
 	D3DXMatrixInverse(&invview, nullptr, &invview);
-	shaderM->SetValue("InvVMatrix", invview);
-	shaderM->SetValue("InvVPMatrix", invproj * invview);
+	shaderM->SetValue("g_mInvVMatrix", invview);
+	shaderM->SetValue("g_mInvVPMatrix", invproj * invview);
 
 	/*************************************/
 	//	変換行列をシェーダ側に贈る
 	/*************************************/
 	// View変換行列 
-	shaderM->SetValue("VMatrix", matView);
+	shaderM->SetValue("g_mVMatrix", matView);
 	// Projection変換行列 
-	shaderM->SetValue("PMatrix", matProjection);
+	shaderM->SetValue("g_mPMatrix", matProjection);
 
 	// View*Proj変換行列
-	shaderM->SetValue("VPMatrix", matView*matProjection);
+	shaderM->SetValue("g_mVPMatrix", matView*matProjection);
 
 
 }
@@ -247,8 +247,8 @@ void DeferredEx::DirLight(const Vector3 dir, const Vector3 color)
 	LightDir.Normalize();
 
 	//	シェーダー設定 shaderに送る
-	shaderM->SetValue("ViewLightVec", LightDir);
-	shaderM->SetValue("LightColor", (Vector3)color);
+	shaderM->SetValue("g_vViewLightVec", LightDir);
+	shaderM->SetValue("g_vLightColor", (Vector3)color);
 
 	//現在のレンダーターゲットを一時的に確保
 	Surface* now = nullptr;
@@ -267,11 +267,11 @@ void DeferredEx::DirLight(const Vector3 dir, const Vector3 color)
 }
 
 // 半球ライティング
-void DeferredEx::HemiLight(const Vector3 SkyColor, const Vector3 GroundColor)
+void DeferredEx::HemiLight(const Vector3 g_vSkyColor, const Vector3 g_vGroundColor)
 {
 	//	シェーダー設定
-	shaderM->SetValue("SkyColor", (Vector3)SkyColor);
-	shaderM->SetValue("GroundColor", (Vector3)GroundColor);
+	shaderM->SetValue("g_vSkyColor", (Vector3)g_vSkyColor);
+	shaderM->SetValue("g_vGroundColor", (Vector3)g_vGroundColor);
 
 	//現在のレンダーターゲットを一時的に確保
 	Surface* now = nullptr;
@@ -287,7 +287,7 @@ void DeferredEx::HemiLight(const Vector3 SkyColor, const Vector3 GroundColor)
 	tdnSystem::GetDevice()->SetRenderTarget(0, now);
 }
 
-void DeferredEx::AllLight(const Vector3 dir, const Vector3 color, const Vector3 SkyColor, const Vector3 GroundColor)
+void DeferredEx::AllLight(const Vector3 dir, const Vector3 color, const Vector3 g_vSkyColor, const Vector3 g_vGroundColor)
 {
 	Matrix matV = matView;
 
@@ -306,10 +306,10 @@ void DeferredEx::AllLight(const Vector3 dir, const Vector3 color, const Vector3 
 	LightDir.Normalize();
 
 	//	シェーダー設定 
-	shaderM->SetValue("ViewLightVec", LightDir);
-	shaderM->SetValue("LightColor", (Vector3)color);
-	shaderM->SetValue("SkyColor", (Vector3)SkyColor);
-	shaderM->SetValue("GroundColor", (Vector3)GroundColor);
+	shaderM->SetValue("g_vViewLightVec", LightDir);
+	shaderM->SetValue("g_vLightColor", (Vector3)color);
+	shaderM->SetValue("g_vSkyColor", (Vector3)g_vSkyColor);
+	shaderM->SetValue("g_vGroundColor", (Vector3)g_vGroundColor);
 
 	//現在のレンダーターゲットを一時的に確保
 	Surface* now = nullptr;
@@ -406,8 +406,8 @@ void DeferredEx::BloomRender()
 	m_pSurface[(int)SURFACE_NAME_EX::BLOOM]->RenderTarget();
 	tdnSystem::GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
 
-	shaderM->SetValue("TU", (float)1.25f / (float)MiniSizeX);
-	shaderM->SetValue("TV", (float)1.25f / (float)MiniSizeY);
+	shaderM->SetValue("g_fTU", (float)1.25f / (float)MiniSizeX);
+	shaderM->SetValue("g_fTV", (float)1.25f / (float)MiniSizeY);
 
 	// 画面の明るい部分をブルームの種として抽出
 	//m_sBloomScreen->Render(0, 0, MiniTex_x, MiniTex_y, 0, 0,
@@ -519,10 +519,10 @@ void DeferredEx::GpuPointLightRender()
 	for (int i = 0; i < (int)m_PLSdata.size(); i++)
 	{
 		// カメラ空間変換したポジションを入れる
-		shaderM->SetValue("PLSpos", m_PLSdata[i].pos);
-		shaderM->SetValue("PLScolor", m_PLSdata[i].color);
-		shaderM->SetValue("PLSrange", m_PLSdata[i].range);
-		shaderM->SetValue("PLSpower", m_PLSdata[i].power);
+		shaderM->SetValue("g_vPLSpos", m_PLSdata[i].pos);
+		shaderM->SetValue("g_vPLScolor", m_PLSdata[i].color);
+		shaderM->SetValue("g_fPLSrange", m_PLSdata[i].range);
+		shaderM->SetValue("g_fPLSpower", m_PLSdata[i].power);
 
 		//PointLightBall->SetScale(30.0f);
 		m_pPLS->SetPos(m_PLSdata[i].wpos);
@@ -561,7 +561,7 @@ void DeferredEx::InitShadowMap(const int size )
 }
 
 //　シャドウの行列生成
-void DeferredEx::CreateShadowMatrix
+void DeferredEx::CreateShadog_mWMatrix
 (Vector3 dir, Vector3 target, Vector3 playerVec, const float dist)
 {
 	// シャドウマップが生成されていなければ転送しない
@@ -587,7 +587,7 @@ void DeferredEx::CreateShadowMatrix
 	Math::OlthoLH(work, width, width, 0.02f, width * 2.5f);	//平行投影行列
 	ShadowMat *= work;
 	// 合成する
-	shaderM->SetValue("ShadowProjection", ShadowMat);
+	shaderM->SetValue("g_mShadowProjection", ShadowMat);
 
 	// アルファ調整
 	m_fShadowRange = width * 0.25f;
@@ -632,8 +632,8 @@ void DeferredEx::ShadowBegin()
 void DeferredEx::ShadowEnd()
 {
 
-	//shaderD->SetValue("TU", 1.0f / shadowSize); // 2でもありかも
-	//shaderD->SetValue("TV", 1.0f / shadowSize);
+	//shaderD->SetValue("g_fTU", 1.0f / shadowSize); // 2でもありかも
+	//shaderD->SetValue("g_fTV", 1.0f / shadowSize);
 	//// シャドウマップの解像度でブラー処理を変化	
 	//for (int i = 0; i < 2; i++)
 	//{
@@ -683,7 +683,7 @@ void DeferredEx::CtrlExposure()
 
 
 	//tdnText::Draw(10, 600, 0xff00ffff, "露光度%.1f", m_fExposure);
-	shaderM->SetValue("exposure", m_fExposure);
+	shaderM->SetValue("g_fExposure", m_fExposure);
 }
 
 //****************************
@@ -699,8 +699,8 @@ void DeferredEx::SetRadialBlur(Vector3 pos, float power)
 	Vector2 screenPos = Math::WorldToProj(pos);
 	
 	// 場所
-	shaderM->SetValue("CenterX", screenPos.x);
-	shaderM->SetValue("CenterY", screenPos.y);
+	shaderM->SetValue("g_fCenterX", screenPos.x);
+	shaderM->SetValue("g_fCenterY", screenPos.y);
 
 }
 
@@ -711,8 +711,8 @@ void DeferredEx::SetRadialBlur(Vector2 pos, float power)
 	shaderM->SetValue("BluePower", m_blurPower);
 
 	// 場所
-	shaderM->SetValue("CenterX", pos.x);
-	shaderM->SetValue("CenterY", pos.y);
+	shaderM->SetValue("g_fCenterX", pos.x);
+	shaderM->SetValue("g_fCenterY", pos.y);
 
 }
 
@@ -722,8 +722,8 @@ void DeferredEx::RadialBlurUpdate()
 	m_blurPower = Math::Clamp(m_blurPower, 0.0f, 30.0f);
 
 	// ブラ―
-	shaderM->SetValue("BlurPower", m_blurPower);
-	shaderM->SetValue("BlurValue", m_blurValue);
+	shaderM->SetValue("g_fBlurPower", m_blurPower);
+	shaderM->SetValue("g_fBlurValue", m_blurValue);
 
 }
 

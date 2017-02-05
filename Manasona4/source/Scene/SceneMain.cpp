@@ -753,7 +753,7 @@ void sceneMain::RenderStage()
 	DeferredManagerEx.GetTex(SURFACE_NAME_EX::BLOOM_SEED)->RenderTarget(1); //切り替え
 
 	// ステージ用のパラメータ
-	shaderM->SetValue("g_OverDriveDim", PlayerMgr->GetOverDriveDim());
+	shaderM->SetValue("g_fOverDriveDim", PlayerMgr->GetOverDriveDim());
 
 	// ステージ描画
 	//m_pStage->Render(shaderM, "Stage");
@@ -773,7 +773,7 @@ void sceneMain::RenderShadow()
 	// フラグが立ってる時のみ描画  [1206] 一応用意しといた
 	//if (m_bBakeStageShadow == true)
 	{
-		DeferredManagerEx.CreateShadowMatrix
+		DeferredManagerEx.CreateShadog_mWMatrix
 			(m_pStage->GetShaderParam().vDirLightVec, Vector3(0, 0, 0), Vector3(0, 0, 1), 400);
 
 		{

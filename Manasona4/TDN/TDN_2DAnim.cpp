@@ -270,8 +270,8 @@ void AnimAction::MoveAppeared::RenderSpecial(tdn2DObj* pic, int x, int y)
 		vec.Normalize();
 
 		// シェーダ側に転送
-		shaderM->SetValue("DirectionalX", vec.x);
-		shaderM->SetValue("DirectionalY", vec.y);
+		shaderM->SetValue("g_fDirectionalX", vec.x);
+		shaderM->SetValue("g_fDirectionalY", vec.y);
 
 		pic->Render(
 			(int)(Math::Blend(m_rate, (float)m_startX, (float)x)),

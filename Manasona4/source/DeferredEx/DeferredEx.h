@@ -34,7 +34,7 @@ public:
 	//***************************
 	void G_Begin();
 	void G_End();
-	void G_Update(const Vector3 ViewPos);
+	void G_Update(const Vector3 g_vViewPos);
 
 	//***************************
 	//		Lighting
@@ -43,9 +43,9 @@ public:
 	// 平行光
 	void DirLight(const Vector3 dir, const Vector3 color);
 	// 半球ライティング
-	void HemiLight(const Vector3 SkyColor, const Vector3 GroundColor);
+	void HemiLight(const Vector3 g_vSkyColor, const Vector3 g_vGroundColor);
 	// 平行光＋半球ライティング
-	void AllLight(const Vector3 dir, const Vector3 color, const Vector3 SkyColor, const Vector3 GroundColor);
+	void AllLight(const Vector3 dir, const Vector3 color, const Vector3 g_vSkyColor, const Vector3 g_vGroundColor);
 	
 	//****************************
 	//		FORWARD
@@ -74,7 +74,7 @@ public:
 	//		SHADOW
 	//****************************
 	void InitShadowMap(const int size = 1024);
-	void CreateShadowMatrix(Vector3 dir, Vector3 target, Vector3 playerVec, const float dist = 100.0f);
+	void CreateShadog_mWMatrix(Vector3 dir, Vector3 target, Vector3 playerVec, const float dist = 100.0f);
 
 	void ShadowBegin();
 	void ShadowEnd();
@@ -84,8 +84,8 @@ public:
 	//		DOWNSAMPLE
 	//****************************
 	float GetExposure() { return m_fExposure; }
-	void SetExposure(float exposure) { this->m_fExposure = exposure; }
-	void AddExposure(float exposure) { this->m_fExposure += exposure; }
+	void SetExposure(float g_fExposure) { this->m_fExposure = g_fExposure; }
+	void AddExposure(float g_fExposure) { this->m_fExposure += g_fExposure; }
 	void CtrlExposure();
 
 	//****************************

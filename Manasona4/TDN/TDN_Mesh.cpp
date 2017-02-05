@@ -1195,7 +1195,7 @@ void tdnMesh::Render( tdnShader *shader, char *technique )
 	unsigned int numPass = shader->Begin( technique );
 
 	Matrix m = worldMatrix * matView * matProjection;
-	shader->SetValue( "WMatrix", worldMatrix );
+	shader->SetValue( "g_mWMatrix", worldMatrix );
 	shader->SetWVPMatrix(&m);
 	if ( texture )
 		shader->SetValue( "Texture", texture );

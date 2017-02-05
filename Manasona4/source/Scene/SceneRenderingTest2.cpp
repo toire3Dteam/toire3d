@@ -286,7 +286,7 @@ void sceneRenderingTest2::Update()
 
 	static float uvWater = 0;
 	uvWater += 0.00025f;
-	shaderM->SetValue("uvSea", uvWater);
+	shaderM->SetValue("m_fUvSea", uvWater);
 }
 
 //******************************************************************
@@ -430,7 +430,7 @@ void sceneRenderingTest2::RenderShadow()
 {
 	if (DeferredManagerEx.GetShadowFlag() == false)return;
 
-	DeferredManagerEx.CreateShadowMatrix
+	DeferredManagerEx.CreateShadog_mWMatrix
 		(m_dirLight, Vector3(0, 0, 0), Vector3(0, 0, 1), 400);
 
 	{

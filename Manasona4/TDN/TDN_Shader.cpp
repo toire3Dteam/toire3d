@@ -66,7 +66,7 @@ tdnShader::tdnShader(char* filename, bool iscfx)
 	}
 
 	// 基礎変数の読み込み
-	hmWVP = pShader->GetParameterByName(NULL, "WVPMatrix");	//親構造体パラメータのハンドルNULLで最上階　パラメータ名 
+	hmWVP = pShader->GetParameterByName(NULL, "g_mWVPMatrix");	//親構造体パラメータのハンドルNULLで最上階　パラメータ名 
 	htexDecale = pShader->GetParameterByName(NULL, "Texture");
 }
 
