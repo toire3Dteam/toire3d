@@ -302,6 +302,7 @@ void BattleLoading::Render()
 	m_tagSlideChara2P[GetCharaType(SIDE::RIGHT)].RenderName();
 
 
+
 	//FOR(IMAGE::ARRAY_END)
 	//{
 	//	m_pImages[i].Render();

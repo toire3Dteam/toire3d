@@ -29,7 +29,7 @@ int GetCharaType(SIDE eSide)
 void BattleLoadingState::Intro::Enter(BattleLoading *pMain)
 {
 	// フェード初期化
-	Fade::Set(Fade::FLAG::FADE_IN, 8);
+	Fade::Set(Fade::FLAG::FADE_IN, 64);
 
 	for (int i = 0; i < BattleLoading::IMAGE::ARRAY_END; i++)
 	{
@@ -350,7 +350,7 @@ void BattleLoadingState::FinalStep::Execute(BattleLoading *pMain)
 	if (pMain->m_iSceneFrame >= 180)
 	{
 		// 次へ
-		pMain->GetFSM()->ChangeState(BattleLoadingState::Intro::GetInstance());
+		pMain->GetFSM()->ChangeState(BattleLoadingState::FadeChangeStep::GetInstance());
 		return;
 	}
 
@@ -412,7 +412,7 @@ bool BattleLoadingState::FinalStep::OnMessage(BattleLoading *pMain, const Messag
 void BattleLoadingState::FadeChangeStep::Enter(BattleLoading *pMain)
 {
 	// フェード
-
+	Fade::Set(Fade::FLAG::FADE_OUT, 8);
 
 	// タイマー初期化
 	pMain->m_iSceneFrame = 0;
@@ -429,11 +429,11 @@ void BattleLoadingState::FadeChangeStep::Execute(BattleLoading *pMain)
 
 
 	pMain->m_iSceneFrame++;
-	if (pMain->m_iSceneFrame >= 180)
+	if (pMain->m_iSceneFrame >= 24)
 	{
 		// 次へ
-		pMain->GetFSM()->ChangeState(BattleLoadingState::Intro::GetInstance());
-		return;
+		//pMain->GetFSM()->ChangeState(BattleLoadingState::Intro::GetInstance());
+		//return;
 	}
 
 }

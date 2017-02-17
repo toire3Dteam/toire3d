@@ -24,6 +24,8 @@
 #include "PointLight\PointLightInstancingMesh.h"
 
 #include "BattleLoading\BattleLoading.h"
+#include "Fade\Fade.h"
+
 
 SoundWindow* g_pSoundWindow;
 
@@ -401,6 +403,9 @@ void sceneRenderingTest2::Update()
 	static float uvWater = 0;
 	uvWater += 0.00025f;
 	shaderM->SetValue("m_fUvSea", uvWater);
+
+	// フェード
+	Fade::Update();
 }
 
 //******************************************************************
@@ -549,6 +554,9 @@ void sceneRenderingTest2::Render()
 
 	tdnStopWatch::End();
 
+
+	// フェード
+	Fade::Render();
 }
 
 void sceneRenderingTest2::RenderShadow()
