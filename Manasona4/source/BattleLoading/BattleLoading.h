@@ -127,11 +127,14 @@ public:
 		if (!m_pInstance) m_pInstance = new BattleLoading;
 		return m_pInstance;
 	}
+
+
+	// 初期化・解放
+	void Initialize();
 	static void Rerease() 
 	{
 		SAFE_DELETE(m_pInstance);
 	}
-
 	// 更新・描画
 	void Update();
 	void Render();
@@ -166,7 +169,15 @@ public:
 		ARRAY_END
 	};
 
+	bool isEnd() { return m_bEnd; }
+	void SetEndFlag(bool bEnd) { m_bEnd = bEnd; }
+
 private:
+	//------------------------------------------------------
+	//	メンバ変数
+	//------------------------------------------------------
+	bool m_bEnd;	// VS演出終わったかどうか
+
 	// ステートマシン
 	StateMachine<BattleLoading> *m_pStateMachine;
 

@@ -2,7 +2,7 @@
 #include "SceneSelect.h"
 #include "SceneSelectState.h"
 #include "SceneCollect.h"
-#include "SceneMain.h"
+#include "SceneVS.h"
 #include "SceneMenu.h"
 #include "../BaseEntity/Message/Message.h"
 #include "../Fade/Fade.h"
@@ -382,7 +382,7 @@ void SceneSelectState::End::Execute(sceneSelect *pMain)
 			SelectDataMgr->Get()->eStage = (STAGE)(pMain->m_iSelectStageNo - 1);	// RANDOM‚Ô‚ñ‚ðˆø‚¢‚Ä‚¢‚é
 		}
 
-		MainFrameEX->ChangeScene(new sceneMain());
+		MainFrameEX->ChangeScene(new sceneVS);
 		return;
 	}
 

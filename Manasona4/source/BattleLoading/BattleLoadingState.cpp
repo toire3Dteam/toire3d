@@ -431,9 +431,7 @@ void BattleLoadingState::FadeChangeStep::Execute(BattleLoading *pMain)
 	pMain->m_iSceneFrame++;
 	if (pMain->m_iSceneFrame >= 24)
 	{
-		// ŽŸ‚Ö
-		//pMain->GetFSM()->ChangeState(BattleLoadingState::Intro::GetInstance());
-		//return;
+		pMain->SetEndFlag(true);
 	}
 
 }

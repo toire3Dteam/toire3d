@@ -281,11 +281,14 @@ bool sceneMain::Initialize()
 	voice->InitializeCharacterVoice(SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].eCharacter);
 
 	// BGM流す
-	bgm->PlayStreamIn((LPSTR)BattleMusicMgr->GetMusicFilePath(SelectDataMgr->Get()->iBattleMusicID, SelectDataMgr->Get()->eStage).c_str());
+	//bgm->PlayStreamIn((LPSTR)BattleMusicMgr->GetMusicFilePath(SelectDataMgr->Get()->iBattleMusicID, SelectDataMgr->Get()->eStage).c_str());
 
 	// ポーズ押した人のデバイスID
 	m_iPauseDeviceID = 0;
 	m_eCommandSide = SIDE::LEFT;
+
+	// ★
+	m_bFirstUpdate = true;
 
 	return true;
 }
@@ -340,6 +343,15 @@ sceneMain::~sceneMain()
 
 void sceneMain::Update()
 {
+	// ★★★シームレスに読み込むので、Initialize関数で初期化すると都合が悪い(例えばストリーミングBGMとか)やつをUpdateで1回だけ呼び出したいときに使う
+	if (m_bFirstUpdate)
+	{
+		// BGM流す
+		bgm->PlayStreamIn((LPSTR)BattleMusicMgr->GetMusicFilePath(SelectDataMgr->Get()->iBattleMusicID, SelectDataMgr->Get()->eStage).c_str());
+
+		m_bFirstUpdate = false;
+	}
+
 	// ラウンドアイコンが1以上なら対戦中フラグOn
 	bool l_bVS = false;
 	if (m_iRoundNum >= 1) { l_bVS = true; }
@@ -518,6 +530,8 @@ void sceneMain::Update()
 
 void sceneMain::Render()
 {
+	if (m_bFirstUpdate) return;
+
 	// カメラ
 	CameraMgr->Activate();
 

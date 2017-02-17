@@ -1,20 +1,22 @@
-#include	"TDNLIB.h"
-#include	"FrameworkEx.h"
-#include	"../Scene/sceneMain.h"
-#include	"../Scene/sceneRenderingTest.h"
-#include	"../Scene/sceneRenderingTest2.h"
-#include	"../Scene/sceneResult.h"
-#include	"../Scene/sceneTitle.h"
-#include	"../Scene/SceneMenu.h"
-#include	"../Scene/SceneCollect.h"
-#include	"../Scene/SceneSelect.h"
-#include	"System.h"
-#include	"../Sound/SoundManager.h"
-#include	"../Data/PlayerData.h"
-#include	"../Effect/Particle.h"
-#include    "../MenuUI/TutorialManager.h"
-#include	"Trophy\TrophyManager.h"
-#include    "../Challenge/ChallengeManagerManager.h"
+#include "TDNLIB.h"
+#include "FrameworkEx.h"
+#include "../Scene/sceneMain.h"
+#include "../Scene/sceneRenderingTest.h"
+#include "../Scene/sceneRenderingTest2.h"
+#include "../Scene/sceneResult.h"
+#include "../Scene/sceneTitle.h"
+#include "../Scene/SceneMenu.h"
+#include "../Scene/SceneCollect.h"
+#include "../Scene/SceneSelect.h"
+#include "../Scene/SceneVS.h"
+#include "System.h"
+#include "../Sound/SoundManager.h"
+#include "../Data/PlayerData.h"
+#include "../Effect/Particle.h"
+#include "../MenuUI/TutorialManager.h"
+#include "Trophy/TrophyManager.h"
+#include "../Challenge/ChallengeManagerManager.h"
+#include "BattleLoading/BattleLoading.h"
 
 //*****************************/
 //		WinMain
@@ -51,17 +53,18 @@ BOOL InitApp(HINSTANCE hInstance, int nCmdShow)									// ƒQ[ƒ€‹N“®‚ÌÅ‰‚Ì
 	tdnMovieManager::Initialize();
 	ParticleManager::Initialize("DATA/Effect/particle.png", 1024);	// ƒp[ƒeƒBƒNƒ‹‰Šú‰»(š‚È‚º‚±‚±‚É‘‚­‚©‚Æ‚¢‚¤‚ÆAƒV[ƒ€ƒŒƒXƒV[ƒ“‚É‚ÄA‰Šú‰»¨‰Šú‰»¨‰ğ•ú‚É‚È‚Á‚Ä‚µ‚Ü‚¤‚½‚ß)
 	TrophyMgr;
+	BattleLoadInst;
 	//IEX‚ÌƒVƒXƒeƒ€ŠÖ”‚ğˆê“IÌ—pA˜b‚µ‡‚¢‚ÅSystem.h‚ğ–•Á‚·‚é‚©Œˆ‚ß‚é
 	SYSTEM_Initialize();
 
 	//MainFrameEX = new Framework();			 // ƒƒCƒ“ƒtƒŒ[ƒ€ƒ[ƒN¶¬
 	//MainFrameEX->ChangeScene(new sceneMain); // ‰ŠúƒV[ƒ“
 	//MainFrameEX->ChangeScene(new sceneRenderingTest); // •`‰æƒeƒXƒgƒV[ƒ“
-	MainFrameEX->ChangeScene(new sceneRenderingTest2); // •`‰æƒeƒXƒgƒV[ƒ“
+	//MainFrameEX->ChangeScene(new sceneRenderingTest2); // •`‰æƒeƒXƒgƒV[ƒ“
 	//MainFrameEX->ChangeScene(new sceneResult(SIDE::RIGHT)); // ƒŠƒUƒ‹ƒgƒV[ƒ“
-	//MainFrameEX->ChangeScene(new sceneEffectTool); // 
+	//MainFrameEX->ChangeScene(new sceneVS); // 
 	//MainFrameEX->ChangeScene(new sceneTitle);
-	//MainFrameEX->ChangeScene(new sceneMenu);
+	MainFrameEX->ChangeScene(new sceneMenu);
 	//MainFrameEX->ChangeScene(new sceneCollect);
 	//MainFrameEX->ChangeScene(new sceneSelect);
 	
@@ -77,6 +80,7 @@ BOOL EndApp()																	// ‚±‚Ì’†‚ÅƒVƒXƒeƒ€‚àŠÜ‚ß‚½‘S‚Ä‚ÌŒãˆ—‚ğ‚·‚é‚Ì‚Åƒ
 {
 	//delete MainFrame;			// [’ˆÓ]System‚ªRelease‚³‚ê‚é‘O‚ÉÁ‚·–
 	MainFrameEX->Release();
+	BattleLoadInst->Rerease();
 	ParticleManager::Release();
 	SYSTEM_Release();
 	TrophyMgr->Rerease();

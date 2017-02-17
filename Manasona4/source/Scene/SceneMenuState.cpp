@@ -14,6 +14,7 @@
 #include "../Window/ChallengeWindow.h"
 #include "../Window/ChallengeSelectWindow.h"
 #include "Challenge\ChallengeManagerManager.h"
+#include "SceneVS.h"
 
 //+--------------------
 // ì‹ÆŒø—¦‰»
@@ -654,7 +655,7 @@ void SceneMenuState::TutorialSelectStep::Execute(sceneMenu *pMain)
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = pMain->GetCtrlDevice();
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = pMain->GetCtrlDevice();
 
-		MainFrameEX->ChangeScene(new sceneMain());
+		MainFrameEX->ChangeScene(new sceneVS());
 		return;
 	}
 
@@ -1057,7 +1058,7 @@ void SceneMenuState::ChallengeNoStep::Execute(sceneMenu *pMain)
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = pMain->GetCtrlDevice();
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = pMain->GetCtrlDevice();
 
-		MainFrameEX->ChangeScene(new sceneMain());
+		MainFrameEX->ChangeScene(new sceneVS());
 
 		return;
 

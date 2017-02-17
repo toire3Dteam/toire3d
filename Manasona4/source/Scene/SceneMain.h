@@ -166,4 +166,6 @@ private:
 	int m_iPauseDeviceID;
 	SIDE m_eCommandSide;
 
+	// ★★★シームレスに読み込むので、イニシャライズで初期化すると都合が悪い(例えばストリーミングBGMとか)やつをUpdateで1回だけ呼び出したいときに使う
+	bool m_bFirstUpdate;
 };

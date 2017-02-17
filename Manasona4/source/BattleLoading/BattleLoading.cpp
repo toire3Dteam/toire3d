@@ -12,7 +12,8 @@
 // 前方宣言
 BattleLoading* BattleLoading::m_pInstance = nullptr;
 
-BattleLoading::BattleLoading() :BaseGameEntity(ENTITY_ID::BATTLE_LOADING)
+BattleLoading::BattleLoading() :BaseGameEntity(ENTITY_ID::BATTLE_LOADING),
+	m_bEnd(false)
 {
 	// 画像初期化
 	m_pImages[IMAGE::BLACK_LINE].pPic = new tdn2DAnim("DATA/UI/BattleLoading/BlackLine.png");
@@ -205,6 +206,13 @@ BattleLoading::BattleLoading() :BaseGameEntity(ENTITY_ID::BATTLE_LOADING)
 
 
 }
+
+void BattleLoading::Initialize()
+{
+	// ステートマシン初期化 
+	m_pStateMachine->ChangeState(BattleLoadingState::Intro::GetInstance());
+}
+
 
 BattleLoading::~BattleLoading()
 {

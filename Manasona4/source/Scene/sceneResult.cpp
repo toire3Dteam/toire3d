@@ -15,7 +15,7 @@
 #include "../Data/PlayerData.h"
 #include "../Data/SelectData.h"
 #include "../DeferredEx/DeferredEx.h"
-
+#include "../Scene/SceneVS.h"
 #include "../PointLight/PointLight.h"
 
 #include "../ResultPerformance/BaseResultPerformance.h"
@@ -446,7 +446,7 @@ void sceneResult::Update()
 			// ここで選択したアイコンにより飛ぶ場所が変わる
 			if (m_pResultWindow->GetChoiceState() == ResultWindow::AGAIN)
 			{
-				MainFrameEX->ChangeScene(new sceneMain(), true);
+				MainFrameEX->ChangeScene(new sceneVS());
 				return;
 			}
 			else if (m_pResultWindow->GetChoiceState() == ResultWindow::BACK_CHARA)

@@ -5213,8 +5213,10 @@ bool BasePlayerState::Throw::OnMessage(BasePlayer * pPerson, const Message & msg
 	{
 	case MESSAGE_TYPE::BE_THROWN:
 	{
-		// 投げ始動中に掴まれたら投げ抜け
-		if (pPerson->GetActionFrame() == FRAME_STATE::START)
+		// 投げ始動中に掴まれたら投げ抜け(通常投げのみ投げ抜けする。兄貴で投げ抜けできないように)
+		if (pPerson->GetActionFrame() == FRAME_STATE::START
+			&& pPerson->GetTargetPlayer()->GetFSM()->isInState(*Throw::GetInstance())
+			)
 		{
 			pPerson->GetFSM()->ChangeState(SuccessThrowRelease::GetInstance());
 
