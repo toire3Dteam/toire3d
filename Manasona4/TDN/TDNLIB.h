@@ -1792,12 +1792,12 @@ public:
 			numIndexes( 0 ), indexArray( nullptr ),
 			numStream( 0 ), streamSize( 0 ), streamArray( nullptr )
 		{}
-		inline ~CreateData()
-		{
-			delete[]vertexArray;
-			delete[]indexArray;
-			delete[]streamArray;
-		}
+		//inline ~CreateData()
+		//{
+		//	delete[]vertexArray;
+		//	delete[]indexArray;
+		//	delete[]streamArray;
+		//}
 
 	};
 	virtual bool Create( const CreateData &data );
@@ -3431,6 +3431,7 @@ public:
 	void Render();
 	void Render(u32 dwFlags, float param = -1);
 	void Render(tdnShader* shader, char* name);
+
 
 	//------------------------------------------------------
 	//	レイ判定

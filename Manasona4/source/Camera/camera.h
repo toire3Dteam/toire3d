@@ -165,7 +165,7 @@ private:
 class GlobalCameraState : public State<Camera>
 {
 public:
-	// this is a シングルトン
+	// 実体_
 	static GlobalCameraState *GetInstance(){ static GlobalCameraState i; return &i; }
 
 	// 入る
@@ -208,7 +208,7 @@ private:
 class FixCameraState :public State<Camera>
 {
 public:
-	// this is a シングルトン
+	// 実体_
 	static FixCameraState *GetInstance(){ static FixCameraState i; return &i; }
 
 	// 入る
@@ -236,7 +236,7 @@ private:
 class SumaburaCameraState :public State<Camera>
 {
 public:
-	// this is a シングルトン
+	// 実体_
 	static SumaburaCameraState *GetInstance(){ static SumaburaCameraState i; return &i; }
 
 	// 入る
@@ -264,7 +264,7 @@ private:
 class EffectCameraState :public State<Camera>
 {
 public:
-	// this is a シングルトン
+	// 実体_
 	static EffectCameraState *GetInstance(){ static EffectCameraState i; return &i; }
 
 	// 入る

@@ -1,5 +1,5 @@
 #include "TDNLIB.h"
-#include "../system/Framework.h"
+#include "../system/FrameworkEx.h"
 #include "SceneRenderingTest2.h"
 #include "../Stage/Stage.h"
 #include "../Sound/SoundManager.h"
@@ -20,6 +20,10 @@
 
 #include "Window\BaseWindow.h"
 #include "Window\SoundWindow.h"
+
+#include "PointLight\PointLightInstancingMesh.h"
+
+#include "BattleLoading\BattleLoading.h"
 
 SoundWindow* g_pSoundWindow;
 
@@ -55,11 +59,56 @@ struct Water
 	Vector3 vPos;
 };
 Water g_tagWater;
-
 float g_fUvWater = 0.0f;
+
+//+-------------
+//	メッシュ
+//+-------------
+tdnMesh* g_pBox;
+//PointLightInstancingMesh* g_pObj;
+
 
 bool sceneRenderingTest2::Initialize()
 {
+	//g_pObj = new PointLightInstancingMesh("Data/Shader/PLS_CCW.imo", 3);
+	//Matrix* mat = new Matrix[g_pObj->GetMaxInstancingNum()];
+	//for (int i = 0; i < g_pObj->GetMaxInstancingNum(); i++)
+	//{
+	//	D3DXMatrixIdentity(&mat[i]);
+	//	mat[i]._11 = 1.0f;
+	//	mat[i]._22 = 1.0f;
+	//	mat[i]._33 = 1.0f;
+	//	mat[i]._41 = (float)(rand() % 50 / (float)5) - 0.5 - 5;
+	//	mat[i]._42 = (float)(rand() % 50 / (float)5) - 1.0f;
+	//	mat[i]._43 = (float)(rand() % 50 / (float)5) - 0.5;
+
+	//}
+	//g_pObj->Update(mat, g_pObj->GetMaxInstancingNum());
+	//g_pObj->GetInstancingData(1)->vPos.x = 10;
+	//g_pObj->GetInstancingData(1)->fPower = 2;
+	//g_pObj->GetInstancingData(1)->fScale = 50;
+	//
+	//g_pObj->GetInstancingData(2)->vPos.y = 10;
+	//g_pObj->GetInstancingData(2)->vPos.x = -10;	
+	//g_pObj->GetInstancingData(2)->fScale = 2;
+	//
+	//g_pObj->GetInstancingData(0)->vPos.x = -10;
+	//
+	//g_pObj->InstancingUpdate();
+	//delete mat;
+
+	g_pBox = new tdnMesh();
+	Vector3 posList[]
+	{
+		{ -2, -2, 0 },
+		{ -2, 2, 0 },
+		{ 0, 0, 0 },
+		{ 2, -2, 0 },
+		{ 2, 2, 0 },
+	};
+	g_pBox->CreateCube(1, 1, 1, 0xFFFFFFFF, posList, 5);
+
+
 	//	ビュー設定
 	tdnView::Init();
 
@@ -67,7 +116,41 @@ bool sceneRenderingTest2::Initialize()
 
 	DeferredManagerEx;
 	DeferredManagerEx.InitShadowMap(1024);
-	m_bShaderFlag = true;
+	DeferredManagerEx.InitPointLightInstancing(5);
+
+	// ワールド座標のデータも詰める
+	Vector3 wpos = Vector3(150, 20, -10);
+	InstancingData data;
+
+	for (int i = 0; i < DeferredManagerEx.GetPLSInstancing()->GetMaxInstancingNum(); i++)
+	{
+		wpos.x -= 50;
+
+		data.vPos = wpos;
+		data.fPower = 6;
+		data.fScale = 35;
+		data.vColor = Vector3(1.5f, 0.75f, 0.4f);
+
+		DeferredManagerEx.GetPLSInstancing()->SetInstancingData(i, data);
+
+	}
+	DeferredManagerEx.GetPLSInstancing()->InstancingUpdate();
+
+
+	//Matrix* mat = new Matrix[g_pObj->GetMaxInstancingNum()];
+	//for (int i = 0; i < g_pObj->GetMaxInstancingNum(); i++)
+	//{
+	//	D3DXMatrixIdentity(&mat[i]);
+	//	mat[i]._11 = 1.0f;
+	//	mat[i]._22 = 1.0f;
+	//	mat[i]._33 = 1.0f;
+	//	mat[i]._41 = (float)(rand() % 50 / (float)5) - 0.5 - 5;
+	//	mat[i]._42 = (float)(rand() % 50 / (float)5) - 1.0f;
+	//	mat[i]._43 = (float)(rand() % 50 / (float)5) - 0.5;
+
+	//}
+
+	m_bShaderFlag = false;
 	PointLightMgr;
 	m_camera.pos = Vector3(0, 20, -100);
 	m_camera.target = Vector3(0, 15, 0);
@@ -111,11 +194,15 @@ bool sceneRenderingTest2::Initialize()
 	// 兄貴
 	m_pAniki = new iex3DObj("Data/CHR/Aniki/Aniki.iem");
 
+	BattleLoadInst;
+
 	return true;
 }
 
 sceneRenderingTest2::~sceneRenderingTest2()
 {
+	//SAFE_DELETE(g_pObj);
+
 	DeferredManagerEx.Release();
 	PointLightMgr->Release();
 	
@@ -136,6 +223,10 @@ sceneRenderingTest2::~sceneRenderingTest2()
 
 	SAFE_DELETE(m_pAniki);
 
+	SAFE_DELETE(g_pBox);
+
+	BattleLoadInst->Rerease();
+
 }
 
 //******************************************************************
@@ -144,6 +235,29 @@ sceneRenderingTest2::~sceneRenderingTest2()
 
 void sceneRenderingTest2::Update()
 {
+	BattleLoadInst->Update();
+
+	//// ワールド座標のデータも詰める
+	//Vector3 wpos = Vector3(0, 15, 0);
+
+	//// カメラ空間変換
+	//Matrix mat = matView;
+	//Vector3 vpos;
+	//vpos.x = wpos.x * mat._11 + wpos.y * mat._21 + wpos.z * mat._31 + mat._41;
+	//vpos.y = wpos.x * mat._12 + wpos.y * mat._22 + wpos.z * mat._32 + mat._42;
+	//vpos.z = wpos.x * mat._13 + wpos.y * mat._23 + wpos.z * mat._33 + mat._43;
+
+	//DeferredManagerEx.GetPLSInstancing()->GetInstancingData(0)->vPos = wpos;
+	//DeferredManagerEx.GetPLSInstancing()->GetInstancingData(0)->vVpos = vpos;
+	//DeferredManagerEx.GetPLSInstancing()->GetInstancingData(0)->fScale = 90;
+
+	//DeferredManagerEx.GetPLSInstancing()->GetInstancingData(0)->vColor = Vector3(1.5f, 0.75f, 0.4f);
+	////DeferredManagerEx.GetPLSInstancing()->GetInstancingData(0)->fRange = 100;
+	//DeferredManagerEx.GetPLSInstancing()->GetInstancingData(0)->fPower = 4;
+
+	//DeferredManagerEx.GetPLSInstancing()->InstancingUpdate();
+
+	g_pBox->UpdateWorldMatrix();
 
 	// カメラ
 	static float cameraAngle = 0;
@@ -305,6 +419,9 @@ void sceneRenderingTest2::Render()
 	// 水用の環境光
 	WaterEnvRender();
 
+	// シェーダ更新
+	DeferredManagerEx.G_Update(m_camera.pos);
+
 	if (m_bShaderFlag)
 	{
 		// G_Bufferクリア
@@ -312,9 +429,7 @@ void sceneRenderingTest2::Render()
 		DeferredManagerEx.ClearBloom();
 		DeferredManagerEx.ClearGpuPointLight();
 
-		// シェーダ更新
-		DeferredManagerEx.G_Update(m_camera.pos);
-
+	
 		// 影
 		RenderShadow();
 
@@ -341,6 +456,8 @@ void sceneRenderingTest2::Render()
 
 		// ポイントライト描画
 		DeferredManagerEx.GpuPointLightRender();
+
+		//g_pObj->InstancingPointLightRender();
 
 		// 最後の処理
 		{
@@ -387,9 +504,17 @@ void sceneRenderingTest2::Render()
 		g_pSky->Render();
 		g_tagWater.pObj->Render(shaderM, "copy");
 
-		m_pAniki->Render(shaderM, "copy");
+		//m_pAniki->Render(shaderM, "copy");
+
+		//g_pBox->Render(shaderM, "linecopy");
+		
+		//g_pObj->Render(shaderM, "copy");
+		//g_pObj->InstancingRender();
+		DeferredManagerEx.GetPLSInstancing()->InstancingRender();
 
 	}
+
+	BattleLoadInst->Render();
 	
 	float len = Math::Length(Vector3(10, 10, 10), Vector3(0, 0, 0));
 
@@ -430,7 +555,7 @@ void sceneRenderingTest2::RenderShadow()
 {
 	if (DeferredManagerEx.GetShadowFlag() == false)return;
 
-	DeferredManagerEx.CreateShadog_mWMatrix
+	DeferredManagerEx.CreateShadowMatrix
 		(m_dirLight, Vector3(0, 0, 0), Vector3(0, 0, 1), 400);
 
 	{

@@ -351,7 +351,7 @@ void SceneTitleState::End::Execute(sceneTitle *pMain)
 	// ƒƒCƒ“‚Ö
 	if (Fade::isFadeOutCompletion())
 	{
-		MainFrameEx->ChangeScene(new sceneMenu(),true);
+		MainFrameEX->ChangeScene(new sceneMenu(),true);
 		return;
 	}
 
@@ -431,7 +431,7 @@ void SceneTitleState::BackMenu::Execute(sceneTitle *pMain)
 	if (Fade::isFadeOutCompletion())
 	{
 		// ƒƒjƒ…[‚Ö
-		MainFrameEx->ChangeScene(new sceneMenu());
+		MainFrameEX->ChangeScene(new sceneMenu());
 		return;
 	}
 

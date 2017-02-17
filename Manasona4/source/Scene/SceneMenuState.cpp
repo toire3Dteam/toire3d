@@ -173,7 +173,7 @@ bool SceneMenuState::FirstStep::PadUpdate(sceneMenu *pMain, int DeviceID)
 		case MENU_ICON_TYPE::COLLECT:
 			M_UIMgr->Action();
 			bChangedState = true;
-			MainFrameEx->ChangeScene(new sceneCollect, true);
+			MainFrameEX->ChangeScene(new sceneCollect, true);
 			break;
 		case MENU_ICON_TYPE::OPTION:
 			pMain->SetPauseDeviceID(DeviceID);// ★ポーズメニューを押した人保存
@@ -347,7 +347,7 @@ bool SceneMenuState::BattleControllerSelectStep::PadUpdate(sceneMenu *pMain, int
 			// (TODO) ラウンド数設定 [12/1] ここでラウンドの設定はしない
 			//SelectDataMgr->Get()->iWinRound = 2;
 
-			MainFrameEx->ChangeScene(new sceneSelect, true);
+			MainFrameEX->ChangeScene(new sceneSelect, true);
 			bChangedState = true;
 		}
 
@@ -547,7 +547,7 @@ bool SceneMenuState::TrainingControllerSelectStep::PadUpdate(sceneMenu *pMain, i
 			// (TODO) ラウンド数設定 [12/1] ここでラウンドの設定はしない
 			//SelectDataMgr->Get()->iWinRound = 2;
 
-			MainFrameEx->ChangeScene(new sceneSelect, true);
+			MainFrameEX->ChangeScene(new sceneSelect, true);
 			bChangedState = true;
 		}
 
@@ -654,7 +654,7 @@ void SceneMenuState::TutorialSelectStep::Execute(sceneMenu *pMain)
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = pMain->GetCtrlDevice();
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = pMain->GetCtrlDevice();
 
-		MainFrameEx->ChangeScene(new sceneMain());
+		MainFrameEX->ChangeScene(new sceneMain());
 		return;
 	}
 
@@ -1057,7 +1057,7 @@ void SceneMenuState::ChallengeNoStep::Execute(sceneMenu *pMain)
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = pMain->GetCtrlDevice();
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = pMain->GetCtrlDevice();
 
-		MainFrameEx->ChangeScene(new sceneMain());
+		MainFrameEX->ChangeScene(new sceneMain());
 
 		return;
 

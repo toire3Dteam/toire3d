@@ -18,7 +18,7 @@ namespace SceneSelectState
 	class Intro : public State<sceneSelect>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static Intro* GetInstance() { static Intro state; return &state; }
 
 		// 入る
@@ -48,7 +48,7 @@ namespace SceneSelectState
 	class CharaSelect : public State<sceneSelect>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static CharaSelect* GetInstance() { static CharaSelect state; return &state; }
 
 		// 入る
@@ -81,7 +81,7 @@ namespace SceneSelectState
 	class StageAndBGM : public State<sceneSelect>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static StageAndBGM* GetInstance() { static StageAndBGM state; return &state; }
 
 		// 入る
@@ -115,7 +115,7 @@ namespace SceneSelectState
 	class End : public State<sceneSelect>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static End* GetInstance() { static End state; return &state; }
 
 		// 入る
@@ -148,7 +148,7 @@ namespace SceneSelectState
 	class BackMenu : public State<sceneSelect>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static BackMenu* GetInstance() { static BackMenu state; return &state; }
 
 		// 入る

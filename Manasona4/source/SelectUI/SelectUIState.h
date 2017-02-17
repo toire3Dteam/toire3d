@@ -20,7 +20,7 @@ namespace SelectUIState
 	class Intro : public State<SelectUI>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static Intro* GetInstance() { static Intro state; return &state; }
 
 		// 入る
@@ -50,7 +50,7 @@ namespace SelectUIState
 	class FirstStep : public State<SelectUI>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static FirstStep* GetInstance() { static FirstStep state; return &state; }
 
 		// 入る
@@ -81,7 +81,7 @@ namespace SelectUIState
 	class MiddleStep : public State<SelectUI>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static MiddleStep* GetInstance() { static MiddleStep state; return &state; }
 
 		// 入る
@@ -113,7 +113,7 @@ namespace SelectUIState
 	class SecondStep : public State<SelectUI>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static SecondStep* GetInstance() { static SecondStep state; return &state; }
 
 		// 入る
@@ -144,7 +144,7 @@ namespace SelectUIState
 	class SecondToOKStep : public State<SelectUI>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static SecondToOKStep* GetInstance() { static SecondToOKStep state; return &state; }
 
 		// 入る
@@ -175,7 +175,7 @@ namespace SelectUIState
 	class OKStep : public State<SelectUI>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static OKStep* GetInstance() { static OKStep state; return &state; }
 
 		// 入る
@@ -208,7 +208,7 @@ namespace SelectUIState
 	class OKToSecondStep : public State<SelectUI>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static OKToSecondStep * GetInstance() { static OKToSecondStep state; return &state; }
 
 		// 入る

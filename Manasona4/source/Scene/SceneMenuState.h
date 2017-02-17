@@ -12,7 +12,7 @@ namespace SceneMenuState
 	class Intro : public State<sceneMenu>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static Intro* GetInstance() { static Intro state; return &state; }
 
 		// 入る
@@ -42,7 +42,7 @@ namespace SceneMenuState
 	class FirstStep : public State<sceneMenu>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static FirstStep* GetInstance() { static FirstStep state; return &state; }
 
 		// 入る
@@ -75,7 +75,7 @@ namespace SceneMenuState
 	class BattleControllerSelectStep : public State<sceneMenu>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static BattleControllerSelectStep* GetInstance() { static BattleControllerSelectStep state; return &state; }
 
 		// 入る
@@ -107,7 +107,7 @@ namespace SceneMenuState
 	class TrainingControllerSelectStep : public State<sceneMenu>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static TrainingControllerSelectStep* GetInstance() { static TrainingControllerSelectStep state; return &state; }
 
 		// 入る
@@ -140,7 +140,7 @@ namespace SceneMenuState
 	class TutorialSelectStep : public State<sceneMenu>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static TutorialSelectStep* GetInstance() { static TutorialSelectStep state; return &state; }
 
 		// 入る
@@ -172,7 +172,7 @@ namespace SceneMenuState
 	class OptionStep : public State<sceneMenu>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static OptionStep* GetInstance() { static OptionStep state; return &state; }
 
 		// 入る
@@ -204,7 +204,7 @@ namespace SceneMenuState
 	class ChallengeStep : public State<sceneMenu>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static ChallengeStep* GetInstance() { static ChallengeStep state; return &state; }
 
 		// 入る
@@ -236,7 +236,7 @@ namespace SceneMenuState
 	class ChallengeNoStep : public State<sceneMenu>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static ChallengeNoStep* GetInstance() { static ChallengeNoStep state; return &state; }
 
 		// 入る
@@ -268,7 +268,7 @@ namespace SceneMenuState
 	class SystemWindowStep : public State<sceneMenu>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static SystemWindowStep* GetInstance() { static SystemWindowStep state; return &state; }
 
 		// 入る
@@ -301,7 +301,7 @@ namespace SceneMenuState
 	class GameWindowStep : public State<sceneMenu>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static GameWindowStep* GetInstance() { static GameWindowStep state; return &state; }
 
 		// 入る
@@ -333,7 +333,7 @@ namespace SceneMenuState
 	class SoundWindowStep : public State<sceneMenu>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static SoundWindowStep* GetInstance() { static SoundWindowStep state; return &state; }
 
 		// 入る

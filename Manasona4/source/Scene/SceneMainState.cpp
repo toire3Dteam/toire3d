@@ -511,7 +511,7 @@ void SceneMainState::Finish::Execute(sceneMain *pMain)
 			while (!LoadSceneThreadMgr->isInitializeEnd());
 
 			// すでに読み込んだリザルトシーンに行く
-			MainFrameEx->ChangeScene(LoadSceneThreadMgr->GetNewScene());
+			MainFrameEX->ChangeScene(LoadSceneThreadMgr->GetNewScene());
 
 			// スレッドの開放 シングルトンだからシーン変わってもデリートとか大丈夫のはず
 			LoadSceneThreadMgr->Release();
@@ -659,7 +659,7 @@ void SceneMainState::HeaveHoDriveOverFlowSuccess::Execute(sceneMain *pMain)
 			while (!LoadSceneThreadMgr->isInitializeEnd());
 
 			// すでに読み込んだリザルトシーンに行く
-			MainFrameEx->ChangeScene(LoadSceneThreadMgr->GetNewScene());
+			MainFrameEX->ChangeScene(LoadSceneThreadMgr->GetNewScene());
 
 			// シングルトンだからシーン変わってもデリートとか大丈夫のはず
 			LoadSceneThreadMgr->Release();
@@ -1026,14 +1026,14 @@ void SceneMainState::TutorialClear::Execute(sceneMain *pMain)
 		if (TutorialMgr->isBusy() == true && 
 			TutorialMgr->GetSelectType() == TUTORIAL_TYPE::PARTNER)
 		{
-			MainFrameEx->ChangeScene(new sceneMenu());
+			MainFrameEX->ChangeScene(new sceneMenu());
 			return;
 		}
 
 		// (TODO)ここで配列の最後まできたらメニューに戻る処理
 		if (TutorialMgr->GetSelectType() == TUTORIAL_TYPE::ARRAY_END)
 		{
-			MainFrameEx->ChangeScene(new sceneMenu());
+			MainFrameEX->ChangeScene(new sceneMenu());
 			return;
 		}
 		else
@@ -1403,7 +1403,7 @@ void SceneMainState::ChallengeClear::Execute(sceneMain *pMain)
 		// (TODO)ここで配列の最後まできたらメニューに戻る処理
 		if ((CHALLENGE_TYPE)ChallengeMgrMgr->GetSelectMgr()->GetSelectType() == CHALLENGE_TYPE::ARRAY_END)
 		{
-			MainFrameEx->ChangeScene(new sceneMenu());
+			MainFrameEX->ChangeScene(new sceneMenu());
 			return;
 		}
 		else
@@ -1998,7 +1998,7 @@ void SceneMainState::PauseMenu::Execute(sceneMain *pMain)
 	{
 		// ポーズウィンドウ止める
 		pMain->GetWindow(BATTLE_WINDOW_TYPE::PAUSE)->Stop();
-		MainFrameEx->ChangeScene(new sceneSelect());
+		MainFrameEX->ChangeScene(new sceneSelect());
 		return;
 	}
 
@@ -2007,7 +2007,7 @@ void SceneMainState::PauseMenu::Execute(sceneMain *pMain)
 	{
 		// ポーズウィンドウ止める
 		pMain->GetWindow(BATTLE_WINDOW_TYPE::PAUSE)->Stop();
-		MainFrameEx->ChangeScene(new sceneMenu());
+		MainFrameEX->ChangeScene(new sceneMenu());
 		return;
 	}
 
@@ -2132,7 +2132,7 @@ void SceneMainState::TutorialPauseMenu::Execute(sceneMain *pMain)
 	{
 		// ポーズウィンドウ止める
 		pMain->GetWindow(BATTLE_WINDOW_TYPE::TUTORIAL_PAUSE)->Stop();
-		MainFrameEx->ChangeScene(new sceneMenu());
+		MainFrameEX->ChangeScene(new sceneMenu());
 		return;
 	}
 	
@@ -2309,7 +2309,7 @@ void SceneMainState::ChallengePauseMenu::Execute(sceneMain *pMain)
 		{
 			// ポーズウィンドウ止める
 			pMain->GetWindow(BATTLE_WINDOW_TYPE::CHALLENGE_PAUSE)->Stop();
-			MainFrameEx->ChangeScene(new sceneMenu());
+			MainFrameEX->ChangeScene(new sceneMenu());
 			return;
 		}
 
@@ -2485,7 +2485,7 @@ void SceneMainState::TrainingPause::Execute(sceneMain *pMain)
 	{
 		// ポーズウィンドウ止める
 		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Stop();
-		MainFrameEx->ChangeScene(new sceneSelect());
+		MainFrameEX->ChangeScene(new sceneSelect());
 		return;
 	}
 
@@ -2494,7 +2494,7 @@ void SceneMainState::TrainingPause::Execute(sceneMain *pMain)
 	{
 		// ポーズウィンドウ止める
 		pMain->GetWindow(BATTLE_WINDOW_TYPE::TRAINING_PAUSE)->Stop();
-		MainFrameEx->ChangeScene(new sceneMenu());
+		MainFrameEX->ChangeScene(new sceneMenu());
 		return;
 	}
 

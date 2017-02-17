@@ -1,5 +1,5 @@
 #include "TDNLIB.h"
-#include "../system/Framework.h"
+#include "../system/FrameworkEx.h"
 #include "SceneRenderingTest.h"
 #include "../Stage/Stage.h"
 #include "../Sound/SoundManager.h"
@@ -565,7 +565,7 @@ void sceneRenderingTest::RenderShadow()
 {
 	if (DeferredManagerEx.GetShadowFlag() == false)return;
 
-	DeferredManagerEx.CreateShadog_mWMatrix
+	DeferredManagerEx.CreateShadowMatrix
 		(m_dirLight, Vector3(0, 0, 0), Vector3(0, 0, 1), 400);
 
 	{

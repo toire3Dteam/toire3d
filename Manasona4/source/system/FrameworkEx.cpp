@@ -70,6 +70,8 @@ void FrameworkEx::Release()
 /************************/
 bool FrameworkEx::Update()
 {
+	// return UpdateIex();
+
 	// マイクロ秒まで調べるのに必要な構造体
 	LARGE_INTEGER count;
 	QueryPerformanceCounter(&count);	// クロックカウント数取得	
@@ -95,7 +97,8 @@ bool FrameworkEx::Update()
 	// 一回の更新に2FPS以上かかってしまった場合 描画を止めて更新だけする
 	if (intervalTime > FPS_1 * 2) m_bRenderFlag = false;
 	else m_bRenderFlag = true;
-	m_bRenderFlag = true;
+	
+	m_bRenderFlag = true; // (TODO)
 
 	// 新たに1FPSを加算
 	// この数値を触ることにより1フレームの長さを変えれる

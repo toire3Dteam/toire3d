@@ -1,6 +1,6 @@
 #pragma once
 #include "TDNLIB.h"
-#include "../system/Framework.h"
+#include "../system/FrameworkEx.h"
 #include "EffectTool\Effect2DManager.h"
 
 class sceneEffectTool : public BaseScene

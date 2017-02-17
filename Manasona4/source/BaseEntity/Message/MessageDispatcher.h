@@ -1,7 +1,7 @@
 #pragma once
 #include "Message.h"
 #include "../Entity/EntityEnum.h"
-#include<set>
+#include <set>
 
 /*
 	Telegramの作成・送信・管理はこのクラスで処理する。
@@ -16,7 +16,7 @@
 class BaseGameEntity;
 
 // enum的な
-const double MSG_NO_DELAY = 0.0f;
+const int	MSG_NO_DELAY = 0;
 const int   MSG_NO_EXINFO= 0;
 
 class MessageDispatcher
@@ -25,12 +25,14 @@ public:
 
 	static MessageDispatcher* Instance();
 
-	void Dispatch(double  delay,
+	//  メッセージ発送
+	void Dispatch(int  delay,
 		ENTITY_ID    sender,
 		ENTITY_ID    receiver,
 		MESSAGE_TYPE    msg,
 		void*  ExtraInfo);
 
+	// 遅延メッセージ用
 	void DispatchDelayed();
 
 private:
@@ -39,8 +41,9 @@ private:
 	// メッセージ送信時刻でソートされる
 	std::set<Message> PriorityQ;// 優先
 
-	// ディスパッチ遅延メッセージによって利用されます
+	//　メッセージ発射
 	void Discharge(BaseGameEntity* pReceiver, const Message& msg);
+
 
 	// 封印
 	MessageDispatcher() {};

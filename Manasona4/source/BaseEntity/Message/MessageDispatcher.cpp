@@ -16,7 +16,7 @@ MessageDispatcher* MessageDispatcher::Instance()
 void MessageDispatcher::Discharge(BaseGameEntity* pReceiver,
 	const Message& telegram)
 {
-	if (!pReceiver->HandleMessage(telegram))
+	if (pReceiver->HandleMessage(telegram) == false)
 	{
 		// ここに来たということは受信者側が対応してなくて弾かれた可能性がある
 		printf("ID[%d] の送ったメッセージが処理されません\n", (int)telegram.Sender);
@@ -32,7 +32,7 @@ void MessageDispatcher::Discharge(BaseGameEntity* pReceiver,
 }
 
 // メッセージ発送
-void MessageDispatcher::Dispatch(double  delay,
+void MessageDispatcher::Dispatch(int  delay,
 	ENTITY_ID    sender,
 	ENTITY_ID    receiver,
 	MESSAGE_TYPE    msg,
@@ -55,7 +55,7 @@ void MessageDispatcher::Dispatch(double  delay,
 	Message telegram(delay, sender, receiver, msg, ExtraInfo);
 
 	//もし遅延がなかったらすぐに送信！                     
-	if (delay <= 0.0f)
+	if (delay <= 0)
 	{
 		printf("ID[%d] からのメッセージを ID[%d] に送信\n", (int)sender, (int)receiver);
 		//MyDebugString("ID[%d] からのメッセージを ID[%d] に送信\n", (int)sender, (int)receiver);
@@ -63,22 +63,16 @@ void MessageDispatcher::Dispatch(double  delay,
 		// 受信者に電報を送るぜ
 		Discharge(pReceiver, telegram);
 	}
+	// 遅延があればキューへ送る
+	else
+	{
+		// キューへ詰め込む
+		//PriorityQ.insert(telegram);
 
-	//else calculate the time when the telegram should be dispatched
-	//else
-	//{
-	//	double CurrentTime = Clock->GetCurrentTime();
+		//printf("ID[%d] の送ったメッセージを[%d]フレーム遅延させ送信します\n",
+		//	(int)telegram.Sender, telegram.DispatchTime);
 
-	//	telegram.DispatchTime = CurrentTime + delay;
-
-	//	//and put it in the queue
-	//	PriorityQ.insert(telegram);
-
-	//	cout << "\nDelayed telegram from " << GetNameOfEntity(pSender->ID()) << " recorded at time "
-	//		<< Clock->GetCurrentTime() << " for " << GetNameOfEntity(pReceiver->ID())
-	//		<< ". Msg is " << MsgToStr(msg);
-
-	//}
+	}
 }
 
 

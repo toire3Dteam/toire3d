@@ -164,7 +164,7 @@ struct Message
 	void*        ExtraInfo;
 
 	// メッセージの遅延時間
-	double       DispatchTime;
+	int       DispatchTime;
 
 	Message() :DispatchTime(-1),
 		Sender(ENTITY_ID::ID_ERROR),
@@ -172,7 +172,7 @@ struct Message
 		Msg(MESSAGE_TYPE::OTHER)
 	{}
 
-	Message(double time,
+	Message(int time,
 		ENTITY_ID    sender,
 		ENTITY_ID    receiver,
 		MESSAGE_TYPE    msg,

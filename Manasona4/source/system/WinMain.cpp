@@ -54,16 +54,16 @@ BOOL InitApp(HINSTANCE hInstance, int nCmdShow)									// ÉQÅ[ÉÄãNìÆéûÇÃç≈èâÇÃè
 	//IEXÇÃÉVÉXÉeÉÄä÷êîÇàÍéûìIçÃópÅAòbÇµçáÇ¢Ç≈System.hÇñïè¡Ç∑ÇÈÇ©åàÇﬂÇÈ
 	SYSTEM_Initialize();
 
-	//MainFrameEx = new Framework();			 // ÉÅÉCÉìÉtÉåÅ[ÉÄÉèÅ[ÉNê∂ê¨
-	MainFrameEx->ChangeScene(new sceneMain); // èâä˙ÉVÅ[Éì
-	//MainFrameEx->ChangeScene(new sceneRenderingTest); // ï`âÊÉeÉXÉgÉVÅ[Éì
-	//MainFrameEx->ChangeScene(new sceneRenderingTest2); // ï`âÊÉeÉXÉgÉVÅ[Éì
-	//MainFrameEx->ChangeScene(new sceneResult(SIDE::RIGHT)); // ÉäÉUÉãÉgÉVÅ[Éì
-	//MainFrameEx->ChangeScene(new sceneEffectTool); // 
-	//MainFrameEx->ChangeScene(new sceneTitle);
-	//MainFrameEx->ChangeScene(new sceneMenu);
-	//MainFrameEx->ChangeScene(new sceneCollect);
-	//MainFrameEx->ChangeScene(new sceneSelect);
+	//MainFrameEX = new Framework();			 // ÉÅÉCÉìÉtÉåÅ[ÉÄÉèÅ[ÉNê∂ê¨
+	//MainFrameEX->ChangeScene(new sceneMain); // èâä˙ÉVÅ[Éì
+	//MainFrameEX->ChangeScene(new sceneRenderingTest); // ï`âÊÉeÉXÉgÉVÅ[Éì
+	MainFrameEX->ChangeScene(new sceneRenderingTest2); // ï`âÊÉeÉXÉgÉVÅ[Éì
+	//MainFrameEX->ChangeScene(new sceneResult(SIDE::RIGHT)); // ÉäÉUÉãÉgÉVÅ[Éì
+	//MainFrameEX->ChangeScene(new sceneEffectTool); // 
+	//MainFrameEX->ChangeScene(new sceneTitle);
+	//MainFrameEX->ChangeScene(new sceneMenu);
+	//MainFrameEX->ChangeScene(new sceneCollect);
+	//MainFrameEX->ChangeScene(new sceneSelect);
 	
 
 
@@ -76,7 +76,7 @@ BOOL InitApp(HINSTANCE hInstance, int nCmdShow)									// ÉQÅ[ÉÄãNìÆéûÇÃç≈èâÇÃè
 BOOL EndApp()																	// Ç±ÇÃíÜÇ≈ÉVÉXÉeÉÄÇ‡ä‹ÇﬂÇΩëSÇƒÇÃå„èàóùÇÇ∑ÇÈÇÃÇ≈ÉNÉâÉXÇÃíÜÇ…ÇÕì¸ÇÍÇÍÇ»Ç¢
 {
 	//delete MainFrame;			// [íçà”]SystemÇ™ReleaseÇ≥ÇÍÇÈëOÇ…è¡Ç∑éñ
-	MainFrameEx->Release();
+	MainFrameEX->Release();
 	ParticleManager::Release();
 	SYSTEM_Release();
 	TrophyMgr->Rerease();
@@ -113,7 +113,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// ÉÅÉCÉìÉãÅ[Év
 	for (;;)
 	{
-	//NOTACTIVE:
 		// ÉÅÉbÉZÅ[ÉWèàóù
 		if (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))	// ÉÅÉbÉZÅ[ÉWÇ™Ç†ÇÍÇŒTRUE
 		{
@@ -121,21 +120,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			TranslateMessage(&msg);						// ÉÅÉbÉZÅ[ÉWì¸óÕÇÉvÉçÉOÉâÉÄÇ≈èàóùÇ≈Ç´ÇÈå`éÆÇ…ïœä∑
 			DispatchMessage(&msg);						// WindowProcÇåƒÇ—ÇæÇµÅAÉÅÉbÉZÅ[ÉWèàóùÇçsÇ§ÅB
 
-			// ÉEÉBÉìÉhÉEÇ™ÉAÉNÉeÉBÉuèÛë‘Ç∂Ç·Ç»Ç©Ç¡ÇΩÇÁé~ÇﬂÇÈ
-			if (tdnSystem::GetWindowActive() == false)
-			{
-				WaitMessage();
-				//goto NOTACTIVE;
-			}
+			//// ÉEÉBÉìÉhÉEÇ™ÉAÉNÉeÉBÉuèÛë‘Ç∂Ç·Ç»Ç©Ç¡ÇΩÇÁé~ÇﬂÇÈ
+			//if (tdnSystem::GetWindowActive() == false)
+			//{
+			//	WaitMessage();
+			//}
 		}
 		else
 		{
 			//static int TDNtimer = 0;
 
 			// ÉQÅ[ÉÄÇÃçXêVÅEï`âÊ
-			if (MainFrameEx->Update())
+			if (MainFrameEX->Update())
 			{
-				MainFrameEx->Render();
+				MainFrameEX->Render();
 				//TDNtimer++;
 				//MyAssert((TDNtimer != 60 * 60), "óVÇ—Ç∑Ç¨Ç¢Ç¢Ç¢Ç¢Ç¢Ç¢Ç¢Ç¢ÅIÅIÅIÅIÅI");
 			}			

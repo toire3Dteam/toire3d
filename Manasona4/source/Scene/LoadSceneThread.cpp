@@ -51,6 +51,7 @@ void LoadSceneThreadManager::LoadSceneThread::ThreadFunction(void *arg)
 	//	スレッド終了処理
 	m_bThread = false;
 	//_endthread();
+
 }
 
 

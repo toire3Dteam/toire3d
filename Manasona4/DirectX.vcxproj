@@ -115,6 +115,8 @@
     <ClCompile Include="source\BaseEntity\Entity\BaseGameEntity.cpp" />
     <ClCompile Include="source\BaseEntity\Entity\EntityManager.cpp" />
     <ClCompile Include="source\BaseEntity\Message\MessageDispatcher.cpp" />
+    <ClCompile Include="source\BattleLoading\BattleLoading.cpp" />
+    <ClCompile Include="source\BattleLoading\BattleLoadingState.cpp" />
     <ClCompile Include="source\Camera\camera.cpp" />
     <ClCompile Include="source\Camera\EffectCamera.cpp" />
     <ClCompile Include="source\Challenge\AirouChallenge.cpp" />
@@ -265,6 +267,7 @@
     <ClCompile Include="TDN\DirectShow\baseclasses\renbase.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="source\PointLight\PointLightInstancingMesh.cpp" />
     <ClCompile Include="TDN\IEX_3DObject.cpp" />
     <ClCompile Include="TDN\IEX_Mesh.cpp" />
     <ClCompile Include="TDN\IEX_SkinMesh.cpp" />
@@ -299,7 +302,7 @@
     <ClCompile Include="TDN\TDN_View.cpp" />
     <ClCompile Include="source\Sound\SoundManager.cpp" />
     <ClCompile Include="source\system\Framework.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="source\system\System.cpp" />
     <ClCompile Include="SOURCE\system\WinMain.cpp" />
@@ -312,6 +315,8 @@
     <ClInclude Include="source\BaseEntity\Message\MessageDispatcher.h" />
     <ClInclude Include="source\BaseEntity\State\state.h" />
     <ClInclude Include="source\BaseEntity\State\StateMachine.h" />
+    <ClInclude Include="source\BattleLoading\BattleLoading.h" />
+    <ClInclude Include="source\BattleLoading\BattleLoadingState.h" />
     <ClInclude Include="source\Camera\camera.h" />
     <ClInclude Include="source\Camera\EffectCamera.h" />
     <ClInclude Include="source\Challenge\AirouChallenge.h" />
@@ -571,6 +576,7 @@
     <ClInclude Include="TDN\DirectShow\baseclasses\wxutil.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="source\PointLight\PointLightInstancingMesh.h" />
     <ClInclude Include="TDN\ogg\codec.h" />
     <ClInclude Include="TDN\ogg\ogg.h" />
     <ClInclude Include="TDN\ogg\os_types.h" />
@@ -579,7 +585,7 @@
     <ClInclude Include="TDN\TDNLIB.h" />
     <ClInclude Include="source\Sound\SoundManager.h" />
     <ClInclude Include="source\system\Framework.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="source\system\BaseScene.h" />
     <ClInclude Include="source\system\ItDebug.h" />

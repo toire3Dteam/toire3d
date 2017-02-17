@@ -518,7 +518,6 @@ void sceneMain::Update()
 
 void sceneMain::Render()
 {
-	//tdnStopWatch::Start();
 	// カメラ
 	CameraMgr->Activate();
 
@@ -566,9 +565,13 @@ void sceneMain::Render()
 		DeferredManagerEx.AllLight(m_pStage->GetShaderParam().vDirLightVec, m_pStage->GetShaderParam().vDirLightColor,
 			m_pStage->GetShaderParam().vSkyColor, m_pStage->GetShaderParam().vGroundColor);
 
+
+		tdnStopWatch::Start();
+
 		// ポイントライト描画
 		DeferredManagerEx.GpuPointLightRender();
 
+		tdnStopWatch::End();
 
 		// ★必殺用のステージが描画されるなら描画しない
 		if (m_bOverDriveStageFlag == false)
@@ -740,7 +743,6 @@ void sceneMain::Render()
 	//{
 	//	v.push_back(i);
 	//}
-	//tdnStopWatch::End();
 }
 
 void sceneMain::RenderStage()
@@ -773,7 +775,7 @@ void sceneMain::RenderShadow()
 	// フラグが立ってる時のみ描画  [1206] 一応用意しといた
 	//if (m_bBakeStageShadow == true)
 	{
-		DeferredManagerEx.CreateShadog_mWMatrix
+		DeferredManagerEx.CreateShadowMatrix
 			(m_pStage->GetShaderParam().vDirLightVec, Vector3(0, 0, 0), Vector3(0, 0, 1), 400);
 
 		{

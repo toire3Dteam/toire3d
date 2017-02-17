@@ -382,7 +382,7 @@ void SceneSelectState::End::Execute(sceneSelect *pMain)
 			SelectDataMgr->Get()->eStage = (STAGE)(pMain->m_iSelectStageNo - 1);	// RANDOM‚Ô‚ñ‚ğˆø‚¢‚Ä‚¢‚é
 		}
 
-		MainFrameEx->ChangeScene(new sceneMain());
+		MainFrameEX->ChangeScene(new sceneMain());
 		return;
 	}
 
@@ -453,7 +453,7 @@ void SceneSelectState::BackMenu::Execute(sceneSelect *pMain)
 	if (Fade::isFadeOutCompletion())
 	{
 		// ƒƒjƒ…[‚Ö
-		MainFrameEx->ChangeScene(new sceneMenu());
+		MainFrameEX->ChangeScene(new sceneMenu());
 		return;
 	}
 

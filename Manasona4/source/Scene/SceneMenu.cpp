@@ -213,11 +213,10 @@ void sceneMenu::Update()
 
 			// チャレンジでもない
 			SelectDataMgr->Get()->bChallenge = false;
-			MainFrameEx->ChangeScene(new sceneMain);
+			MainFrameEX->ChangeScene(new sceneMain);
 			return;
 		}
 
-#ifdef DEBUG
 		// エンターでワープ
 		if (KeyBoard(KB_ENTER) == 2)
 		{
@@ -227,9 +226,11 @@ void sceneMenu::Update()
 			data.iRemainingHP = 80;
 			data.iElapsedTime = 35;
 
-			MainFrameEx->ChangeScene(new sceneResult(data));
+			MainFrameEX->ChangeScene(new sceneResult(data));
 			return;
 		}
+#ifdef DEBUG
+
 
 		if (KeyBoardTRG(KB_SPACE))
 		{
@@ -287,7 +288,7 @@ void sceneMenu::Update()
 
 			// チャレンジでもない
 			SelectDataMgr->Get()->bChallenge = false;
-			MainFrameEx->ChangeScene(new sceneMain);
+			MainFrameEX->ChangeScene(new sceneMain);
 		}
 #endif // DEBUG
 

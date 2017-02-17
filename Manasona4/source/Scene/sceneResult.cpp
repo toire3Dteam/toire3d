@@ -446,17 +446,17 @@ void sceneResult::Update()
 			// ここで選択したアイコンにより飛ぶ場所が変わる
 			if (m_pResultWindow->GetChoiceState() == ResultWindow::AGAIN)
 			{
-				MainFrameEx->ChangeScene(new sceneMain(), true);
+				MainFrameEX->ChangeScene(new sceneMain(), true);
 				return;
 			}
 			else if (m_pResultWindow->GetChoiceState() == ResultWindow::BACK_CHARA)
 			{
-				MainFrameEx->ChangeScene(new sceneSelect());
+				MainFrameEX->ChangeScene(new sceneSelect());
 				return;
 			}
 			else if (m_pResultWindow->GetChoiceState() == ResultWindow::BACK_MENU)
 			{
-				MainFrameEx->ChangeScene(new sceneMenu());
+				MainFrameEX->ChangeScene(new sceneMenu());
 				return;
 			}
 		}

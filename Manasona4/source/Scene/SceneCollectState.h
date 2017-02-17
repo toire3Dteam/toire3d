@@ -11,7 +11,7 @@ namespace SceneCollectState
 	class Intro : public State<sceneCollect>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static Intro* GetInstance() { static Intro state; return &state; }
 
 		// 入る
@@ -41,7 +41,7 @@ namespace SceneCollectState
 	class TrophyStep : public State<sceneCollect>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static TrophyStep* GetInstance() { static TrophyStep state; return &state; }
 
 		// 入る
@@ -78,7 +78,7 @@ namespace SceneCollectState
 	class PictureStep : public State<sceneCollect>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static PictureStep* GetInstance() { static PictureStep state; return &state; }
 
 		// 入る
@@ -111,7 +111,7 @@ namespace SceneCollectState
 	class PictureWatch : public State<sceneCollect>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static PictureWatch* GetInstance() { static PictureWatch state; return &state; }
 
 		// 入る
@@ -144,7 +144,7 @@ namespace SceneCollectState
 	class BuyPictureStep : public State<sceneCollect>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static BuyPictureStep* GetInstance() { static BuyPictureStep state; return &state; }
 
 		// 入る
@@ -177,7 +177,7 @@ namespace SceneCollectState
 	class MovieStep : public State<sceneCollect>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static MovieStep* GetInstance() { static MovieStep state; return &state; }
 
 		// 入る
@@ -210,7 +210,7 @@ namespace SceneCollectState
 	class MovieWatch : public State<sceneCollect>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static MovieWatch* GetInstance() { static MovieWatch state; return &state; }
 
 		// 入る
@@ -243,7 +243,7 @@ namespace SceneCollectState
 	class BuyMovieStep : public State<sceneCollect>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static BuyMovieStep* GetInstance() { static BuyMovieStep state; return &state; }
 
 		// 入る
@@ -276,7 +276,7 @@ namespace SceneCollectState
 	class RecordStep : public State<sceneCollect>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static RecordStep* GetInstance() { static RecordStep state; return &state; }
 
 		// 入る
@@ -310,7 +310,7 @@ namespace SceneCollectState
 	class BackMenuStep : public State<sceneCollect>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static BackMenuStep* GetInstance() { static BackMenuStep state; return &state; }
 
 		// 入る

@@ -309,7 +309,7 @@ void sceneCollect::Update()
 		if (Fade::isFadeStop())
 		{
 			bEnd = false;
-			MainFrameEx->ChangeScene(new sceneMenu);
+			MainFrameEX->ChangeScene(new sceneMenu);
 		}
 	}
 	// スペースキーで抜ける

@@ -1227,7 +1227,7 @@ void SceneCollectState::BackMenuStep::Execute(sceneCollect *pMain)
 	else
 	{
 		// š‚±‚±‚Åƒƒjƒ…[‚ÉˆÚ“®‚µ‚Ü‚·
-		MainFrameEx->ChangeScene(new sceneMenu());
+		MainFrameEX->ChangeScene(new sceneMenu());
 		return;
 
 	}

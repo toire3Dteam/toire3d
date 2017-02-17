@@ -13,7 +13,7 @@ namespace SceneMainState
 	class StageIntro : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static StageIntro* GetInstance(){ static StageIntro state; return &state; }
 
 		// 入る
@@ -45,7 +45,7 @@ namespace SceneMainState
 	class CharaIntro : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static CharaIntro* GetInstance(){ static CharaIntro state; return &state; }
 
 		// 入る
@@ -79,7 +79,7 @@ namespace SceneMainState
 	class Round : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static Round* GetInstance(){ static Round state; return &state; }
 
 		// 入る
@@ -109,7 +109,7 @@ namespace SceneMainState
 	class Main : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static Main* GetInstance(){ static Main state; return &state; }
 
 		// 入る
@@ -140,7 +140,7 @@ namespace SceneMainState
 	class Finish : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static Finish* GetInstance(){ static Finish state; return &state; }
 
 		// 入る
@@ -173,7 +173,7 @@ namespace SceneMainState
 	class HeaveHoDriveOverFlowSuccess : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static HeaveHoDriveOverFlowSuccess* GetInstance() { static HeaveHoDriveOverFlowSuccess state; return &state; }
 
 		// 入る
@@ -205,7 +205,7 @@ namespace SceneMainState
 	class TutorialIntro : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static TutorialIntro* GetInstance() { static TutorialIntro state; return &state; }
 
 		// 入る
@@ -236,7 +236,7 @@ namespace SceneMainState
 	class TutorialMain : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static TutorialMain* GetInstance() { static TutorialMain state; return &state; }
 
 		// 入る
@@ -268,7 +268,7 @@ namespace SceneMainState
 	class TutorialClear: public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static TutorialClear* GetInstance() { static TutorialClear state; return &state; }
 
 		// 入る
@@ -300,7 +300,7 @@ namespace SceneMainState
 	class ChallengeIntro : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static ChallengeIntro* GetInstance() { static ChallengeIntro state; return &state; }
 
 		// 入る
@@ -331,7 +331,7 @@ namespace SceneMainState
 	class ChallengeMain : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static ChallengeMain* GetInstance() { static ChallengeMain state; return &state; }
 
 		// 入る
@@ -363,7 +363,7 @@ namespace SceneMainState
 	class ChallengeClear : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static ChallengeClear* GetInstance() { static ChallengeClear state; return &state; }
 
 		// 入る
@@ -394,7 +394,7 @@ namespace SceneMainState
 	//class ChallengeReplayIntro : public State<sceneMain>
 	//{
 	//public:
-	//	// this is a シングルトン
+	//	// 実体_
 	//	static ChallengeReplayIntro* GetInstance() { static ChallengeReplayIntro state; return &state; }
 
 	//	// 入る
@@ -425,7 +425,7 @@ namespace SceneMainState
 	class ChallengeReplay : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static ChallengeReplay* GetInstance() { static ChallengeReplay state; return &state; }
 
 		// 入る
@@ -456,7 +456,7 @@ namespace SceneMainState
 	class TrainingIntro : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static TrainingIntro* GetInstance() { static TrainingIntro state; return &state; }
 
 		// 入る
@@ -487,7 +487,7 @@ namespace SceneMainState
 	class Training : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static Training* GetInstance() { static Training state; return &state; }
 
 		// 入る
@@ -519,7 +519,7 @@ namespace SceneMainState
 	class PauseMenu : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static PauseMenu* GetInstance() { static PauseMenu state; return &state; }
 
 		// 入る
@@ -550,7 +550,7 @@ namespace SceneMainState
 	class TutorialPauseMenu : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static TutorialPauseMenu* GetInstance() { static TutorialPauseMenu state; return &state; }
 
 		// 入る
@@ -581,7 +581,7 @@ namespace SceneMainState
 	class ChallengePauseMenu : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static ChallengePauseMenu* GetInstance() { static ChallengePauseMenu state; return &state; }
 
 		// 入る
@@ -612,7 +612,7 @@ namespace SceneMainState
 	class TrainingPause : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static TrainingPause* GetInstance() { static TrainingPause state; return &state; }
 
 		// 入る
@@ -643,7 +643,7 @@ namespace SceneMainState
 	class SoundMenu : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static SoundMenu* GetInstance() { static SoundMenu state; return &state; }
 
 		// 入る
@@ -674,7 +674,7 @@ namespace SceneMainState
 	class TrainingOptionMenu : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static TrainingOptionMenu* GetInstance() { static TrainingOptionMenu state; return &state; }
 
 		// 入る
@@ -706,7 +706,7 @@ namespace SceneMainState
 	class TrainingDummyMenu : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static TrainingDummyMenu* GetInstance() { static TrainingDummyMenu state; return &state; }
 
 		// 入る
@@ -738,7 +738,7 @@ namespace SceneMainState
 	class TrainingCharacterMenu : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static TrainingCharacterMenu* GetInstance() { static TrainingCharacterMenu state; return &state; }
 
 		// 入る
@@ -769,7 +769,7 @@ namespace SceneMainState
 	class HideMenu : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static HideMenu* GetInstance() { static HideMenu state; return &state; }
 
 		// 入る
@@ -800,7 +800,7 @@ namespace SceneMainState
 	class CommandMenu : public State<sceneMain>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static CommandMenu* GetInstance() { static CommandMenu state; return &state; }
 
 		// 入る

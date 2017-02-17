@@ -13,7 +13,7 @@ namespace SceneTitleState
 	class Intro : public State<sceneTitle>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static Intro* GetInstance() { static Intro state; return &state; }
 
 		// 入る
@@ -43,7 +43,7 @@ namespace SceneTitleState
 	class LogoStep : public State<sceneTitle>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static LogoStep* GetInstance() { static LogoStep state; return &state; }
 
 		// 入る
@@ -73,7 +73,7 @@ namespace SceneTitleState
 	class MovieStep : public State<sceneTitle>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static MovieStep* GetInstance() { static MovieStep state; return &state; }
 
 		// 入る
@@ -104,7 +104,7 @@ namespace SceneTitleState
 	class TitleStep : public State<sceneTitle>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static TitleStep* GetInstance() { static TitleStep state; return &state; }
 
 		// 入る
@@ -134,7 +134,7 @@ namespace SceneTitleState
 	class End : public State<sceneTitle>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static End* GetInstance() { static End state; return &state; }
 
 		// 入る
@@ -167,7 +167,7 @@ namespace SceneTitleState
 	class BackMenu : public State<sceneTitle>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static BackMenu* GetInstance() { static BackMenu state; return &state; }
 
 		// 入る

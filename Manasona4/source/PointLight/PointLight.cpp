@@ -119,5 +119,33 @@ float maxPower, int endFlame, int alphaNear, int alphaFar)
 	m_PointLightData.push_back(data);
 }
 
+void PointLightManager::InitPointLightInstancing(int Num)
+{
+
+	DeferredManagerEx.InitPointLightInstancing(Num);
+
+}
+
+void PointLightManager::SetPointLightInstancing(int iIndex, Vector3 pos, Vector3 color, float range, float power)
+{
+	InstancingData data;
+
+	data.vPos = pos;
+	data.fPower = power;
+	data.fScale = range;
+	data.vColor = color;
+
+	// 設定を送る
+	DeferredManagerEx.GetPLSInstancing()->SetInstancingData(iIndex, data);
+
+}
+
+
+void PointLightManager::UpdatePointLightInstancing()
+{
+	// 頂点データ書き込み
+	DeferredManagerEx.GetPLSInstancing()->InstancingUpdate();
+}
+
 
 

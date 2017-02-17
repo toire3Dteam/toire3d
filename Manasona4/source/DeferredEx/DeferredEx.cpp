@@ -1,38 +1,40 @@
 #include "DeferredEx.h"
 
-/******************
-*	DeferredEX
-*******************/
+//+-------------------------------------
+//	DeferredEX
+//+-------------------------------------
 
-DeferredEx* DeferredEx::pInstance = nullptr;
+DeferredEx* DeferredEx::m_pInstance = nullptr;
 
-/*********************************/
+//+-------------------------------------
 // インスタンス
+//+-------------------------------------
 DeferredEx& DeferredEx::GetInstance()
 {
-	if (!pInstance)
+	if (!m_pInstance)
 	{
-		pInstance = new DeferredEx();
+		m_pInstance = new DeferredEx();
 	}
-	return *pInstance;
+	return *m_pInstance;
 }
 
 void DeferredEx::Release()
 {
-	if (pInstance)
+	if (m_pInstance)
 	{
-		delete pInstance;
-		pInstance = nullptr;
+		delete m_pInstance;
+		m_pInstance = nullptr;
 	}
 }
 
-/* マップの読み込み情報 */
+/* マップの読み込み情報メモ */
 // N RGB->法線 
-// L R->スペキュラの強さ G->スペキュラのざらざら感 B->
+// L R->Rou G->ラフネス B->
 // H R->AO G->エミッシブ追加予定　 B->空白
 
-/*********************************/
+//+-------------------------------------
 // 初期化・解放
+//+-------------------------------------
 DeferredEx::DeferredEx()
 {
 	// 極小バッファのサイズ
@@ -43,7 +45,7 @@ DeferredEx::DeferredEx()
 	// 露光度
 	m_fExposure = 0.0f;
 
-	//　目線
+	// 目線
 	m_vViewPos = Vector3(.0f, .0f, .0f);
 
 	// 放射ブラ―
@@ -108,14 +110,15 @@ DeferredEx::DeferredEx()
 	m_pSaveBackBuffer = nullptr;
 	m_pSaveStencilSurface = nullptr;		// ステンシル保存用
 	m_pShadowStencilSurface = nullptr;		// シャドウ用ステンシル
-
-	m_iShadowSize = 0;				// シャドウマップのサイズ
-	m_fShadowRange = 0.0f;			// Shadowのカメラからの距離	
-	m_bShadowFlag = false;			// シャドウマップの使用フラグ
+	m_iShadowSize = 0;						// シャドウマップのサイズ
+	m_fShadowRange = 0.0f;					// Shadowのカメラからの距離	
+	m_bShadowFlag = false;					// シャドウマップの使用フラグ
 
 	// Gpu_PointLight
 	m_PLSdata.reserve(PLS_MAX);// 前もって容量を確保 (reserve) しておけば、データの追加時に発生する再割り当て (reallocation) を防ぐことができ、効率的です。 
 	m_pPLS = new iexMesh("DATA/Shader/PLS_CCW.imo");
+
+	m_bPLSInstancing = false;
 
 	// ToonTex
 	m_pToonShadoTex = new tdn2DObj("Data/Shader/toonShadow.png");
@@ -132,7 +135,6 @@ DeferredEx::~DeferredEx()
 	}
 
 	SAFE_DELETE(m_pPLS);
-
 	SAFE_DELETE(m_pToonShadoTex);
 
 	//Surfaceの解放	
@@ -141,15 +143,20 @@ DeferredEx::~DeferredEx()
 	SAFE_RELEASE(m_pSaveStencilSurface);
 	SAFE_RELEASE(m_pShadowStencilSurface);
 
+	if (m_bPLSInstancing == true)
+	{
+		SAFE_DELETE(m_pPLSInstancing);
+	}
+
 }
 
-/*****************************/
+//+-------------------------------------
 // G_Bufferの作成
+//+-------------------------------------
 void DeferredEx::G_Begin()
 {	
 	// BackBufferサーフェイスを保存
-	tdnSystem::GetDevice()->GetRenderTarget(0, &m_pBackBuffer);// (TODO)これ何回もする必要ある？
-
+	tdnSystem::GetDevice()->GetRenderTarget(0, &m_pBackBuffer);
 
 	//MRTの割り当て
 	m_pSurface[(int)SURFACE_NAME_EX::NORMAL_DEPTH]->RenderTarget(0);
@@ -159,11 +166,11 @@ void DeferredEx::G_Begin()
 
 void DeferredEx::G_End()
 {
-	//バックバッファサーフェイスの復元・MRTの終了処理
+	// バックバッファサーフェイスの復元・MRTの終了処理
 	tdnSystem::GetDevice()->SetRenderTarget(0, m_pBackBuffer);
 	tdnSystem::GetDevice()->SetRenderTarget(1, nullptr);
 
-	//作った情報テクスチャを転送
+	// 作った情報テクスチャを転送
 	shaderM->SetValue("NormalDepthTex", m_pSurface[(int)SURFACE_NAME_EX::NORMAL_DEPTH]);
 	shaderM->SetValue("RoughnessLightMapTex", m_pSurface[(int)SURFACE_NAME_EX::ROUGHNESS]);
 
@@ -180,12 +187,12 @@ void DeferredEx::G_Update(const Vector3 g_vViewPos)
 	m_vViewPos = g_vViewPos;
 	shaderM->SetValue("g_vViewPos", m_vViewPos);
 
-	//プロジェクション逆行列生成
+	// プロジェクション逆行列生成
 	Matrix invproj = matProjection;
 	D3DXMatrixInverse(&invproj, nullptr, &invproj);
 	shaderM->SetValue("g_mInvPMatrix", invproj);
 
-	//プロジェクション→ワールド逆行列生成
+	// プロジェクション→ワールド逆行列生成
 	Matrix invview = matView;
 	D3DXMatrixInverse(&invview, nullptr, &invview);
 	shaderM->SetValue("g_mInvVMatrix", invview);
@@ -205,24 +212,23 @@ void DeferredEx::G_Update(const Vector3 g_vViewPos)
 
 }
 
-//**************************************************
+//+-------------------------------------
 //				Lighting
-//**************************************************
+//+-------------------------------------
 // 光のサーフェイスクリア
 void DeferredEx::ClearLightSurface()
 {
-	//現在のレンダーターゲットを一時的に確保
+	// 現在のレンダーターゲットを一時的に確保
 	Surface* now = nullptr;
 	tdnSystem::GetDevice()->GetRenderTarget(0, &now);
 
-	//ライトサーフェイス画面クリア
+	// ライトサーフェイス画面クリア
 	m_pSurface[(int)SURFACE_NAME_EX::LIGHT]->RenderTarget(0);
 	m_pSurface[(int)SURFACE_NAME_EX::SPEC]->RenderTarget(1);
-	//ライトサーフェイス画面クリア
+	// ライトサーフェイス画面クリア
 	tdnSystem::GetDevice()->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, 0);
 
-
-	//レンダーターゲットの復元
+	// レンダーターゲットの復元
 	tdnSystem::GetDevice()->SetRenderTarget(0, now);
 	tdnSystem::GetDevice()->SetRenderTarget(1, nullptr);
 }
@@ -238,15 +244,14 @@ void DeferredEx::DirLight(const Vector3 dir, const Vector3 color)
 	vWLightDir.Normalize();
 	shaderM->SetValue("g_vWLightVec", vWLightDir);
 
-	//ビュー座標系に変換
+	// ビュー座標系に変換
 	LightDir.x = dir.x * matV._11 + dir.y * matV._21 + dir.z * matV._31;
 	LightDir.y = dir.x * matV._12 + dir.y * matV._22 + dir.z * matV._32;
 	LightDir.z = dir.x * matV._13 + dir.y * matV._23 + dir.z * matV._33;
 
-
 	LightDir.Normalize();
 
-	//	シェーダー設定 shaderに送る
+	// シェーダー設定 shaderに送る
 	shaderM->SetValue("g_vViewLightVec", LightDir);
 	shaderM->SetValue("g_vLightColor", (Vector3)color);
 
@@ -269,21 +274,21 @@ void DeferredEx::DirLight(const Vector3 dir, const Vector3 color)
 // 半球ライティング
 void DeferredEx::HemiLight(const Vector3 g_vSkyColor, const Vector3 g_vGroundColor)
 {
-	//	シェーダー設定
+	// シェーダー設定
 	shaderM->SetValue("g_vSkyColor", (Vector3)g_vSkyColor);
 	shaderM->SetValue("g_vGroundColor", (Vector3)g_vGroundColor);
 
-	//現在のレンダーターゲットを一時的に確保
+	// 現在のレンダーターゲットを一時的に確保
 	Surface* now = nullptr;
 	tdnSystem::GetDevice()->GetRenderTarget(0, &now);
 
-	//レンダーターゲットの切替え
+	// レンダーターゲットの切替え
 	m_pSurface[(int)SURFACE_NAME_EX::LIGHT]->RenderTarget();
 
-	//	レンダリング
+	// レンダリング
 	m_pSurface[(int)SURFACE_NAME_EX::NORMAL_DEPTH]->Render(0, 0, shaderM, "HemiLight");
 
-	//レンダーターゲットの復元
+	// レンダーターゲットの復元
 	tdnSystem::GetDevice()->SetRenderTarget(0, now);
 }
 
@@ -331,9 +336,9 @@ void DeferredEx::AllLight(const Vector3 dir, const Vector3 color, const Vector3 
 }
 
 
-//****************************
+//+-------------------------------------
 //	FORWARD
-//****************************
+//+-------------------------------------
 
 void DeferredEx::ClearForward()
 {
@@ -376,9 +381,9 @@ void DeferredEx::ForwardRender()
 
 }
 
-//****************************
+//+-------------------------------------
 //		BLOOM
-//****************************
+//+-------------------------------------
 
 void DeferredEx::ClearBloom()
 {
@@ -437,9 +442,9 @@ void DeferredEx::BloomRender()
 };
 
 
-//****************************
+//+-------------------------------------
 //		GPU_POINTLIGHT
-//****************************
+//+-------------------------------------
 
 void  DeferredEx::ClearPLSdata()
 {
@@ -515,6 +520,12 @@ void DeferredEx::GpuPointLightRender()
 	// GPUポイントライト
 	m_pSurface[(int)SURFACE_NAME_EX::POINT_LIGHT]->RenderTarget(0);
 
+	// 静止画用
+	if (m_bPLSInstancing == true)
+	{
+		m_pPLSInstancing->InstancingRender();
+	}
+
 	// ここで描画
 	for (int i = 0; i < (int)m_PLSdata.size(); i++)
 	{
@@ -540,6 +551,22 @@ void DeferredEx::GpuPointLightRender()
 
 }
 
+// 初期化
+void DeferredEx::InitPointLightInstancing(const int iIndex)
+{
+#ifdef _DEBUG
+	MyAssert((m_bPLSInstancing == false), "すでに生成されている");
+#endif // _DEBUG
+
+	m_bPLSInstancing = true;
+	m_pPLSInstancing = new PointLightInstancingMesh("Data/Shader/PLS_CCW.imo", iIndex);
+
+}
+
+//+-------------------------------------
+//	シャドウ
+//+-------------------------------------
+
 //　シャドウの初期化
 void DeferredEx::InitShadowMap(const int size )
 {
@@ -560,8 +587,8 @@ void DeferredEx::InitShadowMap(const int size )
 	m_bShadowFlag = true;	// シャドウマップ採用
 }
 
-//　シャドウの行列生成
-void DeferredEx::CreateShadog_mWMatrix
+// シャドウの行列生成
+void DeferredEx::CreateShadowMatrix
 (Vector3 dir, Vector3 target, Vector3 playerVec, const float dist)
 {
 	// シャドウマップが生成されていなければ転送しない
@@ -571,15 +598,15 @@ void DeferredEx::CreateShadog_mWMatrix
 		exit(-1);
 	}
 
-	//	シャドウ作成
+	// シャドウ作成
 	dir.Normalize();
 	Vector3 pos = target - dir * dist;
 	Vector3 up(.0f, 1.0f, .0f);
 
-	//幅の指定
+	// 幅の指定
 	float width = dist;
 
-	//	視点とライト位置へ
+	// 視点とライト位置へ
 	Matrix	ShadowMat, work;
 	// ビュー行列の設定
 	Math::LookAtLH(ShadowMat, pos + (playerVec), target + (playerVec), up);
@@ -596,12 +623,17 @@ void DeferredEx::CreateShadog_mWMatrix
 //　シャドウマップ用の描画開始
 void DeferredEx::ShadowBegin()
 {
+
+#ifdef _DEBUG
+	
 	// シャドウマップが生成されていなければ書かない
 	if (m_bShadowFlag == false)
 	{
-		MessageBox(tdnSystem::GetWindow(), "シャドウマップが作られていない", __FUNCTION__, MB_OK);
-		assert(0);
+		MyAssert(0, "シャドウマップが生成されていない状態で影を書き込もうとしています");
 	}
+
+#endif // _DEBUG
+
 
 	// 現在のサーフェイスを一時保管
 	tdnSystem::GetDevice()->GetRenderTarget(0, &m_pBackBuffer);
@@ -622,7 +654,7 @@ void DeferredEx::ShadowBegin()
 	// シャドウマップのレンダースタート
 	m_pSurface[(int)SURFACE_NAME_EX::SHADOW_MAP]->RenderTarget();
 
-	//　画面クリア
+	// 画面クリア
 	tdnSystem::GetDevice()->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0);
 
 	// この関数を終えたら影を描画したい対象を描画
@@ -641,26 +673,32 @@ void DeferredEx::ShadowEnd()
 	//}
 	shaderM->SetValue("ShadowMap", m_pSurface[(int)SURFACE_NAME_EX::SHADOW_MAP]);
 
-	//レンダーターゲットの復元
+	// レンダーターゲットの復元
 	tdnSystem::GetDevice()->SetRenderTarget(0, m_pBackBuffer);
 
-	//ステンシルバッファの復元
+	// ステンシルバッファの復元
 	tdnSystem::GetDevice()->SetDepthStencilSurface(m_pSaveStencilSurface);
 
-	//ビューポートの復元
+	// ビューポートの復元
 	tdnSystem::GetDevice()->SetViewport(&m_pSaveViewPort);
 }
 
 
-//****************************
+//+-------------------------------------
 //		DOWNSAMPLE
-//****************************
+//+-------------------------------------
 void DeferredEx::CtrlExposure()
 {
+
+	shaderM->SetValue("g_fExposure", m_fExposure);
+
+#ifdef _DEBUG
+
+	//tdnText::Draw(10, 600, 0xff00ffff, "露光度%.1f", m_fExposure);
+
 	// 露光度
 	if (KeyBoard(KB_C))
 	{
-		// 動く
 		if (KeyBoard(KB_LEFT))
 		{
 			m_fExposure -= 0.1f;
@@ -671,7 +709,6 @@ void DeferredEx::CtrlExposure()
 		}
 
 	}
-	// 動く
 	if (KeyBoard(KB_P))
 	{
 		m_fExposure -= 0.05f;
@@ -680,15 +717,13 @@ void DeferredEx::CtrlExposure()
 	{
 		m_fExposure += 0.05f;
 	}
+#endif // _DEBUG
 
-
-	//tdnText::Draw(10, 600, 0xff00ffff, "露光度%.1f", m_fExposure);
-	shaderM->SetValue("g_fExposure", m_fExposure);
 }
 
-//****************************
+//+-------------------------------------
 //		RADIAL_BLUR
-//****************************
+//+-------------------------------------
 void DeferredEx::SetRadialBlur(Vector3 pos, float power)
 {
 	// ブラ―
@@ -727,16 +762,9 @@ void DeferredEx::RadialBlurUpdate()
 
 }
 
-//void DeferredEx::RadialBlurRender()
-//{
-//
-//
-//}
-
-
-//****************************
+//+-------------------------------------
 //		FINAL
-//****************************
+//+-------------------------------------
 void DeferredEx::FinalBegin()
 {
 	// 最後の演算結果をシェーダー側へ送る
@@ -763,18 +791,21 @@ void DeferredEx::FinalEnd()
 	tdnSystem::GetDevice()->SetRenderTarget(0, m_pSaveBackBuffer);//レンダーターゲットの復元
 	tdnSystem::GetDevice()->SetRenderTarget(1, nullptr);
 
-
 	// 描画
 	m_pSurface[(int)SURFACE_NAME_EX::SCREEN]->Render(0, 0,shaderM,"RadialBlur");
 
 }
-//いまはブルームがじゅうじにぼけてたｔからうんたらかんたら
-//あしたはすべてにトーンマップ
 
-//******************************************
+void DeferredEx::SendFinalScreenEnv()
+{
+	shaderM->SetValue("EnvFullBuf", m_pSurface[(int)SURFACE_NAME_EX::SCREEN]);
+}
+
+//+-------------------------------------
 //				texture
-//******************************************
-tdn2DObj* DeferredEx::GetTex(const SURFACE_NAME_EX name) //テクスチャを取ってくる
+//+-------------------------------------
+// テクスチャを取ってくる
+tdn2DObj* DeferredEx::GetTex(const SURFACE_NAME_EX name) 
 {
 	// エラー処理
 	switch (name)

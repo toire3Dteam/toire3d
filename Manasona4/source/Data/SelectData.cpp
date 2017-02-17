@@ -11,7 +11,7 @@ eAIType(AI_TYPE::PRACTICE_LAND)		// AIのタイプ
 {}
 
 SelectData::SelectData():
-eStage(STAGE::SEA),						// ステージ
+eStage(STAGE::NANASATO_SITY),				// ステージ
 bTutorial(false),							// チュートリアルかどうか
 bTraining(true),							// トレーニングかどうか	
 bChallenge(false),							// チャレンジかどうか	
@@ -24,7 +24,7 @@ iChallengeType(0)							// 選択しているチャレンジ
 	tagSideDatas[(int)SIDE::LEFT].iDeviceID = 0;
 	tagSideDatas[(int)SIDE::RIGHT].iDeviceID = 1;
 
-	tagSideDatas[(int)SIDE::RIGHT].eCharacter = CHARACTER::AIROU;
+	tagSideDatas[(int)SIDE::RIGHT].eCharacter = CHARACTER::TEKI;
 
 	// 片方AI用
 	tagSideDatas[(int)SIDE::RIGHT].bAI = true;

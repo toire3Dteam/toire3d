@@ -1133,12 +1133,12 @@ protected:
 	//------------------------------------------------------
 	//	無敵関連
 	//------------------------------------------------------
-	int m_iInvincibleLV;			// 無敵かどうか
-	int m_iInvincibleTime;		// 無敵時間		無敵時は0以上の値が入り、0になるまでデクリメントされる
-	float m_fInvincibleColRate;	// 無敵時間の点滅のレート
+	int m_iInvincibleLV;				// 無敵かどうか
+	int m_iInvincibleTime;				// 無敵時間		無敵時は0以上の値が入り、0になるまでデクリメントされる
+	float m_fInvincibleColRate;			// 無敵時間の点滅のレート
 	int m_iInvincibleColRateFlame;		// 無敵点滅のフレーム(速さ）
-	bool m_bInvincibleColRateUpFlag;		// 無敵点滅の上げ下げフラグ
-	bool m_bEscape;				// エスケープ判定の時に立つフラグ
+	bool m_bInvincibleColRateUpFlag;	// 無敵点滅の上げ下げフラグ
+	bool m_bEscape;						// エスケープ判定の時に立つフラグ
 
 
 	//------------------------------------------------------

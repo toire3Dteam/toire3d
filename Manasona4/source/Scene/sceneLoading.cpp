@@ -73,7 +73,7 @@ void sceneLoading::Update()
 	// ★ロードが終わったら、シーンをチェンジ
 	if (LoadSceneThreadMgr->isInitializeEnd())
 	{
-		MainFrameEx->ChangeScene(m_pNewScene);
+		MainFrameEX->ChangeScene(m_pNewScene);
 	}
 }
 //

@@ -1,5 +1,5 @@
 #include "TDNLIB.h"
-#include "Framework.h"
+#include "FrameworkEx.h"
 #include "../Scene/sceneLoading.h"
 #include "../Sound/SoundManager.h"
 
@@ -9,12 +9,15 @@
 //
 //*****************************************************************************************************************************
 
+// 実体化
+Framework* Framework::m_pInstance = nullptr;
+
 //------------------------------------------------------
 //		初期化・解放
 //------------------------------------------------------
-Framework::Framework(int FPSMode)
+Framework::Framework()
 {
-	this->FPSMode = FPSMode;
+	this->FPSMode = FPS_FLEX;
 
 	scene = NULL;
 
@@ -30,6 +33,21 @@ Framework::~Framework()
 	if (scene != NULL) delete scene;
 }
 
+
+Framework * Framework::GetInstance()
+{
+	if (Framework::m_pInstance == nullptr)
+	{
+		m_pInstance = new Framework();
+	}
+
+	return m_pInstance;
+}
+
+void Framework::Release()
+{
+	SAFE_DELETE(m_pInstance);
+}
 
 //*****************************************************************************************************************************
 //		更新
@@ -48,15 +66,15 @@ bool Framework::Update()
 
 	//	スキップタイプ 
 	switch (FPSMode){
-	case FPS_60:	bRender = TRUE;	break;
-	case FPS_30:	if (dwGameFrame & 0x01) bRender = TRUE; else bRender = FALSE;
+	case FPS_60_IEX:	bRender = TRUE;	break;
+	case FPS_30_IEX:	if (dwGameFrame & 0x01) bRender = TRUE; else bRender = FALSE;
 		break;
 	case FPS_FLEX:	if (dTime > 167 * 2) bRender = FALSE; else bRender = TRUE;
 		break;
 	}
 
 	//	フレーム時間更新
-	if (GetKeyState(VK_LCONTROL) < 0) dwFrameTime += 300;
+	if (GetKeyState(VK_LCONTROL) < 0) dwFrameTime += 600;
 	dwFrameTime += 167;
 
 	//	秒間フレーム数保存
@@ -69,15 +87,21 @@ bool Framework::Update()
 	dwCurFrame++;	//	フレーム数更新
 	dwGameFrame++;	//	ゲームフレーム数更新
 
-	tdnInput::Update();
 
-	// サウンド更新
+	// システム更新
+	tdnInput::Update();
 	SoundManager::Update();
 
 	/*動画を再生していたら描画させない*/
 	if (scene != NULL){
 		//movie_play = scene->Update();
 		//return movie_play;
+		
+		// シーンの更新
+		scene->Update();
+
+		// 動画が再生していたら描画させない
+		return true;
 	}
 
 	return true;
@@ -97,7 +121,10 @@ void Framework::Render()
 
 #ifdef _DEBUG
 	//	フレーム表示
-	tdnText::Draw(0, 0, 0xff00ffff, "FPS %d/%d", dwFPS, dwRenderFPS);
+	tdnText::Draw(tdnSystem::GetScreenSize().right - 128, tdnSystem::GetScreenSize().bottom - 36, 0xff00ffff, "FPS %d/%d", dwFPS, dwRenderFPS);
+
+	// ストップウォッチの描画
+	tdnStopWatch::DrawResult(200, 0);
 #endif
 
 

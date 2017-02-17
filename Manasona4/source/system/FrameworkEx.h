@@ -1,6 +1,7 @@
 #pragma once
 #include "TDNLIB.h"
 #include "BaseScene.h"
+#include "Framework.h"
 
 
 /****************************/
@@ -25,14 +26,14 @@ public:
 	static void Release();
 
 	//	更新・描画
-	bool Update();
+	bool Update();	
 	void Render();
 
 	//	シーンの切り替え
 	void ChangeScene(BaseScene* newScene, bool bLoadingScene = false);
 
 private:
-	// 自分自身
+	// 実体
 	static FrameworkEx* m_pInstance;
 	
 	/**********************/
@@ -70,4 +71,4 @@ private:
 };
 
 // インスタンス
-#define MainFrameEx FrameworkEx::GetInstance()
+//#define MainFrameEX FrameworkEx::GetInstance()

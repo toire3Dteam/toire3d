@@ -13,7 +13,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static Global* GetInstance();
 
 		// 入る
@@ -47,7 +47,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static PracticeGlobal* GetInstance();
 
 		// 入る
@@ -83,7 +83,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static PracticeJump* GetInstance();
 
 		// 入る
@@ -117,7 +117,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static PracticeLand* GetInstance();
 
 		// 入る
@@ -151,7 +151,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static PracticeSquat* GetInstance();
 
 		// 入る
@@ -185,7 +185,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static PracticeAttack* GetInstance();
 
 		// 入る
@@ -219,7 +219,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static PracticeGuard* GetInstance();
 
 		// 入る
@@ -254,7 +254,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static PracticeDokkoiAttack* GetInstance();
 
 		// 入る
@@ -288,7 +288,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static PracticeDownAttack* GetInstance();
 
 		// 入る
@@ -323,7 +323,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static InterruptInvincible* GetInstance();
 
 		// 入る
@@ -357,7 +357,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static Wait* GetInstance();
 
 		// 入る
@@ -391,7 +391,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static Space* GetInstance();
 
 		// 入る
@@ -425,7 +425,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static SimpleJump* GetInstance();
 
 		// 入る
@@ -459,7 +459,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static Escape* GetInstance();
 
 		// 入る
@@ -493,7 +493,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static Guard* GetInstance();
 
 		// 入る
@@ -527,7 +527,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static Chase* GetInstance();
 
 		// 入る
@@ -561,7 +561,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static ChaseAir* GetInstance();
 
 		// 入る
@@ -595,7 +595,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static RushAttack* GetInstance();
 
 		// 入る
@@ -629,7 +629,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static Recovery* GetInstance();
 
 		// 入る
@@ -663,7 +663,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static ThrowTech* GetInstance();
 
 		// 入る
@@ -698,7 +698,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static SetThrow* GetInstance();
 
 		// 入る
@@ -732,7 +732,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static Throw* GetInstance();
 
 		// 入る
@@ -766,7 +766,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static SetAnitiAir* GetInstance();
 
 		// 入る
@@ -800,7 +800,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static AnitiAir* GetInstance();
 
 		// 入る
@@ -835,7 +835,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static SetAerialAttack* GetInstance();
 
 		// 入る
@@ -869,7 +869,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static AerialAttack* GetInstance();
 
 		// 入る
@@ -904,7 +904,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static AerialDestructAttack* GetInstance();
 
 		// 入る
@@ -938,7 +938,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static InvincibleAttack* GetInstance();
 
 		// 入る
@@ -973,7 +973,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static SkillAttack* GetInstance();
 
 		// 入る
@@ -1008,7 +1008,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static DokkoiAttack* GetInstance();
 
 		// 入る
@@ -1043,7 +1043,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static EasyAttack* GetInstance();
 
 		// 入る
@@ -1077,7 +1077,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static BackWark* GetInstance();
 
 		// 入る
@@ -1111,7 +1111,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static MightyWark* GetInstance();
 
 		// 入る
@@ -1145,7 +1145,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static BackStep* GetInstance();
 
 		// 入る
@@ -1180,7 +1180,7 @@ namespace AIState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static PartnerAttack* GetInstance();
 
 		// 入る

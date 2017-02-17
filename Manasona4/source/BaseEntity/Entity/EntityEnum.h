@@ -30,6 +30,7 @@ namespace GAME_ID
 		TROPHY_MGR,					// トロフィーマネージャー
 		PICTURE_MGR,				// ピクチャーマネージャー
 		MOVIE_MGR,					// ムービーマネージャー
+		BATTLE_LOADING,				// バトル用ロード
 		ID_PLAYER_FIRST,			//人のIDの初め
 		ID_PLAYER_MAX = ID_PLAYER_FIRST + GAME_PLAYER_MAX,	//人の最大ID+1
 

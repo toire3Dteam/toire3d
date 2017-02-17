@@ -365,6 +365,25 @@ void Stage::NanasatoSity::Initialize(Camera *pCamera)
 
 	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
 	pCamera->SetStageCameraInfo("DATA/Stage/Sister/camera.txt");
+
+
+	// ポイントライト配置
+	Vector3 LightCol = Vector3(1.5f, 0.75f, 0.4f);
+	float LightSize = 60;
+
+	PointLightMgr->InitPointLightInstancing(8);
+	PointLightMgr->SetPointLightInstancing(0,Vector3(11, 19, -8), LightCol, LightSize, 4);
+	PointLightMgr->SetPointLightInstancing(1,Vector3(-34, 34, -8), LightCol, LightSize, 4);
+	PointLightMgr->SetPointLightInstancing(2,Vector3(92, 31, 49), LightCol, LightSize, 4);
+	PointLightMgr->SetPointLightInstancing(3,Vector3(-85, 31, 21), LightCol, LightSize, 4);
+	PointLightMgr->SetPointLightInstancing(4,Vector3(-53, 13, 120), LightCol, LightSize, 4);
+	PointLightMgr->SetPointLightInstancing(5,Vector3(1, 24, 120), LightCol, LightSize, 4);
+	PointLightMgr->SetPointLightInstancing(6,Vector3(-67, 16, 205), LightCol, LightSize, 4);
+	PointLightMgr->SetPointLightInstancing(7,Vector3(4, 6, 217), LightCol, LightSize, 4);
+	//PointLightMgr->SetPointLightInstancing(8,Vector3(6, 30, 321), LightCol, LightSize , 4);
+	//PointLightMgr->SetPointLightInstancing(9,Vector3(-66, 22, 319), LightCol, LightSize, 4 );
+	PointLightMgr->UpdatePointLightInstancing();
+
 }
 
 Stage::NanasatoSity::~NanasatoSity()
@@ -379,18 +398,19 @@ void Stage::NanasatoSity::Update()
 	Base::Update();
 
 	// ポイントライト配置
-	Vector3 LightCol = Vector3(1.5f, 0.75f, 0.4f);
-	float LightSize = 60;
-	PointLightMgr->AddPointLight(Vector3(11, 19, -8), LightCol, LightSize , 4 * 1, 1, 1, 1);
-	PointLightMgr->AddPointLight(Vector3(-34, 34, -8), LightCol, LightSize , 4 * 1, 1, 1, 1);
-	PointLightMgr->AddPointLight(Vector3(92, 31, 49), LightCol, LightSize , 4 * 1, 1, 1, 1);
-	PointLightMgr->AddPointLight(Vector3(-85, 31, 21), LightCol, LightSize, 4 * 1, 1, 1, 1);
-	PointLightMgr->AddPointLight(Vector3(-53, 13, 120), LightCol, LightSize , 4 * 1, 1, 1, 1);
-	PointLightMgr->AddPointLight(Vector3(1, 24, 120), LightCol, LightSize , 4 * 1, 1, 1, 1);
-	PointLightMgr->AddPointLight(Vector3(-67, 16,205 ), LightCol, LightSize , 4 * 1, 1, 1, 1);
-	PointLightMgr->AddPointLight(Vector3(4, 6, 217), LightCol, LightSize , 4 * 1, 1, 1, 1);
-	//PointLightMgr->AddPointLight(Vector3(6, 30, 321), LightCol, LightSize , 4 * 1, 1, 1, 1);
-	//PointLightMgr->AddPointLight(Vector3(-66, 22, 319), LightCol, LightSize, 4 * 1, 1, 1, 1);
+	//Vector3 LightCol = Vector3(1.5f, 0.75f, 0.4f);
+	//float LightSize = 60;
+	//PointLightMgr->AddPointLight(Vector3(11, 19, -8), LightCol, LightSize, 4, 1, 1, 1);
+	//PointLightMgr->AddPointLight(Vector3(-34, 34, -8), LightCol, LightSize, 4, 1, 1, 1);
+	//PointLightMgr->AddPointLight(Vector3(92, 31, 49), LightCol, LightSize, 4, 1, 1, 1);
+	//PointLightMgr->AddPointLight(Vector3(-85, 31, 21), LightCol, LightSize, 4, 1, 1, 1);
+	//PointLightMgr->AddPointLight(Vector3(-53, 13, 120), LightCol, LightSize, 4, 1, 1, 1);
+	//PointLightMgr->AddPointLight(Vector3(1, 24, 120), LightCol, LightSize, 4, 1, 1, 1);
+	//PointLightMgr->AddPointLight(Vector3(-67, 16, 205), LightCol, LightSize, 4, 1, 1, 1);
+	//PointLightMgr->AddPointLight(Vector3(4, 6, 217), LightCol, LightSize, 4, 1, 1, 1);
+	//PointLightMgr->AddPointLight(Vector3(6, 30, 321), LightCol, LightSize , 4 , 1, 1, 1);
+	//PointLightMgr->AddPointLight(Vector3(-66, 22, 319), LightCol, LightSize, 4 , 1, 1, 1);
+
 
 	// 水
 	m_fUvWater += 0.001f;

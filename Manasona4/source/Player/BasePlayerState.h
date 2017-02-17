@@ -41,7 +41,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		//this is a シングルトン
+		//実体_
 		static Global* GetInstance(){ static Global instance; return &instance; }
 
 		// 入る
@@ -76,7 +76,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static Wait* GetInstance(){ static Wait instance; return &instance; }
 
 		// 入る
@@ -110,7 +110,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static Walk* GetInstance(){ static Walk instance; return &instance; }
 
 		// 入る
@@ -144,7 +144,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static BackWalk* GetInstance(){ static BackWalk instance; return &instance; }
 
 		// 入る
@@ -178,7 +178,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static Run* GetInstance(){ static Run instance; return &instance; }
 
 		// 入る
@@ -212,7 +212,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static BackStep* GetInstance(){ static BackStep instance; return &instance; }
 
 		// 入る
@@ -247,7 +247,7 @@ namespace BasePlayerState
 	//{
 	//public:
 
-	//	// this is a シングルトン
+	//	// 実体_
 	//	static FrontBrake* GetInstance();
 
 	//	// 入る
@@ -281,7 +281,7 @@ namespace BasePlayerState
 	//{
 	//public:
 
-	//	// this is a シングルトン
+	//	// 実体_
 	//	static TurnOverBrake* GetInstance();
 
 	//	// 入る
@@ -315,7 +315,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static Jump* GetInstance(){ static Jump instance; return &instance; }
 
 		// 入る
@@ -350,7 +350,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static AerialJump* GetInstance(){ static AerialJump instance; return &instance; }
 
 		// 入る
@@ -385,7 +385,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static Fall* GetInstance(){ static Fall instance; return &instance; }
 
 		// 入る
@@ -421,7 +421,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static Land* GetInstance(){ static Land instance; return &instance; }
 
 		// 入る
@@ -457,7 +457,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static RushAttack* GetInstance(){ static RushAttack instance; return &instance; }
 
 		// 入る
@@ -492,7 +492,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static KnockBack* GetInstance(){ static KnockBack instance; return &instance; }
 
 		// 入る
@@ -527,7 +527,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static DownFall* GetInstance(){ static DownFall instance; return &instance; }
 
 		// 入る
@@ -563,7 +563,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static KnockDown* GetInstance(){ static KnockDown instance; return &instance; }
 
 		// 入る
@@ -598,7 +598,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static Die* GetInstance(){ static Die instance; return &instance; }
 
 		// 入る
@@ -633,7 +633,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static LandRecovery* GetInstance(){ static LandRecovery instance; return &instance; }
 
 		// 入る
@@ -668,7 +668,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static AerialRecovery* GetInstance(){ static AerialRecovery instance; return &instance; }
 
 		// 入る
@@ -703,7 +703,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static Squat* GetInstance(){ static Squat instance; return &instance; }
 
 		// 入る
@@ -737,7 +737,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static SquatAttack* GetInstance(){ static SquatAttack instance; return &instance; }
 
 		// 入る
@@ -771,7 +771,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static AntiAirAttack* GetInstance(){ static AntiAirAttack instance; return &instance; }
 
 		// 入る
@@ -805,7 +805,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static DownAttack* GetInstance() { static DownAttack instance; return &instance; }
 
 		// 入る
@@ -840,7 +840,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static DokkoiAttack* GetInstance() { static DokkoiAttack instance; return &instance; }
 
 		// 入る
@@ -874,7 +874,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static AerialAttack* GetInstance(){ static AerialAttack instance; return &instance; }
 
 		// 入る
@@ -908,7 +908,7 @@ namespace BasePlayerState
 	//{
 	//public:
 
-	//	// this is a シングルトン
+	//	// 実体_
 	//	static AerialDropAttack* GetInstance();
 
 	//	// 入る
@@ -942,7 +942,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static Escape* GetInstance(){ static Escape instance; return &instance; }
 
 		// 入る
@@ -977,7 +977,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static StandAction* GetInstance(){ static StandAction instance; return &instance; }
 
 		// 入る
@@ -1011,7 +1011,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static InvincibleAttack* GetInstance(){ static InvincibleAttack instance; return &instance; }
 
 		// 入る
@@ -1045,7 +1045,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static Skill* GetInstance(){ static Skill instance; return &instance; }
 
 		// 入る
@@ -1079,7 +1079,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static OverDrive_OneMore* GetInstance(){ static OverDrive_OneMore instance; return &instance; }
 
 		// 入る
@@ -1113,7 +1113,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static OverDrive_Burst* GetInstance(){ static OverDrive_Burst instance; return &instance; }
 
 		// 入る
@@ -1146,7 +1146,7 @@ namespace BasePlayerState
 	class Guard :public State<BasePlayer>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static Guard* GetInstance(){ static Guard instance; return &instance; }
 
 		// 入る
@@ -1180,7 +1180,7 @@ namespace BasePlayerState
 	class Throw :public State<BasePlayer>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static Throw* GetInstance(){ static Throw instance; return &instance; }
 
 		// 入る
@@ -1213,7 +1213,7 @@ namespace BasePlayerState
 	class ThrowHold :public State<BasePlayer>
 	{
 	public:
-		// this is a シングルトン
+		// 実体_
 		static ThrowHold* GetInstance() { static ThrowHold instance; return &instance; }
 
 		// 入る
@@ -1247,7 +1247,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static ThrowSuccess* GetInstance(){ static ThrowSuccess instance; return &instance; }
 
 		// 入る
@@ -1281,7 +1281,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static ThrowBind* GetInstance(){ static ThrowBind instance; return &instance; }
 
 		// 入る
@@ -1315,7 +1315,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static SuccessThrowRelease* GetInstance(){ static SuccessThrowRelease instance; return &instance; }
 
 		// 入る
@@ -1349,7 +1349,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static HeavehoDrive* GetInstance(){ static HeavehoDrive instance; return &instance; }
 
 		// 入る
@@ -1383,7 +1383,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static HeavehoDriveOverFlow* GetInstance(){ static HeavehoDriveOverFlow instance; return &instance; }
 
 		// 入る
@@ -1418,7 +1418,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static HeavehoDriveOverFlow_Success* GetInstance(){ static HeavehoDriveOverFlow_Success instance; return &instance; }
 
 		// 入る
@@ -1452,7 +1452,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static Win* GetInstance(){ static Win instance; return &instance; }
 
 		// 入る
@@ -1486,7 +1486,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static AerialDash* GetInstance() { static AerialDash instance; return &instance; }
 
 		// 入る
@@ -1520,7 +1520,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static AerialBackDash* GetInstance() { static AerialBackDash instance; return &instance; }
 
 		// 入る
@@ -1553,7 +1553,7 @@ namespace BasePlayerState
 	{
 	public:
 
-		// this is a シングルトン
+		// 実体_
 		static Intro* GetInstance() { static Intro instance; return &instance; }
 
 		// 入る
@@ -1586,7 +1586,7 @@ namespace BasePlayerState
 	//{
 	//public:
 	//
-	//	// this is a シングルトン
+	//	// 実体_
 	//	static StrongAttack* GetInstance() { static StrongAttack instance; return &instance; }
 	//
 	//	// 入る
