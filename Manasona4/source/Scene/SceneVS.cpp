@@ -34,7 +34,7 @@ sceneVS::~sceneVS()
 void sceneVS::Update()
 {
 	// フェード
-	Fade::Update();
+	//Fade::Update();
 
 	// VS終わった後のロード中
 	if (m_bEndVS)
@@ -48,21 +48,23 @@ void sceneVS::Update()
 		return;
 	}
 
+
 	// VS演出の更新
 	BattleLoadInst->Update();
 	
+	// シーンを読み込み終わっていたら
+	if (LoadSceneThreadMgr->isInitializeEnd())
+	{
+		BattleLoadInst->SetSkipFlag(true);
+	}
+
 	// VS演出終わった瞬間
 	if (BattleLoadInst->isEnd())
 	{
-		// シーンを読み込み終わっていたら
-		if (LoadSceneThreadMgr->isInitializeEnd())
-		{
-			// すでに読み込んだシーンに行く
-			MainFrameEX->ChangeScene(LoadSceneThreadMgr->GetNewScene());
-		}
 		// 終了フラグオン
 		m_bEndVS = true;
 	}
+
 }
 //
 //=============================================================================================
@@ -72,8 +74,8 @@ void sceneVS::Update()
 //		描			画
 void sceneVS::Render()
 {
-	tdnView::Clear();
+	//tdnView::Clear();
 
 	BattleLoadInst->Render();
-	Fade::Render();
+	//Fade::Render();
 }

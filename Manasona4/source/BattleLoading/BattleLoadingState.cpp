@@ -29,7 +29,7 @@ int GetCharaType(SIDE eSide)
 void BattleLoadingState::Intro::Enter(BattleLoading *pMain)
 {
 	// フェード初期化
-	Fade::Set(Fade::FLAG::FADE_IN, 64);
+	// Fade::Set(Fade::FLAG::FADE_IN, 64);
 
 	for (int i = 0; i < BattleLoading::IMAGE::ARRAY_END; i++)
 	{
@@ -43,20 +43,36 @@ void BattleLoadingState::Intro::Enter(BattleLoading *pMain)
 		pMain->m_tagFinalChara2P[i].End();
 	}
 
+	// 最初は黒
+	pMain->m_fFadeRate = 1.0f;
+
 	// 初期演出
-	//pMain->FirstAction();
+	//pMain->m_pImages[BattleLoading::IMAGE::BLUE_RING].Action();
 
 	pMain->m_pImages[BattleLoading::IMAGE::BLACK_LINE].Action();
 	
+
+	// タイマー初期化
+	pMain->m_iSceneFrame = 0;
 
 }
 
 void BattleLoadingState::Intro::Execute(BattleLoading *pMain)
 {
 
-	// 1Pのスライドへ
-	pMain->GetFSM()->ChangeState(BattleLoadingState::Slide1P::GetInstance());
+	// 
+	pMain->m_iSceneFrame++;
+	if (pMain->m_iSceneFrame >= 12)
+	{
+		pMain->m_fFadeRate -= 0.1f;
+	}
 
+	if (pMain->m_fFadeRate <= 0.0f)
+	{
+		// 1Pのスライドへ
+		pMain->GetFSM()->ChangeState(BattleLoadingState::Slide1P::GetInstance());
+		return;
+	}
 }
 
 void BattleLoadingState::Intro::Exit(BattleLoading *pMain) 
@@ -247,6 +263,9 @@ void BattleLoadingState::SlideEnd::Enter(BattleLoading *pMain)
 	// 最終フレームの演出開始
 	pMain->m_pImages[BattleLoading::IMAGE::F_FRAME].Action(6);
 
+	// 光る円
+	pMain->m_pImages[BattleLoading::IMAGE::BLUE_RING].Action();
+
 	// タイマー初期化
 	pMain->m_iSceneFrame = 0;
 }
@@ -354,6 +373,28 @@ void BattleLoadingState::FinalStep::Execute(BattleLoading *pMain)
 		return;
 	}
 
+	// スキップ可能なら
+	if (pMain->m_bSkip == true)
+	{
+		// パッド分更新
+		int NumDevice(tdnInputManager::GetNumDevice());
+		if (NumDevice == 0)NumDevice = 1;
+		for (int i = 0; i < NumDevice; i++)
+		{
+			// メニュー切り替え
+			if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, i) == 3||
+				tdnInput::KeyGet(KEYCODE::KEY_A, i) == 3 || 
+				tdnInput::KeyGet(KEYCODE::KEY_B, i) == 3 )
+			{
+				// 次へ
+				pMain->GetFSM()->ChangeState(BattleLoadingState::FadeChangeStep::GetInstance());
+				return;
+
+			}
+		}
+	}
+	
+
 }
 
 void BattleLoadingState::FinalStep::Exit(BattleLoading *pMain)
@@ -412,7 +453,7 @@ bool BattleLoadingState::FinalStep::OnMessage(BattleLoading *pMain, const Messag
 void BattleLoadingState::FadeChangeStep::Enter(BattleLoading *pMain)
 {
 	// フェード
-	Fade::Set(Fade::FLAG::FADE_OUT, 8);
+	// Fade::Set(Fade::FLAG::FADE_OUT, 8);
 
 	// タイマー初期化
 	pMain->m_iSceneFrame = 0;
@@ -422,6 +463,7 @@ void BattleLoadingState::FadeChangeStep::Execute(BattleLoading *pMain)
 {
 
 	// 更新
+	pMain->m_fFadeRate += 0.1f;
 
 	// キャラ
 	pMain->m_tagFinalChara1P[GetCharaType(SIDE::LEFT)].Update();
@@ -438,11 +480,6 @@ void BattleLoadingState::FadeChangeStep::Execute(BattleLoading *pMain)
 
 void BattleLoadingState::FadeChangeStep::Exit(BattleLoading *pMain)
 {
-	// (TODO)
-	//pMain->m_pImages[BattleLoading::IMAGE::F_BLACK_CIRCLE].End();
-	//pMain->m_pImages[BattleLoading::IMAGE::F_BACK].End();
-	//pMain->m_pImages[BattleLoading::IMAGE::F_VERSUS].End();
-	//pMain->m_pImages[BattleLoading::IMAGE::F_FRAME].End();
 
 }
 

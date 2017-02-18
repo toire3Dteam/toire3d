@@ -32,7 +32,7 @@ ScoreUI::ScoreUI(ResultData data)
 		case ScoreUI::HP:
 			// èÍèä
 			m_tagScore[i].x = 25;
-			m_tagScore[i].iAddNumX = 198;
+			m_tagScore[i].iAddNumX = 218;
 			m_tagScore[i].iAddNumY = 100;
 			m_tagScore[i].y = 230;
 

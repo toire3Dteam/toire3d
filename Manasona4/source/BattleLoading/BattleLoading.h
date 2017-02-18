@@ -153,6 +153,7 @@ public:
 	enum IMAGE
 	{
 		BLACK_LINE,
+		BLUE_RING,
 		S_UP_FRAME,
 		S_DOWN_FRAME,
 		S_VS,
@@ -171,6 +172,8 @@ public:
 
 	bool isEnd() { return m_bEnd; }
 	void SetEndFlag(bool bEnd) { m_bEnd = bEnd; }
+	
+	void SetSkipFlag(bool bSkip) { m_bSkip = bSkip; }
 
 private:
 	//------------------------------------------------------
@@ -200,6 +203,10 @@ private:
 	int m_iSceneFrame;
 
 	Vector2 m_vCirclePos;
+
+	float m_fFadeRate;
+
+	bool m_bSkip;
 
 	//+------------------------------------
 	// ステートをフレンドクラスへ

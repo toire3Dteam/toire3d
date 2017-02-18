@@ -66,6 +66,8 @@ Nazenara::Nazenara(SIDE side, const SideData &data) :BasePlayer(side, data), m_p
 	m_pGodHand = new GodHandEffect;
 	m_pGodHandWind = new CycloneEffect;
 	m_pGodHandImpact = new FireRingEffect;
+	m_pNazenarabaDrop = new NazenarabaDropEffect();
+
 
 	// 最後に初期化
 	Reset();
@@ -81,6 +83,8 @@ void Nazenara::Reset()
 	m_pGodHand->Stop();
 	m_pGodHandWind->Stop();
 	m_pGodHandImpact->Stop();
+	m_pNazenarabaDrop->Stop();
+
 
 	m_bArm = false;
 }
@@ -736,6 +740,7 @@ Nazenara::~Nazenara()
 	SAFE_DELETE(m_pGodHand);
 	SAFE_DELETE(m_pGodHandWind);
 	SAFE_DELETE(m_pGodHandImpact);
+	SAFE_DELETE(m_pNazenarabaDrop);
 
 	FOR((int)SKILL_ACTION_TYPE::MAX) SAFE_DELETE(m_pSkillActions[i])
 }
@@ -755,6 +760,8 @@ void Nazenara::Update(PLAYER_UPDATE flag)
 	m_pGodHand->Update();
 	m_pGodHandWind->Update();
 	m_pGodHandImpact->Update();
+
+	m_pNazenarabaDrop->Update();
 }
 
 void Nazenara::Render()
@@ -769,6 +776,8 @@ void Nazenara::Render()
 	m_pGodHand->Render();
 	m_pGodHandWind->Render();
 	m_pGodHandImpact->Render();
+
+	m_pNazenarabaDrop->Render();
 }
 
 void Nazenara::RenderDrive()
@@ -1114,8 +1123,9 @@ void Nazenara::SkillAction::AerialDrop::Enter()
 	// 重力の影響受けるな！
 	m_pNazenara->SetMoveUpdate(false);
 
-	// アイルー正面向きながらドリル防止
+	// 正面向きながら攻撃防止
 	m_pNazenara->SetDirAngle();
+
 
 	// フレーム初期化
 	m_ActiveFrame = 0;
@@ -1128,6 +1138,19 @@ bool Nazenara::SkillAction::AerialDrop::Execute()
 	{
 		return true;
 	}
+
+	if (m_pNazenara->m_iCurrentActionFrame == 15)
+	{
+		// かかとおとしエフェクト
+		float l_fDropAngle = 0.0f;
+		if (m_pNazenara->GetDir() == DIR::RIGHT)
+		{
+			l_fDropAngle = 3.14f;
+		}
+		m_pNazenara->m_pNazenarabaDrop->Action(m_pNazenara->GetCenterPos(), 0.8f, 0.75f, Vector3(0, l_fDropAngle, 0), Vector3(0, l_fDropAngle, 0));
+
+	}
+
 
 	// 1回でも当たったらフラグ
 	if (m_pNazenara->isHitAttack())

@@ -5087,7 +5087,7 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 											 Vector3 vKnockBackMove(Collision::CheckMove(pPerson, Vector3(fGuardKnockBack, 0, 0)), 0, 0);
 											 pPerson->AddMove(vKnockBackMove);
 
-											 if (HitDamageInfo->iAttribute == (int)ATTACK_ATTRIBUTE::STRIKE)
+											 if (HitDamageInfo->iAttribute == (int)ATTACK_ATTRIBUTE::STRIKE && !HitDamageInfo->bStandAttack)
 											 {
 												 // •Ç‚¾‚Æ‚±‚Á‚¿‚ÉˆÚ“®‚ª‚©‚©‚é
 												 pPerson->GetTargetPlayer()->AddMove(Vector3(-(fGuardKnockBack - vKnockBackMove.x), 0, 0));

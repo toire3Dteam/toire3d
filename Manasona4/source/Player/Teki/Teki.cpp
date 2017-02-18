@@ -79,7 +79,7 @@ Teki::Teki(SIDE side, const SideData &data) :BasePlayer(side, data)
 	m_pUpperLineEffect = new TekiUpperLineEffect();
 	m_pCycloneEffect = new CycloneEffect();
 	m_pCounterEffect = new TekiCounterEffect();
-
+	m_pStepEffect = new StepEffect();
 
 	// リセットはなるべく最後に
 	Reset();
@@ -93,6 +93,7 @@ void Teki::Reset()
 	m_pUpperLineEffect->Stop();
 	m_pCycloneEffect->Stop();
 	m_pCounterEffect->Stop();
+	m_pStepEffect->Stop();
 
 }
 
@@ -672,6 +673,8 @@ Teki::~Teki()
 	SAFE_DELETE(m_pUpperLineEffect);
 	SAFE_DELETE(m_pCycloneEffect);
 	SAFE_DELETE(m_pCounterEffect);
+	SAFE_DELETE(m_pStepEffect);
+
 }
 
 void Teki::Update(PLAYER_UPDATE flag)
@@ -683,6 +686,8 @@ void Teki::Update(PLAYER_UPDATE flag)
 	m_pUpperLineEffect->Update();
 	m_pCycloneEffect->Update();
 	m_pCounterEffect->Update();
+	m_pStepEffect->Update();
+
 }
 
 void Teki::Render()
@@ -694,6 +699,7 @@ void Teki::Render()
 	m_pUpperLineEffect->Render();
 	m_pCycloneEffect->Render();
 	m_pCounterEffect->Render();
+	m_pStepEffect->Render();
 
 }
 
@@ -1076,6 +1082,16 @@ void Teki::SkillAction::Squat::Enter()
 
 	// 走るエフェクト
 	m_pTeki->AddEffectAction(m_pTeki->GetPos(), EFFECT_TYPE::RUN);
+
+	// ステップエフェクト
+	float l_fStepAngle = 0.0f;
+	if (m_pTeki->GetDir() == DIR::RIGHT) 
+	{
+		l_fStepAngle = 3.14f;
+	}
+
+	m_pTeki->m_pStepEffect->Action(m_pTeki->GetFlontPos(),
+		0.85f, 1.0f, Vector3(0, 0, l_fStepAngle), Vector3(0, 0, l_fStepAngle));
 
 }
 

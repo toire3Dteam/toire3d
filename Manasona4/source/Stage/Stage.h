@@ -84,13 +84,25 @@ namespace Stage
 	{
 	public:
 		Sand() :Base(){}
+		~Sand();
 		void Initialize(Camera *pCamera);
-		//void Update() override;
+		void Update() override;
 		void Render() override;
 		//void Render_ShadowBuf() override;
 
 		EFFECT_CAMERA_ID GetIntroCameraScriptID(){ return EFFECT_CAMERA_ID::SAND_STAGE_INTRO; }
 	private:
+
+		static const int m_cGRASS_MAX = 10;
+		struct Grass
+		{
+			iex3DObj* pObj;
+			Vector3 vPos;
+		};
+		Grass m_pGrass[m_cGRASS_MAX];
+	
+
+
 	};
 
 	// 海ステージ

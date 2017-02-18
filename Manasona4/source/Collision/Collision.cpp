@@ -379,6 +379,7 @@ bool Collision::CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou)
 			HitDamageInfo.fComboRate = pStandAttackData->fComboRate;
 			HitDamageInfo.iAttribute = (int)pStandAttackData->attribute;
 			HitDamageInfo.fRepeatAttackRate = pStandAttackData->fRepeatAttackRate;
+			HitDamageInfo.bStandAttack = true;	// スタンドフラグをON
 
 			// コンボ用
 			//COMBO_DESK comboDesk;

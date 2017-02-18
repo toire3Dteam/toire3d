@@ -148,8 +148,55 @@ void Stage::Sand::Initialize(Camera *pCamera)
 	m_fBottom = 0;
 	m_fWidth = 200;
 
+	FOR(m_cGRASS_MAX) 
+	{
+		m_pGrass[i].pObj = new iex3DObj("Data/Stage/Stage/kusa/kusa_1.iem");
+		m_pGrass[i].vPos = Vector3(0,0,90);
+		m_pGrass[i].pObj->SetScale(1.5f);
+		m_pGrass[i].pObj->SetAngle(tdnRandom::Get(0.0f, 3.14f));
+
+	}
+
+	//草の位置
+	m_pGrass[0].vPos = Vector3(-20, 0, 53);
+	m_pGrass[1].vPos = Vector3(-15, 0, 53);
+	m_pGrass[2].vPos = Vector3(110, 0, 80);
+	m_pGrass[3].vPos = Vector3(105, 0, 80);
+	m_pGrass[4].vPos = Vector3(-92, 0, 55);
+	m_pGrass[5].vPos = Vector3(-98, 0, 55);
+	m_pGrass[6].vPos = Vector3(10, 0, 90);
+	m_pGrass[7].vPos = Vector3(15, 0, 90);
+
+	m_pGrass[8].vPos = Vector3(20, 0, 80);
+	m_pGrass[9].vPos = Vector3(25, 0, 80);
+
 	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
 	pCamera->SetStageCameraInfo("DATA/Stage/Stage/camera.txt");
+}
+
+
+Stage::Sand::~Sand()
+{
+	FOR(m_cGRASS_MAX)
+	{
+		SAFE_DELETE(m_pGrass[i].pObj);
+	}
+}
+
+
+void Stage::Sand::Update()
+{
+	// 壁
+	m_pAreWall->Update();
+
+	// 草
+	FOR(m_cGRASS_MAX)
+	{
+		m_pGrass[i].pObj->SetPos(m_pGrass[i].vPos);
+		m_pGrass[i].pObj->Animation();
+		m_pGrass[i].pObj->Update();
+	}
+
 }
 
 void Stage::Sand::Render()
@@ -157,6 +204,10 @@ void Stage::Sand::Render()
 	m_pBack2->Render(shaderM, "sky");
 	m_pBack->Render(shaderM, "sky");
 	
+	FOR(m_cGRASS_MAX)
+	{
+		m_pGrass[i].pObj->Render(shaderM, "Stage");
+	}
 
 	m_pObj->Render(shaderM,"Stage");
 	m_pAreWall->RenderAreaWall();// 壁

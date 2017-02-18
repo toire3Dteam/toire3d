@@ -100,7 +100,8 @@ struct HIT_DAMAGE_INFO
 	float fComboRate;		// コンボ補正
 	int iAttribute;			// 属性
 	float fRepeatAttackRate;// 同技補正値(技ごとに持つことにした)
-	HIT_DAMAGE_INFO(){ ZeroMemory(this, sizeof(this)); }
+	bool bStandAttack;		// スタンド攻撃かどうか
+	HIT_DAMAGE_INFO() { ZeroMemory(this, sizeof(this)); bStandAttack = false; }
 };
 
 // 攻撃ヒットしたプレイヤー用

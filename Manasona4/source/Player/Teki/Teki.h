@@ -207,7 +207,7 @@ private:
 	TekiUpperLineEffect* m_pUpperLineEffect;
 	BaseUVEffect *m_pCycloneEffect;	// •KŽE‚Ì•—
 	TekiCounterEffect* m_pCounterEffect;
-
+	StepEffect* m_pStepEffect;
 
 };
 

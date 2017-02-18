@@ -902,6 +902,24 @@ public:
 private:
 };
 
+/*****************/
+//	ドロップエフェクト
+/*****************/
+class NazenarabaDropEffect :public BaseUVEffect
+{
+public:
+	NazenarabaDropEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/nazenara/nazenarabaDrop.IMO", 0.0f, 0.055f, 12, false, 1, 8);
+	};
+	~NazenarabaDropEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::Render(); };
+	
+private:
+};
+
 /*****************************************/
 //	TEKIアッパーライン
 /*****************************************/
@@ -941,6 +959,25 @@ public:
 private:
 
 };
+
+/**************************/
+//	ステップエフェクト
+/**************************/
+class StepEffect :public BaseUVEffect
+{
+public:
+	StepEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Teki/StepEffect.imo", 0.0f, 0.05f, 10, false, 1, 4);
+	};
+	~StepEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADD(); };
+	
+private:
+};
+
 
 /*************************/
 //	多段ヒットエフェクト

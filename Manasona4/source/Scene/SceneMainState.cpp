@@ -1277,7 +1277,11 @@ void SceneMainState::ChallengeMain::Execute(sceneMain *pMain)
 
 #ifdef _DEBUG
 
-	if (KeyBoardTRG(KB_N)) CommandMgr->SaveStart(PlayerMgr->GetPlayer(ENTITY_ID::ID_PLAYER_FIRST));
+	if (KeyBoardTRG(KB_N))
+	{
+		CommandMgr->SaveStart(PlayerMgr->GetPlayer(ENTITY_ID::ID_PLAYER_FIRST));
+	}
+	
 	if (KeyBoardTRG(KB_M))
 	{
 		CommandMgr->SaveEnd();
@@ -1285,6 +1289,7 @@ void SceneMainState::ChallengeMain::Execute(sceneMain *pMain)
 	}
 	if (KeyBoardTRG(KB_COMMA)) CommandMgr->Action(ChallengeMgrMgr->GetSelectMgr()->GetChallenge()->GetReplayDataName().c_str());
 	CommandMgr->SaveUpdate();
+
 #endif // _DEBUG
 
 }

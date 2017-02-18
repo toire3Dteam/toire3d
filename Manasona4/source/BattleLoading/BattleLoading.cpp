@@ -12,11 +12,14 @@
 // 前方宣言
 BattleLoading* BattleLoading::m_pInstance = nullptr;
 
-BattleLoading::BattleLoading() :BaseGameEntity(ENTITY_ID::BATTLE_LOADING),
-	m_bEnd(false)
+BattleLoading::BattleLoading() :BaseGameEntity(ENTITY_ID::BATTLE_LOADING)
 {
+	m_bEnd = false;
+	m_bSkip = false;
+
 	// 画像初期化
 	m_pImages[IMAGE::BLACK_LINE].pPic = new tdn2DAnim("DATA/UI/BattleLoading/BlackLine.png");
+	m_pImages[IMAGE::BLUE_RING].pPic = new tdn2DAnim("DATA/UI/BattleLoading/BlueRing.png");
 	m_pImages[IMAGE::S_UP_FRAME].pPic = new tdn2DAnim("DATA/UI/BattleLoading/Slide/upframe.png");
 	m_pImages[IMAGE::S_DOWN_FRAME].pPic = new tdn2DAnim("DATA/UI/BattleLoading/Slide/downframe.png");
 	m_pImages[IMAGE::S_VS].pPic = new tdn2DAnim("DATA/UI/BattleLoading/Slide/vs.png");
@@ -39,7 +42,8 @@ BattleLoading::BattleLoading() :BaseGameEntity(ENTITY_ID::BATTLE_LOADING),
 	}
 
 	m_pImages[IMAGE::BLACK_LINE].pPic->Action();
-	
+	m_pImages[IMAGE::BLUE_RING].pPic->OrderRipple(12, 1.0f,0.2f);
+
 	// 各画像の設定
 	m_pImages[IMAGE::S_UP_FRAME].pPic->OrderMoveAppeared(12, 0, 256);
 	m_pImages[IMAGE::S_UP_FRAME].vMove.y = -0.05f;
@@ -164,7 +168,7 @@ BattleLoading::BattleLoading() :BaseGameEntity(ENTITY_ID::BATTLE_LOADING),
 			m_tagFinalChara1P[i].pPic = new tdn2DAnim("Data/UI/BattleLoading/CHR/Airou.png");
 			m_tagFinalChara2P[i].pPic = new tdn2DAnim("Data/UI/BattleLoading/CHR/Airou.png");
 
-			m_tagFinalChara1P[i].vStartPos.x = -500;
+			m_tagFinalChara1P[i].vStartPos.x = -600;
 			m_tagFinalChara2P[i].vStartPos.x = 100;
 			break;
 		case CHARACTER::TEKI:
@@ -211,6 +215,10 @@ void BattleLoading::Initialize()
 {
 	// ステートマシン初期化 
 	m_pStateMachine->ChangeState(BattleLoadingState::Intro::GetInstance());
+
+	m_bEnd = false;
+	m_bSkip = false;
+
 }
 
 
@@ -256,6 +264,10 @@ void BattleLoading::Update()
 
 	// ★ステートマシン更新
 	m_pStateMachine->Update();
+
+	// クランプ
+	m_fFadeRate = Math::Clamp(m_fFadeRate, 0.0f, 1.0f);
+
 
 #ifdef _DEBUG
 	if (KeyBoardTRG(KB_Z))
@@ -309,6 +321,14 @@ void BattleLoading::Render()
 	m_tagSlideChara1P[GetCharaType(SIDE::LEFT)].RenderName();
 	m_tagSlideChara2P[GetCharaType(SIDE::RIGHT)].RenderName();
 
+
+	// フェード
+	// クランプ
+	DWORD col = ARGB((int)(m_fFadeRate * 255), 0, 0, 0);
+	tdnPolygon::Rect(0, 0, 1280, 720, RS::COPY, col);
+
+	// リング
+	m_pImages[IMAGE::BLUE_RING].Render(RS::ADD);
 
 
 	//FOR(IMAGE::ARRAY_END)
