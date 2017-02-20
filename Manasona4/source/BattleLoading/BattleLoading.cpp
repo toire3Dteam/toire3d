@@ -304,15 +304,15 @@ void BattleLoading::Update()
 
 
 #ifdef _DEBUG
-	if (KeyBoardTRG(KB_Z))
-	{
-		m_tagSlideChara1P[0].Action();
-	}
-	
-	if (KeyBoardTRG(KB_X))
-	{
-		m_tagSlideChara2P[0].Action();
-	}
+	//if (KeyBoardTRG(KB_Z))
+	//{
+	//	m_tagSlideChara1P[0].Action();
+	//}
+	//
+	//if (KeyBoardTRG(KB_X))
+	//{
+	//	m_tagSlideChara2P[0].Action();
+	//}
 
 #endif // _DEBUG
 

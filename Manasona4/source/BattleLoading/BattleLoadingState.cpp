@@ -6,6 +6,7 @@
 #include "Data\SelectData.h"
 #include "system\System.h"
 #include "system\FrameworkEx.h"
+#include "Sound\SoundManager.h"
 
 
 int GetCharaType(SIDE eSide)
@@ -70,9 +71,12 @@ void BattleLoadingState::Intro::Execute(BattleLoading *pMain)
 		pMain->m_fFadeRate -= 0.1f;
 	}
 
+	// 光の演出(ロードの演出スタート)
 	if (pMain->m_iSceneFrame == 18)
 	{
 		pMain->m_pImages[BattleLoading::IMAGE::I_INTRO_LIGHT].Action();
+		se->Play("バトルローディング");
+
 	}
 
 	//if (pMain->m_fFadeRate <= 0.0f)
@@ -151,7 +155,7 @@ void BattleLoadingState::Slide1P::Execute(BattleLoading *pMain)
 	pMain->m_pImages[BattleLoading::IMAGE::S_1PBACK_SL].vPos.x += 20.0f;
 
 	pMain->m_iSceneFrame++;
-	if (pMain->m_iSceneFrame >= 120)
+	if (pMain->m_iSceneFrame >= 90)
 	{
 		// 2Pのスライドへ
 		pMain->GetFSM()->ChangeState(BattleLoadingState::Slide2P::GetInstance());
@@ -229,7 +233,7 @@ void BattleLoadingState::Slide2P::Execute(BattleLoading *pMain)
 	pMain->m_pImages[BattleLoading::IMAGE::S_2PBACK_SL].vPos.x -= 20.0f;
 
 	pMain->m_iSceneFrame++;
-	if (pMain->m_iSceneFrame >= 120)
+	if (pMain->m_iSceneFrame >= 90)
 	{
 		// スライド終りへ
 		pMain->GetFSM()->ChangeState(BattleLoadingState::SlideEnd::GetInstance());
@@ -411,7 +415,7 @@ void BattleLoadingState::FinalStep::Execute(BattleLoading *pMain)
 	}
 
 	pMain->m_iSceneFrame++;
-	if (pMain->m_iSceneFrame >= 180)
+	if (pMain->m_iSceneFrame >= 200)
 	{
 		// 次へ
 		pMain->GetFSM()->ChangeState(BattleLoadingState::FadeChangeStep::GetInstance());
@@ -499,6 +503,8 @@ void BattleLoadingState::FadeChangeStep::Enter(BattleLoading *pMain)
 {
 	// フェード
 	// Fade::Set(Fade::FLAG::FADE_OUT, 8);
+	se->Stop("バトルローディング",0);
+
 
 	pMain->m_pImages[BattleLoading::IMAGE::LOADING_CIRCLE].Action();
 

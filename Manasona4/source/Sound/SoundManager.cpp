@@ -78,6 +78,8 @@ const SE_Manager::DATA all_dataS[]
 	{ "リベル",						"DATA/Sound/SE/Battle/appear.wav",				1, false },
 	{ "アクション",					"DATA/Sound/SE/Battle/fill.wav",				1, false },
 
+	{ "バトルローディング",			"DATA/Sound/SE/BlazBlue/BattleLoading.wav",				1, false },
+
 	//{ "フェイトイズターニング",		"DATA/Sound/SE/BlazBlue/voice/the_wheel.wav",	1, false },
 	//{ "リベル",						"DATA/Sound/SE/BlazBlue/voice/revel.wav",		1, false },
 	//{ "ワン",						"DATA/Sound/SE/BlazBlue/voice/one.wav",			1, false },
