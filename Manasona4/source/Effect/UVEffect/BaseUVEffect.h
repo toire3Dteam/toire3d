@@ -734,12 +734,30 @@ public:
 	~MayaShotEffect() {};
 
 	void Update() { BaseUVEffect::Update(); };
-	void Render() { BaseUVEffect::RenderADD(); };
+	void Render() { BaseUVEffect::RenderADDNOZ(); };
 	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
 
 private:
 };
 
+/*****************************/
+//	マーヤショット2エフェクト
+/*****************************/
+class MayaShot2Effect :public BaseUVEffect
+{
+public:
+	MayaShot2Effect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/maya/shot2.IMO", 0.08f, 0.0f, 46, false, 1, 40);
+	};
+	~MayaShot2Effect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADDNOZ(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
 /*****************************/
 //	マズルフラッシュエフェクト 
 /*****************************/

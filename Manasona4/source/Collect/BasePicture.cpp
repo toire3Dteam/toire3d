@@ -215,7 +215,7 @@ AirouPicture::AirouPicture()
 	m_bRock = false;
 
 	// 値段
-	m_iPrice = 10;
+	m_iPrice = 1000;
 }
 
 // 実行後の画像の初期化
@@ -243,7 +243,7 @@ TekiPicture::TekiPicture()
 	m_bRock = false;
 
 	// 値段
-	m_iPrice = 10;
+	m_iPrice = 1000;
 }
 
 // 実行後の画像の初期化
@@ -271,7 +271,7 @@ NazenarabaPicture::NazenarabaPicture()
 	m_bRock = false;
 
 	// 値段
-	m_iPrice = 10;
+	m_iPrice = 1000;
 }
 
 // 実行後の画像の初期化
@@ -300,7 +300,7 @@ RestPicture::RestPicture()
 	m_bRock = false;
 
 	// 値段
-	m_iPrice = 10;
+	m_iPrice = 1000;
 }
 
 // 実行後の画像の初期化
@@ -327,7 +327,7 @@ GatheringPicture::GatheringPicture()
 	m_bRock = false;
 
 	// 値段
-	m_iPrice = 10;
+	m_iPrice = 1000;
 }
 
 // 実行後の画像の初期化
@@ -354,7 +354,7 @@ StylishPicture::StylishPicture()
 	m_bRock = false;
 
 	// 値段
-	m_iPrice = 10;
+	m_iPrice = 1000;
 }
 
 // 実行後の画像の初期化
@@ -381,7 +381,7 @@ CoolPicture::CoolPicture()
 	m_bRock = false;
 
 	// 値段
-	m_iPrice = 10;
+	m_iPrice = 1000;
 }
 
 // 実行後の画像の初期化
@@ -408,7 +408,7 @@ AlleyPicture::AlleyPicture()
 	m_bRock = false;
 
 	// 値段
-	m_iPrice = 10;
+	m_iPrice = 1000;
 }
 
 // 実行後の画像の初期化
@@ -435,7 +435,7 @@ SadPicture::SadPicture()
 	m_bRock = false;
 
 	// 値段
-	m_iPrice = 10;
+	m_iPrice = 1000;
 }
 
 // 実行後の画像の初期化
@@ -462,7 +462,7 @@ SexyPicture::SexyPicture()
 	m_bRock = false;
 
 	// 値段
-	m_iPrice = 10;
+	m_iPrice = 1000;
 }
 
 // 実行後の画像の初期化
@@ -489,7 +489,7 @@ SeaPicture::SeaPicture()
 	m_bRock = false;
 
 	// 値段
-	m_iPrice = 10;
+	m_iPrice = 1000;
 }
 
 // 実行後の画像の初期化
@@ -498,6 +498,254 @@ void SeaPicture::InitExe()
 	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Sea.png");
 	m_tagPicture.sTitle = "【スペシャルイラスト】海";
 	m_tagPicture.sText = "奈良県には海がない。";
+	m_tagPicture.vPos.x = 0.0f;
+	m_tagPicture.vPos.y = 0.0f;
+	m_tagPicture.fScale = 1.0f;
+	m_tagPicture.iAlpha = 1.0f;
+}
+
+
+//+---------------------------------
+//	アラミタマのイラスト
+//+---------------------------------
+AramitamaPicture::AramitamaPicture()
+{
+	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Aramitama.png");
+	m_tagPictureIcon.sTitle = "【キャラクターイラスト】アラミタマ";
+	m_tagPictureIcon.sText = "アラミタマのキャラクターイラスト";
+
+	// 隠しトロフィーフラグ
+	m_bRock = false;
+
+	// 値段
+	m_iPrice = 1000;
+}
+
+void AramitamaPicture::InitExe()
+{
+	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Aramitama.png");
+	m_tagPicture.sTitle = "【キャラクターイラスト】アラミタマ";
+	m_tagPicture.sText = "アラミタマのキャラクターイラスト";
+	m_tagPicture.vPos.x = -100.0f;
+	m_tagPicture.vPos.y = 0.0f;
+	m_tagPicture.fScale = 1.0f;
+	m_tagPicture.iAlpha = 1.0f;
+}
+
+
+//+---------------------------------
+//	兄貴のイラスト
+//+---------------------------------
+AnikiPicture::AnikiPicture()
+{
+	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Aniki.png");
+	m_tagPictureIcon.sTitle = "【キャラクターイラスト】兄貴";
+	m_tagPictureIcon.sText = "兄貴のキャラクターイラスト";
+
+	// 隠しトロフィーフラグ
+	m_bRock = false;
+
+	// 値段
+	m_iPrice = 1000;
+
+}
+
+void AnikiPicture::InitExe()
+{
+	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Aniki.png");
+	m_tagPicture.sTitle = "【キャラクターイラスト】兄貴";
+	m_tagPicture.sText = "兄貴のキャラクターイラスト";
+	m_tagPicture.vPos.x = -200.0f;
+	m_tagPicture.vPos.y = 0.0f;
+	m_tagPicture.fScale = 1.0f;
+	m_tagPicture.iAlpha = 1.0f;
+
+}
+
+//+---------------------------------
+//	リザルトテキのイラスト
+//+---------------------------------
+WinTekiPicture::WinTekiPicture()
+{
+	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/WinTeki.png");
+	m_tagPictureIcon.sTitle = "【リザルトイラスト】テキ";
+	m_tagPictureIcon.sText = "リザルト画面のイラストです。";
+
+	// 隠しトロフィーフラグ
+	m_bRock = false;
+
+	// 値段
+	m_iPrice = 1000;
+
+}
+
+void WinTekiPicture::InitExe()
+{
+	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/WinTeki.png");
+	m_tagPicture.sTitle = "【リザルトイラスト】テキ";
+	m_tagPicture.sText = "リング場で相手をKOさせたイメージ。";
+	m_tagPicture.vPos.x = 0.0f;
+	m_tagPicture.vPos.y = 0.0f;
+	m_tagPicture.fScale = 1.0f;
+	m_tagPicture.iAlpha = 1.0f;
+}
+
+//+---------------------------------
+//	リザルト兄貴のイラスト
+//+---------------------------------
+WinAnikiPicture::WinAnikiPicture()
+{
+	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/WinAniki.png");
+	m_tagPictureIcon.sTitle = "【リザルトイラスト】兄貴";
+	m_tagPictureIcon.sText = "リザルト画面のイラストです。";
+
+	// 隠しトロフィーフラグ
+	m_bRock = false;
+
+	// 値段
+	m_iPrice = 1000;
+}
+
+void WinAnikiPicture::InitExe()
+{
+	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/WinAniki.png");
+	m_tagPicture.sTitle = "【リザルトイラスト】兄貴";
+	m_tagPicture.sText = "歪みねぇ一枚絵。";
+	m_tagPicture.vPos.x = 0.0f;
+	m_tagPicture.vPos.y = 0.0f;
+	m_tagPicture.fScale = 1.0f;
+	m_tagPicture.iAlpha = 1.0f;
+}
+
+//+---------------------------------
+//	真夏2のイラスト
+//+---------------------------------
+Manatu2Picture::Manatu2Picture()
+{
+	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Manatu2.png");
+	m_tagPictureIcon.sTitle = "【ゲームイラスト】真夏のファイト";
+	m_tagPictureIcon.sText = "ゲームのイラストです。";
+
+	// 隠しトロフィーフラグ
+	m_bRock = false;
+
+	// 値段
+	m_iPrice = 1000;
+}
+
+void Manatu2Picture::InitExe()
+{
+	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Manatu2.png");
+	m_tagPicture.sTitle = "【ゲームイラスト】真夏のファイト";
+	m_tagPicture.sText = "2年生の時に制作した作品\n";
+	m_tagPicture.vPos.x = 0.0f;
+	m_tagPicture.vPos.y = 0.0f;
+	m_tagPicture.fScale = 1.0f;
+	m_tagPicture.iAlpha = 1.0f;
+}
+
+//+---------------------------------
+//	トイレのイラスト
+//+---------------------------------
+ToirePicture::ToirePicture()
+{
+	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Toire.png");
+	m_tagPictureIcon.sTitle = "【ゲームイラスト】トイレアクション";
+	m_tagPictureIcon.sText = "ゲームのイラストです。";
+
+	// 隠しトロフィーフラグ
+	m_bRock = false;
+
+	// 値段
+	m_iPrice = 1000;
+}
+
+void ToirePicture::InitExe()
+{
+	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Toire.png");
+	m_tagPicture.sTitle = "【ゲームイラスト】トイレアクション";
+	m_tagPicture.sText = "2年生の時に制作した作品\n2人以上トイレに駆け込むと大爆発が起きる、\n";
+	m_tagPicture.vPos.x = 0.0f;
+	m_tagPicture.vPos.y = 0.0f;
+	m_tagPicture.fScale = 1.0f;
+	m_tagPicture.iAlpha = 1.0f;
+}
+
+//+---------------------------------
+//	真冬のイラスト
+//+---------------------------------
+MahuyuPicture::MahuyuPicture()
+{
+	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Mahuyu.png");
+	m_tagPictureIcon.sTitle = "【ゲームイラスト】真冬の夜の";
+	m_tagPictureIcon.sText = "ゲームのイラストです。";
+
+	// 隠しトロフィーフラグ
+	m_bRock = false;
+
+	// 値段
+	m_iPrice = 1000;
+}
+
+void MahuyuPicture::InitExe()
+{
+	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Mahuyu.png");
+	m_tagPicture.sTitle = "【ゲームイラスト】真冬の夜の";
+	m_tagPicture.sText = "1年生の時に制作した作品\n";
+	m_tagPicture.vPos.x = 0.0f;
+	m_tagPicture.vPos.y = 0.0f;
+	m_tagPicture.fScale = 1.0f;
+	m_tagPicture.iAlpha = 1.0f;
+}
+
+//+---------------------------------
+//	スイカのイラスト
+//+---------------------------------
+SuikaPicture::SuikaPicture()
+{
+	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Suika.png");
+	m_tagPictureIcon.sTitle = "【ゲームイラスト】スイカ";
+	m_tagPictureIcon.sText = "ゲームのイラストです。";
+
+	// 隠しトロフィーフラグ
+	m_bRock = false;
+
+	// 値段
+	m_iPrice = 1000;
+}
+
+void SuikaPicture::InitExe()
+{
+	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Suika.png");
+	m_tagPicture.sTitle = "【ゲームイラスト】スイカ";
+	m_tagPicture.sText = "1年生の時に制作した作品\nスイカを相手に投げつける対戦ゲーム";
+	m_tagPicture.vPos.x = 0.0f;
+	m_tagPicture.vPos.y = 0.0f;
+	m_tagPicture.fScale = 1.0f;
+	m_tagPicture.iAlpha = 1.0f;
+}
+
+//+---------------------------------
+//	真夏1のイラスト
+//+---------------------------------
+Manatu1Picture::Manatu1Picture()
+{
+	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Manatu1.png");
+	m_tagPictureIcon.sTitle = "【ゲームイラスト】初代真夏";
+	m_tagPictureIcon.sText = "ゲームのイラストです。";
+
+	// 隠しトロフィーフラグ
+	m_bRock = false;
+
+	// 値段
+	m_iPrice = 1000;
+}
+
+void Manatu1Picture::InitExe()
+{
+	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Manatu1.png");
+	m_tagPicture.sTitle = "【ゲームイラスト】初代真夏";
+	m_tagPicture.sText = "1年生の時に制作した作品\n原点にして頂点。";
 	m_tagPicture.vPos.x = 0.0f;
 	m_tagPicture.vPos.y = 0.0f;
 	m_tagPicture.fScale = 1.0f;

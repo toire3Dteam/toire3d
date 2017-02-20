@@ -120,6 +120,37 @@ private:
 
 };
 
+//+---------------------------------
+//	アラミタマのイラスト
+//+---------------------------------
+class AramitamaPicture :public BasePicture
+{
+public:
+	AramitamaPicture();
+	~AramitamaPicture() {};
+
+	// ★かなり質の良い画像を読み込むので選択したときに画像をロードさせる
+	void InitExe();
+
+private:
+
+};
+
+//+---------------------------------
+//	兄貴のイラスト
+//+---------------------------------
+class AnikiPicture :public BasePicture
+{
+public:
+	AnikiPicture();
+	~AnikiPicture() {};
+
+	// ★かなり質の良い画像を読み込むので選択したときに画像をロードさせる
+	void InitExe();
+
+private:
+
+};
 
 //+---------------------------------
 //	一枚絵のイラスト
@@ -227,3 +258,101 @@ public:
 private:
 
 };
+
+
+class WinTekiPicture :public BasePicture
+{
+public:
+	WinTekiPicture();
+	~WinTekiPicture() {};
+
+	// ★かなり質の良い画像を読み込むので選択したときに画像をロードさせる
+	void InitExe();
+
+private:
+
+};
+
+
+class WinAnikiPicture :public BasePicture
+{
+public:
+	WinAnikiPicture();
+	~WinAnikiPicture() {};
+
+	// ★かなり質の良い画像を読み込むので選択したときに画像をロードさせる
+	void InitExe();
+
+private:
+
+};
+
+
+class Manatu1Picture :public BasePicture
+{
+public:
+	Manatu1Picture();
+	~Manatu1Picture() {};
+
+	// ★かなり質の良い画像を読み込むので選択したときに画像をロードさせる
+	void InitExe();
+
+private:
+
+};
+
+
+class SuikaPicture :public BasePicture
+{
+public:
+	SuikaPicture();
+	~SuikaPicture() {};
+
+	// ★かなり質の良い画像を読み込むので選択したときに画像をロードさせる
+	void InitExe();
+
+private:
+
+};
+
+
+class MahuyuPicture :public BasePicture
+{
+public:
+	MahuyuPicture();
+	~MahuyuPicture() {};
+
+	// ★かなり質の良い画像を読み込むので選択したときに画像をロードさせる
+	void InitExe();
+
+private:
+
+};
+
+
+class ToirePicture :public BasePicture
+{
+public:
+	ToirePicture();
+	~ToirePicture() {};
+
+	// ★かなり質の良い画像を読み込むので選択したときに画像をロードさせる
+	void InitExe();
+
+private:
+
+};
+
+class Manatu2Picture :public BasePicture
+{
+public:
+	Manatu2Picture();
+	~Manatu2Picture() {};
+
+	// ★かなり質の良い画像を読み込むので選択したときに画像をロードさせる
+	void InitExe();
+
+private:
+
+};
+

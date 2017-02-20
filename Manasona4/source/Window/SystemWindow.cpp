@@ -210,6 +210,12 @@ bool  SystemWindow::Ctrl(int DeviceID)
 
 			}
 
+			// ªƒZ[ƒu‚ğ‰Ÿ‚µ‚½‚Æ‚«
+			if (m_iChoiceState == (SYSTEM_STATE::SAVE))
+			{
+				PlayerDataMgr->SavePlayerData();
+			}
+
 			return true;
 		}
 	}

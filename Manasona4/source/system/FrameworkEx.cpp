@@ -38,6 +38,12 @@ FrameworkEx::FrameworkEx()
 	m_bUpdateFlag = true;
 	m_bSlowFlag = false;
 
+	// FPSのモード
+	m_eFPSMode = FPS_MODE::NORMAL;
+
+	// 起動からのフレーム数
+	m_dwGameFrame = 0;
+
 	// ゲームのシーン
 	m_scene = NULL;
 
@@ -88,17 +94,43 @@ bool FrameworkEx::Update()
 	//	経過時間
 	double	intervalTime = m_dCurrentTime - m_dFlameTime;
 
-	// 2秒以上離れていたらすごい速度で更新し続けるので時間を合わす
-	if (intervalTime > (FPS_60 * 2))
+	// 3FPS以上離れていたらすごい速度で更新し続けるので時間を合わす
+	if (intervalTime > (FPS_1 * 3))
 	{
 		m_dFlameTime = m_dCurrentTime;	// ゲーム自体が止まるようにしているならあまり関係ないかと
 	}
 
 	// 一回の更新に2FPS以上かかってしまった場合 描画を止めて更新だけする
-	if (intervalTime > FPS_1 * 2) m_bRenderFlag = false;
-	else m_bRenderFlag = true;
-	
-	m_bRenderFlag = true; // (TODO)
+	//if (intervalTime > FPS_1 * 2) m_bRenderFlag = false;
+	//else m_bRenderFlag = true;
+
+	switch (m_eFPSMode)
+	{
+	case FPS_MODE::NORMAL:
+		m_bRenderFlag = true; // 常に描画
+
+		break;
+	case FPS_MODE::FPS_30:
+		(m_dwGameFrame % 2 == 0) ? m_bRenderFlag = true : m_bRenderFlag = false;
+
+		break;
+	case FPS_MODE::FPS_40:
+		(m_dwGameFrame % 2 == 0) ? m_bRenderFlag = true : m_bRenderFlag = false;
+		if (m_dwGameFrame % 3 == 0) m_bRenderFlag = true;
+
+		break;
+	case FPS_MODE::FPS_45:
+		(m_dwGameFrame % 2 == 0) ? m_bRenderFlag = true : m_bRenderFlag = false;
+		if (m_dwGameFrame % 3 == 0||
+			m_dwGameFrame % 5 == 0||
+			m_dwGameFrame % 7 == 0||
+			m_dwGameFrame % 13 == 0) m_bRenderFlag = true;
+		break;
+	default:
+		MyAssert(0, "FPSモードが設定されていない値に");
+		break;
+	}
+
 
 	// 新たに1FPSを加算
 	// この数値を触ることにより1フレームの長さを変えれる
@@ -119,6 +151,9 @@ bool FrameworkEx::Update()
 	// FPSカウント加算
 	m_iWorkFPS++;
 
+	//	ゲームフレーム数更新
+	m_dwGameFrame++;	
+	
 	// システム更新
 	tdnInput::Update();
 	SoundManager::Update();

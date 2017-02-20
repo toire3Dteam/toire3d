@@ -537,6 +537,7 @@ void BasePlayer::Reset()
 	m_RecoveryDamageCount.clear();
 
 	// パートナーのゲージも初期化
+	m_pStand->Break();
 	m_pStand->SetStandGage(0);
 	m_pStand->SetStandStock(0);
 
@@ -2045,7 +2046,7 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 	case EFFECT_TYPE::MUZZLE_FLASH:
 	{
 		// マズルフラッシュ
-		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::MUZZLE_FLASH, 0.90f, 1.0f, Vector3(0, 0, zAngle), Vector3(0, 0, zAngle));
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::MUZZLE_FLASH, 1.0f, 1.25f, Vector3(0, 0, zAngle), Vector3(0, 0, zAngle));
 
 		// 飛び散る光
 		//m_PanelEffectMGR->AddEffect

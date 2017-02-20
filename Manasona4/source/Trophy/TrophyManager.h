@@ -20,6 +20,7 @@ enum class TROPHY_TYPE
 	SS_RANK_WIN,		//  SSランクで倒した
 	SS_POWERFUL_ENEMY,	//  最高難易度でCOM+SSランクで倒した
 	MENY_CONTENT,		//  コンテンツをたくさん解放した
+	CHALLENGE_CLEAR,	//  チャレンジモードで何かタスクをこなした
 	COMPLETE_TROPHY,	//  全てのトロフィーを集めた
 	//_6,
 	//_7, _8, _9, _10, _11, _12,
@@ -74,6 +75,8 @@ public:
 
 	// トロフィー所持数
 	int GetTrophyOwned();
+
+	//void SetTrainingFrame(int iFrame) { m_iTrainingFrame = iFrame; };
 private:
 
 	// トロフィー達
@@ -104,7 +107,8 @@ public:
 	void CheakPowerfulEnemyWin(SIDE eWinnerSide);
 	void CheakRank(SIDE eWinnerSide, RANK_TYPE eRank);
 	void CheakBuyManyContent(int iOwnedContent);
-	
+	void CheakChallengeClear();
+
 
 private:
 	int m_iTrainingFrame;

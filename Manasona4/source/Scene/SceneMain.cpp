@@ -33,10 +33,10 @@
 
 //BaseEffect* g_eff;
 //EffectManager;
-PanelEffectManager* m_panel;
-UVEffectManager* g_uvEffect;
+//PanelEffectManager* m_panel;
+//UVEffectManager* g_uvEffect;
 
-int stopTimer = 0;
+//int stopTimer = 0;
 
 //******************************************************************
 //		初期化・解放
@@ -82,13 +82,13 @@ bool sceneMain::Initialize()
 #ifdef _DEBUG
 	sprintf_s(m_LoadComment, 256, "パネルエフェクト初期化待ち");
 #endif
-	m_panel = new PanelEffectManager();
+	//m_panel = new PanelEffectManager();
 
 
 #ifdef _DEBUG
 	sprintf_s(m_LoadComment, 256, "UVエフェクト初期化");
 #endif
-	g_uvEffect = new UVEffectManager();
+	//g_uvEffect = new UVEffectManager();
 
 
 #ifdef _DEBUG
@@ -303,8 +303,8 @@ sceneMain::~sceneMain()
 	//delete CameraMgr;
 	PlayerMgr->Release();
 	//EffectMgr.Release();
-	SAFE_DELETE(m_panel);
-	SAFE_DELETE(g_uvEffect);
+	//SAFE_DELETE(m_panel);
+	//SAFE_DELETE(g_uvEffect);
 	//ParticleManager::Release();
 	DeferredManagerEx.Release();
 	SAFE_DELETE(m_stageScreen);
@@ -371,12 +371,6 @@ void sceneMain::Update()
 	{
 		//	com->Update();
 
-		stopTimer++;
-		//if (stopTimer > 60 * 60)
-		//{
-		//	return true;
-		//}
-
 		// カメラ更新(ステートマシンに書いた)
 		//CameraMgr->Update();
 
@@ -437,22 +431,22 @@ void sceneMain::Update()
 		//}
 
 		// 
-		if (KeyBoardTRG(KB_H))
-		{
-			SIDE data = SIDE::LEFT;
-			// 
-			MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
-				MESSAGE_TYPE::OVER_DRIVE_CUTIN, &data);
+		//if (KeyBoardTRG(KB_H))
+		//{
+		//	SIDE data = SIDE::LEFT;
+		//	// 
+		//	MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
+		//		MESSAGE_TYPE::OVER_DRIVE_CUTIN, &data);
 
-		}
-		if (KeyBoardTRG(KB_J))
-		{
+		//}
+		//if (KeyBoardTRG(KB_J))
+		//{
 
-			SIDE data = SIDE::RIGHT;
-			//
-			MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
-				MESSAGE_TYPE::OVER_DRIVE_CUTIN, &data);
-		}
+		//	SIDE data = SIDE::RIGHT;
+		//	//
+		//	MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
+		//		MESSAGE_TYPE::OVER_DRIVE_CUTIN, &data);
+		//}
 
 
 		if (KeyBoardTRG(KB_K))
@@ -467,36 +461,36 @@ void sceneMain::Update()
 			}
 		}
 
-		if (KeyBoardTRG(KB_U))
-		{
-			//TimeMgr->a
-			GameUIMgr->Action();
-		}
-		if (KeyBoardTRG(KB_I))
-		{
-			// UIにメッセージを送る
-			SIDE side = SIDE::LEFT;
-			MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
-				MESSAGE_TYPE::APP_WIN_ICON, &side);
-		}
+		//if (KeyBoardTRG(KB_U))
+		//{
+		//	//TimeMgr->a
+		//	GameUIMgr->Action();
+		//}
+		//if (KeyBoardTRG(KB_I))
+		//{
+		//	// UIにメッセージを送る
+		//	SIDE side = SIDE::LEFT;
+		//	MsgMgr->Dispatch(0, ENTITY_ID::UI_MGR, ENTITY_ID::UI_MGR,
+		//		MESSAGE_TYPE::APP_WIN_ICON, &side);
+		//}
 
-		if (KeyBoardTRG(KB_N))
-		{
-			OverDriveAction();
-		}
+		//if (KeyBoardTRG(KB_N))
+		//{
+		//	OverDriveAction();
+		//}
 
-		if (KeyBoardTRG(KB_B))
-		{
-			OverDriveEnd();
-		}
+		//if (KeyBoardTRG(KB_B))
+		//{
+		//	OverDriveEnd();
+		//}
 
 		// UI
 		GameUIMgr->Update();
 
 		//g_eff->Update();
 		//EffectMgr.Update();
-		m_panel->Update();
-		g_uvEffect->Update();
+		//m_panel->Update();
+		//g_uvEffect->Update();
 
 		//TimeMgr->Update();
 		CutInMgr->Update();
@@ -681,7 +675,7 @@ void sceneMain::Render()
 		// ステージ描画
 		m_pStage->RenderCopy();
 		// プレイヤー
-		PlayerMgr->Render(shader, "copy");
+		PlayerMgr->Render(shaderM, "copy");
 
 
 	}
@@ -787,7 +781,8 @@ void sceneMain::RenderShadow()
 	if (DeferredManagerEx.GetShadowFlag() == false)return;
 
 	// フラグが立ってる時のみ描画  [1206] 一応用意しといた
-	//if (m_bBakeStageShadow == true)
+	if (m_bBakeStageShadow == true ||
+		m_pStage->isBakeShadow() == false)
 	{
 		DeferredManagerEx.CreateShadowMatrix
 			(m_pStage->GetShaderParam().vDirLightVec, Vector3(0, 0, 0), Vector3(0, 0, 1), 400);
@@ -800,7 +795,11 @@ void sceneMain::RenderShadow()
 
 
 			// プレイヤー
-			PlayerMgr->RenderShadow();
+			if (m_pStage->isBakeShadow() == false)
+			{
+				PlayerMgr->RenderShadow();
+			}
+			
 
 			DeferredManagerEx.ShadowEnd();
 		}

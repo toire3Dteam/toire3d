@@ -5,6 +5,8 @@
 #include "../BaseEntity/Message/Message.h"
 #include "Data\SelectData.h"
 #include "system\System.h"
+#include "system\FrameworkEx.h"
+
 
 int GetCharaType(SIDE eSide)
 {
@@ -48,10 +50,10 @@ void BattleLoadingState::Intro::Enter(BattleLoading *pMain)
 
 	// 初期演出
 	//pMain->m_pImages[BattleLoading::IMAGE::BLUE_RING].Action();
-
 	pMain->m_pImages[BattleLoading::IMAGE::BLACK_LINE].Action();
-	
+	pMain->m_pImages[BattleLoading::IMAGE::S_1PBACK].Action();
 
+	
 	// タイマー初期化
 	pMain->m_iSceneFrame = 0;
 
@@ -60,14 +62,21 @@ void BattleLoadingState::Intro::Enter(BattleLoading *pMain)
 void BattleLoadingState::Intro::Execute(BattleLoading *pMain)
 {
 
+
 	// 
 	pMain->m_iSceneFrame++;
-	if (pMain->m_iSceneFrame >= 12)
+	if (pMain->m_iSceneFrame >= 18)
 	{
 		pMain->m_fFadeRate -= 0.1f;
 	}
 
-	if (pMain->m_fFadeRate <= 0.0f)
+	if (pMain->m_iSceneFrame == 18)
+	{
+		pMain->m_pImages[BattleLoading::IMAGE::I_INTRO_LIGHT].Action();
+	}
+
+	//if (pMain->m_fFadeRate <= 0.0f)
+	if (pMain->m_iSceneFrame >= 46)
 	{
 		// 1Pのスライドへ
 		pMain->GetFSM()->ChangeState(BattleLoadingState::Slide1P::GetInstance());
@@ -77,11 +86,15 @@ void BattleLoadingState::Intro::Execute(BattleLoading *pMain)
 
 void BattleLoadingState::Intro::Exit(BattleLoading *pMain) 
 {
+	pMain->m_pImages[BattleLoading::IMAGE::I_INTRO_LIGHT].End();
 
 }
 
 void BattleLoadingState::Intro::Render(BattleLoading *pMain)
 {
+
+	// 黒い板
+	pMain->m_pIntroBlackBack->Render(0, 0);
 
 
 #ifdef _DEBUG
@@ -117,7 +130,9 @@ void BattleLoadingState::Slide1P::Enter(BattleLoading *pMain)
 
 	// 1PLAYER
 	pMain->m_pImages[BattleLoading::IMAGE::S_1PLAYER].Action();
-	pMain->m_pImages[BattleLoading::IMAGE::S_1PBACK].Action();
+	//pMain->m_pImages[BattleLoading::IMAGE::S_1PBACK].Action();
+	pMain->m_pImages[BattleLoading::IMAGE::S_1PBACK_SL].Action();
+	pMain->m_pImages[BattleLoading::IMAGE::S_1PBACK_SL].vPos = VECTOR2_ZERO;
 
 	// キャラ
 	pMain->m_tagSlideChara1P[GetCharaType(SIDE::LEFT)].Action();
@@ -131,6 +146,9 @@ void BattleLoadingState::Slide1P::Execute(BattleLoading *pMain)
 	// 更新
 	pMain->m_tagSlideChara1P[GetCharaType(SIDE::LEFT)].Update();
 	pMain->m_tagSlideChara2P[GetCharaType(SIDE::RIGHT)].Update();
+
+	// スピードライン
+	pMain->m_pImages[BattleLoading::IMAGE::S_1PBACK_SL].vPos.x += 20.0f;
 
 	pMain->m_iSceneFrame++;
 	if (pMain->m_iSceneFrame >= 120)
@@ -149,6 +167,7 @@ void BattleLoadingState::Slide1P::Exit(BattleLoading *pMain)
 	// PLAYER
 	pMain->m_pImages[BattleLoading::IMAGE::S_1PLAYER].End();
 	pMain->m_pImages[BattleLoading::IMAGE::S_1PBACK].End();
+	pMain->m_pImages[BattleLoading::IMAGE::S_1PBACK_SL].End();
 
 
 }
@@ -192,7 +211,10 @@ void BattleLoadingState::Slide2P::Enter(BattleLoading *pMain)
 	// 2PLAYER
 	pMain->m_pImages[BattleLoading::IMAGE::S_2PLAYER].Action();
 	pMain->m_pImages[BattleLoading::IMAGE::S_2PBACK].Action();
-	
+	pMain->m_pImages[BattleLoading::IMAGE::S_2PBACK_SL].Action();
+	pMain->m_pImages[BattleLoading::IMAGE::S_2PBACK_SL].vPos = VECTOR2_ZERO;
+
+
 	// タイマー初期化
 	pMain->m_iSceneFrame = 0;
 }
@@ -202,6 +224,9 @@ void BattleLoadingState::Slide2P::Execute(BattleLoading *pMain)
 	// 更新
 	pMain->m_tagSlideChara1P[GetCharaType(SIDE::LEFT)].Update();
 	pMain->m_tagSlideChara2P[GetCharaType(SIDE::RIGHT)].Update();
+
+	// スピードライン
+	pMain->m_pImages[BattleLoading::IMAGE::S_2PBACK_SL].vPos.x -= 20.0f;
 
 	pMain->m_iSceneFrame++;
 	if (pMain->m_iSceneFrame >= 120)
@@ -220,6 +245,8 @@ void BattleLoadingState::Slide2P::Exit(BattleLoading *pMain)
 	// PLAYER
 	pMain->m_pImages[BattleLoading::IMAGE::S_2PLAYER].End();
 	//pMain->m_pImages[BattleLoading::IMAGE::S_2PBACK].End();// まだ2Pの背景残す
+	pMain->m_pImages[BattleLoading::IMAGE::S_2PBACK_SL].End();
+
 
 }
 
@@ -334,6 +361,14 @@ void BattleLoadingState::FinalStep::Enter(BattleLoading *pMain)
 
 	// 開始
 	pMain->m_pImages[BattleLoading::IMAGE::F_BLACK_CIRCLE].Action();
+	pMain->m_pImages[BattleLoading::IMAGE::F_CIRCLE_1].Action();
+	pMain->m_pImages[BattleLoading::IMAGE::F_CIRCLE_2].Action();
+	pMain->m_pImages[BattleLoading::IMAGE::F_CIRCLE_1].fAngle = 0.0f;
+	pMain->m_pImages[BattleLoading::IMAGE::F_CIRCLE_2].fAngle = 0.0f;
+
+	pMain->m_pImages[BattleLoading::IMAGE::F_LIGHT_PARTICLE].Action();
+	pMain->m_pImages[BattleLoading::IMAGE::F_LIGHT_PARTICLE].vPos = VECTOR2_ZERO;
+
 	pMain->m_pImages[BattleLoading::IMAGE::F_BACK].Action();
 	pMain->m_pImages[BattleLoading::IMAGE::F_FLASH_BACK].Action();
 	pMain->m_pImages[BattleLoading::IMAGE::F_VERSUS].Action();
@@ -350,6 +385,10 @@ void BattleLoadingState::FinalStep::Enter(BattleLoading *pMain)
 
 void BattleLoadingState::FinalStep::Execute(BattleLoading *pMain)
 {
+	// アニメーション
+	pMain->m_pImages[BattleLoading::IMAGE::F_CIRCLE_1].fAngle += 0.005f;
+	pMain->m_pImages[BattleLoading::IMAGE::F_CIRCLE_2].fAngle -= 0.005f;
+	pMain->m_pImages[BattleLoading::IMAGE::F_LIGHT_PARTICLE].vPos.y += 2.0f;
 
 	//// 更新
 	//pMain->m_tagSlideChara1P[GetCharaType(SIDE::LEFT)].Update();
@@ -364,6 +403,12 @@ void BattleLoadingState::FinalStep::Execute(BattleLoading *pMain)
 	pMain->m_tagFinalChara1P[GetCharaType(SIDE::LEFT)].Update();
 	pMain->m_tagFinalChara2P[GetCharaType(SIDE::RIGHT)].Update();
 
+	// ↓のフレームまでキャラを少し動かす
+	if (pMain->m_iSceneFrame <= 60)
+	{
+		pMain->m_tagFinalChara1P[GetCharaType(SIDE::LEFT)].vPos.x -= 0.25f;
+		pMain->m_tagFinalChara2P[GetCharaType(SIDE::RIGHT)].vPos.x += 0.25f;
+	}
 
 	pMain->m_iSceneFrame++;
 	if (pMain->m_iSceneFrame >= 180)
@@ -455,6 +500,8 @@ void BattleLoadingState::FadeChangeStep::Enter(BattleLoading *pMain)
 	// フェード
 	// Fade::Set(Fade::FLAG::FADE_OUT, 8);
 
+	pMain->m_pImages[BattleLoading::IMAGE::LOADING_CIRCLE].Action();
+
 	// タイマー初期化
 	pMain->m_iSceneFrame = 0;
 }
@@ -463,7 +510,16 @@ void BattleLoadingState::FadeChangeStep::Execute(BattleLoading *pMain)
 {
 
 	// 更新
-	pMain->m_fFadeRate += 0.1f;
+	pMain->m_fFadeRate += 0.05f;
+
+	// アニメーション
+	pMain->m_pImages[BattleLoading::IMAGE::F_CIRCLE_1].fAngle += 0.005f;
+	pMain->m_pImages[BattleLoading::IMAGE::F_CIRCLE_2].fAngle -= 0.005f;
+	pMain->m_pImages[BattleLoading::IMAGE::F_LIGHT_PARTICLE].vPos.y += 2.0f;
+
+	// ローディング用
+	pMain->m_pImages[BattleLoading::IMAGE::LOADING_CIRCLE].fAngle -= 0.1f;
+
 
 	// キャラ
 	pMain->m_tagFinalChara1P[GetCharaType(SIDE::LEFT)].Update();
@@ -471,16 +527,26 @@ void BattleLoadingState::FadeChangeStep::Execute(BattleLoading *pMain)
 
 
 	pMain->m_iSceneFrame++;
-	if (pMain->m_iSceneFrame >= 24)
+	if (pMain->m_iSceneFrame >= 28)
 	{
+		// ★演出終了時にFPSを戻す
+		if (MainFrameEX->GetFPSMode() != FPS_MODE::NORMAL)
+		{
+			MainFrameEX->SetFPSMode(FPS_MODE::NORMAL);
+		}
+
+		// 演出終了
 		pMain->SetEndFlag(true);
+
+		//pMain->GetFSM()->ChangeState(BattleLoadingState::Intro::GetInstance());
+		//return;	
 	}
 
 }
 
 void BattleLoadingState::FadeChangeStep::Exit(BattleLoading *pMain)
 {
-
+	pMain->m_pImages[BattleLoading::IMAGE::LOADING_CIRCLE].End();
 }
 
 void BattleLoadingState::FadeChangeStep::Render(BattleLoading *pMain)

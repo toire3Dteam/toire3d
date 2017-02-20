@@ -18,6 +18,7 @@ struct SlideDesc
 	Vector2		vPos;
 	Vector2		vMove;
 	float		fAlpha;
+	float		fAngle;
 	bool		bEnd;
 
 	SlideDesc::SlideDesc()
@@ -28,12 +29,15 @@ struct SlideDesc
 		vPos = VECTOR2_ZERO;
 		vMove= VECTOR2_ZERO;
 		fAlpha = 1.0f;
+		fAngle = 0.0f;
 		bEnd = false;
 	}
 
 	// 更新
 	void Update();
 	void Render(RS eRS = RS::COPY);
+	void RenderUV(int iw,int ih,RS eRS = RS::COPY);
+	void RenderUV(int iw, int ih, tdnShader* pShader, char* name);
 	void RenderSP();
 
 	void Action(int iDelayTimer = 0);
@@ -140,6 +144,10 @@ public:
 	void Render();
 	void MaskRender();
 	void MaskRender(FinalCharaDesc pFinalChara);
+	void MaskRenderLightParticle(SlideDesc pSlide);
+	
+	// 処理不可を最低限の物だけ更新
+	void LoadingCircleUpdate();
 
 	//------------------------
 	//	アクセサー
@@ -154,6 +162,8 @@ public:
 	{
 		BLACK_LINE,
 		BLUE_RING,
+		LOADING_CIRCLE,
+		I_INTRO_LIGHT,
 		S_UP_FRAME,
 		S_DOWN_FRAME,
 		S_VS,
@@ -161,12 +171,17 @@ public:
 		S_2PLAYER,
 		S_1PBACK,
 		S_2PBACK,
+		S_1PBACK_SL,
+		S_2PBACK_SL,
 		F_BACK,
 		F_VERSUS,
 		F_FRAME,
 		F_FLASH,
 		F_FLASH_BACK,
 		F_BLACK_CIRCLE,
+		F_CIRCLE_1,
+		F_CIRCLE_2,
+		F_LIGHT_PARTICLE,
 		ARRAY_END
 	};
 
@@ -198,6 +213,10 @@ private:
 	tdn2DObj* m_pMask1P;
 	tdn2DObj* m_pMask2P;
 	tdn2DObj* m_pMaskSurface;
+	tdn2DObj* m_pMaskLightParticle;
+
+	tdn2DObj* m_pIntroBlackBack;
+	tdn2DObj* m_pMaskIntroBlackBack;
 
 	// シーン用のフレーム
 	int m_iSceneFrame;

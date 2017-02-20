@@ -191,7 +191,18 @@ private:
 
 };
 
+//+---------------------------------
+//	チャレンジモードでタスクをクリア
+//+---------------------------------
+class ChallengeTrophy :public BaseTrophy
+{
+public:
+	ChallengeTrophy();
+	~ChallengeTrophy() {};
 
+private:
+
+};
 
 
 

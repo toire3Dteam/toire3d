@@ -871,8 +871,11 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 										 HitAttackInfo.bFirstAttack = false;
 									 }
 
-									 MsgMgr->Dispatch(0, msg.Receiver, msg.Sender, MESSAGE_TYPE::HIT_ATTACK, &HitAttackInfo);
-
+									 // 攻撃は通す、スキルは通す、だがスタンドは通さない(キマリ)
+									 if (HitDamageInfo->bStandAttack == false)
+									 {
+										 MsgMgr->Dispatch(0, msg.Receiver, msg.Sender, MESSAGE_TYPE::HIT_ATTACK, &HitAttackInfo);
+									 }
 
 
 									 comboDesk.side = pPerson->GetSide();
@@ -990,6 +993,7 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 	{
 									 if (pPerson->isAttackState())
 									 {
+
 										 pPerson->GetAttackData()->bHitSuccess = true;	// マジで当たったガーーーーール！！！！
 #ifdef _DEBUG
 										 //// コンボが当たった時間

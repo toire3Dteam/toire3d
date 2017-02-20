@@ -22,6 +22,7 @@ Stage::Base::Base() : m_pObj(nullptr), m_pBack(nullptr), m_pBack2(nullptr), m_fB
 	m_tagShaderParam.vSkyColor = Vector3(0.6f, 0.5f, 0.5f);
 	m_tagShaderParam.vGroundColor= Vector3(0.45f, 0.43f, 0.43f);
 
+	m_bBakeShadow = false;
 }
 
 Stage::Base::~Base()
@@ -43,8 +44,8 @@ void Stage::Base::Update()
 
 void Stage::Base::RenderCopy()
 {
-	if (m_pBack) m_pBack->Render(shader, "copy");
-	m_pObj->Render(shader,"copy");
+	if (m_pBack) m_pBack->Render(shaderM, "copy");
+	m_pObj->Render(shaderM,"copy");
 }
 void Stage::Base::Render(tdnShader* shader, char* name)
 {
@@ -125,6 +126,7 @@ void Stage::Base::Collision(BasePlayer *player, Vector3 *move)
 //+------------------------------------------------------
 void Stage::Sand::Initialize(Camera *pCamera)
 {
+
 	//m_pObj = new iexMesh("DATA/Stage/Senjo/pupupu2.IMO");
 	m_pObj = new iexMesh("DATA/Stage/Stage/sandStage.IMO");
 	//m_pObj->SetScale(2);
@@ -156,6 +158,14 @@ void Stage::Sand::Initialize(Camera *pCamera)
 		m_pGrass[i].pObj->SetAngle(tdnRandom::Get(0.0f, 3.14f));
 
 	}
+	FOR(m_cGRASS_MAX2)
+	{
+		m_pGrass2[i].pObj = new iex3DObj("Data/Stage/Stage/kusa/kusa_2.iem");
+		m_pGrass2[i].vPos = Vector3(0, 0, 90);
+		m_pGrass2[i].pObj->SetScale(2.25f);
+		m_pGrass2[i].pObj->SetAngle(tdnRandom::Get(0.0f, 3.14f));
+
+	}
 
 	//草の位置
 	m_pGrass[0].vPos = Vector3(-20, 0, 53);
@@ -170,6 +180,13 @@ void Stage::Sand::Initialize(Camera *pCamera)
 	m_pGrass[8].vPos = Vector3(20, 0, 80);
 	m_pGrass[9].vPos = Vector3(25, 0, 80);
 
+
+	m_pGrass2[0].vPos = Vector3(25, 0, 90);
+	m_pGrass2[1].vPos = Vector3(110, 0, 80);
+	m_pGrass2[2].vPos = Vector3(10, 0, 90);
+	m_pGrass2[3].vPos = Vector3(-98, 0, 55);
+
+
 	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
 	pCamera->SetStageCameraInfo("DATA/Stage/Stage/camera.txt");
 }
@@ -180,6 +197,10 @@ Stage::Sand::~Sand()
 	FOR(m_cGRASS_MAX)
 	{
 		SAFE_DELETE(m_pGrass[i].pObj);
+	}
+	FOR(m_cGRASS_MAX2)
+	{
+		SAFE_DELETE(m_pGrass2[i].pObj);
 	}
 }
 
@@ -196,6 +217,12 @@ void Stage::Sand::Update()
 		m_pGrass[i].pObj->Animation();
 		m_pGrass[i].pObj->Update();
 	}
+	FOR(m_cGRASS_MAX2)
+	{
+		m_pGrass2[i].pObj->SetPos(m_pGrass2[i].vPos);
+		m_pGrass2[i].pObj->Animation();
+		m_pGrass2[i].pObj->Update();
+	}
 
 }
 
@@ -207,6 +234,10 @@ void Stage::Sand::Render()
 	FOR(m_cGRASS_MAX)
 	{
 		m_pGrass[i].pObj->Render(shaderM, "Stage");
+	}
+	FOR(m_cGRASS_MAX2)
+	{
+		m_pGrass2[i].pObj->Render(shaderM, "Stage");
 	}
 
 	m_pObj->Render(shaderM,"Stage");
@@ -435,6 +466,10 @@ void Stage::NanasatoSity::Initialize(Camera *pCamera)
 	//PointLightMgr->SetPointLightInstancing(9,Vector3(-66, 22, 319), LightCol, LightSize, 4 );
 	PointLightMgr->UpdatePointLightInstancing();
 
+
+	// 影焼き込み
+	m_bBakeShadow = true;
+
 }
 
 Stage::NanasatoSity::~NanasatoSity()
@@ -586,6 +621,9 @@ void Stage::Syuten::Initialize(Camera *pCamera)
 
 	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
 	pCamera->SetStageCameraInfo("DATA/Stage/Syuten/camera.txt");
+
+	// 影焼き込み
+	m_bBakeShadow = true;
 }
 
 Stage::Syuten::~Syuten()

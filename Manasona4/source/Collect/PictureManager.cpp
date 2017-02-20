@@ -52,6 +52,27 @@ PictureManager::PictureManager() :BaseGameEntity(ENTITY_ID::PICTURE_MGR)	// エン
 		case PICTURE_TYPE::NAZENARABA:
 			m_pPicture[i] = new NazenarabaPicture();
 			break;
+		case PICTURE_TYPE::ARAMITAMA:
+			m_pPicture[i] = new AramitamaPicture();
+			break;
+		case PICTURE_TYPE::ANIKI:
+			m_pPicture[i] = new AnikiPicture();
+			break;
+		case PICTURE_TYPE::MANATU:
+			m_pPicture[i] = new Manatu1Picture();
+			break;
+		case PICTURE_TYPE::SUIKA:
+			m_pPicture[i] = new SuikaPicture();
+			break;
+		case PICTURE_TYPE::MAHUYU:
+			m_pPicture[i] = new MahuyuPicture();
+			break;
+		case PICTURE_TYPE::TOIRE:
+			m_pPicture[i] = new ToirePicture();
+			break;
+		case PICTURE_TYPE::MANATU2:
+			m_pPicture[i] = new Manatu2Picture();
+			break;
 		default:
 			m_pPicture[i] = new AirouPicture();
 			//MyAssert(0, "そのタイプは存在しない。");	

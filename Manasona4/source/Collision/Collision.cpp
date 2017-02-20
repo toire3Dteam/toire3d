@@ -464,8 +464,10 @@ bool Collision::CollisionShot(Shot::Base *shot, BasePlayer *you)
 		HitDamageInfo.bFinishOK = pShotAttackData->bFinish;
 		HitDamageInfo.fGuardKnockBackPower = pShotAttackData->fGuardKnockBackPower;
 		HitDamageInfo.DamageMotion = pShotAttackData->places[iHitPlace].DamageMotion;
+		HitDamageInfo.fComboRate = pShotAttackData->fComboRate;							// (2/19)遠距離技後攻撃するとインフレダメージが発生したので
 		HitDamageInfo.iAttribute = (int)pShotAttackData->attribute;
 		HitDamageInfo.fRepeatAttackRate = pShotAttackData->fRepeatAttackRate;
+
 
 		if (shot->GetVec().x < 0) HitDamageInfo.FlyVector.x *= -1;
 		MsgMgr->Dispatch(0, shot->GetPlayer()->GetID(), you->GetID(), MESSAGE_TYPE::HIT_DAMAGE, &HitDamageInfo);

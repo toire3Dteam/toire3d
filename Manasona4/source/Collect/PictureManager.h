@@ -20,6 +20,13 @@ enum class PICTURE_TYPE
 	AIROU,				//	アイル―
 	TEKI,				//	テキ
 	NAZENARABA,			//	∵
+	ARAMITAMA,			//	アラミタマ
+	ANIKI,				//  兄貴	
+	MANATU,				//  初代真夏
+	SUIKA,				//  スイカ
+	MAHUYU,				//  真冬
+	TOIRE,				//  トイレ
+	MANATU2,			//  真夏2
 	ARRAY_END
 };
 

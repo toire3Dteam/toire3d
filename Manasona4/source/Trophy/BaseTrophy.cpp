@@ -281,7 +281,7 @@ TrainingTimeTrophy::TrainingTimeTrophy()
 {
 	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/Plactice.png");
 	m_tagTrophy.sTitle = "努力家";
-	m_tagTrophy.sText = "5分以上トレーニングルームで練習した。";
+	m_tagTrophy.sText = "連続で5分以上トレーニングルームで練習した。";
 
 	// 隠しトロフィーフラグ
 	m_bHide = false;
@@ -334,6 +334,19 @@ BuyManyContentTrophy::BuyManyContentTrophy()
 	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/item.png");
 	m_tagTrophy.sTitle = "お金で買えない価値がある";
 	m_tagTrophy.sText = "10種類以上コンテンツを解放した。";
+
+	// 隠しトロフィーフラグ
+	m_bHide = false;
+}
+
+//+---------------------------------
+//	チャレンジモードでタスクをクリア
+//+---------------------------------
+ChallengeTrophy::ChallengeTrophy()
+{
+	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/kusuri.png");
+	m_tagTrophy.sTitle = "コンボマスター";
+	m_tagTrophy.sText = "チャレンジモードで最高難易度のタスクをクリアした。";
 
 	// 隠しトロフィーフラグ
 	m_bHide = false;

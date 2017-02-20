@@ -7,7 +7,13 @@
 /****************************/
 //		フレームワークEx
 /****************************/
-
+enum class FPS_MODE
+{
+	NORMAL,
+	FPS_30,
+	FPS_40,
+	FPS_45,
+};
 
 class FrameworkEx
 {
@@ -31,6 +37,10 @@ public:
 
 	//	シーンの切り替え
 	void ChangeScene(BaseScene* newScene, bool bLoadingScene = false);
+
+	// FPSモード切替
+	FPS_MODE GetFPSMode() { return m_eFPSMode; }
+	void SetFPSMode(FPS_MODE eFpsMode) { m_eFPSMode = eFpsMode; }
 
 private:
 	// 実体
@@ -57,6 +67,12 @@ private:
 	bool m_bUpdateFlag;
 	bool m_bSlowFlag;
 
+	// FPSのモード
+	FPS_MODE m_eFPSMode;
+
+	// 起動からのフレーム数
+	DWORD m_dwGameFrame;	
+
 	// FPSの操作
 	bool FPSCtrl();
 	/*************/
@@ -71,4 +87,4 @@ private:
 };
 
 // インスタンス
-//#define MainFrameEX FrameworkEx::GetInstance()
+#define MainFrameEX FrameworkEx::GetInstance()

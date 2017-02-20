@@ -62,6 +62,8 @@ namespace Stage
 		float GetBottom(){ return m_fBottom; }
 		float GetWidth(){ return m_fWidth; }
 
+		bool isBakeShadow() { return m_bBakeShadow; }
+
 		// このステージで使用するシェーダの情報
 		ShaderParam GetShaderParam() { return  m_tagShaderParam; };
 
@@ -73,6 +75,7 @@ namespace Stage
 		BaseUVEffect *m_pAreWall;		// エリアウォール
 		float m_fWidth;					// ステージの幅
 		float m_fBottom;				// Y座標
+		bool m_bBakeShadow;				// シャドウマップを一回だけ焼きこませるか
 
 		ShaderParam m_tagShaderParam;	// シェーダの情報
 
@@ -101,6 +104,13 @@ namespace Stage
 		};
 		Grass m_pGrass[m_cGRASS_MAX];
 	
+		static const int m_cGRASS_MAX2 = 4;
+		struct Grass2
+		{
+			iex3DObj* pObj;
+			Vector3 vPos;
+		};
+		Grass2 m_pGrass2[m_cGRASS_MAX2];
 
 
 	};

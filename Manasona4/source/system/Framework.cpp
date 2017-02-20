@@ -17,7 +17,7 @@ Framework* Framework::m_pInstance = nullptr;
 //------------------------------------------------------
 Framework::Framework()
 {
-	this->FPSMode = FPS_FLEX;
+	this->FPSMode = FPS_30_IEX;
 
 	scene = NULL;
 
@@ -67,7 +67,7 @@ bool Framework::Update()
 	//	スキップタイプ 
 	switch (FPSMode){
 	case FPS_60_IEX:	bRender = TRUE;	break;
-	case FPS_30_IEX:	if (dwGameFrame & 0x01) bRender = TRUE; else bRender = FALSE;
+	case FPS_30_IEX:	if (dwGameFrame % 2 == 0) bRender = TRUE; else bRender = FALSE;
 		break;
 	case FPS_FLEX:	if (dTime > 167 * 2) bRender = FALSE; else bRender = TRUE;
 		break;

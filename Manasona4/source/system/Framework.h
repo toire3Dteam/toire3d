@@ -47,6 +47,9 @@ public:
 	//------------------------------------------------------
 	void ChangeScene(BaseScene* newScene, bool bLoadingScene = false);
 
+	// FPSモード切替
+	void SetFPSMode(BYTE iFPSMode) { FPSMode = iFPSMode; }
+
 private:
 	// 実体
 	static Framework* m_pInstance;
@@ -79,4 +82,4 @@ private:
 };
 
 // インスタンス
-#define MainFrameEX Framework::GetInstance()
+//#define MainFrameEX Framework::GetInstance()

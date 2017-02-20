@@ -397,6 +397,7 @@ Stand::Maya::Maya(BasePlayer *pPlayer) :Base(pPlayer)
 
 	// 玉の実体
 	m_pBullet = new  MayaShotEffect();/*iexMesh("DATA/UVeffect/Airou/AirouBoost.IMO");*/
+	m_pBullet2 = new  MayaShot2Effect();
 
 	// アクションフレームロードする
 	LoadActionFrameList("DATA/CHR/Stand/Maya/FrameList.txt");
@@ -449,7 +450,7 @@ Stand::Maya::Maya(BasePlayer *pPlayer) :Base(pPlayer)
 	//	しゃがみ
 	// 地上ヒットも空中ヒットも共通の情報
 	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT] = new AttackData;
-	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->damage = 800;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->damage = 1200;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->pierceLV = 0;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->HitSE = "ヒット6";
 	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->WhiffSE = "空振り1";
@@ -560,7 +561,8 @@ Stand::Maya::Maya(BasePlayer *pPlayer) :Base(pPlayer)
 
 Stand::Maya::~Maya()
 {
-	delete m_pBullet;
+	SAFE_DELETE(m_pBullet);
+	SAFE_DELETE(m_pBullet2);
 }
 
 void Stand::Maya::Update(bool bControl)
@@ -597,9 +599,18 @@ void Stand::Maya::Update(bool bControl)
 		// マズルエフェクト発動！
 		m_pPlayer->AddEffectAction(m_pos + Vector3(0, 4, -2), EFFECT_TYPE::MUZZLE_FLASH, ShotVec);
 
+		Shot::Base *pNewShot = nullptr;
 
 		// 玉の情報を格納
-		Shot::Base *pNewShot(new Shot::Maya(m_pPlayer, m_pAttackData[(int)m_ActionType], m_pBullet, m_pos + Vector3(-ShotVec.x * 2, 5, 0), ShotVec));
+		if (m_ActionType== SKILL_ACTION_TYPE::SQUAT)
+		{
+			pNewShot = new Shot::Maya(m_pPlayer, m_pAttackData[(int)m_ActionType], m_pBullet2, m_pos + Vector3(-ShotVec.x * 2, 5, 0), ShotVec);
+		}
+		else
+		{
+			pNewShot = new Shot::Maya(m_pPlayer, m_pAttackData[(int)m_ActionType], m_pBullet, m_pos + Vector3(-ShotVec.x * 2, 5, 0), ShotVec);
+		}
+
 		MsgMgr->Dispatch(0, m_pPlayer->GetID(), ENTITY_ID::SHOT_MGR, MESSAGE_TYPE::ADD_SHOT, pNewShot);
 	}
 }
@@ -608,7 +619,7 @@ void Stand::Maya::Action(SKILL_ACTION_TYPE type)
 {
 	// とりあえず、プレイヤーと同じ座標
 	m_pos = m_pPlayer->GetPos();
-	Vector3 v(0.5f, 0.0f, 1.0f);
+	Vector3 v(0.5f, 0.0f, 2.0f);
 	if (m_dir == DIR::LEFT)v.x *= -1;
 	//v.z *= 1.;
 	m_pos += v * 5.0f;

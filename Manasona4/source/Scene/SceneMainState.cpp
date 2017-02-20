@@ -1257,8 +1257,6 @@ void SceneMainState::ChallengeMain::Execute(sceneMain *pMain)
 				// フェードアウト
 				Fade::Set(Fade::FLAG::FADE_OUT, 16, 0x00000000);
 
-				// (TODO)必殺の時にワープするとバグる
-
 				return;
 			}
 		}
@@ -1333,10 +1331,13 @@ bool SceneMainState::ChallengeMain::OnMessage(sceneMain *pMain, const Message & 
 		break;
 	case MESSAGE_TYPE::KO:	// 誰かのHPが0になったら切り替え
 	{
-		FINISH_TYPE *type = (FINISH_TYPE*)msg.ExtraInfo;
-		pMain->GetFSM()->ChangeState(Finish::GetInstance());
-		if (*type == FINISH_TYPE::NORMAL)pMain->GetRoundCall()->CallFinish(msg.Sender);
-		else if (*type == FINISH_TYPE::OVER_DRIVE) pMain->GetRoundCall()->CallOverDriveFinish(msg.Sender);
+		//FINISH_TYPE *type = (FINISH_TYPE*)msg.ExtraInfo;
+		//pMain->GetFSM()->ChangeState(Finish::GetInstance());
+		//if (*type == FINISH_TYPE::NORMAL)pMain->GetRoundCall()->CallFinish(msg.Sender);
+		//else if (*type == FINISH_TYPE::OVER_DRIVE) pMain->GetRoundCall()->CallOverDriveFinish(msg.Sender);
+
+		// フェードアウト
+		Fade::Set(Fade::FLAG::FADE_OUT, 16, 0x00000000);
 
 		return true;
 	}
@@ -1360,6 +1361,12 @@ void SceneMainState::ChallengeClear::Enter(sceneMain *pMain)
 	// (TODO)ここで配列の最後まできたらメニューに戻る処理
 	// お疲れ様でした！とかは最後のクリアティップスで書こう。
 	//pMain->SetSelectChallenge(Challenge_TYPE((int)pMain->GetSelectChallenge() + 1));
+
+
+	if (ChallengeMgrMgr->GetSelectMgr()->GetSelectType() >= 2)
+	{
+		TrophyMgr->CheakChallengeClear();
+	}
 
 
 

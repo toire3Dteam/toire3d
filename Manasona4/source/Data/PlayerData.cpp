@@ -1,5 +1,6 @@
 ﻿#include "TDNLIB.h"
 #include "PlayerData.h"
+#include "SelectData.h"
 
 //------------------------------------------------------
 //	初期化
@@ -28,8 +29,10 @@ m_StartClock(clock())	// 現在時刻保存
 PlayerDataManager::~PlayerDataManager()
 {
 	// セーブフラグあったらデータ記録
-	if (m_bSaveFlag)
+	if (m_ConfigData.iAutoSave == (int)AUTO_SAVE_TYPE::YES)
+	{
 		SavePlayerData();
+	}
 }
 
 //------------------------------------------------------

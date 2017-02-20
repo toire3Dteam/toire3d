@@ -318,7 +318,7 @@ public:
 	EFFECT_TYPE HitEffectType;	// エフェクトのタイプ
 	LPCSTR HitSE;				// 当たったときに鳴らすSE
 	LPCSTR WhiffSE;				// 空振りSE
-	EFFECT_TYPE WhiffEffectType;	// 振りエフェクト
+	EFFECT_TYPE WhiffEffectType;// 振りエフェクト
 	int pierceLV;				// 貫通レベル
 	bool bAntiAir;				// 対空攻撃かどうか　(追加)
 	bool bFinish;				// フィニッシュになる攻撃かどうか
@@ -356,7 +356,9 @@ public:
 		bFinish(true),
 		AntiGuard(ANTIGUARD_ATTACK::NONE),
 		pCollisionShape(new CollisionShape::Square),
-		fGuardKnockBackPower(0){}
+		fGuardKnockBackPower(0),
+		GuardRecoveryFrame(0),
+		WhiffEffectType(EFFECT_TYPE::WHIFF){}
 	~AttackData(){ SAFE_DELETE(pCollisionShape); }
 };
 

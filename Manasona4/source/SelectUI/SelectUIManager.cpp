@@ -72,6 +72,10 @@ SelectUIManager::SelectUIManager()
 	//m_pPic[PIC_TYPE::INFO_BOX_RIGHT] = new tdn2DAnim("DATA/UI/CharacterSelect/Info/InfoBox.png");
 	//m_pPic[PIC_TYPE::INFO_BOX_RIGHT]->OrderMoveAppeared(12, 899 + 384 , 354);
 
+	// アイコン幅
+	m_iWidthIcon = 88;
+	m_iIconX = 384;
+
 	// キャラアイコン
 	for (int i = 0; i < (int)CHARACTER::END; i++)
 	{
@@ -99,7 +103,7 @@ SelectUIManager::SelectUIManager()
 		}	
 
 		// 共通設定
-		m_pCharacterIcon[i]->OrderMoveAppeared(12, 384 + (i * 88), 482 + 384);
+		m_pCharacterIcon[i]->OrderMoveAppeared(12, m_iIconX + (i * m_iWidthIcon), 482 + m_iIconX);
 	}
 
 
@@ -219,7 +223,7 @@ void SelectUIManager::Render()
 		}
 
 
-		m_pCharacterIcon[i]->Render(384 + (i * 88), 482);
+		m_pCharacterIcon[i]->Render(m_iIconX + (i * m_iWidthIcon), 482);
 	}
 
 	// 中でステートマシンによる複雑な描画がある

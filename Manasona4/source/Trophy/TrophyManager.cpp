@@ -60,6 +60,10 @@ TrophyManager::TrophyManager() :BaseGameEntity(ENTITY_ID::TROPHY_MGR)	// ƒGƒ“ƒeƒ
 			m_pTrophy[i] = new BuyManyContentTrophy();
 
 			break;
+		case TROPHY_TYPE::CHALLENGE_CLEAR:
+			m_pTrophy[i] = new ChallengeTrophy();
+
+			break;
 		case TROPHY_TYPE::COMPLETE_TROPHY:
 			m_pTrophy[i] = new CompleteTrophy();
 
@@ -80,6 +84,8 @@ TrophyManager::TrophyManager() :BaseGameEntity(ENTITY_ID::TROPHY_MGR)	// ƒGƒ“ƒeƒ
 	m_aActionStack.clear();
 	m_aActionStack.reserve(8);
 	m_iIntervalFrame = 0;
+
+	m_iTrainingFrame = 0;
 }
 
 TrophyManager::~TrophyManager()
@@ -567,6 +573,19 @@ void TrophyManager::CheakBuyManyContent(int iOwnedContent)
 
 	}
 
+
+}
+
+
+void TrophyManager::CheakChallengeClear()
+{
+	// ‚Ü‚¾«‚ÌƒgƒƒtƒB[‚ðŽè‚É“ü‚ê‚Ä‚¢‚È‚©‚Á‚½‚ç
+	if (PlayerDataMgr->m_TrophyData.iChallengeClear == 0)
+	{
+		TROPHY_TYPE eType = TROPHY_TYPE::CHALLENGE_CLEAR;
+		MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
+
+	}
 
 }
 

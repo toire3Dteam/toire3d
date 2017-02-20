@@ -123,6 +123,7 @@ namespace Stand
 		bool isAttackFrame(){ return false; }	// マーヤは判定なし
 	private:
 		BaseUVEffect *m_pBullet;	// 飛び道具のメッシュの実体(玉に参照させる)
+		BaseUVEffect *m_pBullet2;	// 飛び道具のメッシュの実体(玉に参照させる)
 
 	};
 

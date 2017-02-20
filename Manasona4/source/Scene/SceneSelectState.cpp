@@ -42,7 +42,12 @@ void SceneSelectState::Intro::Execute(sceneSelect *pMain)
 
 
 }
-void SceneSelectState::Intro::Exit(sceneSelect *pMain) {}
+
+void SceneSelectState::Intro::Exit(sceneSelect *pMain) 
+{
+
+}
+
 void SceneSelectState::Intro::Render(sceneSelect *pMain)
 {
 	tdnText::Draw(0, 0, 0xffffffff, "Intro");

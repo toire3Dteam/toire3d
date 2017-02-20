@@ -45,6 +45,8 @@ void sceneVS::Update()
 			// すでに読み込んだシーンに行く
 			MainFrameEX->ChangeScene(LoadSceneThreadMgr->GetNewScene());
 		}
+
+		BattleLoadInst->LoadingCircleUpdate();// 待ってる間ローディングのサークルだけ動かす
 		return;
 	}
 

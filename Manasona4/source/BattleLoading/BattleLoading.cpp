@@ -3,6 +3,7 @@
 #include "../Fade/Fade.h"
 #include "BaseEntity\Message\MessageDispatcher.h"
 #include "system\System.h"
+#include "system\FrameworkEx.h"
 
 
 //+---------------------------
@@ -20,6 +21,9 @@ BattleLoading::BattleLoading() :BaseGameEntity(ENTITY_ID::BATTLE_LOADING)
 	// 画像初期化
 	m_pImages[IMAGE::BLACK_LINE].pPic = new tdn2DAnim("DATA/UI/BattleLoading/BlackLine.png");
 	m_pImages[IMAGE::BLUE_RING].pPic = new tdn2DAnim("DATA/UI/BattleLoading/BlueRing.png");
+	m_pImages[IMAGE::LOADING_CIRCLE].pPic = new tdn2DAnim("DATA/UI/Loading/loadPic.png");
+	m_pImages[IMAGE::I_INTRO_LIGHT].pPic = new tdn2DAnim("DATA/UI/BattleLoading/Intro/introLight.png");
+
 	m_pImages[IMAGE::S_UP_FRAME].pPic = new tdn2DAnim("DATA/UI/BattleLoading/Slide/upframe.png");
 	m_pImages[IMAGE::S_DOWN_FRAME].pPic = new tdn2DAnim("DATA/UI/BattleLoading/Slide/downframe.png");
 	m_pImages[IMAGE::S_VS].pPic = new tdn2DAnim("DATA/UI/BattleLoading/Slide/vs.png");
@@ -27,6 +31,8 @@ BattleLoading::BattleLoading() :BaseGameEntity(ENTITY_ID::BATTLE_LOADING)
 	m_pImages[IMAGE::S_2PLAYER].pPic = new tdn2DAnim("DATA/UI/BattleLoading/Slide/2PLAYER.png");
 	m_pImages[IMAGE::S_1PBACK].pPic = new tdn2DAnim("DATA/UI/BattleLoading/Slide/1PBACK.png");
 	m_pImages[IMAGE::S_2PBACK].pPic = new tdn2DAnim("DATA/UI/BattleLoading/Slide/2PBACK.png");
+	m_pImages[IMAGE::S_1PBACK_SL].pPic = new tdn2DAnim("DATA/UI/BattleLoading/Slide/1PbackSpeedLine.png");
+	m_pImages[IMAGE::S_2PBACK_SL].pPic = new tdn2DAnim("DATA/UI/BattleLoading/Slide/2PbackSpeedLine.png");
 
 	m_pImages[IMAGE::F_BACK].pPic = new tdn2DAnim("DATA/UI/BattleLoading/Final/Back.png");
 	m_pImages[IMAGE::F_VERSUS].pPic = new tdn2DAnim("DATA/UI/BattleLoading/Final/Versus.png");
@@ -35,6 +41,10 @@ BattleLoading::BattleLoading() :BaseGameEntity(ENTITY_ID::BATTLE_LOADING)
 	m_pImages[IMAGE::F_FLASH_BACK].pPic = new tdn2DAnim("DATA/UI/BattleLoading/Final/BackFlash.png");
 
 	m_pImages[IMAGE::F_BLACK_CIRCLE].pPic = new tdn2DAnim("DATA/UI/BattleLoading/Final/BlackCircle.png");
+	m_pImages[IMAGE::F_CIRCLE_1].pPic = new tdn2DAnim("DATA/UI/BattleLoading/Final/Circle_1.png");
+	m_pImages[IMAGE::F_CIRCLE_2].pPic = new tdn2DAnim("DATA/UI/BattleLoading/Final/Circle_2.png");
+	m_pImages[IMAGE::F_LIGHT_PARTICLE].pPic = new tdn2DAnim("DATA/UI/BattleLoading/Final/LightParticle.png");
+
 
 	for (int i = 0; i < IMAGE::ARRAY_END; i++)
 	{
@@ -43,6 +53,12 @@ BattleLoading::BattleLoading() :BaseGameEntity(ENTITY_ID::BATTLE_LOADING)
 
 	m_pImages[IMAGE::BLACK_LINE].pPic->Action();
 	m_pImages[IMAGE::BLUE_RING].pPic->OrderRipple(12, 1.0f,0.2f);
+
+	
+	m_pImages[IMAGE::LOADING_CIRCLE].vStartPos = Vector2(1280 - 256 + 32, 720 - 256 + 32);
+	m_pImages[IMAGE::LOADING_CIRCLE].pPic->OrderMoveAppeared(6, (int)m_pImages[IMAGE::LOADING_CIRCLE].vStartPos.x, (int)m_pImages[IMAGE::LOADING_CIRCLE].vStartPos.y + 32);
+
+	m_pImages[IMAGE::I_INTRO_LIGHT].pPic->OrderGrow(29, 0.2f, 0.05f);
 
 	// 各画像の設定
 	m_pImages[IMAGE::S_UP_FRAME].pPic->OrderMoveAppeared(12, 0, 256);
@@ -68,12 +84,24 @@ BattleLoading::BattleLoading() :BaseGameEntity(ENTITY_ID::BATTLE_LOADING)
 	m_pMask1P = new tdn2DObj("Data/UI/BattleLoading/Final/LeftMask.png");
 	m_pMask2P = new tdn2DObj("Data/UI/BattleLoading/Final/RightMask.png");
 	m_pMaskSurface = new tdn2DObj(1280, 720, TDN2D::USEALPHA);
+	m_pMaskLightParticle = new tdn2DObj("Data/UI/BattleLoading/Final/LightParticleMask.png");
+
+	m_pIntroBlackBack = new tdn2DObj("Data/UI/BattleLoading/IntroBlack.png");
+
 
 	m_vCirclePos.x = 300;
 	m_vCirclePos.y = 413;
 	m_pImages[IMAGE::F_BLACK_CIRCLE].vStartPos = m_vCirclePos;
 	m_pImages[IMAGE::F_BLACK_CIRCLE].pPic->OrderMoveAppeared(8,
 		(int)m_pImages[IMAGE::F_BLACK_CIRCLE].vStartPos.x, (int)m_pImages[IMAGE::F_BLACK_CIRCLE].vStartPos.y);
+
+	m_pImages[IMAGE::F_CIRCLE_1].vStartPos = m_vCirclePos;
+	m_pImages[IMAGE::F_CIRCLE_1].pPic->OrderMoveAppeared(8,
+		(int)m_pImages[IMAGE::F_CIRCLE_1].vStartPos.x, (int)m_pImages[IMAGE::F_CIRCLE_1].vStartPos.y);
+
+	m_pImages[IMAGE::F_CIRCLE_2].vStartPos = m_vCirclePos;
+	m_pImages[IMAGE::F_CIRCLE_2].pPic->OrderMoveAppeared(8,
+		(int)m_pImages[IMAGE::F_CIRCLE_2].vStartPos.x, (int)m_pImages[IMAGE::F_CIRCLE_2].vStartPos.y);
 
 
 	for (int i = 0; i < (int)CHARACTER::END; i++)
@@ -219,6 +247,9 @@ void BattleLoading::Initialize()
 	m_bEnd = false;
 	m_bSkip = false;
 
+	// ★ローディング時にFPSを落とす
+	MainFrameEX->SetFPSMode(FPS_MODE::FPS_45);
+
 }
 
 
@@ -243,6 +274,9 @@ BattleLoading::~BattleLoading()
 	SAFE_DELETE(m_pMask1P);
 	SAFE_DELETE(m_pMask2P);
 	SAFE_DELETE(m_pMaskSurface);
+	SAFE_DELETE(m_pMaskLightParticle);
+
+	SAFE_DELETE(m_pIntroBlackBack);
 
 
 	SAFE_DELETE(m_pStateMachine);
@@ -296,8 +330,17 @@ void BattleLoading::Render()
 	m_pImages[IMAGE::S_1PBACK].Render();
 	m_pImages[IMAGE::S_2PBACK].Render();
 
+	m_pImages[IMAGE::S_1PBACK_SL].RenderUV(1280,720,RS::ADD);
+	m_pImages[IMAGE::S_2PBACK_SL].RenderUV(1280,720,RS::ADD);
+
+
 	m_pImages[IMAGE::F_BACK].Render();
 	m_pImages[IMAGE::F_FLASH_BACK].Render(RS::ADD);
+
+	// 光の粒
+	MaskRenderLightParticle(m_pImages[IMAGE::F_LIGHT_PARTICLE]);
+	shader2D->SetMaskScreen(m_pMaskLightParticle);
+	m_pMaskSurface->Render(0, 0, shader2D, "Mask_Add");
 
 
 	// ★ここにステートマシン描画
@@ -312,6 +355,9 @@ void BattleLoading::Render()
 	m_pImages[IMAGE::S_2PLAYER].Render();
 
 	m_pImages[IMAGE::F_BLACK_CIRCLE].Render();
+	m_pImages[IMAGE::F_CIRCLE_1].Render();
+	m_pImages[IMAGE::F_CIRCLE_2].Render();
+
 	m_pImages[IMAGE::F_FRAME].Render();
 	m_pImages[IMAGE::F_VERSUS].Render();
 
@@ -320,6 +366,9 @@ void BattleLoading::Render()
 	// キャラのネーム
 	m_tagSlideChara1P[GetCharaType(SIDE::LEFT)].RenderName();
 	m_tagSlideChara2P[GetCharaType(SIDE::RIGHT)].RenderName();
+
+	// イントロ
+	m_pImages[IMAGE::I_INTRO_LIGHT].Render(RS::ADD);
 
 
 	// フェード
@@ -330,6 +379,12 @@ void BattleLoading::Render()
 	// リング
 	m_pImages[IMAGE::BLUE_RING].Render(RS::ADD);
 
+	// ローディングの円
+	if (m_pStateMachine->isInState(*BattleLoadingState::FadeChangeStep::GetInstance()) == true && 
+		m_bSkip == false)// スキップが可能なら描画しない(全て読み込み終わっている)
+	{
+		m_pImages[IMAGE::LOADING_CIRCLE].Render();
+	}
 
 	//FOR(IMAGE::ARRAY_END)
 	//{
@@ -375,6 +430,30 @@ void BattleLoading::MaskRender(FinalCharaDesc pFinalChara)
 
 }
 
+void BattleLoading::MaskRenderLightParticle(SlideDesc pSlide)
+{
+	// 現在のレンダーターゲットを一時的に確保
+	Surface* now = nullptr;
+	tdnSystem::GetDevice()->GetRenderTarget(0, &now);
+	m_pMaskSurface->RenderTarget();
+
+	// サーフェイス画面クリア
+	tdnSystem::GetDevice()->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, 0);
+
+	// キャラクター画像
+	pSlide.RenderUV(1280, 720);
+
+	// レンダーターゲットの復元
+	tdnSystem::GetDevice()->SetRenderTarget(0, now);
+}
+
+void BattleLoading::LoadingCircleUpdate()
+{
+	// ローディングサークル回転用
+	m_pImages[BattleLoading::IMAGE::LOADING_CIRCLE].fAngle -= 0.1f;
+	m_pImages[BattleLoading::IMAGE::LOADING_CIRCLE].Update();
+}
+
 //+---------------------------------
 //	スライドデータ
 //+---------------------------------
@@ -384,6 +463,8 @@ void SlideDesc::Update()
 	// 動き更新
 	vPos += vMove;
 	
+	pPic->SetAngle(fAngle);
+
 	// フラグが立っていれば徐々透明に(TODO)
 	if (bEnd == true)
 	{
@@ -407,6 +488,19 @@ void SlideDesc::Render(RS eRS)
 	pPic->Render((int)vPos.x, (int)vPos.y, eRS);
 }
 
+void SlideDesc::RenderUV(int iw, int ih, RS eRS)
+{
+	pPic->Render(0, 0, iw, ih, (int)vPos.x, (int)vPos.y, iw, ih, eRS);
+}
+
+void SlideDesc::RenderUV(int iw, int ih, tdnShader* pShader, char* name)
+{
+	if (bEnd == true)return;
+	pPic->Render(0, 0, iw, ih, (int)vPos.x, (int)vPos.y, iw, ih, pShader, name);
+}
+
+
+
 void SlideDesc::RenderSP()
 {
 	pPic->RenderSpecial((int)vPos.x, (int)vPos.y);
@@ -417,6 +511,7 @@ void SlideDesc::Action(int iDelayTimer)
 	// 初期値へ
 	vPos = vStartPos;
 	fAlpha = 1.0f;
+	fAngle = 0.0f;
 
 	// 演出開始
 	pPic->Action(iDelayTimer);

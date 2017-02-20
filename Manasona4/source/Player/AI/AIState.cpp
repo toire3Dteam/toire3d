@@ -1561,7 +1561,6 @@ void AIState::Wait::Execute(AI * pPerson)
 			break;
 		}
 
-
 		// 相手が起き上がり攻撃被せてきたら
 		if (TargetPlayer->isAttackState() == true &&
 			TargetPlayer->AIAttackRange() > GetRange(pPerson))
@@ -1580,6 +1579,28 @@ void AIState::Wait::Execute(AI * pPerson)
 				return;
 			}
 
+		}
+
+		// 最高難易度限定
+		if (pPerson->m_eAIType == AI_TYPE::CPU_YOKOE)
+		{
+			// 相手のスタンドが発動してたら	
+			if (TargetPlayer->GetStand()->isActive() &&
+				30 >= GetRangeVsStand(pPerson))//
+			{
+				if (l_iStrong <= 25)
+				{
+					// 回避ステート
+					pPerson->GetFSM()->ChangeState(AIState::Escape::GetInstance());
+					return;
+				}
+				else
+				{
+					// ガード
+					pPerson->GetFSM()->ChangeState(AIState::Guard::GetInstance());
+					return;
+				}
+			}
 		}
 
 		// ★パートナーゲージが溜まっていて
@@ -2991,6 +3012,27 @@ void AIState::SetThrow::Execute(AI * pPerson)
 				return;
 			}
 		}
+
+
+		// 相手のスタンドが発動してたら	
+		if (TargetPlayer->GetStand()->isActive() &&
+			30 >= GetRangeVsStand(pPerson))//
+		{
+			if (tdnRandom::Get(0, 100) <= 20)
+			{
+				// 回避ステート
+				pPerson->GetFSM()->ChangeState(AIState::Escape::GetInstance());
+				return;
+			}
+			else
+			{
+				// ガード
+				pPerson->GetFSM()->ChangeState(AIState::Guard::GetInstance());
+				return;
+			}
+		}
+		
+
 	}
 
 }
@@ -3150,6 +3192,27 @@ void AIState::SetAnitiAir::Execute(AI * pPerson)
 				return;
 			}
 		}
+
+
+	
+			// 相手のスタンドが発動してたら	
+		if (TargetPlayer->GetStand()->isActive() &&
+			30 >= GetRangeVsStand(pPerson))//
+		{
+			if (tdnRandom::Get(0, 100) <= 25)
+			{
+				// 回避ステート
+				pPerson->GetFSM()->ChangeState(AIState::Escape::GetInstance());
+				return;
+			}
+			else
+			{
+				// ガード
+				pPerson->GetFSM()->ChangeState(AIState::Guard::GetInstance());
+				return;
+			}
+		}
+		
 	}
 
 

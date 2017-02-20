@@ -84,6 +84,8 @@ private:
 	SelectUI* m_pLeftSide;
 	SelectUI* m_pRightSide;
 
+	int m_iWidthIcon; // 
+	int m_iIconX;
 
 	// ‹¤’Ê‚Ì‰æ‘œ
 	// ‰æ‘œ

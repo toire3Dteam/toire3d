@@ -1037,15 +1037,15 @@ DEF_POINTLIGHT PS_PointLightSphere(VS_POINTLIGHT In)
 {
 	DEF_POINTLIGHT OUT = (DEF_POINTLIGHT)0;
 
-	//スクリーン空間をテクスチャ座標に ○
-	In.wvpPos.x += 0.5f;// ★ずらす
-	In.wvpPos.y -= 0.5f;// ★ずらす
+	//スクリーン空間をテクスチャ座標に
+	//In.wvpPos.x += 0.5f; 
+	//In.wvpPos.y -= 0.5f; 
 
 	const float2 ScreenTex = In.wvpPos.xy / In.wvpPos.w * float2(0.5f, -0.5f) + float2(0.5f, 0.5f);
 	//ScreenTex.x += 0.001f;
-	// 必要な情報を取得　○
+	// 必要な情報を取得
 	const float4 NormalDepth = tex2D(NormalDepthSamp, ScreenTex);
-	const float3 Normal = CalcNormal(NormalDepth.xy*2.0f - 1.0f);// ○
+	const float3 Normal = CalcNormal(NormalDepth.xy*2.0f - 1.0f);//
 	const float3 Pos = CalcViewPosition(ScreenTex, NormalDepth.zw);
 
 	// PLのPosとこのピクセルの位置で←ポジション＆距離
@@ -2089,20 +2089,20 @@ return OUT;
 //------------------------------------------------------
 technique PlayerToonNoRim
 {
-	pass OutLine
-	{
-		ZEnable = true;				// 奥行考慮
-		ZWriteEnable = false;		// 奥行を書き込むか
+	//pass OutLine
+	//{
+	//	ZEnable = true;				// 奥行考慮
+	//	ZWriteEnable = false;		// 奥行を書き込むか
 
-		AlphaBlendEnable = true;	// アルファブレンド考慮
-		BlendOp = Add;				// ブレンド仕様
-		SrcBlend = SrcAlpha;		// 現在描いてる方
-		DestBlend = InvSrcAlpha;	// 描かれている方
-		CullMode = CW;				// カリングの仕様
+	//	AlphaBlendEnable = true;	// アルファブレンド考慮
+	//	BlendOp = Add;				// ブレンド仕様
+	//	SrcBlend = SrcAlpha;		// 現在描いてる方
+	//	DestBlend = InvSrcAlpha;	// 描かれている方
+	//	CullMode = CW;				// カリングの仕様
 
-		VertexShader = compile vs_3_0 VS_OutLine();
-		PixelShader = compile ps_3_0 PS_OutLine();
-	}
+	//	VertexShader = compile vs_3_0 VS_OutLine();
+	//	PixelShader = compile ps_3_0 PS_OutLine();
+	//}
 
 	pass P0
 	{

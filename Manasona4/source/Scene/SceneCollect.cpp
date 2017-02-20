@@ -906,7 +906,7 @@ void sceneCollect::PictureInit()
 
 	// スクロール間隔
 	m_tagPI.iScrollAddX = 154+32;
-	m_tagPI.iScrollAddY = 92+32;
+	m_tagPI.iScrollAddY = 92 + 24/*+32*/;
 
 	// +アイコンの初期位置も決める
 	Vector2 l_vIconPos = VECTOR2_ZERO;

@@ -1489,3 +1489,45 @@ technique Mask_Add
 		PixelShader = compile ps_3_0 PS_Mask();
 	}
 }
+
+
+//float4 PS_MaskScreen(VS_OUTPUT_M In) : COLOR
+//{
+//	float4 OUT;
+//
+//const float2 ScreenTex = In.wvpPos.xy *float2(0.5, -0.5) + float2(0.5, 0.5);
+//
+//// ブラインドマップ取得
+//float rate = tex2D(MaskSamp, ScreenTex).r;
+//
+//OUT.rgba = rate  * tex2D(DecaleSamp2, In.Tex);
+//return OUT;
+//}
+//
+//technique MaskScreen
+//{
+//	pass P0
+//	{
+//		AlphaBlendEnable = true;
+//		BlendOp = Add;
+//		SrcBlend = SrcAlpha;
+//		DestBlend = InvSrcAlpha;
+//		// シェーダ
+//		VertexShader = compile vs_3_0 VS_Mask();
+//		PixelShader = compile ps_3_0 PS_MaskScreen();
+//	}
+//}
+//
+//technique Mask_Screen_Add
+//{
+//	pass P0
+//	{
+//		AlphaBlendEnable = true;
+//		BlendOp = Add;
+//		SrcBlend = SrcAlpha;
+//		DestBlend = One;
+//		// シェーダ
+//		VertexShader = compile vs_3_0 VS_Mask();
+//		PixelShader = compile ps_3_0 PS_MaskScreen();
+//	}
+//}

@@ -686,7 +686,7 @@ void Aramitama::InitMushiDatas()
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->GuardRecoveryFrame = 20;
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->fGuardKnockBackPower = .25f;
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->attribute = ATTACK_ATTRIBUTE::BULLET;
-	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->fComboRate = 1.0f;
+	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->fComboRate = 0.85f;
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->fRepeatAttackRate = 0.9f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
@@ -722,8 +722,8 @@ void Aramitama::InitMushiDatas()
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->GuardRecoveryFrame = 20;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->fGuardKnockBackPower = .25f;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->attribute = ATTACK_ATTRIBUTE::BULLET;
-	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->fComboRate = 1.0f;
-	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->fRepeatAttackRate = .5f;// かなり同技補正きつく
+	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->fComboRate = 0.5f;	
+	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->fRepeatAttackRate = .45f;// かなり同技補正きつく
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
@@ -732,7 +732,7 @@ void Aramitama::InitMushiDatas()
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 25;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 35;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 50;
-	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 60;
+	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 50;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	// 判定形状
@@ -746,7 +746,7 @@ void Aramitama::InitMushiDatas()
 	//	D虫ミタマ
 	m_pMushi[(int)MUSHI_TYPE::AERIAL] = new MushiData("DATA/CHR/Aramitama/aramitama_mushi2.IEM", Shot::AramitamaMushi::Aerial::c_SOJOURN_TIME);
 	// 地上ヒットも空中ヒットも共通の情報
-	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->damage = 400;
+	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->damage = 300;
 	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->pierceLV = 0;
 	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->HitSE = "斬撃2";
 	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->WhiffSE = "空振り1";
@@ -759,7 +759,7 @@ void Aramitama::InitMushiDatas()
 	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->GuardRecoveryFrame = 20;
 	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->fGuardKnockBackPower = .25f;
 	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->attribute = ATTACK_ATTRIBUTE::BULLET;
-	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->fComboRate = 1.0f;
+	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->fComboRate = 0.85f;
 	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->fRepeatAttackRate = .99f;
 	// 地上ヒットと空中ヒットで挙動が変わるもの
 	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
@@ -1189,7 +1189,7 @@ bool Aramitama::SkillAction::Squat::Execute()
 		
 		// チャージエフェクト発動
 		m_pAramitama->m_pAChargeWave->Action(m_pAramitama->GetPos());
-		m_pAramitama->m_pAChargeAura->Action(m_pAramitama->GetPos());
+		m_pAramitama->m_pAChargeAura->Action(m_pAramitama->GetPos(), 1.0f, 1.25f);
 	}
 	
 
@@ -1657,6 +1657,9 @@ void Aramitama::CharacterDataUIAction(int iDelayTimer)
 
 }
 
+//+--------------------------------------------------------------------
+//	虫データ
+//+--------------------------------------------------------------------
 void Aramitama::MushiData::Action(Aramitama *pAramitama, MUSHI_TYPE type)
 {
 	// クールタイム残ってたらスルー
