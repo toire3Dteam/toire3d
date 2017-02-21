@@ -548,8 +548,8 @@ void Aniki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL4].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(-.05f, .325f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL4].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL4].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 0;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL4].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 1;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL4].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 1;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL4].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 20;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL4].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 20;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL4].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL4].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	// 判定形状
@@ -933,7 +933,7 @@ void Aniki::InitMotionDatas()
 	m_iMotionNumbers[(int)MOTION_TYPE::PERSONA] = 19;
 	m_iMotionNumbers[(int)MOTION_TYPE::SKILL_LAND] = 20;
 	m_iMotionNumbers[(int)MOTION_TYPE::SKILL2] = 21;
-	m_iMotionNumbers[(int)MOTION_TYPE::SKILL3] = 23;
+	m_iMotionNumbers[(int)MOTION_TYPE::SKILL3] = 44;
 	m_iMotionNumbers[(int)MOTION_TYPE::SKILL4] = 40;
 	m_iMotionNumbers[(int)MOTION_TYPE::SKILL_SQUAT] = 43;
 	m_iMotionNumbers[(int)MOTION_TYPE::SKILL_AERIAL] = 20;
@@ -1114,10 +1114,17 @@ void Aniki::SkillAction::Land2::Enter()
 	// 向き変更
 	m_pAniki->SetDirAngle();
 
+
+	// 相手の位置を手元に固定
+	m_pAniki->GetTargetPlayer()->SetPos(m_pAniki->GetPos() + Vector3(m_pAniki->GetDirVecX() * 7.25f, 0, 0));
+	m_pAniki->GetTargetPlayer()->GetObj()->SetPos(m_pAniki->GetTargetPlayer()->GetPos());
+	m_pAniki->GetTargetPlayer()->GetObj()->Update();
+
 	// 分かりやすいようにお互いヒットストップをかける
 	const int l_ciHitStopFrame(m_pAniki->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame);
 	m_pAniki->SetHitStopFrame(l_ciHitStopFrame);
 	m_pAniki->GetTargetPlayer()->SetHitStopFrame(l_ciHitStopFrame);
+
 
 	// オーバードライブ不可
 	m_pAniki->SetNotOverDrive(true);
@@ -1304,7 +1311,7 @@ bool Aniki::SkillAction::Land4::Execute()
 	//if (m_pAniki->GetAttackData()->bHit)
 	//{
 		// 強制起き上がらせ
-	if (m_pAniki->GetCurrentFrame() == 30 && m_pAniki->GetTargetPlayer()->GetHP() > 0)
+	if (m_pAniki->GetCurrentFrame() == 24 && m_pAniki->GetTargetPlayer()->GetHP() > 0)
 	{
 		m_pAniki->GetTargetPlayer()->GetFSM()->ChangeState(BasePlayerState::LandRecovery::GetInstance());
 	}

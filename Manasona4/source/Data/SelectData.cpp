@@ -3,7 +3,7 @@
 #include "../Sound/BattleMusic.h"
 
 SideData::SideData() :
-eCharacter(CHARACTER::NAZENARA),	// 選択キャラクター
+eCharacter(CHARACTER::ANIKI),	// 選択キャラクター
 ePartner(PARTNER::HETE),			// 選択パートナー
 iDeviceID(0),						// 操作するデバイスID
 bAI(false),							// AIかどうか
@@ -11,9 +11,9 @@ eAIType(AI_TYPE::PRACTICE_LAND)		// AIのタイプ
 {}
 
 SelectData::SelectData():
-eStage(STAGE::NANASATO_SITY),				// ステージ
+eStage(STAGE::SEA),				// ステージ
 bTutorial(false),							// チュートリアルかどうか
-bTraining(true),							// トレーニングかどうか	
+bTraining(false),							// トレーニングかどうか	
 bChallenge(false),							// チャレンジかどうか	
 iBattleMusicID(BattleMusicManager::RANDOM),	// 流す曲の番号
 iRoundTime(99),								// 一試合の初期時間
@@ -27,7 +27,7 @@ iChallengeType(0)							// 選択しているチャレンジ
 	tagSideDatas[(int)SIDE::RIGHT].eCharacter = CHARACTER::TEKI;
 
 	// 片方AI用
-	tagSideDatas[(int)SIDE::RIGHT].bAI = true;
+	//tagSideDatas[(int)SIDE::RIGHT].bAI = true;
 }
 
 TrainingData::TrainingData():

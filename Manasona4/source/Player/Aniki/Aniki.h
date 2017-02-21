@@ -46,7 +46,7 @@ public:
 		BasePlayer::DownAttackInit();
 
 		// ˆÚ“®
-		SetMove(Vector3(GetDirVecX() * 1, 1, 0));
+		SetMove(Vector3(GetDirVecX() * 2, 0, 0));
 	}
 
 	/****************************/

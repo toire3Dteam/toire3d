@@ -58,13 +58,13 @@ BOOL InitApp(HINSTANCE hInstance, int nCmdShow)									// ƒQ[ƒ€‹N“®Žž‚ÌÅ‰‚Ì
 	SYSTEM_Initialize();
 
 	//MainFrameEX = new Framework();			 // ƒƒCƒ“ƒtƒŒ[ƒ€ƒ[ƒN¶¬
-	//MainFrameEX->ChangeScene(new sceneMain); // ‰ŠúƒV[ƒ“
+	MainFrameEX->ChangeScene(new sceneMain); // ‰ŠúƒV[ƒ“
 	//MainFrameEX->ChangeScene(new sceneRenderingTest); // •`‰æƒeƒXƒgƒV[ƒ“
 	//MainFrameEX->ChangeScene(new sceneRenderingTest2); // •`‰æƒeƒXƒgƒV[ƒ“
 	//MainFrameEX->ChangeScene(new sceneResult(SIDE::RIGHT)); // ƒŠƒUƒ‹ƒgƒV[ƒ“
 	//MainFrameEX->ChangeScene(new sceneVS); // 
 	//MainFrameEX->ChangeScene(new sceneTitle);
-	MainFrameEX->ChangeScene(new sceneMenu);
+	//MainFrameEX->ChangeScene(new sceneMenu);
 	//MainFrameEX->ChangeScene(new sceneCollect);
 	//MainFrameEX->ChangeScene(new sceneSelect);
 	

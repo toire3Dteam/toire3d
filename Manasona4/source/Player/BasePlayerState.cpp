@@ -124,7 +124,9 @@ bool isThrownState(BasePlayer *pPerson)
 		!pPerson->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) &&
 		!pPerson->GetFSM()->isInState(*BasePlayerState::DownFall::GetInstance()) &&
 		!pPerson->GetFSM()->isInState(*BasePlayerState::LandRecovery::GetInstance()) &&
-		!pPerson->GetFSM()->isInState(*BasePlayerState::Jump::GetInstance())
+		!pPerson->GetFSM()->isInState(*BasePlayerState::Jump::GetInstance()) &&
+		!pPerson->GetFSM()->isInState(*BasePlayerState::Fall::GetInstance()) &&
+		!pPerson->GetFSM()->isInState(*BasePlayerState::AerialDash::GetInstance())
 		);
 }
 
