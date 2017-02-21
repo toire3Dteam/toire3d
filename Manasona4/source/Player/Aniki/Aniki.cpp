@@ -4,7 +4,7 @@
 #include "../../DeferredEx/DeferredEx.h"
 #include "../../BaseEntity/Message/MessageDispatcher.h"
 #include "Ketsudram.h"
-#include "Window/Player/TekiWindow.h"
+#include "Window/Player/AnikiWindow.h"
 #include "Stand\Stand.h"
 
 Aniki::Aniki(SIDE side, const SideData &data) :BasePlayer(side, data), m_pKetsudram(nullptr), m_eHeaveHoType(HEAVEHO_TYPE::STRIKE)
@@ -22,7 +22,7 @@ Aniki::Aniki(SIDE side, const SideData &data) :BasePlayer(side, data), m_pKetsud
 		l_vWindowPos.x = 550;
 		l_vWindowPos.y = 100;
 	}
-	m_pCommandWindow = new TekiWindow(l_vWindowPos);
+	m_pCommandWindow = new AnikiWindow(l_vWindowPos);
 
 
 	// エフェクトカメラID
@@ -62,6 +62,10 @@ Aniki::Aniki(SIDE side, const SideData &data) :BasePlayer(side, data), m_pKetsud
 	// スピードライン
 	m_pSpeedLine = new SpeedLineGreenEffect;
 
+	// エフェクト
+	m_pSpearEffect = new SpearEffect();
+
+
 	// リセットはなるべく最後に
 	Reset();
 }
@@ -75,6 +79,8 @@ void Aniki::Reset()
 
 	// リスタートすると残るので削除
 	SAFE_DELETE(m_pKetsudram);
+
+	m_pSpearEffect->Stop();
 }
 
 void Aniki::InitActionDatas()
@@ -386,7 +392,7 @@ void Aniki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	// 判定形状
-	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->pCollisionShape->width = 21;
+	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->pCollisionShape->width = 12;
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->pCollisionShape->height = 8;
 	m_ActionDatas[(int)BASE_ACTION_STATE::INVINCIBLE_ATTACK].pAttackData->pCollisionShape->pos.Set(0, 4, 0);
 
@@ -849,6 +855,8 @@ Aniki::~Aniki()
 	FOR((int)SKILL_ACTION_TYPE::MAX) SAFE_DELETE(m_pSkillActions[i]);
 	FOR((int)HEAVEHO_TYPE::MAX)SAFE_DELETE(m_pHeaveHoActions[i]);
 	SAFE_DELETE(m_pKetsudram);
+
+	SAFE_DELETE(m_pSpearEffect);
 }
 
 void Aniki::Update(PLAYER_UPDATE flag)
@@ -858,6 +866,11 @@ void Aniki::Update(PLAYER_UPDATE flag)
 
 	// ケツドラム更新
 	if (m_pKetsudram)m_pKetsudram->Update();
+
+	// エフェクト
+	m_pSpearEffect->Update();
+
+
 }
 
 void Aniki::Render()
@@ -878,6 +891,8 @@ void Aniki::Render()
 	Vector2 vScreenPos = Math::WorldToScreen(m_vPos);// (TODO)頭のポジションの座標を使う
 	m_pThrowMark->Render((int)vScreenPos.x - 56, (int)vScreenPos.y - 324, RS::COPY_NOZ);
 
+	// 専用エフェクト
+	m_pSpearEffect->Render();
 
 }
 
@@ -920,7 +935,7 @@ void Aniki::InitMotionDatas()
 	m_iMotionNumbers[(int)MOTION_TYPE::SKILL2] = 21;
 	m_iMotionNumbers[(int)MOTION_TYPE::SKILL3] = 23;
 	m_iMotionNumbers[(int)MOTION_TYPE::SKILL4] = 40;
-	m_iMotionNumbers[(int)MOTION_TYPE::SKILL_SQUAT] = 22;
+	m_iMotionNumbers[(int)MOTION_TYPE::SKILL_SQUAT] = 43;
 	m_iMotionNumbers[(int)MOTION_TYPE::SKILL_AERIAL] = 20;
 	m_iMotionNumbers[(int)MOTION_TYPE::SKILL_AERIALDROP] = 24;
 	m_iMotionNumbers[(int)MOTION_TYPE::HEAVEHO_DRIVE] = 7;
@@ -1156,12 +1171,24 @@ void Aniki::SkillAction::Squat::Enter()
 	voice->Play(VOICE_TYPE::SKILL_SQUAT, CHARACTER::ANIKI);
 
 	// 走るエフェクト
-	m_pAniki->AddEffectAction(m_pAniki->GetPos(), EFFECT_TYPE::RUN);
+	m_pAniki->AddEffectAction( m_pAniki->GetFlontPos(), EFFECT_TYPE::RUN);
+
 
 }
 
 bool Aniki::SkillAction::Squat::Execute()
 {
+	if (m_pAniki->m_iCurrentActionFrame == 8)
+	{
+		float l_fSpearAngle = 0.0f;
+		if (m_pAniki->GetDir() == DIR::LEFT)
+		{
+			l_fSpearAngle = 3.14f;
+		}
+		m_pAniki->m_pSpearEffect->Action(m_pAniki->GetFlontPos(), 1.1f, 1.5f, Vector3(0, l_fSpearAngle, 0), Vector3(0, l_fSpearAngle, 0));
+
+	}
+
 	// アクション終了フラグ
 	if (!m_pAniki->isAttackState()) return true;
 

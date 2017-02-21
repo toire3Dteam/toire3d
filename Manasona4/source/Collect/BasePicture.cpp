@@ -691,7 +691,7 @@ void MahuyuPicture::InitExe()
 {
 	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Mahuyu.png");
 	m_tagPicture.sTitle = "【ゲームイラスト】真冬の夜の";
-	m_tagPicture.sText = "1年生の時に制作した作品\n";
+	m_tagPicture.sText = "1年の時\n";
 	m_tagPicture.vPos.x = 0.0f;
 	m_tagPicture.vPos.y = 0.0f;
 	m_tagPicture.fScale = 1.0f;
@@ -731,7 +731,7 @@ void SuikaPicture::InitExe()
 Manatu1Picture::Manatu1Picture()
 {
 	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Manatu1.png");
-	m_tagPictureIcon.sTitle = "【ゲームイラスト】初代真夏";
+	m_tagPictureIcon.sTitle = "【ゲームイラスト】最初に作ったゲーム";
 	m_tagPictureIcon.sText = "ゲームのイラストです。";
 
 	// 隠しトロフィーフラグ
@@ -744,8 +744,8 @@ Manatu1Picture::Manatu1Picture()
 void Manatu1Picture::InitExe()
 {
 	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Manatu1.png");
-	m_tagPicture.sTitle = "【ゲームイラスト】初代真夏";
-	m_tagPicture.sText = "1年生の時に制作した作品\n原点にして頂点。";
+	m_tagPicture.sTitle = "【ゲームイラスト】最初に作ったゲーム";
+	m_tagPicture.sText = "頑張って作った記憶が思い出がよみがえる、懐かしの作品。";
 	m_tagPicture.vPos.x = 0.0f;
 	m_tagPicture.vPos.y = 0.0f;
 	m_tagPicture.fScale = 1.0f;

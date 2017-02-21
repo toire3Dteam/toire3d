@@ -896,7 +896,7 @@ void sceneCollect::PictureInit()
 {
 	//@‰Šú‚Ìæ“ª
 	m_tagPI.iTop = 0;
-	m_tagPI.iBottom = 3;
+	m_tagPI.iBottom = 2;
 
 	// ‰½—ñ‚©‚ğİ’è
 	m_tagPI.iRowNum = 5;

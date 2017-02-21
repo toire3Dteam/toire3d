@@ -43,6 +43,12 @@ PictureManager::PictureManager() :BaseGameEntity(ENTITY_ID::PICTURE_MGR)	// ƒGƒ“
 		case PICTURE_TYPE::SEA:
 			m_pPicture[i] = new SeaPicture();
 			break;
+		case PICTURE_TYPE::WIN_TEKI:
+			m_pPicture[i] = new WinTekiPicture();
+			break;
+		case PICTURE_TYPE::WIN_ANIKI:
+			m_pPicture[i] = new WinAnikiPicture();
+			break;
 		case PICTURE_TYPE::AIROU:
 			m_pPicture[i] = new AirouPicture();
 			break;

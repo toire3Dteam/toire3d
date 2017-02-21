@@ -171,13 +171,14 @@ public:
 	// 遠距離スキル
 	bool AIFarSkill()
 	{
-		return false;	// このキャラクターに遠距離技はない
+		m_pAI->PushInputList(PLAYER_INPUT::DOWN);
+		m_pAI->PushInputList(PLAYER_INPUT::D);
+		return true;
 	};
 
 	// 空中近距離スキル
 	bool AIAerialNearSkill()
 	{
-		m_pAI->PushInputList(PLAYER_INPUT::DOWN);
 		m_pAI->PushInputList(PLAYER_INPUT::D);
 		return true;
 	};

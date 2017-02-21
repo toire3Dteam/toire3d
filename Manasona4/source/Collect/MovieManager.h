@@ -11,6 +11,7 @@ enum class MOVIE_TYPE
 {
 	OP,					//	オープニング
 	OLD_OP,				//	過去オープニング
+	STAFF_ROLL,			//	スタッフロール
 	ARRAY_END
 };
 

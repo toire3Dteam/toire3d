@@ -25,6 +25,9 @@ MovieManager::MovieManager() :BaseGameEntity(ENTITY_ID::MOVIE_MGR)	// エンティテ
 		case MOVIE_TYPE::OLD_OP:
 			m_pMovie[i] = new OldOpMovie();
 			break;
+		case MOVIE_TYPE::STAFF_ROLL:
+			m_pMovie[i] = new StaffRollMovie();
+			break;
 		default:
 			m_pMovie[i] = new OpMovie();
 			//MyAssert(0, "そのタイプは存在しない。");	

@@ -155,7 +155,7 @@ OpMovie::OpMovie()
 	m_bRock = false;
 
 	// 値段
-	m_iPrice = 10;
+	m_iPrice = 1000;
 }
 
 // 実行後の画像の初期化
@@ -183,7 +183,7 @@ OldOpMovie::OldOpMovie()
 	m_bRock = false;
 
 	// 値段
-	m_iPrice = 10;
+	m_iPrice = 1000;
 }
 
 // 実行後の画像の初期化
@@ -193,6 +193,34 @@ void OldOpMovie::InitExe()
 	m_tagMovie.pPic = new tdn2DObj(m_tagMovie.pMovie->GetTexture());
 	m_tagMovie.sTitle = "【ムービー】前作のオープニング";
 	m_tagMovie.sText = "西遊記を元に作ったＯＰ、夏休み中気合で作ったなつかしの一品。";
+
+
+	// ムービー再生
+	m_tagMovie.pMovie->Play();
+}
+
+
+//+-------------------------------------
+// スタッフロール
+StaffRollMovie::StaffRollMovie()
+{
+	m_tagMovieIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Staffroll.png");
+	m_tagMovieIcon.sTitle = "【ムービー】スタッフロール";
+	m_tagMovieIcon.sText = "ムービーです。";
+
+	// 隠しトロフィーフラグ
+	m_bRock = false;
+
+	// 値段
+	m_iPrice = 1000;
+}
+
+void StaffRollMovie::InitExe()
+{
+	m_tagMovie.pMovie = new tdnMovie("DATA/Movie/staff.wmv", true, false);
+	m_tagMovie.pPic = new tdn2DObj(m_tagMovie.pMovie->GetTexture());
+	m_tagMovie.sTitle = "【ムービー】スタッフロール";
+	m_tagMovie.sText = "スタッフロール。";
 
 
 	// ムービー再生

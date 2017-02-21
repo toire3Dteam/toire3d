@@ -17,6 +17,8 @@ enum class PICTURE_TYPE
 	SAD,				//	かなしい
 	SEXY,				//  セクシー
 	SEA,				//  海
+	WIN_TEKI,			//  リザルトテキ
+	WIN_ANIKI,			//  リザルト兄貴
 	AIROU,				//	アイル―
 	TEKI,				//	テキ
 	NAZENARABA,			//	∵

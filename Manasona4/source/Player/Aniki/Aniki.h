@@ -281,5 +281,9 @@ private:
 	{
 		m_pDefaultObj->SetFrame(462);
 	}
+
+	// エフェクト
+	SpearEffect* m_pSpearEffect;
+
 };
 

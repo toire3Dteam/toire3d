@@ -97,3 +97,16 @@ public:
 private:
 
 };
+
+class StaffRollMovie :public BaseMovie
+{
+public:
+	StaffRollMovie();
+	~StaffRollMovie() {};
+
+	// š‚©‚È‚è¿‚Ì—Ç‚¢‰æ‘œ‚ğ“Ç‚İ‚Ş‚Ì‚Å‘I‘ğ‚µ‚½‚Æ‚«‚É‰æ‘œ‚ğƒ[ƒh‚³‚¹‚é
+	void InitExe();
+
+private:
+
+};

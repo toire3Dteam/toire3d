@@ -248,6 +248,7 @@
     <ClCompile Include="source\Window\ParamSetting\VoiceParamSetting.cpp" />
     <ClCompile Include="source\Window\PauseWindow.cpp" />
     <ClCompile Include="source\Window\Player\AirouWindow.cpp" />
+    <ClCompile Include="source\Window\Player\AnikiWindow.cpp" />
     <ClCompile Include="source\Window\Player\AramitamaWindow.cpp" />
     <ClCompile Include="source\Window\Player\NazenarabaWindow.cpp" />
     <ClCompile Include="source\Window\Player\TekiWindow.cpp" />
@@ -456,6 +457,7 @@
     <ClInclude Include="source\Window\ParamSetting\VoiceParamSetting.h" />
     <ClInclude Include="source\Window\PauseWindow.h" />
     <ClInclude Include="source\Window\Player\AirouWindow.h" />
+    <ClInclude Include="source\Window\Player\AnikiWindow.h" />
     <ClInclude Include="source\Window\Player\AramitamaWindow.h" />
     <ClInclude Include="source\Window\Player\NazenarabaWindow.h" />
     <ClInclude Include="source\Window\Player\TekiWindow.h" />

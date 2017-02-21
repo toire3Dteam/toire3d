@@ -1243,3 +1243,22 @@ public:
 private:
 
 };
+
+
+/*****************************/
+//	兄貴のスピアエフェクト
+/*****************************/
+class SpearEffect :public BaseUVEffect
+{
+public:
+	SpearEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Aniki/Spear.IMO", 0.08f, 0.05f, 10, false, 1, 8);
+	};
+	~SpearEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADDNOZ(); };
+
+private:
+};

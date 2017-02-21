@@ -123,8 +123,8 @@ bool FrameworkEx::Update()
 		(m_dwGameFrame % 2 == 0) ? m_bRenderFlag = true : m_bRenderFlag = false;
 		if (m_dwGameFrame % 3 == 0||
 			m_dwGameFrame % 5 == 0||
-			m_dwGameFrame % 7 == 0||
-			m_dwGameFrame % 13 == 0) m_bRenderFlag = true;
+			m_dwGameFrame % 7 == 0/*||
+			m_dwGameFrame % 13 == 0*/) m_bRenderFlag = true;
 		break;
 	default:
 		MyAssert(0, "FPSÉÇÅ[ÉhÇ™ê›íËÇ≥ÇÍÇƒÇ¢Ç»Ç¢ílÇ…");
