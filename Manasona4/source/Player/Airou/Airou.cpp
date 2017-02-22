@@ -1110,8 +1110,15 @@ bool Airou::HeavehoDriveUpdate()
 			delete m_pOshiokiMgr, m_pOshiokiMgr = nullptr;
 		}
 
+		// ここに来たら終わり
+		return true;
+	}
+
+	// 当たった時に
+	if (m_iCurrentActionFrame > 87 + 2 + 24)
+	{
 		// 攻撃が当たってたら
-		else if (m_bHeavehoHit)
+		if (m_bHeavehoHit && !m_pOshiokiMgr)
 		{
 			SetMotion(m_iMotionNumbers[(int)MOTION_TYPE::HEAVEHO_DRIVE] + 1);
 			m_pOshiokiMgr = new OshiokiManager::OverDrive(this, m_pTargetPlayer);
@@ -1119,8 +1126,6 @@ bool Airou::HeavehoDriveUpdate()
 			return false;
 		}
 
-		// ここに来たら終わり
-		return true;
 	}
 
 	// ヒーホーストップ時間計測

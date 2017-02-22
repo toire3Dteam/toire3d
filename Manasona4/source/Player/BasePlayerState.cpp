@@ -4793,7 +4793,12 @@ void BasePlayerState::OverDrive_Burst::Execute(BasePlayer * pPerson)
 }
 
 void BasePlayerState::OverDrive_Burst::Exit(BasePlayer * pPerson)
-{}
+{
+
+	// バースト可能
+	pPerson->SetNotOverDrive(false);
+
+}
 
 void BasePlayerState::OverDrive_Burst::Render(BasePlayer * pPerson)
 {
@@ -5564,6 +5569,10 @@ void BasePlayerState::HeavehoDrive::Enter(BasePlayer * pPerson)
 
 	// ★必殺はフォローまで無敵
 	pPerson->SetInvincible(114514, 1);
+
+	// 相手のバースト使用不可に
+	pPerson->GetTargetPlayer()->ActionNotOverDrive();
+
 }
 
 void BasePlayerState::HeavehoDrive::Execute(BasePlayer * pPerson)

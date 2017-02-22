@@ -286,6 +286,8 @@ bool SceneCollectState::PictureStep::PadUpdate(sceneCollect *pMain, int DeviceID
 	// 決定でイラスト鑑賞ステートへ！
 	if (tdnInput::KeyGet(KEYCODE::KEY_B, DeviceID) == 3)
 	{
+		pMain->SetCtrlDevice(DeviceID); // このボタンを押したデバイスを保存
+
 		// しかしまだ解放されていなかったら
 		if (PlayerDataMgr->m_SecretData.iAllPic[pMain->m_tagPI.iSelectNo] == 0)
 		{
@@ -720,6 +722,8 @@ bool SceneCollectState::MovieStep::PadUpdate(sceneCollect *pMain, int DeviceID)
 	// 決定でムービー鑑賞ステートへ！
 	if (tdnInput::KeyGet(KEYCODE::KEY_B, DeviceID) == 3)
 	{
+		pMain->SetCtrlDevice(DeviceID); // このボタンを押したデバイスを保存
+
 		// しかしまだ解放されていなかったら
 		if (PlayerDataMgr->m_SecretData.iAllMovie[pMain->m_tagMI.iSelectNo] == 0)
 		{
@@ -1239,7 +1243,7 @@ bool SceneCollectState::BackMenuStep::PadUpdate(sceneCollect *pMain, int DeviceI
 	bool bChangedState(false);
 
 	// 
-	if (pMain->GetTips(TIPS_TYPE_COLLECT::BACK_MENU)->GetSelectState() == TipsCard::OK)
+	if (pMain->GetTips(TIPS_TYPE_COLLECT::BACK_MENU)->GetSelectState() == TipsCard::SELECT_STATE::OK)
 	{
 		// フェードしてチュートリアルへ
 		// フェードアウト
@@ -1248,7 +1252,7 @@ bool SceneCollectState::BackMenuStep::PadUpdate(sceneCollect *pMain, int DeviceI
 		bChangedState = true;
 
 	}
-	else if (pMain->GetTips(TIPS_TYPE_COLLECT::BACK_MENU)->GetSelectState() == TipsCard::CANCEL)
+	else if (pMain->GetTips(TIPS_TYPE_COLLECT::BACK_MENU)->GetSelectState() == TipsCard::SELECT_STATE::CANCEL)
 	{
 		// 戻る
 		pMain->GetFSM()->RevertToPreviousState();
@@ -1306,6 +1310,7 @@ void SceneCollectState::BackMenuStep::Render(sceneCollect *pMain)
 #ifdef _DEBUG
 
 	tdnText::Draw(0, 0, 0xffffffff, "BackMenuStep");
+	tdnText::Draw(0, 100, 0xffffffff, "状態_%d", (int)pMain->GetTips(TIPS_TYPE_COLLECT::BACK_MENU)->GetSelectState());
 
 #endif // _DEBUG
 

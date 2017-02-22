@@ -564,9 +564,8 @@ public:
 	virtual bool HeavehoDriveUpdate() = 0;
 	virtual void HeavehoDriveHitEvent()		// 最初の一撃が当たったときに呼び出される関数
 	{
-		// 相手のバースト使用不可に
-		GetTargetPlayer()->ActionNotOverDrive();
-		// m_bNotOverDrive = true; 
+
+	
 	}		
 
 	/****************************/

@@ -172,6 +172,7 @@ bool SceneMenuState::FirstStep::PadUpdate(sceneMenu *pMain, int DeviceID)
 			bChangedState = true;	// ★関数分けしたので、これをtrueにしたらreturnするようにした
 			break;
 		case MENU_ICON_TYPE::COLLECT:
+			pMain->SetPauseDeviceID(DeviceID);// ★ポーズメニューを押した人保存
 			M_UIMgr->Action();
 			bChangedState = true;
 			MainFrameEX->ChangeScene(new sceneCollect, true);

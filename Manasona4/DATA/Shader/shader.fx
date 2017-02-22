@@ -1,44 +1,39 @@
 //------------------------------------------------------
 //		変換行列
 //------------------------------------------------------
-float4x4 g_mWMatrix;		// ワールド変換行列
-float4x4 g_mVMatrix;		// ビュー変換行列
-float4x4 g_mPMatrix;		// プロジェクション変換行列
+float4x4 g_mWMatrix;			// ワールド変換行列
+float4x4 g_mVMatrix;			// ビュー変換行列
+float4x4 g_mPMatrix;			// プロジェクション変換行列
 
-float4x4 g_mWVPMatrix;		// 投影変換行列
-float4x4 g_mVPMatrix;		// ワールド座標から→プロジェクション座標へ持っていく行列
+float4x4 g_mWVPMatrix;			// 投影変換行列
+float4x4 g_mVPMatrix;			// ワールド座標から→プロジェクション座標へ持っていく行列
 
-float4x4 g_mInvPMatrix;	// プロジェクション座標 ->View座標　へ戻す逆行列
-float4x4 g_mInvVMatrix;	// View座標 ->ワールド座標　へ戻す逆行列
-float4x4 g_mInvVPMatrix;	// プロジェクション座標 -> ワールド座標 へ戻す逆行列
+float4x4 g_mInvPMatrix;			// プロジェクション座標 ->ビュー座標　へ戻す逆行列
+float4x4 g_mInvVMatrix;			// ビュー座標 ->ワールド座標　へ戻す逆行列
+float4x4 g_mInvVPMatrix;		// プロジェクション座標 -> ワールド座標 へ戻す逆行列
 
-float4x4 g_mShadowProjection; // 影
+float4x4 g_mShadowProjection;	// 影
 
 //------------------------------------------------------
 //		環境関連
 //------------------------------------------------------
-float3	g_vViewPos;		// ワールド座標の目のポジション
+float3 g_vViewPos;								// ワールド座標の目のポジション
+float3 g_vWLightVec = { 1.0f, -1.0f, 1.0f };	// ワールド空間での平行光の向き
+//float3 LightVec;								// 平行光の向き
+float3 g_vViewLightVec;							// ビュー座標での光りの向き
+float3 g_vLightColor	= { 1.0f, 1.0f, 1.0f };
+float3 g_vSkyColor		= { .4f, .6f, .6f };
+float3 g_vGroundColor	= { .6f, .4f, .4f };
+float  g_fRimPowerRate		= 2.0f;				// リムライトの光の幅 
+float  g_fEmissivePowerRate = 2.0f;				// エミッシブの幅 エミッシブがいらない時はテクス茶を変えずこの数値を下げる
 
-float3 g_vWLightVec = { 1.0f, -1.0f, 1.0f };// ワールド空間での平行光の向き
+float g_fFogNear	= 128.0f;
+float g_fFogFar		= 512.0f;
+float3 g_vFogColor	= { 0.2f, 0.3f, 0.35f };
 
-//float3 LightVec;		// 平行光の向き
-float3 g_vViewLightVec;	// ビュー座標での光りの向き
-float3 g_vLightColor = { 1.0f, 1.0f, 1.0f };
-
-float3 g_vSkyColor = { .4f, .6f, .6f };
-float3 g_vGroundColor = { .6f, .4f, .4f };
-
-float g_fRimPowerRate = 2.0f;		 // リムライトの光の幅 
-float g_fEmissivePowerRate = 2.0f;// エミッシブの幅 エミッシブがいらない時はテクス茶を変えずこの数値を下げる
-// 今は0に
-
-float g_fFogNear = 128.0f;
-float g_fFogFar = 512.0f;
-float3 g_vFogColor = { 0.2f, 0.3f, 0.35f };
-
-/***************************/
+//------------------------------------------------------
 //	最初の頂点データ
-/***************************/
+//------------------------------------------------------
 struct VS_INPUT
 {
 	float4 Pos    : POSITION;
@@ -50,20 +45,19 @@ struct VS_INPUT
 //------------------------------------------------------
 //		テクスチャサンプラー	
 //------------------------------------------------------
-
 // MinFilter	縮小フィルタに使用されるメソッド
 // MagFilter	拡大フィルタに使用されるメソッド
 // MipFilter	MIPMAPに使用されるメソッド
-// AddressU	0 - 1の範囲外にあるuテクスチャー座標の解決に使用されるメソッド
-// AddressV	0 - 1の範囲外にあるvテクスチャー座標の解決に使用されるメソッド
+// AddressU		0 - 1の範囲外にあるuテクスチャー座標の解決に使用されるメソッド
+// AddressV		0 - 1の範囲外にあるvテクスチャー座標の解決に使用されるメソッド
 // LINEAR		バイリニア補間フィルタリング。目的のピクセルに外接する2×2テクセルの重み付き平均領域を使用
-// NONE		MIPMAPを無効にし、拡大フィルタを使用
+// NONE			MIPMAPを無効にし、拡大フィルタを使用
 // CLAMP		範囲[0.0, 1.0]の外にあるテクスチャー座標には、それぞれ0.0または1.0のテクスチャーカラーを設定
 // MIPMAP		メインとなるテクスチャの画像を補完するよう事前計算され最適化された画像群。詳細さのレベルによって画像を切り替える
 
-// WRAP...反対側から同じ絵を繰り返します
-// CLAMP...端の色を繰り返します
-// BORDER...透明色にします
+// WRAP...		反対側から同じ絵を繰り返します
+// CLAMP..		端の色を繰り返します
+// BORDER...	透明色にします
 
 texture Texture;
 sampler DecaleSamp = sampler_state
@@ -99,6 +93,8 @@ sampler RoughnessSamp = sampler_state
 
 	AddressU = Wrap;
 	AddressV = Wrap;
+
+	BorderColor = 0x00000000;
 };
 
 texture MultiMap;		//	マルチマップテクスチャ
@@ -112,7 +108,7 @@ sampler MultiSamp = sampler_state
 	AddressU = Wrap;
 	AddressV = Wrap;
 
-	BorderColor = 0x00000000;
+	BorderColor = 0xffffffff;
 };
 
 texture ToonShadowMap;	//	トゥーンの影用テクスチャ
@@ -133,16 +129,16 @@ sampler ToonShadowSamp = sampler_state
 //
 //********************************************************************
 
-/***************************/
-//	★TDNMeshで使用
-/***************************/
+//------------------------------------------------------
+//	TDNMesh用
+//------------------------------------------------------
 struct VSINPUT
 {
 	float4 Pos : POSITION;
 	float4 Normal : NORMAL;
 	float4 Color : COLOR;
 	float2 UV : TEXCOORD0;
-	// インスタンシング
+	// インスタンシング用
 	float4 worldPos : TEXCOORD1;
 };
 
@@ -231,8 +227,6 @@ float4 PS_Basic(VS_OUTPUT In) : COLOR
 
 	//	ピクセル色決定
 	OUT = In.Color * tex2D(DecaleSamp, In.Tex);
-
-	//OUT.r = 1.0f;
 	OUT.a = 1.0f;
 
 	return OUT;
@@ -268,7 +262,6 @@ float4 PS_Black(VS_OUTPUT In) : COLOR
 
 	//	ピクセル色決定
 	OUT.rgb = 0.0f;
-
 	OUT.a = 1.0f;
 
 	return OUT;
@@ -329,10 +322,9 @@ technique cameraAlpha
 }
 
 
-/***************************/
+//------------------------------------------------------
 //	G_Buffer用の頂点データ
-/***************************/
-
+//------------------------------------------------------
 struct VS_DEFERRED
 {
 	float4 Pos				:POSITION;
@@ -355,6 +347,7 @@ struct PS_DEFERRED
 };
 
 // 2つの情報をこの順番通りに描く
+// 後で法線デコードする無理やり突っ込む形にした
 struct PS_G_BUFFER
 {
 	float4 NormalDepth		:COLOR0;	// 法線情報&奥行き
@@ -362,10 +355,9 @@ struct PS_G_BUFFER
 };
 
 
-//*****************************************
+//------------------------------------------------------
 //		G_Buffer [1206] 最適化ずみ
-//*****************************************
-
+//------------------------------------------------------
 VS_DEFERRED VS_G_Buffer(VS_INPUT In)
 {
 	VS_DEFERRED Out = (VS_DEFERRED)0;
@@ -389,7 +381,7 @@ VS_DEFERRED VS_G_Buffer(VS_INPUT In)
 
 	// 頂点スクリーン座標系算出
 	float3	vx;
-	float3	vy = { .0f, 1.0f, 0.5f };			// 仮のy方向ベクトル  0.001f は　外積を成功させる為にずらしている　同じ値で外積すると0ベクトルになる
+	float3	vy = { .0f, 1.0f, 0.5f };			// 仮のy方向ベクトル  は　外積を成功させる為にずらしている　同じ値で外積すると0ベクトルになる
 
 	vx = cross(N, vy);
 	vx = normalize(vx);
@@ -406,53 +398,32 @@ PS_G_BUFFER PS_G_Buffer(VS_DEFERRED In)
 {
 	PS_G_BUFFER OUT = (PS_G_BUFFER)0;
 
-	// (1212) アルファが少しでもなければ破棄 Decaleを吐き出さないようにしているので
+	// アルファが少しでもなければ破棄 Decaleを吐き出さないようにしているので
 	clip((tex2D(DecaleSamp, In.Tex).a - 0.999f));
 
-	//float2 Tex = In.Tex;
-
-		//float3 E = normalize(In.vE);
-
-		//　各色に光のパラメーターを設定
-		//  R->AO  G->Emissive  B->未設定
-		// float3 multiRate = tex2D(MultiSamp, Tex).rgb;
-
-		//ディヒューズ
-		//OUT.Diffuse = In.Color * tex2D( DecaleSamp,Tex );
-	//	OUT.Diffuse = tex2D(DecaleSamp, Tex);
-	//OUT.Diffuse.a = 1.0f;
-
-	//スペキュラ
+	// 質感のパラメーター R G Bにそれぞれ送る
 	OUT.Specular = tex2D(RoughnessSamp, In.Tex);
-	//OUT.Specular.a = 1.0f;
-	//OUT.Specular.a = multiRate.g;	// エミッシブを入れる
-
-	
-	// OUT.Depth = In.Depth.z / In.Depth.w;	//★　wで割って-1~1に変換する　
-	// Positonと違い自分でNDC空間にする必要がある
-
 
 	{
-		// [1206] 接空間は頂点で正規化してるのでPixel側では正規化しない
+		// 接空間は頂点で正規化してるのでPixel側では正規化しない
 		
 		// 	接空間からビュー空間へ持っていくビュー回転行列を作成
-		// ↓★これは（接→Viewの[変換行列]）
+		// ↓これは（接→ビューの[変換行列]）
 		float3x3 ts;								//法線から求めた軸
 		ts[0] = normalize(In.Tangent);				//接線
 		ts[1] = normalize(In.Binormal);				//従法線
 		ts[2] = normalize(In.Normal);				//法線
 
 
-		float3 N = tex2D(NormalSamp, In.Tex).xyz * 2.0f - 1.0f;// テクスチャから色を取得してベクトルに変換
-		float3 normal = normalize(mul(N, ts));// 接空間のNormalを↑の変換行列を掛け合わせView空間の法線へ　
-		normal = normal * 0.5f + 0.5f;// 法線を色で出すため0~1の間に戻す
+		float3 N = tex2D(NormalSamp, In.Tex).xyz * 2.0f - 1.0f;	// テクスチャから色を取得してベクトルに変換
+		float3 normal = normalize(mul(N, ts));					// 接空間のNormalを↑の変換行列を掛け合わせView空間の法線へ　
+		normal = normal * 0.5f + 0.5f;							// 法線を色で出すため0~1の間に戻す
 		OUT.NormalDepth.rg = normal.rg;
 
 	}
 
-	//深度
-	//OUT.NormalDepth.ba = In.Depth.zw;
-	OUT.NormalDepth.b = In.Depth.z / In.Depth.w; // 一応Wで割ってNDC空間にしてみる
+	// 深度
+	OUT.NormalDepth.b = In.Depth.z / In.Depth.w; //Positonと違い自分で Wで割ってNDC空間に
 	OUT.NormalDepth.a = In.Depth.w; //　
 
 
@@ -461,6 +432,8 @@ PS_G_BUFFER PS_G_Buffer(VS_DEFERRED In)
 
 /* deferredでαに情報を書き入れる方法 */
 /*
+他の友達や後輩に教えてやれるようにメモ
+
 普通に描くと　半透明オブジェクトが重なり合い情報が正確にでない
 解決方法は
 SrcBlend = One;
@@ -470,7 +443,7 @@ ZEnable = true;
 
 ↑どういうことが起こるか
 ソースブレンドは　今書いているものをどれくらい乗っけるかの値
-これを One(1,1,1,1)にすることで全力で上にかぶせる用に設定
+これを One(1,1,1,1)にすることで全力で上から描画用に設定
 
 デプスブレンドは　後に描いていた物体をどう薄めるか
 これを　Zero(0,0,0,0)にすることで一切描かない
@@ -479,6 +452,7 @@ ZEnable = true;
 Ｚ値を考慮すればそもそも後ろを書かなくできる
 
 */
+
 technique G_Buffer
 {
 	pass P0
@@ -486,10 +460,8 @@ technique G_Buffer
 		// レンダリングステート
 		AlphaBlendEnable = true;
 		BlendOp = Add;
-		//SrcBlend = SrcAlpha;		// 最初のRGBデータソースを指定します
-		//DestBlend = InvSrcAlpha;	// 2番目のRGBデータソースを指定します
-		SrcBlend = One;		//1,1,1,1
-		DestBlend = Zero;	//0,0,0,0
+		SrcBlend = One;		
+		DestBlend = Zero;	
 		CullMode = CCW;
 		ZEnable = true;
 		ZWriteEnable = true;
@@ -536,14 +508,11 @@ float3 CalcViewPosition(float2 UV, float2 zw)
 	//		   -1.0f
 
 	float4 proj;
-	proj.xy = (UV*float2(2.0f, -2.0f) + float2(-1.0f, 1.0f))* zw.y; //先生に聞こう
-	//proj.xy = UV*2.0f - 1.0f;
-	//proj.y *= -1.0f;
+	proj.xy = (UV*float2(2.0f, -2.0f) + float2(-1.0f, 1.0f))* zw.y; // 先生に聞こう
 	proj.zw = zw;	// ZとWはそのまま入れる
 
 	// プロジェクション逆行列でビュー座標系に変換　Proj->View
-	float4 viewPos = mul(proj, g_mInvPMatrix);
-	//viewPos.xyz /= viewPos.w;		// Wで割ってはいけない。なぜ？
+	float4 viewPos = mul(proj, g_mInvPMatrix);// Wで割る必要はなし
 
 	return viewPos.xyz;
 }
@@ -604,9 +573,9 @@ sampler ShadowSamp = sampler_state
 	AddressV = BORDER;
 };
 
-/********************************************************/
+//------------------------------------------------------
 //			シャドウ
-/********************************************************/
+//------------------------------------------------------
 
 struct VS_SHADOW
 {
@@ -660,17 +629,18 @@ technique ShadowBuf
 	}
 }
 
-/***************************/
+//------------------------------------------------------
 //	ライティング用構造体
-/***************************/
+//------------------------------------------------------
 struct PS_LIGHT
 {
 	float4	color : COLOR0;
 	float4  spec  : COLOR1;
 };
 
-/***********************************/
+//------------------------------------------------------
 //	平行光
+//------------------------------------------------------
 PS_LIGHT PS_DirLight(float2 Tex:TEXCOORD0)
 {
 	PS_LIGHT OUT;
@@ -683,7 +653,7 @@ PS_LIGHT PS_DirLight(float2 Tex:TEXCOORD0)
 	// ライト率(ハーフランバート)
 	float rate = (dot(Normal, -g_vViewLightVec));
 	float3 HalfLambert = pow((rate + 1.0f)*0.5f, 2);	// HalfLambert
-	float3 Lambert = max(0, rate);				// Lambert
+	//float3 Lambert = max(0, rate);					// Lambert
 
 	// ピクセルの色
 	OUT.color.rgb = (HalfLambert * g_vLightColor);
@@ -713,8 +683,9 @@ technique DirLight
 	}
 }
 
-/***********************************/
+//------------------------------------------------------
 //	平行光(影)
+//------------------------------------------------------
 PS_LIGHT PS_DirLightShadow(float2 Tex:TEXCOORD0)
 {
 	PS_LIGHT OUT;
@@ -791,6 +762,7 @@ PS_LIGHT PS_DirLightShadow(float2 Tex:TEXCOORD0)
 
 		//if (depth.r < fragDepth - 0.001f)
 		{
+
 			const float variance = depth.g - depth.r * depth.r;
 			ShadowValue = variance / (variance + (fragDepth - depth.r) * (fragDepth - depth.r));
 		}
@@ -827,8 +799,9 @@ technique DirLightShadow
 	}
 }
 
-//*************************************
+//------------------------------------------------------
 ///		半球ライティング
+//------------------------------------------------------
 float4 PS_HemiLight(float2 Tex: TEXCOORD0) :COLOR
 {
 	float4 OUT;
@@ -865,8 +838,9 @@ technique HemiLight
 
 
 
-/***********************************/
+//------------------------------------------------------
 //	平行光(影)+環境光
+//------------------------------------------------------
 PS_LIGHT PS_AllLight(float2 Tex:TEXCOORD0)
 {
 	PS_LIGHT OUT;
@@ -944,6 +918,11 @@ PS_LIGHT PS_AllLight(float2 Tex:TEXCOORD0)
 		// 砂利じゃり防止
 		if (depth.r < fragDepth - 0.001f)
 		{
+			// チェビチェフの不等式
+			// [メモ]　
+			// 今はチェビチェフの不等式で中で何が起こっているかは分かっていない
+			// ゲームの完成を優先にしたいので今は置いといて必ず来年調べる。
+			// とにかく今は↓の式で確率論を出せることだけ頭に入れておく
 			const float variance = depth.g - depth.r * depth.r;
 			ShadowValue = variance / (variance + (fragDepth - depth.r) * (fragDepth - depth.r));
 		}
@@ -990,9 +969,9 @@ technique AllLight
 }
 
 
-//**********************************
+//------------------------------------------------------
 ///		点光源スフィア配置型
-//**********************************
+//------------------------------------------------------
 
 struct DEF_POINTLIGHT
 {
@@ -1008,10 +987,10 @@ struct VS_POINTLIGHT
 };
 
 // グローバル座標
-float3 g_vPLSpos;		// ※View座標系に変換しておくこと
-float  g_fPLSrange = 30.0f;
-float3 g_vPLScolor = float3(300, 600, 300);// カラー
-float  g_fPLSpower = 2.0f;// パワー
+float3 g_vPLSpos;							// ※View座標系に変換しておくこと
+float  g_fPLSrange = 30.0f;					// 距離
+float3 g_vPLScolor = float3(300, 600, 300);	// 色
+float  g_fPLSpower = 2.0f;					// 力
 
 //------------------------------------------------------
 //		PointLightSphereの頂点シェーダー
@@ -1070,10 +1049,10 @@ technique PointLightSphere
 	{
 		AlphaBlendEnable = true;
 		BlendOp = Add;
-		SrcBlend = SrcAlpha;//　追加
+		SrcBlend = SrcAlpha;	//　追加
 		DestBlend = One;
-		CullMode = Cw;	// カリングはなし 法線方向にのばしたいけど中見せたい→CW
-		ZEnable = FALSE;	// 奥行考慮とかいう必殺　はなしになった。　プレイヤーが前にいると困る
+		CullMode = Cw;			// カリングはなし 法線方向にのばしたいけど中見せたい→CW
+		ZEnable = FALSE;		// 奥行考慮は仕方なくする
 		ZWriteEnable = FALSE;
 		//PixelShader = compile ps_3_0 PS_PointLight();
 		//VertexShader = compile vs_3_0 VS_PointLightBall();
@@ -1205,9 +1184,9 @@ sampler EnvFullBufSamp = sampler_state
 	AddressV = WRAP;//MIRROR
 };
 
-/***************************************/
-/*ぼかし用サンプラー*/
-/***************************************/
+//------------------------------------------------------
+//	ぼかし用サンプラー
+//------------------------------------------------------
 
 sampler GaussianSamp = sampler_state
 {
@@ -1225,8 +1204,9 @@ sampler GaussianSamp = sampler_state
 float g_fTU = 1.0f / 1280.0f, g_fTV = 1.0f / 720.0f;
 float g_fBlurValue = 1.0f;
 
-/***************************************/
-/*		ガウシアンブラー			　 */
+//------------------------------------------------------
+//		ガウシアンブラー			　 
+//------------------------------------------------------
 float4 PS_gaussX(float2 Tex : TEXCOORD0) : COLOR
 {
 
@@ -1385,9 +1365,9 @@ technique gaussY
 	}
 }
 
-//********************************************************************
+//------------------------------------------------------
 //		放射ブラ―
-//********************************************************************
+//------------------------------------------------------
 
 float g_fCenterX = 0.0f;
 float g_fCenterY = 0.0f;
@@ -1402,12 +1382,7 @@ float4 PS_RadialBlur(float2 Tex:TEXCOORD0) : COLOR
 {
 	float4	OUT;
 
-	/*******************************************/
 	// ( NDC空間 ) -> ( UV空間 ) に持ってくる
-	// 
-	// 
-	// 
-	/*******************************************/
 	
 	//　放射中心
 	float2 ss_center = float2((g_fCenterX + 1.0f) * 0.5f, (-g_fCenterY + 1.0f) * 0.5f);
@@ -1450,9 +1425,9 @@ technique RadialBlur
 }
 
 
-//********************************************************************
+//------------------------------------------------------
 //		移動ブラ―
-//********************************************************************
+//------------------------------------------------------
 
 float g_fDirectionalX = 1.0f;
 float g_fDirectionalY = 0.0f;
@@ -1464,10 +1439,7 @@ float4 PS_DirectionalBlur(float2 Tex:TEXCOORD0) : COLOR
 {
 	float4	OUT;
 
-	/*******************************************/
 	// ( NDC空間 ) -> ( UV空間 ) に持ってくる
-	// 
-	/*******************************************/
 
 	//　オフセット
 	float2 uvOffset = float2(g_fDirectionalX, g_fDirectionalY) *(g_fDirectionalBlurPower);
@@ -1536,9 +1508,9 @@ technique add_hdrBloom
 	}
 }
 
-/****************************/
-/*			ToneMap			*/
-/****************************/
+//------------------------------------------------------
+//			ToneMap			
+//------------------------------------------------------
 
 /*露光度*/
 float g_fExposure = 0.0f;
@@ -1546,9 +1518,9 @@ float g_fExposure = 0.0f;
 // 高輝度
 float3 g_vBloomColor = { 0.825f, 0.85f, 0.85f };
 
-/***********************************/
+//------------------------------------------------------
 //	高輝度抽出用の構造体
-/***********************************/
+//------------------------------------------------------
 struct PS_TONEMAP
 {
 	float4	color : COLOR0;
@@ -1575,12 +1547,6 @@ struct VS_OUTPUT_FINAL
 	float4 wPos			: TEXCOORD1;//　ピクセルに送る情報にワールドからのポジション追加
 	float4 wvpPos		: TEXCOORD2;//　ピクセルに送る情報にゲーム画面ラストのポジション追加
 };
-
-//********************************************************************
-//
-//		基本３Ｄシェーダー		
-//
-//********************************************************************
 
 //------------------------------------------------------
 //		頂点シェーダー	
@@ -1642,10 +1608,8 @@ technique DefaultLighting
 
 		AlphaBlendEnable = true;	// アルファブレンド考慮
 		BlendOp = Add;				// ブレンド仕様
-		//SrcBlend = SrcAlpha;		// 現在描いてる方
-		//DestBlend = InvSrcAlpha;	// 描かれている方
-		SrcBlend = One;		//1,1,1,1
-		DestBlend = Zero;	//0,0,0,0
+		SrcBlend = One;		
+		DestBlend = Zero;	
 
 		CullMode = CCW;				// カリングの仕様
 
@@ -1737,7 +1701,7 @@ lightCol += tex2D(PLSSamp, ScreenTex);
 OUT.color.rgb *= lightCol;
 OUT.color.rgb += tex2D(SpecSamp, ScreenTex);
 
-// ピクセル色をグロウ用にサンプリング
+// ピクセル色をグロ-用にサンプリング
 const float4 l_fGlowCol = tex2D(MultiSamp, In.Tex);
 OUT.color.rgb += l_fGlowCol.rgb;
 
@@ -1783,15 +1747,15 @@ technique StageNanasato
 //------------------------------------------------------
 //		プレイヤー用のグローバルエリア
 //------------------------------------------------------
-float g_InvincibleColRate = 0.0f;//Flash そのキャラクターダウン後の点滅のレート
-float g_OrangeColRate = 0.0f;//　オレンジの光
-float g_MagentaColRate = 0.0f;//　マゼンタの光
-float g_OverDriveColRate = 0.0f;//
-float g_WillPowerRate = 0.0f;//  根性値
+float g_InvincibleColRate = 0.0f;	// Flash そのキャラクターダウン後の点滅のレート
+float g_OrangeColRate = 0.0f;		// オレンジの光
+float g_MagentaColRate = 0.0f;		// マゼンタの光
+float g_OverDriveColRate = 0.0f;	//
+float g_WillPowerRate = 0.0f;		// 根性値
 
 // [1206] 最適化のためレートの送る回数を減らすため仕方なく固めることに
 float3 g_vPlayerColDesc;		//	赤->点滅 青->オレンジ 緑->マゼンタ
-float3 g_vPlayerColDesc2;	//  赤->オーバードライブ時　青->覚醒 　緑->エッジが赤か青か
+float3 g_vPlayerColDesc2;		//  赤->オーバードライブ時　青->覚醒 　緑->エッジが赤か青か
 
 /*************************************/
 // アウトラインに必要な変数
@@ -1808,10 +1772,9 @@ struct VS_OUTPUT_OUTLINE
 	float4 Color	: COLOR;
 };
 
-/*************************************/
+//------------------------------------------------------
 // アウトライン用の頂点シェーダー
-/*************************************/
-
+//------------------------------------------------------
 VS_OUTPUT_OUTLINE VS_OutLine(VS_INPUT In) //:POSITION テクスコードの情報がなくなるので書かない
 {
 
@@ -1826,10 +1789,9 @@ VS_OUTPUT_OUTLINE VS_OutLine(VS_INPUT In) //:POSITION テクスコードの情報がなくな
 	return OUT;
 }
 
-/*************************************/
+//------------------------------------------------------
 // アウトライン用のピクセルシェーダー
-/*************************************/
-
+//------------------------------------------------------
 PS_TONEMAP PS_OutLine(VS_OUTPUT_OUTLINE In)
 {
 	PS_TONEMAP	OUT = (PS_TONEMAP)0;
@@ -1880,10 +1842,10 @@ PS_TONEMAP PS_Player(VS_OUTPUT_FINAL In) : COLOR
 {
 	PS_TONEMAP	OUT = (PS_TONEMAP)0;
 
-	//スクリーン空間をテクスチャ座標に  NDC->UV y反転
+	// スクリーン空間をテクスチャ座標に  NDC->UV y反転
 	const float2 ScreenTex = In.wvpPos.xy / In.wvpPos.w * float2(0.5, -0.5) + float2(0.5, 0.5);
 
-	//	ピクセル色決定
+	// ピクセル色決定
 	OUT.color = In.Color * tex2D(DecaleSamp, In.Tex);
 
 	float4 lightCol = tex2D(LightSamp, ScreenTex);
@@ -1892,18 +1854,13 @@ PS_TONEMAP PS_Player(VS_OUTPUT_FINAL In) : COLOR
 	//OUT.color.rgb += tex2D(SpecSamp, ScreenTex);
 	//OUT.color.rgb += tex2D(PLSSamp, ScreenTex);
 
-
-	//OUT.color.g += 0.5;
-
-
-
-	//トーンマッピング
+	// トーンマッピング
 	OUT.color.rgb *= exp2(g_fExposure);
 
 	OUT.high.rgb = max(float3(0.0f, 0.0f, 0.0f), (OUT.color.rgb - g_vBloomColor));
 	OUT.high.a = 1.0f;
 
-	//高輝度抽出後にしないとHDRで光ってしまうので最後に
+	// 高輝度抽出後にしないとHDRで光ってしまうので最後に
 	OUT.color.rgb += g_InvincibleColRate;
 
 	return OUT;
@@ -1921,10 +1878,8 @@ technique Player
 
 		AlphaBlendEnable = true;	// アルファブレンド考慮
 		BlendOp = Add;				// ブレンド仕様
-		//SrcBlend = SrcAlpha;		// 現在描いてる方
-		//DestBlend = InvSrcAlpha;	// 描かれている方
-		SrcBlend = One;				//1,1,1,1
-		DestBlend = Zero;			//0,0,0,0
+		SrcBlend = One;				// 現在描いてる方
+		DestBlend = Zero;			// 描かれている方
 		CullMode = CCW;				// カリングの仕様
 		AlphaRef = 0x00000080;
 		AlphaFunc = GREATEREQUAL;	// αがAlphaRef以上ならOK
@@ -1964,7 +1919,6 @@ PS_TONEMAP PS_ToonPlayer(VS_OUTPUT_FINAL In) : COLOR
 	float3 toonShadowCol = tex2D(ToonShadowSamp, float2(HalfLambert, 0.0f));
 		OUT.color.rgb *= toonShadowCol;
 
-	//OUT.color.g += 0.5;
 	float3 E = Pos.xyz;// ビューの目線
 		E = normalize(E);
 	float RimPower = pow(1.0f - max(0.0f, dot(-E, Normal)), 4.0f);
@@ -1976,7 +1930,7 @@ PS_TONEMAP PS_ToonPlayer(VS_OUTPUT_FINAL In) : COLOR
 	OUT.high.rgb = max(float3(0.0f, 0.0f, 0.0f), (OUT.color.rgb - g_vBloomColor));
 	OUT.high.a = 1.0f;
 
-	// キャサリンっぽい白いリム
+	// キャサリンっぽく白いリム
 	OUT.color.rgb += (RimPower)* float3(1, 1, 1);
 
 	// オーバードライブ用
@@ -2036,7 +1990,7 @@ PS_TONEMAP PS_ToonPlayerNoRim(VS_OUTPUT_FINAL In) : COLOR
 {
 	PS_TONEMAP	OUT = (PS_TONEMAP)0;
 
-//スクリーン空間をテクスチャ座標に  NDC->UV y反転
+// スクリーン空間をテクスチャ座標に  NDC->UV y反転
 const float2 ScreenTex = In.wvpPos.xy / In.wvpPos.w * float2(0.5, -0.5) + float2(0.5, 0.5);
 // 必要な情報を取得
 const float4 NormalDepth = tex2D(NormalDepthSamp, ScreenTex);
@@ -2150,8 +2104,8 @@ PS_TONEMAP PS_Persona(VS_OUTPUT_FINAL In) : COLOR
 	//float3 toonShadowCol = tex2D(ToonShadowSamp, float2(HalfLambert, 0.0f));
 	//	OUT.color.rgb *= toonShadowCol;
 
-		// ピクセルの色
-		//OUT.color.rgb = (HalfLambert * g_vLightColor);
+	// ピクセルの色
+	// OUT.color.rgb = (HalfLambert * g_vLightColor);
 	
 
 	// 青いリムライティング
@@ -2173,8 +2127,8 @@ PS_TONEMAP PS_Persona(VS_OUTPUT_FINAL In) : COLOR
 
 	OUT.high.a = 1.0f;
 
-	//高輝度抽出後にしないとHDRで光ってしまうので最後に
-	//OUT.color.rgb += g_InvincibleColRate;
+	// 高輝度抽出後にしないとHDRで光ってしまうので最後に
+	// OUT.color.rgb += g_InvincibleColRate;
 
 
 
@@ -2233,7 +2187,7 @@ technique Persona
 VS_OUTPUT_FINAL VS_Sky(VS_INPUT In)
 {
 	VS_OUTPUT_FINAL Out = (VS_OUTPUT_FINAL)0;
-	//TransMatrixとPosを合成してwPosの情報生成
+	// TransMatrixとPosを合成してwPosの情報生成
 	Out.wPos = mul(In.Pos, g_mWMatrix);
 
 	Out.Pos = mul(In.Pos, g_mWVPMatrix);
@@ -2251,8 +2205,8 @@ PS_TONEMAP PS_Sky(VS_OUTPUT_FINAL In) : COLOR
 {
 	PS_TONEMAP	OUT = (PS_TONEMAP)0;
 
-	//スクリーン空間をテクスチャ座標に  NDC->UV y反転
-	//const float2 ScreenTex = In.wvpPos.xy / In.wvpPos.w * float2(0.5, -0.5) + float2(0.5, 0.5);
+	// スクリーン空間をテクスチャ座標に  NDC->UV y反転
+	// const float2 ScreenTex = In.wvpPos.xy / In.wvpPos.w * float2(0.5, -0.5) + float2(0.5, 0.5);
 
 	//	ピクセル色決定
 	OUT.color = In.Color * tex2D(DecaleSamp, In.Tex);
