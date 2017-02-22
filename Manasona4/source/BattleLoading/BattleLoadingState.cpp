@@ -75,8 +75,13 @@ void BattleLoadingState::Intro::Execute(BattleLoading *pMain)
 	if (pMain->m_iSceneFrame == 18)
 	{
 		pMain->m_pImages[BattleLoading::IMAGE::I_INTRO_LIGHT].Action();
-		se->Play("バトルローディング");
+		//se->Play("バトルローディング");
 
+	}
+
+	if (pMain->m_iSceneFrame == 1)
+	{
+		bgm->PlayStreamIn("DATA/Sound/BGM/System/VS.ogg");
 	}
 
 	//if (pMain->m_fFadeRate <= 0.0f)
@@ -503,8 +508,8 @@ void BattleLoadingState::FadeChangeStep::Enter(BattleLoading *pMain)
 {
 	// フェード
 	// Fade::Set(Fade::FLAG::FADE_OUT, 8);
-	se->Stop("バトルローディング",0);
-
+	//se->Stop("バトルローディング",0);
+	bgm->StopStreamIn(true);
 
 	pMain->m_pImages[BattleLoading::IMAGE::LOADING_CIRCLE].Action();
 
