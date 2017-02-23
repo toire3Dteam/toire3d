@@ -18,7 +18,7 @@ bool PlayerDataManager::Initialize()
 //------------------------------------------------------
 //	コンストラクタ
 //------------------------------------------------------
-PlayerDataManager::PlayerDataManager() :m_bSaveFlag(true),
+PlayerDataManager::PlayerDataManager() :m_bSaveFlag(false),
 m_StartClock(clock())	// 現在時刻保存
 {
 }
@@ -29,7 +29,7 @@ m_StartClock(clock())	// 現在時刻保存
 PlayerDataManager::~PlayerDataManager()
 {
 	// セーブフラグあったらデータ記録
-	if (m_ConfigData.iAutoSave == (int)AUTO_SAVE_TYPE::YES)
+	if (m_ConfigData.iAutoSave == (int)AUTO_SAVE_TYPE::YES && m_bSaveFlag)
 	{
 		SavePlayerData();
 	}
@@ -74,6 +74,9 @@ bool PlayerDataManager::LoadPlayerData()
 
 	// ファイル閉じる
 	fclose(fp);
+
+	// 全部読み込み切ったらセーブしてもいい
+	m_bSaveFlag = true;
 
 	return true;		// 読み込み成功
 }

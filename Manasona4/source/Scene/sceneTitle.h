@@ -66,6 +66,9 @@ private:
 	// 雲のスクロール処理
 	float m_fCloudU;
 
+	// ゲームタイマー
+	int m_iGameTimer;
+
 	// ステートをフレンドクラスへ
 	friend class SceneTitleState::Intro;
 	friend class SceneTitleState::LogoStep;

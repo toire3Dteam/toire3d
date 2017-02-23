@@ -819,8 +819,8 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 
 #ifdef _DEBUG
 									 // 数字エフェクト追加
-									 Vector2 screenPos = Math::WorldToScreen(pPerson->GetPos());
-									 NumberEffect.AddNumber((int)screenPos.x, (int)screenPos.y - 200, damage, Number_Effect::COLOR_TYPE::WHITE, Number::NUM_KIND::NORMAL);
+									// Vector2 screenPos = Math::WorldToScreen(pPerson->GetPos());
+									 //NumberEffect.AddNumber((int)screenPos.x, (int)screenPos.y - 200, damage, Number_Effect::COLOR_TYPE::WHITE, Number::NUM_KIND::NORMAL);
 #endif
 
 									 // 根性値が発動してるなら
@@ -889,7 +889,6 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 pPerson->GetRecoveryDamageCount()->push_back((BASE_ACTION_STATE)HitDamageInfo->iAttackType);
 
 									 // (追加)ヒットエフェクト発動! 
-									 // (TODO)エフェクトを今は自分のポジションにおいてる！！！　後でヒットポジションとかいるかも
 									 pPerson->AddEffectAction(pPerson->GetCenterPos() + Vector3(0, 4, 0), (EFFECT_TYPE)HitDamageInfo->HitEffectType);
 
 									 // 空中ジャンプの権利復活
@@ -996,7 +995,7 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 if (pPerson->isAttackState())
 									 {
 
-										 pPerson->GetAttackData()->bHitSuccess = true;	// マジで当たったガーーーーール！！！！
+										 pPerson->GetAttackData()->bHitSuccess = true;
 #ifdef _DEBUG
 										 //// コンボが当たった時間
 										 //Vector2 screenPos = Math::WorldToScreen(pPerson->GetPos());

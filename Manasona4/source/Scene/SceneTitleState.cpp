@@ -50,6 +50,7 @@ void SceneTitleState::Intro::Execute(sceneTitle *pMain)
 
 void SceneTitleState::Intro::Exit(sceneTitle *pMain) 
 {
+	
 
 }
 
@@ -90,24 +91,50 @@ void SceneTitleState::LogoStep::Enter(sceneTitle *pMain)
 	// ロゴのアニメーション開始
 	pMain->m_pLogo->Action();
 
+	// 放置用
+	pMain->m_iGameTimer = 0;
+
 }
 void SceneTitleState::LogoStep::Execute(sceneTitle *pMain)
 {
 	// ロゴ更新
 	pMain->m_pLogo->Update();
 
-	// パッド分更新
-	int NumDevice(tdnInputManager::GetNumDevice());
-	// パッド何もささってないとき用
-	if (NumDevice == 0)NumDevice = 1;
-	for (int i = 0; i < NumDevice; i++)
+	// 
+	if (Fade::isFadeOutCompletion() == false)
 	{
-		if (KEY(KEY_A, i) == 3 || KEY(KEY_B, i) == 3 || KEY(KEY_C, i) == 3 || KEY(KEY_D, i) == 3)
+
+		if (Fade::GetMode() != Fade::FLAG::FADE_OUT)
 		{
-			// 何かボタン押したらメニューへ
-			pMain->GetFSM()->ChangeState(MovieStep::GetInstance());
-			return;
+
+			pMain->m_iGameTimer++;
+			if (pMain->m_iGameTimer == 180)
+			{
+				// フェードアウト
+				Fade::Set(Fade::FLAG::FADE_OUT, 8);
+			}
+
+			// パッド分更新
+			int NumDevice(tdnInputManager::GetNumDevice());
+			// パッド何もささってないとき用
+			if (NumDevice == 0)NumDevice = 1;
+			for (int i = 0; i < NumDevice; i++)
+			{
+				if (KEY(KEY_A, i) == 3 || KEY(KEY_B, i) == 3 || KEY(KEY_C, i) == 3 || KEY(KEY_D, i) == 3)
+				{
+					// フェードアウト
+					Fade::Set(Fade::FLAG::FADE_OUT, 8);
+					return;
+				}
+			}
+
 		}
+
+	}
+	else
+	{
+		pMain->GetFSM()->ChangeState(MovieStep::GetInstance());
+		return;
 	}
 
 }
@@ -240,6 +267,12 @@ void SceneTitleState::TitleStep::Enter(sceneTitle *pMain)
 	// BGムービー再生
 	pMain->m_pMovieBGLine->Play();
 
+	// 放置用
+	pMain->m_iGameTimer = 0;
+
+	pMain->m_fCloudU = 0;
+
+
 }
 void SceneTitleState::TitleStep::Execute(sceneTitle *pMain)
 {
@@ -274,6 +307,13 @@ void SceneTitleState::TitleStep::Execute(sceneTitle *pMain)
 			pMain->GetFSM()->ChangeState(End::GetInstance());
 			return;
 		}
+	}
+
+	pMain->m_iGameTimer++;
+	if (pMain->m_iGameTimer >= 60 * 120)
+	{
+		pMain->GetFSM()->ChangeState(Intro::GetInstance());
+		return;
 	}
 
 

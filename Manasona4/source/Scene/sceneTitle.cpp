@@ -35,9 +35,9 @@ bool sceneTitle::Initialize()
 
 	m_fLoadPercentage = .5f;	// ロード割合
 	
-
-
 	m_fLoadPercentage = 1.0f;	// ロード割合
+
+	m_iGameTimer = 0;
 
 	/* ステートマシン初期化 */
 	m_pStateMachine = new StateMachine<sceneTitle>(this);
