@@ -2,6 +2,7 @@
 #include "SceneMenu.h"
 #include "SceneMenuState.h"
 #include "SceneMain.h"
+#include "SceneVS.h"
 #include "../BaseEntity/Message/Message.h"
 #include "../Fade/Fade.h"
 #include "../Sound/SoundManager.h"
@@ -213,7 +214,7 @@ void sceneMenu::Update()
 
 			// ƒ`ƒƒƒŒƒ“ƒW‚Å‚à‚È‚¢
 			SelectDataMgr->Get()->bChallenge = false;
-			MainFrameEX->ChangeScene(new sceneMain);
+			MainFrameEX->ChangeScene(new sceneVS);
 			return;
 		}
 

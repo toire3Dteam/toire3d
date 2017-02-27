@@ -5,6 +5,7 @@
 #include "SceneMenu.h"
 #include "../BaseEntity/Message/Message.h"
 #include "../Fade/Fade.h"
+#include "Data\PlayerData.h"
 
 //=============================================================================================
 //		初	期	化	と	開	放
@@ -69,6 +70,14 @@ void sceneTitle::Update()
 {
 	// フェード更新
 	Fade::Update();
+
+	// 全データ削除
+	if (KeyBoard(KB_CTRL) >= 12&&
+		KeyBoard(KB_E) >= 12)
+	{
+		PlayerDataMgr->ClearData();
+	}
+
 
 	{
 		// ★ステートマシン更新(何故ここに書くかというと、中でシーンチェンジの処理を行っているため)

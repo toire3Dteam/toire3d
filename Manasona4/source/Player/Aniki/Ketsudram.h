@@ -50,7 +50,7 @@ namespace Ketsudram
 					DamageInfo.fComboRate = 1;
 					DamageInfo.bOverDrive = true;
 
-					DamageInfo.BeInvincible = true;		// 無敵になるかどうか
+					DamageInfo.BeInvincible = true;			// 無敵になるかどうか
 					DamageInfo.damage = 514;				// ダメージ(スコア)
 					DamageInfo.FlyVector.Set(0, 0);			// 吹っ飛びベクトル
 					DamageInfo.iHitStopFrame = 1;			// ヒットストップ

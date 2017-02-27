@@ -50,6 +50,13 @@ void SceneMainState::StageIntro::Enter(sceneMain *pMain)
 
 void SceneMainState::StageIntro::Execute(sceneMain *pMain)
 {
+	// プレイヤー更新
+	PlayerMgr->Update(PLAYER_UPDATE::CONTROL_NO);
+	PlayerMgr->UpdatePos();
+
+	// カメラ更新
+	CameraMgr->Update();
+
 	if (m_bSkip)
 	{
 		if (Fade::isFadeOutCompletion())
@@ -70,21 +77,20 @@ void SceneMainState::StageIntro::Execute(sceneMain *pMain)
 				break;
 			}
 		}
+		
+		
+		// エフェクトカメラ終わったら掛け合いに行く
+		if (!CameraMgr->GetFSM()->isInState(*EffectCameraState::GetInstance()))
+		{
+			// 掛け合いステートへ
+			//pMain->GetFSM()->ChangeState(CharaIntro::GetInstance());
+			m_bSkip = true;
+			Fade::Set(Fade::FADE_OUT, 12);
+		}
+
 	}
 
-	// プレイヤー更新
-	PlayerMgr->Update(PLAYER_UPDATE::CONTROL_NO);
-	PlayerMgr->UpdatePos();
 
-	// カメラ更新
-	CameraMgr->Update();
-
-	// エフェクトカメラ終わったら掛け合いに行く
-	if (!CameraMgr->GetFSM()->isInState(*EffectCameraState::GetInstance()))
-	{
-		// 掛け合いステートへ
-		pMain->GetFSM()->ChangeState(CharaIntro::GetInstance());
-	}
 }
 
 void SceneMainState::StageIntro::Exit(sceneMain *pMain){}
@@ -141,9 +147,12 @@ void SceneMainState::CharaIntro::Execute(sceneMain *pMain)
 		}
 	}
 
-	// くっそかりレベルで今は時間経過で次のラウンドコールへ
-	if(++m_iKakeaiTimer > 180) pMain->GetFSM()->ChangeState(Round::GetInstance());
+	// 今は時間経過で次のラウンドコールへ
+	if (++m_iKakeaiTimer > 170)
+	{
+		pMain->GetFSM()->ChangeState(Round::GetInstance());
 
+	}
 	// プレイヤー更新
 	PlayerMgr->Update(PLAYER_UPDATE::CONTROL_NO);
 	PlayerMgr->UpdatePos();

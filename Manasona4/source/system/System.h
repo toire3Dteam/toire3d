@@ -11,7 +11,7 @@
 //*****************************************************************************
 //		ƒOƒ[ƒoƒ‹•Ï”
 //*****************************************************************************
-extern tdnShader* shader;
+//extern tdnShader* shader;
 extern tdnShader* shader2D;
 extern tdnShader* shaderM;
 

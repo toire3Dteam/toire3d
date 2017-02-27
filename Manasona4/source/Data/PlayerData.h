@@ -267,10 +267,11 @@ public:
 	// セーブ
 	void SavePlayerData();
 
+	void ClearData();		// やったらあかんやつ(データ全消去)
+
 private:
 	//static PlayerDataManager *m_pInstance;
 	bool LoadPlayerData();
-	void ClearData();		// やったらあかんやつ(データ全消去)
 
 	bool m_bSaveFlag;	// trueにしたら消したときにセーブする
 

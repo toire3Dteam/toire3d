@@ -21,6 +21,7 @@
 #include "../ResultPerformance/BaseResultPerformance.h"
 #include "SceneMenu.h"
 #include "SceneSelect.h"
+#include "sceneTitle.h"
 #include "../SceneSwitch/SceneSwitch.h"
 #include "ResultPerformance\ScoreUI\ScoreUI.h"
 #include "Window\ResultWindow.h"
@@ -369,6 +370,13 @@ void sceneResult::Update()
 	if (KeyBoardTRG(KB_Z)) 
 	{
 		m_ResultPerformance->Action();
+	}
+
+
+	if (KeyBoardTRG(KB_T))
+	{
+		MainFrameEX->ChangeScene(new sceneTitle);
+		return;
 	}
 
 
