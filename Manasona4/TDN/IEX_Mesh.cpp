@@ -1,4 +1,5 @@
 #include	"TDNLIB.h"
+#include	"system\System.h"
 
 //**************************************************************************************************
 //
@@ -59,6 +60,7 @@ void iexMesh::Release()
 
 		//	テクスチャ解放
 		for (DWORD i = 0; i<MaterialCount; i++){
+
 			if (lpTexture[i] != NULL) tdnTexture::Release(lpTexture[i]);
 			if (lpNormal[i] != NULL) tdnTexture::Release(lpNormal[i]);
 			if (lpSpecular[i] != NULL) tdnTexture::Release(lpSpecular[i]);

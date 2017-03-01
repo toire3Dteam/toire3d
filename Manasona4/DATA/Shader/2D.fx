@@ -1327,34 +1327,6 @@ technique blind
 //}
 
 
-// -------------------------------------------------------------
-// ピクセルシェーダプログラム
-// -------------------------------------------------------------
-float4 PS_passhero(VS_OUTPUT_G In) : COLOR
-{
-	float4 col = tex2D(DecaleSamp2, In.Tex);
-	
-	if (col.r < 0.3)discard;
-
-	return col;
-
-}
-
-technique hero
-{
-	pass P0
-	{
-		AlphaBlendEnable = true;
-		BlendOp = Add;
-		SrcBlend = SrcAlpha;
-		DestBlend = InvSrcAlpha;
-		// シェーダ
-		VertexShader = compile vs_3_0 VS_pass1();
-		PixelShader = compile ps_3_0 PS_passhero();
-	}
-}
-
-
 
 
 /***********************************/

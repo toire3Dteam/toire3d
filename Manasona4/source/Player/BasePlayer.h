@@ -724,6 +724,7 @@ public:
 	bool isSquat() { return m_bSquat; }
 	bool isAerialJump() { return m_bAerialJump; }
 	bool isAerialDash() { return m_bAerialDash; }
+	bool isAerialSkillOK() { return m_bAerialSkillOK; }
 	int  GetAerialDashFrame() { return m_iAerialDashFrame; }
 	float GetAerialDashSpeed(){ return m_tagCharacterParam.fAerialDashSpeed; }
 	float GetMaxJump() { return m_tagCharacterParam.fMaxJump; }
@@ -732,6 +733,7 @@ public:
 	void SetSquat(bool bSquat) { m_bSquat = bSquat; }
 	void SetAerialJump(bool bAerialJump) { m_bAerialJump = bAerialJump; }
 	void SetAerialDash(bool bAerialDash) { m_bAerialDash = bAerialDash; }
+	void SetAerialSkillOK(bool bAerialSkillOK) { m_bAerialSkillOK = bAerialSkillOK; }
 	void SetAerialDashFrame(int iAerialDashFrame) { m_iAerialDashFrame = iAerialDashFrame; }
 
 	//------------------------------------------------------
@@ -1115,6 +1117,7 @@ protected:
 	bool m_bSquat;			// しゃがみフラグ
 	bool m_bAerialJump;		// 空中ジャンプのフラグ
 	bool m_bAerialDash;		// 空中ダッシュのフラグ
+	bool m_bAerialSkillOK;	// 空中必殺技使用フラグ
 	int m_iAerialDashFrame;	// 空中ダッシュの時間
 
 	//------------------------------------------------------

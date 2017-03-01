@@ -276,6 +276,7 @@ m_bLand(true),
 m_bSquat(false),
 m_bAerialJump(true),
 m_bAerialDash(false),
+m_bAerialSkillOK(true),
 m_iAerialDashFrame(0),
 
 //m_RecoveryDamageCount(),
@@ -477,6 +478,7 @@ void BasePlayer::Reset()
 	m_bAerialJump =
 	m_bMoveUpdate =
 	m_bSinkingUpdate =
+	m_bAerialSkillOK =
 	true;
 
 	/* falseで初期化ゾーン */
@@ -587,7 +589,7 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 	}
 	if (KeyBoardTRG(KB_0))
 	{
-		m_iHP = 3000;
+		m_iHP = 1000;
 		//bOutLog = true;
 	}
 
@@ -1124,6 +1126,10 @@ void BasePlayer::ActionOverDrive(OVERDRIVE_TYPE type)
 
 	// ジャンプの権利も復活
 	m_bAerialJump = true;
+
+	// ジャンプ必殺の権利も復活
+	m_bAerialSkillOK = true;
+
 }
 
 void BasePlayer::ColorUpdate()

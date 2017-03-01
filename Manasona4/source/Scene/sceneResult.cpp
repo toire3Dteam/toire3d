@@ -222,6 +222,11 @@ bool sceneResult::Initialize()
 
 sceneResult::~sceneResult()
 {
+	// シェーダデータを消す
+	SAFE_DELETE(shaderM);
+	SAFE_DELETE(shader2D);
+
+
 	m_pStream->Stop();
 	//ParticleManager::Release();
 	delete m_pEffectCamera;
@@ -244,6 +249,17 @@ sceneResult::~sceneResult()
 	SAFE_DELETE(m_pScoreUI);
 	SAFE_DELETE(m_pInfoPlate);
 	SAFE_DELETE(m_pResultWindow);
+
+
+	// シェーダデータを読み込む
+	if (shaderM == nullptr)
+	{
+		shaderM = new tdnShader("DATA/SHADER/SHADER.cfx", true);
+	}
+	if (shader2D == nullptr)
+	{
+		shader2D = new tdnShader("DATA/SHADER/2D.cfx", true);
+	}
 }
 
 //******************************************************************

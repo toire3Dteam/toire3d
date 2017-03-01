@@ -291,6 +291,16 @@ bool SkillCancel(BasePlayer *pPerson)
 	// 攻撃キャンセル
 	if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::D, true))
 	{
+		// 空中スキルは一回しか発動できない
+		if (!pPerson->isLand())
+		{
+			if (pPerson->isAerialSkillOK() == true)
+			{
+				pPerson->SetAerialSkillOK(false);
+			}
+			else return false;
+		}
+
 		pPerson->GetFSM()->ChangeState(BasePlayerState::Skill::GetInstance());
 		return true;
 	}
@@ -893,6 +903,7 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 
 									 // 空中ジャンプの権利復活
 									 pPerson->SetAerialJump(true);
+									 pPerson->SetAerialSkillOK(true);// 空中攻撃の権利も戻る
 
 									 // 攻撃に相手を無敵にさせる属性が入ってたら
 									 if (HitDamageInfo->BeInvincible)
@@ -911,10 +922,11 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 const int DamagedHP(max(pPerson->GetHP() - damage, 0));
 									 // ダメージを受けた後のHPを設定
 									 pPerson->SetHP(DamagedHP);
-									 if (DamagedHP == 0)
+									 if (DamagedHP == 0&&
+										 HitDamageInfo->bFinishOK) // フィニッシュフラグのある攻撃なら(必殺の途中で死なない為のフラグ)
 									 {
-										 // フィニッシュフラグのある攻撃なら(必殺の途中で死なない為のフラグ)
-										 if (HitDamageInfo->bFinishOK)
+										 
+										 //if (HitDamageInfo->bFinishOK)
 										 {
 											 // ★KOのメッセージを送る
 											 KO_INFO KOInfo;

@@ -113,4 +113,13 @@ void tdnShader::SetMaskScreen(tdn2DObj* maskScreen)
 	//pShader->SetValue("MaskTex", maskScreen->get);
 }
 
+void tdnShader::SetMaskScreenNULL()
+{
+	tdnShader::SetValue("MaskTex", NULL);
+}
 
+
+void tdnShader::SetTextureNULL(char* name)
+{
+	pShader->SetTexture(name, NULL);
+}

@@ -665,6 +665,7 @@ void Collision::RaypicDown(Stage::Base *obj, BasePlayer *player, Vector3 *move)
 				// ★★★　地面に付いたら
 				player->SetLand(true);//プレイヤーのポジションをセットした後に変更
 				player->SetAerialJump(true);// 空中ジャンプの権利も戻る
+				player->SetAerialSkillOK(true);// 空中攻撃の権利も戻る
 				hit = true;
 			}
 			// 空中にいるよ！

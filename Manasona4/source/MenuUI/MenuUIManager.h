@@ -72,7 +72,7 @@ private:
 	int m_iInfoY;
 
 	// ‰¼
-	tdn2DObj* pExp;
+	//tdn2DObj* pExp;
 
 	// ƒ^ƒCƒgƒ‹
 	tdn2DObj* m_pTitle;

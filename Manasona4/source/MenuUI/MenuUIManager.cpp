@@ -88,7 +88,7 @@ MenuUIManager::MenuUIManager(int iSelectNo)
 	m_pCoinUI = new CoinUI(Vector2(15.0f, 540.0f));
 
 	// ‰¼
-	pExp = new tdn2DObj("Data/UI/Menu/exp.png");
+	//pExp = new tdn2DObj("Data/UI/Menu/exp.png");
 
 	// ƒ^ƒCƒgƒ‹
 	m_pTitle = new tdn2DObj("Data/UI/Menu/title.png");
@@ -113,7 +113,7 @@ MenuUIManager::~MenuUIManager()
 	SAFE_DELETE(m_pBlackLine);
 	SAFE_DELETE(m_pInfo);
 
-	SAFE_DELETE(pExp);
+	//SAFE_DELETE(pExp);
 	SAFE_DELETE(m_pTitle);
 
 	SAFE_DELETE(m_pMoveMgr);
@@ -154,7 +154,7 @@ void MenuUIManager::Move()
 void MenuUIManager::Render()
 {
 	// ‰¼
-	pExp->Render(0, 0);
+	//pExp->Render(0, 0);
 	m_pMove->Render(0, 0);
 
 	m_pBlackLine->Render(0, 0);

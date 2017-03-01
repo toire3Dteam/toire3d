@@ -287,6 +287,8 @@ void Stage::Sea::Initialize(Camera *pCamera)
 Stage::Sea::~Sea()
 {
 	SAFE_DELETE(m_pSea);
+
+	shaderM->SetTextureNULL("EnvMap");
 	SAFE_DELETE(m_pEnvSea);
 }
 

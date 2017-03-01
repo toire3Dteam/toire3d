@@ -123,7 +123,7 @@ DeferredEx::DeferredEx()
 	// ToonTex
 	m_pToonShadoTex = new tdn2DObj("Data/Shader/toonShadow.png");
 	shaderM->SetValue("ToonShadowMap", m_pToonShadoTex);
-
+	
 }
 
 DeferredEx::~DeferredEx()
@@ -135,6 +135,8 @@ DeferredEx::~DeferredEx()
 	}
 
 	SAFE_DELETE(m_pPLS);
+	
+	shaderM->SetTextureNULL("ToonShadowMap");
 	SAFE_DELETE(m_pToonShadoTex);
 
 	//Surface‚Ì‰ð•ú	

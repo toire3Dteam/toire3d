@@ -849,6 +849,7 @@ public:
 	};
 	~AreaWallEffect() 
 	{
+		shaderM->SetTextureNULL("AreaWallTex");
 		SAFE_DELETE(m_pMaskPic);
 	};
 

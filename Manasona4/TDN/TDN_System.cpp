@@ -488,7 +488,13 @@ BOOL tdnSystem::InitD3D(HWND hWnd)
 // ‰ð•ú
 void tdnSystem::Release()
 {
-	SAFE_RELEASE(Device);
+	//SAFE_RELEASE(Device);
+	ULONG l_uRef = Device->Release();
+	if (l_uRef > 0)
+	{
+	//	MyAssert(0, "‚ ‚ ");
+	}
+
 	SAFE_RELEASE(lpD3D);
 	SAFE_RELEASE(pLine);
 	////ƒNƒ‰ƒX‰ð•ú

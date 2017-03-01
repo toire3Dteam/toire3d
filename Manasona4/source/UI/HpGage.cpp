@@ -190,6 +190,7 @@ void HpGage::MaskUpdate()
 void HpGage::Render()
 {
 	if (m_iWaitFrame > 0) return;
+	if (m_bFirstActionFlag == false) return;
 
 	// マスクを使用してる時で描画を分ける
 	if (m_bUseMask == true)

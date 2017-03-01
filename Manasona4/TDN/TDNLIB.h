@@ -3,6 +3,10 @@
 #define	_CRT_SECURE_NO_DEPRECATE
 #define	DIRECTINPUT_VERSION	0x0800 
 
+#ifdef _DEBUG
+#define D3D_DEBUG_INFO
+#endif
+
 // スタティックリンク
 #pragma comment (lib, "d3d9.lib")
 #pragma comment (lib, "d3dx9.lib")
@@ -1063,6 +1067,9 @@ public:
 	void SetValue(char* name, LPDIRECT3DCUBETEXTURE9& obj);
 
 	void SetMaskScreen(tdn2DObj* maskScreen);
+	void SetMaskScreenNULL();
+
+	void SetTextureNULL(char* name);
 
 private:
 	LPD3DXEFFECT pShader;	// エフェクトファイルへのアクセスポインタ

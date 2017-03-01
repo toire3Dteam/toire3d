@@ -43,7 +43,8 @@
 //******************************************************************
 sceneMain::sceneMain() :BaseGameEntity(ENTITY_ID::SCENE_MAIN){}
 bool sceneMain::Initialize()
-{
+{	
+
 	// ラウンド数
 	// (TODO)[11/4]ラウンド数が0の時はラウンドコールを抜く処理がしたい
 	// トレーニングやチュートリアルのため
@@ -295,6 +296,15 @@ bool sceneMain::Initialize()
 
 sceneMain::~sceneMain()
 {
+	// シェーダデータを消す
+	//SAFE_DELETE(shaderM);
+	SAFE_DELETE(shader2D);
+
+	shaderM->SetTextureNULL("Texture");
+	shaderM->SetTextureNULL("NormalMap");
+	shaderM->SetTextureNULL("RoughnessMap");
+	shaderM->SetTextureNULL("MultiMap");
+
 	delete prevEF;
 	delete m_pStateMachine;
 	//delete m_pMyMusicMgr;
@@ -335,6 +345,18 @@ sceneMain::~sceneMain()
 	if (CommandMgr->SaveIsAction(SIDE::RIGHT))CommandMgr->SaveEnd(SIDE::RIGHT);
 	// コマンドセーブ
 	//CommandMgr->Release();
+
+	// シェーダデータを読み込む
+	//if (shaderM == nullptr)
+	//{
+	//	shaderM = new tdnShader("DATA/SHADER/SHADER.cfx", true);
+	//}
+	if (shader2D == nullptr)
+	{
+		shader2D = new tdnShader("DATA/SHADER/2D.cfx", true);
+	}
+
+
 }
 
 //******************************************************************

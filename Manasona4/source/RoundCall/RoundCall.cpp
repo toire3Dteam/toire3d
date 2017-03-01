@@ -268,6 +268,8 @@ RebelCall::~RebelCall()
 {
 	SAFE_DELETE(m_pNumber);
 	SAFE_DELETE(m_pCenterCircle.pic);
+	//m_pBG.pic->GetObj()->GetTexture()->
+	//shader2D->SetMaskScreenNULL();
 	SAFE_DELETE(m_pBG.pic);
 	SAFE_DELETE(m_pBlackLineL.pic);
 	SAFE_DELETE(m_pBlackLineR.pic);

@@ -1,4 +1,6 @@
 #include	"TDNLIB.h"
+#include <DxErr.h>
+#pragma comment (lib, "dxerr.lib")
 
 //*****************************************************************************
 //
@@ -181,10 +183,23 @@ void tdnTexture::Release(Texture2D* lpTexture)
 		tdnSystem::GetDevice()->SetTexture(0, NULL);
 		lpLastTexture = NULL;						// (?)なにこれ？
 		//	テクスチャ解放
-		if (TexInfo[TexNo].lpTexture->Release() != D3D_OK)
+		HRESULT hr= TexInfo[TexNo].lpTexture->Release();
+		if (hr != D3D_OK)
 		{
-			//	解放失敗 (?) なんかシェーダーを使ったら解放失敗する
-			//MessageBox(0, "テクスチャの解放に失敗", "Texture", MB_OK);
+			if (hr == S_FALSE)
+			{
+
+				//	解放失敗 (?) なんかシェーダーを使ったら解放失敗する
+				MessageBox(0, "テクスチャの解放に失敗", "Texture", MB_OK);
+				char errStr[512]{};
+				sprintf_s(errStr, "Error: %s error description: %s\n",
+					DXGetErrorString(hr),
+					DXGetErrorDescription(hr));
+				OutputDebugString(errStr);
+
+
+			}
+
 		}
 		TexInfo[TexNo].lpTexture = NULL;
 		TexInfo[TexNo].UseCount = 0;
