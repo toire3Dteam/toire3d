@@ -305,8 +305,8 @@ sceneMain::~sceneMain()
 	shaderM->SetTextureNULL("RoughnessMap");
 	shaderM->SetTextureNULL("MultiMap");
 
-	delete prevEF;
-	delete m_pStateMachine;
+	SAFE_DELETE(prevEF);
+	SAFE_DELETE(m_pStateMachine);
 	//delete m_pMyMusicMgr;
 	bgm->StopStreamIn();
 	delete m_pStage;
@@ -320,7 +320,7 @@ sceneMain::~sceneMain()
 	SAFE_DELETE(m_stageScreen);
 	HeaveHoFinishUI->Rerease();
 	PointLightMgr->Release();
-	delete m_pShotMgr;
+	SAFE_DELETE(m_pShotMgr);
 	NumberEffect.Release();
 	GameUIMgr->Rerease();
 	//TimeMgr->Release();
@@ -427,13 +427,13 @@ void sceneMain::Update()
 		NumberEffect.Update();
 
 		// エンターでエフェクトカメラ発動してみる
-		if (KeyBoardTRG(KB_ENTER))
-		{
+		//if (KeyBoardTRG(KB_ENTER))
+		//{
 			//m_pMyMusicMgr->PlayHeaveHo();
 			//EFFECT_CAMERA_INFO eci;
 			//eci.scriptID = 0;
 			//MsgMgr->Dispatch(0, ENTITY_ID::CAMERA_MGR, ENTITY_ID::CAMERA_MGR, MESSAGE_TYPE::EFFECT_CAMERA, &eci);
-		}
+		//}
 
 
 		//if (KeyBoardTRG(KB_N))
@@ -509,12 +509,6 @@ void sceneMain::Update()
 		// UI
 		GameUIMgr->Update();
 
-		//g_eff->Update();
-		//EffectMgr.Update();
-		//m_panel->Update();
-		//g_uvEffect->Update();
-
-		//TimeMgr->Update();
 		CutInMgr->Update();
 
 		m_pRoundCallMgr->Update();// ラウンドコール
@@ -669,11 +663,7 @@ void sceneMain::Render()
 			ParticleManager::Render();
 
 	
-			
-			// UV・パネル　(最適化) コスト6　全然問題なし 
-			//m_panel->Render();
-			//m_panel->Render3D();
-			//g_uvEffect->Render();
+			// UV・パネル　(最適化) コスト6　全然問題なし
 			DeferredManagerEx.FinalEnd();
 		}
 
@@ -765,14 +755,6 @@ void sceneMain::Render()
 	}
 #endif
 
-
-	// 処理不可実験
-	//std::vector<int> v;
-	//int N = 500 * 100;
-	//for (int i = 0; i < N; i++)
-	//{
-	//	v.push_back(i);
-	//}
 }
 
 void sceneMain::RenderStage()

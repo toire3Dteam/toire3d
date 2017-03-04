@@ -119,8 +119,12 @@ void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage, SideData Side
 PlayerManager::~PlayerManager()
 {
 	// ダブルポインターの開放
-	FOR(m_NumPlayer)delete m_pPlayers[i];
-	delete[] m_pPlayers;
+	FOR(m_NumPlayer)
+	{
+		SAFE_DELETE(m_pPlayers[i]);
+	}
+
+	//delete[] m_pPlayers;
 
 	SAFE_DELETE(m_pDamageInfoPlate);
 }

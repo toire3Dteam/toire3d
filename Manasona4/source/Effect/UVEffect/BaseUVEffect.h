@@ -1263,3 +1263,48 @@ public:
 
 private:
 };
+
+/*****************************/
+//	ŒZ‹M‚Ì•KŽE‚ÌŒõ
+/*****************************/
+class RayEffect :public BaseUVEffect
+{
+public:
+	RayEffect();
+	~RayEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADDNOZ(); };
+
+private:
+};
+
+/*****************************/
+//	ŒZ‹M‚ÌŽè‚ÌŒõ
+/*****************************/
+class HandLightEffect :public BaseUVEffect
+{
+public:
+	HandLightEffect();
+	~HandLightEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADDNOZ(); };
+
+private:
+};
+
+/*****************************/
+//	ŒZ‹M‚ÌƒLƒƒƒmƒ“
+/*****************************/
+class AnikiCanonEffect :public BaseUVEffect
+{
+public:
+	AnikiCanonEffect();
+	~AnikiCanonEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADDNOZ(); };
+
+private:
+};

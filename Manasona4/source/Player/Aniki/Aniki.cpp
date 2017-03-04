@@ -64,7 +64,9 @@ Aniki::Aniki(SIDE side, const SideData &data) :BasePlayer(side, data), m_pKetsud
 
 	// エフェクト
 	m_pSpearEffect = new SpearEffect();
-
+	m_pRayEffect = new RayEffect();
+	m_pHandLightEffect = new HandLightEffect();
+	m_pAnikiCanonEffect = new AnikiCanonEffect();
 
 	// リセットはなるべく最後に
 	Reset();
@@ -81,6 +83,10 @@ void Aniki::Reset()
 	SAFE_DELETE(m_pKetsudram);
 
 	m_pSpearEffect->Stop();
+	m_pRayEffect->Stop();
+	m_pHandLightEffect->Stop();
+	m_pAnikiCanonEffect->Stop();
+
 }
 
 void Aniki::InitActionDatas()
@@ -765,7 +771,7 @@ void Aniki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->bAntiAir = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->bFinish = true;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->AntiGuard = ANTIGUARD_ATTACK::ALL_BREAK;
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->ShakeCameraInfo.Set(1.0f, 20);
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->ShakeCameraInfo.Set(1.25f, 25);
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->GuardRecoveryFrame = 18;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->attribute = ATTACK_ATTRIBUTE::STRIKE;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->fComboRate = 0.85f;
@@ -774,8 +780,8 @@ void Aniki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(14, 2);
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(14, 2);
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 30;
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 30;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 36;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 36;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 90;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 90;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE3].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
@@ -857,6 +863,10 @@ Aniki::~Aniki()
 	SAFE_DELETE(m_pKetsudram);
 
 	SAFE_DELETE(m_pSpearEffect);
+	SAFE_DELETE(m_pRayEffect);
+	SAFE_DELETE(m_pHandLightEffect);
+	SAFE_DELETE(m_pAnikiCanonEffect);
+
 }
 
 void Aniki::Update(PLAYER_UPDATE flag)
@@ -869,7 +879,9 @@ void Aniki::Update(PLAYER_UPDATE flag)
 
 	// エフェクト
 	m_pSpearEffect->Update();
-
+	m_pRayEffect->Update();
+	m_pHandLightEffect->Update();
+	m_pAnikiCanonEffect->Update();
 
 }
 
@@ -893,7 +905,9 @@ void Aniki::Render()
 
 	// 専用エフェクト
 	m_pSpearEffect->Render();
-
+	m_pRayEffect->Render();
+	m_pHandLightEffect->Render();
+	m_pAnikiCanonEffect->Render();
 }
 
 void Aniki::RenderDrive()
@@ -1072,6 +1086,10 @@ void Aniki::SkillAction::Land::Enter()
 
 	// リセット
 	m_iHitCount = 0;
+
+	//D3DXMATRIX WorldMat = *m_pAniki->GetDefaultObj()->GetBone(46) * m_pAniki->GetDefaultObj()->TransMatrix;
+	//m_pAniki->m_pRayEffect->Action(Vector3(WorldMat._41, WorldMat._42, WorldMat._43), 1, 1, Vector3(0, 0, 0), Vector3(1, 1, 1));
+	//m_pAniki->m_pRayEffect->Action(m_pAniki->GetPos());
 }
 
 bool Aniki::SkillAction::Land::Execute()
@@ -1626,15 +1644,33 @@ void Aniki::HeaveHoAction::ThrowSuccess::Enter()
 	// アイルーみたいに座標をいじる
 	m_pAniki->SetPos(VECTOR_ZERO);
 	m_pAniki->GetTargetPlayer()->SetPos(Vector3(m_pAniki->GetDirVecX() * 5, 0, 0));
+
+	D3DXMATRIX WorldMat = *m_pAniki->GetDefaultObj()->GetBone(46) * m_pAniki->GetDefaultObj()->TransMatrix;
+	m_pAniki->m_pRayEffect->Action(Vector3(WorldMat._41, WorldMat._42, WorldMat._43), 1.2f, 0.7f, Vector3(0, 0, 0), Vector3(2, 4, 1));
+
+
 }
 
 bool Aniki::HeaveHoAction::ThrowSuccess::Execute()
 {
+	D3DXMATRIX WorldMat = *m_pAniki->GetDefaultObj()->GetBone(46) * m_pAniki->GetDefaultObj()->TransMatrix;
+	m_pAniki->m_pRayEffect->SetPos(Vector3(WorldMat._41, WorldMat._42, WorldMat._43));
+	m_pAniki->m_pHandLightEffect->SetPos(Vector3(WorldMat._41, WorldMat._42, WorldMat._43));
+
 	// 攻撃終わったら
 	if (!m_pAniki->isAttackState())
 	{
 		return true;
 	}
+
+	if (m_pAniki->GetCurrentFrame() == 60)
+	{
+
+		m_pAniki->m_pHandLightEffect->Action(Vector3(WorldMat._41, WorldMat._42, WorldMat._43), 1.0f, 4.5f);
+
+	}
+
+
 
 	// 落ちてくるやつ制御する
 	const Vector3 l_vTargetMove(m_pAniki->GetTargetPlayer()->GetMove());
@@ -1645,6 +1681,12 @@ bool Aniki::HeaveHoAction::ThrowSuccess::Execute()
 	{
 		// アッーーーー
 		voice->Play(VOICE_TYPE::DIE, CHARACTER::ANIKI);
+		
+		float m_fAngle = 0.0f;
+		if (m_pAniki->GetDir() == DIR::RIGHT)m_fAngle = 3.14f;
+
+		m_pAniki->m_pAnikiCanonEffect->Action(m_pAniki->GetTargetPlayer()->GetCenterPos(), 1.2f, 0.35f, Vector3(0, m_fAngle, 0), Vector3(0, m_fAngle, 0));
+
 	}
 
 	return false;

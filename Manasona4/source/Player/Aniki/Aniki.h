@@ -284,6 +284,8 @@ private:
 
 	// エフェクト
 	SpearEffect* m_pSpearEffect;
-
+	RayEffect* m_pRayEffect;
+	HandLightEffect* m_pHandLightEffect;
+	AnikiCanonEffect* m_pAnikiCanonEffect;
 };
 

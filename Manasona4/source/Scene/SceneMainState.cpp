@@ -463,8 +463,10 @@ bool SceneMainState::Main::OnMessage(sceneMain *pMain, const Message & msg)
 		data.eWinnerSide = KOInfo->WinnerSide;
 		data.iMaxDamage = GameUIMgr->GetComboUI(KOInfo->LoseSide)->GetMaxDamage();		
 		data.iRemainingHP =GameUIMgr->GetHpGage(KOInfo->WinnerSide)->GetHPPercentage();
+		if (data.iRemainingHP <= 0)	data.iRemainingHP = 1;// ¬”“_ˆÈ‰º‚Å0‚É‚È‚Á‚½HP‚Í1‚É
 		data.iElapsedTime = GameUIMgr->GetTimer()->GetElapsedTime();
 		
+
 		// šŸ‚Á‚½‘¤‚ªAI‚¶‚á‚È‚©‚Á‚½‚ç
 		if (SelectDataMgr->Get()->tagSideDatas[(int)KOInfo->WinnerSide].bAI == false)
 		{
@@ -482,8 +484,15 @@ bool SceneMainState::Main::OnMessage(sceneMain *pMain, const Message & msg)
 
 		pMain->GetFSM()->ChangeState(Finish::GetInstance());
 
-		if(KOInfo->FinishType == FINISH_TYPE::NORMAL)pMain->GetRoundCall()->CallFinish(msg.Sender);
-		else if (KOInfo->FinishType == FINISH_TYPE::OVER_DRIVE) pMain->GetRoundCall()->CallOverDriveFinish(msg.Sender);
+		// ‰‰o (OverDriveFinish)
+		if (KOInfo->FinishType == FINISH_TYPE::NORMAL)
+		{
+			pMain->GetRoundCall()->CallFinish(msg.Sender);
+		}
+		else if (KOInfo->FinishType == FINISH_TYPE::OVER_DRIVE)
+		{
+			pMain->GetRoundCall()->CallOverDriveFinish(msg.Sender);
+		}
 
 		return true;
 	}
@@ -1907,8 +1916,16 @@ bool SceneMainState::Training::OnMessage(sceneMain *pMain, const Message & msg)
 	{
 		FINISH_TYPE *type = (FINISH_TYPE*)msg.ExtraInfo;
 		pMain->GetFSM()->ChangeState(Finish::GetInstance());
-		if (*type == FINISH_TYPE::NORMAL)pMain->GetRoundCall()->CallFinish(msg.Sender);
-		else if (*type == FINISH_TYPE::OVER_DRIVE) pMain->GetRoundCall()->CallOverDriveFinish(msg.Sender);
+
+		// ‰‰o
+		if (*type == FINISH_TYPE::NORMAL)
+		{
+			pMain->GetRoundCall()->CallFinish(msg.Sender);
+		}
+		else if (*type == FINISH_TYPE::OVER_DRIVE)
+		{
+			pMain->GetRoundCall()->CallOverDriveFinish(msg.Sender);
+		}
 
 		return true;
 	}

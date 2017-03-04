@@ -150,3 +150,19 @@ ExitEffect::ExitEffect()
 {
 	m_pic = new AnimationUV("Data/UVeffect/Stand/Exit.IMO", 0.0f, -0.04f, 12, false, 3, 10);
 }
+
+
+RayEffect::RayEffect()
+{
+	m_pic = new AnimationUV("Data/UVeffect/Aniki/Ray2.IMO", 0.0f, 0.0085f, 120, false, 2, 90);
+};
+
+HandLightEffect::HandLightEffect()
+{
+	m_pic = new AnimationUV("Data/UVeffect/Aniki/HandLight.IMO", 0.075f, 0.05f, 100, false, 20, 98);
+};
+
+AnikiCanonEffect::AnikiCanonEffect()
+{
+	m_pic = new AnimationUV("Data/UVeffect/Aniki/AnikiCanon.IMO", 0.0f, 0.5f, 16, false, 1, 10);
+};

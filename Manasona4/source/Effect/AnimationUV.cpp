@@ -62,6 +62,10 @@ AnimationUV::AnimationUV(char* name, float moveTU, float moveTV, int EndFlame, b
 // α考慮
 AnimationUV::AnimationUV(char* name, float moveTU, float moveTV, int EndFlame, bool IsRoop, int AlphaNear, int AlphaFar)
 {
+#ifdef _DEBUG
+	MyAssert((EndFlame > AlphaFar), "最終フレームが他のフレームより短い");
+#endif // _DEBUG
+	
 	obj = new iexMesh(name);
 
 	tu = 0.0f; tv = 0.0f;

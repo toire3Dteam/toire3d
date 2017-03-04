@@ -23,9 +23,9 @@ AnikiWindow::AnikiWindow(Vector2 vPos) :BaseWindow(vPos)
 	AddIconData("■空中投げ", "空中で相手を捕まえ真下に投げる攻撃。");
 	AddIconData("■フェアリーエクスプレス", "ダウンしている相手を強制的に起き上がらせる。");
 	AddIconData("▲蟹のポーズ", "発動時近くの相手吹き飛ばす、切り替えし攻撃します。");
-	AddIconData("●ケツドラム", "手前の相手をダウンさせ連続で攻撃する必殺技。");
 	AddIconData("●フェアリーバースト", "手前の相手を捕まえ、強力な一撃を放つ必殺技。");
-
+	AddIconData("●ケツドラム", "手前の相手をダウンさせ連続で攻撃する必殺技。");
+	
 	AddCommandData("△", 365);
 	AddCommandData("↓＋△", 365);
 	AddCommandData("空中で△", 365);

@@ -27,7 +27,7 @@ iChallengeType(0)							// 選択しているチャレンジ
 	tagSideDatas[(int)SIDE::RIGHT].eCharacter = CHARACTER::TEKI;
 
 	// 片方AI用
-	//tagSideDatas[(int)SIDE::RIGHT].bAI = true;
+	tagSideDatas[(int)SIDE::RIGHT].bAI = true;
 }
 
 TrainingData::TrainingData():
