@@ -85,7 +85,7 @@ void RoundTimeTypeParamSetting::Ctrl(int DeviceID)
 	if (m_bLeftPush)
 	{
 		PlayerDataMgr->m_ConfigData.iRoundTimeType = (PlayerDataMgr->m_ConfigData.iRoundTimeType > (int)ROUND_TIME_TYPE::SEC_30)
-			? PlayerDataMgr->m_ConfigData.iRoundTimeType - 1 : 3;	
+			? PlayerDataMgr->m_ConfigData.iRoundTimeType - 1 : (int)ROUND_TIME_TYPE::SEC_INFINITY;
 	}
 	// ‰E‰Ÿ‚µ‚Ä‚½‚ç
 	if (m_bRightPush)

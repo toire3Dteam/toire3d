@@ -131,7 +131,7 @@ AramitamaChallenge2::AramitamaChallenge2(int iTitleNo) : BaseChallenge(iTitleNo)
 	m_pTaskTitle.iStingLength = addByte;
 
 	// Tips
-	m_pIntroTips = new TipsCard("補助技だった技は魂ゲージを溜まれば仲間を使い\n攻撃技になります。挑戦してみましょう。\n");
+	m_pIntroTips = new TipsCard("補助技だった技は魂ゲージを溜まれば仲魔を使い\n攻撃技になります。挑戦してみましょう。\n");
 	m_pClearTips = new TipsCard("よくできました！\n上手く使い相手を翻弄しましょう。");
 
 	// リプレイデータの名前
@@ -139,6 +139,7 @@ AramitamaChallenge2::AramitamaChallenge2(int iTitleNo) : BaseChallenge(iTitleNo)
 
 	// タスクセット
 	AddTaskData("スキル－△");
+	AddTaskData("ジャンプ－↑");
 	AddTaskData("空中回避－空中で↓+△");
 	AddTaskData("チャージ－↓+△");
 
@@ -165,6 +166,7 @@ void AramitamaChallenge2::TaskUpdate(BasePlayer * pPerson)
 	enum
 	{
 		SKILL,
+		JUMP,
 		AERIAL_SKILL,
 		CHARGE
 	};
@@ -184,6 +186,12 @@ void AramitamaChallenge2::TaskUpdate(BasePlayer * pPerson)
 				TaskSuccess(SKILL);
 			}
 
+		}
+		
+		// ジャンプしたらクリア
+		if (pPerson->GetFSM()->isInState(*BasePlayerState::Jump::GetInstance()))
+		{
+			TaskSuccess(JUMP);
 		}
 
 		// ★空中スキル

@@ -123,8 +123,7 @@ PlayerManager::~PlayerManager()
 	{
 		SAFE_DELETE(m_pPlayers[i]);
 	}
-
-	//delete[] m_pPlayers;
+	delete[] m_pPlayers;
 
 	SAFE_DELETE(m_pDamageInfoPlate);
 }

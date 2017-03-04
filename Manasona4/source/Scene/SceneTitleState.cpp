@@ -183,6 +183,9 @@ void SceneTitleState::MovieStep::Enter(sceneTitle *pMain)
 {
 	// フェード初期化
 	Fade::Set(Fade::FLAG::FADE_IN, 8);
+	
+	// ムービー初期化
+	pMain->m_pMovie->SetTime(0);
 
 	// ムービー再生
 	pMain->m_pMovie->Play();

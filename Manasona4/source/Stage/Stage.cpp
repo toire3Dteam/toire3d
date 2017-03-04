@@ -610,6 +610,10 @@ void Stage::Syuten::Initialize(Camera *pCamera)
 	m_fBottom = 0;
 	m_fWidth = 200;
 
+	//m_pBack2 = new iexMesh("DATA/Stage/SkyDome/Skydome.IMO");
+	//m_pBack2->SetPos(Vector3(0, 0, 300));
+	//m_pBack2->Update();
+
 	// …
 	m_fUvWater = 0.0f;
 	m_fWaterHeight = -24;
@@ -658,6 +662,7 @@ void Stage::Syuten::Update()
 void Stage::Syuten::Render()
 {
 	m_pBack->Render(shaderM, "sky");
+	//m_pBack2->Render(shaderM, "sky");
 	m_pObj->Render(shaderM, "Stage");
 	
 	m_pAreWall->RenderAreaWall();// •Ç
