@@ -444,6 +444,9 @@ bool HeaveHoCancel(BasePlayer * pPerson)
 
 bool HeaveHoOverFlowCancel(BasePlayer * pPerson)
 {
+	// ••ˆó
+	return false;
+
 	if (pPerson->isOverDrive() == false)return false;
 
 #ifdef _DEBUG
