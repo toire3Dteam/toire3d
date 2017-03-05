@@ -807,8 +807,15 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 		//if (bOutLog) tdnStopWatch::Start();
 
 		// ƒ‚[ƒVƒ‡ƒ“•âŠÔ‚ðŠ|‚¯‚é‚Ì‚¾‚ªAUŒ‚ƒ‚[ƒVƒ‡ƒ“‚ªŽáŠ±’x‚ê‚Ä‚µ‚Ü‚¤‚Ì‚ÅAUŒ‚ƒ‚[ƒVƒ‡ƒ“‚Ì‚Æ‚«‚Í•âŠÔ‚ðŠ|‚¯‚È‚¢
-		const float slerp((isAttackState()) ? 0 : .5f);
-		m_pObj->Update();
+		float l_fSlerp = 0.0f;// (isAttackState()) ? 0 : .25f;
+		if (m_pStateMachine->isInState(*BasePlayerState::Wait::GetInstance()) || 
+			m_pStateMachine->isInState(*BasePlayerState::Squat::GetInstance()))
+		{
+			l_fSlerp = 0.25f;
+		}
+
+		m_pObj->Update(l_fSlerp);
+
 		//if (bOutLog)
 		//{
 		//	tdnStopWatch::End();

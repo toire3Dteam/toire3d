@@ -1045,7 +1045,7 @@ public:
 	AI* GetAI() { return m_pAI; }
 
 	// カラー
-	virtual void ChangeColor() = 0;// (12/28) 後で色変えれるようにしたい
+	virtual void ChangeColor(COLOR_TYPE eColType) = 0;// (12/28) 後で色変えれるようにしたい
 
 	//_/_/_/_/_/_/__/_/__/_/__/_/__
 	// 定数

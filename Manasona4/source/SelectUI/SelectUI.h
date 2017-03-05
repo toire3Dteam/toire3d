@@ -69,12 +69,19 @@ public:
 		return (PARTNER)m_iSelectPartnerNo;
 	}
 
+	COLOR_TYPE GetSelectCharacterColor()
+	{
+		return (COLOR_TYPE)m_iSelectCharacterColor;
+	}
+
 	bool IsOK() { return m_bOK; }
 	bool IsAI() { return m_bAI; }
 
 	int GetDevice() { return m_iDeviceID; }
 
 private:
+	int m_iWidthIcon; // 
+	int m_iIconX;
 
 	StateMachine<SelectUI> *m_pStateMachine;	// ステートマシン
 
@@ -84,6 +91,9 @@ private:
 	// キャラクターセレクト・パートナーセレクト番号
 	int m_iSelectCharacterNo;
 	int m_iSelectPartnerNo;
+
+	// キャラクターカラー
+	int m_iSelectCharacterColor;
 
 	// キャラクターサイド
 	SIDE m_eSide;
@@ -117,6 +127,10 @@ private:
 
 	// 最後のOK!の文字
 	SelectPicture m_tagOKfont;
+
+	// カラータイプ
+	SelectPicture m_tagColorType2P;
+	SelectPicture m_tagColorTypeEX;
 
 	// タイマー
 	int m_iWaitFrame;

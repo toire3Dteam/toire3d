@@ -3422,6 +3422,23 @@ void BasePlayerState::Squat::Enter(BasePlayer * pPerson)
 	// しゃがみフラグON
 	pPerson->SetSquat(true);
 
+	// 後ろに下がる慣性を消す
+	if (pPerson->GetDir() == DIR::LEFT)
+	{
+		if (pPerson->GetMove().x > 0.0f)
+		{
+			// 慣性を消す
+			pPerson->SetMove(Vector3(0, 0, 0));
+		}
+	}
+	else
+	{
+		if (pPerson->GetMove().x < 0.0f)
+		{
+			// 慣性を消す
+			pPerson->SetMove(Vector3(0, 0, 0));
+		}
+	}
 }
 
 void BasePlayerState::Squat::Execute(BasePlayer * pPerson)
@@ -3874,6 +3891,9 @@ void BasePlayerState::DokkoiAttack::Execute(BasePlayer * pPerson)
 	// HITしていたらキャンセルできる
 	else if (pPerson->GetAttackData()->bHitSuccess == true)
 	{
+		// (追加)スタンドの攻撃が持続的当たっていたらダッシュキャンセル不可
+		if (pPerson->GetStand()->isHit())return;	
+
 		// 同じボタンか相手の方向 + (12/29)攻撃ボタンも追加。やっぱ止めた
 		if (/*pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::C, true) ||*/ pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R1, true) || pPerson->isPushInputTRG((pPerson->GetDir() == DIR::LEFT) ? PLAYER_COMMAND_BIT::LEFT : PLAYER_COMMAND_BIT::RIGHT, true))
 		{
@@ -5276,6 +5296,10 @@ void BasePlayerState::ThrowHold::Enter(BasePlayer * pPerson)
 	pPerson->GetTargetPlayer()->AddEffectAction(pPerson->GetTargetPlayer()->GetPos(), EFFECT_TYPE::THROW_HOLD);
 
 	pPerson->SetActionState(BASE_ACTION_STATE::FRAMECOUNT);
+
+	// 自分のパートナーを戻す
+	pPerson->GetStand()->Break();
+
 }
 
 void BasePlayerState::ThrowHold::Execute(BasePlayer * pPerson)
@@ -5586,6 +5610,9 @@ void BasePlayerState::HeavehoDrive::Enter(BasePlayer * pPerson)
 
 	// 相手のバースト使用不可に
 	pPerson->GetTargetPlayer()->ActionNotOverDrive();
+
+	// 自分のパートナーを戻す
+	pPerson->GetStand()->Break();
 
 }
 

@@ -688,13 +688,29 @@ void Airou::RenderDrive()
 	if (m_pOshiokiMgr) m_pOshiokiMgr->Render();
 }
 
-void Airou::ChangeColor()
+void Airou::ChangeColor(COLOR_TYPE eColType)
 {
+	LPSTR path = "none";
 
-	LPSTR path("DATA/CHR/Airou/tex_airou4.png");
+	switch (eColType)
+	{
+	case COLOR_TYPE::NORMAL:
+		path = ("DATA/CHR/Airou/tex_airou.png");
+		break;
+	case COLOR_TYPE::EXTRA:
+		path = ("DATA/CHR/Airou/tex_airouEx.png");
+		break;
+	case COLOR_TYPE::MIRROR:
+		path = ("DATA/CHR/Airou/tex_airou4.png");
+		break;
+	default:
+		MyAssert(0, "存在しないカラータイプ");
+		break;
+	}
+
 	m_pDefaultObj->SetTexture(tdnTexture::Load(path), 0);
 	m_pHHDOFObj->SetTexture(tdnTexture::Load(path), 0);
-	
+
 }
 
 void Airou::InitMotionDatas()

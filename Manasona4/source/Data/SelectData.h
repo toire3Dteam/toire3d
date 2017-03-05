@@ -62,6 +62,12 @@ enum class RANK_TYPE
 	SS, S, A, B, C
 };
 
+// カラー
+enum class COLOR_TYPE
+{
+	NORMAL, EXTRA, MIRROR // EXTRA, EXTRA2
+};
+
 //+----------------------
 //	システム用
 //+----------------------
@@ -238,9 +244,10 @@ struct SideData
 {
 	CHARACTER eCharacter;
 	PARTNER ePartner;
-	int iDeviceID;	// コントローラーデバイスのID
-	bool bAI;		// AIフラグ
-	AI_TYPE eAIType;// AIのタイプ
+	int iDeviceID;			// コントローラーデバイスのID
+	bool bAI;				// AIフラグ
+	AI_TYPE eAIType;		// AIのタイプ
+	COLOR_TYPE eColorType;	// カラータイプ 
 	SideData();
 	//SideData &operator=(const SideData &data) { character = data.character, partner = data.partner, iDeviceID = data.iDeviceID, bAI = data.bAI; return *this; }
 };

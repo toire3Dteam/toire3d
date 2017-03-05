@@ -446,7 +446,7 @@ void Aramitama::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->damage = 270;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->HitSE = "斬撃2";
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->WhiffSE = "空振り5";
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->WhiffSE = "空振り4";
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->HitEffectType = EFFECT_TYPE::DAMAGE;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->WhiffEffectType = EFFECT_TYPE::WHIFF;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->bAntiAir = false;
@@ -481,7 +481,7 @@ void Aramitama::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->damage = 180;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->HitSE = "斬撃2";
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->WhiffSE = "空振り5";
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->WhiffSE = "空振り4";
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->HitEffectType = EFFECT_TYPE::MULTIPLE_HIT;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->WhiffEffectType = EFFECT_TYPE::WHIFF;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->bAntiAir = false;
@@ -871,11 +871,29 @@ void Aramitama::RenderDrive()
 	BasePlayer::RenderDrive();
 }
 
-void Aramitama::ChangeColor()
+void Aramitama::ChangeColor(COLOR_TYPE eColType)
 {
-	LPSTR path("DATA/CHR/Aramitama/tex_aramitama_blue.png");
+	LPSTR path = "none";
+
+	switch (eColType)
+	{
+	case COLOR_TYPE::NORMAL:
+		path = ("DATA/CHR/Aramitama/tex_aramitama.png");
+		break;
+	case COLOR_TYPE::EXTRA:
+		path = ("DATA/CHR/Aramitama/tex_aramitamaEx.png");
+		break;
+	case COLOR_TYPE::MIRROR:
+		path = ("DATA/CHR/Aramitama/tex_aramitama2.png");
+		break;
+	default:
+		MyAssert(0, "存在しないカラータイプ");
+		break;
+	}
+
 	m_pDefaultObj->SetTexture(tdnTexture::Load(path), 0);
 	m_pHHDOFObj->SetTexture(tdnTexture::Load(path), 0);
+
 }
 
 void Aramitama::InitMotionDatas()
@@ -1190,6 +1208,9 @@ bool Aramitama::SkillAction::Squat::Execute()
 		// チャージエフェクト発動
 		m_pAramitama->m_pAChargeWave->Action(m_pAramitama->GetPos());
 		m_pAramitama->m_pAChargeAura->Action(m_pAramitama->GetPos(), 1.0f, 1.25f);
+
+		// チャージ音
+		se->Play("ミタマチャージ");
 	}
 	
 

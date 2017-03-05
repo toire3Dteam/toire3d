@@ -73,8 +73,8 @@ SelectUIManager::SelectUIManager()
 	//m_pPic[PIC_TYPE::INFO_BOX_RIGHT]->OrderMoveAppeared(12, 899 + 384 , 354);
 
 	// アイコン幅
-	m_iWidthIcon = 88;
-	m_iIconX = 384;
+	m_iWidthIcon = 88;// 88
+	m_iIconX = 404;	  // 384
 
 	// キャラアイコン
 	for (int i = 0; i < (int)CHARACTER::END; i++)

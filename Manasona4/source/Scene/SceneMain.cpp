@@ -398,6 +398,10 @@ void sceneMain::Update()
 
 		// ショット更新(ゲームが止まってなかったら)
 		if(!PlayerMgr->isGameStop())m_pShotMgr->Update();
+		else
+		{
+			m_pShotMgr->EraseCheakUpdate();
+		}
 
 		// ステージ更新
 		m_pStage->Update();

@@ -131,9 +131,11 @@ void Collision::PlayerCollision(PlayerManager *pPlayerMgr, ShotManager *pShotMgr
 					{
 						it->SetCollisionFlag(false);
 					}
-
 					// ŠÑ’Ê’i‚Å‚Í‚È‚¢‚Ì‚ÅAÁ‚¦‚Ä‚Ç‚¤‚¼
-					else it->Erase();
+					else
+					{
+						it->Erase();
+					}
 				}
 			}
 		};
@@ -550,6 +552,8 @@ bool Collision::RaypicShot(Stage::Base *obj, Shot::Base *shot)
 	const Vector3 move(shot->GetMove());
 	const Vector3 pos(shot->GetPos());
 
+	const float abjWidth = 10.0f;
+
 	if (move.y > 0) // ã
 	{
 		if (pos.y + move.y > 100) return true;
@@ -561,11 +565,11 @@ bool Collision::RaypicShot(Stage::Base *obj, Shot::Base *shot)
 
 	if (move.x > 0) // ‰E
 	{
-		if (pos.x + move.x > obj->GetWidth() / 2) return true;
+		if (pos.x + move.x > (obj->GetWidth() / 2)+ abjWidth) return true;
 	}
 	else if (move.x < 0) // ¶
 	{
-		if (pos.x + move.x < -obj->GetWidth() / 2) return true;
+		if (pos.x + move.x < -((obj->GetWidth() / 2) + abjWidth)) return true;
 	}
 
 	return false;

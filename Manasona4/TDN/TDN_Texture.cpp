@@ -189,9 +189,11 @@ void tdnTexture::Release(Texture2D* lpTexture)
 			if (hr == S_FALSE)
 			{
 
+#ifdef _DEBUG
 				//	解放失敗 (?) なんかシェーダーを使ったら解放失敗する
 				MessageBox(0, "テクスチャの解放に失敗", "Texture", MB_OK);
-				char errStr[512]{};
+#endif // _DEBUG
+					char errStr[512]{};
 				sprintf_s(errStr, "Error: %s error description: %s\n",
 					DXGetErrorString(hr),
 					DXGetErrorDescription(hr));

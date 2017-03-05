@@ -709,10 +709,26 @@ void Teki::RenderDrive()
 	BasePlayer::RenderDrive();
 }
 
-void Teki::ChangeColor()
+void Teki::ChangeColor(COLOR_TYPE eColType)
 {
+	LPSTR path = "none";
 
-	LPSTR path("DATA/CHR/Teki/teki2.png");
+	switch (eColType)
+	{
+	case COLOR_TYPE::NORMAL:
+		path = ("DATA/CHR/teki/teki.png");
+		break;
+	case COLOR_TYPE::EXTRA:
+		path = ("DATA/CHR/teki/tekiEx.png");
+		break;
+	case COLOR_TYPE::MIRROR:
+		path = ("DATA/CHR/teki/teki2.png");
+		break;
+	default:
+		MyAssert(0, "存在しないカラータイプ");
+		break;
+	}
+
 	m_pDefaultObj->SetTexture(tdnTexture::Load(path), 0);
 	m_pHHDOFObj->SetTexture(tdnTexture::Load(path), 0);
 	
@@ -1322,6 +1338,8 @@ void Teki::SkillAction::AerialDrop::Enter()
 
 	// アクションステート変更
 	m_pTeki->SetActionState(BASE_ACTION_STATE::SKILL_AERIALDROP);
+
+	se->Play("空振り6");
 }
 
 bool Teki::SkillAction::AerialDrop::Execute()

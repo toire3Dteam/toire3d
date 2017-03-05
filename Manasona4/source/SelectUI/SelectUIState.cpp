@@ -97,6 +97,41 @@ void SelectUIState::FirstStep::Execute(SelectUI *pMain)
 		// SEの再生
 		se->Play("カーソル2");
 	}
+
+	// カラー変更
+	if (tdnInput::KeyGet(KEYCODE::KEY_L1, pMain->m_iDeviceID) == 3)
+	{
+		pMain->m_iSelectCharacterColor--;
+
+		// 一周回る処理
+		if (pMain->m_iSelectCharacterColor <= -1)
+		{
+			pMain->m_iSelectCharacterColor = (int)COLOR_TYPE::MIRROR;
+		}
+
+		// 演出
+		//pMain->ActionChara();
+
+		// SEの再生
+		se->Play("カーソル2");
+	}
+	if (tdnInput::KeyGet(KEYCODE::KEY_R1, pMain->m_iDeviceID) == 3)
+	{
+		pMain->m_iSelectCharacterColor++;
+
+		// 一周回る処理
+		if (pMain->m_iSelectCharacterColor > (int)COLOR_TYPE::MIRROR)
+		{
+			pMain->m_iSelectCharacterColor = 0;
+		}
+
+		// 演出
+		//pMain->ActionChara();
+
+		// SEの再生
+		se->Play("カーソル2");
+	}
+
 	/**********************************************************/
 	
 	// ×押してなかったら
@@ -177,7 +212,14 @@ void SelectUIState::FirstStep::Exit(SelectUI *pMain)
 void SelectUIState::FirstStep::Render(SelectUI *pMain)
 {
 
+#ifdef _DEBUG
 	tdnText::Draw(0, 0, 0xffffffff, "FirstStep");
+
+	tdnText::Draw(0, 200, 0xffaaaaaa, "SelectCharacterColor->%d", pMain->m_iSelectCharacterColor);
+
+#endif // _DEBUG
+
+	
 }
 
 bool SelectUIState::FirstStep::OnMessage(SelectUI *pMain, const Message & msg)

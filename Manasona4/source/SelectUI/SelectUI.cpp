@@ -8,6 +8,10 @@ static float g_scale = 0.9f;
 
 SelectUI::SelectUI(SIDE side, ENTITY_ID id, int DeviceID, bool bAI) :BaseGameEntity(id)
 {
+	// アイコン幅
+	m_iWidthIcon = 88;// 88
+	m_iIconX = 404;   // 384
+
 	// 遅延タイマー
 	m_iWaitFrame = 0;
 
@@ -23,6 +27,9 @@ SelectUI::SelectUI(SIDE side, ENTITY_ID id, int DeviceID, bool bAI) :BaseGameEnt
 	// キャラの選択番号初期化
 	m_iSelectCharacterNo = 0;
 	m_iSelectPartnerNo = 0;
+
+	// キャラのカラー
+	m_iSelectCharacterColor = 0;
 
 	// キャラクターの画像
 	for (int i = 0; i < (int)CHARACTER::END; i++)
@@ -156,11 +163,11 @@ SelectUI::SelectUI(SIDE side, ENTITY_ID id, int DeviceID, bool bAI) :BaseGameEnt
 		m_tagPartnerSirclePlate.iX = 315 ;
 	
 
-		m_tagInfoBox.pPic->OrderMoveAppeared(14, m_tagInfoBox.iX - 384, m_tagInfoBox.iY);
+		m_tagInfoBox.pPic->OrderMoveAppeared(14, m_tagInfoBox.iX - m_iIconX, m_tagInfoBox.iY);
 
-		m_tagNamePlate.pPic->OrderMoveAppeared(14, m_tagNamePlate.iX -384, m_tagNamePlate.iY);
-		m_tagAndPlate.pPic->OrderMoveAppeared(8, m_tagAndPlate.iX -384, m_tagAndPlate.iY);
-		m_tagPartnerPlate.pPic->OrderMoveAppeared(8, m_tagPartnerPlate.iX -384, m_tagPartnerPlate.iY);
+		m_tagNamePlate.pPic->OrderMoveAppeared(14, m_tagNamePlate.iX - m_iIconX, m_tagNamePlate.iY);
+		m_tagAndPlate.pPic->OrderMoveAppeared(8, m_tagAndPlate.iX - m_iIconX, m_tagAndPlate.iY);
+		m_tagPartnerPlate.pPic->OrderMoveAppeared(8, m_tagPartnerPlate.iX - m_iIconX, m_tagPartnerPlate.iY);
 		m_tagPartnerSirclePlate.pPic->OrderMoveAppeared(12, m_tagPartnerSirclePlate.iX - 512, m_tagPartnerSirclePlate.iY);
 	}
 	else
@@ -175,11 +182,11 @@ SelectUI::SelectUI(SIDE side, ENTITY_ID id, int DeviceID, bool bAI) :BaseGameEnt
 
 		m_tagPartnerSirclePlate.iX = 709 ;
 
-		m_tagInfoBox.pPic->OrderMoveAppeared(14, m_tagInfoBox.iX + 384, m_tagInfoBox.iY);
+		m_tagInfoBox.pPic->OrderMoveAppeared(14, m_tagInfoBox.iX + m_iIconX, m_tagInfoBox.iY);
 
-		m_tagNamePlate.pPic->OrderMoveAppeared(14, m_tagNamePlate.iX + 384, m_tagNamePlate.iY);
-		m_tagAndPlate.pPic->OrderMoveAppeared(8, m_tagAndPlate.iX + 384, m_tagAndPlate.iY);
-		m_tagPartnerPlate.pPic->OrderMoveAppeared(8, m_tagPartnerPlate.iX + 384, m_tagPartnerPlate.iY);
+		m_tagNamePlate.pPic->OrderMoveAppeared(14, m_tagNamePlate.iX + m_iIconX, m_tagNamePlate.iY);
+		m_tagAndPlate.pPic->OrderMoveAppeared(8, m_tagAndPlate.iX + m_iIconX, m_tagAndPlate.iY);
+		m_tagPartnerPlate.pPic->OrderMoveAppeared(8, m_tagPartnerPlate.iX + m_iIconX, m_tagPartnerPlate.iY);
 		m_tagPartnerSirclePlate.pPic->OrderMoveAppeared(12, m_tagPartnerSirclePlate.iX + 512, m_tagPartnerSirclePlate.iY);
 
 	}
@@ -201,6 +208,19 @@ SelectUI::SelectUI(SIDE side, ENTITY_ID id, int DeviceID, bool bAI) :BaseGameEnt
 	m_pSelect.pPic->Action();
 	m_pSelect.iX = 0;
 	m_pSelect.iY = 0;
+
+	m_tagColorType2P.pPic = new tdn2DAnim("Data/UI/CharacterSelect/Icon/Col2p.png");
+	m_tagColorType2P.pPic->OrderNone();
+	m_tagColorType2P.pPic->Action();
+	m_tagColorType2P.iX = 0;
+	m_tagColorType2P.iY = 0;
+
+	m_tagColorTypeEX.pPic = new tdn2DAnim("Data/UI/CharacterSelect/Icon/ColEx.png");
+	m_tagColorTypeEX.pPic->OrderNone();
+	m_tagColorTypeEX.pPic->Action();
+	m_tagColorTypeEX.iX = 0;
+	m_tagColorTypeEX.iY = 0;
+
 
 	// OKの文字
 	m_tagOKfont.pPic = new tdn2DAnim("Data/UI/CharacterSelect/Info/OK.png");
@@ -253,7 +273,7 @@ void SelectUI::InitCharcterPos()
 
 			// アニメーション
 			// 立ち絵
-			m_tagCharaPic[i].pPic->OrderMoveAppeared(12, m_tagCharaPic[i].iX - 384, m_tagCharaPic[i].iY);
+			m_tagCharaPic[i].pPic->OrderMoveAppeared(12, m_tagCharaPic[i].iX - m_iIconX, m_tagCharaPic[i].iY);
 		}
 		else // 右サイドだったら 
 		{
@@ -275,7 +295,7 @@ void SelectUI::InitCharcterPos()
 
 			// アニメーション
 			// 立ち絵
-			m_tagCharaPic[i].pPic->OrderMoveAppeared(12, m_tagCharaPic[i].iX + 384, m_tagCharaPic[i].iY);
+			m_tagCharaPic[i].pPic->OrderMoveAppeared(12, m_tagCharaPic[i].iX + m_iIconX, m_tagCharaPic[i].iY);
 
 		}
 
@@ -284,7 +304,7 @@ void SelectUI::InitCharcterPos()
 		m_tagCharaPicRip[i].pPic->OrderRipple(14, 1.0f, 0.01f);
 
 		// 説明
-		m_tagCharaInfo[i].pPic->OrderMoveAppeared(12, m_tagCharaInfo[i].iX + 384 / 12, m_tagCharaInfo[i].iY);
+		m_tagCharaInfo[i].pPic->OrderMoveAppeared(12, m_tagCharaInfo[i].iX + m_iIconX / 12, m_tagCharaInfo[i].iY);
 
 		// 名前
 		m_tagCharaName[i].pPic->OrderMoveAppeared(8, m_tagCharaName[i].iX - 100, m_tagCharaName[i].iY + 10);
@@ -347,7 +367,7 @@ void SelectUI::InitPartnerPos()
 		m_tagPartnerPicRip[i].pPic->OrderRipple(14, 1.0f, 0.015f);
 
 		// 説明
-		m_tagPartnerInfo[i].pPic->OrderMoveAppeared(12, m_tagPartnerInfo[i].iX + 384 / 12, m_tagPartnerInfo[i].iY);
+		m_tagPartnerInfo[i].pPic->OrderMoveAppeared(12, m_tagPartnerInfo[i].iX + m_iIconX / 12, m_tagPartnerInfo[i].iY);
 
 		// 名前
 		m_tagPartnerName[i].pPic->OrderMoveAppeared(8, m_tagPartnerName[i].iX - 100, m_tagPartnerName[i].iY + 10);
@@ -386,6 +406,10 @@ SelectUI::~SelectUI()
 	SAFE_DELETE(m_pStateMachine);
 
 	SAFE_DELETE(m_pSelect.pPic);
+
+	SAFE_DELETE(m_tagColorType2P.pPic);
+	SAFE_DELETE(m_tagColorTypeEX.pPic);
+
 	SAFE_DELETE(m_tagOKfont.pPic);
 }
 
@@ -432,6 +456,8 @@ void SelectUI::Update(bool bControl)
 	
 	// セレクト更新
 	m_pSelect.pPic->Update();
+	m_tagColorType2P.pPic->Update();
+	m_tagColorTypeEX.pPic->Update();
 
 	// OK
 	m_tagOKfont.pPic->Update();
@@ -503,33 +529,45 @@ void SelectUI::Render()
 	m_tagPartnerName[m_iSelectPartnerNo].pPic->Render(m_tagPartnerName[m_iSelectPartnerNo].iX, m_tagPartnerName[m_iSelectPartnerNo].iY);
 
 	// アイコン
-	m_pCharaIconRip[m_iSelectCharacterNo]->Render(384 + (m_iSelectCharacterNo * 88), 482, RS::ADD);
+	m_pCharaIconRip[m_iSelectCharacterNo]->Render(m_iIconX + (m_iSelectCharacterNo * m_iWidthIcon), 482, RS::ADD);
 	if (GetFSM()->isInState(*SelectUIState::FirstStep::GetInstance()))
 	{
 	
 		m_pSelect.pPic->SetScale(0.9f);	// 少し小さく
 		m_pSelect.pPic->SetARGB(0xffffffff);
+
+		int l_iX = 0;
 		if (m_eSide== SIDE::LEFT)
 		{
-
-			m_pSelect.pPic->Render(384 + (m_iSelectCharacterNo * 88) - 2, 482);
+			l_iX = -2;	
 		}
 		else
 		{
-
-			m_pSelect.pPic->Render(384 + (m_iSelectCharacterNo * 88) + 42, 482);
+			l_iX = 42;
 		}
+
+		m_pSelect.pPic->Render(m_iIconX + (m_iSelectCharacterNo * m_iWidthIcon) + l_iX, 482);
+
+		if (m_iSelectCharacterColor == (int)COLOR_TYPE::EXTRA)
+		{
+			m_tagColorTypeEX.pPic->Render(m_iIconX + (m_iSelectCharacterNo * m_iWidthIcon) + l_iX, 482);
+		}
+		else if (m_iSelectCharacterColor == (int)COLOR_TYPE::MIRROR)
+		{
+			m_tagColorType2P.pPic->Render(m_iIconX + (m_iSelectCharacterNo * m_iWidthIcon) + l_iX, 482);
+		}
+
 
 	}else if (GetFSM()->isInState(*SelectUIState::MiddleStep::GetInstance()))
 	{
 		m_pSelect.pPic->SetARGB(0xcc777777);
 		if (m_eSide == SIDE::LEFT)
 		{
-			m_pSelect.pPic->Render(384 + (m_iSelectCharacterNo * 88) - 2, 482);
+			m_pSelect.pPic->Render(m_iIconX + (m_iSelectCharacterNo * m_iWidthIcon) - 2, 482);
 
 		}else
 		{
-			m_pSelect.pPic->Render(384 + (m_iSelectCharacterNo * 88) + 42, 482);
+			m_pSelect.pPic->Render(m_iIconX + (m_iSelectCharacterNo * m_iWidthIcon) + 42, 482);
 		}
 	}
 	else if (GetFSM()->isInState(*SelectUIState::SecondStep::GetInstance()))
@@ -537,12 +575,12 @@ void SelectUI::Render()
 		m_pSelect.pPic->SetScale(1.0f);	// 元に戻す
 
 		m_pSelect.pPic->SetARGB(0xffffffff);
-		m_pSelect.pPic->Render(m_tagPartnerPlate.iX+88, m_tagPartnerPlate.iY + 76);
+		m_pSelect.pPic->Render(m_tagPartnerPlate.iX+ m_iWidthIcon, m_tagPartnerPlate.iY + 76);
 	}
 	else if (GetFSM()->isInState(*SelectUIState::SecondToOKStep::GetInstance()))
 	{
 		m_pSelect.pPic->SetARGB(0xff888888);
-		m_pSelect.pPic->Render(m_tagPartnerPlate.iX + 88, m_tagPartnerPlate.iY + 76);
+		m_pSelect.pPic->Render(m_tagPartnerPlate.iX + m_iWidthIcon, m_tagPartnerPlate.iY + 76);
 	}
 
 

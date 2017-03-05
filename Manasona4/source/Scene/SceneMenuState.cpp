@@ -656,6 +656,9 @@ void SceneMenuState::TutorialSelectStep::Execute(sceneMenu *pMain)
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = pMain->GetCtrlDevice();
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = pMain->GetCtrlDevice();
 
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].eColorType = COLOR_TYPE::NORMAL;
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].eColorType = COLOR_TYPE::NORMAL;
+
 		MainFrameEX->ChangeScene(new sceneVS());
 		return;
 	}
@@ -1058,6 +1061,9 @@ void SceneMenuState::ChallengeNoStep::Execute(sceneMenu *pMain)
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].eAIType = AI_TYPE::PRACTICE_LAND;
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].iDeviceID = pMain->GetCtrlDevice();
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].iDeviceID = pMain->GetCtrlDevice();
+
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].eColorType = COLOR_TYPE::NORMAL;
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].eColorType = COLOR_TYPE::NORMAL;
 
 		MainFrameEX->ChangeScene(new sceneVS());
 

@@ -58,6 +58,19 @@ public:
 		}
 	}
 
+	COLOR_TYPE GetSelectCharacterColor(SIDE side)
+	{
+		if (side == SIDE::LEFT)
+		{
+			return m_pLeftSide->GetSelectCharacterColor();
+		}
+		else
+		{
+			return m_pRightSide->GetSelectCharacterColor();
+		}
+	}
+
+
 	bool isFirstStep(int device) 
 	{
 		if (m_pLeftSide->GetDevice() == device)

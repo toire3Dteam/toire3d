@@ -789,12 +789,30 @@ void Nazenara::RenderDrive()
 	if (m_pOverFlow) m_pOverFlow->Render();
 }
 
-void Nazenara::ChangeColor()
+void Nazenara::ChangeColor(COLOR_TYPE eColType)
 {
-	LPSTR path("DATA/CHR/Nazenara/tex_nazenaraba4.png");
+	LPSTR path = "none";
+
+	switch (eColType)
+	{
+	case COLOR_TYPE::NORMAL:
+		path = ("DATA/CHR/Nazenara/tex_nazenaraba.png");
+		break;
+	case COLOR_TYPE::EXTRA:
+		path = ("DATA/CHR/Nazenara/tex_nazenarabaEx.png");
+		break;
+	case COLOR_TYPE::MIRROR:
+		path = ("DATA/CHR/Nazenara/tex_nazenaraba4.png");
+		break;
+	default:
+		MyAssert(0, "存在しないカラータイプ");
+		break;
+	}
+
 	m_pDefaultObj->SetTexture(tdnTexture::Load(path), 0);
 	m_pHHDOFObj->SetTexture(tdnTexture::Load(path), 0);
-	m_pArm->SetTexture(tdnTexture::Load(path), 0);	
+	m_pArm->SetTexture(tdnTexture::Load(path), 0);
+
 }
 
 void Nazenara::InitMotionDatas()

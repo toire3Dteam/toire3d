@@ -191,7 +191,7 @@ public:
 	/****************************/
 	//	 カラー
 	/****************************/
-	void ChangeColor();
+	void ChangeColor(COLOR_TYPE eColType)override;
 
 	static const int c_WASSYOIGAUGE_MAX;			// ゲージ最大値=烙印発動時間
 

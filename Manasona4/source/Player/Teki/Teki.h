@@ -196,7 +196,7 @@ public:
 	/****************************/
 	//	 カラー
 	/****************************/
-	void ChangeColor();
+	void ChangeColor(COLOR_TYPE eColType)override;
 
 private:
 	// 純粋仮想関数オーバーライド

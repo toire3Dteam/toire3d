@@ -69,9 +69,15 @@ float g_fUvWater = 0.0f;
 tdnMesh* g_pBox;
 //PointLightInstancingMesh* g_pObj;
 
+iex3DObj* g_pSkinObj;
+float g_fSleap = 0;
+int m_iSquat = 10;
 
 bool sceneRenderingTest2::Initialize()
 {
+	g_pSkinObj= new iex3DObj("Data/CHR/teki/teki.iem");
+	g_pSkinObj->SetMotion(0);
+
 	//g_pObj = new PointLightInstancingMesh("Data/Shader/PLS_CCW.imo", 3);
 	//Matrix* mat = new Matrix[g_pObj->GetMaxInstancingNum()];
 	//for (int i = 0; i < g_pObj->GetMaxInstancingNum(); i++)
@@ -196,7 +202,7 @@ bool sceneRenderingTest2::Initialize()
 	// 兄貴
 	m_pAniki = new iex3DObj("Data/CHR/Aniki/Aniki.iem");
 
-	BattleLoadInst;
+	//BattleLoadInst;
 
 	return true;
 }
@@ -227,8 +233,9 @@ sceneRenderingTest2::~sceneRenderingTest2()
 
 	SAFE_DELETE(g_pBox);
 
-	BattleLoadInst->Rerease();
+	//BattleLoadInst->Rerease();
 
+	SAFE_DELETE(g_pSkinObj);
 }
 
 //******************************************************************
@@ -237,7 +244,19 @@ sceneRenderingTest2::~sceneRenderingTest2()
 
 void sceneRenderingTest2::Update()
 {
-	BattleLoadInst->Update();
+	if (KeyBoard(KB_H)) {
+		g_pSkinObj->SetMotion(0);
+	}
+	if (KeyBoard(KB_J)) {
+		g_pSkinObj->SetMotion(10);
+	}
+
+	g_pSkinObj->Animation();
+	//g_pSkinObj->UpdateSkinMeshFrame(,);
+	g_pSkinObj->Update(0.25f);
+
+
+	//BattleLoadInst->Update();
 
 	//// ワールド座標のデータも詰める
 	//Vector3 wpos = Vector3(0, 15, 0);
@@ -479,6 +498,7 @@ void sceneRenderingTest2::Render()
 			// 海
 			g_pSea->Render(shaderM, "DefaultLighting");
 
+		
 			// パーティクル
 			ParticleManager::Render();
 
@@ -505,6 +525,8 @@ void sceneRenderingTest2::Render()
 
 	}else
 	{
+		g_pSkinObj->Render();
+
 		//g_pStage->Render(shaderM, "copy");
 		g_pSky->Render();
 		g_tagWater.pObj->Render(shaderM, "copy");
@@ -519,7 +541,7 @@ void sceneRenderingTest2::Render()
 
 	}
 
-	BattleLoadInst->Render();
+	//BattleLoadInst->Render();
 	
 	float len = Math::Length(Vector3(10, 10, 10), Vector3(0, 0, 0));
 

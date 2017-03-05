@@ -916,11 +916,29 @@ void Aniki::RenderDrive()
 	BasePlayer::RenderDrive();
 }
 
-void Aniki::ChangeColor()
+void Aniki::ChangeColor(COLOR_TYPE eColType)
 {
-	LPSTR path("DATA/CHR/Aniki/Aniki2.png");
+	LPSTR path = "none";
+
+	switch (eColType)
+	{
+	case COLOR_TYPE::NORMAL:
+		path = ("DATA/CHR/Aniki/Aniki.png");
+		break;
+	case COLOR_TYPE::EXTRA:
+		path = ("DATA/CHR/Aniki/AnikiEx.png");
+		break;
+	case COLOR_TYPE::MIRROR:
+		path = ("DATA/CHR/Aniki/Aniki2.png");
+		break;
+	default:
+		MyAssert(0, "存在しないカラータイプ");
+		break;
+	}
+
 	m_pDefaultObj->SetTexture(tdnTexture::Load(path), 0);
 	m_pHHDOFObj->SetTexture(tdnTexture::Load(path), 0);
+
 }
 
 void Aniki::InitMotionDatas()

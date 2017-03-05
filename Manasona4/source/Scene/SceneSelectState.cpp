@@ -337,7 +337,7 @@ void SceneSelectState::End::Execute(sceneSelect *pMain)
 	// メインへ
 	if (Fade::isFadeOutCompletion())
 	{
-		// (TODO) ↑で選択したキャラクター・パートナー・ステージ・BGMを設定する
+		// ↑で選択したキャラクター・パートナー・ステージ・BGMを設定する
 		
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].eCharacter
 			= pMain->GetSelectUIMgr()->GetSelectCharacter(SIDE::LEFT);
@@ -352,6 +352,13 @@ void SceneSelectState::End::Execute(sceneSelect *pMain)
 			= pMain->GetSelectUIMgr()->GetSelectPartner(SIDE::RIGHT);
 
 		SelectDataMgr->Get()->iBattleMusicID=pMain->m_iSelectBGMNo;
+
+		// (追加) カラータイプ　
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].eColorType
+			= pMain->GetSelectUIMgr()->GetSelectCharacterColor(SIDE::LEFT);
+		
+		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].eColorType
+			= pMain->GetSelectUIMgr()->GetSelectCharacterColor(SIDE::RIGHT);
 
 		// ステージの登録(★RANDOMを0にしているので、実際のenumに合わす必要がある)
 		if (pMain->m_iSelectStageNo == 0)

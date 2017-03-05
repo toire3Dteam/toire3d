@@ -19,7 +19,25 @@ void ShotManager::Update()
 	FOR((int)SIDE::ARRAY_MAX)for (auto it = m_list[i].begin(); it != m_list[i].end();)
 	{
 		(*it)->Update();
-		if ((*it)->EraseOK()){ delete (*it); it = m_list[i].erase(it); }
+		if ((*it)->EraseOK())
+		{ 
+			delete (*it);
+			it = m_list[i].erase(it); 
+		}
+		else it++;
+	}
+}
+
+// 消すかどうかチェックするだけの更新
+void ShotManager::EraseCheakUpdate()
+{
+	FOR((int)SIDE::ARRAY_MAX)for (auto it = m_list[i].begin(); it != m_list[i].end();)
+	{
+		if ((*it)->EraseOK())
+		{
+			delete (*it);
+			it = m_list[i].erase(it);
+		}
 		else it++;
 	}
 }

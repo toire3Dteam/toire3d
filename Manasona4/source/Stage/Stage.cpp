@@ -505,7 +505,7 @@ void Stage::NanasatoSity::Update()
 	shaderM->SetValue("g_fUvWater", m_fUvWater);
 
 	//m_pWater->SetAngle(Vector3(0, 0, 1));
-	m_pWater->SetPos(Vector3(0, m_fWaterHeight, 100));
+	m_pWater->SetPos(Vector3(0, m_fWaterHeight, 200));
 	m_pWater->Update();
 
 }
@@ -655,7 +655,7 @@ void Stage::Syuten::Update()
 	shaderM->SetValue("g_fUvWater", m_fUvWater);
 
 	//m_pWater->SetAngle(Vector3(0, 0, 1));
-	m_pWater->SetPos(Vector3(0, m_fWaterHeight, 100));
+	m_pWater->SetPos(Vector3(0, m_fWaterHeight, 200));
 	m_pWater->Update();
 }
 

@@ -74,12 +74,28 @@ void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage, SideData Side
 		}
 		m_pPlayers[i]->InitActionDatas();		// ★攻撃情報を各キャラに初期化させる
 		m_pPlayers[i]->InitMotionDatas();		// 各キャラごとのモーション番号
+
+		// (追加)カラー変更
+		m_pPlayers[i]->ChangeColor(SideDatas[(int)side].eColorType);
+
 	}
 
-	// キャラが被ってたら2Pの色を変える
+	// キャラが被ってたら
 	if (SideDatas[(int)SIDE::LEFT].eCharacter== SideDatas[(int)SIDE::RIGHT].eCharacter)
 	{
-		m_pPlayers[(int)SIDE::RIGHT]->ChangeColor();
+		// カラータイプも被っていたら2Pの色を変える
+		if (SideDatas[(int)SIDE::LEFT].eColorType == SideDatas[(int)SIDE::RIGHT].eColorType)
+		{
+			COLOR_TYPE l_eCol = COLOR_TYPE::NORMAL;
+			// 1Pがデフォルトカラーならミラー用のカラーに
+			if (SideDatas[(int)SIDE::LEFT].eColorType == COLOR_TYPE::NORMAL)
+			{
+				l_eCol = COLOR_TYPE::MIRROR;
+			}
+
+			m_pPlayers[(int)SIDE::RIGHT]->ChangeColor(l_eCol);
+		}
+
 	}
 
 
