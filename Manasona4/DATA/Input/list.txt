@@ -16,3 +16,6 @@ ID: PS3
 NAME: Wireless Controller|
 ID: PS3
 
+NAME: JC-P301U|
+ID: DEFAULT
+

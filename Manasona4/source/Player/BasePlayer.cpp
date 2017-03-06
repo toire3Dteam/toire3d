@@ -741,7 +741,8 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 			!m_pStateMachine->isInState(*BasePlayerState::AerialDash::GetInstance()) &&
 			!m_pStateMachine->isInState(*BasePlayerState::AerialBackDash::GetInstance()) &&
 			!m_pStateMachine->isInState(*BasePlayerState::InvincibleAttack::GetInstance()) &&
-			!m_pStateMachine->isInState(*BasePlayerState::AerialAttack::GetInstance())
+			!m_pStateMachine->isInState(*BasePlayerState::AerialAttack::GetInstance()) &&
+			!m_pStateMachine->isInState(*BasePlayerState::StandAction::GetInstance())
 			)
 		{
 			m_dir = m_TargetDir;

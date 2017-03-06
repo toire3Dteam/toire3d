@@ -4318,6 +4318,12 @@ bool BasePlayerState::Escape::OnMessage(BasePlayer * pPerson, const Message & ms
 
 void BasePlayerState::StandAction::Enter(BasePlayer * pPerson)
 {
+	// 地上でのみ向きを修正
+	if (pPerson->isLand())
+	{
+		pPerson->SetDirAngle();
+	}
+
 	// 召喚モーションに変える
 	pPerson->SetMotion(MOTION_TYPE::PERSONA);
 
@@ -4340,7 +4346,8 @@ void BasePlayerState::StandAction::Enter(BasePlayer * pPerson)
 	// ペルソナ発動エフェクト！
 	pPerson->AddEffectAction(pPerson->GetPos(),EFFECT_TYPE::PERSONA);
 
-	pPerson->SetDirAngle();
+
+	
 
 	// 前回移動量保存
 	//pPerson->SetStandSaveMove(pPerson->GetMove());
