@@ -218,6 +218,9 @@ void sceneMenu::Update()
 			return;
 		}
 
+#ifdef DEBUG
+
+
 		// エンターでワープ
 		if (KeyBoard(KB_ENTER) == 2)
 		{
@@ -230,8 +233,6 @@ void sceneMenu::Update()
 			MainFrameEX->ChangeScene(new sceneResult(data));
 			return;
 		}
-#ifdef DEBUG
-
 
 		if (KeyBoardTRG(KB_SPACE))
 		{

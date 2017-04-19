@@ -168,6 +168,7 @@ bool SceneMenuState::FirstStep::PadUpdate(sceneMenu *pMain, int DeviceID)
 			break;
 		case MENU_ICON_TYPE::CHALLENGE:
 			pMain->SetPauseDeviceID(DeviceID);// ★ポーズメニューを押した人保存
+			pMain->SetCtrlDevice(DeviceID);
 			pMain->GetFSM()->ChangeState(ChallengeStep::GetInstance());
 			bChangedState = true;	// ★関数分けしたので、これをtrueにしたらreturnするようにした
 			break;
