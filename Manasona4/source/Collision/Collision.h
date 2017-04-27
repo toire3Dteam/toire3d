@@ -46,6 +46,21 @@ namespace CollisionShape
 
 		virtual void Render(){}
 	};
+
+	// キャラクター用の当たり判定
+	class SquareChara : public Base
+	{
+	public:
+
+		float height,	// ★★★高さ＜半分ではなく、下から上への長さ＞
+			width;		// 幅＜半分＞
+
+		SquareChara() :Base(), height(0.0f), width(0.0f) {}
+		~SquareChara() {}
+
+		virtual void Render() {}
+	};
+
 }
 
 class Collision
@@ -61,6 +76,8 @@ public:
 	// 形状で判定
 	static bool HitCheck(CollisionShape::Circle* c1, CollisionShape::Circle* c2);
 	static bool HitCheck(CollisionShape::Square* s1, CollisionShape::Square* s2);
+	static bool HitCheck(CollisionShape::Square* s1, CollisionShape::SquareChara* s2);
+	static bool HitCheck(CollisionShape::SquareChara* s1, CollisionShape::SquareChara* s2);
 	static bool HitCheck(CollisionShape::Circle* c, CollisionShape::Square* s);
 
 	static void SetStage(Stage::Base *pStage){ m_pStage = pStage; }

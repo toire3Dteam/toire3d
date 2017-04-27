@@ -3537,6 +3537,9 @@ void BasePlayerState::SquatAttack::Enter(BasePlayer * pPerson)
 
 	pPerson->SetDirAngle();
 
+	// しゃがみフラグON
+	pPerson->SetSquat(true);
+
 	// 攻撃ボイスを再生する
 	voice->Play(VOICE_TYPE::SQUAT_ATTACK, pPerson->GetCharacterType());
 }
@@ -3607,6 +3610,8 @@ void BasePlayerState::SquatAttack::Execute(BasePlayer * pPerson)
 
 void BasePlayerState::SquatAttack::Exit(BasePlayer * pPerson)
 {
+	// しゃがみフラグ
+	pPerson->SetSquat(false);
 
 
 }
@@ -4649,7 +4654,11 @@ void BasePlayerState::OverDrive_OneMore::Enter(BasePlayer * pPerson)
 	voice->Play(VOICE_TYPE::OVERDRIVE_ONEMORE, pPerson->GetCharacterType());
 
 	// 上に浮く
-	pPerson->SetMove(Vector3(0, 1, 0));
+	//pPerson->SetMove(Vector3(0, 1, 0));
+	
+	// 重力無視
+	pPerson->SetMove(Vector3(0, 0, 0));
+	pPerson->SetMoveUpdate(false);
 
 	// バースト前エフェクト　発動！
 	pPerson->AddEffectAction(pPerson->GetCenterPos(), EFFECT_TYPE::ONEMORE_BURST_START);
@@ -4680,7 +4689,7 @@ void BasePlayerState::OverDrive_OneMore::Execute(BasePlayer * pPerson)
 	if (pPerson->GetActionFrame() == FRAME_STATE::START)
 	{
 		// ↑
-		pPerson->SetMove(Vector3(0, .21f, 0));
+		//pPerson->SetMove(Vector3(0, .21f, 0));
 	}
 	if (pPerson->GetActionFrame() == FRAME_STATE::ACTIVE)
 	{
@@ -4754,6 +4763,9 @@ void BasePlayerState::OverDrive_OneMore::Exit(BasePlayer * pPerson)
 {
 	// ゲームを止めるフラグ
 	pPerson->SetGameTimerStopFlag(false);
+
+	// 重力考慮
+	pPerson->SetMoveUpdate(true);
 
 
 }
@@ -4883,6 +4895,10 @@ void BasePlayerState::Guard::Enter(BasePlayer * pPerson)
 
 		// ガードステートを設定する
 		pPerson->SetGuardState(GUARD_STATE::DOWN_GUARD);
+
+		// しゃがみフラグON
+		pPerson->SetSquat(true);
+
 	}
 
 	/* 立ちガード */
@@ -4892,6 +4908,9 @@ void BasePlayerState::Guard::Enter(BasePlayer * pPerson)
 
 		// ガードステートを設定する
 		pPerson->SetGuardState(GUARD_STATE::UP_GUARD);
+
+		// しゃがみフラグOFF
+		pPerson->SetSquat(false);
 	}
 
 	// ガード成功フラグ初期化
@@ -4954,6 +4973,10 @@ void BasePlayerState::Guard::Execute(BasePlayer * pPerson)
 
 				// ガードステートを設定する
 				pPerson->SetGuardState(GUARD_STATE::DOWN_GUARD);
+
+				// しゃがみフラグON
+				pPerson->SetSquat(true);
+
 				return;
 			}
 
@@ -4964,6 +4987,10 @@ void BasePlayerState::Guard::Execute(BasePlayer * pPerson)
 
 				// ガードステートを設定する
 				pPerson->SetGuardState(GUARD_STATE::UP_GUARD);
+
+				// しゃがみフラグOFF
+				pPerson->SetSquat(false);
+
 				return;
 			}
 		}
@@ -5043,6 +5070,10 @@ void BasePlayerState::Guard::Exit(BasePlayer * pPerson)
 
 	// ガード成功フラグ初期化
 	pPerson->SetGuardSuccess(false);
+
+	// しゃがみフラグOFF
+	pPerson->SetSquat(false);
+
 
 }
 

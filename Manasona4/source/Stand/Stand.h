@@ -140,4 +140,17 @@ namespace Stand
 		void Action(SKILL_ACTION_TYPE type);
 	};
 
+
+	/**************************/
+	//		アッタカイ
+	class Attakai : public Base
+	{
+	public:
+		Attakai(BasePlayer *pPlayer);
+		//~Mokoi();
+		void Update(bool bControl);
+
+		// 純粋仮想オーバーライド
+		void Action(SKILL_ACTION_TYPE type);
+	};
 }

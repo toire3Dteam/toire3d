@@ -203,9 +203,10 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 	if (you->GetInvincibleLV() <= pAttackData->pierceLV)	// ‘ŠŽè‚ª–³“G‚Å‚È‚¢
 	{
 		// UŒ‚”»’èŒ`ó‚Æ‘ŠŽè‚ÌŽlŠp‚Å”»’è‚ð‚Æ‚é
-		CollisionShape::Square AttackShape, YouShape;
+		CollisionShape::Square AttackShape;
+		CollisionShape::SquareChara YouShape;
 		memcpy_s(&AttackShape, sizeof(CollisionShape::Square), pAttackData->pCollisionShape, sizeof(CollisionShape::Square));
-		memcpy_s(&YouShape, sizeof(CollisionShape::Square), you->GetHitSquare(), sizeof(CollisionShape::Square));
+		memcpy_s(&YouShape, sizeof(CollisionShape::SquareChara), you->GetHitSquare(), sizeof(CollisionShape::SquareChara));
 		if (my->GetDir() == DIR::LEFT) AttackShape.pos.x *= -1;	// ‚±‚Ìpos‚Íâ‘Î+(‰E)‚È‚Ì‚ÅA¶Œü‚«‚È‚ç‹t‚É‚·‚é
 		AttackShape.pos += my->GetPos();
 		YouShape.pos += you->GetPos();
@@ -337,9 +338,10 @@ bool Collision::CollisionStandAttack(Stand::Base *pStand, BasePlayer *pYou)
 	if (pYou->GetInvincibleLV() == 0)								// ‘ŠŽè‚ª–³“G‚Å‚È‚¢
 	{
 		// UŒ‚”»’èŒ`ó‚Æ‘ŠŽè‚ÌŽlŠp‚Å”»’è‚ð‚Æ‚é
-		CollisionShape::Square AttackShape, YouShape;
+		CollisionShape::Square AttackShape;
+		CollisionShape::SquareChara YouShape;
 		memcpy_s(&AttackShape, sizeof(CollisionShape::Square), pStandAttackData->pCollisionShape, sizeof(CollisionShape::Square));
-		memcpy_s(&YouShape, sizeof(CollisionShape::Square), pYou->GetHitSquare(), sizeof(CollisionShape::Square));
+		memcpy_s(&YouShape, sizeof(CollisionShape::SquareChara), pYou->GetHitSquare(), sizeof(CollisionShape::SquareChara));
 		if (pStand->GetDir() == DIR::LEFT) AttackShape.pos.x *= -1;	// ‚±‚Ìpos‚Íâ‘Î+(‰E)‚È‚Ì‚ÅA¶Œü‚«‚È‚ç‹t‚É‚·‚é
 		AttackShape.pos += pStand->GetPos();
 		YouShape.pos += pYou->GetPos();
@@ -433,9 +435,10 @@ bool Collision::CollisionShot(Shot::Base *shot, BasePlayer *you)
 	}
 
 	// UŒ‚”»’èŒ`ó‚Æ‘ŠŽè‚ÌŽlŠp‚Å”»’è‚ð‚Æ‚é
-	CollisionShape::Square AttackShape, YouShape;
+	CollisionShape::Square AttackShape;
+	CollisionShape::SquareChara YouShape;
 	memcpy_s(&AttackShape, sizeof(CollisionShape::Square), pShotAttackData->pCollisionShape, sizeof(CollisionShape::Square));
-	memcpy_s(&YouShape, sizeof(CollisionShape::Square), you->GetHitSquare(), sizeof(CollisionShape::Square));
+	memcpy_s(&YouShape, sizeof(CollisionShape::SquareChara), you->GetHitSquare(), sizeof(CollisionShape::SquareChara));
 	AttackShape.pos += shot->GetPos();
 	YouShape.pos += you->GetPos();
 	if (Collision::HitCheck(&AttackShape, &YouShape))
@@ -609,7 +612,7 @@ void Collision::Raypic(BasePlayer *player, Vector3 *move) // ƒXƒe[ƒW‚ÆƒvƒŒƒCƒ„
 float Collision::CheckMove(BasePlayer *pPlayer, const Vector3 &vMove)
 {
 	Vector3 pos(pPlayer->GetPos()), move(vMove);
-	const CollisionShape::Square *square(pPlayer->GetHitSquare());
+	const CollisionShape::SquareChara *square(pPlayer->GetHitSquare());
 	float width(m_pStage->GetWidth() / 2);
 
 	if (move.x < 0) // ¶
@@ -646,7 +649,7 @@ void Collision::RaypicDown(Stage::Base *obj, BasePlayer *player, Vector3 *move)
 		bool hit(false);
 
 		Vector3 pos(player->GetPos());
-		const CollisionShape::Square *square(player->GetHitSquare());
+		const CollisionShape::SquareChara *square(player->GetHitSquare());
 		Vector3 ray_pos;
 
 		ray_pos = pos;
@@ -659,7 +662,7 @@ void Collision::RaypicDown(Stage::Base *obj, BasePlayer *player, Vector3 *move)
 		{
 			if (pos.y + move->y <= bottom)
 			{
-				pos.y = bottom + square->height - square->pos.y;
+				pos.y = bottom + /*square->height - */square->pos.y;
 				move->y = 0;
 
 				// ƒvƒŒƒCƒ„[‚ÉƒZƒbƒg‚·‚é‚Ì‚Å‚Í‚È‚­Amove’l‚ÌƒAƒhƒŒƒX‚ðˆø”‚Å‚à‚ç‚Á‚Ä’¼Ú‘‚«Š·‚¦‚éŒ`‚É‚µ‚½B(‚ß‚èž‚Ý”»’è‚ÅA‚ß‚èž‚Ý”»’è—p‚Ìmove’l‚ðŽg‚¤‚±‚Æ‚É‚È‚Á‚½‚Ì‚Å)
@@ -711,7 +714,7 @@ void Collision::RaypicDown(Stage::Base *obj, BasePlayer *player, Vector3 *move)
 void Collision::RaypicLeft(Stage::Base *obj, BasePlayer *player, Vector3 *move, float fTargetVecX)
 {
 	Vector3 pos(player->GetPos());
-	const CollisionShape::Square *square(player->GetHitSquare());
+	const CollisionShape::SquareChara *square(player->GetHitSquare());
 
 	const float width(
 		//(fabsf(fTargetVecX) > 50) ? pos.x : 
@@ -738,7 +741,7 @@ void Collision::RaypicLeft(Stage::Base *obj, BasePlayer *player, Vector3 *move, 
 void Collision::RaypicRight(Stage::Base *obj, BasePlayer *player, Vector3 *move, float fTargetVecX)
 {
 	Vector3 pos(player->GetPos());
-	const CollisionShape::Square *square(player->GetHitSquare());
+	const CollisionShape::SquareChara *square(player->GetHitSquare());
 
 	if (move->x > 0) // ‰E
 	{
@@ -800,9 +803,9 @@ void Collision::RaypicRight(Stage::Base *obj, BasePlayer *player, Vector3 *move,
 void Collision::Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2)
 {
 	// ƒvƒŒƒCƒ„[‚Ì”»’è¡
-	CollisionShape::Square s1, s2;
-	memcpy_s(&s1, sizeof(CollisionShape::Square), pPlayer1->GetHitSquare(), sizeof(CollisionShape::Square));
-	memcpy_s(&s2, sizeof(CollisionShape::Square), pPlayer2->GetHitSquare(), sizeof(CollisionShape::Square));
+	CollisionShape::SquareChara s1, s2;
+	memcpy_s(&s1, sizeof(CollisionShape::SquareChara), pPlayer1->GetHitSquare(), sizeof(CollisionShape::SquareChara));
+	memcpy_s(&s2, sizeof(CollisionShape::SquareChara), pPlayer2->GetHitSquare(), sizeof(CollisionShape::SquareChara));
 	s1.pos += pPlayer1->GetPos(), s2.pos += pPlayer2->GetPos();
 
 	// ‚Æ‚è‚ ‚¦‚¸A‰¡‚¾‚¯”»’è‚µ‚Ä‚Ý‚é
@@ -853,6 +856,54 @@ bool Collision::HitCheck(CollisionShape::Square* s1, CollisionShape::Square* s2)
 		return false;
 
 	return true;
+}
+
+bool Collision::HitCheck(CollisionShape::Square * s1, CollisionShape::SquareChara * s2)
+{
+	// ‰¡”»’è
+	if ((s1->width + s2->width) < abs(s1->pos.x - s2->pos.x))
+		return false;
+
+	// c”»’è
+	const float 
+		s1MinH = s1->pos.y - (s1->height), 
+		s1MaxH = s1->pos.y + (s1->height), 
+		s2MinH = s2->pos.y, 
+		s2MaxH = s2->pos.y + s2->height;
+	if (s1MinH >= s2MinH && s1MinH <= s2MaxH ||
+		s1MaxH >= s2MinH && s1MaxH <= s2MaxH ||
+		s2MinH >= s1MinH && s2MinH <= s1MaxH ||
+		s2MaxH >= s1MinH && s2MaxH <= s1MaxH
+		)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool Collision::HitCheck(CollisionShape::SquareChara * s1, CollisionShape::SquareChara * s2)
+{
+	// ‰¡”»’è
+	if ((s1->width + s2->width) < abs(s1->pos.x - s2->pos.x))
+		return false;
+
+	// c”»’è
+	const float
+		s1MinH = s1->pos.y,
+		s1MaxH = s1->pos.y + (s1->height),
+		s2MinH = s2->pos.y,
+		s2MaxH = s2->pos.y + s2->height;
+	if (s1MinH >= s2MinH && s1MinH <= s2MaxH ||
+		s1MaxH >= s2MinH && s1MaxH <= s2MaxH ||
+		s2MinH >= s1MinH && s2MinH <= s1MaxH ||
+		s2MaxH >= s1MinH && s2MaxH <= s1MaxH
+		)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 bool Collision::HitCheck(CollisionShape::Circle* c, CollisionShape::Square* s)

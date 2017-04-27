@@ -730,7 +730,12 @@ public:
 	float GetMaxJump() { return m_tagCharacterParam.fMaxJump; }
 	Jump *GetJump() { return &m_jump; }
 	void SetLand(bool bLand) { m_bLand = bLand; }
-	void SetSquat(bool bSquat) { m_bSquat = bSquat; }
+	void SetSquat(bool bSquat)
+	{
+		m_bSquat = bSquat;
+		m_tagCharacterParam.HitSquare.height = 
+			(m_bSquat == true) ? m_tagOrgCharacterParam.fSquatHeight : m_tagOrgCharacterParam.HitSquare.height;
+	}
 	void SetAerialJump(bool bAerialJump) { m_bAerialJump = bAerialJump; }
 	void SetAerialDash(bool bAerialDash) { m_bAerialDash = bAerialDash; }
 	void SetAerialSkillOK(bool bAerialSkillOK) { m_bAerialSkillOK = bAerialSkillOK; }
@@ -988,7 +993,8 @@ public:
 	//bool isMaxSpeed() { return (abs(m_move.x) >= m_maxSpeed); }
 	float GetMaxSpeed() { return m_tagCharacterParam.fMaxSpeed; }
 	SIDE GetSide(){ return m_side; }
-	CollisionShape::Square *GetHitSquare() { return &m_tagCharacterParam.HitSquare; }	// ステージのあたり判定用
+	//CollisionShape::Square *GetHitSquare() { return &m_tagCharacterParam.HitSquare; }	// ステージのあたり判定用
+	CollisionShape::SquareChara *GetHitSquare() { return &m_tagCharacterParam.HitSquare; }	// ステージのあたり判定用
 
 	// UI
 	//ComboUI* GetComboUI(){ return m_pComboUI; }
@@ -1077,7 +1083,8 @@ protected:
 		float fMaxJump;								// 最大ジャンプ力
 		float fAerialDashSpeed;						// 空中ダッシュの速度
 		bool bInvincibleCoutner;					// 無敵攻撃がカウンタータイプか
-		CollisionShape::Square HitSquare;			// 四角判定(ステージ衝突で使う)
+		CollisionShape::SquareChara HitSquare;		// 四角判定(ステージ衝突で使う)
+		float fSquatHeight;							// しゃがんだ高さ
 		EFFECT_CAMERA_ID eHeaveHoOverFlowCameraID;	// 一撃必殺カメラのID
 		CUTIN_TYPE_NAME eCutInType;					// 一撃必殺カットインのID
 	}m_tagCharacterParam;

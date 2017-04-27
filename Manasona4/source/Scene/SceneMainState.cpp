@@ -1854,7 +1854,7 @@ void SceneMainState::Training::Execute(sceneMain *pMain)
 			{
 				SelectDataMgr->Get()->tagTrainingDatas.eStartPosition = START_POSITION::LEFT;
 			}
-			else if (y < -.5f + gosa ||
+			else if (y > .5f - gosa ||
 				tdnInput::KeyGet(KEYCODE::KEY_DOWN, i) == 1)
 			{
 				SelectDataMgr->Get()->tagTrainingDatas.eStartPosition = START_POSITION::MIDDLE;

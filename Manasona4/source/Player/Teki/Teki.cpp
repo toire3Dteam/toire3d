@@ -1383,6 +1383,13 @@ void Teki::HeavehoDriveInit()
 
 	// Move値無効
 	m_vMove = VECTOR_ZERO;
+	float l_fXVec;
+	l_fXVec = m_pTargetPlayer->GetPos().x - this->GetPos().x;
+	// Normalize();
+	if (abs(l_fXVec) >= 15)
+	{
+		m_vMove.x += GetDirVecX()*1.25f;
+	}
 
 	// ストップタイマー
 	SetGameTimerStopFlag(true);
@@ -1399,23 +1406,28 @@ bool Teki::HeavehoDriveUpdate()
 		return true;
 	}
 
-	// ヒーホーストップ時間計測
-	if (m_iHeavehoStopTimer > 0) if (--m_iHeavehoStopTimer == 0)
+	// 時が止まっている間
+	if (m_iHeavehoStopTimer > 0)
 	{
-		// しょおおおおおおりゅううううけんん！！！！！ウーハー！小杉
-		m_vMove.Set((m_dir == DIR::LEFT) ? -.5f : .5f, 2.5f, 0);
 
-		// アッパーラインエフェクト
-		Vector3 l_vMoveVec = m_vMove;
-		l_vMoveVec.Normalize();
-		float l_fZAngle = atan2(-l_vMoveVec.x, l_vMoveVec.y);
-		m_pUpperLineEffect->Action(GetFlontPos(), 1, 1, Vector3(0, 0, l_fZAngle), Vector3(0, 0, l_fZAngle));
-		m_pCycloneEffect->Action(GetFlontPos(), 1.5f, 3.5f, Vector3(0, 0, l_fZAngle), Vector3(0, 0, l_fZAngle));
+		// 時止めが終わった瞬間
+		if (--m_iHeavehoStopTimer == 0)
+		{
+			// しょおおおおおおりゅううううけんん！！！！！ウーハー！小杉
+			m_vMove.Set((m_dir == DIR::LEFT) ? -.5f : .5f, 2.5f, 0);
 
-		// 重力の影響を戻す！
-		SetMoveUpdate(true);
+			// アッパーラインエフェクト
+			Vector3 l_vMoveVec = m_vMove;
+			l_vMoveVec.Normalize();
+			float l_fZAngle = atan2(-l_vMoveVec.x, l_vMoveVec.y);
+			m_pUpperLineEffect->Action(GetFlontPos(), 1, 1, Vector3(0, 0, l_fZAngle), Vector3(0, 0, l_fZAngle));
+			m_pCycloneEffect->Action(GetFlontPos(), 1.5f, 3.5f, Vector3(0, 0, l_fZAngle), Vector3(0, 0, l_fZAngle));
 
-		SetGameTimerStopFlag(false);
+			// 重力の影響を戻す！
+			SetMoveUpdate(true);
+
+			SetGameTimerStopFlag(false);
+		}
 	}
 
 	return false;

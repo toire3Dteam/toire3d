@@ -76,6 +76,9 @@ void BasePlayer::LoadCharacterParam(LPSTR filename)
 	ifs >> m_tagCharacterParam.HitSquare.height;
 	ifs >> m_tagCharacterParam.HitSquare.pos.y;
 
+	// しゃがんだ高さ
+	ifs >> m_tagCharacterParam.fSquatHeight;
+
 	// 最大速度(ダッシュ速度
 	ifs >> skip;
 	ifs >> m_tagCharacterParam.fMaxSpeed;
@@ -370,6 +373,9 @@ m_eCharacterType(CHARACTER::AIROU)
 		break;
 	case PARTNER::HETE:
 		m_pStand = new Stand::Hete(this);
+		break;
+	case PARTNER::ATTAKAI:
+		m_pStand = new Stand::Attakai(this);
 		break;
 	default:
 		MyAssert(0,"そのスタンドのタイプ存在しない");
@@ -1447,22 +1453,24 @@ void BasePlayer::Render()
 
 	}
 
-	// 判定の描画
-	CollisionShape::Square square;
+	//// 判定の描画
+	//CollisionShape::SquareChara squareChara;
 
-	memcpy_s(&square, sizeof(CollisionShape::Square), &m_tagCharacterParam.HitSquare, sizeof(CollisionShape::Square));
-	square.pos += m_vPos;
+
+	//memcpy_s(&squareChara, sizeof(CollisionShape::SquareChara), &m_tagCharacterParam.HitSquare, sizeof(CollisionShape::SquareChara));
+	//squareChara.pos += m_vPos;
 
 	Vector3 wv[3];	// ワールドバーテックス
-	wv[0].Set(square.pos.x - square.width, square.pos.y + square.height, 0);
-	wv[1].Set(square.pos.x + square.width, square.pos.y + square.height, 0);
-	wv[2].Set(square.pos.x + square.width, square.pos.y - square.height, 0);
+	//wv[0].Set(squareChara.pos.x - squareChara.width, squareChara.pos.y + squareChara.height, 0);
+	//wv[1].Set(squareChara.pos.x + squareChara.width, squareChara.pos.y + squareChara.height, 0);
+	//wv[2].Set(squareChara.pos.x + squareChara.width, squareChara.pos.y /*- squareChara.height*/, 0);
 
 	Vector2 sv[3];	// スクリーンバーテックス
-	FOR(3)sv[i] = Math::WorldToScreen(wv[i]);
+	//FOR(3)sv[i] = Math::WorldToScreen(wv[i]);
 
-	tdnPolygon::Rect((int)sv[0].x, (int)sv[0].y, (int)(sv[1].x - sv[0].x), (int)(sv[2].y - sv[0].y), RS::COPY, 0x80ffffff);
+	//tdnPolygon::Rect((int)sv[0].x, (int)sv[0].y, (int)(sv[1].x - sv[0].x), (int)(sv[2].y - sv[0].y), RS::COPY, 0x80ffffff);
 
+	CollisionShape::Square square;
 	/* 攻撃判定の描画 */
 	if (isAttackState())
 	{
@@ -1539,22 +1547,25 @@ void BasePlayer::Render(tdnShader* shader, char* name)
 
 void BasePlayer::RenderDebug()
 {
-	// 判定の描画
-	CollisionShape::Square square;
 
-	memcpy_s(&square, sizeof(CollisionShape::Square), &m_tagCharacterParam.HitSquare, sizeof(CollisionShape::Square));
-	square.pos += m_vPos;
+	// 判定の描画
+	CollisionShape::SquareChara squareChara;
+
+	memcpy_s(&squareChara, sizeof(CollisionShape::SquareChara), &m_tagCharacterParam.HitSquare, sizeof(CollisionShape::SquareChara));
+	squareChara.pos += m_vPos;
 
 	Vector3 wv[3];	// ワールドバーテックス
-	wv[0].Set(square.pos.x - square.width, square.pos.y + square.height, 0);
-	wv[1].Set(square.pos.x + square.width, square.pos.y + square.height, 0);
-	wv[2].Set(square.pos.x + square.width, square.pos.y - square.height, 0);
+	wv[0].Set(squareChara.pos.x - squareChara.width, squareChara.pos.y + squareChara.height, 0);
+	wv[1].Set(squareChara.pos.x + squareChara.width, squareChara.pos.y + squareChara.height, 0);
+	wv[2].Set(squareChara.pos.x + squareChara.width, squareChara.pos.y /*- squareChara.height*/, 0);
 
 	Vector2 sv[3];	// スクリーンバーテックス
 	FOR(3)sv[i] = Math::WorldToScreen(wv[i]);
 
 	tdnPolygon::Rect((int)sv[0].x, (int)sv[0].y, (int)(sv[1].x - sv[0].x), (int)(sv[2].y - sv[0].y), RS::COPY, 0x80ffffff);
 
+	// 判定の描画
+	CollisionShape::Square square;
 	/* 攻撃判定の描画 */
 	if (isAttackState())
 	{

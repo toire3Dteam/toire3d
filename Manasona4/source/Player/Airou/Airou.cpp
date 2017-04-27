@@ -1139,6 +1139,10 @@ bool Airou::HeavehoDriveUpdate()
 			SetMotion(m_iMotionNumbers[(int)MOTION_TYPE::HEAVEHO_DRIVE] + 1);
 			m_pOshiokiMgr = new OshiokiManager::OverDrive(this, m_pTargetPlayer);
 			m_pOshiokiMgr->Action();
+
+			// 0429追加　マーヤバグ修正のために、当たってたら無敵にする
+			SetEscapeFlag(true);
+
 			return false;
 		}
 
@@ -1155,6 +1159,8 @@ void Airou::HeavehoDriveExit()
 	// 重力早くもどって！
 	SetMoveUpdate(true);
 
+	// 0429追加　マーヤバグ修正のため
+	SetEscapeFlag(false);
 }
 
 void Airou::HeavehoDriveHitEvent()
