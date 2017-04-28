@@ -188,5 +188,7 @@ private:
 
 	BaseUVEffect *m_pAirouEntryEffect;
 	BaseUVEffect *m_pAirouEntryCircleEffect;
+
+	BaseUVEffect *m_pAirouImpactEffect;
 };
 

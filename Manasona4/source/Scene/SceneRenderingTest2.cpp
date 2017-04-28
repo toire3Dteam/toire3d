@@ -25,7 +25,7 @@
 
 #include "BattleLoading\BattleLoading.h"
 #include "Fade\Fade.h"
-
+#include "Effect\ExPlosion.h"
 
 SoundWindow* g_pSoundWindow;
 
@@ -72,9 +72,17 @@ tdnMesh* g_pBox;
 iex3DObj* g_pSkinObj;
 float g_fSleap = 0;
 int m_iSquat = 10;
+//
+//BaseUVEffect *m_pExplosion;			// 爆発UVエフェクト
+//BaseUVEffect *m_pFireRing;
+//BaseUVEffect *m_pFireWave;
+
+CExplosion *eeeee;
 
 bool sceneRenderingTest2::Initialize()
 {
+	eeeee = new CExplosion();
+
 	g_pSkinObj= new iex3DObj("Data/CHR/teki/teki.iem");
 	g_pSkinObj->SetMotion(0);
 
@@ -236,6 +244,9 @@ sceneRenderingTest2::~sceneRenderingTest2()
 	//BattleLoadInst->Rerease();
 
 	SAFE_DELETE(g_pSkinObj);
+
+	SAFE_DELETE(eeeee);
+
 }
 
 //******************************************************************
@@ -244,6 +255,17 @@ sceneRenderingTest2::~sceneRenderingTest2()
 
 void sceneRenderingTest2::Update()
 {
+	if (KeyBoardTRG(KB_B)) 
+	{
+		eeeee->Action(VECTOR_ZERO);
+
+	}
+
+	eeeee->Update();
+
+	ParticleManager::Update();
+
+
 	if (KeyBoard(KB_H)) {
 		g_pSkinObj->SetMotion(0);
 	}
@@ -530,6 +552,9 @@ void sceneRenderingTest2::Render()
 		//g_pStage->Render(shaderM, "copy");
 		g_pSky->Render();
 		g_tagWater.pObj->Render(shaderM, "copy");
+
+		eeeee->Render();
+		ParticleManager::Render();
 
 		//m_pAniki->Render(shaderM, "copy");
 

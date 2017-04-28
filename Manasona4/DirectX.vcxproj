@@ -142,6 +142,7 @@
     <ClCompile Include="source\Effect\AnimationRipple.cpp" />
     <ClCompile Include="source\Effect\AnimationRippleEx.cpp" />
     <ClCompile Include="source\Effect\AnimationUV.cpp" />
+    <ClCompile Include="source\Effect\ExPlosion.cpp" />
     <ClCompile Include="source\Effect\LocusEffect.cpp" />
     <ClCompile Include="source\Effect\PanelEffect\PanelEffect.cpp" />
     <ClCompile Include="source\Effect\PanelEffect\PanelEffectManager.cpp" />
@@ -345,6 +346,7 @@
     <ClInclude Include="source\Effect\AnimationRipple.h" />
     <ClInclude Include="source\Effect\AnimationRippleEx.h" />
     <ClInclude Include="source\Effect\AnimationUV.h" />
+    <ClInclude Include="source\Effect\ExPlosion.h" />
     <ClInclude Include="source\Effect\LocusEffect.h" />
     <ClInclude Include="source\Effect\PanelEffect\PanelEffect.h" />
     <ClInclude Include="source\Effect\PanelEffect\PanelEffectManager.h" />

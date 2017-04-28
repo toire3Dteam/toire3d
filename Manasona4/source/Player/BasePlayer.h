@@ -26,6 +26,8 @@
 // コマンド表用
 #include "Window\BaseWindow.h"
 
+// 爆発エフェクト
+#include "../Effect/ExPlosion.h"
 
 // 前方宣言
 class AI;
@@ -274,6 +276,7 @@ enum class EFFECT_TYPE
 	CYCLONE_RUN,		// 竜巻を起こして走る
 	MULTIPLE_HIT_BLOW,	// 多段ヒット（物理）
 	THROW_HOLD,			// 掴まえた時
+	EXPLOSION,			// 爆発
 };
 
 // ガードの種類
@@ -1262,6 +1265,9 @@ protected:
 
 	// オーバードライブゲージが使えない
 	bool m_bNotOverDrive;		 
+
+	// 爆発
+	CExplosion* m_pExplosion;
 
 
 	// (メモ)　//////////////////////////////////////////////////////////

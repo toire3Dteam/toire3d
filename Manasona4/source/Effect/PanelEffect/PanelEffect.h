@@ -22,11 +22,19 @@ public:
 
 	AnimationPanel* GetPanel() { return m_pic; }
 
+	// アクセサ
+	void SetAdd3DScale(float fScale){m_picAdd3DScale = fScale;}
+	void AddAdd3DScale(float fScale) { m_picAdd3DScale += fScale; }
+	float GetAdd3DScale() {	return m_picAdd3DScale;}
+
+	void SetPos(Vector3 vPos) { m_pos = vPos; }
+	Vector3 GetPos() { return m_pos;}
 protected:
 	AnimationPanel* m_pic;
 	Vector3 m_pos;
 	int m_picSize;
 	float m_pic3DScale;
+	float m_picAdd3DScale;
 	RS state;
 
 	int m_iDelayFrame;
@@ -696,4 +704,50 @@ public:
 	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
 
 private:
+};
+
+
+// 爆弾
+class BomEffect :public BasePanelEffect
+{
+public:
+	BomEffect()
+	{
+		m_picSize = 128;
+		m_pic = new AnimationPanel("Data/Effect/Bom.png", 128, 128, 58, 1, 8, true);
+		// m_pic->GetPic()->SetScale(3.0f);
+		state = RS::COPY_NOZ;
+		m_pic3DScale = 50;//3Dのスケール
+	};
+
+	~BomEffect() {};
+
+	//void Update() { BasePanelEffect::Update(); };
+	//void Render() { BasePanelEffect::Render(); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
+
+private:
+
+};
+
+class BomAddEffect :public BasePanelEffect
+{
+public:
+	BomAddEffect()
+	{
+		m_picSize = 128;
+		m_pic = new AnimationPanel("Data/Effect/BomAdd.png", 128, 128, 58, 1, 8, true);
+		//m_pic->GetPic()->SetScale(3.0f);
+		state = RS::COPY_NOZ;
+		m_pic3DScale = 50;//3Dのスケール
+	};
+
+	~BomAddEffect() {};
+
+	//void Update() { BasePanelEffect::Update(); };
+	//void Render() { BasePanelEffect::Render(); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
+
+private:
+
 };

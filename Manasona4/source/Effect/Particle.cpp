@@ -694,19 +694,41 @@ void ParticleManager::EffectResultSplash(const Vector3 &pos)
 //*****************************************************************************
 void ParticleManager::EffectExplosion(const Vector3 &pos)
 {
-	Vector3 Pos, Move, Power(0, 0, 0);
+	Vector3 Pos, Move, Power(0, -0.002f, 0);
 
-	FOR(20)
+	FOR(30)
 	{
 		Pos = pos;
+		Pos.x += tdnRandom::Get(-18, 18);
+		Pos.y += tdnRandom::Get(-18, 18);
+		Pos.z += tdnRandom::Get(-18, 18);
+
 		Move.x = (rand() % 101 - 50)*0.007f;
-		Move.y = (rand() % 100)*0.007f;
+		Move.y = (rand() % 100)*0.005f;
 		Move.z = (rand() % 101 - 50)*0.007f;
-		Set2(9, 0, 0.9f, 80, .0f, 50, .75f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, rand() % 628 * .01f, 1.005f, rand() % 4 + 10.0f, RS::ADD);
+		Set2(9, 0, 0.9f, 70, .0f, 30, .65f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0.01,  .05f, 1.005f, 9.0f, RS::ADD);
+	
+		//Set2(15, 0, 1.0f, 60, .0f, 40, 1.0f, Pos, Move, Power, .1f, .1f, .1f, 0.7f,0,1, 1, RS::SUB);
+		//Set2(2, 0, 1.0f, 60, .0f, 40, 1.0f, Pos, Move, Power, .3f, .3f, .3f, 0.9f,0,1, 1, RS::ADD);
+		//Set2(15, 20, 0.0f, 80, .0f, 60, 0.8f, Pos, Move, Power, 1.0f, .5f, .2f, 10.5f,0,1, 1, RS::SUB);
+	}
+
+	FOR(10)
+	{
+		Pos = pos;
+		Pos.x += tdnRandom::Get(-18, 18);
+		Pos.y += tdnRandom::Get(-18, 18);
+		Pos.z += tdnRandom::Get(-18, 18);
+
+		Move.x = (rand() % 101 - 50)*0.007f;
+		Move.y = (rand() % 100)*0.005f;
+		Move.z = (rand() % 101 - 50)*0.007f;
+
+		Set2(15, 20, 0.0f, 110, .0f, 40, .75f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0.01,  .05f, 1.005f,  9.0f, RS::SUB);
 	}
 
 	// 中心の爆発
-	//Set2(7, 0, 1.0f, 75, .0f, 60, 1.0f, Pos, Move, Power, 1, 1, 1, 0, 0, 1.1f, 4, RS::ADD);
+	//Set2(7, 0, 1.0f, 18, .5f, 12, 1.0f, Pos, Move, Power, 1, 1, 1, 0, 0, 2.0f, 1, RS::COPY);
 }
 
 
@@ -735,7 +757,6 @@ void ParticleManager::EffectShotLocus(const Vector3 & pos)
 
 		// パーティクルセット
 		Set(6, 0, .0f, 50, .0f, 20, .9f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, rand() % 2 + 1.5f, RS::ADD);
-		// id  sf  s   ef   e   mf   m
 	}
 
 }

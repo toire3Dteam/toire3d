@@ -436,6 +436,8 @@ m_eCharacterType(CHARACTER::AIROU)
 		for (int j = 0; j < FRAME_MAX; j++) m_ActionFrameList[i][j] = FRAME_STATE::END;
 	}
 
+	m_pExplosion = new CExplosion();
+
 	//tdnDebug::OutPutLog("[初期化チェック}\n");
 	//tdnDebug::OutPutLog("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, ");
 }
@@ -576,6 +578,7 @@ BasePlayer::~BasePlayer()
 	SAFE_DELETE(m_pSpeedLine);
 	SAFE_DELETE(m_pCutinPic);
 	SAFE_DELETE(m_pCommandWindow);
+	SAFE_DELETE(m_pExplosion);
 }
 
 void BasePlayer::Update(PLAYER_UPDATE flag)
@@ -850,6 +853,10 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 	m_pPanelEffectMGR->Update();
 	m_pUVEffectMGR->Update();
 	m_pThrowMark->Update();
+	m_pExplosion->Update();
+
+
+
 
 	//if (bOutLog)
 	//{
@@ -1253,6 +1260,9 @@ void BasePlayer::UpdatePos()
 	}
 }
 
+
+// ※兄貴は兄貴用のレンダーで描画しています
+// 後でなんとかしなくてはいけない
 // ★基本描画
 void BasePlayer::Render()
 {
@@ -1289,6 +1299,7 @@ void BasePlayer::Render()
 	m_pPanelEffectMGR->Render();	
 	Vector2 vScreenPos = Math::WorldToScreen(m_vPos);// (TODO)頭のポジションの座標を使う
 	m_pThrowMark->Render((int)vScreenPos.x - 56, (int)vScreenPos.y - 324, RS::COPY_NOZ);
+	m_pExplosion->Render();
 
 	
 
@@ -2171,6 +2182,22 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 		// 掴まえた時のエフェクト
 		m_pPanelEffectMGR->AddEffect
 			(GetCenterPos() + Vector3(0, 2.5, -4), PANEL_EFFECT_TYPE::THROW, 0);
+
+	}	break;
+	case EFFECT_TYPE::EXPLOSION:
+	{
+		// エフェクト
+		m_pExplosion->Action(pos);
+		// パーティクル
+		ParticleManager::EffectExplosion(pos);
+
+		PointLightMgr->AddPointLight(pos + Vector3(0, 5, 0), Vector3(1.2f, 0.6f, 0.0f), 30, 4, 40, 4, 15);// ポイントライトエフェクト！
+		//Vector3 FlyVector(m_vMove);
+		//FlyVector.Normalize();
+		//ParticleManager::EffectHit(pos, FlyVector);
+		
+		// ブラ―エフェクト
+		DeferredManagerEx.SetRadialBlur(pos, 6.25f);
 
 	}	break;
 	default:

@@ -147,10 +147,19 @@ namespace Stand
 	{
 	public:
 		Attakai(BasePlayer *pPlayer);
-		//~Mokoi();
+		~Attakai();
 		void Update(bool bControl);
+		void Render(tdnShader* shader, char* name);
 
 		// 純粋仮想オーバーライド
 		void Action(SKILL_ACTION_TYPE type);
+
+	private:
+		BasePanelEffect* m_pBomEf;
+		BasePanelEffect* m_pBomAddEf;
+		float m_fDangerRate;
+		int m_iActiveStartFrame;
+	
+
 	};
 }

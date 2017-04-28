@@ -67,6 +67,9 @@ Airou::Airou(SIDE side, const SideData &data) :BasePlayer(side, data)
 	// スピードライン
 	m_pSpeedLine = new SpeedLineGreenEffect;
 
+	m_pAirouImpactEffect = new AirouImpactEffect();
+
+
 	// 最後に初期化
 	Reset();
 }
@@ -455,9 +458,9 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	// 判定形状
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->pCollisionShape->width = 20;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->pCollisionShape->height = 7;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->pCollisionShape->pos.Set(9, 8, 0);
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->pCollisionShape->width = 25;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->pCollisionShape->height = 8;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->pCollisionShape->pos.Set(15, 9, 0);
 
 	//==============================================================================================================
 	//	キャラクター固有空中下攻撃
@@ -643,6 +646,8 @@ void Airou::InitActionDatas()
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::AERIAL] = new SkillAction::Land(this);
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::AERIAL2] = nullptr;
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::AERIALDROP] = new SkillAction::AerialDrop(this);
+
+
 }
 
 Airou::~Airou()
@@ -650,13 +655,20 @@ Airou::~Airou()
 	SAFE_DELETE(m_pOshiokiMgr);
 	SAFE_DELETE(m_pAirouEntryEffect); 
 	SAFE_DELETE(m_pAirouEntryCircleEffect);
+	SAFE_DELETE(m_pAirouImpactEffect);
+
 	FOR((int)SKILL_ACTION_TYPE::MAX) SAFE_DELETE(m_pSkillActions[i])
+		
+
 }
 
 void Airou::Update(PLAYER_UPDATE flag)
 {
 	// 基底クラスの更新
 	BasePlayer::Update(flag);
+
+	// Ef
+	m_pAirouImpactEffect->Update();
 
 	// おしおき更新
 	if (m_pOshiokiMgr)
@@ -674,6 +686,9 @@ void Airou::Render()
 
 	// 基底クラスの更新
 	BasePlayer::Render();
+
+	// Ef
+	if (m_pAirouImpactEffect)m_pAirouImpactEffect->Render();
 
 	// おしおき描画
 	if (m_pOshiokiMgr) m_pOshiokiMgr->Render();
@@ -976,6 +991,21 @@ bool Airou::SkillAction::Squat::Execute()
 	{
 		return true;
 	}
+	
+	if (m_pAirou->GetActionFrame() == FRAME_STATE::ACTIVE)
+	{
+		static const int IMPACT_FRAME = 24;
+		// 初段
+		if (m_pAirou->m_iCurrentActionFrame == IMPACT_FRAME)
+		{
+			Vector3 vPos = m_pAirou->GetPos();
+			vPos.x += m_pAirou->GetDirVecX() * 24;
+			float fAngle = (m_pAirou->GetDirVecX() < 0) ? 1.57f : 0.0f;
+			m_pAirou->m_pAirouImpactEffect->Action(vPos + Vector3(0, 1, 0) , 0.45f, 0.75f,
+				Vector3(0, fAngle, 0), Vector3(0, fAngle, 0));
+		}
+	}
+
 
 	if (m_pAirou->GetAttackData()->bHit)
 	{

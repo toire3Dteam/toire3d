@@ -120,8 +120,8 @@ SelectUI::SelectUI(SIDE side, ENTITY_ID id, int DeviceID, bool bAI) :BaseGameEnt
 		case PARTNER::ATTAKAI:
 			m_tagPartnerPic[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Partner/Hete.png");
 			m_tagPartnerPicRip[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Partner/hete.png");
-			m_tagPartnerInfo[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Info/hete.png");
-			m_tagPartnerName[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Name/hete.png");
+			m_tagPartnerInfo[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Info/attakai.png");
+			m_tagPartnerName[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Name/attakai.png");
 			m_tagPartneSirclePic[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Partner/heteSircle.png");
 
 			break;
