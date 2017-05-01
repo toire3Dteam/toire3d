@@ -299,9 +299,10 @@ enum class ANTIGUARD_ATTACK
 // UŒ‚‘®«
 enum class ATTACK_ATTRIBUTE
 {
-	STRIKE,	// ‘ÅŒ‚‘®«
-	BULLET,	// ’e‘®«
-	THROW,	// “Š‚°‘®«
+	STRIKE,			// ‘ÅŒ‚‘®«
+	BULLET,			// ’e‘®«
+	THROW,			// “Š‚°‘®«
+	AERIAL_THROW	// ‹ó’†“Š‚°‘®«
 };
 
 /****************************************/

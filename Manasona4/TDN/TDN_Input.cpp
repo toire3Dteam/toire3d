@@ -1,5 +1,4 @@
 ﻿#include "TDNLIB.h"
-#include "../source/system/ItDebug.h"
 
 //*****************************************************************************************************************************
 //
@@ -12,8 +11,14 @@
 LPDIRECTINPUT8 tdnInputManager::m_lpDI = nullptr;
 int tdnInputManager::m_NumDevice = 0;
 DIDEVICEINSTANCE tdnInputManager::m_DeviceInstances[tdnInputEnum::INPUT_DEVICE_MAX];
-char tdnInputManager::m_GroupID[tdnInputEnum::INPUT_DEVICE_MAX][32];
+KEY_CONFIG_DATA tdnInputManager::m_tagConfigDatas[tdnInputEnum::INPUT_DEVICE_MAX];
 IDirectInputDevice8* tdnInputManager::m_pMouse;
+std::vector<KEY_CONFIG_DATA> tdnInputManager::m_vConfigList;
+
+DWORD tdnInputManager::m_dwNumForceFeedbackAxis = 0;
+
+// 振動オン
+//#define VIBRATION_ON
 
 //------------------------------------------------------
 //		コントローラー列挙
@@ -61,60 +66,58 @@ BOOL CALLBACK tdnInputManager::EnumDeviceCallback(const DIDEVICEINSTANCE* pdidi,
 	tszInstanceName
 	インスタンスの登録名。たとえば、"Joystick 1"。
 	*/
-	std::ifstream infs("DATA/Input/list.txt");
-	MyAssert(infs, "エラー: TDN_Input\n原因、データフォルダにInput/list.txtが入ってない！");
 
-	// 過去にcontrollerをさしたことがあるか検索
+	// コンフィグcontroller検索
 	bool find(false);
-	while (!infs.eof())
+	for(auto it : m_vConfigList)
 	{
-		char yomitobashi[64];
-
-		// 名前まで読み飛ばし
+		// 一致してたら
+		if (strcmp(m_DeviceInstances[m_NumDevice].tszInstanceName, it.tszPadName) == 0)
 		{
-			do
-			{
-				infs >> yomitobashi;
-			} while (strcmp(yomitobashi, "NAME:") != 0 && !infs.eof());
-			infs.read(yomitobashi, 1);	// TDN空白
-		}
-		char work[128];
-
-		// ファイルの読み込みが空白で区切りやがるので、1バイトずつ読まないといけないし、終端も付けないといけない(とても面倒くさい)
-		{
-			int i(0);
-			while (!infs.eof())
-			{
-				char byte;
-				infs.read(&byte, 1);
-				if (byte == '|')		// 自分でつけた終端マーク
-				{
-					work[i] = '\0';
-					break;
-				}
-				else work[i++] = byte;
-			}
-		}
-
-		// 同一controllerチェック
-		if (strcmp(m_DeviceInstances[m_NumDevice].tszInstanceName, work) == 0)
-		{
-			// ID読み飛ばし
-			infs >> yomitobashi;
-			// 見つかったcontrollerの名前のグループID登録
-			infs >> m_GroupID[m_NumDevice];
 			find = true;
+
+			// controller情報登録
+			memcpy_s(&m_tagConfigDatas[m_NumDevice], sizeof(KEY_CONFIG_DATA), &it, sizeof(KEY_CONFIG_DATA));
 			break;
 		}
 	}
-	infs.close();
 
+	// 見つからなかったので新規登録
 	if (!find)
 	{
-		// 見つからなかったのでリスト追加します
-		std::ofstream ofs("DATA/Input/list.txt", std::ios::out | std::ios::ate | std::ios::app);
-		ofs << "NAME: " << m_DeviceInstances[m_NumDevice].tszInstanceName << "|";
-		ofs << "\nID: DEFAULT\n\n";
+		KEY_CONFIG_DATA l_tagConfigData;
+
+		// controllerの名前
+		strcpy_s(l_tagConfigData.tszPadName, MAX_PATH, m_DeviceInstances[m_NumDevice].tszInstanceName);
+		
+		// controllerのコンフィグ
+		l_tagConfigData.tagPadSet.AllDatas[0] = AXIS_X;
+		l_tagConfigData.tagPadSet.AllDatas[1] = AXIS_Y;
+		l_tagConfigData.tagPadSet.AllDatas[2] = AXIS_Z;
+		l_tagConfigData.tagPadSet.AllDatas[3] = AXIS_RZ;
+		l_tagConfigData.tagPadSet.AllDatas[4] = 3;
+		l_tagConfigData.tagPadSet.AllDatas[5] = 4;
+		l_tagConfigData.tagPadSet.AllDatas[6] = 1;
+		l_tagConfigData.tagPadSet.AllDatas[7] = 2;
+		l_tagConfigData.tagPadSet.AllDatas[8] = 5;
+		l_tagConfigData.tagPadSet.AllDatas[9] = 7;
+		l_tagConfigData.tagPadSet.AllDatas[10] = 11;
+		l_tagConfigData.tagPadSet.AllDatas[11] = 6;
+		l_tagConfigData.tagPadSet.AllDatas[12] = 8;
+		l_tagConfigData.tagPadSet.AllDatas[13] = 12;
+		l_tagConfigData.tagPadSet.AllDatas[14] = 10;
+		l_tagConfigData.tagPadSet.AllDatas[15] = 9;
+
+		// controller情報登録
+		memcpy_s(&m_tagConfigDatas[m_NumDevice], sizeof(KEY_CONFIG_DATA), &ConfigurePort, sizeof(KEY_CONFIG_DATA));
+
+		// リスト追加
+		m_vConfigList.push_back(l_tagConfigData);
+
+		// テキストにも追加します
+		std::ofstream ofs("DATA/Input/key_config.txt", std::ios::out | std::ios::ate | std::ios::app);
+		ofs << "NAME: " << m_DeviceInstances[m_NumDevice].tszInstanceName << "\n";
+		ofs << "3 4 1 2 5 7 11 6 8 12 10 9\n\n";
 	}
 
 	//	最大
@@ -127,6 +130,9 @@ BOOL CALLBACK tdnInputManager::EnumDeviceCallback(const DIDEVICEINSTANCE* pdidi,
 //------------------------------------------------------
 void tdnInputManager::Initialize()
 {
+	// コンフィグ情報読み込み
+	LoadConfig();
+
 	m_lpDI = nullptr;
 	MyAssert(DirectInput8Create(GetModuleHandle(nullptr), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_lpDI, nullptr) == DI_OK, "DirectInputの初期化でエラー");
 	m_lpDI->Initialize(GetModuleHandle(nullptr), DIRECTINPUT_VERSION);
@@ -140,14 +146,75 @@ void tdnInputManager::Initialize()
 
 	m_NumDevice = 0;
 
-	// 最初は全員デフォルトのID
-	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++) strcpy_s(m_GroupID[i], 32, "DEFAULT");
+	// コンフィグ初期化
+	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++) ZeroMemory(&m_tagConfigDatas[i], sizeof(KEY_CONFIG_DATA));
 
 	//	ゲームパッドの列挙(この中でIDの振り分けしてます)
-	m_lpDI->EnumDevices(DI8DEVCLASS_GAMECTRL, EnumDeviceCallback, m_lpDI, DIEDFL_ATTACHEDONLY);
+	m_lpDI->EnumDevices(DI8DEVCLASS_GAMECTRL, EnumDeviceCallback, m_lpDI, DIEDFL_ATTACHEDONLY
+#ifdef VIBRATION_ON
+	| DIEDFL_FORCEFEEDBACK
+#endif
+	);
+}
 
+//------------------------------------------------------
+//	コンフィグデータ読み込み
+//------------------------------------------------------
+void tdnInputManager::LoadConfig()
+{
+	// 既存バッファ解放
+	m_vConfigList.clear();
 
+	// ファイルオープン
+	std::ifstream ifs("DATA/Input/key_config.txt");
+	if (!ifs) return;
 
+	while (!ifs.eof())
+	{
+		// リストにセットする用の変数
+		KEY_CONFIG_DATA l_tagConfigData;
+
+		// 名前まで読み飛ばし
+		char yomitobashi[64];
+		{
+			do
+			{
+				ifs >> yomitobashi;
+			} while (strcmp(yomitobashi, "NAME:") != 0 && !ifs.eof());
+			ifs.read(yomitobashi, 1);	// TDN空白
+		}
+
+		// ファイルの読み込みが空白で区切りやがるので、1バイトずつ読まないといけない
+		{
+			int i(0);
+			while (!ifs.eof())
+			{
+				char c;
+				ifs.read(&c, 1);
+
+				// 終端マーク
+				if (c == '\n')
+				{
+					l_tagConfigData.tszPadName[i] = '\0';
+					break;
+				}
+
+				l_tagConfigData.tszPadName[i++] = c;
+			}
+		}
+
+		// キー配置読み込み
+		l_tagConfigData.tagPadSet.AllDatas[0] = AXIS_X, l_tagConfigData.tagPadSet.AllDatas[1] = AXIS_Y, l_tagConfigData.tagPadSet.AllDatas[2] = AXIS_Z, l_tagConfigData.tagPadSet.AllDatas[3] = AXIS_RZ;
+		for (int i = 4; i < 16; i++)
+		{
+			int n;
+			ifs >> n;
+			l_tagConfigData.tagPadSet.AllDatas[i] = (u8)n;
+		}
+
+		// リストにセット
+		m_vConfigList.push_back(l_tagConfigData);
+	}
 }
 
 //------------------------------------------------------
@@ -164,7 +231,12 @@ BOOL CALLBACK tdnInputManager::EnumAxes(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID
 	diprg.diph.dwHow = DIPH_BYID;
 	diprg.lMin = -tdnInputEnum::STICK_WIDTH;
 	diprg.lMax = +tdnInputEnum::STICK_WIDTH;
-	if (((LPDIRECTINPUTDEVICE8)pvRef)->SetProperty(DIPROP_RANGE, &diprg.diph) != DI_OK) return DIENUM_STOP;
+	if (FAILED(((LPDIRECTINPUTDEVICE8)pvRef)->SetProperty(DIPROP_RANGE, &diprg.diph))) return DIENUM_STOP;
+
+#ifdef VIBRATION_ON
+	DWORD *pdwNumForceFeedbackAxis = (DWORD*)pvRef;
+	if ((lpddoi->dwFlags & DIDOI_FFACTUATOR) != 0) (*pdwNumForceFeedbackAxis)++;
+#endif
 
 	return DIENUM_CONTINUE;
 }
@@ -172,7 +244,7 @@ BOOL CALLBACK tdnInputManager::EnumAxes(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID
 //------------------------------------------------------
 //	デバイス取得
 //------------------------------------------------------
-LPDIRECTINPUTDEVICE8 tdnInputManager::GetDevice(int no)
+LPDIRECTINPUTDEVICE8 tdnInputManager::CreateDevice(int no)
 {
 	HRESULT	hr;
 	LPDIRECTINPUTDEVICE8	lpDevice;
@@ -219,9 +291,19 @@ LPDIRECTINPUTDEVICE8 tdnInputManager::GetDevice(int no)
 		DIPROP_AUTOCENTER,
 		&dipdw.diph);
 
-
 	// 各軸設定
-	lpDevice->EnumObjects(EnumAxes, lpDevice, DIDFT_AXIS);
+	lpDevice->EnumObjects(
+		EnumAxes,
+#ifdef VIBRATION_ON
+		(LPVOID)&m_dwNumForceFeedbackAxis,
+#else
+		lpDevice,
+#endif
+		DIDFT_AXIS);
+
+#ifdef VIBRATION_ON
+	if (m_dwNumForceFeedbackAxis > 2) m_dwNumForceFeedbackAxis = 2;
+#endif
 
 	// 入力制御開始
 	m_pMouse->Acquire();
@@ -230,6 +312,32 @@ LPDIRECTINPUTDEVICE8 tdnInputManager::GetDevice(int no)
 	return lpDevice;
 }
 
+bool tdnInputManager::CreateEffect(LPDIRECTINPUTEFFECT pEffect, LPDIRECTINPUTDEVICE8 lpDevice)
+{
+	DWORD           rgdwAxes[2] = { DIJOFS_X , DIJOFS_Y };
+	LONG            rglDirection[2] = { 1 , 1 };
+	DICONSTANTFORCE cf;
+	DIEFFECT        eff{};
+
+	eff.dwSize = sizeof(DIEFFECT);
+	eff.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
+	eff.dwDuration = INFINITE;
+	eff.dwSamplePeriod = 0;
+	eff.dwGain = DI_FFNOMINALMAX;
+	eff.dwTriggerButton = DIEB_NOTRIGGER;
+	eff.dwTriggerRepeatInterval = 0;
+	eff.cAxes = m_dwNumForceFeedbackAxis;
+	eff.rgdwAxes = rgdwAxes;
+	eff.rglDirection = rglDirection;
+	eff.lpEnvelope = 0;
+	eff.cbTypeSpecificParams = sizeof(DICONSTANTFORCE);
+	eff.lpvTypeSpecificParams = &cf;
+	eff.dwStartDelay = 0;
+
+	if (FAILED(lpDevice->CreateEffect(GUID_ConstantForce, &eff, &pEffect, NULL)))return false;
+
+	return true;
+}
 
 //*****************************************************************************************************************************
 //				入力デバイス
@@ -274,11 +382,11 @@ const int tdnInputDevice::default_joy_map[20] =
 //------------------------------------------------------
 //	初期化
 //------------------------------------------------------
-tdnInputDevice::tdnInputDevice(int n) :lpDevice(nullptr), pEffect(nullptr)
+tdnInputDevice::tdnInputDevice(int n) :lpDevice(nullptr), m_pEffect(nullptr)
 {
 	if (n != -1){
-		lpDevice = tdnInputManager::GetDevice(n);
-		//if (lpDevice) InitVibration();
+		lpDevice = tdnInputManager::CreateDevice(n);
+		if (lpDevice) InitVibration();
 	}
 
 	// デフォルト設定
@@ -288,6 +396,10 @@ tdnInputDevice::tdnInputDevice(int n) :lpDevice(nullptr), pEffect(nullptr)
 	// キー初期化
 	pad_axisX = pad_axisY = pad_axisX2 = pad_axisY2 = 0;
 	for (int i = 0; i<20; i++) key_info[i] = 0;
+}
+void tdnInputDevice::InitVibration()
+{
+	tdnInputManager::CreateEffect(m_pEffect, lpDevice);
 }
 
 //------------------------------------------------------
@@ -299,9 +411,9 @@ tdnInputDevice::~tdnInputDevice()
 		lpDevice->Unacquire();	// アクセス権解放
 		lpDevice->Release();
 	}
-	if (pEffect){
-		pEffect->Stop();
-		pEffect->Release();
+	if (m_pEffect){
+		m_pEffect->Stop();
+		m_pEffect->Release();
 	}
 }
 
@@ -414,8 +526,14 @@ void tdnInputDevice::Update()
 }
 
 //------------------------------------------------------
-//	情報取得
+//	振動発動
 //------------------------------------------------------
+void tdnInputDevice::StartVibration()
+{
+#ifdef VIBRATION_ON
+	if (m_pEffect) m_pEffect->Start(0, 1);
+#endif
+}
 
 
 //------------------------------------------------------
@@ -457,15 +575,20 @@ tdnInputDevice* tdnInput::device[tdnInputEnum::INPUT_DEVICE_MAX] = { nullptr };
 //------------------------------------------------------
 void tdnInput::Initialize()
 {
-	// デバイス初期化
+	// この中でcontrollerの列挙とかコンフィグの読み込みとか
 	tdnInputManager::Initialize();
+
+	// デバイス初期化
 	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++)
 	{
 		device[i] = new tdnInputDevice(i);
 	}
 
-	// とりあえず全員デフォルトのキーコンフィグ
-	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++) PadAsign(tdnInputManager::GetGroupID(i), i);
+	// 読み込んだキーコンフィグを設定
+	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++)
+	{
+		device[i]->PadAsign(tdnInputManager::GetConfigDatas(i)->tagPadSet);
+	}
 
 	OKB_Init();
 }
@@ -489,15 +612,20 @@ void tdnInput::Reset()
 	// 解放
 	tdnInputManager::Release();
 
-	// 初期化
+	// この中でcontrollerの列挙とかコンフィグの読み込みとか
 	tdnInputManager::Initialize();
+
+	// デバイス初期化
 	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++)
 	{
-		if (device[i]) delete device[i];
 		device[i] = new tdnInputDevice(i);
 	}
-	// とりあえず全員デフォルトのキーコンフィグ
-	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++) PadAsign(tdnInputManager::GetGroupID(i), i);
+
+	// 読み込んだキーコンフィグを設定
+	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++)
+	{
+		device[i]->PadAsign(tdnInputManager::GetConfigDatas(i)->tagPadSet);
+	}
 }
 
 //------------------------------------------------------
@@ -505,59 +633,11 @@ void tdnInput::Reset()
 //------------------------------------------------------
 void tdnInput::Update()
 {
-	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++) device[i]->Update();
+	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++)
+	{
+		device[i]->Update();
+	}
 	OKB_Update();
-}
-
-
-//------------------------------------------------------
-//	キーコンフィグで設定したのをアサイン
-//------------------------------------------------------
-void tdnInput::PadAsign(LPSTR ID, int no)
-{
-	std::ifstream infs("DATA/Input/key_config.txt");
-	MyAssert(infs, "エラー: TDN_Input\n原因、データフォルダにInput/key_config.txtが入ってない！");
-
-	// 最初のコメント文読み飛ばし
-	{
-		char skip[128];
-		infs >> skip;
-	}
-
-	char str[64];
-
-	// ID検索処理
-	bool find(false);
-	do
-	{
-		infs >> str;
-		if (strcmp(ID, str) == 0)
-		{
-			find = true;
-			break;
-		}
-
-		// 読み飛ばし
-		for (int i = 0; i < 12; i++) infs >> str;
-
-		// ID検索に引っかからなかった！
-		MyAssert(!infs.eof(), "tdnInputでエラー : key_configに存在しないIDが含まれています。listのIDを確認してください");
-
-	} while (!find);
-
-	// ID情報の後にキーコンフィグがある
-	u8 Z[16];
-	Z[0] = AXIS_X, Z[1] = AXIS_Y, Z[2] = AXIS_Z, Z[3] = AXIS_RZ;
-	for (int i = 4; i < 16; i++)
-	{
-		int n;
-		infs >> n;
-		Z[i] = n;
-	}
-
-	PADSET padset;
-	memcpy(&padset, Z, 16);
-	device[no]->PadAsign(padset);
 }
 
 //------------------------------------------------------
@@ -611,6 +691,13 @@ void tdnInput::GetAxisXY2f(float *outX, float *outY, int no)
 	//	*outX /= dist;
 	//	*outY /= dist;
 	//}
+}
+
+void tdnInput::Vibration(int no)
+{
+#ifdef VIBRATION_ON
+	device[no]->StartVibration();
+#endif
 }
 
 //*****************************************************************************************************************************

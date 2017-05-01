@@ -2230,6 +2230,28 @@ namespace tdnInputEnum
 	static const float MIN_MOVE_STICK = .35f;
 }
 
+struct PADSET
+{
+	union
+	{
+		struct
+		{
+			u8	lx, ly, rx, ry;
+			u8	A, B, X, Y;
+			u8	L1, L2, L3;
+			u8	R1, R2, R3;
+			u8	START, SELECT;
+		};
+		u8 AllDatas[16];
+	};
+};
+
+struct KEY_CONFIG_DATA
+{
+	PADSET tagPadSet;		// キーコンフィグ情報
+	char tszPadName[MAX_PATH];	// 挿してるcontrollerの名前
+};
+
 
 //-----------------------------------------------------------------------------
 //		入力デバイス管理
@@ -2244,12 +2266,18 @@ private:
 	static LPDIRECTINPUT8 m_lpDI;
 	static int m_NumDevice;
 	static DIDEVICEINSTANCE	m_DeviceInstances[tdnInputEnum::INPUT_DEVICE_MAX];
-	static char m_GroupID[tdnInputEnum::INPUT_DEVICE_MAX][32];
+	static KEY_CONFIG_DATA m_tagConfigDatas[tdnInputEnum::INPUT_DEVICE_MAX];
 
 	static BOOL CALLBACK EnumDeviceCallback(const DIDEVICEINSTANCE* pdidi, VOID* pContext);
 	static BOOL CALLBACK EnumAxes(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID pvRef);
 	static IDirectInputDevice8 *m_pMouse;
+	static std::vector<KEY_CONFIG_DATA> m_vConfigList;
 
+	static void LoadConfig();
+
+	// 振動関連
+	static DWORD m_dwNumForceFeedbackAxis;
+	static LPDIRECTINPUTEFFECT m_lpDIEffect[tdnInputEnum::INPUT_DEVICE_MAX];
 public:
 	static void Initialize();
 	static void Release()
@@ -2266,12 +2294,46 @@ public:
 			m_lpDI->Release();
 			m_lpDI = nullptr;
 		}
+		m_vConfigList.clear();
 	}
-	static LPDIRECTINPUTDEVICE8 GetDevice(int no);
-	static LPSTR GetGroupID(int no){ return m_GroupID[no]; }
-	static LPSTR GetDeviceInstanceName(int no){ return m_DeviceInstances[no].tszInstanceName; }
+	static LPDIRECTINPUTDEVICE8 CreateDevice(int no);
+	static bool CreateEffect(LPDIRECTINPUTEFFECT pEffect, LPDIRECTINPUTDEVICE8 lpDevice);
+	static KEY_CONFIG_DATA *GetConfigDatas(int no){ return &m_tagConfigDatas[no]; }
+	static LPCSTR GetDeviceInstanceName(int no){ return m_DeviceInstances[no].tszInstanceName; }
 	static IDirectInputDevice8* GetMouseDevice(){ return m_pMouse; }
 	static int GetNumDevice(){ return m_NumDevice; }
+
+	// コンフィグデータセーブ
+	static void SetConfig(const KEY_CONFIG_DATA &tagNewConfigData)
+	{
+		std::ofstream ofs("DATA/Input/key_config.txt");
+
+		for(auto it : m_vConfigList)
+		{
+			if (strcmp(it.tszPadName, tagNewConfigData.tszPadName) == 0)
+			{
+				// 上書き
+				memcpy_s(&it, sizeof(KEY_CONFIG_DATA), &tagNewConfigData, sizeof(KEY_CONFIG_DATA));
+			}
+
+			// controllerの名前
+			ofs << "NAME: " << it.tszPadName << "\n";
+			
+			// コンフィグ情報
+			ofs << it.tagPadSet.AllDatas[4] << " "
+				<< it.tagPadSet.AllDatas[5] << " "
+				<< it.tagPadSet.AllDatas[6] << " "
+				<< it.tagPadSet.AllDatas[7] << " "
+				<< it.tagPadSet.AllDatas[8] << " "
+				<< it.tagPadSet.AllDatas[9] << " "
+				<< it.tagPadSet.AllDatas[10] << " "
+				<< it.tagPadSet.AllDatas[11] << " "
+				<< it.tagPadSet.AllDatas[12] << " "
+				<< it.tagPadSet.AllDatas[13] << " "
+				<< it.tagPadSet.AllDatas[14] << " "
+				<< it.tagPadSet.AllDatas[15] << "\n\n";
+		}
+	}
 };
 
 enum KEYCODE
@@ -2312,23 +2374,15 @@ enum KEYCODE
 	AXIS_RZ = 5
 };
 
-typedef struct tagKEYSET
-{
-	u8	up, down, left, right;
-	u8	A, B, X, Y;
-	u8	L1, L2, L3;
-	u8	R1, R2, R3;
-	u8	START, SELECT;
-} KEYSET, *LPKEYSET;
+//typedef struct tagKEYSET
+//{
+//	u8	up, down, left, right;
+//	u8	A, B, X, Y;
+//	u8	L1, L2, L3;
+//	u8	R1, R2, R3;
+//	u8	START, SELECT;
+//} KEYSET, *LPKEYSET;
 
-typedef struct tagPADSET
-{
-	u8	lx, ly, rx, ry;
-	u8	A, B, X, Y;
-	u8	L1, L2, L3;
-	u8	R1, R2, R3;
-	u8	START, SELECT;
-} PADSET, *LPPADSET;
 
 /**
 *@brief		ユーザーからの入力情報を管理するクラス
@@ -2338,7 +2392,7 @@ class tdnInputDevice
 {
 private:
 	LPDIRECTINPUTDEVICE8 lpDevice;
-	LPDIRECTINPUTEFFECT	 pEffect;
+	LPDIRECTINPUTEFFECT	 m_pEffect;
 
 	// デフォルトのキー配置
 	static const int default_key_map[20];
@@ -2351,6 +2405,9 @@ private:
 	int joy_map[20];
 	int	pad_axisX, pad_axisY;
 	int	pad_axisX2, pad_axisY2;
+
+	// 振動用
+	void InitVibration();
 public:
 	tdnInputDevice(int n);
 	~tdnInputDevice();
@@ -2362,6 +2419,8 @@ public:
 	int tdnInputDevice::GetAxisY(){ return (pad_axisY*pad_axisY > tdnInputEnum::MIN_MOVE_STICK*(tdnInputEnum::STICK_WIDTH*tdnInputEnum::STICK_WIDTH)) ? pad_axisY : 0; }
 	int tdnInputDevice::GetAxisX2(){ return (pad_axisX2*pad_axisX2 > tdnInputEnum::MIN_MOVE_STICK*(tdnInputEnum::STICK_WIDTH*tdnInputEnum::STICK_WIDTH)) ? pad_axisX2 : 0; }
 	int tdnInputDevice::GetAxisY2(){ return (pad_axisY2*pad_axisY2 > tdnInputEnum::MIN_MOVE_STICK*(tdnInputEnum::STICK_WIDTH*tdnInputEnum::STICK_WIDTH)) ? pad_axisY2 : 0; }
+
+	void StartVibration();
 };
 
 /**
@@ -2378,7 +2437,6 @@ public:
 	static void Release();
 	static void Reset();	// 抜き差ししたら呼び出す
 	static void Update();
-	static void PadAsign(LPSTR config, int no = 0);
 
 	static int KeyGet(KEYCODE key, int no = 0){ return device[no]->Get(key); }
 	static int GetAxisX(int no = 0) { return device[no]->GetAxisX(); }
@@ -2387,6 +2445,8 @@ public:
 	static int GetAxisY2(int no = 0){ return device[no]->GetAxisY2(); }
 	static void GetAxisXYf(float *outX, float *outY, int no = 0);
 	static void GetAxisXY2f(float *outX, float *outY, int no = 0);
+
+	static void Vibration(int no = 0);
 };
 
 #define KEY(x,n) ( tdnInput::KeyGet(x,n) )

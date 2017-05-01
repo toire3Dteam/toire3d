@@ -111,23 +111,31 @@ bool isDamageCounterStatePrev(BasePlayer *pPerson)
 		);
 }
 
-bool isThrownState(BasePlayer *pPerson)
+bool isThrownState(BasePlayer *pPerson, bool bAerialThrow)
 {
-	return (
-		pPerson->isLand() &&	// 地上にいて
+	if (bAerialThrow)
+	{
+		// 空中にいるなら問答無用で掴まる
+		return (!pPerson->isLand());
+	}
+	else
+	{
+		return (
+			pPerson->isLand() &&	// 地上にいて
 
-		// 硬直中は不可
-		pPerson->GetRecoveryFrame() <= 0 &&
+									// 硬直中は不可
+			pPerson->GetRecoveryFrame() <= 0 &&
 
-		// ダメージ系のステート以外だったら
-		!pPerson->GetFSM()->isInState(*BasePlayerState::KnockBack::GetInstance()) &&
-		!pPerson->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) &&
-		!pPerson->GetFSM()->isInState(*BasePlayerState::DownFall::GetInstance()) &&
-		!pPerson->GetFSM()->isInState(*BasePlayerState::LandRecovery::GetInstance()) &&
-		!pPerson->GetFSM()->isInState(*BasePlayerState::Jump::GetInstance()) &&
-		!pPerson->GetFSM()->isInState(*BasePlayerState::Fall::GetInstance()) &&
-		!pPerson->GetFSM()->isInState(*BasePlayerState::AerialDash::GetInstance())
-		);
+			// ダメージ系のステート以外だったら
+			!pPerson->GetFSM()->isInState(*BasePlayerState::KnockBack::GetInstance()) &&
+			!pPerson->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) &&
+			!pPerson->GetFSM()->isInState(*BasePlayerState::DownFall::GetInstance()) &&
+			!pPerson->GetFSM()->isInState(*BasePlayerState::LandRecovery::GetInstance()) &&
+			!pPerson->GetFSM()->isInState(*BasePlayerState::Jump::GetInstance()) &&
+			!pPerson->GetFSM()->isInState(*BasePlayerState::Fall::GetInstance()) &&
+			!pPerson->GetFSM()->isInState(*BasePlayerState::AerialDash::GetInstance())
+			);
+	}
 }
 
 bool RunCancel(BasePlayer * pPerson)
@@ -650,7 +658,7 @@ bool GuardUpdate(BasePlayer *pPerson)
 		if (target->isAttackState()) if (target->GetAttackData()->attribute != ATTACK_ATTRIBUTE::THROW) bAttackState = true;
 
 		// スタンド
-		if (target->GetStand()->isActive() && target->GetStand()->GetAttackData()) bStandAttack = true;
+		if (target->GetStand()->isActive() && target->GetStand()->GetAttackData() && target->GetStand()->isAttackFrame()) bStandAttack = true;
 
 		if (bAttackState || bStandAttack)
 		{
@@ -773,9 +781,20 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 		// 掴まれたよメッセージ
 	case MESSAGE_TYPE::BE_THROWN:
 	{
-									pPerson->SetDir((pPerson->GetTargetPlayer()->GetDir() == DIR::LEFT) ? DIR::RIGHT : DIR::LEFT);	// 要は掴んだ相手の方を向く
-									pPerson->GetFSM()->ChangeState(ThrowBind::GetInstance());		// 投げくらいステートへ
-									break;
+		int *RecoveryFrame = (int*)msg.ExtraInfo;
+
+		// コンボデスク送信(しないとオーバーフローが発生してゲージがおかしくなる)
+		COMBO_DESK comboDesk;
+		comboDesk.side = pPerson->GetSide();
+		comboDesk.damage = 0;
+		comboDesk.recoveryFrame = *RecoveryFrame;
+		MsgMgr->Dispatch(0, ENTITY_ID::PLAYER_MGR, ENTITY_ID::UI_MGR, MESSAGE_TYPE::COMBO_COUNT, &comboDesk);
+
+		// 空中投げを打撃から投げ属性にすることによって復帰フレームが減ったままだったので、ここで設定するゴリくんが登場しました。
+		pPerson->SetRecoveryFrame(*RecoveryFrame);
+		pPerson->SetDir((pPerson->GetTargetPlayer()->GetDir() == DIR::LEFT) ? DIR::RIGHT : DIR::LEFT);	// 要は掴んだ相手の方を向く
+		pPerson->GetFSM()->ChangeState(ThrowBind::GetInstance());		// 投げくらいステートへ
+		break;
 	}
 		// 攻撃くらったよメッセージ
 	case MESSAGE_TYPE::HIT_DAMAGE:
@@ -1007,110 +1026,110 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 		// 攻撃当たったよメッセージ
 	case MESSAGE_TYPE::HIT_ATTACK:
 	{
-									 if (pPerson->isAttackState())
-									 {
+		if (pPerson->isAttackState())
+		{
 
-										 pPerson->GetAttackData()->bHitSuccess = true;
+			pPerson->GetAttackData()->bHitSuccess = true;
 #ifdef _DEBUG
-										 //// コンボが当たった時間
-										 //Vector2 screenPos = Math::WorldToScreen(pPerson->GetPos());
-										 //NumberEffect.AddNumber((int)screenPos.x, (int)screenPos.y - 200, pPerson->GetCurrentFrame(), Number_Effect::COLOR_TYPE::WHITE, Number::NUM_KIND::NORMAL);
+			//// コンボが当たった時間
+			//Vector2 screenPos = Math::WorldToScreen(pPerson->GetPos());
+			//NumberEffect.AddNumber((int)screenPos.x, (int)screenPos.y - 200, pPerson->GetCurrentFrame(), Number_Effect::COLOR_TYPE::WHITE, Number::NUM_KIND::NORMAL);
 #endif
-									 }
+		}
 
-									 HIT_ATTACK_INFO *HitAttackInfo = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
-									 //pPerson->SetHitStopFrame(HitAttackInfo->iHitStopFrame);// ヒットストップ
-									 pPerson->AddCollectScore(HitAttackInfo->HitScore);	// 実体前のスコアを加算
-									 if (HitAttackInfo->bOverDrive) pPerson->ConversionScore();	// フィニッシュアタックならスコア生産
-									 // 必殺以外
-									 else
-									 {
-										 // 最初の一回はボーナスでSP上昇
-										 if (HitAttackInfo->bFirstAttack == true)
-										 {
-											 pPerson->AddOverDriveGage(5);
-										 }
+		HIT_ATTACK_INFO *HitAttackInfo = (HIT_ATTACK_INFO*)msg.ExtraInfo;		// オリジナル情報構造体受け取る
+		//pPerson->SetHitStopFrame(HitAttackInfo->iHitStopFrame);// ヒットストップ
+		pPerson->AddCollectScore(HitAttackInfo->HitScore);	// 実体前のスコアを加算
+		if (HitAttackInfo->bOverDrive) pPerson->ConversionScore();	// フィニッシュアタックならスコア生産
+		// 必殺以外
+		else
+		{
+			// 最初の一回はボーナスでSP上昇
+			if (HitAttackInfo->bFirstAttack == true)
+			{
+				pPerson->AddOverDriveGage(5);
+			}
 
-										 // 攻撃を当ててSPゲージ上昇だ！
-										 if (HitAttackInfo->HitScore <= 50)
-										 {
-											 pPerson->AddOverDriveGage(0.5f);
-										 }
-										 else if (HitAttackInfo->HitScore <= 100)
-										 {
-											 pPerson->AddOverDriveGage(1);
-										 }
-										 else if (HitAttackInfo->HitScore <= 200)
-										 {
-											 pPerson->AddOverDriveGage(2.0f);
-										 }
-										 else if (HitAttackInfo->HitScore <= 300)
-										 {
-											 pPerson->AddOverDriveGage(2.25f);
-										 }
-										 else if (HitAttackInfo->HitScore <= 400)
-										 {
-											 pPerson->AddOverDriveGage(2.5f);
-										 }
-										 else if (HitAttackInfo->HitScore <= 500)
-										 {
-											 pPerson->AddOverDriveGage(4);
+			// 攻撃を当ててSPゲージ上昇だ！
+			if (HitAttackInfo->HitScore <= 50)
+			{
+				pPerson->AddOverDriveGage(0.5f);
+			}
+			else if (HitAttackInfo->HitScore <= 100)
+			{
+				pPerson->AddOverDriveGage(1);
+			}
+			else if (HitAttackInfo->HitScore <= 200)
+			{
+				pPerson->AddOverDriveGage(2.0f);
+			}
+			else if (HitAttackInfo->HitScore <= 300)
+			{
+				pPerson->AddOverDriveGage(2.25f);
+			}
+			else if (HitAttackInfo->HitScore <= 400)
+			{
+				pPerson->AddOverDriveGage(2.5f);
+			}
+			else if (HitAttackInfo->HitScore <= 500)
+			{
+				pPerson->AddOverDriveGage(4);
 
-										 }
-										 else if (HitAttackInfo->HitScore <= 700)
-										 {
-											 pPerson->AddOverDriveGage(4.5);
+			}
+			else if (HitAttackInfo->HitScore <= 700)
+			{
+				pPerson->AddOverDriveGage(4.5);
 
-										 }
-										 else if (HitAttackInfo->HitScore <= 900)
-										 {
-											 pPerson->AddOverDriveGage(5);
+			}
+			else if (HitAttackInfo->HitScore <= 900)
+			{
+				pPerson->AddOverDriveGage(5);
 
-										 }
-										 else if (HitAttackInfo->HitScore <= 1000)
-										 {
-											 pPerson->AddOverDriveGage(6);
+			}
+			else if (HitAttackInfo->HitScore <= 1000)
+			{
+				pPerson->AddOverDriveGage(6);
 
-										 }
-										 else if (HitAttackInfo->HitScore <= 1200)
-										 {
-											 pPerson->AddOverDriveGage(6.5f);
-										 }
-										 else
-										 {
-											 pPerson->AddOverDriveGage(7);
-										 }
-									 }
+			}
+			else if (HitAttackInfo->HitScore <= 1200)
+			{
+				pPerson->AddOverDriveGage(6.5f);
+			}
+			else
+			{
+				pPerson->AddOverDriveGage(7);
+			}
+		}
 
 
-									 //// この攻撃で相手が相手が死んでたら
-									 //if (pPerson->GetTargetPlayer()->GetHP() == 0)
-									 //{
-									//	 // KOのメッセージを送る
-									//	 FINISH_TYPE FinishType(HitAttackInfo->bOverDrive ? FINISH_TYPE::OVER_DRIVE : FINISH_TYPE::NORMAL);
-									 //
-									//	 // 
-									//	 MsgMgr->Dispatch(0, pPerson->GetID(), ENTITY_ID::SCENE_MAIN, MESSAGE_TYPE::KO, &FinishType);
-									 //}
-									 break;
+		//// この攻撃で相手が相手が死んでたら
+		//if (pPerson->GetTargetPlayer()->GetHP() == 0)
+		//{
+	   //	 // KOのメッセージを送る
+	   //	 FINISH_TYPE FinishType(HitAttackInfo->bOverDrive ? FINISH_TYPE::OVER_DRIVE : FINISH_TYPE::NORMAL);
+		//
+	   //	 // 
+	   //	 MsgMgr->Dispatch(0, pPerson->GetID(), ENTITY_ID::SCENE_MAIN, MESSAGE_TYPE::KO, &FinishType);
+		//}
+		break;
 	}
 
 	case HEAVE_HO_OVERFLOW_START:
 	{
-									// メッセージが届いたらオーバーフローへ移動
-									pPerson->GetFSM()->ChangeState(BasePlayerState::HeavehoDriveOverFlow_Success::GetInstance());
-									return true;
+		// メッセージが届いたらオーバーフローへ移動
+		pPerson->GetFSM()->ChangeState(BasePlayerState::HeavehoDriveOverFlow_Success::GetInstance());
+		return true;
 	}break;
 
 	case MESSAGE_TYPE::END_FINISHCALL:	// フィニッシュのコールが終わったら、勝ちモーションに行く
 
 
 	{
-											// 必要勝利ラウンド数が送られてくるので、あと1回勝てば試合終了フラグのチェック(一撃必殺用)
-											int *RoundNum((int*)msg.ExtraInfo);
-											if (pPerson->GetWinNum() == *RoundNum - 2) pPerson->SetLastOneWin();
+		// 必要勝利ラウンド数が送られてくるので、あと1回勝てば試合終了フラグのチェック(一撃必殺用)
+		int *RoundNum((int*)msg.ExtraInfo);
+		if (pPerson->GetWinNum() == *RoundNum - 2) pPerson->SetLastOneWin();
 
-											pPerson->GetFSM()->ChangeState(BasePlayerState::Win::GetInstance());
+		pPerson->GetFSM()->ChangeState(BasePlayerState::Win::GetInstance());
 	}
 		break;
 	}
@@ -4961,8 +4980,17 @@ void BasePlayerState::Guard::Execute(BasePlayer * pPerson)
 		
 	}
 
+	BasePlayer *target(pPerson->GetTargetPlayer());
+	bool bAttackState(false);
+	bool bStandAttack(false);
+	// ★相手が何かしらの攻撃をしていたら、
+	if (target->isAttackState()) if (target->GetAttackData()->attribute != ATTACK_ATTRIBUTE::THROW) bAttackState = true;
+
+	// スタンド
+	if (target->GetStand()->isActive() && target->GetStand()->GetAttackData() && target->GetStand()->isAttackFrame()) bStandAttack = true;
+
 	// 相手キャラが攻撃ステートなら
-	if (pPerson->GetTargetPlayer()->isAttackState() || (pPerson->GetTargetPlayer()->GetStand()->isActive() && pPerson->GetTargetPlayer()->GetStand()->GetAttackData()))
+	if (bAttackState || bStandAttack)
 	{
 		if (isInputGuardCommand(pPerson))
 		{
@@ -5331,7 +5359,6 @@ bool BasePlayerState::Throw::OnMessage(BasePlayer * pPerson, const Message & msg
 void BasePlayerState::ThrowHold::Enter(BasePlayer * pPerson)
 {
 	pPerson->GetTargetPlayer()->GetThrowMark()->Action();
-	pPerson->GetTargetPlayer()->AddEffectAction(pPerson->GetTargetPlayer()->GetPos(), EFFECT_TYPE::THROW_HOLD);
 
 	pPerson->SetActionState(BASE_ACTION_STATE::FRAMECOUNT);
 
@@ -5519,6 +5546,9 @@ void BasePlayerState::ThrowBind::Enter(BasePlayer * pPerson)
 	// 投げられた時のエフェクト
 	//pPerson->GetThrowMark()->Action();
 	pPerson->AddEffectAction(pPerson->GetPos() , EFFECT_TYPE::THROW);
+
+	// ThrowHoldのエンターからこっちに移しました
+	pPerson->AddEffectAction(pPerson->GetPos(), EFFECT_TYPE::THROW_HOLD);
 
 	COMBO_DESK comboDesk;
 	comboDesk.side = pPerson->GetSide();

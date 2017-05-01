@@ -68,12 +68,23 @@ void Collision::PlayerCollision(PlayerManager *pPlayerMgr, ShotManager *pShotMgr
 			// 2重ヒット防止用のフラグをONにする
 			if (pPlayer2->isAttackState())pPlayer2->GetAttackData()->bHit = true;
 		}
+		else if (pHitDamageInfo[0]->iAttribute == (int)ATTACK_ATTRIBUTE::AERIAL_THROW && pHitDamageInfo[1]->iAttribute == (int)ATTACK_ATTRIBUTE::STRIKE)
+		{
+			// 2重ヒット防止用のフラグをONにする
+			if (pPlayer2->isAttackState())pPlayer2->GetAttackData()->bHit = true;
+		}
 
 		else if (pHitDamageInfo[1]->iAttribute == (int)ATTACK_ATTRIBUTE::THROW && pHitDamageInfo[0]->iAttribute == (int)ATTACK_ATTRIBUTE::STRIKE)
 		{
 			// 2重ヒット防止用のフラグをONにする
 			if (pPlayer1->isAttackState())pPlayer1->GetAttackData()->bHit = true;
 		}
+		else if (pHitDamageInfo[1]->iAttribute == (int)ATTACK_ATTRIBUTE::AERIAL_THROW && pHitDamageInfo[0]->iAttribute == (int)ATTACK_ATTRIBUTE::STRIKE)
+		{
+			// 2重ヒット防止用のフラグをONにする
+			if (pPlayer1->isAttackState())pPlayer1->GetAttackData()->bHit = true;
+		}
+
 		else
 		{
 			// メッセージを送信
@@ -93,7 +104,7 @@ void Collision::PlayerCollision(PlayerManager *pPlayerMgr, ShotManager *pShotMgr
 		// 当たってたら
 		if (pHitDamageInfo[0])
 		{
-			if (pHitDamageInfo[0]->iAttribute != (int)ATTACK_ATTRIBUTE::THROW)
+			if (pHitDamageInfo[0]->iAttribute != (int)ATTACK_ATTRIBUTE::THROW && pHitDamageInfo[0]->iAttribute != (int)ATTACK_ATTRIBUTE::AERIAL_THROW)
 			{
 				// メッセージを送信
 				SendHitMessage(pPlayer2, pPlayer1, pHitDamageInfo[0]);
@@ -104,7 +115,7 @@ void Collision::PlayerCollision(PlayerManager *pPlayerMgr, ShotManager *pShotMgr
 		}
 		if (pHitDamageInfo[1])
 		{
-			if (pHitDamageInfo[1]->iAttribute != (int)ATTACK_ATTRIBUTE::THROW)
+			if (pHitDamageInfo[1]->iAttribute != (int)ATTACK_ATTRIBUTE::THROW && pHitDamageInfo[1]->iAttribute != (int)ATTACK_ATTRIBUTE::AERIAL_THROW)
 			{
 				// メッセージを送信
 				SendHitMessage(pPlayer1, pPlayer2, pHitDamageInfo[1]);
@@ -212,11 +223,15 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 		YouShape.pos += you->GetPos();
 		if (Collision::HitCheck(&AttackShape, &YouShape))
 		{
+			// 相手がヒットしたときの地上にいたか空中にいたか
+			int iHitPlace((!you->isLand() || you->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) || you->GetFSM()->isInState(*BasePlayerState::DownFall::GetInstance())) ? (int)AttackData::HIT_PLACE::AERIAL : (int)AttackData::HIT_PLACE::LAND);
+
+
 			// ★投げ属性なら
-			if (pAttackData->attribute == ATTACK_ATTRIBUTE::THROW)
+			if (pAttackData->attribute == ATTACK_ATTRIBUTE::THROW || pAttackData->attribute == ATTACK_ATTRIBUTE::AERIAL_THROW)
 			{
 				// 相手が投げられる系のステートじゃなかったらつかめない
-				if (!isThrownState(you)) return;
+				if (!isThrownState(you, (pAttackData->attribute == ATTACK_ATTRIBUTE::AERIAL_THROW))) return;
 
 				*OutDamageInfo = new HIT_DAMAGE_INFO;
 				(*OutDamageInfo)->iAttribute = (int)pAttackData->attribute;
@@ -229,7 +244,7 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 				//you->SetHitStopFrame(pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame);
 
 				// 掴まれたメッセージ
-				MsgMgr->Dispatch(0, my->GetID(), you->GetID(), MESSAGE_TYPE::BE_THROWN, nullptr);
+				MsgMgr->Dispatch(0, my->GetID(), you->GetID(), MESSAGE_TYPE::BE_THROWN, &pAttackData->places[iHitPlace].HitRecoveryFrame);
 
 				// 投げSEをここで再生
 				LPCSTR seID = pAttackData->HitSE;
@@ -252,9 +267,6 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 				//pAttackData->bHit = true;	// 2重ヒット防止用のフラグをONにする
 
 				/* メッセージ送信 */
-
-				// 相手がヒットしたときの地上にいたか空中にいたか
-				int iHitPlace((!you->isLand() || you->GetFSM()->isInState(*BasePlayerState::KnockDown::GetInstance()) || you->GetFSM()->isInState(*BasePlayerState::DownFall::GetInstance())) ? (int)AttackData::HIT_PLACE::AERIAL : (int)AttackData::HIT_PLACE::LAND);
 
 				// (A列車)(TODO) ★★★これだとフィニッシュアーツがひとつしか存在しなくなるのでどうにかしよう
 				// フィニッシュアーツかどうか

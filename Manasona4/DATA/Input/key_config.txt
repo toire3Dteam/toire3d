@@ -1,16 +1,21 @@
-//A,B,C,D,L1,L2,L3,R1,R2,R3,START,SELECT
-
-DEFAULT
-2 3 1 4 7 5 11 8 6 12 9 10
-
-XBOX
-1 2 3 4 5 9 11 6 10 12 7 8
-
-PS3
-2 3 1 4 5 7 11 6 8 12 10 9
-
-GAMEPAD
+NAME: Elecom Wired Gamepad
 3 4 1 2 5 7 11 6 8 12 10 9
 
-NORI_GAMEPAD
+NAME: PAD A
 2 3 1 4 5 7 11 6 8 12 10 9
+
+NAME: XBOX 360 For Windows (Controller)
+1 2 3 4 5 9 11 6 10 12 7 8
+
+NAME: Controller (XBOX 360 For Windows)
+1 2 3 4 5 9 11 6 10 12 7 8
+
+NAME: PLAYSTATION(R)3 Controller
+2 3 1 4 5 7 11 6 8 12 10 9
+
+NAME: Wireless Controller
+2 3 1 4 5 7 11 6 8 12 10 9
+
+NAME: JC-P301U
+2 3 1 4 7 5 11 8 6 12 9 10
+
