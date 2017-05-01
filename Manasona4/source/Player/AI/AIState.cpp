@@ -6,6 +6,9 @@
 #include "Stand\Stand.h"
 #include "Data\PlayerData.h"
 #include "Data\SelectData.h"
+#include "Shot\BaseShot.h"
+#include "Shot\ShotManager.h"
+
 
 #define MyPlayer (pPerson->GetBasePlayer())
 #define TargetPlayer (pPerson->GetTargetPlayer())
@@ -156,6 +159,24 @@ float GetRangeVsStand(AI * pPerson)
 
 }
 
+// 相手の遠距離と自分のXの距離
+//float GetRangeVsShot(AI * pPerson)
+//{
+//	float l_fRange = 0.0f;
+//
+//	if (TargetPlayer->GetStand()->isActive() == true)
+//	{
+//		l_fRange = TargetPlayer->GetStand()->GetPos().x;
+//
+//	}
+//	else
+//	{
+//		l_fRange = 0.0f;
+//	}
+//
+//	return abs(l_fRange - MyPlayer->GetPos().x);
+//
+//}
 
 // 難易度が低い追いかけるステート　ものすごくしょぼい
 bool EasyTypeChaseBrain(AI * pPerson)
@@ -466,7 +487,7 @@ bool YokoeTypeChaseBrain(AI * pPerson)
 
 	// 相手のスタンドが発動してたら	
 	if (TargetPlayer->GetStand()->isActive() &&
-		30 >= GetRangeVsStand(pPerson))//
+		BasePlayer::c_GUARD_DISTANCE >= GetRangeVsStand(pPerson))//
 	{
 		int l_iRam = tdnRandom::Get(0, 100);
 		if (l_iRam <= 35)
@@ -739,7 +760,7 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 		// 相手が攻撃振ったらかつ
 		// 	相手の技が近くにきたら
 		if (TargetPlayer->isAttackState() == true &&
-			30 >= GetRange(pPerson))// (TODO)
+			BasePlayer::c_GUARD_DISTANCE >= GetRange(pPerson))// (TODO)
 		{
 			// 投げだったらハジク(投げに対して移動してしまうため)
 			if (TargetPlayer->GetActionState() != BASE_ACTION_STATE::THROW)
@@ -788,7 +809,7 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 
 		// 相手のスタンドが発動してたら	
 		if (TargetPlayer->GetStand()->isActive() &&
-			30 >= GetRangeVsStand(pPerson))//
+			BasePlayer::c_GUARD_DISTANCE >= GetRangeVsStand(pPerson))//
 		{
 			// ★設定によりガードを切り替えるか変えないか設定する
 			if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch == ENEMY_GUARD_SWITCH_TYPE::OK)
@@ -827,7 +848,58 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 			}// 中段か下段か
 
 		}// 相手スタンドに対するガード
-	}
+
+
+		// 遠距離の判定
+		for (auto it : *ShotMgr->GetList(pPerson->GetTargetPlayer()->GetSide()))
+		{
+			float fRange = abs((it)->GetPos().x - pPerson->GetBasePlayer()->GetPos().x);
+
+			// 遠距離技との距離が縮まれば
+			if (BasePlayer::c_GUARD_DISTANCE >= fRange)
+			{
+				// ★設定によりガードを切り替えるか変えないか設定する
+				if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch == ENEMY_GUARD_SWITCH_TYPE::OK)
+				{
+					// 相手と逆方向レバーを押す
+					if (MyPlayer->GetDir() == DIR::LEFT)
+					{
+						pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+					}
+					else
+					{
+						pPerson->PushInputList(PLAYER_INPUT::LEFT);
+					}
+
+					// 下段なら
+					if ((it)->GetAttackData()->AntiGuard == ANTIGUARD_ATTACK::DOWN_ATTACK)
+					{
+						pPerson->PushInputList(PLAYER_INPUT::DOWN);
+					}
+
+				}
+				else
+				{
+
+					// 相手と逆方向レバーを押す
+					if (MyPlayer->GetDir() == DIR::LEFT)
+					{
+						pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+					}
+					else
+					{
+						pPerson->PushInputList(PLAYER_INPUT::LEFT);
+					}
+
+
+				}// 中段か下段か
+
+			}
+
+
+		}// 遠距離の判定
+
+	}// 練習用ガードフラグ
 
 }
 
@@ -988,7 +1060,7 @@ void AIState::PracticeSquat::Execute(AI * pPerson)
 	{
 		// 相手が攻撃振っているか
 		if (TargetPlayer->isAttackState() == true &&
-			30 >= GetRange(pPerson))// (TODO)
+			BasePlayer::c_GUARD_DISTANCE >= GetRange(pPerson))// (TODO)
 		{
 			// ★設定によりガードを切り替えるか変えないか
 			if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch 

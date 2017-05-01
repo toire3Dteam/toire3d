@@ -79,7 +79,7 @@ public:
 	bool  HandleMessage(const Message& msg){ return m_pStateMachine->HandleMessage(msg); }
 
 	Stage::Base *GetStage() { return m_pStage;	}
-	ShotManager *GetShotManager(){ return m_pShotMgr; }
+	// ShotManager *GetShotManager(){ return m_pShotMgr; }
 
 	void SetRoundNum(int roundNum) { m_iRoundNum = roundNum; }
 	int GetRoundNum() { return m_iRoundNum; }
@@ -121,7 +121,7 @@ private:
 	Stage::Base *m_pStage;			// ステージさん
 
 	//Camera *m_pCamera;				// カメラさん
-	ShotManager *m_pShotMgr;		// ショット管理さん
+	//ShotManager *m_pShotMgr;		// ショット管理さん
 	
 	tdn2DObj* m_stageScreen;		// ステージオンリーのレンダーターゲット
 

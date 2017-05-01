@@ -706,7 +706,7 @@ void ParticleManager::EffectExplosion(const Vector3 &pos)
 		Move.x = (rand() % 101 - 50)*0.007f;
 		Move.y = (rand() % 100)*0.005f;
 		Move.z = (rand() % 101 - 50)*0.007f;
-		Set2(9, 0, 0.9f, 70, .0f, 30, .65f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0.01,  .05f, 1.005f, 9.0f, RS::ADD);
+		Set2(9, 0, 0.9f, 70, .0f, 30, .65f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0.01f,  .05f, 1.005f, 9.0f, RS::ADD);
 	
 		//Set2(15, 0, 1.0f, 60, .0f, 40, 1.0f, Pos, Move, Power, .1f, .1f, .1f, 0.7f,0,1, 1, RS::SUB);
 		//Set2(2, 0, 1.0f, 60, .0f, 40, 1.0f, Pos, Move, Power, .3f, .3f, .3f, 0.9f,0,1, 1, RS::ADD);
@@ -724,7 +724,7 @@ void ParticleManager::EffectExplosion(const Vector3 &pos)
 		Move.y = (rand() % 100)*0.005f;
 		Move.z = (rand() % 101 - 50)*0.007f;
 
-		Set2(15, 20, 0.0f, 110, .0f, 40, .75f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0.01,  .05f, 1.005f,  9.0f, RS::SUB);
+		Set2(15, 20, 0.0f, 110, .0f, 40, .75f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0.01f,  .05f, 1.005f,  9.0f, RS::SUB);
 	}
 
 	// íÜêSÇÃîöî≠

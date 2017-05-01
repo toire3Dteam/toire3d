@@ -439,7 +439,7 @@ bool Collision::CollisionShot(Shot::Base *shot, BasePlayer *you)
 
 	if (isInputGuardCommand(you) && isPossibleGuardState(you) && you->isLand())
 	{
-		if (Math::Length(you->GetPos(), shot->GetPos()) < BasePlayer::c_GUARD_DISTANCE)// ƒK[ƒh”­“®‹——£
+		if (fabsf(you->GetPos().x - shot->GetPos().x) < BasePlayer::c_GUARD_DISTANCE)// ƒK[ƒh”­“®‹——£
 		{
 			you->GetFSM()->ChangeState(BasePlayerState::Guard::GetInstance());
 			//return false;

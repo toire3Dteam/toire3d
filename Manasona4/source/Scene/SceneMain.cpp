@@ -154,7 +154,8 @@ bool sceneMain::Initialize()
 	sprintf_s(m_LoadComment, 256, "その他初期化");
 #endif
 
-	m_pShotMgr = new ShotManager;
+	//m_pShotMgr = new ShotManager;
+	ShotMgr;
 
 	m_fLoadPercentage = .8f;	// ロード割合
 
@@ -320,7 +321,8 @@ sceneMain::~sceneMain()
 	SAFE_DELETE(m_stageScreen);
 	HeaveHoFinishUI->Rerease();
 	PointLightMgr->Release();
-	SAFE_DELETE(m_pShotMgr);
+	//SAFE_DELETE(m_pShotMgr);
+	ShotMgr->Release();
 	NumberEffect.Release();
 	GameUIMgr->Rerease();
 	//TimeMgr->Release();
@@ -397,10 +399,15 @@ void sceneMain::Update()
 		//CameraMgr->Update();
 
 		// ショット更新(ゲームが止まってなかったら)
-		if(!PlayerMgr->isGameStop())m_pShotMgr->Update();
+		if (!PlayerMgr->isGameStop())
+		{
+			//m_pShotMgr->Update();
+			ShotMgr->Update();
+		}
 		else
 		{
-			m_pShotMgr->EraseCheakUpdate();
+			//m_pShotMgr->EraseCheakUpdate();
+			ShotMgr->EraseCheakUpdate();
 		}
 
 		// ステージ更新
@@ -657,8 +664,8 @@ void sceneMain::Render()
 			PlayerMgr->Render();
 			
 			// ショット
-			m_pShotMgr->Render();
-
+			//m_pShotMgr->Render();
+			ShotMgr->Render();
 
 
 
@@ -906,7 +913,8 @@ void sceneMain::Reset()
 	m_bOverDriveStageFlag = false;
 	PlayerMgr->Reset();
 	CameraMgr->SetPlayersPos();
-	m_pShotMgr->Reset();
+	//m_pShotMgr->Reset();
+	ShotMgr->Reset();
 	ParticleManager::Reset();
 	GameUIMgr->Reset();
 }

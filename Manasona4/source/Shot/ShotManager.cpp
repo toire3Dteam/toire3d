@@ -4,6 +4,9 @@
 #include "BaseShot.h"
 #include "../Player/PlayerManager.h"
 
+// ショットマネージャーの実態
+ShotManager *ShotManager::m_pInstance = nullptr;
+
 ShotManager::ShotManager() :BaseGameEntity(ENTITY_ID::SHOT_MGR)
 {
 

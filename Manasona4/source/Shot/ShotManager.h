@@ -9,10 +9,17 @@ namespace Shot{class Base;}
 class ShotManager : public BaseGameEntity
 {
 public:
-	//------------------------------------------------------
-	//	コンストラクタ
-	//------------------------------------------------------
-	ShotManager();
+
+	//+-----------------------------------------------------
+	//	実体
+	//+-----------------------------------------------------
+	static ShotManager* GetInstance()
+	{
+		if (m_pInstance == nullptr)m_pInstance = new ShotManager();
+		return m_pInstance;
+	}
+
+	static void Release() { SAFE_DELETE(m_pInstance); }
 
 	//------------------------------------------------------
 	//	デストラクタ(リストの開放)
@@ -49,7 +56,15 @@ public:
 	std::list<Shot::Base*> *GetList(SIDE side){ return &m_list[(int)side]; }
 
 private:
+	// 1つしかない実体
+	static ShotManager *m_pInstance;
 
+	//------------------------------------------------------
+	//	コンストラクタ
+	//------------------------------------------------------
+	ShotManager();
+	ShotManager(const ShotManager&);
+	ShotManager &operator=(const ShotManager&) {};
 
 	//------------------------------------------------------
 	//	飛び道具を格納するリスト
@@ -57,3 +72,5 @@ private:
 	std::list<Shot::Base*> m_list[(int)SIDE::ARRAY_MAX];
 
 };
+
+#define ShotMgr	ShotManager::GetInstance()

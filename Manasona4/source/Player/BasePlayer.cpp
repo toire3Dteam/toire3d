@@ -29,7 +29,7 @@ const int BasePlayer::c_THROW_ESCAPE_FRAME = 15;	// 投げぬけの猶予フレーム
 const int BasePlayer::c_THROW_MISS_FRAME = 30;	// 投げ外しロスのフレーム(全キャラ共通だろうという考え)
 const int BasePlayer::c_THROW_RELEASE_FRAME = 15;	// 投げ抜けで、パシンてなってる間のフレーム(これも全キャラ共通だろう)
 const int BasePlayer::c_WINNER_TIME = 180;
-const float BasePlayer::c_GUARD_DISTANCE = 32.0f;
+const float BasePlayer::c_GUARD_DISTANCE = 24.0f;
 const int BasePlayer::c_FIRST_HIT_ADD_DAMAGE = 300;	// 初段ヒット加算ダメージ
 const int BasePlayer::c_COUNTER_BONUS_DAMAGE = 200;	// カウンターヒット加算ダメージ
 
@@ -795,10 +795,7 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 		{
 			if(m_iRecoveryFrame < 30)m_pObj->Animation();
 		}
-		else if (
-			!m_pStateMachine->isInState(*BasePlayerState::ThrowHold::GetInstance()) &&
-			!m_pStateMachine->isInState(*BasePlayerState::ThrowBind::GetInstance())
-			)
+		else if (!m_pStateMachine->isInState(*BasePlayerState::ThrowHold::GetInstance()))
 		{
 			m_pObj->Animation();
 		}
