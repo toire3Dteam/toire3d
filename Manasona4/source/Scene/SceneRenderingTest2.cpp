@@ -27,8 +27,12 @@
 #include "Fade\Fade.h"
 #include "Effect\ExPlosion.h"
 
+#include "KeyConfig\KeyConfig.h"
+
+
 SoundWindow* g_pSoundWindow;
 
+KeyConfig* keyconfig;
 
 /*****************************/
 // 描画テスト用
@@ -81,6 +85,8 @@ CExplosion *eeeee;
 
 bool sceneRenderingTest2::Initialize()
 {
+	keyconfig = new KeyConfig();
+
 	eeeee = new CExplosion();
 
 	g_pSkinObj= new iex3DObj("Data/CHR/teki/teki.iem");
@@ -247,6 +253,7 @@ sceneRenderingTest2::~sceneRenderingTest2()
 
 	SAFE_DELETE(eeeee);
 
+	SAFE_DELETE(keyconfig);
 }
 
 //******************************************************************
@@ -255,6 +262,15 @@ sceneRenderingTest2::~sceneRenderingTest2()
 
 void sceneRenderingTest2::Update()
 {
+	if (KeyBoardTRG(KB_F))
+	{
+		keyconfig->Action(Vector2(100,100));
+	}
+	keyconfig->Ctrl(0);
+
+	keyconfig->Update();
+
+
 	if (KeyBoardTRG(KB_B)) 
 	{
 		eeeee->Action(VECTOR_ZERO);
@@ -587,6 +603,8 @@ void sceneRenderingTest2::Render()
 	//  WindowUI
 	g_pSoundWindow->Redner();
 
+
+	keyconfig->Render();
 
 	tdnText::Draw(0, 30, 0xffffffff, "CameraPos    : %.1f %.1f %.1f", m_camera.pos.x, m_camera.pos.y, m_camera.pos.z);
 	tdnText::Draw(0, 60, 0xffffffff, "CameraTarget : %.1f %.1f %.1f", m_camera.target.x, m_camera.target.y, m_camera.target.z);

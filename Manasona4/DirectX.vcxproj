@@ -150,6 +150,7 @@
     <ClCompile Include="source\Effect\UVEffect\BaseUVEffect.cpp" />
     <ClCompile Include="source\Effect\UVEffect\UVEffectManager.cpp" />
     <ClCompile Include="source\Fade\Fade.cpp" />
+    <ClCompile Include="source\KeyConfig\KeyConfig.cpp" />
     <ClCompile Include="source\MenuUI\CoinUI.cpp" />
     <ClCompile Include="source\MenuUI\ControllerSelectUI.cpp" />
     <ClCompile Include="source\MenuUI\InformationPlate\InformationPlate.cpp" />
@@ -355,6 +356,7 @@
     <ClInclude Include="source\Effect\UVEffect\BaseUVEffect.h" />
     <ClInclude Include="source\Effect\UVEffect\UVEffectManager.h" />
     <ClInclude Include="source\Fade\Fade.h" />
+    <ClInclude Include="source\KeyConfig\KeyConfig.h" />
     <ClInclude Include="source\MenuUI\CoinUI.h" />
     <ClInclude Include="source\MenuUI\ControllerSelectUI.h" />
     <ClInclude Include="source\MenuUI\InformationPlate\InformationPlate.h" />

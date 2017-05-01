@@ -122,7 +122,7 @@ void AnimationPanel::Action()
 	// ‰Šú‰»
 	m_count = 0;
 	m_flame = 0;
-
+	m_loopCount = 0;// [4/29 ƒ‹[ƒv‚·‚é‰ñ”‚à‰Šú‰»]
 }
 
 bool AnimationPanel::GetisAction()

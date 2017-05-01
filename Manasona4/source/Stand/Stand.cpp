@@ -50,7 +50,7 @@ m_ActionType(SKILL_ACTION_TYPE::NO_ACTION),
 m_CurrentActionFrame(0),
 m_dir(DIR::LEFT),
 m_ePartnerType(PARTNER::MOKOI),
-m_fScale(1.0f),
+m_fScale(0.0f),
 m_pSummonEffect(nullptr),
 m_pSummonWaveEffect(nullptr),
 m_pExitEffect(nullptr),
@@ -283,7 +283,10 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 {
 	// モコイの実体
 	m_pObj = new iex3DObj("DATA/CHR/Stand/Mokoi/mokoi.IEM");
-	
+	m_pObj->SetPos(m_pos);
+	m_pObj->SetScale(m_fScale, 1.0f, m_fScale);
+	m_pObj->Update();
+
 	// タイプ設定
 	m_ePartnerType = PARTNER::MOKOI;
 
@@ -469,6 +472,9 @@ Stand::Maya::Maya(BasePlayer *pPlayer) :Base(pPlayer)
 {
 	// マーヤの実体
 	m_pObj = new iex3DObj("DATA/CHR/Stand/Maya/maya.IEM");
+	m_pObj->SetPos(m_pos);
+	m_pObj->SetScale(m_fScale, 1.0f, m_fScale);
+	m_pObj->Update();
 
 	// タイプ設定
 	m_ePartnerType = PARTNER::MAYA;
@@ -721,6 +727,9 @@ Stand::Hete::Hete(BasePlayer *pPlayer) :Base(pPlayer)
 {
 	// モコイの実体
 	m_pObj = new iex3DObj("DATA/CHR/Stand/Hete/hete.IEM");
+	m_pObj->SetPos(m_pos);
+	m_pObj->SetScale(m_fScale, 1.0f, m_fScale);
+	m_pObj->Update();
 
 	// タイプ設定
 	m_ePartnerType = PARTNER::HETE;
@@ -937,6 +946,9 @@ Stand::Attakai::Attakai(BasePlayer *pPlayer) :Base(pPlayer)
 {
 	// アッタカイの実体
 	m_pObj = new iex3DObj("DATA/CHR/Stand/Attakai/Attakai.IEM");
+	m_pObj->SetPos(m_pos);
+	m_pObj->SetScale(m_fScale, 1.0f, m_fScale);
+	m_pObj->Update();
 
 	// タイプ設定
 	m_ePartnerType = PARTNER::ATTAKAI;
@@ -959,12 +971,12 @@ Stand::Attakai::Attakai(BasePlayer *pPlayer) :Base(pPlayer)
 	/*****************************/
 	// 基本ステータス
 	m_standStockMAX = 1;
-	m_standGageMAX = 6 * 18;
+	m_standGageMAX = 60 * 18;
 
 	/*****************************/
 	// そのキャラクターのアイコン
-	m_pIcon = new tdn2DAnim("Data/UI/Game/PersonaIcon/hete.png");
-	m_pIconRip = new tdn2DAnim("Data/UI/Game/PersonaIcon/hete.png");
+	m_pIcon = new tdn2DAnim("Data/UI/Game/PersonaIcon/attakai.png");
+	m_pIconRip = new tdn2DAnim("Data/UI/Game/PersonaIcon/attakai.png");
 
 	//==============================================================================================================
 	//	地上ニュートラル
@@ -1208,14 +1220,19 @@ void Stand::Attakai::Action(SKILL_ACTION_TYPE type)
 	}
 
 
-	if (type == SKILL_ACTION_TYPE::AERIAL ||
-		type == SKILL_ACTION_TYPE::AERIALDROP)
+	if (type == SKILL_ACTION_TYPE::AERIALDROP)
 	{
 		// そして地面に召喚
 		m_pos.y = 0.0f;
 
 		// 相手のいる座標に
-		m_pos.x = m_pPlayer->GetTargetPlayer()->GetPos().x;
+		m_pos.x = m_pPlayer->GetTargetPlayer()->GetPos().x - m_pPlayer->GetTargetPlayer()->GetDirVecX() * 5;
+
+	}
+	if (type == SKILL_ACTION_TYPE::AERIAL)
+	{
+		// 地面に召喚
+		m_pos.y = 0.0f;
 
 	}
 	m_pObj->SetPos(m_pos);
@@ -1224,12 +1241,15 @@ void Stand::Attakai::Action(SKILL_ACTION_TYPE type)
 
 	// 基底クラスのアクション
 	// 空中はすべてしゃがみ技に
-	if (type == SKILL_ACTION_TYPE::AERIAL ||
-		type == SKILL_ACTION_TYPE::AERIALDROP)
+	if (type == SKILL_ACTION_TYPE::AERIALDROP)
 	{
 		
 		Base::Action(SKILL_ACTION_TYPE::SQUAT);
 
+	}
+	else if (type == SKILL_ACTION_TYPE::AERIAL)
+	{
+		Base::Action(SKILL_ACTION_TYPE::LAND);
 	}
 	else
 	{

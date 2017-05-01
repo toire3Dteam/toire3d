@@ -45,7 +45,7 @@ void CExplosion::Action(Vector3 vPos)
 	m_pExplosion->Update();
 	m_pFireWave->Action(vPos, 2.0f*0.5f, 3.5f*0.5f, Vector3(0, 0, 0), Vector3(0, 0, 0));
 	m_pFireWave->Update();
-	m_pFireRing->Action(vPos), .75f*0.5f, 1.0f*0.5f, Vector3(0, 0.4f, 0), Vector3(0, 0.4f, 0);
+	m_pFireRing->Action(vPos + Vector3(0, 5, 0)), .75f*0.5f, 2.0f*0.5f, Vector3(0, 0.4f, 0), Vector3(0, 0.4f, 0);
 	m_pFireRing->Update();
 
 	
