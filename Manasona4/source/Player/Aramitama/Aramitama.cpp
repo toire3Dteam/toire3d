@@ -736,8 +736,8 @@ void Aramitama::InitMushiDatas()
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	// ”»’èŒ`ó
-	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->pCollisionShape->width = 16;
-	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->pCollisionShape->height = 16;
+	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->pCollisionShape->width = 15;
+	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->pCollisionShape->height = 15;
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->pCollisionShape->pos.Set(0, 0, 0);
 
 

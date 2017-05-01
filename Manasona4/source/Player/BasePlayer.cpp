@@ -29,7 +29,7 @@ const int BasePlayer::c_THROW_ESCAPE_FRAME = 15;	// 投げぬけの猶予フレーム
 const int BasePlayer::c_THROW_MISS_FRAME = 30;	// 投げ外しロスのフレーム(全キャラ共通だろうという考え)
 const int BasePlayer::c_THROW_RELEASE_FRAME = 15;	// 投げ抜けで、パシンてなってる間のフレーム(これも全キャラ共通だろう)
 const int BasePlayer::c_WINNER_TIME = 180;
-const float BasePlayer::c_GUARD_DISTANCE = 24.0f;
+const float BasePlayer::c_GUARD_ADD_RANGE = 10.0f;
 const int BasePlayer::c_FIRST_HIT_ADD_DAMAGE = 300;	// 初段ヒット加算ダメージ
 const int BasePlayer::c_COUNTER_BONUS_DAMAGE = 200;	// カウンターヒット加算ダメージ
 
@@ -841,11 +841,11 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 	}
 
 	// 1more覚醒していたらスタンドの動きを止める
-	if (GetFSM()->isInState(*BasePlayerState::OverDrive_OneMore::GetInstance()) == false)
-	{
-		// スタンド更新
-		m_pStand->Update((flag == PLAYER_UPDATE::CONTROL_OK));
-	}
+	//if (GetFSM()->isInState(*BasePlayerState::OverDrive_OneMore::GetInstance()) == false)
+	//{
+	//	// スタンド更新
+	//	m_pStand->Update((flag == PLAYER_UPDATE::CONTROL_OK));
+	//}
 
 	//if (bOutLog) tdnStopWatch::Start();
 
@@ -1022,6 +1022,17 @@ void BasePlayer::MoveUpdate()
 	else
 	{
 		m_vMove *= 0.8f;	// 減速(A列車:この値はキャラ固有の値)
+	}
+
+}
+
+void BasePlayer::StandUpdate(PLAYER_UPDATE flag)
+{
+	// 1more覚醒していたらスタンドの動きを止める
+	if (GetFSM()->isInState(*BasePlayerState::OverDrive_OneMore::GetInstance()) == false)
+	{
+		// スタンド更新
+		m_pStand->Update((flag == PLAYER_UPDATE::CONTROL_OK));
 	}
 
 }

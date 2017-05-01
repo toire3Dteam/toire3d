@@ -138,17 +138,47 @@ bool SearchNearInvinciblePlayer(AI * pPerson)
 // ‘ŠŽè‚ÆŽ©•ª‚ÌX‚Ì‹——£
 float GetRange(AI * pPerson)
 {
-	return abs(TargetPlayer->GetPos().x - MyPlayer->GetPos().x);
+	// ‹——£
+	//if (fabsf(MyPlayer->GetPos().x - (TargetPlayer->GetPos().x +
+	//	TargetPlayer->GetAttackData()->pCollisionShape->pos.x * TargetPlayer->GetDirVecX()))
+	//		> BasePlayer::c_GUARD_DISTANCE)
+	//{
+	//	return false;				// ƒK[ƒh”­“®‹——£
+	//}
+	//else
+	//{
+	//	return true;
+	//}
+
+	return  (fabsf(MyPlayer->GetPos().x - (TargetPlayer->GetPos().x +
+		TargetPlayer->GetAttackData()->pCollisionShape->pos.x * TargetPlayer->GetDirVecX())));
+
+	//return abs(TargetPlayer->GetPos().x - MyPlayer->GetPos().x);
 }
 
 // ‘ŠŽèƒXƒ^ƒ“ƒh‚ÆŽ©•ª‚ÌX‚Ì‹——£
 float GetRangeVsStand(AI * pPerson)
 {
+
 	float l_fRange = 0.0f;
+
+	// ƒXƒ^ƒ“ƒh
+	//if (TargetPlayer->GetStand()->isActive() &&
+	//	TargetPlayer->GetStand()->GetAttackData() &&
+	//	TargetPlayer->GetStand()->isAttackFrame())
+	//{
+	//	// ‹——£
+	//	return l_fRange = fabsf(TargetPlayer->GetStand()->GetPos().x - MyPlayer->GetPos().x);
+	//}
+	//else
+	//{
+	//	l_fRange = 0.0f;
+	//}	
 
 	if (TargetPlayer->GetStand()->isActive() == true)
 	{
-		l_fRange = TargetPlayer->GetStand()->GetPos().x;
+		l_fRange = TargetPlayer->GetStand()->GetPos().x
+			+ TargetPlayer->GetStand()->GetAttackData()->pCollisionShape->pos.x * ((TargetPlayer->GetStand()->GetDir() == DIR::LEFT) ? -1.0f : 1.0f);
 
 	}else
 	{
@@ -487,7 +517,7 @@ bool YokoeTypeChaseBrain(AI * pPerson)
 
 	// ‘ŠŽè‚ÌƒXƒ^ƒ“ƒh‚ª”­“®‚µ‚Ä‚½‚ç	
 	if (TargetPlayer->GetStand()->isActive() &&
-		BasePlayer::c_GUARD_DISTANCE >= GetRangeVsStand(pPerson))//
+		BasePlayer::c_GUARD_ADD_RANGE + TargetPlayer->GetStand()->GetAttackData()->pCollisionShape->width >= GetRangeVsStand(pPerson))//
 	{
 		int l_iRam = tdnRandom::Get(0, 100);
 		if (l_iRam <= 35)
@@ -760,7 +790,7 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 		// ‘ŠŽè‚ªUŒ‚U‚Á‚½‚ç‚©‚Â
 		// 	‘ŠŽè‚Ì‹Z‚ª‹ß‚­‚É‚«‚½‚ç
 		if (TargetPlayer->isAttackState() == true &&
-			BasePlayer::c_GUARD_DISTANCE >= GetRange(pPerson))// (TODO)
+			BasePlayer::c_GUARD_ADD_RANGE + TargetPlayer->GetAttackData()->pCollisionShape->width  >= GetRange(pPerson))// (TODO)
 		{
 			// “Š‚°‚¾‚Á‚½‚çƒnƒWƒN(“Š‚°‚É‘Î‚µ‚ÄˆÚ“®‚µ‚Ä‚µ‚Ü‚¤‚½‚ß)
 			if (TargetPlayer->GetActionState() != BASE_ACTION_STATE::THROW)
@@ -809,7 +839,7 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 
 		// ‘ŠŽè‚ÌƒXƒ^ƒ“ƒh‚ª”­“®‚µ‚Ä‚½‚ç	
 		if (TargetPlayer->GetStand()->isActive() &&
-			BasePlayer::c_GUARD_DISTANCE >= GetRangeVsStand(pPerson))//
+			TargetPlayer->GetStand()->GetAttackData()->pCollisionShape->width  >= GetRangeVsStand(pPerson))//
 		{
 			// šÝ’è‚É‚æ‚èƒK[ƒh‚ðØ‚è‘Ö‚¦‚é‚©•Ï‚¦‚È‚¢‚©Ý’è‚·‚é
 			if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch == ENEMY_GUARD_SWITCH_TYPE::OK)
@@ -853,10 +883,10 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 		// ‰“‹——£‚Ì”»’è
 		for (auto it : *ShotMgr->GetList(pPerson->GetTargetPlayer()->GetSide()))
 		{
-			float fRange = abs((it)->GetPos().x - pPerson->GetBasePlayer()->GetPos().x);
+			float fRange = fabsf((it)->GetPos().x - pPerson->GetBasePlayer()->GetPos().x);
 
 			// ‰“‹——£‹Z‚Æ‚Ì‹——£‚ªk‚Ü‚ê‚Î
-			if (BasePlayer::c_GUARD_DISTANCE >= fRange)
+			if (BasePlayer::c_GUARD_ADD_RANGE + (it)->GetAttackData()->pCollisionShape->width  > fRange)
 			{
 				// šÝ’è‚É‚æ‚èƒK[ƒh‚ðØ‚è‘Ö‚¦‚é‚©•Ï‚¦‚È‚¢‚©Ý’è‚·‚é
 				if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch == ENEMY_GUARD_SWITCH_TYPE::OK)
@@ -1060,7 +1090,7 @@ void AIState::PracticeSquat::Execute(AI * pPerson)
 	{
 		// ‘ŠŽè‚ªUŒ‚U‚Á‚Ä‚¢‚é‚©
 		if (TargetPlayer->isAttackState() == true &&
-			BasePlayer::c_GUARD_DISTANCE >= GetRange(pPerson))// (TODO)
+			BasePlayer::c_GUARD_ADD_RANGE + TargetPlayer->GetAttackData()->pCollisionShape->width  >= GetRange(pPerson))// (TODO)
 		{
 			// šÝ’è‚É‚æ‚èƒK[ƒh‚ðØ‚è‘Ö‚¦‚é‚©•Ï‚¦‚È‚¢‚©
 			if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch 

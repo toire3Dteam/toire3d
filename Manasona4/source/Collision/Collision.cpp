@@ -1,6 +1,7 @@
 #include "TDNLIB.h"
 #include "Collision.h"
 #include "../Player/BasePlayer.h"
+#include "../Player/BasePlayerState.h"
 #include "../Player/PlayerManager.h"
 #include "../BaseEntity/Message/Message.h"
 #include "../BaseEntity/Message/MessageDispatcher.h"
@@ -203,8 +204,14 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 			you->GetActionFrame() == FRAME_STATE::START)
 			&& you->GetAttackData()->bAntiAir == true)
 		{
-			// Ž©•ª‚ª‹ó’†‚ÅUŒ‚‚µ‚Ä‚¢‚½ê‡
-			if (my->isLand() == false)return;
+			// •KŽE‹Z‚Æƒo[ƒXƒg‚Í‘Î‹ó–³—
+			if ((my->GetFSM()->isInState(*BasePlayerState::HeavehoDrive::GetInstance())) == false &&
+				(my->GetFSM()->isInState(*BasePlayerState::OverDrive_Burst::GetInstance())) == false)
+			{
+				// Ž©•ª‚ª‹ó’†‚ÅUŒ‚‚µ‚Ä‚¢‚½ê‡
+				if (my->isLand() == false)return;
+			}
+
 		}
 
 	}
@@ -439,7 +446,7 @@ bool Collision::CollisionShot(Shot::Base *shot, BasePlayer *you)
 
 	if (isInputGuardCommand(you) && isPossibleGuardState(you) && you->isLand())
 	{
-		if (fabsf(you->GetPos().x - shot->GetPos().x) < BasePlayer::c_GUARD_DISTANCE)// ƒK[ƒh”­“®‹——£
+		if (fabsf(you->GetPos().x - shot->GetPos().x) < BasePlayer::c_GUARD_ADD_RANGE + shot->GetAttackData()->pCollisionShape->width )// ƒK[ƒh”­“®‹——£
 		{
 			you->GetFSM()->ChangeState(BasePlayerState::Guard::GetInstance());
 			//return false;

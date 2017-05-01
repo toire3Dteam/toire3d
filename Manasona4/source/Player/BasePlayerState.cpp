@@ -658,13 +658,21 @@ bool GuardUpdate(BasePlayer *pPerson)
 		if (target->isAttackState()) if (target->GetAttackData()->attribute != ATTACK_ATTRIBUTE::THROW) bAttackState = true;
 
 		// スタンド
-		if (target->GetStand()->isActive() && target->GetStand()->GetAttackData() && target->GetStand()->isAttackFrame()) bStandAttack = true;
+		if (target->GetStand()->isActive() && target->GetStand()->GetAttackData() && target->GetStand()->isAttackFrame())
+			bStandAttack = true;
 
-		if (bAttackState || bStandAttack)
+		if (bAttackState)
 		{
 			// 距離
-			if(bAttackState) if (fabsf(pPerson->GetPos().x - target->GetPos().x) > BasePlayer::c_GUARD_DISTANCE) return false;				// ガード発動距離
-			if (bStandAttack) if (fabsf(target->GetStand()->GetPos().x - pPerson->GetPos().x) > BasePlayer::c_GUARD_DISTANCE) return false;	// 対スタンドのガード発動距離(へて用)
+			if (fabsf(pPerson->GetPos().x - (target->GetPos().x + target->GetAttackData()->pCollisionShape->pos.x * target->GetDirVecX())) > BasePlayer::c_GUARD_ADD_RANGE + target->GetAttackData()->pCollisionShape->width ) return false;				// ガード発動距離
+
+			// ガード条件を満たしたのでガード
+			pPerson->GetFSM()->ChangeState(BasePlayerState::Guard::GetInstance());
+		}
+		else if(bStandAttack)
+		{
+			// 距離
+			if (fabsf(target->GetStand()->GetPos().x - pPerson->GetPos().x) > BasePlayer::c_GUARD_ADD_RANGE + target->GetStand()->GetAttackData()->pCollisionShape->width ) return false;	// 対スタンドのガード発動距離(へて用)
 
 			// ガード条件を満たしたのでガード
 			pPerson->GetFSM()->ChangeState(BasePlayerState::Guard::GetInstance());
@@ -4907,6 +4915,9 @@ bool BasePlayerState::OverDrive_Burst::OnMessage(BasePlayer * pPerson, const Mes
 
 void BasePlayerState::Guard::Enter(BasePlayer * pPerson)
 {
+	// [5/1]移動量０
+	pPerson->SetMove(VECTOR_ZERO);
+
 	/* しゃがみガード */
 	if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN))
 	{

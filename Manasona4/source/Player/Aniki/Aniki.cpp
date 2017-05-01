@@ -903,12 +903,15 @@ void Aniki::Render()
 	m_pPanelEffectMGR->Render();
 	Vector2 vScreenPos = Math::WorldToScreen(m_vPos);// (TODO)頭のポジションの座標を使う
 	m_pThrowMark->Render((int)vScreenPos.x - 56, (int)vScreenPos.y - 324, RS::COPY_NOZ);
+	m_pExplosion->Render();
 
 	// 専用エフェクト
 	m_pSpearEffect->Render();
 	m_pRayEffect->Render();
 	m_pHandLightEffect->Render();
 	m_pAnikiCanonEffect->Render();
+	
+
 }
 
 void Aniki::RenderDrive()

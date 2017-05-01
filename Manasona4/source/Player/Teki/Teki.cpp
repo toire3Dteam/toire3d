@@ -395,6 +395,8 @@ void Teki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->GuardRecoveryFrame = 18;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->fGuardKnockBackPower = .1f;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->fComboRate = 0.85f;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->fRepeatAttackRate = .95f;// “¯‹Z•â³‚ÌŠ|‚©‚é’l
+
 	// ’nãƒqƒbƒg‚Æ‹ó’†ƒqƒbƒg‚Å‹““®‚ª•Ï‚í‚é‚à‚Ì
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
@@ -402,8 +404,8 @@ void Teki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.15f, .325f);
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 1;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 2;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 80;
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 110;// (12/26) “¯‹Z•â³‚Ì‰e‹¿‚Å”’l‚ ‚°‚é‚±‚Æ‚É@ƒ‰ƒbƒVƒ…Œn‚Í•â³‚ÍÅ‰‚Ìˆê‰ñ‚¾‚¯‚Å‚¢‚¢‚©‚à
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 40;
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 50;// (12/26) “¯‹Z•â³‚Ì‰e‹¿‚Å”’l‚ ‚°‚é‚±‚Æ‚É@ƒ‰ƒbƒVƒ…Œn‚Í•â³‚ÍÅ‰‚Ìˆê‰ñ‚¾‚¯‚Å‚¢‚¢‚©‚à
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_BACK;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	// ”»’èŒ`ó
@@ -604,7 +606,7 @@ void Teki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	// ”»’èŒ`ó
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->width = 17;
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->height = 12;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->height = 16;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pCollisionShape->pos.Set(3, 14, 0);
 
 	//==============================================================================================================

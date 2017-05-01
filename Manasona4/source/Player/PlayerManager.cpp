@@ -168,13 +168,18 @@ void PlayerManager::Update(PLAYER_UPDATE flag)
 	// ●暗転解放処理
 	m_OverDriveDim = min(m_OverDriveDim + 0.1f, 1.0f);
 	
-	
 
 	/* プレイヤーたち更新 */
 	FOR(m_NumPlayer)
 	{
 		if(m_bHeaveHoDriveOverFlow)m_pPlayers[i]->UpdateDrive();			// モーションとか移動値の作成とか、基本的な更新。
 		else m_pPlayers[i]->Update(flag);
+	}
+
+	/*　プレイヤーのスタンド更新 */
+	FOR(m_NumPlayer)
+	{
+		m_pPlayers[i]->StandUpdate(flag);
 	}
 
 	// チームポイント計算

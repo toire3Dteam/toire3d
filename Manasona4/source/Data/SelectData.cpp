@@ -4,7 +4,7 @@
 
 SideData::SideData() :
 eCharacter(CHARACTER::AIROU),	// 選択キャラクター
-ePartner(PARTNER::ATTAKAI),			// 選択パートナー
+ePartner(PARTNER::MOKOI),			// 選択パートナー
 iDeviceID(0),						// 操作するデバイスID
 bAI(false),							// AIかどうか
 eAIType(AI_TYPE::PRACTICE_LAND),	// AIのタイプ
@@ -14,7 +14,7 @@ eColorType(COLOR_TYPE::NORMAL)		// カラータイプ
 SelectData::SelectData():
 eStage(STAGE::SEA),				// ステージ
 bTutorial(false),							// チュートリアルかどうか
-bTraining(false),							// トレーニングかどうか	
+bTraining(true),							// トレーニングかどうか	
 bChallenge(false),							// チャレンジかどうか	
 iBattleMusicID(BattleMusicManager::RANDOM),	// 流す曲の番号
 iRoundTime(99),								// 一試合の初期時間

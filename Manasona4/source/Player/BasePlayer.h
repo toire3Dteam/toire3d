@@ -445,6 +445,8 @@ public:
 	void InvincibleUpdate();	 // 無敵の制御
 	void OverDriveUpdate();		// 覚醒の制御
 	void ColorUpdate(); // 光色の制御
+	void StandUpdate(PLAYER_UPDATE flag);
+
 
 	//------------------------------------------------------
 	//	コントロール制御
@@ -1072,7 +1074,7 @@ public:
 	static const int	c_THROW_MISS_FRAME;		// 投げ失敗のフレーム(全キャラ共通だろうという考え)
 	static const int	c_THROW_RELEASE_FRAME;	// 投げ抜けで、パシンてなってる間のフレーム(これも全キャラ共通だろう)
 	static const int	c_WINNER_TIME;			// 勝ちモーション再生時間
-	static const float	c_GUARD_DISTANCE;		// ガードが発動する距離
+	static const float	c_GUARD_ADD_RANGE;		// ガードが発動する距離
 	static const int	c_FIRST_HIT_ADD_DAMAGE;	// 初段ヒット加算ダメージ
 	static const int	c_COUNTER_BONUS_DAMAGE;	// カウンターヒット時のボーナス加算値(ダメージ)
 
