@@ -19,12 +19,21 @@ namespace Stand
 		// ペルソナブレイク
 		void Break();
 
-		// ゲッター
+		// ★★★今攻撃しているかどうかと、ガードしないようにしたいスタンドへのオーバーライドも兼ねている
 		virtual bool isAttackFrame()
 		{
 			// 攻撃判定出てる
 			return (m_ActionFrameList[(int)m_ActionType][m_CurrentActionFrame] == FRAME_STATE::ACTIVE);
 		}
+		//virtual bool isActiveBeforeFrom()
+		//{
+		//	FRAME_STATE eState = m_ActionFrameList[(int)m_ActionType][m_CurrentActionFrame];
+		//	return (eState == FRAME_STATE::ACTIVE_BEFORE || eState == FRAME_STATE::ACTIVE);
+		//}
+
+		// ★アッタカイだけガードしないようにするために、スタンドごとにガードするスタンドか
+		virtual bool isCanGuardStand() = 0;
+
 		bool isActive(){ return m_bActive; }
 		bool isHit()
 		{
@@ -108,6 +117,7 @@ namespace Stand
 		void Update(bool bControl);
 		// 純粋仮想オーバーライド
 		void Action(SKILL_ACTION_TYPE type);
+		bool isCanGuardStand() { return true; }	// ガードできるスタンド
 	};
 
 	/**************************/
@@ -121,6 +131,7 @@ namespace Stand
 		// 純粋仮想オーバーライド
 		void Action(SKILL_ACTION_TYPE type);
 		bool isAttackFrame(){ return false; }	// マーヤは判定なし
+		bool isCanGuardStand() { return false; }	// ガードできないスタンド
 	private:
 		BaseUVEffect *m_pBullet;	// 飛び道具のメッシュの実体(玉に参照させる)
 		BaseUVEffect *m_pBullet2;	// 飛び道具のメッシュの実体(玉に参照させる)
@@ -138,6 +149,7 @@ namespace Stand
 
 		// 純粋仮想オーバーライド
 		void Action(SKILL_ACTION_TYPE type);
+		bool isCanGuardStand() { return true; }	// ガードできるスタンド
 	};
 
 
@@ -153,7 +165,7 @@ namespace Stand
 
 		// 純粋仮想オーバーライド
 		void Action(SKILL_ACTION_TYPE type);
-
+		bool isCanGuardStand() { return false; }	// ガードできないスタンド
 	private:
 		BasePanelEffect* m_pBomEf;
 		BasePanelEffect* m_pBomAddEf;

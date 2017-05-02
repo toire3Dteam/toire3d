@@ -658,7 +658,7 @@ bool GuardUpdate(BasePlayer *pPerson)
 		if (target->isAttackState()) if (target->GetAttackData()->attribute != ATTACK_ATTRIBUTE::THROW) bAttackState = true;
 
 		// スタンド
-		if (target->GetStand()->isActive() && target->GetStand()->GetAttackData() && target->GetStand()->isAttackFrame())
+		if (target->GetStand()->isActive() && target->GetStand()->isCanGuardStand())
 			bStandAttack = true;
 
 		if (bAttackState)
@@ -671,8 +671,12 @@ bool GuardUpdate(BasePlayer *pPerson)
 		}
 		else if(bStandAttack)
 		{
+			float vStandPosX = target->GetStand()->GetPos().x;
+			vStandPosX += target->GetStand()->GetAttackData()->pCollisionShape->pos.x * ((target->GetStand()->GetDir() == DIR::LEFT) ? -1.0f : 1.0f);
+			float vx = fabsf(vStandPosX - pPerson->GetPos().x);
 			// 距離
-			if (fabsf(target->GetStand()->GetPos().x - pPerson->GetPos().x) > BasePlayer::c_GUARD_ADD_RANGE + target->GetStand()->GetAttackData()->pCollisionShape->width ) return false;	// 対スタンドのガード発動距離(へて用)
+			if (vx > BasePlayer::c_GUARD_ADD_RANGE + target->GetStand()->GetAttackData()->pCollisionShape->width) return false;	// 対スタンドのガード発動距離(へて用)
+			
 
 			// ガード条件を満たしたのでガード
 			pPerson->GetFSM()->ChangeState(BasePlayerState::Guard::GetInstance());
@@ -4998,7 +5002,7 @@ void BasePlayerState::Guard::Execute(BasePlayer * pPerson)
 	if (target->isAttackState()) if (target->GetAttackData()->attribute != ATTACK_ATTRIBUTE::THROW) bAttackState = true;
 
 	// スタンド
-	if (target->GetStand()->isActive() && target->GetStand()->GetAttackData() && target->GetStand()->isAttackFrame()) bStandAttack = true;
+	if (target->GetStand()->isActive() && target->GetStand()->isCanGuardStand()) bStandAttack = true;
 
 	// 相手キャラが攻撃ステートなら
 	if (bAttackState || bStandAttack)

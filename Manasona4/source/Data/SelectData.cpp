@@ -3,7 +3,7 @@
 #include "../Sound/BattleMusic.h"
 
 SideData::SideData() :
-eCharacter(CHARACTER::AIROU),	// 選択キャラクター
+eCharacter(CHARACTER::ANIKI),	// 選択キャラクター
 ePartner(PARTNER::MOKOI),			// 選択パートナー
 iDeviceID(0),						// 操作するデバイスID
 bAI(false),							// AIかどうか

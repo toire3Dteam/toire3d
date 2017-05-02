@@ -133,6 +133,7 @@ enum class FRAME_STATE
 	FOLLOW,	// 硬直(後隙)
 	END,	// 終了(このフレームに来たら攻撃終了)
 	RECOVERY_HIT,	// bHitが復活するフレーム
+	ACTIVE_BEFORE,	// 
 };
 static const int FRAME_MAX = 256; // 攻撃のフレームの最大値(これより超えることはないだろう)
 

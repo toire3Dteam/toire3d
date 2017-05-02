@@ -12,6 +12,7 @@
 #include "../Data/SelectData.h"
 #include "../Data/CommandData.h"
 
+
 //_/_/_/_/_/_/__/_/__/_/__/_/__
 // 定数
 //_/_/_/_/__/_/__/_/__/_/__/_/_
@@ -164,6 +165,11 @@ void BasePlayer::LoadAttackFrameList(LPSTR filename)
 				m_ActionFrameList[iActionType][count++] = (FRAME_STATE)i;
 				MyAssert(count < 256, "アクションフレームの合計は255以下にしてください");
 			}
+			//// ★アクティブ開始直前フレーム(兄貴の空投げがバグる)
+			//if (i == (int)FRAME_STATE::START)
+			//{
+			//	m_ActionFrameList[iActionType][count - 1] = FRAME_STATE::ACTIVE_BEFORE;
+			//}
 		}
 		// 終端(全部ENDで初期化してるから大丈夫だけど一応)
 		m_ActionFrameList[iActionType][count] = FRAME_STATE::END;

@@ -29,6 +29,11 @@ void Stand::Base::LoadActionFrameList(char *filename)
 			{
 				m_ActionFrameList[i][count++] = (FRAME_STATE)j;
 			}
+			// ★アクティブ開始直前フレーム
+			if (j == (int)FRAME_STATE::START)
+			{
+				m_ActionFrameList[i][count - 1] = FRAME_STATE::ACTIVE_BEFORE;
+			}
 		}
 		// 終端
 		m_ActionFrameList[i][count] = FRAME_STATE::END;

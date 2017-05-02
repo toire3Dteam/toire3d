@@ -792,7 +792,8 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 
 		// 相手のスタンドが発動してたら	
 		if (TargetPlayer->GetStand()->isActive() &&
-			TargetPlayer->GetStand()->GetAttackData()->pCollisionShape->width  >= GetRangeVsStand(pPerson))//
+			TargetPlayer->GetStand()->isCanGuardStand() &&
+			BasePlayer::c_GUARD_ADD_RANGE + TargetPlayer->GetStand()->GetAttackData()->pCollisionShape->width  >= GetRangeVsStand(pPerson))//
 		{
 			// ★設定によりガードを切り替えるか変えないか設定する
 			if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch == ENEMY_GUARD_SWITCH_TYPE::OK)
