@@ -787,54 +787,7 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 			pPerson->m_iPracticeGuardFrame = 0;
 		}
 		
-		// 相手が攻撃振ったらかつ
-		// 	相手の技が近くにきたら
-		if (TargetPlayer->isAttackState() == true &&
-			BasePlayer::c_GUARD_ADD_RANGE + TargetPlayer->GetAttackData()->pCollisionShape->width  >= GetRange(pPerson))// (TODO)
-		{
-			// 投げだったらハジク(投げに対して移動してしまうため)
-			if (TargetPlayer->GetActionState() != BASE_ACTION_STATE::THROW)
-			{
 
-				// ★設定によりガードを切り替えるか変えないか設定する
-				if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch == ENEMY_GUARD_SWITCH_TYPE::OK)
-				{
-					// 相手と逆方向レバーを押す
-					if (MyPlayer->GetDir() == DIR::LEFT)
-					{
-						pPerson->PushInputList(PLAYER_INPUT::RIGHT);
-					}
-					else
-					{
-						pPerson->PushInputList(PLAYER_INPUT::LEFT);
-					}
-
-					// 下段なら
-					if (TargetPlayer->GetAttackData()->AntiGuard == ANTIGUARD_ATTACK::DOWN_ATTACK)
-					{
-						pPerson->PushInputList(PLAYER_INPUT::DOWN);
-					}
-
-				}
-				else
-				{
-
-					// 相手と逆方向レバーを押す
-					if (MyPlayer->GetDir() == DIR::LEFT)
-					{
-						pPerson->PushInputList(PLAYER_INPUT::RIGHT);
-					}
-					else
-					{
-						pPerson->PushInputList(PLAYER_INPUT::LEFT);
-					}
-
-
-				}// 中段か下段か
-
-			}// 投げだったらハジク
-
-		}// プレイヤーに対するガード
 
 
 		// 相手のスタンドが発動してたら	
@@ -928,6 +881,55 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 
 
 		}// 遠距離の判定
+
+		 // 相手が攻撃振ったらかつ
+		 // 	相手の技が近くにきたら
+		if (TargetPlayer->isAttackState() == true &&
+			BasePlayer::c_GUARD_ADD_RANGE + TargetPlayer->GetAttackData()->pCollisionShape->width >= GetRange(pPerson))// (TODO)
+		{
+			// 投げだったらハジク(投げに対して移動してしまうため)
+			if (TargetPlayer->GetActionState() != BASE_ACTION_STATE::THROW)
+			{
+
+				// ★設定によりガードを切り替えるか変えないか設定する
+				if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch == ENEMY_GUARD_SWITCH_TYPE::OK)
+				{
+					// 相手と逆方向レバーを押す
+					if (MyPlayer->GetDir() == DIR::LEFT)
+					{
+						pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+					}
+					else
+					{
+						pPerson->PushInputList(PLAYER_INPUT::LEFT);
+					}
+
+					// 下段なら
+					if (TargetPlayer->GetAttackData()->AntiGuard == ANTIGUARD_ATTACK::DOWN_ATTACK)
+					{
+						pPerson->PushInputList(PLAYER_INPUT::DOWN);
+					}
+
+				}
+				else
+				{
+
+					// 相手と逆方向レバーを押す
+					if (MyPlayer->GetDir() == DIR::LEFT)
+					{
+						pPerson->PushInputList(PLAYER_INPUT::RIGHT);
+					}
+					else
+					{
+						pPerson->PushInputList(PLAYER_INPUT::LEFT);
+					}
+
+
+				}// 中段か下段か
+
+			}// 投げだったらハジク
+
+		}// プレイヤーに対するガード
 
 	}// 練習用ガードフラグ
 

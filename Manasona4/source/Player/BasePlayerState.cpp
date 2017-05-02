@@ -5141,6 +5141,36 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 
 									 // ガード成功フラグ初期化
 									 pPerson->SetGuardSuccess(false);
+
+									 // ★隕石硬直にガー不を直す
+									 if (pPerson->GetRecoveryFrame() > 0)
+									 {
+										 /* しゃがみガード */
+										 if (pPerson->isPushInput(PLAYER_COMMAND_BIT::DOWN))
+										 {
+											 //pPerson->SetMotion(MOTION_TYPE::DOWN_GUARD);
+
+											 // ガードステートを設定する
+											 pPerson->SetGuardState(GUARD_STATE::DOWN_GUARD);
+
+											 // ★しゃがみフラグONにしたいところだが、F式
+											 //pPerson->SetSquat(true);
+										 }
+
+										 /* 立ちガード */
+										 else
+										 {
+											 //pPerson->SetMotion(MOTION_TYPE::UP_GUARD);
+
+											 // ガードステートを設定する
+											 pPerson->SetGuardState(GUARD_STATE::UP_GUARD);
+
+											 // ★しゃがみフラグOFFにしたいところだが、F式
+											 //pPerson->SetSquat(false);
+										 }
+									 }
+
+
 									 if (pPerson->GetGuardState() == GUARD_STATE::UP_GUARD)
 									 {
 										 // ★相手が立ちガードしてて、下段攻撃じゃなかったらガード成功！

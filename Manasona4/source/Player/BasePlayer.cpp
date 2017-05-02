@@ -602,6 +602,12 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 		//bOutLog = true;
 	}
 
+	// パートナ回復
+	if (KeyBoardTRG(KB_7))
+	{
+		m_pStand->SetStandGage(1000);
+	}
+
 	//if (bOutLog) tdnStopWatch::Start();
 	// 覚醒の更新
 	OverDriveUpdate();
