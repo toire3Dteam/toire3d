@@ -646,6 +646,8 @@ bool isInputGuardCommand(BasePlayer *pPerson)
 	return bGuardCommand;
 }
 
+// [5/3]★★★　スタンドとプレイヤーの同時攻撃でのガード対応のため　ソースコードを改変　バグったら戻す　
+
 bool GuardUpdate(BasePlayer *pPerson)
 {
 	// ガードコマンドを入力してたら
@@ -664,25 +666,30 @@ bool GuardUpdate(BasePlayer *pPerson)
 		if (bAttackState)
 		{
 			// 距離
-			if (fabsf(pPerson->GetPos().x - (target->GetPos().x + target->GetAttackData()->pCollisionShape->pos.x * target->GetDirVecX())) > BasePlayer::c_GUARD_ADD_RANGE + target->GetAttackData()->pCollisionShape->width ) return false;				// ガード発動距離
-
-			// ガード条件を満たしたのでガード
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Guard::GetInstance());
+			if (!(fabsf(pPerson->GetPos().x - (target->GetPos().x +
+				target->GetAttackData()->pCollisionShape->pos.x * target->GetDirVecX()))
+			> BasePlayer::c_GUARD_ADD_RANGE + target->GetAttackData()->pCollisionShape->width)) /*return false;*/				// ガード発動距離
+			{
+				// ガード条件を満たしたのでガード
+				pPerson->GetFSM()->ChangeState(BasePlayerState::Guard::GetInstance());
+			}
 		}
-		else if(bStandAttack)
+		/*else */if(bStandAttack)
 		{
 			float vStandPosX = target->GetStand()->GetPos().x;
 			vStandPosX += target->GetStand()->GetAttackData()->pCollisionShape->pos.x * ((target->GetStand()->GetDir() == DIR::LEFT) ? -1.0f : 1.0f);
 			float vx = fabsf(vStandPosX - pPerson->GetPos().x);
 			// 距離
-			if (vx > BasePlayer::c_GUARD_ADD_RANGE + target->GetStand()->GetAttackData()->pCollisionShape->width) return false;	// 対スタンドのガード発動距離(へて用)
+			if (!(vx > BasePlayer::c_GUARD_ADD_RANGE + target->GetStand()->GetAttackData()->pCollisionShape->width))// return false;	// 対スタンドのガード発動距離(へて用)
+			{
+				// ガード条件を満たしたのでガード
+				pPerson->GetFSM()->ChangeState(BasePlayerState::Guard::GetInstance());
+				return true;
+			}
 			
-
-			// ガード条件を満たしたのでガード
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Guard::GetInstance());
-
-			return true;
 		}
+
+		return false;
 	}
 
 	// ガードコマンドを入力していないので、ガードしてないステートを設定

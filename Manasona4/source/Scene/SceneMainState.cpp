@@ -364,6 +364,9 @@ void SceneMainState::Main::Execute(sceneMain *pMain)
 	// プレイヤー位置確定
 	PlayerMgr->UpdatePos();
 
+	// [5/3]キャラクターの動きを更新した後にターゲットプレイヤーを更新
+	Collision::TargetPlayerUpdate(PlayerMgr);
+
 	// カメラ更新
 	CameraMgr->Update();
 
@@ -549,6 +552,9 @@ void SceneMainState::Finish::Execute(sceneMain *pMain)
 		// プレイヤー位置確定
 		PlayerMgr->UpdatePos();
 
+		// [5/3]キャラクターの動きを更新した後にターゲットプレイヤーを更新
+		Collision::TargetPlayerUpdate(PlayerMgr);
+
 		// カメラ更新
 		CameraMgr->Update();
 
@@ -697,6 +703,9 @@ void SceneMainState::HeaveHoDriveOverFlowSuccess::Execute(sceneMain *pMain)
 		// プレイヤー位置確定
 		PlayerMgr->UpdatePos();
 
+		// [5/3]キャラクターの動きを更新した後にターゲットプレイヤーを更新
+		Collision::TargetPlayerUpdate(PlayerMgr);
+
 		// カメラ更新
 		CameraMgr->Update();
 
@@ -843,6 +852,9 @@ void SceneMainState::TutorialMain::Execute(sceneMain *pMain)
 
 		// プレイヤー位置確定
 		PlayerMgr->UpdatePos();
+
+		// [5/3]キャラクターの動きを更新した後にターゲットプレイヤーを更新
+		Collision::TargetPlayerUpdate(PlayerMgr);
 	}
 	else
 	{
@@ -862,6 +874,9 @@ void SceneMainState::TutorialMain::Execute(sceneMain *pMain)
 
 		// プレイヤー位置確定
 		PlayerMgr->UpdatePos();
+
+		// [5/3]キャラクターの動きを更新した後にターゲットプレイヤーを更新
+		Collision::TargetPlayerUpdate(PlayerMgr);
 	}
 
 	// カメラ更新
@@ -1216,6 +1231,9 @@ void SceneMainState::ChallengeMain::Execute(sceneMain *pMain)
 
 		// プレイヤー位置確定
 		PlayerMgr->UpdatePos();
+
+		// [5/3]キャラクターの動きを更新した後にターゲットプレイヤーを更新
+		Collision::TargetPlayerUpdate(PlayerMgr);
 	}
 	else
 	{
@@ -1235,6 +1253,9 @@ void SceneMainState::ChallengeMain::Execute(sceneMain *pMain)
 
 		// プレイヤー位置確定
 		PlayerMgr->UpdatePos();
+
+		// [5/3]キャラクターの動きを更新した後にターゲットプレイヤーを更新
+		Collision::TargetPlayerUpdate(PlayerMgr);
 	}
 
 	// カメラ更新
@@ -1568,6 +1589,9 @@ void SceneMainState::ChallengeReplay::Execute(sceneMain *pMain)
 
 		// プレイヤー位置確定
 		PlayerMgr->UpdatePos();
+
+		// [5/3]キャラクターの動きを更新した後にターゲットプレイヤーを更新
+		Collision::TargetPlayerUpdate(PlayerMgr);
 	}
 	else
 	{
@@ -1587,6 +1611,9 @@ void SceneMainState::ChallengeReplay::Execute(sceneMain *pMain)
 
 		// プレイヤー位置確定
 		PlayerMgr->UpdatePos();
+
+		// [5/3]キャラクターの動きを更新した後にターゲットプレイヤーを更新
+		Collision::TargetPlayerUpdate(PlayerMgr);
 	}
 
 	// カメラ更新
@@ -1790,14 +1817,20 @@ void SceneMainState::Training::Execute(sceneMain *pMain)
 
 	// プレイヤー更新
 	PlayerMgr->Update(PLAYER_UPDATE::CONTROL_OK);
-	PlayerMgr->UpdatePos();
-
-	// ★★★　(12/24)トレーニング用の更新
-	PlayerMgr->UpdateTraining();
 
 
 	// プレイヤーといろいろ判定(★ここに書いた理由はショットマネージャーとかステージをsceneMainが持っているから)
 	Collision::PlayerCollision(PlayerMgr, ShotMgr);
+
+
+	PlayerMgr->UpdatePos();
+	
+	// [5/3]キャラクターの動きを更新した後にターゲットプレイヤーを更新
+	Collision::TargetPlayerUpdate(PlayerMgr);
+
+	// ★★★　(12/24)トレーニング用の更新
+	PlayerMgr->UpdateTraining();
+
 
 	// カメラ更新
 	CameraMgr->Update();

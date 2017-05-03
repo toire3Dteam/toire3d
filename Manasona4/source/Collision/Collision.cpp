@@ -20,20 +20,21 @@ void Collision::PlayerCollision(PlayerManager *pPlayerMgr, ShotManager *pShotMgr
 	/* プレイヤーVSプレイヤーの攻撃判定 */
 	HIT_DAMAGE_INFO *pHitDamageInfo[(int)SIDE::ARRAY_MAX]{};
 
-	// 敵への方向フラグ更新
-	{
-		const Vector3 v(pPlayer1->GetPos() - pPlayer2->GetPos());
-		if (v.x > 0)
-		{
-			pPlayer1->SetTargetDir(DIR::LEFT);
-			pPlayer2->SetTargetDir(DIR::RIGHT);
-		}
-		else if (v.x < 0)
-		{
-			pPlayer1->SetTargetDir(DIR::RIGHT);
-			pPlayer2->SetTargetDir(DIR::LEFT);
-		}
-	}
+	// [5/3] 場所移動
+	//// 敵への方向フラグ更新
+	//{
+	//	const Vector3 v(pPlayer1->GetPos() - pPlayer2->GetPos());
+	//	if (v.x > 0)
+	//	{
+	//		pPlayer1->SetTargetDir(DIR::LEFT);
+	//		pPlayer2->SetTargetDir(DIR::RIGHT);
+	//	}
+	//	else if (v.x < 0)
+	//	{
+	//		pPlayer1->SetTargetDir(DIR::RIGHT);
+	//		pPlayer2->SetTargetDir(DIR::LEFT);
+	//	}
+	//}
 
 	// めり込み判定
 	if (pPlayer1->isSinkingUpdateOK() && pPlayer2->isSinkingUpdateOK()) Collision::Sinking(pPlayer1, pPlayer2);
@@ -162,6 +163,28 @@ void Collision::PlayerCollision(PlayerManager *pPlayerMgr, ShotManager *pShotMgr
 		if (pHitDamageInfo[i]) delete pHitDamageInfo[i];
 	}
 
+}
+
+
+void Collision::TargetPlayerUpdate(PlayerManager * pPlayerMgr)
+{
+	BasePlayer *pPlayer1(pPlayerMgr->GetPlayer(0)), *pPlayer2(pPlayerMgr->GetPlayer(1));
+
+	// [5/3] 場所移動
+	// 敵への方向フラグ更新
+	{
+		const Vector3 v(pPlayer1->GetPos() - pPlayer2->GetPos());
+		if (v.x > 0)
+		{
+			pPlayer1->SetTargetDir(DIR::LEFT);
+			pPlayer2->SetTargetDir(DIR::RIGHT);
+		}
+		else if (v.x < 0)
+		{
+			pPlayer1->SetTargetDir(DIR::RIGHT);
+			pPlayer2->SetTargetDir(DIR::LEFT);
+		}
+	}
 }
 
 void Collision::SendHitMessage(BasePlayer *pAttackPlayer, BasePlayer *pDamagePlayer, HIT_DAMAGE_INFO *pHitDamageInfo)
@@ -855,6 +878,7 @@ void Collision::Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2)
 		pPlayer2->SetPos(pPlayer2->GetPos() + sinking2);
 	}
 }
+
 
 
 bool Collision::HitCheck(CollisionShape::Circle* c1, CollisionShape::Circle* c2)

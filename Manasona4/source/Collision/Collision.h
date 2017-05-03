@@ -72,6 +72,9 @@ public:
 
 	// プレイヤーの判定
 	static void PlayerCollision(PlayerManager* pPlayerMgr, ShotManager *pShotMgr);
+	
+	// 方向フラグ更新
+	static void TargetPlayerUpdate(PlayerManager* pPlayerMgr);
 
 	// 形状で判定
 	static bool HitCheck(CollisionShape::Circle* c1, CollisionShape::Circle* c2);

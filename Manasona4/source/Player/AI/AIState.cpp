@@ -799,7 +799,7 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 			if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch == ENEMY_GUARD_SWITCH_TYPE::OK)
 			{
 				// 相手と逆方向レバーを押す
-				if (MyPlayer->GetDir() == DIR::LEFT)
+				if (MyPlayer->GetTargetDir() == DIR::LEFT)
 				{
 					pPerson->PushInputList(PLAYER_INPUT::RIGHT);
 				}
@@ -819,7 +819,7 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 			{
 
 				// 相手と逆方向レバーを押す
-				if (MyPlayer->GetDir() == DIR::LEFT)
+				if (MyPlayer->GetTargetDir() == DIR::LEFT)
 				{
 					pPerson->PushInputList(PLAYER_INPUT::RIGHT);
 				}
@@ -846,7 +846,7 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 				if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch == ENEMY_GUARD_SWITCH_TYPE::OK)
 				{
 					// 相手と逆方向レバーを押す
-					if (MyPlayer->GetDir() == DIR::LEFT)
+					if (MyPlayer->GetTargetDir() == DIR::LEFT)
 					{
 						pPerson->PushInputList(PLAYER_INPUT::RIGHT);
 					}
@@ -866,7 +866,7 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 				{
 
 					// 相手と逆方向レバーを押す
-					if (MyPlayer->GetDir() == DIR::LEFT)
+					if (MyPlayer->GetTargetDir() == DIR::LEFT)
 					{
 						pPerson->PushInputList(PLAYER_INPUT::RIGHT);
 					}
@@ -896,7 +896,7 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 				if (SelectDataMgr->Get()->tagTrainingDatas.eEnemyGuardSwitch == ENEMY_GUARD_SWITCH_TYPE::OK)
 				{
 					// 相手と逆方向レバーを押す
-					if (MyPlayer->GetDir() == DIR::LEFT)
+					if (MyPlayer->GetTargetDir() == DIR::LEFT)
 					{
 						pPerson->PushInputList(PLAYER_INPUT::RIGHT);
 					}
@@ -916,7 +916,7 @@ void AIState::PracticeGlobal::Execute(AI * pPerson)
 				{
 
 					// 相手と逆方向レバーを押す
-					if (MyPlayer->GetDir() == DIR::LEFT)
+					if (MyPlayer->GetTargetDir() == DIR::LEFT)
 					{
 						pPerson->PushInputList(PLAYER_INPUT::RIGHT);
 					}
@@ -1329,7 +1329,7 @@ void AIState::PracticeGuard::Execute(AI * pPerson)
 		if (TargetPlayer->isAttackState() == true)
 		{
 			// 相手と逆方向レバーを押す
-			if (MyPlayer->GetDir() == DIR::LEFT)
+			if (MyPlayer->GetTargetDir() == DIR::LEFT)
 			{
 				pPerson->PushInputList(PLAYER_INPUT::RIGHT);
 			}
@@ -1430,7 +1430,7 @@ void AIState::InterruptInvincible::Execute(AI * pPerson)
 	if (TargetPlayer->isAttackState() == true)
 	{
 		// 相手と逆方向レバーを押す
-		if (MyPlayer->GetDir() == DIR::LEFT)
+		if (MyPlayer->GetTargetDir() == DIR::LEFT)
 		{
 			pPerson->PushInputList(PLAYER_INPUT::RIGHT);
 		}
@@ -2210,7 +2210,7 @@ void AIState::Guard::Execute(AI * pPerson)
 		if (l_iRamdom <= 20) // ←の確率で完全ガード
 		{
 			// 相手と逆方向レバーを押す
-			if (MyPlayer->GetDir() == DIR::LEFT)
+			if (MyPlayer->GetTargetDir() == DIR::LEFT)
 			{
 				pPerson->PushInputList(PLAYER_INPUT::RIGHT);
 			}
@@ -2229,7 +2229,7 @@ void AIState::Guard::Execute(AI * pPerson)
 		{
 			// しゃがみガード
 			// 相手と逆方向レバーを押す
-			if (MyPlayer->GetDir() == DIR::LEFT)
+			if (MyPlayer->GetTargetDir() == DIR::LEFT)
 			{
 				pPerson->PushInputList(PLAYER_INPUT::RIGHT);
 			}
@@ -2247,7 +2247,7 @@ void AIState::Guard::Execute(AI * pPerson)
 		{
 			// 立ちガード
 			// 相手と逆方向レバーを押す
-			if (MyPlayer->GetDir() == DIR::LEFT)
+			if (MyPlayer->GetTargetDir() == DIR::LEFT)
 			{
 				pPerson->PushInputList(PLAYER_INPUT::RIGHT);
 			}
@@ -2269,7 +2269,7 @@ void AIState::Guard::Execute(AI * pPerson)
 			if (l_iRamdom <= 20) // ←の確率で完全ガード
 			{
 				// 相手と逆方向レバーを押す
-				if (MyPlayer->GetDir() == DIR::LEFT)
+				if (MyPlayer->GetTargetDir() == DIR::LEFT)
 				{
 					pPerson->PushInputList(PLAYER_INPUT::RIGHT);
 				}
@@ -2288,7 +2288,7 @@ void AIState::Guard::Execute(AI * pPerson)
 			{
 				// しゃがみガード
 				// 相手と逆方向レバーを押す
-				if (MyPlayer->GetDir() == DIR::LEFT)
+				if (MyPlayer->GetTargetDir() == DIR::LEFT)
 				{
 					pPerson->PushInputList(PLAYER_INPUT::RIGHT);
 				}
@@ -2306,7 +2306,7 @@ void AIState::Guard::Execute(AI * pPerson)
 			{
 				// 立ちガード
 				// 相手と逆方向レバーを押す
-				if (MyPlayer->GetDir() == DIR::LEFT)
+				if (MyPlayer->GetTargetDir() == DIR::LEFT)
 				{
 					pPerson->PushInputList(PLAYER_INPUT::RIGHT);
 				}
