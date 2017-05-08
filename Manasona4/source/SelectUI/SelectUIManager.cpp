@@ -1,5 +1,6 @@
 #include "SelectUIManager.h"
 #include "Data\SelectData.h"
+#include "SelectUI.h"
 
 //+-----------------------------------
 //	キャラクターセレクトマネージャー
@@ -97,13 +98,16 @@ SelectUIManager::SelectUIManager()
 		case CHARACTER::ANIKI:
 			m_pCharacterIcon[i] = new tdn2DAnim("Data/UI/CharacterSelect/Icon/aniki.png");
 			break;
+		case CHARACTER::BALANCE:
+			m_pCharacterIcon[i] = new tdn2DAnim("Data/UI/CharacterSelect/Icon/aniki.png");
+			break;
 		default:
 			MyAssert(0,"そんなアイコンはない");
 			break;
 		}	
 
 		// 共通設定
-		m_pCharacterIcon[i]->OrderMoveAppeared(12, m_iIconX + (i * m_iWidthIcon), 482 + m_iIconX);
+		m_pCharacterIcon[i]->OrderMoveAppeared(12, ((i * m_iWidthIcon) % (MOVING_UP * m_iWidthIcon)), 482 + m_iIconX);
 	}
 
 
@@ -193,7 +197,7 @@ void SelectUIManager::Render()
 	//m_pPic[PIC_TYPE::BLACK_LINE]->Render(0, 0);
 
 	// キャラアイコン
-	for (int i = 0; i < (int)CHARACTER::END; i++)
+	for (int i = 0; i < (int)CHARACTER::BALANCE; i++)
 	{
 		if ((int)m_pLeftSide->GetSelectCharacter() == i)
 		{
@@ -223,7 +227,7 @@ void SelectUIManager::Render()
 		}
 
 
-		m_pCharacterIcon[i]->Render(m_iIconX + (i * m_iWidthIcon), 482);
+		m_pCharacterIcon[i]->Render(m_iIconX + ((i * m_iWidthIcon) % (MOVING_UP * m_iWidthIcon)), 482 + ((i / MOVING_UP)*ICON_HEIGHT));
 	}
 
 	// 中でステートマシンによる複雑な描画がある

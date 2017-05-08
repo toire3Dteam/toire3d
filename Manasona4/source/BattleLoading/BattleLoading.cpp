@@ -157,6 +157,13 @@ BattleLoading::BattleLoading() :BaseGameEntity(ENTITY_ID::BATTLE_LOADING)
 			m_tagSlideChara2P[i].pNamePic = new tdn2DAnim("Data/UI/BattleLoading/CHR/AnikiName.png");
 
 			break;
+		case CHARACTER::BALANCE:
+			m_tagSlideChara1P[i].pPic = new tdn2DAnim("Data/UI/BattleLoading/CHR/Aniki.png");
+			m_tagSlideChara2P[i].pPic = new tdn2DAnim("Data/UI/BattleLoading/CHR/Aniki.png");
+			m_tagSlideChara1P[i].pNamePic = new tdn2DAnim("Data/UI/BattleLoading/CHR/AnikiName.png");
+			m_tagSlideChara2P[i].pNamePic = new tdn2DAnim("Data/UI/BattleLoading/CHR/AnikiName.png");
+
+			break;
 		default:
 			MyAssert(0, "ÇªÇÃÉ^ÉCÉvÇÕë∂ç›ÇµÇ»Ç¢");
 			break;
@@ -214,6 +221,11 @@ BattleLoading::BattleLoading() :BaseGameEntity(ENTITY_ID::BATTLE_LOADING)
 
 			break;
 		case CHARACTER::ANIKI:
+			m_tagFinalChara1P[i].pPic = new tdn2DAnim("Data/UI/BattleLoading/CHR/Aniki.png");
+			m_tagFinalChara2P[i].pPic = new tdn2DAnim("Data/UI/BattleLoading/CHR/Aniki.png");
+
+			break;
+		case CHARACTER::BALANCE:
 			m_tagFinalChara1P[i].pPic = new tdn2DAnim("Data/UI/BattleLoading/CHR/Aniki.png");
 			m_tagFinalChara2P[i].pPic = new tdn2DAnim("Data/UI/BattleLoading/CHR/Aniki.png");
 

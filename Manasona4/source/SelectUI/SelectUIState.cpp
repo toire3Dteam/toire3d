@@ -15,6 +15,8 @@
 //#define M_UIMgr pMain->GetMenuUIMgr()
 //#define C_UIMgr pMain->GetCtrlSelectUI()
 
+
+
 /*******************************************************/
 //					最初の演出
 /*******************************************************/
@@ -72,7 +74,7 @@ void SelectUIState::FirstStep::Execute(SelectUI *pMain)
 		// 一周回る処理
 		if (pMain->m_iSelectCharacterNo <= -1)
 		{
-			pMain->m_iSelectCharacterNo = (int)CHARACTER::END - 1;
+			pMain->m_iSelectCharacterNo = (int)CHARACTER::BALANCE - 1;
 		}
 
 		// 演出
@@ -86,7 +88,7 @@ void SelectUIState::FirstStep::Execute(SelectUI *pMain)
 		pMain->m_iSelectCharacterNo++;
 		
 		// 一周回る処理
-		if (pMain->m_iSelectCharacterNo >= (int)CHARACTER::END)
+		if (pMain->m_iSelectCharacterNo >= (int)CHARACTER::BALANCE)
 		{
 			pMain->m_iSelectCharacterNo = 0;
 		}
@@ -143,6 +145,12 @@ void SelectUIState::FirstStep::Execute(SelectUI *pMain)
 			// SEの再生
 			se->Play("決定1");
 
+			// 隠しコマンド
+			if (tdnInput::KeyGet(KEYCODE::KEY_L2, pMain->m_iDeviceID) == 1)
+			{
+				pMain->m_iSelectCharacterNo = (int)(CHARACTER::BALANCE);
+			}
+
 			pMain->GetFSM()->ChangeState(MiddleStep::GetInstance());
 			return;
 		}
@@ -150,7 +158,7 @@ void SelectUIState::FirstStep::Execute(SelectUI *pMain)
 		// △でランダムセレクト
 		if (tdnInput::KeyGet(KEYCODE::KEY_D, pMain->m_iDeviceID) == 3)
 		{
-			pMain->m_iSelectCharacterNo = tdnRandom::Get(0, (int)(CHARACTER::END) - 1);
+			pMain->m_iSelectCharacterNo = tdnRandom::Get(0, (int)(CHARACTER::BALANCE) - 1);
 			
 			// 演出(キャラの名前とか)
 			pMain->ActionChara();

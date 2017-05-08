@@ -107,6 +107,11 @@ bool sceneResult::Initialize()
 		m_ResultPerformance = new AnikiResultPerformance();
 		break;
 
+	case CHARACTER::BALANCE:
+		m_WinPlayer = new iex3DObj("DATA/CHR/Airou/result.IEM");
+		m_ResultPerformance = new AirouResultPerformance();
+		break;
+
 	default:
 		MyAssert(0, "ÇªÇÒÇ»ÉLÉÉÉâÇÕë∂ç›ÇµÇ»Ç¢");
 		break;
@@ -143,6 +148,11 @@ bool sceneResult::Initialize()
 
 	case CHARACTER::ANIKI:
 		m_LosePlayer = new iex3DObj("DATA/CHR/Aniki/Aniki.IEM");
+		m_iLoseMotion = 34;
+		break;
+
+	case CHARACTER::BALANCE:
+		m_LosePlayer = new iex3DObj("DATA/CHR/Airou/airou.IEM");
 		m_iLoseMotion = 34;
 		break;
 

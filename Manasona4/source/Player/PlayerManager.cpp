@@ -4,6 +4,7 @@
 #include "Teki/Teki.h"
 #include "Aramitama/Aramitama.h"
 #include "Aniki/Aniki.h"
+#include "Balance\Balance.h"
 #include "Stage/Stage.h"
 #include "../BaseEntity/Message/MessageDispatcher.h"
 #include "../Stand/Stand.h"
@@ -66,6 +67,9 @@ void PlayerManager::Initialize(int NumPlayer, Stage::Base *pStage, SideData Side
 			break;
 		case CHARACTER::ANIKI:
 			m_pPlayers[i] = new Aniki(side, SideDatas[(int)side]);
+			break;
+		case CHARACTER::BALANCE:
+			m_pPlayers[i] = new Balance(side, SideDatas[(int)side]);
 			break;
 		default:
 			m_pPlayers[i] = new Airou(side, SideDatas[(int)side]);

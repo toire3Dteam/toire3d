@@ -6,6 +6,7 @@ static int adjustY = +32;//24
 static float g_scale = 0.9f;
 
 
+
 SelectUI::SelectUI(SIDE side, ENTITY_ID id, int DeviceID, bool bAI) :BaseGameEntity(id)
 {
 	// アイコン幅
@@ -77,6 +78,14 @@ SelectUI::SelectUI(SIDE side, ENTITY_ID id, int DeviceID, bool bAI) :BaseGameEnt
 			m_pCharaIconRip[i] = new tdn2DAnim("Data/UI/CharacterSelect/icon/aniki.png");
 			break;
 
+		case CHARACTER::BALANCE:
+			m_tagCharaPic[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Character/airou.png");
+			m_tagCharaPicRip[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Character/airou.png");
+			m_tagCharaInfo[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Info/airou.png");
+			m_tagCharaName[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/name/airou.png");
+			m_pCharaIconRip[i] = new tdn2DAnim("Data/UI/CharacterSelect/icon/airou.png");
+
+			break;
 		default:
 			MyAssert(0, "そんなデータはない");
 			break;
@@ -536,33 +545,26 @@ void SelectUI::Render()
 	// パートナーの名前
 	m_tagPartnerName[m_iSelectPartnerNo].pPic->Render(m_tagPartnerName[m_iSelectPartnerNo].iX, m_tagPartnerName[m_iSelectPartnerNo].iY);
 
-	// アイコン
-	m_pCharaIconRip[m_iSelectCharacterNo]->Render(m_iIconX + (m_iSelectCharacterNo * m_iWidthIcon), 482, RS::ADD);
+	// アイコン選択枠光
+	int l_iX = (m_eSide == SIDE::LEFT) ? -2 : 42;
+
+	m_pCharaIconRip[m_iSelectCharacterNo]->Render(m_iIconX + ((m_iSelectCharacterNo * m_iWidthIcon) % (MOVING_UP * m_iWidthIcon)), 482 + ((m_iSelectCharacterNo / MOVING_UP)*ICON_HEIGHT) , RS::ADD);
 	if (GetFSM()->isInState(*SelectUIState::FirstStep::GetInstance()))
 	{
 	
 		m_pSelect.pPic->SetScale(0.9f);	// 少し小さく
 		m_pSelect.pPic->SetARGB(0xffffffff);
 
-		int l_iX = 0;
-		if (m_eSide== SIDE::LEFT)
-		{
-			l_iX = -2;	
-		}
-		else
-		{
-			l_iX = 42;
-		}
 
-		m_pSelect.pPic->Render(m_iIconX + (m_iSelectCharacterNo * m_iWidthIcon) + l_iX, 482);
+		m_pSelect.pPic->Render(m_iIconX + ((m_iSelectCharacterNo * m_iWidthIcon)  % (MOVING_UP * m_iWidthIcon) ) + l_iX, 482 + ((m_iSelectCharacterNo / MOVING_UP)*ICON_HEIGHT));
 
 		if (m_iSelectCharacterColor == (int)COLOR_TYPE::EXTRA)
 		{
-			m_tagColorTypeEX.pPic->Render(m_iIconX + (m_iSelectCharacterNo * m_iWidthIcon) + l_iX, 482);
+			m_tagColorTypeEX.pPic->Render(m_iIconX + ((m_iSelectCharacterNo * m_iWidthIcon)  % (MOVING_UP * m_iWidthIcon) ) + l_iX, 482 + ((m_iSelectCharacterNo / MOVING_UP)*ICON_HEIGHT));
 		}
 		else if (m_iSelectCharacterColor == (int)COLOR_TYPE::MIRROR)
 		{
-			m_tagColorType2P.pPic->Render(m_iIconX + (m_iSelectCharacterNo * m_iWidthIcon) + l_iX, 482);
+			m_tagColorType2P.pPic->Render(m_iIconX + ((m_iSelectCharacterNo * m_iWidthIcon)  % (MOVING_UP * m_iWidthIcon) ) + l_iX, 482 + ((m_iSelectCharacterNo / MOVING_UP)*ICON_HEIGHT));
 		}
 
 
@@ -571,11 +573,11 @@ void SelectUI::Render()
 		m_pSelect.pPic->SetARGB(0xcc777777);
 		if (m_eSide == SIDE::LEFT)
 		{
-			m_pSelect.pPic->Render(m_iIconX + (m_iSelectCharacterNo * m_iWidthIcon) - 2, 482);
+			m_pSelect.pPic->Render(m_iIconX + ((m_iSelectCharacterNo * m_iWidthIcon) % (MOVING_UP * m_iWidthIcon)) + l_iX, 482 + ((m_iSelectCharacterNo / MOVING_UP)*ICON_HEIGHT));
 
 		}else
 		{
-			m_pSelect.pPic->Render(m_iIconX + (m_iSelectCharacterNo * m_iWidthIcon) + 42, 482);
+			m_pSelect.pPic->Render(m_iIconX + ((m_iSelectCharacterNo * m_iWidthIcon) % (MOVING_UP * m_iWidthIcon)) + l_iX, 482 + ((m_iSelectCharacterNo / MOVING_UP)*ICON_HEIGHT));
 		}
 	}
 	else if (GetFSM()->isInState(*SelectUIState::SecondStep::GetInstance()))

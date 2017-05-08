@@ -9,7 +9,8 @@
 //*****************************************************************************
 
 // キャラクターのタイプ
-enum class CHARACTER { AIROU, TEKI, NAZENARA, ARAMITAMA, ANIKI, END }; // (2/2)出すときは兄貴封印
+enum class CHARACTER { AIROU, TEKI, NAZENARA, ARAMITAMA, ANIKI,   // (2/2)出すときは兄貴封印
+	BALANCE ,END}; // ←の後に書くキャラは隠しキャラ(エウレシア) ENDの場所を上に移せばバレない
 
 // パートナーのタイプ
 enum class PARTNER { MOKOI, MAYA, HETE,ATTAKAI, END };

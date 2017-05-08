@@ -10,6 +10,8 @@
 // フレンド用
 #include "SelectUIState.h"
 
+#define ICON_HEIGHT  -120
+#define MOVING_UP  5
 
 //+--------------------------
 //	キャラクターセレクトUI
