@@ -671,6 +671,14 @@ public:
 	{
 		// [12/10]
 		MyAssert(isAttackState(),"GetAttackDataでアタックデータがないことが判明");	// アタックデータがないステートでアタックデータを参照しようとしている}
+		
+		//if (m_ActionDatas[(int)state].pAttackData->fComboRate >= 1.0f)
+		//{
+		//	BASE_ACTION_STATE s = state;
+		//	s = s;
+		//	m_ActionDatas[(int)state].pAttackData->fComboRate = m_ActionDatas[(int)state].pAttackData->fComboRate;
+		//}
+
 		return m_ActionDatas[(int)state].pAttackData;
 	}
 	AttackData *GetAttackData(){ return GetAttackData(m_eActionState);}// 自分の状態の攻撃データを渡す

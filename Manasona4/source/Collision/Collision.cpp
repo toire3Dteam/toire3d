@@ -326,8 +326,8 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 				(*OutDamageInfo)->HitRecoveryFrame = pAttackData->places[iHitPlace].HitRecoveryFrame;		// 硬直時間
 				(*OutDamageInfo)->GuardRecoveryFrame = pAttackData->GuardRecoveryFrame;		// 硬直時間
 				(*OutDamageInfo)->HitEffectType = (int)pAttackData->HitEffectType;			// この攻撃のヒットエフェクトを相手に送る
-				(*OutDamageInfo)->iAttackType = (int)my->GetActionState();						// 何の攻撃かのタイプ(コンボ中に同じ攻撃を使わせないように)
 				(*OutDamageInfo)->bOverDrive = bOverDrive;										// ふぃにしゅアーツかどうか	
+				(*OutDamageInfo)->iAttackType = (int)my->GetActionState();						// 何の攻撃かのタイプ(コンボ中に同じ攻撃を使わせないように)
 				(*OutDamageInfo)->iAntiGuard = (int)pAttackData->AntiGuard;				// ガード突き破りタイプ
 				(*OutDamageInfo)->HitSE = pAttackData->HitSE;
 				(*OutDamageInfo)->bFinishOK = pAttackData->bFinish;
@@ -336,6 +336,7 @@ void Collision::CollisionPlayerAttack(BasePlayer *my, BasePlayer *you, HIT_DAMAG
 				(*OutDamageInfo)->fComboRate = pAttackData->fComboRate;
 				(*OutDamageInfo)->iAttribute = (int)pAttackData->attribute;
 				(*OutDamageInfo)->fRepeatAttackRate = pAttackData->fRepeatAttackRate;
+				(*OutDamageInfo)->bStandAttack = false;	// スタンドフラグをOFF
 
 				// ★コンボUI エフェクト(カウント)発動
 				// ★★プレイヤーのグローバルステートのダメージのところに移しました

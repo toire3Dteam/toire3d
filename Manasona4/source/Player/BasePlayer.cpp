@@ -1622,6 +1622,9 @@ void BasePlayer::RenderDebug()
 	Vector2 pos2d = Math::WorldToScreen(m_vPos);
 	tdnText::Draw((int)pos2d.x - 20, (int)pos2d.y - 160, 0xffffffff, "F: %d", m_iCurrentActionFrame);
 
+
+	tdnText::Draw((int)pos2d.x - 20, (int)pos2d.y - 200, 0xffff0022, "ï‚ê≥íl: %.2f", m_fDamageRate);
+
 }
 
 void BasePlayer::RenderShadow()
