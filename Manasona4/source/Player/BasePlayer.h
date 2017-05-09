@@ -918,8 +918,62 @@ public:
 
 		return true;
 	}
+	// 関数で呼び出す用()
+	bool GetCommand(PLAYER_COMMAND_BIT CommandBit, int frame, bool bAhead)
+	{
+		// 先行入力フラグだったら先行入力も返す
+		if (bAhead) if ((int)CommandBit & (int)m_wAheadCommand) return true;
+		return ((m_wCommandHistory[frame] & (int)CommandBit) != 0);
+	}
 	bool isSomePushTRG(SOMEPUSH_COMMAND Command, bool bAhead = false)
 	{
+		int yuuyo = 5;
+		switch (Command)
+		{
+		case SOMEPUSH_COMMAND::BURST:
+		{
+			bool bCheck[3]{ false };
+
+			if (isPushInputTRG(PLAYER_COMMAND_BIT::A, bAhead))
+			{
+				for (int i = 0; i < yuuyo; i++)
+				{
+					if (GetCommand(PLAYER_COMMAND_BIT::B, i, bAhead)) bCheck[0] = true;
+					if (GetCommand(PLAYER_COMMAND_BIT::C, i, bAhead)) bCheck[1] = true;
+					if (GetCommand(PLAYER_COMMAND_BIT::D, i, bAhead)) bCheck[2] = true;
+				}
+			}
+			else if (isPushInputTRG(PLAYER_COMMAND_BIT::B, bAhead))
+			{
+				for (int i = 0; i < yuuyo; i++)
+				{
+					if (GetCommand(PLAYER_COMMAND_BIT::A, i, bAhead)) bCheck[0] = true;
+					if (GetCommand(PLAYER_COMMAND_BIT::C, i, bAhead)) bCheck[1] = true;
+					if (GetCommand(PLAYER_COMMAND_BIT::D, i, bAhead)) bCheck[2] = true;
+				}
+			}
+			else if (isPushInputTRG(PLAYER_COMMAND_BIT::C, bAhead))
+			{
+				for (int i = 0; i < yuuyo; i++)
+				{
+					if (GetCommand(PLAYER_COMMAND_BIT::A, i, bAhead)) bCheck[0] = true;
+					if (GetCommand(PLAYER_COMMAND_BIT::B, i, bAhead)) bCheck[1] = true;
+					if (GetCommand(PLAYER_COMMAND_BIT::D, i, bAhead)) bCheck[2] = true;
+				}
+			}
+			else if (isPushInputTRG(PLAYER_COMMAND_BIT::D, bAhead))
+			{
+				for (int i = 0; i < yuuyo; i++)
+				{
+					if (GetCommand(PLAYER_COMMAND_BIT::A, i, bAhead)) bCheck[0] = true;
+					if (GetCommand(PLAYER_COMMAND_BIT::B, i, bAhead)) bCheck[1] = true;
+					if (GetCommand(PLAYER_COMMAND_BIT::C, i, bAhead)) bCheck[2] = true;
+				}
+			}
+			return (bCheck[0] && bCheck[1] && bCheck[2]);
+		}
+			break;
+		}
 		return true;
 	}
 	WORD GetCommandHistory(int no = 0) { return m_wCommandHistory[no]; }

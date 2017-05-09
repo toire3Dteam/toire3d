@@ -12,6 +12,7 @@
 #include "../Sound/SoundManager.h"
 
 Stage::Base *Collision::m_pStage = nullptr;
+const float Collision::c_ADJUST_AERIALWALL = .1f;	// 空中にいるときだけ壁判定を余分に持たせ、壁プレイヤーとの入れ替わりが発生しないようにする
 
 void Collision::PlayerCollision(PlayerManager *pPlayerMgr, ShotManager *pShotMgr)
 {
@@ -759,12 +760,16 @@ void Collision::RaypicLeft(Stage::Base *obj, BasePlayer *player, Vector3 *move, 
 	Vector3 pos(player->GetPos());
 	const CollisionShape::SquareChara *square(player->GetHitSquare());
 
-	const float width(
-		//(fabsf(fTargetVecX) > 50) ? pos.x : 
-		-obj->GetWidth()/2);
+	float width(-obj->GetWidth()/2);
 
 	if (move->x < 0) // 左
 	{
+		// 空中だったら、壁より若干手前に設定する
+		if (!player->isLand())
+		{
+			width += c_ADJUST_AERIALWALL;
+		}
+
 		bool hit = false;
 
 		//if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // 当たった
@@ -788,11 +793,15 @@ void Collision::RaypicRight(Stage::Base *obj, BasePlayer *player, Vector3 *move,
 
 	if (move->x > 0) // 右
 	{
+		float width(obj->GetWidth() / 2);
+
 		bool hit = false;
 
-		const float width(
-			//(fabsf(fTargetVecX) > 50) ? pos.x : 
-			obj->GetWidth() / 2);
+		// 空中だったら、壁より若干手前に設定する
+		if (!player->isLand())
+		{
+			width -= c_ADJUST_AERIALWALL;
+		}
 
 		//if (obj->RayPick2(&hit_pos, &ray_pos, &ray_vec, &dist) != -1) // 当たった
 		{
@@ -867,8 +876,11 @@ void Collision::Sinking(BasePlayer *pPlayer1, BasePlayer *pPlayer2)
 
 		sinking1.y = 0;
 		sinking2.y = 0;
-		static const float rate = .75f;
+		float rate = .5f;
 		sinking1 *= rate;	// 完全に戻すと不自然なので
+		if (!pPlayer1->isLand()) rate *= 0.05f;
+		rate = .5f;
+		if (!pPlayer2->isLand()) rate *= 0.05f;
 		sinking2 *= rate;
 
 		// むーぶちに足すと挙動がおかしいので、座標に足す。でもそのまま足すと壁抜けするのでレイピック

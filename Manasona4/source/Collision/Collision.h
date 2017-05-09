@@ -87,6 +87,7 @@ public:
 private:
 
 	static Stage::Base *m_pStage;	// どっからでもアクセスしたいので持つ
+	static const float c_ADJUST_AERIALWALL;	// 空中にいるときだけ壁判定を余分に持たせ、壁プレイヤーとの入れ替わりが発生しないようにする
 
 	// 玉用の簡易版レイピック
 	static bool RaypicShot(Stage::Base *obj, Shot::Base *shot);

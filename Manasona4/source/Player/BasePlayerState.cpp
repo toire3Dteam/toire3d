@@ -334,7 +334,7 @@ bool OverDriveCancel(BasePlayer *pPerson)
 		if (pPerson->GetRecoveryFrame() <= 0)
 		{
 			// 覚醒（バースト）キャンセル(攻めの場合、先行入力可能)
-			if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R3, true))
+			if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R3, true) || pPerson->isSomePushTRG(SOMEPUSH_COMMAND::BURST, true))
 			{
 				// 先行入力リセット
 				pPerson->AheadCommandReset();
@@ -348,7 +348,7 @@ bool OverDriveCancel(BasePlayer *pPerson)
 		else
 		{
 			// 覚醒（バースト）キャンセル
-			if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R3, true))
+			if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::R3, true) || pPerson->isSomePushTRG(SOMEPUSH_COMMAND::BURST, true))
 			{
 				// 守りのバースト
 				pPerson->GetFSM()->ChangeState(BasePlayerState::OverDrive_Burst::GetInstance());
