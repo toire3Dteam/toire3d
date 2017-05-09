@@ -15,6 +15,7 @@
 #include "../Window/ChallengeSelectWindow.h"
 #include "Challenge\ChallengeManagerManager.h"
 #include "SceneVS.h"
+#include "KeyConfig\KeyConfig.h"
 
 //+--------------------
 // 作業効率化
@@ -777,6 +778,15 @@ void SceneMenuState::OptionStep::Execute(sceneMenu *pMain)
 		return;
 	}
 
+	// キーコンフィグでボタンを押したら
+	if (pMain->GetWindow(WINDOW_TYPE::OPTION)->GetChoiceState()
+		== OptionWindow::OPTION_STATE::KEYCONFIG)
+	{
+		// キーコンフィグメニューへ
+		pMain->GetFSM()->ChangeState(KeyConfigWindowStep::GetInstance());
+		return;
+	}
+
 	// (1/18) メニューを開いた人だけが動かせる
 	int l_iDeviceID = pMain->GetPauseDeviceID();
 
@@ -1350,6 +1360,132 @@ void SceneMenuState::SoundWindowStep::Render(sceneMenu *pMain)
 }
 
 bool SceneMenuState::SoundWindowStep::OnMessage(sceneMenu *pMain, const Message & msg)
+{
+	// メッセージタイプ
+	//switch (msg.Msg)
+	//{
+
+	//default:
+	//	break;
+	//}
+
+	// Flaseで返すとグローバルステートのOnMessageの処理へ行く
+	return false;
+}
+
+
+/*******************************************************/
+//				キーコンフィグ選択
+/*******************************************************/
+
+void SceneMenuState::KeyConfigWindowStep::Enter(sceneMenu *pMain)
+{
+	// キーコンフィグ起動
+	pMain->GetKeyWindow(SIDE::LEFT)->Action(Vector2(-150, 40), pMain->GetPauseDeviceID());
+
+}
+
+void SceneMenuState::KeyConfigWindowStep::Execute(sceneMenu *pMain)
+{
+	// UI
+	M_UIMgr->Update();
+
+	// 戻るボタンを押したら
+	if (pMain->GetKeyWindow(SIDE::LEFT)->GetChoiceState()
+		== KeyConfig::KEY_CONFIG_STATE::BACK)
+	{
+		pMain->GetKeyWindow(SIDE::LEFT)->Stop();	// ウィンドウを閉じる	
+	}
+	if (pMain->GetKeyWindow(SIDE::RIGHT)->GetChoiceState()
+		== KeyConfig::KEY_CONFIG_STATE::BACK)
+	{
+		pMain->GetKeyWindow(SIDE::RIGHT)->Stop();	// ウィンドウを閉じる	
+	}
+
+	// 全員ウィンドウを起動していなかったら
+	if (pMain->GetKeyWindow(SIDE::LEFT)->IsActive() == false &&
+		pMain->GetKeyWindow(SIDE::RIGHT)->IsActive() == false)
+	{
+		pMain->GetFSM()->RevertToPreviousState();	// 前のステートへ戻る
+		return;
+	}
+
+
+	// (1/18) メニューを開いた人だけが動かせる
+	int l_iDeviceID = pMain->GetPauseDeviceID();
+
+	// パッド分更新
+	// どちらかのコンフィグが空いていた時
+	if (pMain->GetKeyWindow(SIDE::LEFT)->IsActive() == false ||
+		pMain->GetKeyWindow(SIDE::RIGHT)->IsActive() == false)
+	{
+
+		const int NumDevice(tdnInputManager::GetNumDevice());
+		for (int i = 0; i < NumDevice; i++)
+		{
+			if (tdnInput::KeyGet(KEYCODE::KEY_ENTER, i) == 3)
+			{
+				if (pMain->GetKeyWindow(SIDE::LEFT)->GetDeviceID() == i ||
+					pMain->GetKeyWindow(SIDE::RIGHT)->GetDeviceID() == i)return;
+
+
+				// 空いている方のコンフィグをボタン押したデバイスで起動
+				if (pMain->GetKeyWindow(SIDE::LEFT)->IsActive() == false)
+				{
+					pMain->GetKeyWindow(SIDE::LEFT)->Action(Vector2(-150, 40), i);
+				}
+				else
+				{
+					pMain->GetKeyWindow(SIDE::RIGHT)->Action(Vector2(450, 40), i);
+				}
+			}
+
+		}
+	}
+
+	//+----------------------------------
+	//	このステートでの操作
+	//+----------------------------------
+	// パッド分更新
+	// int NumDevice(tdnInputManager::GetNumDevice());
+	// パッド何もささってないとき用
+	// if (NumDevice == 0)NumDevice = 1;
+	// for (int i = 0; i < NumDevice; i++)
+	{
+		if (PadUpdate(pMain, l_iDeviceID)) return;
+	}
+
+}
+
+bool SceneMenuState::KeyConfigWindowStep::PadUpdate(sceneMenu *pMain, int DeviceID)
+{
+	bool bChangedState(false);
+
+	// 選択ウィンドウの操作
+	pMain->GetKeyWindow(SIDE::LEFT)->Ctrl();
+	pMain->GetKeyWindow(SIDE::RIGHT)->Ctrl();
+
+	return bChangedState;
+}
+
+void SceneMenuState::KeyConfigWindowStep::Exit(sceneMenu *pMain)
+{
+	
+}
+
+void SceneMenuState::KeyConfigWindowStep::Render(sceneMenu *pMain)
+{
+	// アイコンUI
+	M_UIMgr->Render();
+
+
+#ifdef _DEBUG
+
+	tdnText::Draw(0, 0, 0xffffffff, "SoundWindowStep");
+#endif // _DEBUG
+}
+
+bool SceneMenuState::KeyConfigWindowStep::OnMessage(sceneMenu *pMain, const Message & msg)
 {
 	// メッセージタイプ
 	//switch (msg.Msg)

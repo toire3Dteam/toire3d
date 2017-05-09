@@ -360,4 +360,36 @@ namespace SceneMenuState
 
 		bool PadUpdate(sceneMenu* pMain, int DeviceID);
 	};
+
+	//--------------------キーオンフィグウィンドウ
+	class KeyConfigWindowStep : public State<sceneMenu>
+	{
+	public:
+		// 実体_
+		static KeyConfigWindowStep* GetInstance() { static KeyConfigWindowStep state; return &state; }
+
+		// 入る
+		virtual void Enter(sceneMenu* pMain);
+
+		// 実行します
+		virtual void Execute(sceneMenu* pMain);
+
+		// 帰る
+		virtual void Exit(sceneMenu* pMain);
+
+		// 描画
+		virtual void Render(sceneMenu* pMain);
+
+		// エージェントからのメッセージを受信した場合、これが実行される
+		virtual bool OnMessage(sceneMenu* pMain, const Message& msg);
+
+	private:
+		KeyConfigWindowStep() {};
+		~KeyConfigWindowStep() {};
+
+		KeyConfigWindowStep(const KeyConfigWindowStep&) {}
+		KeyConfigWindowStep& operator=(const KeyConfigWindowStep&) {}
+
+		bool PadUpdate(sceneMenu* pMain, int DeviceID);
+	};
 }

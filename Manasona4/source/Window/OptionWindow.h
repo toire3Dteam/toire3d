@@ -26,6 +26,7 @@ public:
 		SYSTEM,
 		GAME,
 		SOUND,
+		KEYCONFIG,
 		BACK
 	};
 

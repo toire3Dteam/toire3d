@@ -20,6 +20,7 @@ class MyMusicManager;
 class Camera;
 class RoundCallManager;
 class BaseWindow;
+class KeyConfig;
 //+-----------------------------------
 //	シーンメニュー
 //+-----------------------------------
@@ -77,6 +78,7 @@ public:
 
 	TipsCard* GetTips(TIPS_TYPE type) { return m_pTips[(int)type]; }
 	BaseWindow* GetWindow(WINDOW_TYPE type) { return m_pWindow[(int)type]; }
+	KeyConfig* GetKeyWindow(SIDE side) { return m_pKeyWindow[(int)side]; }
 
 	int GetTrainingCtrlDevice() { return m_iTrainingCtrlDevice; };
 	void SetTrainingCtrlDevice(int DeviceID) { m_iTrainingCtrlDevice= DeviceID; };
@@ -91,7 +93,7 @@ private:
 	MenuUIManager*	m_pMenuUIMgr;
 	static int m_iSelectNo;
 	static int m_iCtrlDevice;
-	
+
 	int m_iTrainingCtrlDevice;
 
 	// コントローラーセレクト用
@@ -102,9 +104,11 @@ private:
 
 	// Window類
 	BaseWindow* m_pWindow[(int)WINDOW_TYPE::ARRAY_END];
+	KeyConfig*  m_pKeyWindow[(int)SIDE::ARRAY_MAX];
 
 	StateMachine<sceneMenu> *m_pStateMachine;	// ステートマシン
-												
+			
+									
 	// ポーズ押した人のデバイスID
 	int m_iPauseDeviceID;
 	SIDE m_eCommandSide;

@@ -23,6 +23,34 @@ public:
 	bool IsActive() { return m_bActive; };
 	int  GetChoiceState() { return m_iChoiceState; }//　★このゲッターで様々な判定をする
 
+	int GetDeviceID() { return m_iDeviceID; }
+
+	// 選択状態
+	enum CHOICE_STATE
+	{
+		HOLD = -1
+	};
+
+	enum KEY_CONFIG_STATE
+	{
+		BACK,			// 戻る
+
+		ATTACK,			// 攻撃
+		SKILL,			// スキル
+		THROW,			// 投げ
+		ESCAPE,			// 回避
+		HEAVEHO_DRIVE,	// 必殺技
+		INVINCIBLE,		// 無敵
+		PARTNER,		// パートナー
+		DOKKOI,			// 中段
+		OVER_DRIVE,		// バースト
+		START,
+		SELECT,
+
+		ARRAY_END		// 配列の終り
+	};
+
+
 protected:
 	static const int SizeX = 432;
 
@@ -40,31 +68,6 @@ protected:
 	// 選択してる場所
 	int m_iSelectNo;
 
-
-	
-	// 選択状態
-	enum CHOICE_STATE
-	{
-		HOLD = -1
-	};
-
-	enum KEY_CONFIG_STATE
-	{
-		ATTACK,			// 攻撃
-		SKILL,			// スキル
-		THROW,			// 投げ
-		ESCAPE,			// 回避
-		HEAVEHO_DRIVE,	// 必殺技
-		INVINCIBLE,		// 無敵
-		PARTNER,		// パートナー
-		DOKKOI,			// 中段
-		OVER_DRIVE,		// バースト
-		START,
-		SELECT,
-
-		BACK,			// 戻る
-		ARRAY_END		// 配列の終り
-	};
 
 	int m_iChoiceState;
 

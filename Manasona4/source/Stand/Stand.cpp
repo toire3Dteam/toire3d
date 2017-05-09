@@ -979,7 +979,7 @@ Stand::Attakai::Attakai(BasePlayer *pPlayer) :Base(pPlayer)
 	/*****************************/
 	// 基本ステータス
 	m_standStockMAX = 1;
-	m_standGageMAX = 60 * 18;
+	m_standGageMAX = 60 * 14;
 
 	/*****************************/
 	// そのキャラクターのアイコン

@@ -184,6 +184,8 @@ void tdnInputManager::LoadConfig()
 			ifs.read(yomitobashi, 1);	// TDN空白
 		}
 
+		if (ifs.eof()) return;
+
 		// ファイルの読み込みが空白で区切りやがるので、1バイトずつ読まないといけない
 		{
 			int i(0);
@@ -337,6 +339,54 @@ bool tdnInputManager::CreateEffect(LPDIRECTINPUTEFFECT pEffect, LPDIRECTINPUTDEV
 	if (FAILED(lpDevice->CreateEffect(GUID_ConstantForce, &eff, &pEffect, NULL)))return false;
 
 	return true;
+}
+
+void tdnInputManager::SetConfig(const KEY_CONFIG_DATA &tagNewConfigData, int no)
+{
+	// 上書き
+	memcpy_s(&m_tagConfigDatas[no].tagPadSet, sizeof(PADSET), &tagNewConfigData.tagPadSet, sizeof(PADSET));
+	tdnInput::PadAsign(tagNewConfigData.tagPadSet, no);
+
+	std::ofstream ofs("DATA/Input/key_config.txt");
+
+	for (auto it : m_vConfigList)
+	{
+		if (strcmp(it.tszPadName, tagNewConfigData.tszPadName) == 0)
+		{
+			// 上書き
+			memcpy_s(&it.tagPadSet, sizeof(PADSET), &tagNewConfigData.tagPadSet, sizeof(PADSET));
+		}
+
+		// controllerの名前
+		ofs << "NAME: " << it.tszPadName << "\n";
+
+		// コンフィグ情報
+		int out;
+		out = it.tagPadSet.A;
+		ofs << out << " ";
+		out = it.tagPadSet.B;
+		ofs << out << " ";
+		out = it.tagPadSet.C;
+		ofs << out << " ";
+		out = it.tagPadSet.D;
+		ofs << out << " ";
+		out = it.tagPadSet.L1;
+		ofs << out << " ";
+		out = it.tagPadSet.L2;
+		ofs << out << " ";
+		out = it.tagPadSet.L3;
+		ofs << out << " ";
+		out = it.tagPadSet.R1;
+		ofs << out << " ";
+		out = it.tagPadSet.R2;
+		ofs << out << " ";
+		out = it.tagPadSet.R3;
+		ofs << out << " ";
+		out = it.tagPadSet.START;
+		ofs << out << " ";
+		out = it.tagPadSet.SELECT;
+		ofs << out << "\n\n";
+	}
 }
 
 //*****************************************************************************************************************************
@@ -616,20 +666,6 @@ void tdnInput::Reset()
 
 	// この中でcontrollerの列挙とかコンフィグの読み込みとか
 	tdnInputManager::Initialize();
-
-	// デバイス初期化
-	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++)
-	{
-		device[i] = new tdnInputDevice(i);
-	}
-
-	// 読み込んだキーコンフィグを設定
-	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++)
-	{
-		device[i]->PadAsign(tdnInputManager::GetConfigDatas(i)->tagPadSet);
-	}
-
-	OKB_Init();
 }
 
 //------------------------------------------------------

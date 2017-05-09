@@ -17,6 +17,7 @@
 #include "BaseEntity\Message\MessageDispatcher.h"
 #include "Data\PlayerData.h"
 #include "Data\CommandData.h"
+#include "KeyConfig\KeyConfig.h"
 
 //#include "sceneResult.h"
 //#include "SceneSwitch/SceneSwitch.h"
@@ -86,6 +87,12 @@ bool sceneMenu::Initialize()
 			break;
 		}
 	}
+	// キーコンフィグ
+	for (int i = 0; i < (int)SIDE::ARRAY_MAX; i++)
+	{
+		m_pKeyWindow[i] = new KeyConfig();
+	}
+
 
 	// 最初の一回目のトロフィの解放確認
 	TrophyMgr->CheakPlayCount(PlayerDataMgr->m_PlayerInfo.PlayCount);
@@ -126,6 +133,13 @@ sceneMenu::~sceneMenu()
 	{
 		SAFE_DELETE(m_pWindow[i]);
 	}
+	
+	// キーコンフィグ
+	for (int i = 0; i < (int)SIDE::ARRAY_MAX; i++)
+	{
+		SAFE_DELETE(m_pKeyWindow[i]);
+	}
+
 }
 
 //******************************************************************
@@ -319,6 +333,11 @@ void sceneMenu::Render()
 	for (int i = 0; i < (int)WINDOW_TYPE::ARRAY_END; i++)
 	{
 		m_pWindow[i]->Redner();
+	}
+	for (int i = 0; i < (int)SIDE::ARRAY_MAX; i++)
+	{
+		// キーウィンドウ
+		m_pKeyWindow[i]->Render();
 	}
 
 	// ヒントカード覧

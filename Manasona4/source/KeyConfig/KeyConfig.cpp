@@ -23,6 +23,7 @@ KeyConfig::KeyConfig()
 	m_aIconData.reserve(64);
 
 	// 存在するパラメータ分追加
+	AddIconData("戻る");
 	AddIconData("□攻撃");
 	AddIconData("△スキル");
 	AddIconData("×投げ");
@@ -43,6 +44,7 @@ KeyConfig::KeyConfig()
 	// 位置微調整用
 	m_iAbjustHeight = -1;
 
+	m_iDeviceID = -1;
 }
 
 KeyConfig::~KeyConfig()
@@ -172,7 +174,6 @@ bool KeyConfig::Ctrl()
 	if (m_bActive == false)return false;
 
 
-
 	if (tdnInput::KeyGet(KEYCODE::KEY_A, m_iDeviceID) == 3)
 	{
 		SetConfig(KEYCODE::KEY_A);
@@ -228,9 +229,26 @@ bool KeyConfig::Ctrl()
 		SetConfig(KEYCODE::KEY_SELECT);
 	}
 
-	// 決定を押してない時
-	if (tdnInput::KeyGet(KEYCODE::KEY_B, m_iDeviceID) == 0)
+
+	// 決定または戻るで
+	if ((KEY_CONFIG_STATE)m_iSelectNo == KEY_CONFIG_STATE::BACK)
 	{
+		// ゲームに戻る動作は離して進む
+		if (tdnInput::KeyGet(KEYCODE::KEY_B, m_iDeviceID) == 3 ||
+			tdnInput::KeyGet(KEYCODE::KEY_A, m_iDeviceID) == 3)
+		{
+			// 選択した番号格納！
+			m_iChoiceState = (KEY_CONFIG_STATE)m_iSelectNo;
+			return true;
+		}
+	}
+	
+
+	// 決定を押してない時
+	//if (tdnInput::KeyGet(KEYCODE::KEY_B, m_iDeviceID) == 0 &&
+	//	tdnInput::KeyGet(KEYCODE::KEY_A, m_iDeviceID) == 0)
+	{
+
 
 		// 選択切り替え
 		if (tdnInput::KeyGet(KEYCODE::KEY_UP, m_iDeviceID) == 3)
@@ -290,7 +308,10 @@ void KeyConfig::Stop()
 	m_iChoiceState = CHOICE_STATE::HOLD;// (12/12) ここにもHOLDの処理
 
 	// キーコンフィグ情報を保存！
-	tdnInputManager::SetConfig(m_tagConfigData);
+	tdnInputManager::SetConfig(m_tagConfigData, m_iDeviceID);
+
+	m_iDeviceID = -1;
+
 }
 
 void KeyConfig::AddIconData(LPSTR string)

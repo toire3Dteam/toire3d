@@ -19,6 +19,7 @@ OptionWindow::OptionWindow(Vector2 vPos) :BaseWindow(vPos)
 	AddIconData("システム設定", "システム設定を行います。");
 	AddIconData("ゲーム設定", "ゲーム内の各種設定変更を行います。");
 	AddIconData("サウンド設定", "各種サウンドの音量の設定変更を行います。");
+	AddIconData("コントローラー設定", "コントローラーの設定変更を行います。");
 	AddIconData("戻る", "このウィンドウを閉じます。");
 
 	// 演出
@@ -46,7 +47,7 @@ bool OptionWindow::Update()
 	m_iAlpha += 255 / 6;
 	m_iAlpha = min(255, m_iAlpha);
 
-	m_pWindow->SetAlpha(m_iAlpha);			// 透明度更新							 // 透明度更新
+	m_pWindow->SetAlpha(m_iAlpha);			// 透明度更新
 	m_pFontBox->SetAlpha(m_iAlpha);			// 透明度更新
 	m_pSelect->SetAlpha(m_iAlpha);			// 透明度更新
 

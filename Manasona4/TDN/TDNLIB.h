@@ -2304,36 +2304,7 @@ public:
 	static int GetNumDevice(){ return m_NumDevice; }
 
 	// コンフィグデータセーブ
-	static void SetConfig(const KEY_CONFIG_DATA &tagNewConfigData)
-	{
-		std::ofstream ofs("DATA/Input/key_config.txt");
-
-		for(auto it : m_vConfigList)
-		{
-			if (strcmp(it.tszPadName, tagNewConfigData.tszPadName) == 0)
-			{
-				// 上書き
-				memcpy_s(&it, sizeof(KEY_CONFIG_DATA), &tagNewConfigData, sizeof(KEY_CONFIG_DATA));
-			}
-
-			// controllerの名前
-			ofs << "NAME: " << it.tszPadName << "\n";
-			
-			// コンフィグ情報
-			ofs << it.tagPadSet.AllDatas[4] << " "
-				<< it.tagPadSet.AllDatas[5] << " "
-				<< it.tagPadSet.AllDatas[6] << " "
-				<< it.tagPadSet.AllDatas[7] << " "
-				<< it.tagPadSet.AllDatas[8] << " "
-				<< it.tagPadSet.AllDatas[9] << " "
-				<< it.tagPadSet.AllDatas[10] << " "
-				<< it.tagPadSet.AllDatas[11] << " "
-				<< it.tagPadSet.AllDatas[12] << " "
-				<< it.tagPadSet.AllDatas[13] << " "
-				<< it.tagPadSet.AllDatas[14] << " "
-				<< it.tagPadSet.AllDatas[15] << "\n\n";
-		}
-	}
+	static void SetConfig(const KEY_CONFIG_DATA &tagNewConfigData, int no);
 };
 
 enum KEYCODE
@@ -2447,6 +2418,7 @@ public:
 	static void GetAxisXY2f(float *outX, float *outY, int no = 0);
 
 	static void Vibration(int no = 0);
+	static void PadAsign(const PADSET &padset, int no) { device[no]->PadAsign(padset); }
 };
 
 #define KEY(x,n) ( tdnInput::KeyGet(x,n) )

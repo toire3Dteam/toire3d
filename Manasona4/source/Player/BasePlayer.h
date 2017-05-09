@@ -82,6 +82,11 @@ enum class PLAYER_COMMAND_BIT
 	L3 = 1 << 14,
 };
 
+enum class SOMEPUSH_COMMAND
+{
+	BURST,	// A + B + C + D
+};
+
 static const PLAYER_COMMAND_BIT c_BitList[(int)PLAYER_INPUT::MAX] =
 {
 	PLAYER_COMMAND_BIT::A,
@@ -911,6 +916,10 @@ public:
 		// 押したかどうかは分かったので、押しっぱなしでないことを確認する
 		if ((m_wCommandHistory[1] & (int)CommandBit)) return false;		// 押しっぱなしやんけ！
 
+		return true;
+	}
+	bool isSomePushTRG(SOMEPUSH_COMMAND Command, bool bAhead = false)
+	{
 		return true;
 	}
 	WORD GetCommandHistory(int no = 0) { return m_wCommandHistory[no]; }
