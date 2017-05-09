@@ -64,6 +64,18 @@ TrophyManager::TrophyManager() :BaseGameEntity(ENTITY_ID::TROPHY_MGR)	// ƒGƒ“ƒeƒ
 			m_pTrophy[i] = new ChallengeTrophy();
 
 			break;
+		case TROPHY_TYPE::AIROU_CHALLENGE:
+			m_pTrophy[i] = new AirouChallengeTrophy();
+
+			break;
+		case TROPHY_TYPE::TEKI_CHALLENGE:
+			m_pTrophy[i] = new TekiChallengeTrophy();
+
+			break;
+		case TROPHY_TYPE::BIG_BIG_DAMAGE:
+			m_pTrophy[i] = new BigBigDamageTrophy();
+
+			break;
 		case TROPHY_TYPE::COMPLETE_TROPHY:
 			m_pTrophy[i] = new CompleteTrophy();
 
@@ -425,7 +437,33 @@ void TrophyManager::CheakBigDamage(bool bVS)
 
 	}
 
-	
+	// ‚Ü‚¾«‚ÌƒgƒƒtƒB[‚ðŽè‚É“ü‚ê‚Ä‚¢‚È‚©‚Á‚½‚ç
+	if (PlayerDataMgr->m_TrophyData.iBigBigDamage == 0)
+	{
+
+		if (PlayerMgr->GetPlayer(SIDE::LEFT)->isAI() == false)
+		{
+			// Å‘åƒ_ƒ[ƒW10000ˆÈã
+			if (GameUIMgr->GetComboUI(SIDE::RIGHT)->GetMaxDamage() >= 10000)
+			{
+				TROPHY_TYPE eType = TROPHY_TYPE::BIG_BIG_DAMAGE;
+				MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
+
+			}
+
+		}
+		else if (PlayerMgr->GetPlayer(SIDE::RIGHT)->isAI() == false)
+		{
+			// Å‘åƒ_ƒ[ƒW10000ˆÈã
+			if (GameUIMgr->GetComboUI(SIDE::LEFT)->GetMaxDamage() >= 10000)
+			{
+				TROPHY_TYPE eType = TROPHY_TYPE::BIG_BIG_DAMAGE;
+				MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
+
+			}
+		}
+
+	}
 
 }
 

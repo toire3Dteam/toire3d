@@ -1,5 +1,10 @@
 #include "ComboUI.h"
 
+#include "Data\PlayerData.h"
+#include "Data\SelectData.h"
+#include "Trophy\TrophyManager.h"
+#include "BaseEntity\Message\MessageDispatcher.h"
+
 //ComboUI::ComboUI()
 //{
 //	m_num = new Number("DATA/UI/Combo/Number.png", 128, Number::NUM_KIND::COMBO);
@@ -100,6 +105,19 @@ ComboUI::~ComboUI()
 void ComboUI::Update()
 {
 	MyAssert(m_iMaxRecoveryFrame != 0, "最大値が0だと0で割ることになる");
+
+	// まだ↓のトロフィーを手に入れていなかったら
+	if (PlayerDataMgr->m_TrophyData.iBigBigDamage == 0)
+	{
+		// トロフィー
+		if (m_pPlayerData->GetTargetPlayer()->GetCharacterType() == CHARACTER::AIROU &&
+			m_iCount >= 100)
+		{
+			TROPHY_TYPE eType = TROPHY_TYPE::AIROU_CHALLENGE;
+			MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
+		}
+	}
+
 
 	// 数字の更新
 	m_num->Update();

@@ -204,11 +204,43 @@ private:
 
 };
 
+//+---------------------------------
+//	アイル―チャレンジトロフィー
+//+---------------------------------
+class AirouChallengeTrophy :public BaseTrophy
+{
+public:
+	AirouChallengeTrophy();
+	~AirouChallengeTrophy() {};
 
+private:
 
+};
 
+//+---------------------------------
+//	テキチャレンジトロフィー
+//+---------------------------------
+class TekiChallengeTrophy :public BaseTrophy
+{
+public:
+	TekiChallengeTrophy();
+	~TekiChallengeTrophy() {};
 
+private:
 
+};
+//+---------------------------------
+//	大大ダメージトロフィー
+//+---------------------------------
+class BigBigDamageTrophy :public BaseTrophy
+{
+public:
+	BigBigDamageTrophy();
+	~BigBigDamageTrophy() {};
+
+private:
+
+};
 
 
 

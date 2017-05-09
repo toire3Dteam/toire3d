@@ -14,6 +14,7 @@ public:
 	void Update(PLAYER_UPDATE flag)override;
 	void Render()override;
 	void RenderDrive()override;
+	bool HandleMessage(const Message& msg)override;
 
 	/****************************/
 	//	キャラクター固有の様々なポジション
@@ -208,6 +209,8 @@ private:
 	BaseUVEffect *m_pCycloneEffect;	// 必殺の風
 	TekiCounterEffect* m_pCounterEffect;
 	StepEffect* m_pStepEffect;
+
+	int m_iAssaultDiveCount;
 
 };
 

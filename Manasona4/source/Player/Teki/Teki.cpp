@@ -3,11 +3,15 @@
 #include "UI/HeaveHoFinish/HeaveHoFinish.h"
 #include "../../DeferredEx/DeferredEx.h"
 #include "../../BaseEntity/Message/MessageDispatcher.h"
+#include "Trophy\TrophyManager.h"
+#include "Data\PlayerData.h"
+#include "Data\SelectData.h"
 
 #include "Window\Player\TekiWindow.h"
 
 Teki::Teki(SIDE side, const SideData &data) :BasePlayer(side, data)
 {
+
 	// コマンドウィンドウ
 	// 右と左でWindowの場所を変える
 	Vector2 l_vWindowPos;
@@ -81,6 +85,8 @@ Teki::Teki(SIDE side, const SideData &data) :BasePlayer(side, data)
 	m_pCounterEffect = new TekiCounterEffect();
 	m_pStepEffect = new StepEffect();
 
+	m_iAssaultDiveCount = 0;
+
 	// リセットはなるべく最後に
 	Reset();
 }
@@ -95,6 +101,7 @@ void Teki::Reset()
 	m_pCounterEffect->Stop();
 	m_pStepEffect->Stop();
 
+	m_iAssaultDiveCount = 0;
 }
 
 void Teki::InitActionDatas()
@@ -704,12 +711,49 @@ void Teki::Render()
 	m_pCounterEffect->Render();
 	m_pStepEffect->Render();
 
+
+#ifdef _DEBUG
+
+	Vector2 pos2d = Math::WorldToScreen(m_vPos);
+	tdnText::Draw((int)pos2d.x - 250, (int)pos2d.y - 280, 0xffff0022, "アサルトカウント: %d", m_iAssaultDiveCount);
+#endif // _DEBUG
+
 }
 
 void Teki::RenderDrive()
 {
 	// 基底クラスの更新
 	BasePlayer::RenderDrive();
+}
+
+bool Teki::HandleMessage(const Message & msg)
+{
+	switch (msg.Msg)
+	{
+	case HIT_ATTACK:
+		if (GetFSM()->isInState(*BasePlayerState::Skill::GetInstance()) &&
+			m_eSkillActionType == SKILL_ACTION_TYPE::AERIAL)
+		{
+			// カウントアップ
+			m_iAssaultDiveCount++;
+
+			// まだ↓のトロフィーを手に入れていなかったら
+			if (PlayerDataMgr->m_TrophyData.iTekiChallenge== 0)
+			{
+				// ↓以上所持していたら
+				if (m_iAssaultDiveCount >= 12)
+				{
+					TROPHY_TYPE eType = TROPHY_TYPE::TEKI_CHALLENGE;
+					MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
+				}
+			}
+		}
+				
+
+		break;
+	}
+
+	return BasePlayer::HandleMessage(msg);
 }
 
 void Teki::ChangeColor(COLOR_TYPE eColType)
@@ -1251,6 +1295,8 @@ void Teki::SkillAction::Aerial::Enter()
 	// 初段だけヒットストップ多め
 	m_pTeki->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 5;
 	m_pTeki->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_AERIAL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 5;
+
+	m_pTeki->m_iAssaultDiveCount = 0;
 }
 
 bool Teki::SkillAction::Aerial::Execute()
@@ -1266,6 +1312,7 @@ bool Teki::SkillAction::Aerial::Execute()
 
 	if (m_pTeki->GetAttackData()->bHit)
 	{
+		
 		// 必殺技キャンセル
 		if (HeaveHoCancel(m_pTeki)) return false;
 
@@ -1328,7 +1375,9 @@ bool Teki::SkillAction::Aerial::Execute()
 }
 
 void Teki::SkillAction::Aerial::Exit()
-{}
+{
+
+}
 
 
 Teki::SkillAction::AerialDrop::AerialDrop(Teki *pTeki) :Base(pTeki, BASE_ACTION_STATE::SKILL_AERIALDROP)

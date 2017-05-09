@@ -790,6 +790,18 @@ void Nazenara::RenderDrive()
 	if (m_pOverFlow) m_pOverFlow->Render();
 }
 
+bool Nazenara::HandleMessage(const Message & msg)
+{
+	switch (msg.Msg)
+	{
+	case HIT_ATTACK:
+
+		break;
+	}
+
+	return BasePlayer::HandleMessage(msg);
+}
+
 void Nazenara::ChangeColor(COLOR_TYPE eColType)
 {
 	LPSTR path = "none";

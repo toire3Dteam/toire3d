@@ -13,6 +13,7 @@ public:
 	void Update(PLAYER_UPDATE flag)override;
 	void Render()override;
 	void RenderDrive()override;
+	bool HandleMessage(const Message& msg)override;
 
 	/****************************/
 	//	キャラクター固有の様々なポジション

@@ -21,7 +21,12 @@ enum class TROPHY_TYPE
 	SS_POWERFUL_ENEMY,	//  最高難易度でCOM+SSランクで倒した
 	MENY_CONTENT,		//  コンテンツをたくさん解放した
 	CHALLENGE_CLEAR,	//  チャレンジモードで何かタスクをこなした
+	AIROU_CHALLENGE,	//	アイル―チャレンジ
+	TEKI_CHALLENGE,		//	テキチャレンジ
+	BIG_BIG_DAMAGE,		//	超物凄い火力
 	COMPLETE_TROPHY,	//  全てのトロフィーを集めた
+
+
 	//_6,
 	//_7, _8, _9, _10, _11, _12,
 	//_13, _14, _15, _16, _17, _18,

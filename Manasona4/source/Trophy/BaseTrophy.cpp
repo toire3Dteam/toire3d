@@ -353,6 +353,50 @@ ChallengeTrophy::ChallengeTrophy()
 }
 
 //+---------------------------------
+//	アイル―で100コンボ
+//+---------------------------------
+AirouChallengeTrophy::AirouChallengeTrophy()
+{
+	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/airou.png");
+	m_tagTrophy.sTitle = "おしおき";
+	m_tagTrophy.sText = "アイル―で100コンボした。";
+
+	// 隠しトロフィーフラグ
+	m_bHide = false;
+
+}
+
+//+---------------------------------
+//	テキでアサルトダイブ
+//+---------------------------------
+TekiChallengeTrophy::TekiChallengeTrophy()
+{
+	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/Teki.png");
+	m_tagTrophy.sTitle = "大根おろし";
+	m_tagTrophy.sText = "テキでアサルトダイブを超上空から当てた。";
+
+	// 隠しトロフィーフラグ
+	m_bHide = false;
+
+}
+
+//+---------------------------------
+//	10000ダメージ
+//+---------------------------------
+BigBigDamageTrophy::BigBigDamageTrophy()
+{
+	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/power2.png");
+	m_tagTrophy.sTitle = "北斗なコンボ";
+	m_tagTrophy.sText = "一回のコンボで10000ダメージ以上与えた。";
+
+	// 隠しトロフィーフラグ
+	m_bHide = false;
+
+}
+
+
+
+//+---------------------------------
 //	全てのトロフィーを集めた
 //+---------------------------------
 CompleteTrophy::CompleteTrophy()

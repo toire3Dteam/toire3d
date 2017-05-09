@@ -29,14 +29,14 @@ KeyConfig::KeyConfig()
 	AddIconData("×投げ");
 	AddIconData("○回避");
 
-	AddIconData("▽必殺");
-	AddIconData("▽無敵");
-	AddIconData("▽パートナー");
+	AddIconData("㊨必殺");
+	AddIconData("㊧無敵");
+	AddIconData("◇パートナー");
 	AddIconData("▽中段");
-	AddIconData("▽バースト");
+	AddIconData("◎バースト");
 
-	AddIconData("▽スタート");
-	AddIconData("▽セレクト");
+	AddIconData("●スタート");
+	AddIconData("■セレクト");
 
 	// 二回戻り防止
 	m_bBackPush = false;
@@ -153,6 +153,7 @@ void KeyConfig::Render()
 
 		}
 
+		// 文字
 		if (i != (int)KEY_CONFIG_STATE::BACK)
 		{
 			std::string l_strSting = "";
