@@ -14,9 +14,9 @@ public:
 	bool Update();
 	void Render();
 
-	bool Ctrl(int DeviceID);
+	bool Ctrl();
 
-	void Action(Vector2 vPos);
+	void Action(Vector2 vPos, int DeviceID);
 	void Stop();
 
 	// アクセサ
@@ -25,6 +25,9 @@ public:
 
 protected:
 	static const int SizeX = 432;
+
+	int m_iDeviceID;
+	KEY_CONFIG_DATA m_tagConfigData, m_tagOrgConfigData;
 
 	// ウィンドウのデザイン
 	tdn2DObj* m_pWindow;	// 全体
@@ -56,6 +59,8 @@ protected:
 		PARTNER,		// パートナー
 		DOKKOI,			// 中段
 		OVER_DRIVE,		// バースト
+		START,
+		SELECT,
 
 		BACK,			// 戻る
 		ARRAY_END		// 配列の終り
@@ -89,4 +94,6 @@ protected:
 protected:
 	void AddIconData(LPSTR string);
 
+	void SetConfig(KEYCODE PushedKey);
+	BYTE *GetKeyConfigButton(KEY_CONFIG_STATE eState);
 };

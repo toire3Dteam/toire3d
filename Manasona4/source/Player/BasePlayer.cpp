@@ -807,7 +807,10 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 		{
 			if(m_iRecoveryFrame < 30)m_pObj->Animation();
 		}
-		else if (!m_pStateMachine->isInState(*BasePlayerState::ThrowHold::GetInstance()))
+		else if (
+			!m_pStateMachine->isInState(*BasePlayerState::ThrowHold::GetInstance()) &&
+			!m_pStateMachine->isInState(*BasePlayerState::ThrowBind::GetInstance())
+			)
 		{
 			m_pObj->Animation();
 		}

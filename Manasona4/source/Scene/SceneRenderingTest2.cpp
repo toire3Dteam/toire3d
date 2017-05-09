@@ -262,14 +262,14 @@ sceneRenderingTest2::~sceneRenderingTest2()
 
 void sceneRenderingTest2::Update()
 {
-	if (KeyBoardTRG(KB_F))
-	{
-		keyconfig->Action(Vector2(100,100));
-	}
-	keyconfig->Ctrl(0);
+	keyconfig->Ctrl();
 
 	keyconfig->Update();
 
+	if (KeyBoardTRG(KB_N))
+	{
+		keyconfig->Action(Vector2(100, 100), 0);
+	}
 
 	if (KeyBoardTRG(KB_B)) 
 	{

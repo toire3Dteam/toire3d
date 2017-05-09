@@ -452,14 +452,13 @@ void Stand::Mokoi::Action(SKILL_ACTION_TYPE type)
 
 	// 基底クラスのアクション
 	// 空中はすべて通常技に
-	if (type == SKILL_ACTION_TYPE::AERIAL ||
-		type == SKILL_ACTION_TYPE::AERIALDROP)
+	if (type == SKILL_ACTION_TYPE::AERIAL)
 	{
 		Base::Action(SKILL_ACTION_TYPE::LAND);
 	}
 	else
 	{
-		if (type == SKILL_ACTION_TYPE::SQUAT)
+		if (type == SKILL_ACTION_TYPE::SQUAT || type == SKILL_ACTION_TYPE::AERIALDROP)
 		{
 			m_pObj->SetMotion(1);
 			if (m_pPlayer->GetDir() == DIR::LEFT)m_pos.x += 15;

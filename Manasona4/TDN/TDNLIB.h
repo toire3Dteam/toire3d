@@ -2236,13 +2236,13 @@ struct PADSET
 	{
 		struct
 		{
-			u8	lx, ly, rx, ry;
-			u8	A, B, X, Y;
-			u8	L1, L2, L3;
-			u8	R1, R2, R3;
-			u8	START, SELECT;
+			BYTE	lx, ly, rx, ry;
+			BYTE	A, B, C, D;
+			BYTE	L1, L2, L3;
+			BYTE	R1, R2, R3;
+			BYTE	START, SELECT;
 		};
-		u8 AllDatas[16];
+		BYTE AllDatas[16];
 	};
 };
 

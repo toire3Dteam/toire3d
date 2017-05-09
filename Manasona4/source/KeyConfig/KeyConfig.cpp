@@ -34,6 +34,9 @@ KeyConfig::KeyConfig()
 	AddIconData("▽中段");
 	AddIconData("▽バースト");
 
+	AddIconData("▽スタート");
+	AddIconData("▽セレクト");
+
 	// 二回戻り防止
 	m_bBackPush = false;
 
@@ -76,7 +79,6 @@ void KeyConfig::Render()
 	int x = (int)m_vPos.x + 18 + (255 /*- m_iAlpha*/);
 	for (int i = 0; i < (int)m_aIconData.size(); i++)
 	{
-
 		// 最後尾ならしっぽを描画
 		if (i == (int)m_aIconData.size() - 1)
 		{
@@ -149,6 +151,14 @@ void KeyConfig::Render()
 
 		}
 
+		if (i != (int)KEY_CONFIG_STATE::BACK)
+		{
+			std::string l_strSting = "";
+			l_strSting = std::to_string(*GetKeyConfigButton((KEY_CONFIG_STATE)i));
+
+			tdnFont::RenderString(l_strSting.c_str(), "HGｺﾞｼｯｸE",// HGP創英ﾌﾟﾚｾﾞﾝｽEB
+				24, x + 240, y + 2, ARGB(255, 255, 255, 255), RS::COPY);
+		}
 
 		// 40ピクセルずらして描画していく
 		y += 40 + m_iAbjustHeight;
@@ -156,44 +166,74 @@ void KeyConfig::Render()
 
 }
 
-bool KeyConfig::Ctrl(int DeviceID)
+bool KeyConfig::Ctrl()
 {
 	// 起動していなかったらハジく
 	if (m_bActive == false)return false;
 
-	// 
-	// 押したときのSE
-	// 決定
-	if (tdnInput::KeyGet(KEYCODE::KEY_B, DeviceID) == 3)
+
+
+	if (tdnInput::KeyGet(KEYCODE::KEY_A, m_iDeviceID) == 3)
 	{
-		se->Play("決定1");
+		SetConfig(KEYCODE::KEY_A);
 	}
 
-	// 戻る
-	if (tdnInput::KeyGet(KEYCODE::KEY_A, DeviceID) == 3)
+	else if (tdnInput::KeyGet(KEYCODE::KEY_B, m_iDeviceID) == 3)
 	{
-		se->Play("キャンセル1");
+		SetConfig(KEYCODE::KEY_B);
 	}
 
-	// ↑
-	if (tdnInput::KeyGet(KEYCODE::KEY_UP, DeviceID) == 3)
+	else if (tdnInput::KeyGet(KEYCODE::KEY_C, m_iDeviceID) == 3)
 	{
-		se->Play("カーソル1");
+		SetConfig(KEYCODE::KEY_C);
 	}
 
-	// ↓
-	if (tdnInput::KeyGet(KEYCODE::KEY_DOWN, DeviceID) == 3)
+	else if (tdnInput::KeyGet(KEYCODE::KEY_D, m_iDeviceID) == 3)
 	{
-		se->Play("カーソル1");
+		SetConfig(KEYCODE::KEY_D);
 	}
 
+	else if (tdnInput::KeyGet(KEYCODE::KEY_L1, m_iDeviceID) == 3)
+	{
+		SetConfig(KEYCODE::KEY_L1);
+	}
+
+	else if (tdnInput::KeyGet(KEYCODE::KEY_L2, m_iDeviceID) == 3)
+	{
+		SetConfig(KEYCODE::KEY_L2);
+	}
+
+	else if (tdnInput::KeyGet(KEYCODE::KEY_R1, m_iDeviceID) == 3)
+	{
+		SetConfig(KEYCODE::KEY_R1);
+	}
+
+	else if (tdnInput::KeyGet(KEYCODE::KEY_R2, m_iDeviceID) == 3)
+	{
+		SetConfig(KEYCODE::KEY_R2);
+	}
+
+	else if (tdnInput::KeyGet(KEYCODE::KEY_R3, m_iDeviceID) == 3)
+	{
+		SetConfig(KEYCODE::KEY_R3);
+	}
+
+	else if (tdnInput::KeyGet(KEYCODE::KEY_START, m_iDeviceID) == 3)
+	{
+		SetConfig(KEYCODE::KEY_START);
+	}
+
+	else if (tdnInput::KeyGet(KEYCODE::KEY_SELECT, m_iDeviceID) == 3)
+	{
+		SetConfig(KEYCODE::KEY_SELECT);
+	}
 
 	// 決定を押してない時
-	if (tdnInput::KeyGet(KEYCODE::KEY_B, DeviceID) == 0)
+	if (tdnInput::KeyGet(KEYCODE::KEY_B, m_iDeviceID) == 0)
 	{
 
 		// 選択切り替え
-		if (tdnInput::KeyGet(KEYCODE::KEY_UP, DeviceID) == 3)
+		if (tdnInput::KeyGet(KEYCODE::KEY_UP, m_iDeviceID) == 3)
 		{
 			m_iSelectNo--;
 			// 選択時の演出
@@ -203,8 +243,9 @@ bool KeyConfig::Ctrl(int DeviceID)
 			{
 				m_iSelectNo = ((int)m_aIconData.size() - 1);
 			}
+			se->Play("カーソル1");
 		}
-		if (tdnInput::KeyGet(KEYCODE::KEY_DOWN, DeviceID) == 3)
+		if (tdnInput::KeyGet(KEYCODE::KEY_DOWN, m_iDeviceID) == 3)
 		{
 			m_iSelectNo++;
 			// 選択時の演出
@@ -214,6 +255,7 @@ bool KeyConfig::Ctrl(int DeviceID)
 			{
 				m_iSelectNo = 0;
 			}
+			se->Play("カーソル1");
 		}
 
 		// 選択してるパラメータの操作
@@ -227,9 +269,14 @@ bool KeyConfig::Ctrl(int DeviceID)
 
 }
 
-void KeyConfig::Action(Vector2 vPos)
+void KeyConfig::Action(Vector2 vPos, int iDeviceID)
 {
+	// 現在のコントローラーのコンフィグのデータをとってくる
+	memcpy_s(&m_tagConfigData, sizeof(KEY_CONFIG_DATA), tdnInputManager::GetConfigDatas(iDeviceID), sizeof(KEY_CONFIG_DATA));
+	memcpy_s(&m_tagOrgConfigData, sizeof(KEY_CONFIG_DATA), tdnInputManager::GetConfigDatas(iDeviceID), sizeof(KEY_CONFIG_DATA));
+
 	m_vPos = vPos;
+	m_iDeviceID = iDeviceID;
 
 	m_iChoiceState = CHOICE_STATE::HOLD;
 	// ウィンドウ起動
@@ -241,6 +288,9 @@ void KeyConfig::Stop()
 	// ウィンドウ終了
 	m_bActive = false;
 	m_iChoiceState = CHOICE_STATE::HOLD;// (12/12) ここにもHOLDの処理
+
+	// キーコンフィグ情報を保存！
+	tdnInputManager::SetConfig(m_tagConfigData);
 }
 
 void KeyConfig::AddIconData(LPSTR string)
@@ -262,4 +312,98 @@ void KeyConfig::AddIconData(LPSTR string)
 	data.iStringLength = addByte;
 
 	m_aIconData.push_back(data);
+}
+
+void KeyConfig::SetConfig(KEYCODE PushedKey)
+{
+	BYTE *l_pSelectKey = GetKeyConfigButton((KEY_CONFIG_STATE)m_iSelectNo);
+
+	// 値入ってなかったら(戻るボタン)出ていけぇ！！
+	if (!l_pSelectKey) return;
+
+	// L1-R1-L2-R2-L3-R3　→　L1-L2-L3-R1-R2-R3
+	BYTE Push = m_tagOrgConfigData.tagPadSet.AllDatas[(BYTE)PushedKey];
+	switch (PushedKey)
+	{
+	case KEYCODE::KEY_L1:
+		Push = m_tagOrgConfigData.tagPadSet.L1;
+		break;
+	case KEYCODE::KEY_L2:
+		Push = m_tagOrgConfigData.tagPadSet.L2;
+		break;
+	case KEYCODE::KEY_L3:
+		Push = m_tagOrgConfigData.tagPadSet.L3;
+		break;
+	case KEYCODE::KEY_R1:
+		Push = m_tagOrgConfigData.tagPadSet.R1;
+		break;
+	case KEYCODE::KEY_R2:
+		Push = m_tagOrgConfigData.tagPadSet.R2;
+		break;
+	case KEYCODE::KEY_R3:
+		Push = m_tagOrgConfigData.tagPadSet.R3;
+		break;
+	}
+
+	// 押したキーと設定されている同じボタンだったら出ていけぇ！！
+	if (Push == *l_pSelectKey) return;
+
+	//BYTE a(tdnInputManager::GetConfigDatas(m_iDeviceID)->tagPadSet.AllDatas[(BYTE)PushedKey]), b(*l_pSelectKey), c(m_tagConfigData.tagPadSet.AllDatas[(BYTE)PushedKey]);
+
+	// キー検索
+	for (int i = 4; i < 16; i++)
+	{
+		if (Push == m_tagConfigData.tagPadSet.AllDatas[i])
+		{
+			// 前のやつと入れ替える
+			BYTE temp = *l_pSelectKey;
+			*l_pSelectKey = Push;
+			m_tagConfigData.tagPadSet.AllDatas[i] = temp;
+		}
+	}
+
+	se->Play("決定1");
+}
+
+BYTE *KeyConfig::GetKeyConfigButton(KEY_CONFIG_STATE eState)
+{
+	switch (eState)
+	{
+	case KeyConfig::ATTACK:
+		return &m_tagConfigData.tagPadSet.C;
+		break;
+	case KeyConfig::SKILL:
+		return &m_tagConfigData.tagPadSet.D;
+		break;
+	case KeyConfig::THROW:
+		return &m_tagConfigData.tagPadSet.A;
+		break;
+	case KeyConfig::ESCAPE:
+		return &m_tagConfigData.tagPadSet.B;
+		break;
+	case KeyConfig::HEAVEHO_DRIVE:
+		return &m_tagConfigData.tagPadSet.R2;
+		break;
+	case KeyConfig::INVINCIBLE:
+		return &m_tagConfigData.tagPadSet.L2;
+		break;
+	case KeyConfig::PARTNER:
+		return &m_tagConfigData.tagPadSet.L1;
+		break;
+	case KeyConfig::DOKKOI:
+		return &m_tagConfigData.tagPadSet.R1;
+		break;
+	case KeyConfig::OVER_DRIVE:
+		return &m_tagConfigData.tagPadSet.R3;
+		break;
+	case KeyConfig::START:
+		return &m_tagConfigData.tagPadSet.START;
+		break;
+	case KeyConfig::SELECT:
+		return &m_tagConfigData.tagPadSet.SELECT;
+		break;
+	default:
+		return nullptr;
+		break;
+	}
 }

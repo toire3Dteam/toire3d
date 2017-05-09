@@ -531,6 +531,9 @@ bool BackStepCancel(BasePlayer * pPerson)
 
 bool AerialDashCancel(BasePlayer *pPerson)
 {
+	// 空中ジャンプの権利が無かったらダッシュできない
+	if (!pPerson->isAerialJump()) return false;
+
 	// 空中ダッシュキャンセル
 	if (pPerson->isDoublePush(PLAYER_COMMAND_BIT::RIGHT, 12))
 	{
@@ -2513,9 +2516,9 @@ void BasePlayerState::Fall::Execute(BasePlayer * pPerson)
 
 
 	//////////////////////////////////////////////
-	//	空中攻撃キャンセル
+	//	空中ダッシュキャンセル
 	//============================================
-	//if (AerialAttackCancel(pPerson)) return;
+	if (AerialDashCancel(pPerson)) return;
 
 	//////////////////////////////////////////////
 	//	攻撃キャンセル
@@ -4441,16 +4444,22 @@ void BasePlayerState::StandAction::Execute(BasePlayer * pPerson)
 		//////////////////////////////////////////////
 		//	左右キーで走りキャンセル
 		//============================================
-		if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::LEFT))
-		{
-			pPerson->SetDir(DIR::LEFT);
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
-		}
-		else if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::LEFT))
-		{
-			pPerson->SetDir(DIR::RIGHT);
-			pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
-		}
+		//if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::LEFT))
+		//{
+		//	if (pPerson->GetDir() == DIR::LEFT)
+		//	{
+		//		pPerson->SetDir(DIR::LEFT);
+		//		pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+		//	}
+		//}
+		//else if (pPerson->isPushInputTRG(PLAYER_COMMAND_BIT::RIGHT))
+		//{
+		//	if (pPerson->GetDir() == DIR::RIGHT)
+		//	{
+		//		pPerson->SetDir(DIR::RIGHT);
+		//		pPerson->GetFSM()->ChangeState(BasePlayerState::Run::GetInstance());
+		//	}
+		//}
 	}
 
 	// 移動量無し
@@ -4771,6 +4780,11 @@ void BasePlayerState::OverDrive_OneMore::Execute(BasePlayer * pPerson)
 		//	スタンドキャンセル
 		//============================================
 		if (StandCancel(pPerson)) return;
+
+		//////////////////////////////////////////////
+		//	空中ダッシュキャンセル
+		//============================================
+		if (AerialDashCancel(pPerson)) return;
 
 		// 動きを止める
 		pPerson->SetMove(Vector3(0, 0, 0));

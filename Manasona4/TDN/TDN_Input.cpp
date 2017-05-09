@@ -109,7 +109,7 @@ BOOL CALLBACK tdnInputManager::EnumDeviceCallback(const DIDEVICEINSTANCE* pdidi,
 		l_tagConfigData.tagPadSet.AllDatas[15] = 9;
 
 		// controller情報登録
-		memcpy_s(&m_tagConfigDatas[m_NumDevice], sizeof(KEY_CONFIG_DATA), &ConfigurePort, sizeof(KEY_CONFIG_DATA));
+		memcpy_s(&m_tagConfigDatas[m_NumDevice], sizeof(KEY_CONFIG_DATA), &l_tagConfigData, sizeof(KEY_CONFIG_DATA));
 
 		// リスト追加
 		m_vConfigList.push_back(l_tagConfigData);
@@ -209,7 +209,7 @@ void tdnInputManager::LoadConfig()
 		{
 			int n;
 			ifs >> n;
-			l_tagConfigData.tagPadSet.AllDatas[i] = (u8)n;
+			l_tagConfigData.tagPadSet.AllDatas[i] = (BYTE)n;
 		}
 
 		// リストにセット
@@ -386,7 +386,9 @@ tdnInputDevice::tdnInputDevice(int n) :lpDevice(nullptr), m_pEffect(nullptr)
 {
 	if (n != -1){
 		lpDevice = tdnInputManager::CreateDevice(n);
+#ifdef VIBRATION_ON
 		if (lpDevice) InitVibration();
+#endif
 	}
 
 	// デフォルト設定
@@ -550,8 +552,8 @@ void tdnInputDevice::PadAsign(const PADSET &padset)
 	//	メインボタン
 	joy_map[KEY_A] = padset.A - 1;
 	joy_map[KEY_B] = padset.B - 1;
-	joy_map[KEY_C] = padset.X - 1;
-	joy_map[KEY_D] = padset.Y - 1;
+	joy_map[KEY_C] = padset.C - 1;
+	joy_map[KEY_D] = padset.D - 1;
 	//	ＬＲキー
 	joy_map[KEY_L1] = padset.L1 - 1;
 	joy_map[KEY_L2] = padset.L2 - 1;
@@ -626,6 +628,8 @@ void tdnInput::Reset()
 	{
 		device[i]->PadAsign(tdnInputManager::GetConfigDatas(i)->tagPadSet);
 	}
+
+	OKB_Init();
 }
 
 //------------------------------------------------------
