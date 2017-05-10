@@ -107,7 +107,7 @@ SelectUIManager::SelectUIManager()
 		}	
 
 		// ‹¤’ÊÝ’è
-		m_pCharacterIcon[i]->OrderMoveAppeared(12, ((i * m_iWidthIcon) % (MOVING_UP * m_iWidthIcon)), 482 + m_iIconX);
+		m_pCharacterIcon[i]->OrderMoveAppeared(12, ((i * m_iWidthIcon) % (MOVING_UP * m_iWidthIcon)) + m_iIconX, 482 + m_iIconX);
 	}
 
 

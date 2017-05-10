@@ -19,7 +19,7 @@ OptionWindow::OptionWindow(Vector2 vPos) :BaseWindow(vPos)
 	AddIconData("システム設定", "システム設定を行います。");
 	AddIconData("ゲーム設定", "ゲーム内の各種設定変更を行います。");
 	AddIconData("サウンド設定", "各種サウンドの音量の設定変更を行います。");
-	AddIconData("コントローラー設定", "コントローラーの設定変更を行います。");
+	AddIconData("コントローラ設定", "コントローラの設定変更を行います。");
 	AddIconData("戻る", "このウィンドウを閉じます。");
 
 	// 演出

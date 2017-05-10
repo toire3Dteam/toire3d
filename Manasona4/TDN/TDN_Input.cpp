@@ -663,9 +663,22 @@ void tdnInput::Reset()
 {
 	// 解放
 	tdnInputManager::Release();
+	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++) SAFE_DELETE(device[i]);
 
 	// この中でcontrollerの列挙とかコンフィグの読み込みとか
 	tdnInputManager::Initialize();
+
+	// デバイス初期化
+	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++)
+	{
+		device[i] = new tdnInputDevice(i);
+	}
+
+	// 読み込んだキーコンフィグを設定
+	for (int i = 0; i < tdnInputEnum::INPUT_DEVICE_MAX; i++)
+	{
+		device[i]->PadAsign(tdnInputManager::GetConfigDatas(i)->tagPadSet);
+	}
 }
 
 //------------------------------------------------------

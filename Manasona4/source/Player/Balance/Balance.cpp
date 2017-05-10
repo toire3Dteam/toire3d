@@ -3,6 +3,7 @@
 #include "UI/HeaveHoFinish/HeaveHoFinish.h"
 #include "../../DeferredEx/DeferredEx.h"
 #include "../../BaseEntity/Message/MessageDispatcher.h"
+#include "../../Shot/BaseShot.h"
 
 #include "Window\Player\TekiWindow.h"
 
@@ -43,27 +44,27 @@ Balance::Balance(SIDE side, const SideData &data) :BasePlayer(side, data)
 	// フレーム読み込み
 	BasePlayer::LoadAttackFrameList("DATA/CHR/Teki/FrameList.txt");
 	// ★フレーム独自改造
-	{
-		// 2段目は2HITじゃなくなったので、ボツニナリマシタ
-		//m_ActionFrameList[(int)BASE_ACTION_STATE::RUSH2][13] = FRAME_STATE::RECOVERY_HIT;
-		//m_ActionFrameList[(int)BASE_ACTION_STATE::RUSH2][14] = FRAME_STATE::ACTIVE;
-		//m_ActionFrameList[(int)BASE_ACTION_STATE::RUSH2][15] = FRAME_STATE::ACTIVE;
+	//{
+	//	// 2段目は2HITじゃなくなったので、ボツニナリマシタ
+	//	//m_ActionFrameList[(int)BASE_ACTION_STATE::RUSH2][13] = FRAME_STATE::RECOVERY_HIT;
+	//	//m_ActionFrameList[(int)BASE_ACTION_STATE::RUSH2][14] = FRAME_STATE::ACTIVE;
+	//	//m_ActionFrameList[(int)BASE_ACTION_STATE::RUSH2][15] = FRAME_STATE::ACTIVE;
 
-		// キルラ
-		m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL][5 + 7] = FRAME_STATE::RECOVERY_HIT;
-		m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL][5 + 13] = FRAME_STATE::RECOVERY_HIT;
-		m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL][5 + 19] = FRAME_STATE::RECOVERY_HIT;
+	//	// キルラ
+	//	m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL][5 + 7] = FRAME_STATE::RECOVERY_HIT;
+	//	m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL][5 + 13] = FRAME_STATE::RECOVERY_HIT;
+	//	m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL][5 + 19] = FRAME_STATE::RECOVERY_HIT;
 
-		// アサルトダイブ
-		int ActiveStartFrame;
-		for (int i = 0;; i++) if (m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL_AERIAL][i] == FRAME_STATE::ACTIVE){ ActiveStartFrame = i; break; }
-		for (int i = ActiveStartFrame; m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL_AERIAL][i] != FRAME_STATE::FOLLOW; i++)
-		{
-			// 小刻みにいくよおおおおっ！！！！！
-			static const int kankaku(3);
-			if ((i - ActiveStartFrame) % kankaku == kankaku - 1) m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL_AERIAL][i] = FRAME_STATE::RECOVERY_HIT;
-		}
-	}
+	//	// アサルトダイブ
+	//	int ActiveStartFrame;
+	//	for (int i = 0;; i++) if (m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL_AERIAL][i] == FRAME_STATE::ACTIVE){ ActiveStartFrame = i; break; }
+	//	for (int i = ActiveStartFrame; m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL_AERIAL][i] != FRAME_STATE::FOLLOW; i++)
+	//	{
+	//		// 小刻みにいくよおおおおっ！！！！！
+	//		static const int kankaku(3);
+	//		if ((i - ActiveStartFrame) % kankaku == kankaku - 1) m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL_AERIAL][i] = FRAME_STATE::RECOVERY_HIT;
+	//	}
+	//}
 	// てきメッシュ
 	m_pObj = m_pDefaultObj;
 
@@ -667,6 +668,43 @@ void Balance::InitActionDatas()
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::AERIAL] = new SkillAction::Aerial(this);
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::AERIAL2] = new SkillAction::AerialDrop(this);
 	m_pSkillActions[(int)SKILL_ACTION_TYPE::AERIALDROP] = new SkillAction::Aerial(this);
+
+	//==============================================================================================================
+	//	ショット
+	// 地上ヒットも空中ヒットも共通の情報
+	m_pShotData = new AttackData;
+	m_pShotData->damage = 800;
+	m_pShotData->pierceLV = 0;
+	m_pShotData->HitSE = "ヒット6";
+	m_pShotData->WhiffSE = "空振り1";
+	m_pShotData->HitEffectType = EFFECT_TYPE::DAMAGE;
+	m_pShotData->WhiffEffectType = EFFECT_TYPE::WHIFF;
+	m_pShotData->bAntiAir = true;
+	m_pShotData->bFinish = true;
+	m_pShotData->AntiGuard = ANTIGUARD_ATTACK::NONE;
+	m_pShotData->ShakeCameraInfo.Set(.2f, 2);
+	m_pShotData->GuardRecoveryFrame = 20;
+	m_pShotData->fGuardKnockBackPower = .25f;
+	m_pShotData->attribute = ATTACK_ATTRIBUTE::BULLET;
+	m_pShotData->fComboRate = 1.0f;
+	// 地上ヒットと空中ヒットで挙動が変わるもの
+	m_pShotData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
+	m_pShotData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
+	m_pShotData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(.75f, 0);
+	m_pShotData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(1.5f, 1.5f);
+	m_pShotData->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 8;
+	m_pShotData->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 10;
+	m_pShotData->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 30;
+	m_pShotData->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 40;
+	m_pShotData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_BACK;
+	m_pShotData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
+	// 判定形状
+	m_pShotData->pCollisionShape->width = 5;
+	m_pShotData->pCollisionShape->height = 5;
+	m_pShotData->pCollisionShape->pos.Set(0, 0, 0);
+
+	m_pBullet = new  MayaShotEffect();
+
 }
 
 Balance::~Balance()
@@ -677,6 +715,8 @@ Balance::~Balance()
 	//SAFE_DELETE(m_pCycloneEffect);
 	//SAFE_DELETE(m_pCounterEffect);
 	//SAFE_DELETE(m_pStepEffect);
+
+	SAFE_DELETE(m_pBullet);
 
 }
 
@@ -988,7 +1028,7 @@ void Balance::SkillAction::Land::Enter()
 	m_pBalance->SetMotion(MOTION_TYPE::SKILL_LAND);
 
 	// アクションステート変更
-	m_pBalance->SetActionState(BASE_ACTION_STATE::FRAMECOUNT);
+	m_pBalance->SetActionState(BASE_ACTION_STATE::SKILL);
 
 	// 向き設定
 	m_pBalance->SetDirAngle();
@@ -996,8 +1036,6 @@ void Balance::SkillAction::Land::Enter()
 	// リセット
 	m_iHitCount = 0;
 
-	// てき自体の横幅を増やす
-	m_pBalance->m_tagCharacterParam.HitSquare.width = 8.5f;
 }
 
 bool Balance::SkillAction::Land::Execute()
@@ -1007,66 +1045,79 @@ bool Balance::SkillAction::Land::Execute()
 
 	if (m_pBalance->GetActionState() == BASE_ACTION_STATE::SKILL)
 	{
-		// ヒット回数計測
-		if (m_pBalance->m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL][m_pBalance->m_iCurrentActionFrame] == FRAME_STATE::RECOVERY_HIT)
+		// アクティブ
+		if (m_pBalance->GetActionFrame() == FRAME_STATE::ACTIVE)
 		{
-			// 最後の一撃だけ強くする
-			if (++m_iHitCount >= 3)
+			static const int IMPACT_FRAME = 24;
+			// 初段
+			if (m_pBalance->m_iCurrentActionFrame == IMPACT_FRAME)
 			{
-				m_pBalance->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(1.5f, 0);
-				m_pBalance->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(.85f, 1.65f);
-			}
+				Vector3 ShotVec;
+				ShotVec.Set(0.5f, 0, 0);
 
-			// コンボレートを下げないようにする
-			m_pBalance->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->fComboRate = 1.0f;
+				// ショットの向き逆
+				ShotVec.x *= m_pBalance->GetDirVecX();
+
+				// マズルエフェクト発動！
+				m_pBalance->AddEffectAction(m_pBalance->GetPos() + Vector3(0, 4, -2), EFFECT_TYPE::MUZZLE_FLASH, ShotVec);
+
+				Shot::Base *pNewShot = nullptr;
+
+				// 玉の情報を格納
+				pNewShot = new Shot::Maya(m_pBalance, m_pBalance->m_pShotData, m_pBalance->m_pBullet,
+					m_pBalance->GetPos() + Vector3(-ShotVec.x * 2, 5, 0), ShotVec);			
+
+				MsgMgr->Dispatch(0, m_pBalance->GetID(), ENTITY_ID::SHOT_MGR, MESSAGE_TYPE::ADD_SHOT, pNewShot);
+			}
 		}
 
+		// 相手にダメージが当たった時のキャンセルルート
 		if (m_pBalance->isHitAttack() && m_pBalance->GetActionFrame() == FRAME_STATE::FOLLOW)
 		{
 			// 必殺技キャンセル
 			if (HeaveHoCancel(m_pBalance)) return false;
 
-			// コークスクリュールート
-			if (m_pBalance->isPushInputTRG(PLAYER_COMMAND_BIT::D, true))
-			{
-				m_pBalance->SkillExit();
-				m_pBalance->m_eSkillActionType = SKILL_ACTION_TYPE::LAND2;
-				m_pBalance->SkillInit();
-				return false;
-			}
+			//// コークスクリュールート
+			//if (m_pBalance->isPushInputTRG(PLAYER_COMMAND_BIT::D, true))
+			//{
+			//	m_pBalance->SkillExit();
+			//	m_pBalance->m_eSkillActionType = SKILL_ACTION_TYPE::LAND2;
+			//	m_pBalance->SkillInit();
+			//	return false;
+			//}
 		}
 	}
 
-	else
-	{
-		// 攻撃ステート終わったら
-		if (m_pBalance->m_iCurrentActionFrame > 12)
-		{
-			m_pBalance->SetMove(m_pBalance->GetMove() * .75f);
+	//else
+	//{
+	//	// 攻撃ステート終わったら
+	//	if (m_pBalance->m_iCurrentActionFrame > 12)
+	//	{
+	//		m_pBalance->SetMove(m_pBalance->GetMove() * .75f);
 
-			// 速度が一定以下になったら
-			if (fabsf(m_pBalance->GetMove().x) < 1 && m_pBalance->m_iCurrentActionFrame >= 40)return true;
-		 }
+	//		// 速度が一定以下になったら
+	//		if (fabsf(m_pBalance->GetMove().x) < 1 && m_pBalance->m_iCurrentActionFrame >= 40)return true;
+	//	 }
 
-		// 走ってる間
-		else //if (m_pBalance->m_iCurrentActionFrame < 12)
-		{
-			m_pBalance->AddMove(Vector3((m_pBalance->m_dir == DIR::LEFT) ? -1.0f : 1.0f, 0, 0));
-			m_pBalance->MoveClampX(3.5f);
+	//	// 走ってる間
+	//	else //if (m_pBalance->m_iCurrentActionFrame < 12)
+	//	{
+	//		m_pBalance->AddMove(Vector3((m_pBalance->m_dir == DIR::LEFT) ? -1.0f : 1.0f, 0, 0));
+	//		m_pBalance->MoveClampX(3.5f);
 
-			// 接近したらキルラッシュモーション
-			if ((m_pBalance->GetPos() - m_pBalance->m_pTargetPlayer->GetPos()).LengthSq() < 16 * 16)
-			{
-				m_pBalance->SetActionState(BASE_ACTION_STATE::SKILL);
-				m_pBalance->SetMotion(MOTION_TYPE::RUSH_ATTACK3);
+	//		// 接近したらキルラッシュモーション
+	//		if ((m_pBalance->GetPos() - m_pBalance->m_pTargetPlayer->GetPos()).LengthSq() < 16 * 16)
+	//		{
+	//			m_pBalance->SetActionState(BASE_ACTION_STATE::SKILL);
+	//			m_pBalance->SetMotion(MOTION_TYPE::RUSH_ATTACK3);
 
-				m_pBalance->AheadCommandReset();
+	//			m_pBalance->AheadCommandReset();
 
-				// 横幅をもどす
-				m_pBalance->m_tagCharacterParam.HitSquare.width = m_pBalance->m_tagOrgCharacterParam.HitSquare.width;
-			}
-		}
-	}
+	//			// 横幅をもどす
+	//			m_pBalance->m_tagCharacterParam.HitSquare.width = m_pBalance->m_tagOrgCharacterParam.HitSquare.width;
+	//		}
+	//	}
+	//}
 
 	return false;
 }
@@ -1074,16 +1125,13 @@ bool Balance::SkillAction::Land::Execute()
 void Balance::SkillAction::Land::Exit()
 {
 	// 攻撃情報を元に戻す
-	m_pBalance->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->damage = m_OrgDamage;
-	m_pBalance->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector = m_OrgFlyVector[(int)AttackData::HIT_PLACE::LAND];
-	m_pBalance->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector = m_OrgFlyVector[(int)AttackData::HIT_PLACE::AERIAL];
-	m_pBalance->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->fComboRate = m_fOrgComboRate;
+	//m_pBalance->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->damage = m_OrgDamage;
+	//m_pBalance->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector = m_OrgFlyVector[(int)AttackData::HIT_PLACE::LAND];
+	//m_pBalance->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector = m_OrgFlyVector[(int)AttackData::HIT_PLACE::AERIAL];
+	//m_pBalance->m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->fComboRate = m_fOrgComboRate;
 
 	// 先行入力リセット
 	m_pBalance->AheadCommandReset();
-
-	// 横幅をもどす
-	m_pBalance->m_tagCharacterParam.HitSquare.width = m_pBalance->m_tagOrgCharacterParam.HitSquare.width;
 }
 
 

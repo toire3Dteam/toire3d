@@ -660,7 +660,7 @@ bool GuardUpdate(BasePlayer *pPerson)
 		bool bAttackState(false);
 		bool bStandAttack(false);
 		// ★相手が何かしらの攻撃をしていたら、
-		if (target->isAttackState()) if (target->GetAttackData()->attribute != ATTACK_ATTRIBUTE::THROW) bAttackState = true;
+		if (target->isAttackState()) if (target->GetAttackData()->attribute != ATTACK_ATTRIBUTE::THROW && target->GetAttackData()->attribute != ATTACK_ATTRIBUTE::AERIAL_THROW) bAttackState = true;
 
 		// スタンド
 		if (target->GetStand()->isActive() && target->GetStand()->isCanGuardStand())

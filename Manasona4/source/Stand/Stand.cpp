@@ -463,6 +463,7 @@ void Stand::Mokoi::Action(SKILL_ACTION_TYPE type)
 			m_pObj->SetMotion(1);
 			if (m_pPlayer->GetDir() == DIR::LEFT)m_pos.x += 15;
 			else m_pos.x -= 15;
+			type = SKILL_ACTION_TYPE::SQUAT;
 		}
 
 		Base::Action(type);

@@ -203,6 +203,10 @@ private:
 	void InitActionDatas();
 	void InitMotionDatas();
 
+	// 波動用
+	AttackData *m_pShotData;
+	BaseUVEffect *m_pBullet;	// 飛び道具のメッシュの実体(玉に参照させる)
+
 	// Balance用のエフェクト
 	//BalanceUpperLineEffect* m_pUpperLineEffect;
 	//BaseUVEffect *m_pCycloneEffect;	// 必殺の風

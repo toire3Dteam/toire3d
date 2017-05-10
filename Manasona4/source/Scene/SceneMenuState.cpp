@@ -782,9 +782,22 @@ void SceneMenuState::OptionStep::Execute(sceneMenu *pMain)
 	if (pMain->GetWindow(WINDOW_TYPE::OPTION)->GetChoiceState()
 		== OptionWindow::OPTION_STATE::KEYCONFIG)
 	{
-		// キーコンフィグメニューへ
-		pMain->GetFSM()->ChangeState(KeyConfigWindowStep::GetInstance());
-		return;
+		// パッド分更新
+		const int NumDevice(tdnInputManager::GetNumDevice());
+		if (NumDevice == 0) 
+		{
+			MessageBox(tdnSystem::GetWindow(), "コントローラがいるって、はっきし分かんだね", __FUNCTION__, MB_OK);
+
+			pMain->GetWindow(WINDOW_TYPE::OPTION)->Stop();// ウィンドウを閉じる
+			pMain->GetFSM()->ChangeState(FirstStep::GetInstance());	// メニューへ戻る
+			return;
+		}
+		else
+		{
+			// キーコンフィグメニューへ
+			pMain->GetFSM()->ChangeState(KeyConfigWindowStep::GetInstance());
+			return;
+		}	
 	}
 
 	// (1/18) メニューを開いた人だけが動かせる
