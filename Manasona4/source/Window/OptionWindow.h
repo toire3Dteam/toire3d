@@ -27,6 +27,7 @@ public:
 		GAME,
 		SOUND,
 		KEYCONFIG,
+		BACK_TITLE,
 		BACK
 	};
 

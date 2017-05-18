@@ -901,11 +901,7 @@ void BasePlayer::UpdateDrive()
 		m_pStand->Update(false);
 	}
 
-	// –³“GŠÔ‚ÌXV
-	if (KeyBoardTRG(KB_H))
-	{
-		SetInvincible(240, 1);
-	}
+
 	InvincibleUpdate();
 
 

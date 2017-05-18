@@ -353,6 +353,20 @@ ChallengeTrophy::ChallengeTrophy()
 }
 
 //+---------------------------------
+//	アッタカイボム
+//+---------------------------------
+AttakaiBomTrophy::AttakaiBomTrophy()
+{
+	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/bom.png");
+	m_tagTrophy.sTitle = "大爆発エンド";
+	m_tagTrophy.sText = "HPが0の相手にアッタカイの爆弾を爆発させた。";
+
+	// 隠しトロフィーフラグ
+	m_bHide = false;
+
+}
+
+//+---------------------------------
 //	アイル―で100コンボ
 //+---------------------------------
 AirouChallengeTrophy::AirouChallengeTrophy()

@@ -159,8 +159,16 @@ void KeyConfig::Render()
 			std::string l_strSting = "";
 			l_strSting = std::to_string(*GetKeyConfigButton((KEY_CONFIG_STATE)i));
 
-			tdnFont::RenderString(l_strSting.c_str(), "HGºÞ¼¯¸E",// HGP‘n‰pÌßÚ¾ÞÝ½EB
-				24, x + 240, y + 2, ARGB(255, 255, 255, 255), RS::COPY);
+			if (m_iSelectNo == i)
+			{
+				tdnFont::RenderString(l_strSting.c_str(), "HGºÞ¼¯¸E",// HGP‘n‰pÌßÚ¾ÞÝ½EB
+					24, x + 240, y + 2, ARGB(255, 3, 10, 88), RS::COPY);
+			}
+			else
+			{
+				tdnFont::RenderString(l_strSting.c_str(), "HGºÞ¼¯¸E",// HGP‘n‰pÌßÚ¾ÞÝ½EB
+					24, x + 240, y + 2, ARGB(255, 255, 255, 255), RS::COPY);
+			}
 		}
 
 		// 40ƒsƒNƒZƒ‹‚¸‚ç‚µ‚Ä•`‰æ‚µ‚Ä‚¢‚­

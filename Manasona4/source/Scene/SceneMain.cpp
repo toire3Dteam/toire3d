@@ -482,7 +482,7 @@ void sceneMain::Update()
 		//}
 
 
-		if (KeyBoardTRG(KB_K))
+		if (KeyBoardTRG(KB_6))
 		{
 			if (m_bShaderFlag)
 			{

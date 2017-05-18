@@ -44,6 +44,10 @@ bool sceneTitle::Initialize()
 	m_pStateMachine = new StateMachine<sceneTitle>(this);
 	m_pStateMachine->SetCurrentState(SceneTitleState::Intro::GetInstance());	// ステートの設定
 
+	m_pNoPad = new tdn2DAnim("Data/Title/NoPad.png");
+	m_pNoPad->OrderJump(30, 1, 0.1f);
+	m_iNoPadRoopCount = 0;
+	//m_pNoPad->OrderAlphaMove(150, 70, 80);
 
 	return true;
 }
@@ -60,6 +64,7 @@ sceneTitle::~sceneTitle()
 	SAFE_DELETE(m_pMovieBGLine);
 	SAFE_DELETE(m_pBGLine);
 
+	SAFE_DELETE(m_pNoPad);
 }
 //=============================================================================================
 

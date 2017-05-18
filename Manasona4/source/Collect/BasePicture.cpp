@@ -389,7 +389,7 @@ void CoolPicture::InitExe()
 {
 	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Cool.png");
 	m_tagPicture.sTitle = "【スペシャルイラスト】攻殻機動隊っぽく立ってみた";
-	m_tagPicture.sText = "イケメン";
+	m_tagPicture.sText = "ハイカラですね。";
 	m_tagPicture.vPos.x = 0.0f;
 	m_tagPicture.vPos.y = 0.0f;
 	m_tagPicture.fScale = 1.0f;
@@ -637,7 +637,7 @@ void Manatu2Picture::InitExe()
 {
 	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Manatu2.png");
 	m_tagPicture.sTitle = "【ゲームイラスト】真夏のファイト";
-	m_tagPicture.sText = "2年生の時に制作した作品\n";
+	m_tagPicture.sText = "3D化したわっしょいたち\n";
 	m_tagPicture.vPos.x = 0.0f;
 	m_tagPicture.vPos.y = 0.0f;
 	m_tagPicture.fScale = 1.0f;
@@ -691,7 +691,7 @@ void MahuyuPicture::InitExe()
 {
 	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Mahuyu.png");
 	m_tagPicture.sTitle = "【ゲームイラスト】真冬の夜の";
-	m_tagPicture.sText = "1年の時\n";
+	m_tagPicture.sText = "弾幕\n";
 	m_tagPicture.vPos.x = 0.0f;
 	m_tagPicture.vPos.y = 0.0f;
 	m_tagPicture.fScale = 1.0f;

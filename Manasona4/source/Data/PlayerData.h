@@ -112,12 +112,12 @@ namespace PlayerData
 				int iSSRankWin;
 				int iSSRankPowerfulEnemyWin;
 				int iBuyManyContent;
-				int iChallengeClear;	
+				int iChallengeClear;
+				int iAttakaiBom;
 				int iAirouChallenge;
 				int iTekiChallenge;
 				int iBigBigDamage;
 				int iCompleteTrophy;
-				int ‹ó‚«˜g17;
 				int ‹ó‚«˜g18;
 				int ‹ó‚«˜g19;
 				int ‹ó‚«˜g20;

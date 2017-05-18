@@ -741,7 +741,7 @@ bool Teki::HandleMessage(const Message & msg)
 			if (PlayerDataMgr->m_TrophyData.iTekiChallenge== 0)
 			{
 				// «ˆÈãŠŽ‚µ‚Ä‚¢‚½‚ç
-				if (m_iAssaultDiveCount >= 12)
+				if (m_iAssaultDiveCount >= 10)
 				{
 					TROPHY_TYPE eType = TROPHY_TYPE::TEKI_CHALLENGE;
 					MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);

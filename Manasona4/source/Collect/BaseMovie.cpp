@@ -183,7 +183,7 @@ OldOpMovie::OldOpMovie()
 	m_bRock = false;
 
 	// ’l’i
-	m_iPrice = 1000;
+	m_iPrice = 10000;
 }
 
 // ÀsŒã‚Ì‰æ‘œ‚Ì‰Šú‰»

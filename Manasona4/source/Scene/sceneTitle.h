@@ -63,6 +63,10 @@ private:
 	// プレスエニーボタンの
 	tdn2DAnim* m_pPreaseAnyButton;
 
+	// NoPad
+	tdn2DAnim* m_pNoPad;
+	int m_iNoPadRoopCount;
+
 	// 雲のスクロール処理
 	float m_fCloudU;
 

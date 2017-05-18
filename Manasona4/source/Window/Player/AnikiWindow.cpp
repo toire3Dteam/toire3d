@@ -32,7 +32,7 @@ AnikiWindow::AnikiWindow(Vector2 vPos) :BaseWindow(vPos)
 	AddCommandData("‡@Œã‚É©“®‚Å", 365);
 	AddCommandData("‡ˆ", 365);
 	AddCommandData("SP50ˆÈã‚Å‡‰", 365);
-	AddCommandData("SP50ˆÈã‚Å«{‡‰", 365);
+	AddCommandData("SP50ˆÈãUŒ‚’†‡‰", 365);
 	// ‰‰o
 	//m_iAlpha = 0;
 

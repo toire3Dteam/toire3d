@@ -3,6 +3,7 @@
 #include "SceneMenuState.h"
 #include "SceneCollect.h"
 #include "SceneSelect.h"
+#include "sceneTitle.h"
 #include "../BaseEntity/Message/Message.h"
 #include "../Fade/Fade.h"
 #include "../Sound/SoundManager.h"
@@ -82,12 +83,6 @@ void SceneMenuState::FirstStep::Enter(sceneMenu *pMain)
 }
 void SceneMenuState::FirstStep::Execute(sceneMenu *pMain)
 {
-	// でばぐ
-	if (tdnInput::KeyGet(KEYCODE::KEY_SPACE, 0) == 3)
-	{
-		M_UIMgr->Action();
-	}
-
 	// パッド分更新
 	const int NumDevice(tdnInputManager::GetNumDevice());
 
@@ -744,76 +739,106 @@ void SceneMenuState::OptionStep::Execute(sceneMenu *pMain)
 	// UI
 	M_UIMgr->Update();
 	
-	// 戻るボタンを押したら
-	if (pMain->GetWindow(WINDOW_TYPE::OPTION)->GetChoiceState() == OptionWindow::OPTION_STATE::BACK)
+	// フェードしていなかったら
+	if (Fade::isFadeOutCompletion() == false)
 	{
-		pMain->GetWindow(WINDOW_TYPE::OPTION)->Stop();// ウィンドウを閉じる
-		pMain->GetFSM()->ChangeState(FirstStep::GetInstance());	// メニューへ戻る
-	}
 
-	// システムでボタンを押したら
-	if (pMain->GetWindow(WINDOW_TYPE::OPTION)->GetChoiceState()
-		== OptionWindow::OPTION_STATE::SYSTEM)
-	{
-		// システムメニューへ
-		pMain->GetFSM()->ChangeState(SystemWindowStep::GetInstance());
-		return;
-	}
-
-	// ゲームでボタンを押したら
-	if (pMain->GetWindow(WINDOW_TYPE::OPTION)->GetChoiceState()
-		== OptionWindow::OPTION_STATE::GAME)
-	{
-		// サウンドメニューへ
-		pMain->GetFSM()->ChangeState(GameWindowStep::GetInstance());
-		return;
-	}
-
-	// サウンドでボタンを押したら
-	if (pMain->GetWindow(WINDOW_TYPE::OPTION)->GetChoiceState()
-		== OptionWindow::OPTION_STATE::SOUND)
-	{
-		// サウンドメニューへ
-		pMain->GetFSM()->ChangeState(SoundWindowStep::GetInstance());
-		return;
-	}
-
-	// キーコンフィグでボタンを押したら
-	if (pMain->GetWindow(WINDOW_TYPE::OPTION)->GetChoiceState()
-		== OptionWindow::OPTION_STATE::KEYCONFIG)
-	{
-		// パッド分更新
-		const int NumDevice(tdnInputManager::GetNumDevice());
-		if (NumDevice == 0) 
+		if (Fade::GetMode() != Fade::FLAG::FADE_OUT)
 		{
-			MessageBox(tdnSystem::GetWindow(), "コントローラがいるって、はっきし分かんだね", __FUNCTION__, MB_OK);
 
-			pMain->GetWindow(WINDOW_TYPE::OPTION)->Stop();// ウィンドウを閉じる
-			pMain->GetFSM()->ChangeState(FirstStep::GetInstance());	// メニューへ戻る
-			return;
-		}
-		else
-		{
-			// キーコンフィグメニューへ
-			pMain->GetFSM()->ChangeState(KeyConfigWindowStep::GetInstance());
-			return;
-		}	
+			// 戻るボタンを押したら
+			if (pMain->GetWindow(WINDOW_TYPE::OPTION)->GetChoiceState() == OptionWindow::OPTION_STATE::BACK)
+			{
+				pMain->GetWindow(WINDOW_TYPE::OPTION)->Stop();// ウィンドウを閉じる
+				pMain->GetFSM()->ChangeState(FirstStep::GetInstance());	// メニューへ戻る
+			}
+
+			// システムでボタンを押したら
+			if (pMain->GetWindow(WINDOW_TYPE::OPTION)->GetChoiceState()
+				== OptionWindow::OPTION_STATE::SYSTEM)
+			{
+				// システムメニューへ
+				pMain->GetFSM()->ChangeState(SystemWindowStep::GetInstance());
+				return;
+			}
+
+			// ゲームでボタンを押したら
+			if (pMain->GetWindow(WINDOW_TYPE::OPTION)->GetChoiceState()
+				== OptionWindow::OPTION_STATE::GAME)
+			{
+				// サウンドメニューへ
+				pMain->GetFSM()->ChangeState(GameWindowStep::GetInstance());
+				return;
+			}
+
+			// サウンドでボタンを押したら
+			if (pMain->GetWindow(WINDOW_TYPE::OPTION)->GetChoiceState()
+				== OptionWindow::OPTION_STATE::SOUND)
+			{
+				// サウンドメニューへ
+				pMain->GetFSM()->ChangeState(SoundWindowStep::GetInstance());
+				return;
+			}
+
+			// キーコンフィグでボタンを押したら
+			if (pMain->GetWindow(WINDOW_TYPE::OPTION)->GetChoiceState()
+				== OptionWindow::OPTION_STATE::KEYCONFIG)
+			{
+				// パッド分更新
+				const int NumDevice(tdnInputManager::GetNumDevice());
+				if (NumDevice == 0)
+				{
+					MessageBox(tdnSystem::GetWindow(), "コントローラがいるって、はっきし分かんだね", __FUNCTION__, MB_OK);
+
+					pMain->GetWindow(WINDOW_TYPE::OPTION)->Stop();// ウィンドウを閉じる
+					pMain->GetFSM()->ChangeState(FirstStep::GetInstance());	// メニューへ戻る
+					return;
+				}
+				else
+				{
+					// キーコンフィグメニューへ
+					pMain->GetFSM()->ChangeState(KeyConfigWindowStep::GetInstance());
+					return;
+				}
+			}
+
+
+			// タイトルへ戻るボタンを押したら
+			if (pMain->GetWindow(WINDOW_TYPE::OPTION)->GetChoiceState()
+				== OptionWindow::OPTION_STATE::BACK_TITLE)
+			{
+				// 
+				//pMain->GetFSM()->ChangeState(SoundWindowStep::GetInstance());
+				Fade::Set(Fade::FLAG::FADE_OUT, 16, 0x00000000);
+				return;
+			}
+
+			// (1/18) メニューを開いた人だけが動かせる
+			int l_iDeviceID = pMain->GetPauseDeviceID();
+
+			//+----------------------------------
+			//	このステートでの操作
+			//+----------------------------------
+			// パッド分更新
+			// int NumDevice(tdnInputManager::GetNumDevice());
+			// パッド何もささってないとき用
+			// if (NumDevice == 0)NumDevice = 1;
+			// for (int i = 0; i < NumDevice; i++)
+			{
+				if (PadUpdate(pMain, l_iDeviceID)) return;
+			}
+
+		}// フェード前に動く	
+
 	}
-
-	// (1/18) メニューを開いた人だけが動かせる
-	int l_iDeviceID = pMain->GetPauseDeviceID();
-
-	//+----------------------------------
-	//	このステートでの操作
-	//+----------------------------------
-	// パッド分更新
-	// int NumDevice(tdnInputManager::GetNumDevice());
-	// パッド何もささってないとき用
-	// if (NumDevice == 0)NumDevice = 1;
-	// for (int i = 0; i < NumDevice; i++)
+	else // フェード後タイトルへ
 	{
-		if (PadUpdate(pMain, l_iDeviceID)) return;
+		// タイトルへ
+		MainFrameEX->ChangeScene(new sceneTitle, true);
+		return;
 	}
+
+
 
 }
 

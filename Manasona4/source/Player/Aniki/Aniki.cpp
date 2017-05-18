@@ -1497,15 +1497,14 @@ void Aniki::HeavehoDriveInit()
 
 	// ヒーホーのタイプ
 	m_eHeaveHoType = (
-		(
 		m_pStateMachine->isPrevState(*BasePlayerState::Wait::GetInstance()) ||
 		m_pStateMachine->isPrevState(*BasePlayerState::Walk::GetInstance()) ||
+		m_pStateMachine->isPrevState(*BasePlayerState::Squat::GetInstance()) ||
 		m_pStateMachine->isPrevState(*BasePlayerState::BackWalk::GetInstance()) ||
 		m_pStateMachine->isPrevState(*BasePlayerState::Run::GetInstance()) ||
 		m_pStateMachine->isPrevState(*BasePlayerState::BackStep::GetInstance()) ||
 		m_pStateMachine->isPrevState(*BasePlayerState::Guard::GetInstance())
-		) &&
-		!isPushInput(PLAYER_COMMAND_BIT::DOWN, true)
+		//&& !isPushInput(PLAYER_COMMAND_BIT::DOWN, true)
 		) ?
 		HEAVEHO_TYPE::THROW : HEAVEHO_TYPE::STRIKE;
 

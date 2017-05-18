@@ -88,8 +88,11 @@ void Stage::Base::CreateStage(Stage::Base**p,STAGE id, Camera *pCamera)
 	case STAGE::NANASATO_SITY:
 		*p = new Stage::NanasatoSity;
 		break;
+	case STAGE::A:
+		*p = new Stage::A;
+		break;
 	default:
-		//MyAssert(0, "ステージに不正な値が入っています%d", (int)id);
+		MyAssert(0, "ステージに不正な値が入っています%d", (int)id);
 		*p = new Stage::NanasatoSity;
 		break;
 	}
@@ -746,18 +749,40 @@ void Stage::Syuten::RenderForward()
 
 void Stage::A::Initialize(Camera *pCamera)
 {
-	m_pObj = new iexMesh("DATA/Stage/A/stage1.IMO");
+	m_pObj = new iexMesh("DATA/Stage/A/toire.IMO");
+	m_pObj->SetPos(Vector3(0, 0, -20));
 	m_pObj->SetAngle(3.14f);
-	m_pObj->SetScale(0.9f);
+	m_pObj->SetScale(1.0f);
 	m_pObj->Update();
 
-	m_pBack = new iexMesh("DATA/Stage/A/stage2.IMO");
+	m_pBack = new iexMesh("DATA/Stage/Senjo/Skydome.IMO");
+	m_pBack->SetPos(Vector3(0, 0, 300));
 	m_pBack->SetAngle(3.14f);
-	m_pBack->SetScale(0.9f);
+	m_pBack->SetScale(3.5f);
 	m_pBack->Update();
+
+	m_pBack2 = new iexMesh("DATA/Stage/SkyDome/Skydome.IMO");
+	//m_pBack2->SetScale(3.5f);
+	m_pBack2->SetPos(Vector3(0, 0, 300));
+	m_pBack2->Update();
+
 	m_fBottom = 0;
 	m_fWidth = 200;
 
 	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
 	pCamera->SetStageCameraInfo("DATA/Stage/A/camera.txt");
+}
+
+void Stage::A::Update()
+{
+	m_pAreWall->Update();
+}
+
+void Stage::A::Render()
+{
+	m_pBack->Render(shaderM, "sky");
+	m_pBack2->Render(shaderM, "sky");
+	m_pObj->Render(shaderM, "Stage");
+
+	m_pAreWall->RenderAreaWall();// 壁
 }

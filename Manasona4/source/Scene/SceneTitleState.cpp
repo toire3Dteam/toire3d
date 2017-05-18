@@ -279,6 +279,15 @@ void SceneTitleState::TitleStep::Enter(sceneTitle *pMain)
 	pMain->m_fCloudU = 0;
 
 
+	// パッド分更新
+	//int NumDevice(tdnInputManager::GetNumDevice());
+	//if (NumDevice == 0)
+	//{
+	//	// ノーパッドアニメ
+	//	pMain->m_pNoPad->Action();
+	//	pMain->m_iNoPadRoopCount = 0;
+	//}
+
 }
 void SceneTitleState::TitleStep::Execute(sceneTitle *pMain)
 {
@@ -297,6 +306,16 @@ void SceneTitleState::TitleStep::Execute(sceneTitle *pMain)
 	// 雲の動き
 	pMain->m_fCloudU -= 0.25f;
 
+	// ノーパッド
+	if (pMain->m_pNoPad->GetAction()->IsEnd() == true &&
+		pMain->m_iNoPadRoopCount <= 3)
+	{
+		// カウント++
+		pMain->m_iNoPadRoopCount++;
+		// アニメのループ
+		pMain->m_pNoPad->Action();
+	}
+	pMain->m_pNoPad->Update();
 
 	// パッド分更新
 	int NumDevice(tdnInputManager::GetNumDevice());
@@ -304,7 +323,23 @@ void SceneTitleState::TitleStep::Execute(sceneTitle *pMain)
 	if (NumDevice == 0)NumDevice = 1;
 	for (int i = 0; i < NumDevice; i++)
 	{
-		if (KEY(KEY_A, i) == 3 || KEY(KEY_B, i) == 3 || KEY(KEY_C, i) == 3 || KEY(KEY_D, i) == 3)
+		const int NumDevice(tdnInputManager::GetNumDevice());
+
+		// 裏道
+		if (KeyBoard(KB_CTRL) >= 1)
+		{
+			if (KEY(KEY_A, i) == 3 || KEY(KEY_B, i) == 3 || KEY(KEY_C, i) == 3 || KEY(KEY_D, i) == 3 || KEY(KEY_ENTER, i) == 3)
+			{
+				// SEの再生
+				se->Play("タイトルスタート");
+				// 何かボタン押したらメニューへ
+				pMain->GetFSM()->ChangeState(End::GetInstance());
+				return;
+			}
+		}
+
+#ifdef _DEBUG
+		if (KEY(KEY_A, i) == 3 || KEY(KEY_B, i) == 3 || KEY(KEY_C, i) == 3 || KEY(KEY_D, i) == 3 || KEY(KEY_ENTER, i) == 3)
 		{
 			// SEの再生
 			se->Play("タイトルスタート");
@@ -313,10 +348,34 @@ void SceneTitleState::TitleStep::Execute(sceneTitle *pMain)
 			pMain->GetFSM()->ChangeState(End::GetInstance());
 			return;
 		}
+#endif // _DEBUG
+
+
+		if (KEY(KEY_A, i) == 3 || KEY(KEY_B, i) == 3 || KEY(KEY_C, i) == 3 || KEY(KEY_D, i) == 3 || KEY(KEY_ENTER, i) == 3 )
+		{
+			
+			if (NumDevice == 0)
+			{
+				// カウント初期化
+				pMain->m_iNoPadRoopCount = 0;
+				// ノーパッドアニメ-ション
+				pMain->m_pNoPad->Action();
+				// パッドがなければ始められない！
+				return;
+			}
+
+			// SEの再生
+			se->Play("タイトルスタート");
+
+			// 何かボタン押したらメニューへ
+			pMain->GetFSM()->ChangeState(End::GetInstance());
+			return;
+		}
+
 	}
 
 	pMain->m_iGameTimer++;
-	if (pMain->m_iGameTimer >= 60 * 12)
+	if (pMain->m_iGameTimer >= 60 * 18)
 	{
 		pMain->GetFSM()->ChangeState(Intro::GetInstance());
 		return;
@@ -390,7 +449,7 @@ void SceneTitleState::TitleStep::Execute(sceneTitle *pMain)
 
 void SceneTitleState::TitleStep::Exit(sceneTitle *pMain)
 {
-
+	pMain->m_pNoPad->Stop();
 }
 
 void SceneTitleState::TitleStep::Render(sceneTitle *pMain)
@@ -413,6 +472,14 @@ void SceneTitleState::TitleStep::Render(sceneTitle *pMain)
 	// 何かボタン押して
 	pMain->m_pPreaseAnyButton->Render(448, 576);
 
+	// ノーパッド
+	const int NumDevice(tdnInputManager::GetNumDevice());
+	if (NumDevice == 0 &&
+		pMain->m_iNoPadRoopCount <= 3 &&
+		pMain->m_pNoPad->GetAction()->IsAction() == true)
+	{
+		pMain->m_pNoPad->Render(980, 500);
+	}
 
 #ifdef _DEBUG
 	

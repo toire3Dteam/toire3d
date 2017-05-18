@@ -172,6 +172,9 @@ void sceneMenu::Update()
 		m_pStateMachine->Update();
 
 
+#ifdef DEBUG
+
+
 		if (KeyBoardTRG(KB_SPACE))
 		{
 			CommandMgr->SetReplayFlag(true);
@@ -231,8 +234,6 @@ void sceneMenu::Update()
 			MainFrameEX->ChangeScene(new sceneVS);
 			return;
 		}
-
-#ifdef DEBUG
 
 
 		// エンターでワープ

@@ -8,6 +8,8 @@
 #include "../Cutin/CutIn.h"
 #include "../Camera/camera.h"
 #include "../UI/GameUI.h"
+#include "../Data/PlayerData.h"
+#include "../Trophy/TrophyManager.h"
 
 // 定数
 //static const float REPEAT_ATTACK_RATE = 0.75f;		// 同じ攻撃当たるなレート　(12/26) 同技補正を強く
@@ -931,6 +933,21 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 if (HitDamageInfo->bStandAttack == false)
 									 {
 										 MsgMgr->Dispatch(0, msg.Receiver, msg.Sender, MESSAGE_TYPE::HIT_ATTACK, &HitAttackInfo);
+									 }
+									 else
+									 {
+										 // まだ↓のトロフィーを手に入れていなかったら
+										 if (PlayerDataMgr->m_TrophyData.iAttakaiBom == 0)
+										 {
+											 // 死体蹴り
+											 if (pPerson->GetTargetPlayer()->GetStand()->GetPartnerType() == PARTNER::ATTAKAI &&
+												 pPerson->GetHP() <= 0)
+											 {
+												 TROPHY_TYPE eType = TROPHY_TYPE::ATTAKAI_BOM;
+												 MsgMgr->Dispatch(0, ENTITY_ID::TROPHY_MGR, ENTITY_ID::TROPHY_MGR, MESSAGE_TYPE::TROPHY_GET, &eType);
+											
+											 }
+										 }
 									 }
 
 

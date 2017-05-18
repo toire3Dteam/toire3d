@@ -64,6 +64,10 @@ TrophyManager::TrophyManager() :BaseGameEntity(ENTITY_ID::TROPHY_MGR)	// ƒGƒ“ƒeƒ
 			m_pTrophy[i] = new ChallengeTrophy();
 
 			break;
+		case TROPHY_TYPE::ATTAKAI_BOM:
+			m_pTrophy[i] = new AttakaiBomTrophy();
+
+			break;
 		case TROPHY_TYPE::AIROU_CHALLENGE:
 			m_pTrophy[i] = new AirouChallengeTrophy();
 

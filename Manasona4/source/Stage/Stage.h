@@ -214,7 +214,7 @@ namespace Stage
 		A() :Base(){}
 		~A(){}
 		void Initialize(Camera *pCamera);
-		//void Update() override;
+		void Update() override;
 		void Render() override;
 		//void Render_ShadowBuf() override;
 

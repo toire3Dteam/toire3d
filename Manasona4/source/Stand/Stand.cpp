@@ -374,6 +374,39 @@ Stand::Mokoi::Mokoi(BasePlayer *pPlayer) :Base(pPlayer)
 	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->pCollisionShape->height = 10;
 	m_pAttackData[(int)SKILL_ACTION_TYPE::SQUAT]->pCollisionShape->pos.Set(5.5f, 10, 0);
 
+	//==============================================================================================================
+	//	‚µ‚á‚ª‚Ý
+	// ’nãƒqƒbƒg‚à‹ó’†ƒqƒbƒg‚à‹¤’Ê‚Ìî•ñ
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP] = new AttackData;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->damage = 1160;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->pierceLV = 0;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->HitSE = "ƒqƒbƒg6";
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->WhiffSE = "‹óU‚è1";
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->HitEffectType = EFFECT_TYPE::DAMAGE;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->WhiffEffectType = EFFECT_TYPE::RUN;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->bAntiAir = true;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->bFinish = true;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->AntiGuard = ANTIGUARD_ATTACK::NONE;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->ShakeCameraInfo.Set(.25f, 6);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->GuardRecoveryFrame = 20;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->fGuardKnockBackPower = .25f;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->fComboRate = 1.0f;
+	// ’nãƒqƒbƒg‚Æ‹ó’†ƒqƒbƒg‚Å‹““®‚ª•Ï‚í‚é‚à‚Ì
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(1.0f, 1.4f);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::AERIAL].FlyVector.Set(1.0f, 1.4f);
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::LAND].iHitStopFrame = 18;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::AERIAL].iHitStopFrame = 18;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::LAND].HitRecoveryFrame = 60;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::AERIAL].HitRecoveryFrame = 60;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
+	// ”»’èŒ`ó
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->pCollisionShape->width = 14;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->pCollisionShape->height = 10;
+	m_pAttackData[(int)SKILL_ACTION_TYPE::AERIALDROP]->pCollisionShape->pos.Set(5.5f, 10, 0);
+
 	// ”»’è”­“®‚µ‚½uŠÔ‚É‹óU‚èSE‚ðÄ¶‚µ‚Ä‚Ý‚é
 	FOR((int)SKILL_ACTION_TYPE::MAX)
 	{
@@ -463,7 +496,6 @@ void Stand::Mokoi::Action(SKILL_ACTION_TYPE type)
 			m_pObj->SetMotion(1);
 			if (m_pPlayer->GetDir() == DIR::LEFT)m_pos.x += 15;
 			else m_pos.x -= 15;
-			type = SKILL_ACTION_TYPE::SQUAT;
 		}
 
 		Base::Action(type);

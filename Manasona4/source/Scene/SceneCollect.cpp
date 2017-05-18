@@ -268,6 +268,10 @@ void sceneCollect::Update()
 	{
 		m_pMovieMgr->AllReset();
 	}
+	if (KeyBoard(KB_L) == 2)
+	{
+		PlayerDataMgr->m_PlayerInfo.coin = 0;
+	}
 
 #ifdef _DEBUG
 

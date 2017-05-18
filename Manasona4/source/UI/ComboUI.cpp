@@ -107,7 +107,7 @@ void ComboUI::Update()
 	MyAssert(m_iMaxRecoveryFrame != 0, "最大値が0だと0で割ることになる");
 
 	// まだ↓のトロフィーを手に入れていなかったら
-	if (PlayerDataMgr->m_TrophyData.iBigBigDamage == 0)
+	if (PlayerDataMgr->m_TrophyData.iAirouChallenge== 0)
 	{
 		// トロフィー
 		if (m_pPlayerData->GetTargetPlayer()->GetCharacterType() == CHARACTER::AIROU &&

@@ -205,6 +205,19 @@ private:
 };
 
 //+---------------------------------
+//	アッタカイボムトロフィー
+//+---------------------------------
+class AttakaiBomTrophy :public BaseTrophy
+{
+public:
+	AttakaiBomTrophy();
+	~AttakaiBomTrophy() {};
+
+private:
+
+};
+
+//+---------------------------------
 //	アイル―チャレンジトロフィー
 //+---------------------------------
 class AirouChallengeTrophy :public BaseTrophy
