@@ -171,7 +171,8 @@ namespace Stand
 		BasePanelEffect* m_pBomAddEf;
 		float m_fDangerRate;
 		int m_iActiveStartFrame;
-	
+		int m_iSoundFrame;						// チカチカSE用のフレーム
+		static const int c_SE_INTERVAL = 90;	// チカチカSEの間隔
 
 	};
 }

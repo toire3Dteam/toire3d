@@ -149,6 +149,8 @@ void SelectUIState::FirstStep::Execute(SelectUI *pMain)
 			if (tdnInput::KeyGet(KEYCODE::KEY_L2, pMain->m_iDeviceID) == 1)
 			{
 				pMain->m_iSelectCharacterNo = (int)(CHARACTER::BALANCE);
+				// ‰‰o
+				pMain->ActionChara();
 			}
 
 			pMain->GetFSM()->ChangeState(MiddleStep::GetInstance());

@@ -69,7 +69,7 @@ Aramitama::Aramitama(SIDE side, const SideData &data) :BasePlayer(side, data)
 		for (int i = ActiveStartFrame; m_ActionFrameList[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE][i] != FRAME_STATE::FOLLOW; i++)
 		{
 			// 小刻みにいくよおおおおっ！！！！！
-			static const int kankaku(6);
+			static const int kankaku(7);
 			if ((i - ActiveStartFrame) % kankaku == kankaku - 1) m_ActionFrameList[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE][i] = FRAME_STATE::RECOVERY_HIT;
 		}
 	}
@@ -576,9 +576,9 @@ void Aramitama::InitActionDatas()
 	//	ヒーホードライブ
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].InstanceAttackData();	// アタックデータ作成
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->damage = 100;
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->damage = 120;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->pierceLV = 0;
-	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->HitSE = "斬撃2";
+	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->HitSE = "電撃";
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->WhiffSE = "空振り5";
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->HitEffectType = EFFECT_TYPE::FINISH_HIT;
 	m_ActionDatas[(int)BASE_ACTION_STATE::HEAVEHO_DRIVE].pAttackData->WhiffEffectType = EFFECT_TYPE::WHIFF;
@@ -1007,6 +1007,9 @@ void Aramitama::ThirdRushUpdate()
 
 				// 50%消費
 				AddOverDriveGage(-50);
+
+				// 相手方向に追尾する
+				AddMove(Vector3(GetTargetDirVecX() * 5.5f, 0, 0));
 
 				// 必殺ステートへ
 				m_pStateMachine->ChangeState(BasePlayerState::HeavehoDrive::GetInstance());

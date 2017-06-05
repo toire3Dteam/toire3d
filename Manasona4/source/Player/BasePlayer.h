@@ -283,6 +283,8 @@ enum class EFFECT_TYPE
 	MULTIPLE_HIT_BLOW,	// 多段ヒット（物理）
 	THROW_HOLD,			// 掴まえた時
 	EXPLOSION,			// 爆発
+	ANITI_AIR,			// 対空エフェクト
+	BOOST,				// ブースト
 };
 
 // ガードの種類
@@ -567,6 +569,13 @@ public:
 	virtual void SkillInit() = 0;		// スキル発動時に呼び出す
 	virtual void SkillExit() = 0;
 	virtual bool SkillUpdate() = 0;//
+
+	/****************************/
+	//	キャラクター固有無敵
+	/****************************/
+	virtual void InvincibleAttackInit() {};		// 無敵発動時に呼び出す
+	virtual void InvincibleAttackExit() {};
+	virtual bool InvincibleAttackUpdate() { return true; };//
 
 	/****************************/
 	//	ヒーホードライブ

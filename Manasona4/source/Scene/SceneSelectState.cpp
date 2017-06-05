@@ -383,6 +383,8 @@ void SceneSelectState::End::Execute(sceneSelect *pMain)
 					break;
 				case STAGE::NANASATO_SITY:
 					break;
+				case STAGE::A:
+					break;
 				default:
 					MyAssert(0, "ステージに不正な値%d", r);
 					break;

@@ -158,6 +158,12 @@ void BasePlayer::LoadAttackFrameList(LPSTR filename)
 
 		FOR((int)FRAME_STATE::END)
 		{
+			// 0524 空振りフレーム全キャラ共通
+			//if (i == (int)FRAME_STATE::ACTIVE)
+			//{
+			//	m_ActionDatas[iActionType].pAttackData->WhiffDelayFrame = count - 1;
+			//}
+
 			int frame;
 			ifs >> frame;
 			for (int j = 0; j < frame; j++)
@@ -1879,6 +1885,9 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 
 		screenPos=Math::WorldToScreen(pos);
 
+		//m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::BREAK_IMPACT,
+		//	0.3f, 0.5f, Vector3(0, diaAngle, 0), Vector3(0, diaAngle, 0));
+
 		//m_PanelEffectMGR->AddEffect((int)screenPos.x, (int)screenPos.y, PANEL_EFFECT_TYPE::WEAK);
 	
 
@@ -2223,6 +2232,33 @@ void BasePlayer::AddEffectAction(Vector3 pos, EFFECT_TYPE effectType, Vector3 At
 		
 		// ブラ―エフェクト
 		DeferredManagerEx.SetRadialBlur(pos, 6.25f);
+
+	}	break;
+	case EFFECT_TYPE::ANITI_AIR:
+	{
+		Vector3 l_vMoveVec = Vector3(0, 1.0f, 0);
+		l_vMoveVec.x = (m_dir == DIR::RIGHT) ? 0.5f : -0.5f;
+		l_vMoveVec.Normalize();
+		float l_fZAngle = atan2(-l_vMoveVec.x, l_vMoveVec.y);
+
+		// 対空エフェクト
+		m_pUVEffectMGR->AddEffect(pos, UV_EFFECT_TYPE::ANITI_AIR, 0.15f, 0.3f, Vector3(0, 0, l_fZAngle), Vector3(0, 0, l_fZAngle));
+
+
+	}	break;
+	case EFFECT_TYPE::BOOST:
+	{
+		Vector3 l_vMoveVec = -m_vMove;//Vector3(-(GetDirVecX()), 0, 0);
+		l_vMoveVec.Normalize();
+		float l_fZAngle = atan2(-l_vMoveVec.x, l_vMoveVec.y);
+
+		// ブースト
+		m_pUVEffectMGR->AddEffect(GetCenterPos() + Vector3(GetDirVecX()*-2, 1, 0), UV_EFFECT_TYPE::BOOST, 1, 2, Vector3(0, 0, l_fZAngle), Vector3(0, 0, l_fZAngle));
+
+		// 青いポイントライト追加
+		PointLightMgr->AddPointLight(GetCenterPos(),
+			Vector3(.0f, 0.25f, .95f), 60, 10, 10, 0, 6);// ポイントライトエフェクト！
+
 
 	}	break;
 	default:

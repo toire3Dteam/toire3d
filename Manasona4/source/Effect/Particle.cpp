@@ -761,6 +761,34 @@ void ParticleManager::EffectShotLocus(const Vector3 & pos)
 
 }
 
+//*****************************************************************************
+//	弾の軌跡エフェクト(人参)
+//*****************************************************************************
+void ParticleManager::EffectNinjinShotLocus(const Vector3 & pos)
+{
+	Vector3 Pos = VECTOR_ZERO, Move = VECTOR_ZERO, Power = VECTOR_ZERO;
+
+	FOR(5)
+	{
+		Pos.x = pos.x + tdnRandom::Get(-3.0f, 3.0f);
+		Pos.y = pos.y + +tdnRandom::Get(-2.5f, 2.5f);
+		Pos.z = pos.z + tdnRandom::Get(-2.5f, 2.5f);
+		const int M = 2;
+		Move.x = tdnRandom::Get(-0.1f, 0.1f);
+		Move.y = tdnRandom::Get(-0.125f, 0.125f);
+		Move.z = tdnRandom::Get(-0.1f, 0.1f);
+		//Move.x = (rand() % M - (M / 2))*0.25f;
+		//Move.y = (rand() % M - (M / 2))*0.25f;
+		//Move.z = (rand() % M - (M / 2))*0.25f;
+		//Power.x = -Move.x*.01f;
+		//Power.y = -Move.y*.01f;
+		//Power.z = -Move.z*.01f;
+
+		// パーティクルセット
+		Set(7, 0, .4f, 40, .0f, 5, .9f, Pos, Move, Power, 1.0f, 1.0f, 1.0f, 0, 1.0f, rand() % 2 + 1.5f, RS::ADD);
+	}
+
+}
 //**************************************************************************************************
 //
 //		パーティクル管理クラス

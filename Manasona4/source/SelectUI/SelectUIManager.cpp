@@ -99,7 +99,7 @@ SelectUIManager::SelectUIManager()
 			m_pCharacterIcon[i] = new tdn2DAnim("Data/UI/CharacterSelect/Icon/aniki.png");
 			break;
 		case CHARACTER::BALANCE:
-			m_pCharacterIcon[i] = new tdn2DAnim("Data/UI/CharacterSelect/Icon/aniki.png");
+			m_pCharacterIcon[i] = new tdn2DAnim("Data/UI/CharacterSelect/Icon/balance.png");
 			break;
 		default:
 			MyAssert(0,"ÇªÇÒÇ»ÉAÉCÉRÉìÇÕÇ»Ç¢");

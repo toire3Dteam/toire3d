@@ -79,11 +79,11 @@ SelectUI::SelectUI(SIDE side, ENTITY_ID id, int DeviceID, bool bAI) :BaseGameEnt
 			break;
 
 		case CHARACTER::BALANCE:
-			m_tagCharaPic[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Character/airou.png");
-			m_tagCharaPicRip[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Character/airou.png");
-			m_tagCharaInfo[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Info/airou.png");
-			m_tagCharaName[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/name/airou.png");
-			m_pCharaIconRip[i] = new tdn2DAnim("Data/UI/CharacterSelect/icon/airou.png");
+			m_tagCharaPic[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Character/balance.png");
+			m_tagCharaPicRip[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Character/balance.png");
+			m_tagCharaInfo[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/Info/balance.png");
+			m_tagCharaName[i].pPic = new tdn2DAnim("Data/UI/CharacterSelect/name/balance.png");
+			m_pCharaIconRip[i] = new tdn2DAnim("Data/UI/CharacterSelect/icon/balance.png");
 
 			break;
 		default:

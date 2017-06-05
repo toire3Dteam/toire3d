@@ -1588,3 +1588,203 @@ void AnikiResultPerformance::Action()
 	//m_movieMgr->SetTime(0);
 	//m_movieMgr->Play();
 }
+
+
+
+
+//+-------------------------------
+//	バランスの演出
+//+-------------------------------
+
+BalanceResultPerformance::BalanceResultPerformance()
+{
+	m_winner.PicClean();
+	m_winner.pic = new tdn2DAnim("DATA/Result/Balance/Winner.png");
+	m_winner.pic->OrderShake(3, 0, 63, 3);
+
+	m_winnerDon.PicClean();
+	m_winnerDon.pic = new tdn2DAnim("DATA/Result/Balance/Winner.png");
+	m_winnerDon.pic->OrderRipple(6, 1.15f, 0.025f);
+
+	m_edge.PicClean();
+	m_edge.pic = new tdn2DAnim("DATA/Result/Balance/Edge.png");
+	m_edge.pic->OrderShake(3, 0, 63, 3);
+
+	m_back.PicClean();
+	m_back.pic = new tdn2DAnim("DATA/Result/Balance/back.png");
+	m_back.pic->OrderNone();
+
+
+	m_font.PicClean();
+	m_font.pic = new tdn2DAnim("DATA/Result/Balance/font.png");
+	//m_font.pic->SetScale(2.0f);
+	m_font.pic->OrderMoveAppeared(12, -400, 100);
+	//m_font.pic->OrderShrink(12, 1, 3);
+	m_iFontAnimFrame = 0;
+
+	//m_fontKill.PicClean();
+	//m_fontKill.pic = new tdn2DAnim("DATA/Result/teki/Kill.png");
+	//m_fontKill.pos.x = 420;
+	//m_fontKill.pos.y = 300;
+	//m_fontKill.pic->SetScale(2.0f);
+	//m_fontKill.pic->OrderMoveAppeared(12, (int)m_fontKill.pos.x, -200);
+
+	
+	// 薔薇
+	m_petal.PicClean();
+	m_petal.pic = new tdn2DAnim("DATA/Result/Balance/font.png");
+	m_petal.uv.x = 0.0f;
+	m_petal.uv.y = 0.0f;
+	m_petal.pic->OrderMoveAppeared(8, -800, 100);
+
+
+	m_pRose.PicClean();
+	m_pRose.pic = new tdn2DAnim("DATA/Result/Balance/flame.png");
+	m_pRose.pic->OrderShrink(12, 1, 3);
+
+	m_pNinjin.PicClean();
+	m_pNinjin.pic = new tdn2DAnim("DATA/Result/Balance/Ninjin.png");
+	m_pNinjin.pic->OrderShrink(12, 1, 3);
+
+	m_pSaku.PicClean();
+	m_pSaku.pic = new tdn2DAnim("DATA/Result/Balance/Saku.png");
+	m_pSaku.pic->OrderMoveAppeared(12, 0, 720);
+
+}
+
+BalanceResultPerformance::~BalanceResultPerformance()
+{
+	SAFE_DELETE(m_winner.pic);
+	SAFE_DELETE(m_winnerDon.pic);
+	SAFE_DELETE(m_edge.pic);
+	SAFE_DELETE(m_back.pic);
+	SAFE_DELETE(m_font.pic);
+	//SAFE_DELETE(m_fontKill.pic);
+	SAFE_DELETE(m_petal.pic);
+	SAFE_DELETE(m_pRose.pic);
+	SAFE_DELETE(m_pNinjin.pic);
+	SAFE_DELETE(m_pSaku.pic);
+
+	//SAFE_DELETE(m_movieMgr);
+	//SAFE_DELETE(m_movieTex);
+
+}
+
+void BalanceResultPerformance::Update()
+{
+	if (m_bAction == false)return;// アクションフラグが立つまでハジク
+
+	m_back.pic->Update();
+
+	m_font.pos.x += 0.1f;
+	m_font.pos.y += -0.05f;
+	m_font.pic->Update();
+
+	// 薔薇
+	m_petal.pos.x += 0.25f;
+	m_petal.pic->Update();
+
+	// 手前のプレイヤー
+	m_winner.pos.x += 0.25f;
+	//m_winner.pos.y -= 0.1f;
+	m_winner.pic->Update();
+
+	m_winnerDon.pic->Update();
+
+	// 
+	m_edge.pic->Update();
+	m_edge.pos.x += 0.25f;
+	//m_edge.pos.y -= 0.1f;
+
+	// 吹き出し
+	m_pRose.pic->Update();
+
+	m_pNinjin.pic->Update();
+	m_pSaku.pic->Update();
+
+};
+
+void BalanceResultPerformance::BackRender()
+{
+	if (m_bAction == false)return;// アクションフラグが立つまでハジク
+
+								  // 真っ白に
+	tdnPolygon::Rect(0, 0, 1280, 720, RS::COPY, 0xffffffff);
+
+	// 背景
+	m_back.pic->Render(0, 0, m_back.pic->GetWidth(), m_back.pic->GetHeight(),
+		(int)m_back.uv.x, (int)m_back.uv.y, m_back.pic->GetWidth(), m_back.pic->GetHeight());
+
+	// 歪みネェナ
+	m_font.pic->Render((int)m_font.pos.x, (int)m_font.pos.y);
+
+	// バラ
+	m_pRose.pic->Render((int)m_pRose.pos.x, (int)m_pRose.pos.y);
+
+
+};
+
+void BalanceResultPerformance::FrontRender()
+{
+	if (m_bAction == false)return;// アクションフラグが立つまでハジク
+
+								  // 手前のリング
+								  //m_pFlontRing.pic->Render((int)m_pFlontRing.pos.x, (int)m_pFlontRing.pos.y);
+
+
+	m_edge.pic->Render((int)m_edge.pos.x, (int)m_edge.pos.y);
+	m_winner.pic->Render((int)m_winner.pos.x, (int)m_winner.pos.y);
+	m_winnerDon.pic->Render((int)m_winnerDon.pos.x, (int)m_winnerDon.pos.y, RS::ADD);
+
+	//m_pNinjin.pic->Render((int)m_pNinjin.pos.x, (int)m_pNinjin.pos.y);
+
+	m_pSaku.pic->Render((int)m_pSaku.pos.x, (int)m_pSaku.pos.y);
+	
+	// 薔薇
+	//m_petal.pic->Render((int)m_petal.pos.x, (int)m_petal.pos.y);
+
+	//m_fontKill.pic->Render((int)m_fontKill.pos.x, (int)m_fontKill.pos.y);
+
+};
+
+void BalanceResultPerformance::Action()
+{
+	m_bAction = true;
+
+	// 初期化＆始動
+	m_winner.pos.x = 495;
+	m_winner.pos.y = -81;
+	m_winner.pic->Action();
+
+	m_winnerDon.pos.x = 495;
+	m_winnerDon.pos.y = -81;
+	m_winnerDon.pic->Action();
+
+	m_edge.pos.x = -25 + 495;
+	m_edge.pos.y = -16 - 81;
+	m_edge.pic->Action();
+
+	m_back.pic->Action();
+
+	// 文字!
+	m_font.pos.y = 0.0f;
+	m_font.pos.x = 0.0f;
+	m_font.pic->Action(8);
+
+
+
+	m_petal.pos.x = 0;
+	m_petal.pos.y = 0;
+	m_petal.pic->Action(4);
+
+	m_pRose.pic->Action();
+
+	m_pNinjin.pos.x = 1280 - 252;
+	m_pNinjin.pos.y = 720 - 380;
+	m_pNinjin.pic->Action();
+
+	m_pSaku.pos.x = 0;
+	m_pSaku.pos.y = 720 - 144;
+	m_pSaku.pic->Action(4);
+
+}

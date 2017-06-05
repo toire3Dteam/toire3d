@@ -172,6 +172,22 @@ void sceneMenu::Update()
 		m_pStateMachine->Update();
 
 
+		// エンターでワープ
+		if (KeyBoard(KB_R) >= 2)
+		{
+			if (KeyBoard(KB_ENTER) == 2)
+			{
+				ResultData data;
+				data.eWinnerSide = SIDE::LEFT;
+				data.iMaxDamage = 2500;
+				data.iRemainingHP = 80;
+				data.iElapsedTime = 35;
+
+				MainFrameEX->ChangeScene(new sceneResult(data));
+				return;
+			}
+		}
+
 #ifdef DEBUG
 
 
@@ -236,18 +252,7 @@ void sceneMenu::Update()
 		}
 
 
-		// エンターでワープ
-		if (KeyBoard(KB_ENTER) == 2)
-		{
-			ResultData data;
-			data.eWinnerSide = SIDE::LEFT;
-			data.iMaxDamage = 2500;
-			data.iRemainingHP = 80;
-			data.iElapsedTime = 35;
 
-			MainFrameEX->ChangeScene(new sceneResult(data));
-			return;
-		}
 
 		if (KeyBoardTRG(KB_SPACE))
 		{

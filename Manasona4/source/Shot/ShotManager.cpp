@@ -45,9 +45,27 @@ void ShotManager::EraseCheakUpdate()
 	}
 }
 
+// •Ð•û‘SÁ‹Ž
+void ShotManager::AllEraseSide(SIDE eSide)
+{	
+	for (auto it = m_list[(int)eSide].begin(); it != m_list[(int)eSide].end();)
+	{
+
+			delete (*it);
+			it = m_list[(int)eSide].erase(it);
+	
+	}
+}
+
 void ShotManager::Render()
 {
-	FOR((int)SIDE::ARRAY_MAX) for (auto it : m_list[i]) it->Render();
+	//FOR((int)SIDE::ARRAY_MAX) for (auto it : m_list[i]) it->Render();
+
+	FOR((int)SIDE::ARRAY_MAX)for (auto it = m_list[i].begin(); it != m_list[i].end();)
+	{
+		(*it)->Render();
+		it++;
+	}
 }
 
 bool ShotManager::HandleMessage(const Message &msg)
@@ -55,11 +73,22 @@ bool ShotManager::HandleMessage(const Message &msg)
 	switch (msg.Msg)
 	{
 	case MESSAGE_TYPE::ADD_SHOT:
+	{
 		Shot::Base *pNewShot = (Shot::Base*)msg.ExtraInfo;
 		pNewShot->Update();//
 		AddShot(PlayerMgr->GetPlayer(msg.Sender)->GetSide(), pNewShot);
 		return true;
 		break;
+	}
+	case MESSAGE_TYPE::ERASE_SIDE_SHOT:
+	{
+		SIDE *eSide = (SIDE*)msg.ExtraInfo;
+		AllEraseSide(*eSide);
+
+		return true;
+		break;
+	}
+
 	}
 
 	return false;

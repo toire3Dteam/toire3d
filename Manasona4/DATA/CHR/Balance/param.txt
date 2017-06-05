@@ -1,5 +1,5 @@
 メッシュ:
-nazenaraba.IEM
+MiMiko.IEM
 
 一撃必殺用:
 naze_hissatsu.IEM

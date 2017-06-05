@@ -158,11 +158,11 @@ bool FrameworkEx::Update()
 	tdnInput::Update();
 	SoundManager::Update();
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 
 	if (FPSCtrl() == true)return true;// FPSの操作
 
-#endif // _DEBUG
+//#endif // _DEBUG
 
 
 	// シーンの更新

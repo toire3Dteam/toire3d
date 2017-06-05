@@ -100,6 +100,12 @@ UVEffectManager::UVEffectManager()
 		case UV_EFFECT_TYPE::CYCLONE_SHORT:
 			m_baseUVEffect[i] = new CycloneShortEffect();
 			break;
+		case UV_EFFECT_TYPE::ANITI_AIR:
+			m_baseUVEffect[i] = new AntiAirEffect();
+			break;
+		case UV_EFFECT_TYPE::BOOST:
+			m_baseUVEffect[i] = new BlueImpactEffect();
+			break;
 		default:
 			assert(0);	// "そんなエフェクトはない"
 			break;

@@ -805,7 +805,12 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 		// 掴まれたよメッセージ
 	case MESSAGE_TYPE::BE_THROWN:
 	{
+
 		int *RecoveryFrame = (int*)msg.ExtraInfo;
+
+		// 自分の出した弾を全て消す
+		SIDE eSide = pPerson->GetSide();
+		MsgMgr->Dispatch(0, msg.Receiver, ENTITY_ID::SHOT_MGR, MESSAGE_TYPE::ERASE_SIDE_SHOT, &eSide);
 
 		// コンボデスク送信(しないとオーバーフローが発生してゲージがおかしくなる)
 		COMBO_DESK comboDesk;
@@ -928,6 +933,10 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 {
 										 HitAttackInfo.bFirstAttack = false;
 									 }
+
+									 // 自分の出した弾を全て消す
+									 SIDE eSide = pPerson->GetSide();
+									 MsgMgr->Dispatch(0, msg.Receiver, ENTITY_ID::SHOT_MGR, MESSAGE_TYPE::ERASE_SIDE_SHOT, &eSide);
 
 									 // 攻撃は通す、スキルは通す、だがスタンドは通さない(キマリ)
 									 if (HitDamageInfo->bStandAttack == false)
@@ -4521,7 +4530,6 @@ bool BasePlayerState::StandAction::OnMessage(BasePlayer * pPerson, const Message
 }
 
 
-
 /*******************************************************/
 //					無敵攻撃ステート
 /*******************************************************/
@@ -4547,10 +4555,16 @@ void BasePlayerState::InvincibleAttack::Enter(BasePlayer * pPerson)
 
 	// 攻撃ボイスを再生する
 	voice->Play(VOICE_TYPE::INVINCIBLE_ATTACK, pPerson->GetCharacterType());
+
+	// 無敵用変数初期化
+	pPerson->InvincibleAttackInit();
 }
 
 void BasePlayerState::InvincibleAttack::Execute(BasePlayer * pPerson)
 {
+	// 無敵更新
+	bool bFlag = pPerson->InvincibleAttackUpdate();
+
 	// 攻撃ステート終わったら
 	if (!pPerson->isFrameAction())
 	{
@@ -4570,6 +4584,10 @@ void BasePlayerState::InvincibleAttack::Exit(BasePlayer * pPerson)
 	pPerson->AheadCommandReset();
 
 	pPerson->SetInvincible(0, 0);
+
+	// 無敵終了
+	pPerson->InvincibleAttackExit();
+
 }
 
 void BasePlayerState::InvincibleAttack::Render(BasePlayer * pPerson)
@@ -5448,6 +5466,11 @@ void BasePlayerState::ThrowHold::Enter(BasePlayer * pPerson)
 	// 自分のパートナーを戻す
 	pPerson->GetStand()->Break();
 
+	// 自分の出した弾を全て消す
+	SIDE eSide = pPerson->GetSide();
+	MsgMgr->Dispatch(0, ENTITY_ID::ID_ERROR, ENTITY_ID::SHOT_MGR, MESSAGE_TYPE::ERASE_SIDE_SHOT, &eSide);
+
+
 }
 
 void BasePlayerState::ThrowHold::Execute(BasePlayer * pPerson)
@@ -6214,7 +6237,15 @@ bool BasePlayerState::AerialBackDash::OnMessage(BasePlayer * pPerson, const Mess
 void BasePlayerState::Intro::Enter(BasePlayer * pPerson)
 {
 	// イントロ用モーション
-	pPerson->SetMotion(MOTION_TYPE::APPEAR);
+	if (pPerson->GetCharacterType() == CHARACTER::BALANCE)
+	{
+		pPerson->SetMotion(34);
+	}
+	else
+	{
+		pPerson->SetMotion(MOTION_TYPE::APPEAR);
+	}
+	
 
 	// キャラごとの掛け合いの初期化
 	pPerson->KakeaiInit();

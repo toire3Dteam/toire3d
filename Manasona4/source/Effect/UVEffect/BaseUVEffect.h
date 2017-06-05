@@ -36,6 +36,8 @@ public:
 	void SetScaleAnimation(float startScale, float endScale) { m_pic->ScaleAnimation(startScale, endScale); }
 	void SetAngleAnimation(Vector3 startAngle, Vector3 endAngle) { m_pic->AngleAnimation(startAngle, endAngle); }
 
+	Vector3 GetPos() { return m_pos; };
+
 protected:
 	AnimationUV* m_pic;
 	Vector3 m_pos;
@@ -44,10 +46,6 @@ protected:
 
 };
 
-/**********************************************/
-// わっしょい　一つのクラスに一つエフェクト作って重ねようかな
-// 
-// 
 
 /**********************************************/
 //	継承先エフェクト
@@ -1305,6 +1303,86 @@ public:
 
 	void Update() { BaseUVEffect::Update(); };
 	void Render() { BaseUVEffect::RenderADDNOZ(); };
+
+private:
+};
+
+
+/*****************************/
+//	人参ショットエフェクト
+/*****************************/
+class NinjinShotEffect :public BaseUVEffect
+{
+public:
+	NinjinShotEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Balance/ninjin.IMO", 0.08f, 0.0f, 46, false, 1, 40);
+	};
+	~NinjinShotEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::Render(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+
+/*****************************/
+//	青い衝撃波エフェクト 
+/*****************************/
+class BlueImpactEffect :public BaseUVEffect
+{
+public:
+	BlueImpactEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Balance/BlueImpact.IMO", 0.0f, 0.0f, 12, false, 0, 8);
+	};
+	~BlueImpactEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADDNOZ(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+
+/*****************************/
+//	USAショットエフェクト
+/*****************************/
+class USAShotEffect :public BaseUVEffect
+{
+public:
+	USAShotEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/Balance/USAShot.IMO", 0.0f, 0.0f, 46, false, 1, 40);
+	};
+	~USAShotEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADDNOZ(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
+
+private:
+};
+
+
+/*****************************/
+//	対空エフェクト 
+/*****************************/
+class AntiAirEffect :public BaseUVEffect
+{
+public:
+	AntiAirEffect()
+	{
+		m_pic = new AnimationUV("Data/UVeffect/HitEffect/AntiAir.IMO", 0.0f, 0.0f, 10, false, 1, 8);
+	};
+	~AntiAirEffect() {};
+
+	void Update() { BaseUVEffect::Update(); };
+	void Render() { BaseUVEffect::RenderADDNOZ(); };
+	void Action(Vector3 pos = VECTOR_ZERO, float startScale = 1.0f, float endScale = 1.0f) { BaseUVEffect::Action(pos, startScale, endScale); };
 
 private:
 };

@@ -31,11 +31,13 @@ enum MESSAGE_TYPE
 	COMBO_COUNT,		// コンボカウント
 	COMBO_GUARD,		// コンボガードされたぜ
 	ADD_SHOT,			// ショットの実体を格納してね
+	ERASE_SIDE_SHOT,	// 片方の出したショットを消す
 	BACK_MENU,			// メニュー画面にもどりたいです。
 	TROPHY_GET,			// トロフィーゲット
 	PICTURE_GET,		// イラストゲット
 	MOVIE_GET,			// ムービーゲット
 	OTHER				// その他。
+
 };
 
 

@@ -299,3 +299,40 @@ private:
 	tdn2DObj* m_movieTex;
 
 };
+
+
+//+-------------------------------
+//	バランスの演出
+//+-------------------------------
+class BalanceResultPerformance : public BaseResultPerformance
+{
+public:
+	BalanceResultPerformance();
+	~BalanceResultPerformance();
+
+	void Update();
+	void BackRender();
+	void FrontRender();
+	void Action();
+
+private:
+	// 必要なやつ
+	Pic m_winner;
+	Pic m_winnerDon;
+	Pic m_edge;
+	Pic m_back;
+
+	Pic m_font;
+	int m_iFontAnimFrame;
+	//Pic m_fontKill;
+
+	Pic m_petal;
+	Pic m_pRose;// 
+	Pic m_pNinjin;// 
+	Pic m_pSaku;
+
+	// バックムービー
+	tdnMovie*  m_movieMgr;
+	tdn2DObj* m_movieTex;
+
+};

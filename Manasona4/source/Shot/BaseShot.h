@@ -19,7 +19,9 @@ namespace Shot
 		MAYA  = 100,
 		MUSHI1,
 		MUSHI2,
-		MUSHI3
+		MUSHI3,
+		NINJIN,
+		USA,
 	};
 
 	//------------------------------------------------------
@@ -118,6 +120,7 @@ namespace Shot
 		//------------------------------------------------------
 		ParamDesc m_tagParamDesc;
 		int m_iHitStopFrame;
+		bool m_bTurnOverUVEffect;
 
 		//------------------------------------------------------
 		//	îªíËÅEçUåÇóÕÇ∆Ç©ÇÃèÓïÒ
@@ -208,5 +211,28 @@ namespace Shot
 			static const float c_SPEED;
 			static const float c_RANGE;
 		};
+	};
+
+	
+	class Ninjin :public Base
+	{
+	public:
+		Ninjin(BasePlayer *pPlayer, AttackData *pAttackData, BaseUVEffect/*iex3DObj*/ *pObj, const Vector3 &vPos, const Vector3 &vVec);
+		~Ninjin();
+		void Update();
+		void Render();
+
+		TYPE GetType() { return TYPE::NINJIN; }
+	};
+
+	class USAShot :public Base
+	{
+	public:
+		USAShot(BasePlayer *pPlayer, AttackData *pAttackData, BaseUVEffect/*iex3DObj*/ *pObj, const Vector3 &vPos, const Vector3 &vVec);
+		~USAShot();
+		void Update();
+		void Render();
+
+		TYPE GetType() { return TYPE::USA; }
 	};
 }

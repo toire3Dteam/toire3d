@@ -109,7 +109,7 @@ bool sceneResult::Initialize()
 
 	case CHARACTER::BALANCE:
 		m_WinPlayer = new iex3DObj("DATA/CHR/Airou/result.IEM");
-		m_ResultPerformance = new AirouResultPerformance();
+		m_ResultPerformance = new BalanceResultPerformance();
 		break;
 
 	default:

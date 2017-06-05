@@ -983,7 +983,7 @@ void Stand::Hete::Action(SKILL_ACTION_TYPE type)
 /******************************/
 //		アッタカイ
 /******************************/
-Stand::Attakai::Attakai(BasePlayer *pPlayer) :Base(pPlayer)
+Stand::Attakai::Attakai(BasePlayer *pPlayer) :Base(pPlayer), m_iSoundFrame(0)
 {
 	// アッタカイの実体
 	m_pObj = new iex3DObj("DATA/CHR/Stand/Attakai/Attakai.IEM");
@@ -1171,6 +1171,16 @@ void Stand::Attakai::Update(bool bControl)
 	// アクティブじゃなかったら出ていけぇ！！
 	if (!m_bActive) return;
 
+	// 爆発するまでの間だけ
+	if (m_ActionFrameList[(int)m_ActionType][m_CurrentActionFrame] == FRAME_STATE::START)
+	{
+		// SEの処理
+		if (++m_iSoundFrame >(int)(c_SE_INTERVAL * (1 - (min(m_fDangerRate + 0.05f, 0.975f)))))	// 0フレーム間隔で鳴らないように調整
+		{
+			se->Play("爆弾カウントダウン");
+			m_iSoundFrame = 0;
+		}
+	}
 
 	// 前方向に進む
 	if (m_ActionType == SKILL_ACTION_TYPE::LAND)
@@ -1239,6 +1249,8 @@ void Stand::Attakai::Action(SKILL_ACTION_TYPE type)
 	if (m_pPlayer->GetDir() == DIR::LEFT)v.x *= -1;
 	//v.z *= 1.;
 	m_pos += v * 11.0f;
+	
+	m_iSoundFrame = c_SE_INTERVAL / 2;
 
 	// (TODO)2/4 今はここでモーションを設定
 	if (type == SKILL_ACTION_TYPE::LAND)

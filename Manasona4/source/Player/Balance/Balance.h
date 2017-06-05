@@ -52,6 +52,13 @@ public:
 	void SkillExit();
 	bool SkillUpdate();//
 
+	/****************************/
+	//	キャラクター固有無敵
+	/****************************/
+	void InvincibleAttackInit() override;
+	void InvincibleAttackExit() override;
+	bool InvincibleAttackUpdate() override;//
+
 	class SkillAction
 	{
 	public:
@@ -93,15 +100,15 @@ public:
 		private:
 		};
 
-		// コークスクリュー
-		class Land2 :public Base
-		{
-		public:
-			Land2(Balance *pBalance);
-			void Enter();
-			bool Execute();
-			void Exit();
-		};
+		//// コークスクリュー
+		//class Land2 :public Base
+		//{
+		//public:
+		//	Land2(Balance *pBalance);
+		//	void Enter();
+		//	bool Execute();
+		//	void Exit();
+		//};
 
 		class Aerial :public Base
 		{
@@ -114,15 +121,15 @@ public:
 			int m_ActiveFrame;	// 初段、二段と攻撃を分けるので、時間の計測で
 		};
 
-		// 着地にしたろ
-		class AerialDrop :public Base
-		{
-		public:
-			AerialDrop(Balance *pBalance);
-			void Enter();
-			bool Execute();
-			void Exit();
-		};
+		//// 着地にしたろ
+		//class AerialDrop :public Base
+		//{
+		//public:
+		//	AerialDrop(Balance *pBalance);
+		//	void Enter();
+		//	bool Execute();
+		//	void Exit();
+		//};
 	};
 
 	SkillAction::Base *m_pSkillActions[(int)SKILL_ACTION_TYPE::MAX];
@@ -206,12 +213,19 @@ private:
 	// 波動用
 	AttackData *m_pShotData;
 	BaseUVEffect *m_pBullet;	// 飛び道具のメッシュの実体(玉に参照させる)
+	BaseUVEffect *m_pUSABullet;	// 飛び道具のメッシュの実体(玉に参照させる)
 
 	// Balance用のエフェクト
-	//BalanceUpperLineEffect* m_pUpperLineEffect;
-	//BaseUVEffect *m_pCycloneEffect;	// 必殺の風
-	//BalanceCounterEffect* m_pCounterEffect;
+	BaseUVEffect* m_pCanonEffect;
+	BaseUVEffect *m_pNozzleFlashEffect;	// 必殺の風
+	BaseUVEffect* m_pBlueImpact;
+	int m_iBlueImpactActFrame;
 	//StepEffect* m_pStepEffect;
+
+	BasePanelEffect* m_pHeartEffect;
+
+	// 人参
+	iex3DObj* m_pNinjin;
 
 };
 

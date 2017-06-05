@@ -15,7 +15,8 @@ Shot::Base::Base(BasePlayer *pPlayer, AttackData *pAttackData,
 	m_bAttitude(bAttitude),
 	m_pUVEffect(nullptr),
 	m_tagParamDesc(),
-	m_iHitStopFrame(0)
+	m_iHitStopFrame(0),
+	m_bTurnOverUVEffect(false)
 {
 	pObj->SetFrame(0);
 	pObj->SetAngle(DIR_ANGLE[(int)pPlayer->GetTargetDir()]);
@@ -76,10 +77,22 @@ void Shot::Base::Update()
 	else if (m_pUVEffect)
 	{
 		m_pUVEffect->SetPos(m_tagParamDesc.vPos);
-		m_pUVEffect->SetAngleAnimation(
-			Vector3(0, 0, atan2f(-m_tagParamDesc.vVec.x, m_tagParamDesc.vVec.y)),
-			Vector3(0, 0, atan2f(-m_tagParamDesc.vVec.x, m_tagParamDesc.vVec.y))
-			);
+
+		if (m_bTurnOverUVEffect == true)
+		{
+			m_pUVEffect->SetAngleAnimation(
+				Vector3(0, 3.14f, atan2f(-m_tagParamDesc.vVec.x, m_tagParamDesc.vVec.y)),
+				Vector3(0, 3.14f, atan2f(-m_tagParamDesc.vVec.x, m_tagParamDesc.vVec.y))
+				);
+		}
+		else
+		{
+			m_pUVEffect->SetAngleAnimation(
+				Vector3(0, 0, atan2f(-m_tagParamDesc.vVec.x, m_tagParamDesc.vVec.y)),
+				Vector3(0, 0, atan2f(-m_tagParamDesc.vVec.x, m_tagParamDesc.vVec.y))
+				);
+		}
+	
 
 
 		// UVエフェクト
@@ -102,7 +115,32 @@ void Shot::Base::Render()
 			m_p3DObj->Render();
 		}
 	}
-	if (m_pUVEffect)m_pUVEffect->Render();
+	if (m_pUVEffect)
+	{
+		// 描画前に位置だけ更新
+		m_pUVEffect->SetPos(m_tagParamDesc.vPos);
+		if (m_bTurnOverUVEffect == true)
+		{
+			m_pUVEffect->SetAngleAnimation(
+				Vector3(0, 3.14f, atan2f(-m_tagParamDesc.vVec.x, m_tagParamDesc.vVec.y)),
+				Vector3(0, 3.14f, atan2f(-m_tagParamDesc.vVec.x, m_tagParamDesc.vVec.y))
+				);
+		}
+		else
+		{
+			m_pUVEffect->SetAngleAnimation(
+				Vector3(0, 0, atan2f(-m_tagParamDesc.vVec.x, m_tagParamDesc.vVec.y)),
+				Vector3(0, 0, atan2f(-m_tagParamDesc.vVec.x, m_tagParamDesc.vVec.y))
+				);
+		}
+		
+		// メッシュの更新
+		m_pUVEffect->GetUV()->GetObj()->SetPos(m_pUVEffect->GetPos());
+		m_pUVEffect->GetUV()->GetObj()->SetAngle(Vector3(0, 0, atan2f(-m_tagParamDesc.vVec.x, m_tagParamDesc.vVec.y)));
+		m_pUVEffect->GetUV()->GetObj()->Update();
+
+		m_pUVEffect->Render();
+	}
 
 #ifdef _DEBUG
 	// 判定の描画
@@ -383,3 +421,230 @@ void Shot::AramitamaMushi::Aerial::Render()
 	// 基底クラスの描画
 	Base::Render();
 }
+
+
+
+Shot::Ninjin::Ninjin(BasePlayer *pPlayer,
+	AttackData *pAttackData,
+	BaseUVEffect/*iex3DObj*/ *pObj,
+	const Vector3 &vPos,
+	const Vector3 &vVec) :
+	Base(pPlayer, pAttackData, pObj)
+{
+	ParamDesc l_tagParamDesc;
+	l_tagParamDesc.vPos = vPos;
+	l_tagParamDesc.vVec = vVec;
+	//l_tagParamDesc.vVelocity = vVec * 2.0f;
+	l_tagParamDesc.vAccel = vVec * 0.0001f;
+	Base::Initialize(l_tagParamDesc);
+
+	//DIR eTargetDir((pPlayer->GetTargetDir() == DIR::LEFT) ? DIR::RIGHT : DIR::LEFT);
+	//pObj->SetAngle(DIR_ANGLE[(int)eTargetDir]);
+
+	//Vector3 l_vAppearPos(pPlayer->GetTargetPlayer()->GetPos());
+	//Vector3 l_vAddMove(pPlayer->GetTargetPlayer()->GetMove() * 1.75f);
+	////if (l_vAppearPos.x + l_vAddMove.x )
+	////l_vAppearPos += l_vAddMove;
+	//l_vAppearPos += Vector3(15 * pPlayer->GetDirVecX(), -15, 0);
+
+
+	//Vector3 l_vTargetPos = pPlayer->GetTargetPlayer()->GetPos();
+	//l_vTargetPos.x += +(pPlayer->GetTargetPlayer()->GetMove().x * 3);// 相手のMove値考慮
+
+	//Vector3 l_vToTargetVec = l_vTargetPos - l_vAppearPos;
+	//l_vToTargetVec.Normalize();
+
+	//const int c_SOJOURN_TIME = 34;
+	//ParamDesc l_tagParamDesc;
+	//l_tagParamDesc.vPos = l_vAppearPos;					// 出現位置
+	//l_tagParamDesc.vVec = l_vToTargetVec;
+	//l_tagParamDesc.vVelocity = l_tagParamDesc.vVec * 2;
+	//l_tagParamDesc.iSojournTime = c_SOJOURN_TIME;		// 滞在時間
+	//l_tagParamDesc.bPenetration = true;					// 当たっても消えない
+	//l_tagParamDesc.bCollisionOK = false;				// 途中から判定が始まる(モーションに合わせてtrueにする)
+	//Base::Initialize(l_tagParamDesc);
+
+}
+
+Shot::Ninjin::~Ninjin()
+{
+}
+
+
+void Shot::Ninjin::Update()
+{
+	// 基底クラスの更新
+	Base::Update();
+
+	// 弾丸の最大速度
+	if (m_tagParamDesc.vVelocity.x >=  2.0f)
+	{
+		m_tagParamDesc.vVelocity.x = 2.0f;
+	}
+
+	// さらに緩急を
+	m_tagParamDesc.vAccel += m_tagParamDesc.vVec* 0.0005f;
+
+	// 追加
+	PointLightMgr->AddPointLight(m_tagParamDesc.vPos + Vector3(0, 5, 0),
+		Vector3(.8f, 0.2f, .05f), 20, 10, 3, 1, 2);// ポイントライトエフェクト！
+
+	// 軌跡のパーティクル
+	ParticleManager::EffectNinjinShotLocus(m_tagParamDesc.vPos);//m_vVelocity
+}
+
+void Shot::Ninjin::Render()
+{
+	// 基底クラスの描画
+	Base::Render();
+}
+
+
+
+
+
+
+Shot::USAShot::USAShot(BasePlayer *pPlayer,
+	AttackData *pAttackData,
+	BaseUVEffect/*iex3DObj*/ *pObj,
+	const Vector3 &vPos,
+	const Vector3 &vVec) :
+	Base(pPlayer, pAttackData, pObj)
+{
+	ParamDesc l_tagParamDesc;
+	l_tagParamDesc.vPos = vPos;
+	l_tagParamDesc.vVec = vVec;
+	l_tagParamDesc.vVelocity = vVec * 5.0f;
+	//l_tagParamDesc.vAccel = vVec * 0.001f;
+
+	l_tagParamDesc.bPenetration = true;					// 当たっても消えない
+	
+	Base::Initialize(l_tagParamDesc);
+
+	//ParamDesc l_tagParamDesc;
+	//l_tagParamDesc.vPos = vPos;
+	//l_tagParamDesc.vVec = vVec;
+	//l_tagParamDesc.vVelocity = vVec * 2.0f;
+	//Base::Initialize(l_tagParamDesc);
+
+	// メッシュ反転
+	if (pPlayer->GetDir() == DIR::LEFT)
+	{
+		m_bTurnOverUVEffect = true;
+	}
+	else
+	{
+		m_bTurnOverUVEffect = false;
+	}
+
+
+	if (m_bTurnOverUVEffect == true)
+	{
+		m_pUVEffect->SetAngleAnimation(
+			Vector3(0, 3.14f, 0.0f),
+			Vector3(0, 3.14f, 0.0f)
+			);
+	}
+	else
+	{
+		m_pUVEffect->SetAngleAnimation(
+			Vector3(0, 0, 0.0f),
+			Vector3(0, 0, 0.0f)
+			);
+	}
+
+
+}
+
+Shot::USAShot::~USAShot()
+{
+}
+
+
+void Shot::USAShot::Update()
+{
+	// ヒットストップ処理
+	if (m_iHitStopFrame > 0)
+	{
+		m_iHitStopFrame--;
+		return;
+	}
+
+	// 滞在時間ありの飛び道具の場合
+	if (m_tagParamDesc.iSojournTime != c_NO_SOJOURN_TIME)
+	{
+		// 滞在時間が終わったら消える
+		if (--m_tagParamDesc.iSojournTime <= 0) m_tagParamDesc.bErase = true;
+	}
+
+	// 基本的な移動量の更新
+	m_tagParamDesc.vVelocity += m_tagParamDesc.vAccel;
+	m_tagParamDesc.vPos += m_tagParamDesc.vVelocity;
+
+	if (m_pUVEffect)
+	{
+		m_pUVEffect->SetPos(m_tagParamDesc.vPos);
+
+
+
+
+		// UVエフェクト
+		m_pUVEffect->Update();
+	}
+
+
+	// 追加
+	//PointLightMgr->AddPointLight(m_tagParamDesc.vPos + Vector3(0, 5, 0),
+	//	Vector3(.8f, 0.2f, .05f), 20, 10, 3, 1, 2);// ポイントライトエフェクト！
+
+												   // 軌跡のパーティクル
+	ParticleManager::EffectNinjinShotLocus(m_tagParamDesc.vPos);//m_vVelocity
+
+}
+
+void Shot::USAShot::Render()
+{
+	// 基底クラスの描画
+
+	if (m_pUVEffect)
+	{
+		// 描画前に位置だけ更新
+		m_pUVEffect->SetPos(m_tagParamDesc.vPos);
+
+		// メッシュの更新
+		m_pUVEffect->GetUV()->GetObj()->SetPos(m_pUVEffect->GetPos());
+		m_pUVEffect->GetUV()->GetObj()->Update();
+
+		m_pUVEffect->Render();
+	}
+
+
+
+#ifdef _DEBUG
+	// 判定の描画
+	CollisionShape::Square square;
+
+	/* 攻撃判定の描画 */
+	if (m_ptagAttackData)
+	{
+		//if (m_ActionFrameList[(int)m_ActionType][m_CurrentActionFrame] == FRAME_STATE::ACTIVE)
+		{
+			Vector3 wv[3];	// ワールドバーテックス
+			Vector2 sv[3];	// スクリーンバーテックス
+
+			memcpy_s(&square, sizeof(CollisionShape::Square), m_ptagAttackData->pCollisionShape, sizeof(CollisionShape::Square));
+			square.pos += m_tagParamDesc.vPos;
+
+			wv[0].Set(square.pos.x - square.width, square.pos.y + square.height, 0);
+			wv[1].Set(square.pos.x + square.width, square.pos.y + square.height, 0);
+			wv[2].Set(square.pos.x + square.width, square.pos.y - square.height, 0);
+
+			FOR(3)sv[i] = Math::WorldToScreen(wv[i]);
+
+			tdnPolygon::Rect((int)sv[0].x, (int)sv[0].y, (int)(sv[1].x - sv[0].x), (int)(sv[2].y - sv[0].y), RS::COPY, 0x80ff0000);
+		}
+	}
+#endif
+
+}
+

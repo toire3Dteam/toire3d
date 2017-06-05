@@ -86,6 +86,7 @@ public:
 	static void EffectResultSplash(const Vector3 &pos);		// ƒŠƒUƒ‹ƒg‚ÌŒŒ‚µ‚Ô‚«
 	static void EffectExplosion(const Vector3 &pos);		// ”š”­‚Ì‰Š
 	static void EffectShotLocus(const Vector3 &pos);		// ’e‚Ì‹OÕ
+	static void EffectNinjinShotLocus(const Vector3 &pos);	// ’e‚Ì‹OÕlQ
 
 	//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
 

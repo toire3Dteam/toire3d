@@ -751,3 +751,23 @@ public:
 private:
 
 };
+
+// 
+class HeartEffect :public BasePanelEffect
+{
+public:
+	HeartEffect()
+	{
+		m_picSize = 256;
+		m_pic = new AnimationPanel("Data/Effect/heart.png", 256, 256, 15, 1, 4, false);
+		state = RS::ADD_NOZ;
+		m_pic3DScale = 55;//3DÇÃÉXÉPÅ[Éã
+	};
+	~HeartEffect() {};
+
+	void Update() { BasePanelEffect::Update(); };
+	void Render() { BasePanelEffect::Render(); };
+	//void Action(int x = 0, int y = 0, int delayFrame = 0) { BasePanelEffect::Action(x, y, delayFrame); };
+
+private:
+};
