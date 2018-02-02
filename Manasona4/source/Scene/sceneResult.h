@@ -68,7 +68,7 @@ private:
 	Surface* m_pBackBuffer;
 	/****************************/
 	
-	static const int PERFORMANCE_ACTION_TIME_MAX = 150;
+	static const int PERFORMANCE_ACTION_TIME_MAX = 150; // 1でEXPO用
 	static const int PERFORMANCE_TIME_MAX = 150;
 	//  パフォーマンス２D
 	int m_iPerformanceActionTimer;

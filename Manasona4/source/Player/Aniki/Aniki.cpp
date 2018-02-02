@@ -1668,7 +1668,7 @@ void Aniki::HeaveHoAction::ThrowSuccess::Enter()
 	// 上に打ち上げる
 	m_pAniki->GetTargetPlayer()->SetMove(Vector3(m_pAniki->GetDirVecX() * .01f, 6, 0));
 
-	// アイルーみたいに座標をいじる
+	// ぶんぶんみたいに座標をいじる
 	m_pAniki->SetPos(VECTOR_ZERO);
 	m_pAniki->GetTargetPlayer()->SetPos(Vector3(m_pAniki->GetDirVecX() * 5, 0, 0));
 

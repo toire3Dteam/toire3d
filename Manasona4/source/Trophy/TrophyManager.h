@@ -22,7 +22,7 @@ enum class TROPHY_TYPE
 	MENY_CONTENT,		//  コンテンツをたくさん解放した
 	CHALLENGE_CLEAR,	//  チャレンジモードで何かタスクをこなした
 	ATTAKAI_BOM,		//  アッタカイのボム
-	AIROU_CHALLENGE,	//	アイル―チャレンジ
+	AIROU_CHALLENGE,	//	ぶんぶんチャレンジ
 	TEKI_CHALLENGE,		//	テキチャレンジ
 	BIG_BIG_DAMAGE,		//	超物凄い火力
 	COMPLETE_TROPHY,	//  全てのトロフィーを集めた

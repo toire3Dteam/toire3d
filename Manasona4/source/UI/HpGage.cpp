@@ -282,10 +282,10 @@ void HpGage::UseMaskScreen()
 			}
 
 
-			m_pWave->Render((int)m_vPos.x + (m_iGageWidth - (int)(m_iGageWidth * m_fRate)), (int)m_vPos.y,
-				(int)(m_iGageWidth), m_iGageHeight,
-				m_iGageWidth - (int)(m_iGageWidth  * m_fRate)+ (int)m_fWaveUV, 0,
-				(int)(m_iGageWidth), m_iGageHeight, RS::ADD);
+			//m_pWave->Render((int)m_vPos.x + (m_iGageWidth - (int)(m_iGageWidth * m_fRate)), (int)m_vPos.y,
+			//	(int)(m_iGageWidth), m_iGageHeight,
+			//	m_iGageWidth - (int)(m_iGageWidth  * m_fRate)+ (int)m_fWaveUV, 0,
+			//	(int)(m_iGageWidth), m_iGageHeight, RS::ADD);
 
 			//-----------------
 			// SPƒQ[ƒW
@@ -360,11 +360,11 @@ void HpGage::UseMaskScreen()
 			}
 
 
-			// TODO
-			m_pWave->Render((int)m_vPos.x, (int)m_vPos.y,
-				m_iGageWidth, m_iGageHeight,
-				(int)m_fWaveUV, 0,
-				m_iGageWidth, m_iGageHeight, RS::ADD);
+			//// TODO
+			//m_pWave->Render((int)m_vPos.x, (int)m_vPos.y,
+			//	m_iGageWidth, m_iGageHeight,
+			//	(int)m_fWaveUV, 0,
+			//	m_iGageWidth, m_iGageHeight, RS::ADD);
 
 
 			//-----------------
@@ -472,10 +472,10 @@ void HpGage::NotMaskRender()
 		}
 
 
-		m_pWave->Render((int)m_vPos.x /*+ (m_iGageWidth - (int)(m_iGageWidth * m_fRate))*/, (int)m_vPos.y,
-			(int)(m_iGageWidth), m_iGageHeight,
-			/*m_iGageWidth - (int)(m_iGageWidth  * m_fRate) +*/ (int)m_fWaveUV, 0,
-			(int)(m_iGageWidth), m_iGageHeight, RS::ADD);
+		//m_pWave->Render((int)m_vPos.x /*+ (m_iGageWidth - (int)(m_iGageWidth * m_fRate))*/, (int)m_vPos.y,
+		//	(int)(m_iGageWidth), m_iGageHeight,
+		//	/*m_iGageWidth - (int)(m_iGageWidth  * m_fRate) +*/ (int)m_fWaveUV, 0,
+		//	(int)(m_iGageWidth), m_iGageHeight, RS::ADD);
 
 
 
@@ -529,10 +529,10 @@ void HpGage::NotMaskRender()
 
 
 		// TODO
-		m_pWave->Render((int)m_vPos.x, (int)m_vPos.y,
-			m_iGageWidth, m_iGageHeight,
-			(int)m_fWaveUV, 0,
-			m_iGageWidth, m_iGageHeight, RS::ADD);
+		//m_pWave->Render((int)m_vPos.x, (int)m_vPos.y,
+		//	m_iGageWidth, m_iGageHeight,
+		//	(int)m_fWaveUV, 0,
+		//	m_iGageWidth, m_iGageHeight, RS::ADD);
 
 	}
 

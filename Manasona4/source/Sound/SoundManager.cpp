@@ -23,7 +23,7 @@ const SE_Manager::DATA all_dataS[]
 	{ "ヒット5",					"DATA/Sound/SE/BlazBlue/hit2.wav", 2, false },
 	{ "ヒット6",					"DATA/Sound/SE/BlazBlue/hit3.wav", 2, false },
 	{ "ケツドラム1",				"DATA/Sound/SE/Battle/Aniki/dram1.wav", 8, false },
-	{ "トスミタマ",					"DATA/Sound/SE/Battle/plasma.wav", 1, false },
+	{ "トスアシスト",					"DATA/Sound/SE/Battle/plasma.wav", 1, false },
 	{ "斬撃1",						"DATA/Sound/SE/P4U2/cut2.wav", 2, false },
 	{ "斬撃2",						"DATA/Sound/SE/BlazBlue/cut1.wav", 6, false },
 	{ "ぐちょヒット",				"DATA/Sound/SE/Battle/gutyo.wav", 8, false },
@@ -43,7 +43,7 @@ const SE_Manager::DATA all_dataS[]
 	{ "空振り4",					"DATA/Sound/SE/BlazBlue/whiff4.wav", 2, false },
 	{ "空振り5",					"DATA/Sound/SE/BlazBlue/whiff5.wav", 2, false },
 	{ "空振り6",					"DATA/Sound/SE/BlazBlue/whiff6.wav", 2, false },
-	{ "アイルードリル",				"DATA/Sound/SE/BlazBlue/drill.wav", 2, false },
+	{ "ぶんぶんドリル",				"DATA/Sound/SE/BlazBlue/drill.wav", 2, false },
 	{ "エスケープ",					"DATA/Sound/SE/Battle/escape.wav",	2, false },
 	{ "ガード小",					"DATA/Sound/SE/BlazBlue/guard1.wav", 8, false },
 	{ "ガード中",					"DATA/Sound/SE/BlazBlue/guard2.wav", 4, false },
@@ -80,7 +80,7 @@ const SE_Manager::DATA all_dataS[]
 
 	{ "バトルローディング",			"DATA/Sound/SE/BlazBlue/BattleLoading.wav",				1, false },
 
-	{ "ミタマチャージ",				"DATA/Sound/SE/Battle/up.wav", 2, false },
+	{ "魂チャージ",				"DATA/Sound/SE/Battle/up.wav", 2, false },
 
 	//{ "フェイトイズターニング",		"DATA/Sound/SE/BlazBlue/voice/the_wheel.wav",	1, false },
 	//{ "リベル",						"DATA/Sound/SE/BlazBlue/voice/revel.wav",		1, false },

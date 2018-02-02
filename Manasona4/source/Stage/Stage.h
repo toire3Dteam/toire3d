@@ -212,14 +212,20 @@ namespace Stage
 	{
 	public:
 		A() :Base(){}
-		~A(){}
+		~A();
 		void Initialize(Camera *pCamera);
 		void Update() override;
 		void Render() override;
+		void RenderForward()override;
+
 		//void Render_ShadowBuf() override;
 
 		EFFECT_CAMERA_ID GetIntroCameraScriptID(){ return EFFECT_CAMERA_ID::SYUTEN_STAGE_INTRO; }
 	private:
+		// “®‰æ
+		//tdn2DObj* m_pBackMovie;
+		tdnMovie*  m_pMovie;
+
 	};
 
 }

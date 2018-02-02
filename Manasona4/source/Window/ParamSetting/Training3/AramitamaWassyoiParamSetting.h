@@ -2,7 +2,7 @@
 #include "../BaseParamSetting.h"
 
 //+------------------------------------
-//	アラミタマのわっしょいゲージの設定
+//	封印されし魂のわっしょいゲージの設定
 //+------------------------------------
 
 class AramitamaWassyoiParamSetting : public BaseParamSetting

@@ -292,7 +292,7 @@ void PlayerManager::UpdateTraining()
 	// キャラクター個別の設定
 	FOR(m_NumPlayer)
 	{
-		// もしアラミタマだったら
+		// もし封印されし魂だったら
 		if (m_pPlayers[i]->GetCharacterType() == CHARACTER::ARAMITAMA)
 		{
 			AramitamaDesk l_tagDesk;

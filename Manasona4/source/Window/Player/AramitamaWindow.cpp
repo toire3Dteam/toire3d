@@ -3,7 +3,7 @@
 #include "Data/SelectData.h"
 
 //+-------------------------------
-//	アラミタマウィンドウ
+//	封印されし魂ウィンドウ
 //+-------------------------------
 
 AramitamaWindow::AramitamaWindow(Vector2 vPos) :BaseWindow(vPos)
@@ -23,12 +23,12 @@ AramitamaWindow::AramitamaWindow(Vector2 vPos) :BaseWindow(vPos)
 	AddIconData("■車輪③", "空中から横に回転しながら攻撃する。");
 	AddIconData("■空中回避③", "後ろへ飛びながら回避します。");
 	
-	AddIconData("■トスミタマ", "味方が相手を上方向に吹っ飛ばします。");
-	AddIconData("■隕石ミタマ", "味方が空中から相手に突進します。");
-	AddIconData("■Dミタマ", "味方が下から上へ回転しながら攻撃します。");
+	AddIconData("■トスアシスト", "味方が相手を上方向に吹っ飛ばします。");
+	AddIconData("■隕石アシスト", "味方が空中から相手に突進します。");
+	AddIconData("■D魂", "味方が下から上へ回転しながら攻撃します。");
 
 	AddIconData("▲月影", "相手を吹き飛ばし、切り替えし攻撃をします。");
-	AddIconData("●ミタマキャノン", "上方向にビームを放つ必殺技。");
+	AddIconData("●魂キャノン", "上方向にビームを放つ必殺技。");
 
 	AddCommandData("△", 365);
 	AddCommandData("↓＋△", 365);

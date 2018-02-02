@@ -213,7 +213,7 @@ void Shot::Maya::Render()
 
 
 /****************************************************/
-//	地上スキル後にトスを上げるアラミタマ
+//	地上スキル後にトスを上げる封印されし魂
 /****************************************************/
 const int Shot::AramitamaMushi::Land::c_SOJOURN_TIME = 34;
 const int Shot::AramitamaMushi::Land::c_ATTACK_FRAME = 8;
@@ -264,7 +264,7 @@ Shot::AramitamaMushi::Land::Land(BasePlayer *pPlayer,
 
 Shot::AramitamaMushi::Land::~Land()
 {
-	// トスミタマの演出止める
+	// トスアシストの演出止める
 	//m_pRefShot->StopRoop();
 }
 
@@ -281,7 +281,7 @@ void Shot::AramitamaMushi::Land::Update()
 		m_bHit = true;
 	}
 
-	// トスミタマの演出
+	// トスアシストの演出
 	m_pRefShot->SetPos(m_tagParamDesc.vPos + m_tagParamDesc.vVec * 10);
 	m_pRefShot->Update();
 }
@@ -291,14 +291,14 @@ void Shot::AramitamaMushi::Land::Render()
 	// 基底クラスの描画
 	Base::Render();
 
-	// トスミタマの演出
+	// トスアシストの演出
 	m_pRefShot->Render();
 }
 
 
 
 /****************************************************/
-//	しゃがみスキル時の隕石アラミタマ
+//	しゃがみスキル時の隕石封印されし魂
 /****************************************************/
 const float Shot::AramitamaMushi::Squat::c_SPEED = 4.25f;
 
@@ -344,7 +344,7 @@ void Shot::AramitamaMushi::Squat::Update()
 	// 基底クラスの更新
 	Base::Update();
 
-	// 隕石ミタマの演出
+	// 隕石アシストの演出
 	//m_pRefShot->SetAngleAnimation();
 	m_pRefShot->SetPos(m_tagParamDesc.vPos);
 	m_pRefShot->Update();
@@ -362,7 +362,7 @@ void Shot::AramitamaMushi::Squat::Render()
 
 
 /****************************************************/
-//	空中スキル時のD虫ミタマ
+//	空中スキル時のD虫魂
 /****************************************************/
 const int	Shot::AramitamaMushi::Aerial::c_SOJOURN_TIME = 80;
 const float Shot::AramitamaMushi::Aerial::c_SPEED = 0.75f;
@@ -412,7 +412,7 @@ void Shot::AramitamaMushi::Aerial::Update()
 	// 多段ヒット用の処理(xフレーム毎に判定を復活させる)
 	if (m_tagParamDesc.iSojournTime % 7 == 0) m_tagParamDesc.bCollisionOK = true;
 
-	// D虫ミタマの演出
+	// D虫魂の演出
 
 }
 

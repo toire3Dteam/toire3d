@@ -857,7 +857,7 @@ void BasePlayer::Update(PLAYER_UPDATE flag)
 		// ★硬直時間のデクリメント
 		if (m_iRecoveryFrame > 0)
 			m_iRecoveryFrame--;
-		else m_fDamageRate = 1.0f;	// (TODOコンボ切れる1フレームで補正が切れてるのにコンボが入る(アイルー1,2,下,スキル下で3400がでる))コンボ切れたら、ダメージレートを戻す
+		else m_fDamageRate = 1.0f;	// (TODOコンボ切れる1フレームで補正が切れてるのにコンボが入る(ぶんぶん1,2,下,スキル下で3400がでる))コンボ切れたら、ダメージレートを戻す
 
 	}
 

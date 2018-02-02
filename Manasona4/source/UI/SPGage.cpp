@@ -242,8 +242,8 @@ void SpGage::Render()
 		//---------------------------
 		// [ª«ó‘Ô]	SP™X‚É‰ñ•œ
 		//---------------------------
-		m_pSpGetting->Render((int)m_vPos.x, (int)m_vPos.y - 64, 64, 64, m_bSpGetting * 64, 0, 64, 64);
-		m_pSpGettingRip->Render((int)m_vPos.x, (int)m_vPos.y - 64, 64, 64, m_bSpGetting * 64, 0, 64, 64, RS::ADD);
+		//m_pSpGetting->Render((int)m_vPos.x, (int)m_vPos.y - 64, 64, 64, m_bSpGetting * 64, 0, 64, 64);
+		//m_pSpGettingRip->Render((int)m_vPos.x, (int)m_vPos.y - 64, 64, 64, m_bSpGetting * 64, 0, 64, 64, RS::ADD);
 	
 
 		//---------------------------
@@ -310,8 +310,8 @@ void SpGage::Render()
 		//---------------------------
 		// [ª«ó‘Ô]	SP™X‚É‰ñ•œ
 		//---------------------------
-		m_pSpGetting->Render((int)m_vPos.x + (310 - 64), (int)m_vPos.y - 64, 64, 64, m_bSpGetting * 64, 0, 64, 64);
-		m_pSpGettingRip->Render((int)m_vPos.x + (310 - 64), (int)m_vPos.y - 64, 64, 64, m_bSpGetting * 64, 0, 64, 64, RS::ADD);
+		//m_pSpGetting->Render((int)m_vPos.x + (310 - 64), (int)m_vPos.y - 64, 64, 64, m_bSpGetting * 64, 0, 64, 64);
+		//m_pSpGettingRip->Render((int)m_vPos.x + (310 - 64), (int)m_vPos.y - 64, 64, 64, m_bSpGetting * 64, 0, 64, 64, RS::ADD);
 	
 
 		//---------------------------

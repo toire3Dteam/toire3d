@@ -30,6 +30,9 @@ bool sceneLoading::Initialize()
 	m_fLoadGaugePercent = 0;
 	m_fLoadAngle = 0.0f;
 
+	// ★ローディング時にFPSを落とす
+	MainFrameEX->SetFPSMode(FPS_MODE::FPS_45);
+
 	// ★スレッド生成
 	LoadSceneThreadMgr->Initialize(m_pNewScene);
 
@@ -43,6 +46,8 @@ sceneLoading::~sceneLoading()
 {
 	// ★スレッド解放
 	LoadSceneThreadMgr->Release();
+
+	MainFrameEX->SetFPSMode(FPS_MODE::NORMAL);
 
 	SAFE_DELETE(m_pImage);
 	SAFE_DELETE(m_pGauge);

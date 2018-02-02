@@ -17,4 +17,4 @@ naze_hissatsu.IEM
 1.25
 
 HP:
-8500
+9500

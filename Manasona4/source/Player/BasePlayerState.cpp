@@ -892,7 +892,7 @@ bool BasePlayerState::Global::OnMessage(BasePlayer * pPerson, const Message & ms
 									 }
 									 
 
-									 // ★必殺技中は同技補正を無視(アイルーのやつとかひどいことになるから)
+									 // ★必殺技中は同技補正を無視(ぶんぶんのやつとかひどいことになるから)
 									 //if (!HitDamageInfo->bOverDrive)
 									 {
 										 for (auto it : *pPerson->GetRecoveryDamageCount())
@@ -4677,7 +4677,7 @@ void BasePlayerState::Skill::Execute(BasePlayer * pPerson)
 
 void BasePlayerState::Skill::Exit(BasePlayer * pPerson)
 {
-	// アイルーとかで重力無視したりするので、一応ここで解除しておく
+	// ぶんぶんとかで重力無視したりするので、一応ここで解除しておく
 	pPerson->SetMoveUpdate(true);
 
 	// スキルの終わり
@@ -5320,7 +5320,7 @@ bool BasePlayerState::Guard::OnMessage(BasePlayer * pPerson, const Message & msg
 										 // ウィークエフェクト発生！
 										 Vector2 screenPos;
 										 screenPos = Math::WorldToScreen(pPerson->GetCenterPos());
-										 pPerson->GetPanelEffectManager()->AddEffect((int)screenPos.x, (int)screenPos.y - 128, PANEL_EFFECT_TYPE::WEAK);
+										// pPerson->GetPanelEffectManager()->AddEffect((int)screenPos.x, (int)screenPos.y - 128, PANEL_EFFECT_TYPE::WEAK);
 
 										 return false;	// ダメージ喰らってどうぞ
 									 }
@@ -5468,7 +5468,7 @@ void BasePlayerState::ThrowHold::Enter(BasePlayer * pPerson)
 
 	// 自分の出した弾を全て消す
 	SIDE eSide = pPerson->GetSide();
-	MsgMgr->Dispatch(0, ENTITY_ID::ID_ERROR, ENTITY_ID::SHOT_MGR, MESSAGE_TYPE::ERASE_SIDE_SHOT, &eSide);
+	MsgMgr->Dispatch(0, ENTITY_ID::SHOT_MGR, ENTITY_ID::SHOT_MGR, MESSAGE_TYPE::ERASE_SIDE_SHOT, &eSide);
 
 
 }

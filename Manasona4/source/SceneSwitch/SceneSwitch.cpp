@@ -36,7 +36,7 @@ void SceneSwitch::Update()
 {
 	if (m_bActionFlag == false) return;
 
-	if (++m_iFrame >= 6)
+	if (++m_iFrame >= 2)
 	{
 		m_iFrame = 0;
 		m_iCount++;
@@ -107,7 +107,7 @@ void SceneSwitchPrev::Update()
 {
 	if (m_bActionFlag == false) return;
 
-	if (++m_iFrame >= 6)
+	if (++m_iFrame >= 3)
 	{
 		m_iFrame = 0;
 		m_iCount++;

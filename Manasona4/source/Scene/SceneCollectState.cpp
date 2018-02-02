@@ -187,7 +187,7 @@ void SceneCollectState::TrophyStep::Render(sceneCollect *pMain)
 	pMain->TrophyRender();
 
 	// 左上タイトル
-	pMain->m_pImages[sceneCollect::IMAGE::TITLE]->Render(0, 0);
+	//pMain->m_pImages[sceneCollect::IMAGE::TITLE]->Render(0, 0);
 
 
 #ifdef _DEBUG
@@ -375,7 +375,7 @@ void SceneCollectState::PictureStep::Render(sceneCollect *pMain)
 
 
 	// 左上タイトル
-	pMain->m_pImages[sceneCollect::IMAGE::TITLE]->Render(0, 0);
+	//pMain->m_pImages[sceneCollect::IMAGE::TITLE]->Render(0, 0);
 
 
 	// フェード
@@ -623,7 +623,7 @@ void SceneCollectState::BuyPictureStep::Render(sceneCollect *pMain)
 	tdnPolygon::Rect(0, 0, 1280, 720, RS::COPY, 0xaa000000);
 
 	// 左上タイトル
-	pMain->m_pImages[sceneCollect::IMAGE::TITLE]->Render(0, 0);
+	//pMain->m_pImages[sceneCollect::IMAGE::TITLE]->Render(0, 0);
 
 
 #ifdef _DEBUG
@@ -801,7 +801,7 @@ void SceneCollectState::MovieStep::Render(sceneCollect *pMain)
 
 
 	// 左上タイトル
-	pMain->m_pImages[sceneCollect::IMAGE::TITLE]->Render(0, 0);
+	//pMain->m_pImages[sceneCollect::IMAGE::TITLE]->Render(0, 0);
 
 
 	// フェード
@@ -1060,7 +1060,7 @@ void SceneCollectState::BuyMovieStep::Render(sceneCollect *pMain)
 	tdnPolygon::Rect(0, 0, 1280, 720, RS::COPY, 0xaa000000);
 
 	// 左上タイトル
-	pMain->m_pImages[sceneCollect::IMAGE::TITLE]->Render(0, 0);
+	//pMain->m_pImages[sceneCollect::IMAGE::TITLE]->Render(0, 0);
 
 
 #ifdef _DEBUG
@@ -1168,7 +1168,7 @@ void SceneCollectState::RecordStep::Render(sceneCollect *pMain)
 
 
 	// 左上タイトル
-	pMain->m_pImages[sceneCollect::IMAGE::TITLE]->Render(0, 0);
+	//pMain->m_pImages[sceneCollect::IMAGE::TITLE]->Render(0, 0);
 
 
 	// フェード
@@ -1304,7 +1304,7 @@ void SceneCollectState::BackMenuStep::Render(sceneCollect *pMain)
 	tdnPolygon::Rect(0, 0, 1280, 720, RS::COPY, 0xaa000000);
 
 	// 左上タイトル
-	pMain->m_pImages[sceneCollect::IMAGE::TITLE]->Render(0, 0);
+	//pMain->m_pImages[sceneCollect::IMAGE::TITLE]->Render(0, 0);
 
 
 #ifdef _DEBUG

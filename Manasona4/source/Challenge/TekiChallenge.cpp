@@ -33,7 +33,7 @@ TekiChallenge1::TekiChallenge1(int iTitleNo) : BaseChallenge(iTitleNo)
 
 	// タスクセット
 	AddTaskData("足払い－＼+▽");
-	AddTaskData("キルラッシュ－△");
+	AddTaskData("ラッシュブロウ－△");
 	AddTaskData("少し間隔を開けて追撃－△");
 
 	Init();
@@ -275,7 +275,7 @@ TekiChallenge3::TekiChallenge3(int iTitleNo) : BaseChallenge(iTitleNo)
 
 	// タスクセット
 	AddTaskData("足払い－＼+▽");
-	AddTaskData("キルラッシュ－△");
+	AddTaskData("ラッシュブロウ－△");
 	AddTaskData("攻撃－□");
 	AddTaskData("追加攻撃－□");
 	AddTaskData("対空攻撃－↓+▽");

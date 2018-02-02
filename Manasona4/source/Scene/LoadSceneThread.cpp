@@ -29,7 +29,7 @@ LoadSceneThreadManager::LoadSceneThread::~LoadSceneThread()
 	{
 		//MessageBoxA(0, "スレッド読み込み中にプログラムが停止しました。スレッドが終わるまで待機します。", "意図せぬ終了", MB_OK);
 		m_pThread->join();
-		//MessageBoxA(0, "待機終了。プログラムは正常に解放されます。多分", "アイルーは神", MB_OK);
+		//MessageBoxA(0, "待機終了。プログラムは正常に解放されます。多分", "ぶんぶんは神", MB_OK);
 	}
 	else m_pThread->join();	// 読み込みスレッド自体は完了しているので、detach(普通にスレッド落とす)でもいいけど、念のためにjoin(スレッドが完全に終了するまで待機してから落とす)にする
 }

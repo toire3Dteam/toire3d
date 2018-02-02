@@ -749,11 +749,18 @@ void Stage::Syuten::RenderForward()
 
 void Stage::A::Initialize(Camera *pCamera)
 {
+	m_pMovie = new tdnMovie("DATA/Movie/A.wmv");
+	m_pMovie->Play();
+	//m_pBackMovie = new tdn2DObj(m_pMovie->GetTexture());
+	
+
 	m_pObj = new iexMesh("DATA/Stage/A/toire.IMO");
 	m_pObj->SetPos(Vector3(0, 0, -20));
 	m_pObj->SetAngle(3.14f);
 	m_pObj->SetScale(1.0f);
 	m_pObj->Update();
+
+	m_pObj->SetTexture(m_pMovie->GetTexture(),4);
 
 	m_pBack = new iexMesh("DATA/Stage/Senjo/Skydome.IMO");
 	m_pBack->SetPos(Vector3(0, 0, 300));
@@ -761,28 +768,55 @@ void Stage::A::Initialize(Camera *pCamera)
 	m_pBack->SetScale(3.5f);
 	m_pBack->Update();
 
-	m_pBack2 = new iexMesh("DATA/Stage/SkyDome/Skydome.IMO");
-	//m_pBack2->SetScale(3.5f);
-	m_pBack2->SetPos(Vector3(0, 0, 300));
+	m_pBack2 = new iexMesh("DATA/Stage/SkyDome/cloud.IMO");
+	m_pBack2->SetScale(550.5f);
+	m_pBack2->SetPos(Vector3(0, 0, 500));
 	m_pBack2->Update();
 
 	m_fBottom = 0;
 	m_fWidth = 200;
 
+
+	// ステージ毎にシェーダに渡すパラメーター
+	m_tagShaderParam.vDirLightVec = Vector3(0.4f, -0.89f, 0.53f);
+	//m_tagShaderParam.vDirLightColor = Vector3(0.8f, 0.72f, 0.72f);
+	//m_tagShaderParam.vSkyColor = Vector3(0.6f, 0.5f, 0.5f);
+	//m_tagShaderParam.vGroundColor = Vector3(0.45f, 0.43f, 0.43f);
+	m_tagShaderParam.vDirLightColor = Vector3(0.4f, 0.32f, 0.22f);
+	m_tagShaderParam.vSkyColor = Vector3(0.6f, 0.4f, 0.25f);
+	m_tagShaderParam.vGroundColor = Vector3(0.6f, 0.4f, 0.25f);
+
 	// ★ここでステージごとのスマブラカメラのテキストパスを与え、情報を設定する
 	pCamera->SetStageCameraInfo("DATA/Stage/A/camera.txt");
 }
 
+Stage::A::~A()
+{
+	SAFE_DELETE(m_pMovie);
+
+}
+
 void Stage::A::Update()
 {
+	// 動画のループ更新
+	m_pMovie->Update();
+
 	m_pAreWall->Update();
 }
 
 void Stage::A::Render()
 {
-	m_pBack->Render(shaderM, "sky");
-	m_pBack2->Render(shaderM, "sky");
+	//m_pBack->Render(shaderM, "sky");
+	m_pBack2->Render(shaderM, "evening");
 	m_pObj->Render(shaderM, "Stage");
 
 	m_pAreWall->RenderAreaWall();// 壁
+}
+
+void Stage::A::RenderForward()
+{
+	//m_pBackMovie->SetScale(50);
+	//m_pBackMovie->Render3D(Vector3(10,10,10),RS::COPY);
+
+
 }

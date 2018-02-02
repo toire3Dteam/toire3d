@@ -131,11 +131,11 @@ void ControllerSelectUI::Render()
 {
 	tdnPolygon::Rect(0, 0, 1280, 720, RS::COPY, 0xaa000000);
 	
-	m_pTopUI->Render(0, 0);
-
+	//m_pTopUI->Render(0, 0);
+	
 	// ギア
-	m_pGia.pPic->Render(896-32, 320 - 32);
-	m_pGiaFont.pPic->Render(896 - 32, 320 - 32);
+	//.pPic->Render(896-32, 320 - 32);
+	//m_pGiaFont.pPic->Render(896 - 32, 320 - 32);
 
 	// プレイヤーカード
 	m_pPlayerCardLeft.pPic->Render(96, 128, 384, 256, 0, m_pPlayerCardLeft.bPlayerFlag * 256, 384, 256);

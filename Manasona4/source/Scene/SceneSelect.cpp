@@ -200,7 +200,7 @@ void sceneSelect::Render()
 	m_pStateMachine->Render();
 
 
-	m_pPic[PIC_TYPE::TITLE]->Render(0, 0);
+	//m_pPic[PIC_TYPE::TITLE]->Render(0, 0);
 	m_pPic[PIC_TYPE::INFO_PLATE]->Render(0, 592 + 5);
 	m_pPic[PIC_TYPE::SELECT_INFO]->Render(0, 592 + 10);
 	m_pPic[PIC_TYPE::SECOND_SELECT_INFO]->Render(0, 592 + 10);

@@ -18,12 +18,12 @@ TekiWindow::TekiWindow(Vector2 vPos) :BaseWindow(vPos)
 	m_iSelectLength = 53;
 
 	// オプションウィンドウに存在するアイコンを詰めていく
-	AddIconData("■キルラッシュ①", "相手に近づいてから、多段攻撃をする。");
-	AddIconData("■ダッキング①", "素早いステップで相手に近づく。");
+	AddIconData("■ラッシュブロウ①", "相手に近づいてから、多段攻撃をする。");
+	AddIconData("■ステップ①", "素早いステップで相手に近づく。");
 	AddIconData("■アサルトダイブ", "空中から真下に相手を落としていく攻撃。");
-	AddIconData("■コークスクリュー", "前方へ突進して相手を吹き飛ばします。");
+	AddIconData("■突進攻撃", "前方へ突進して相手を吹き飛ばします。");
 	AddIconData("▲カウンター", "発動時相手の攻撃が当たれば、切り替えし攻撃します。");
-	AddIconData("●サイクロンアッパー", "手前の相手を高く打ち上げる必殺技。");
+	AddIconData("●ハイアッパー", "手前の相手を高く打ち上げる必殺技。");
 
 	AddCommandData("△", 365);
 	AddCommandData("↓＋△", 365);

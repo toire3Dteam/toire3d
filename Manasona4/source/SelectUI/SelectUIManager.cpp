@@ -197,7 +197,7 @@ void SelectUIManager::Render()
 	//m_pPic[PIC_TYPE::BLACK_LINE]->Render(0, 0);
 
 	// キャラアイコン
-	for (int i = 0; i < (int)CHARACTER::BALANCE; i++)
+	for (int i = 0; i < (int)CHARACTER::END; i++)
 	{
 		if ((int)m_pLeftSide->GetSelectCharacter() == i)
 		{

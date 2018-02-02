@@ -7,7 +7,7 @@
 AramitamaChallenge1::AramitamaChallenge1(int iTitleNo) : BaseChallenge(iTitleNo)
 {
 	// タイトル名
-	m_pTaskTitle.pString += "御霊ファミリー";
+	m_pTaskTitle.pString += "荒ぶる魂ファミリー";
 
 	// クリアから終りまで
 	m_iWaitFrameMAX = 120;
@@ -25,8 +25,8 @@ AramitamaChallenge1::AramitamaChallenge1(int iTitleNo) : BaseChallenge(iTitleNo)
 	m_pTaskTitle.iStingLength = addByte;
 
 	// Tips
-	m_pIntroTips = new TipsCard("アラミタマはスキルを当てることで魂ゲージが増加します。\n魂ゲージが溜まるとスキルの終りに仲間が相手を攻撃します。\n仲間と協力する【コンボ】を覚えましょう。");
-	m_pClearTips = new TipsCard("よくできました！\nアラミタマは魂ゲージが溜まるまでは弱いですが。\n魂ゲージが溜まった後は最強です。");
+	m_pIntroTips = new TipsCard("封印されし魂はスキルを当てることで魂ゲージが増加します。\n魂ゲージが溜まるとスキルの終りに仲間が相手を攻撃します。\n仲間と協力する【コンボ】を覚えましょう。");
+	m_pClearTips = new TipsCard("よくできました！\n封印されし魂は魂ゲージが溜まるまでは弱いですが。\n魂ゲージが溜まった後は最強です。");
 
 	// リプレイデータの名前
 	m_strReplayDataName = "Data/ChallengeData/Aramitama/1.bin";
@@ -220,7 +220,7 @@ void AramitamaChallenge2::TaskUpdate(BasePlayer * pPerson)
 AramitamaChallenge3::AramitamaChallenge3(int iTitleNo) : BaseChallenge(iTitleNo)
 {
 	// タイトル名
-	m_pTaskTitle.pString += "ミタマファイナル";
+	m_pTaskTitle.pString += "魂ファイナル";
 
 	// クリアから終りまで
 	m_iWaitFrameMAX = 120;
@@ -256,7 +256,7 @@ AramitamaChallenge3::AramitamaChallenge3(int iTitleNo) : BaseChallenge(iTitleNo)
 
 	AddTaskData("チャージ－↓+△");
 
-	AddTaskData("ミタマキャノン－㊨");
+	AddTaskData("魂キャノン－㊨");
 
 	Init();
 }

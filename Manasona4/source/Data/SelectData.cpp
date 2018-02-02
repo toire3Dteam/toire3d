@@ -12,7 +12,7 @@ eColorType(COLOR_TYPE::NORMAL)		// カラータイプ
 {}
 
 SelectData::SelectData():
-eStage(STAGE::SEA),				// ステージ
+eStage(STAGE::A),				// ステージ
 bTutorial(false),							// チュートリアルかどうか
 bTraining(true),							// トレーニングかどうか	
 bChallenge(false),							// チャレンジかどうか	
@@ -45,7 +45,7 @@ eEnemyGuardSwitch(ENEMY_GUARD_SWITCH_TYPE::NO),		// 敵のガード切り替え�
 eEnemyTech(ENEMY_TECH_TYPE::ALL),					// 敵の受け身の設定
 eEnemyThrowTech(ENEMY_THROW_TECH_TYPE::NO),			// 敵のなげ抜けの設定
 iEnemyLv(20),										// 敵のLv
-eWassyoiType(WASSYOI_TYPE::NO)						// アラミタマのわっしょいゲージ
+eWassyoiType(WASSYOI_TYPE::NO)						// 封印されし魂のわっしょいゲージ
 {
 
 }

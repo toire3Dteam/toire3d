@@ -16,10 +16,10 @@ ChallengeWindow::ChallengeWindow(Vector2 vPos) :BaseWindow(vPos)
 	m_iSelectLength = 30;
 
 	// オプションウィンドウに存在するアイコンを詰めていく
-	AddIconData("アイル―", "アイルーでチャレンジモードを始めます。");
+	AddIconData("ぶんぶん", "ぶんぶんでチャレンジモードを始めます。");
 	AddIconData("テキ", "テキでチャレンジモードを始めます。");
 	AddIconData("(∵)", "(∵)でチャレンジモードを始めます。");
-	AddIconData("アラミタマ", "アラミタマでチャレンジモードを始めます。");
+	AddIconData("封印されし魂", "封印されし魂でチャレンジモードを始めます。");
 	AddIconData("戻る", "このウィンドウを閉じます。");
 
 	// 演出

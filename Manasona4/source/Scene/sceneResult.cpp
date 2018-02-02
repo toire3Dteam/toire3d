@@ -16,6 +16,7 @@
 #include "../Data/SelectData.h"
 #include "../DeferredEx/DeferredEx.h"
 #include "../Scene/SceneVS.h"
+#include "../Scene/sceneLoading.h"
 #include "../PointLight/PointLight.h"
 
 #include "../ResultPerformance/BaseResultPerformance.h"
@@ -108,7 +109,7 @@ bool sceneResult::Initialize()
 		break;
 
 	case CHARACTER::BALANCE:
-		m_WinPlayer = new iex3DObj("DATA/CHR/Airou/result.IEM");
+		m_WinPlayer = new iex3DObj("DATA/CHR/Balance/Mimiko_rizalto.IEM");
 		m_ResultPerformance = new BalanceResultPerformance();
 		break;
 
@@ -480,7 +481,7 @@ void sceneResult::Update()
 			// ここで選択したアイコンにより飛ぶ場所が変わる
 			if (m_pResultWindow->GetChoiceState() == ResultWindow::AGAIN)
 			{
-				MainFrameEX->ChangeScene(new sceneVS());
+				MainFrameEX->ChangeScene(new sceneLoading(new sceneMain));
 				return;
 			}
 			else if (m_pResultWindow->GetChoiceState() == ResultWindow::BACK_CHARA)
@@ -638,8 +639,9 @@ void sceneResult::CameraRender()
 	m_CameraScreen->RenderTarget();
 	CameraMgr->Activate();
 
+	// 封印
 	// 負けたプレイヤー描画
-	m_LosePlayer->Render(shaderM,"black");
+	//m_LosePlayer->Render(shaderM,"black");
 
 	// 勝ったプレイヤー描画
 	if (m_bPerformanceFlag == false)
@@ -647,11 +649,11 @@ void sceneResult::CameraRender()
 		m_WinPlayer->Render(shaderM,"copy");
 	}
 
-	m_grand->Render(/*shaderM,"black"*/);
+	//m_grand->Render(/*shaderM,"black"*/);
 
-	m_UVEffectMgr->Render();
+	//m_UVEffectMgr->Render();
 
-	ParticleManager::Render();
+	//ParticleManager::Render();
 
 	//レンダーターゲットの復元
 	tdnSystem::GetDevice()->SetRenderTarget(0, m_pBackBuffer);

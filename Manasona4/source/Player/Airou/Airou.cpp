@@ -56,7 +56,7 @@ Airou::Airou(SIDE side, const SideData &data) :BasePlayer(side, data)
 		// 中間の判定のない空間を作る
 		FOR(SKILL_AERIALDROP_MIDDLE) m_ActionFrameList[(int)BASE_ACTION_STATE::SKILL_AERIALDROP][StartActiveFrame + SKILL_AERIALDROP_FIRST + i] = FRAME_STATE::FOLLOW;
 	}
-	// アイルーメッシュ
+	// ぶんぶんメッシュ
 	m_pObj = m_pDefaultObj;
 
 	// 顔グラ
@@ -402,7 +402,7 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->damage = 120;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->pierceLV = 0;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->HitSE = "ぐちょヒット";
-	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->WhiffSE = "アイルードリル";
+	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->WhiffSE = "ぶんぶんドリル";
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->HitEffectType = EFFECT_TYPE::MULTIPLE_HIT;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->WhiffEffectType = EFFECT_TYPE::WHIFF;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->bAntiAir = false;
@@ -448,7 +448,7 @@ void Airou::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->fGuardKnockBackPower = .5f;
 
 	// 地上ヒットと空中ヒットで挙動が変わるもの
-	// [メモ] アイル―は最後吹き飛ばす　棒人間は三段目ものけぞりで隙が短い
+	// [メモ] ぶんぶんは最後吹き飛ばす　棒人間は三段目ものけぞりで隙が短い
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].bBeInvincible = false;
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].FlyVector.Set(1.5f, 1.9f);
@@ -885,13 +885,13 @@ void Airou::SkillAction::Land::Enter()
 	// 重力の影響受けるな！
 	m_pAirou->SetMoveUpdate(false);
 
-	// アイルー自体の横幅を増やす
+	// ぶんぶん自体の横幅を増やす
 	m_pAirou->m_tagCharacterParam.HitSquare.width = 5.5f;
 
-	// アイル―ドリルエフェクト発動！
+	// ぶんぶんドリルエフェクト発動！
 	m_pAirou->AddEffectAction(m_pAirou->m_vPos, EFFECT_TYPE::AIROU_DRILL);
 
-	// アイルー正面向きながらドリル防止
+	// ぶんぶん正面向きながらドリル防止
 	m_pAirou->SetDirAngle();
 
 	m_DrillFrame = 0;
@@ -1034,7 +1034,7 @@ void Airou::SkillAction::AerialDrop::Enter()
 	// 重力の影響受けるな！
 	m_pAirou->SetMoveUpdate(false);
 
-	// アイルー正面向きながらドリル防止
+	// ぶんぶん正面向きながらドリル防止
 	m_pAirou->SetDirAngle();
 
 	// フレーム初期化
@@ -1336,12 +1336,12 @@ void Airou::HeavehoDriveOverFlowSuccessUpdate()
 		m_pTargetPlayer->SetRecoveryFrame(10000);
 		break;
 
-	case 220:	// アイルー流星群開始
+	case 220:	// ぶんぶん流星群開始
 		m_pSpeedLine->SetAngleAnimation(Vector3(PI*-.25f, 0, 0), Vector3(PI*-.25f, 0, 0));
 		m_pOshiokiMgr->Action();
 		break;
 
-	case 525:	// 爆発してアイルーたちが飛び散る
+	case 525:	// 爆発してぶんぶんたちが飛び散る
 		se->Play("フィニッシュ大");
 		m_pOshiokiMgr->Explosion();
 
@@ -1359,7 +1359,7 @@ void Airou::HeavehoDriveOverFlowSuccessUpdate()
 		m_pSpeedLine->SetAngleAnimation(Vector3(PI*-.15f, 0, 0), Vector3(PI*-.15f, 0, 0));
 		break;
 
-	case 750:	// アイルー貫き爆発
+	case 750:	// ぶんぶん貫き爆発
 		se->Play("フィニッシュ大");
 		m_pOshiokiMgr->Explosion();
 		DeferredManagerEx.SetRadialBlur(Vector2(0, 0), 10);

@@ -15,7 +15,7 @@
 #include "../Window/ChallengeWindow.h"
 #include "../Window/ChallengeSelectWindow.h"
 #include "Challenge\ChallengeManagerManager.h"
-#include "SceneVS.h"
+#include "sceneLoading.h"
 #include "KeyConfig\KeyConfig.h"
 
 //+--------------------
@@ -656,7 +656,7 @@ void SceneMenuState::TutorialSelectStep::Execute(sceneMenu *pMain)
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].eColorType = COLOR_TYPE::NORMAL;
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].eColorType = COLOR_TYPE::NORMAL;
 
-		MainFrameEX->ChangeScene(new sceneVS());
+		MainFrameEX->ChangeScene(new sceneLoading(new sceneMain));
 		return;
 	}
 
@@ -1114,7 +1114,7 @@ void SceneMenuState::ChallengeNoStep::Execute(sceneMenu *pMain)
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::LEFT].eColorType = COLOR_TYPE::NORMAL;
 		SelectDataMgr->Get()->tagSideDatas[(int)SIDE::RIGHT].eColorType = COLOR_TYPE::NORMAL;
 
-		MainFrameEX->ChangeScene(new sceneVS());
+		MainFrameEX->ChangeScene(new sceneLoading(new sceneMain));
 
 		return;
 

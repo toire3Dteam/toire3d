@@ -184,7 +184,7 @@ private:
 
 	// おしおき用
 	OshiokiManager::Base *m_pOshiokiMgr;
-	bool m_bHeavehoHit;	// アイルーの必殺が当たったとき用
+	bool m_bHeavehoHit;	// ぶんぶんの必殺が当たったとき用
 
 	BaseUVEffect *m_pAirouEntryEffect;
 	BaseUVEffect *m_pAirouEntryCircleEffect;

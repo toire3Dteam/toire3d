@@ -16,7 +16,7 @@
 
 
 //+-------------------------------
-//	アラミタマの演出
+//	封印されし魂の演出
 //+-------------------------------
 
 AramitamaResultPerformance::AramitamaResultPerformance()
@@ -196,7 +196,7 @@ void AramitamaResultPerformance::Action()
 
 
 //+-------------------------------
-//	アイル―の演出
+//	ぶんぶんの演出
 //+-------------------------------
 
 AirouResultPerformance::AirouResultPerformance()

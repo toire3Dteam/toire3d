@@ -203,13 +203,13 @@ void BasePicture::RenderExeInfo(int iX, int iY)
 
 
 //+---------------------------------
-//	アイル―のイラスト
+//	ぶんぶんのイラスト
 //+---------------------------------
 AirouPicture::AirouPicture()
 {
 	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Airou.png");
-	m_tagPictureIcon.sTitle = "【キャラクターイラスト】アイル―";
-	m_tagPictureIcon.sText = "アイル―のキャラクターイラスト";
+	m_tagPictureIcon.sTitle = "【キャラクターイラスト】ぶんぶん";
+	m_tagPictureIcon.sText = "ぶんぶんのキャラクターイラスト";
 
 	// 隠しトロフィーフラグ
 	m_bRock = false;
@@ -222,8 +222,8 @@ AirouPicture::AirouPicture()
 void AirouPicture::InitExe()
 {
 	m_tagPicture.pPic=new tdn2DObj("Data/UI/Collect/Picture/Airou.png");
-	m_tagPicture.sTitle = "【キャラクターイラスト】アイル―";
-	m_tagPicture.sText = "アイル―のキャラクターイラスト";
+	m_tagPicture.sTitle = "【キャラクターイラスト】ぶんぶん";
+	m_tagPicture.sText = "ぶんぶんのキャラクターイラスト";
 	m_tagPicture.vPos.x = -300.0f;
 	m_tagPicture.vPos.y = -200.0f;
 	m_tagPicture.fScale = 1.0f;
@@ -416,7 +416,7 @@ void AlleyPicture::InitExe()
 {
 	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Alley.png");
 	m_tagPicture.sTitle = "【スペシャルイラスト】路地裏";
-	m_tagPicture.sText = "アイル―は平然と裏切る。";
+	m_tagPicture.sText = "ぶんぶんは平然と裏切る。";
 	m_tagPicture.vPos.x = 0.0f;
 	m_tagPicture.vPos.y = 0.0f;
 	m_tagPicture.fScale = 1.0f;
@@ -470,7 +470,7 @@ void SexyPicture::InitExe()
 {
 	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Sexy.png");
 	m_tagPicture.sTitle = "【スペシャルイラスト】目覚めし者";
-	m_tagPicture.sText = "セクシーに愛されたアラミタマ";
+	m_tagPicture.sText = "セクシーに愛された封印されし魂";
 	m_tagPicture.vPos.x = 0.0f;
 	m_tagPicture.vPos.y = 0.0f;
 	m_tagPicture.fScale = 1.0f;
@@ -506,13 +506,13 @@ void SeaPicture::InitExe()
 
 
 //+---------------------------------
-//	アラミタマのイラスト
+//	封印されし魂のイラスト
 //+---------------------------------
 AramitamaPicture::AramitamaPicture()
 {
 	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Aramitama.png");
-	m_tagPictureIcon.sTitle = "【キャラクターイラスト】アラミタマ";
-	m_tagPictureIcon.sText = "アラミタマのキャラクターイラスト";
+	m_tagPictureIcon.sTitle = "【キャラクターイラスト】封印されし魂";
+	m_tagPictureIcon.sText = "封印されし魂のキャラクターイラスト";
 
 	// 隠しトロフィーフラグ
 	m_bRock = false;
@@ -524,8 +524,8 @@ AramitamaPicture::AramitamaPicture()
 void AramitamaPicture::InitExe()
 {
 	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Aramitama.png");
-	m_tagPicture.sTitle = "【キャラクターイラスト】アラミタマ";
-	m_tagPicture.sText = "アラミタマのキャラクターイラスト";
+	m_tagPicture.sTitle = "【キャラクターイラスト】封印されし魂";
+	m_tagPicture.sText = "封印されし魂のキャラクターイラスト";
 	m_tagPicture.vPos.x = -100.0f;
 	m_tagPicture.vPos.y = 0.0f;
 	m_tagPicture.fScale = 1.0f;
@@ -618,12 +618,12 @@ void WinAnikiPicture::InitExe()
 }
 
 //+---------------------------------
-//	真夏2のイラスト
+//	闘魂2のイラスト
 //+---------------------------------
 Manatu2Picture::Manatu2Picture()
 {
 	m_tagPictureIcon.pIcon = new tdn2DObj("Data/UI/Collect/Icon/Manatu2.png");
-	m_tagPictureIcon.sTitle = "【ゲームイラスト】真夏のファイト";
+	m_tagPictureIcon.sTitle = "【ゲームイラスト】闘魂のファイト";
 	m_tagPictureIcon.sText = "ゲームのイラストです。";
 
 	// 隠しトロフィーフラグ
@@ -636,7 +636,7 @@ Manatu2Picture::Manatu2Picture()
 void Manatu2Picture::InitExe()
 {
 	m_tagPicture.pPic = new tdn2DObj("Data/UI/Collect/Picture/Manatu2.png");
-	m_tagPicture.sTitle = "【ゲームイラスト】真夏のファイト";
+	m_tagPicture.sTitle = "【ゲームイラスト】闘魂のファイト";
 	m_tagPicture.sText = "3D化したわっしょいたち\n";
 	m_tagPicture.vPos.x = 0.0f;
 	m_tagPicture.vPos.y = 0.0f;
@@ -726,7 +726,7 @@ void SuikaPicture::InitExe()
 }
 
 //+---------------------------------
-//	真夏1のイラスト
+//	闘魂1のイラスト
 //+---------------------------------
 Manatu1Picture::Manatu1Picture()
 {

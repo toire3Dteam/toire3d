@@ -19,16 +19,16 @@ enum class PICTURE_TYPE
 	SEA,				//  海
 	WIN_TEKI,			//  リザルトテキ
 	WIN_ANIKI,			//  リザルト兄貴
-	AIROU,				//	アイル―
+	AIROU,				//	ぶんぶん
 	TEKI,				//	テキ
 	NAZENARABA,			//	∵
-	ARAMITAMA,			//	アラミタマ
+	ARAMITAMA,			//	封印されし魂
 	ANIKI,				//  兄貴	
-	MANATU,				//  初代真夏
+	MANATU,				//  初代闘魂
 	SUIKA,				//  スイカ
 	MAHUYU,				//  真冬
 	TOIRE,				//  トイレ
-	MANATU2,			//  真夏2
+	MANATU2,			//  闘魂2
 	ARRAY_END
 };
 

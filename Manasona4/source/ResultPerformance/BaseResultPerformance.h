@@ -72,7 +72,7 @@ public:
 
 
 //+-------------------------------
-//	アラミタマの演出
+//	封印されし魂の演出
 //+-------------------------------
 class AramitamaResultPerformance : public BaseResultPerformance
 {
@@ -102,7 +102,7 @@ private:
 
 
 //+-------------------------------
-//	アイルーの演出
+//	ぶんぶんの演出
 //+-------------------------------
 class AirouResultPerformance : public BaseResultPerformance
 {

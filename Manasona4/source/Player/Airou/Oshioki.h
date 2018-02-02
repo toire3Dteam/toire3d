@@ -10,7 +10,7 @@
 
 
 //*************************************************************
-//	おしおきアイルー
+//	おしおきぶんぶん
 namespace OshiokiAirou
 {
 	class Base
@@ -22,7 +22,7 @@ namespace OshiokiAirou
 		virtual void Render(iex3DObj *pObj) = 0;
 		bool EraseOK(){ return m_bErase; }
 	protected:
-		Vector3 m_vPos;			// アイルー座標
+		Vector3 m_vPos;			// ぶんぶん座標
 		Airou *m_pUser;	// このおしおきを使うプレイヤーのポインタ
 		BasePlayer *m_pTarget;		// 攻撃対象のポインタ
 		Vector3 m_vMoveVec;		// 移動の向き
@@ -92,7 +92,7 @@ namespace OshiokiAirou
 							  DamageInfo.fComboRate = 1;
 							  DamageInfo.bOverDrive = true;
 
-							  // 最後のアイルーのダメージ
+							  // 最後のぶんぶんのダメージ
 							  if (m_bLast)
 							  {
 								  DamageInfo.BeInvincible = true;	// 無敵になるかどうか
@@ -113,7 +113,7 @@ namespace OshiokiAirou
 								  m_pTarget->SetMoveUpdate(true);
 							  }
 
-							  // それ以外のアイルーのダメージ
+							  // それ以外のぶんぶんのダメージ
 							  else
 							  {
 								  DamageInfo.BeInvincible = false;	// 無敵になるかどうか
@@ -147,7 +147,7 @@ namespace OshiokiAirou
 		}
 		void Render(iex3DObj *pObj)
 		{
-			//MyAssert(pObj->GetPos().x != 0 && pObj->GetPos().y != 0 && pObj->GetPos().z != 0, "おしおきアイルーが原点にいる");
+			//MyAssert(pObj->GetPos().x != 0 && pObj->GetPos().y != 0 && pObj->GetPos().z != 0, "おしおきぶんぶんが原点にいる");
 
 			// 描画
 			pObj->SetPos(m_vPos);
@@ -172,7 +172,7 @@ namespace OshiokiAirou
 		float m_fAngleX, m_fAngleY;		// 爆発して回転するから変数いる
 		float m_fRandAddAngle;
 		int m_iExplosionTimer;			// 爆発してから消えるまでの時間
-		bool m_bTsukisasaru;				// 突き刺さるアイルーかどうか
+		bool m_bTsukisasaru;				// 突き刺さるぶんぶんかどうか
 		bool m_bTsukisasatta;			// 突き刺さった瞬間を取る用
 
 		BaseUVEffect *m_pBoost;		// 隕石UVエフェクト
@@ -184,7 +184,7 @@ namespace OshiokiAirou
 		{
 			m_vPos = -(m_vMoveVec = c_VEC) * (bTsukisasaru ? 400.0f : 600.0f);
 
-			// 突きささるアイルーならランダムじゃない
+			// 突きささるぶんぶんならランダムじゃない
 			if (bTsukisasaru)
 			{
 				static const Vector2 add[8] =
@@ -261,7 +261,7 @@ namespace OshiokiAirou
 			}
 			else
 			{
-				if (!m_bTsukisasaru)m_bErase = true;	// 突き刺さるアイルーじゃなかったら消える
+				if (!m_bTsukisasaru)m_bErase = true;	// 突き刺さるぶんぶんじゃなかったら消える
 				else if (!m_bTsukisasatta)
 				{
 					// 突き刺さりエフェクト発動
@@ -291,7 +291,7 @@ namespace OshiokiAirou
 				}
 				else
 				{
-					// アイルー突き刺さりエフェクト更新
+					// ぶんぶん突き刺さりエフェクト更新
 					m_pImpact->SetPos(m_vPos);
 					m_pImpact->Update();
 				}
@@ -390,7 +390,7 @@ namespace OshiokiManager
 		{
 			for (auto it = pList->begin(); it != pList->end();)
 			{
-				// アイルー更新
+				// ぶんぶん更新
 				(*it)->Update();
 
 				// 消去チェック
@@ -406,7 +406,7 @@ namespace OshiokiManager
 		{
 			for (auto it = pList->begin(); it != pList->end();)
 			{
-				// アイルー更新
+				// ぶんぶん更新
 				(*it)->Update();
 
 				// 消去チェック
@@ -433,9 +433,9 @@ namespace OshiokiManager
 	class OverDrive :public Base
 	{
 	private:
-		int m_iCreateTimer;					// アイルー生成用の時間
-		int m_iCreateCount;					// アイルー何匹生成したか
-		const int c_NUM_CREATE = 73;		// アイルーを何体作るか
+		int m_iCreateTimer;					// ぶんぶん生成用の時間
+		int m_iCreateCount;					// ぶんぶん何匹生成したか
+		const int c_NUM_CREATE = 73;		// ぶんぶんを何体作るか
 		const Vector3 c_OSHIOKI_POS = Vector3(0, 30, 0);		// 相手をお仕置きする座標
 		int m_CreateInterval;	// 0.5秒に1回
 
@@ -452,7 +452,7 @@ namespace OshiokiManager
 		}
 		void Update()
 		{
-			// アイループレイヤーの位置補正
+			// ぶんぶんプレイヤーの位置補正
 			Vector3 AirouPlayerPos(m_pAirouPlayer->GetPos());
 			const float ToTargetDistX(fabsf(AirouPlayerPos.x));
 			if (ToTargetDistX < 10)
@@ -468,7 +468,7 @@ namespace OshiokiManager
 			// オブジェアニメーション
 			m_pObj->Animation();
 
-			// アイルーリスト更新
+			// ぶんぶんリスト更新
 			Base::UpdateList(&m_list);
 
 			// 終わり生成回数まで達してなかったら
@@ -493,7 +493,7 @@ namespace OshiokiManager
 		}
 		void Render()
 		{
-			// アイルーリスト描画
+			// ぶんぶんリスト描画
 			Base::RenderList(&m_list);
 		}
 	};
@@ -501,14 +501,14 @@ namespace OshiokiManager
 	class OverFlow :public Base
 	{
 	private:
-		int m_iCreateTimer;					// アイルー生成用の時間
-		int m_iCreateCount;					// アイルー何匹生成したか
-		const int c_NUM_CREATE = 14;		// 突き刺さらないアイルーを何体作るか
-		const int c_NUM_CREATE_TSUKISASARU = 8;// 突き刺さるアイルーを何体作るか
+		int m_iCreateTimer;					// ぶんぶん生成用の時間
+		int m_iCreateCount;					// ぶんぶん何匹生成したか
+		const int c_NUM_CREATE = 14;		// 突き刺さらないぶんぶんを何体作るか
+		const int c_NUM_CREATE_TSUKISASARU = 8;// 突き刺さるぶんぶんを何体作るか
 		const int c_CERATE_INTERVAL = 9;	// 0.5秒に1回
 		bool m_bCreate;
 		bool m_bFirstExplosion;
-		bool m_bTsukisasiCreate;			// 突き刺さるアイルーを作るかどうかのフラグ
+		bool m_bTsukisasiCreate;			// 突き刺さるぶんぶんを作るかどうかのフラグ
 		std::list <OshiokiAirou::OverFlow*> m_list;
 
 		BaseUVEffect *m_pExplosion;			// 爆発UVエフェクト
@@ -528,7 +528,7 @@ namespace OshiokiManager
 		{
 			if (!m_bAction) return;
 
-			// アイルーリスト更新
+			// ぶんぶんリスト更新
 			Base::UpdateList(&m_list);
 
 			// 爆発エフェクト更新
@@ -545,7 +545,7 @@ namespace OshiokiManager
 				if (++m_iCreateTimer > (m_bTsukisasiCreate ? 0 : c_CERATE_INTERVAL))
 				{
 					m_iCreateTimer = 0;	// タイマー初期化
-					m_iCreateCount++;	// 作った数インクリメント&アイルーセット
+					m_iCreateCount++;	// 作った数インクリメント&ぶんぶんセット
 
 					if (m_bTsukisasiCreate)
 					{
@@ -565,7 +565,7 @@ namespace OshiokiManager
 		{
 			if (!m_bAction) return;
 
-			// アイルーリスト描画
+			// ぶんぶんリスト描画
 			Base::RenderList(&m_list);
 
 			// 爆発エフェクト描画

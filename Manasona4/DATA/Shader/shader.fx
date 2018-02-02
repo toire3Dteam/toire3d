@@ -225,6 +225,10 @@ float4 PS_Basic(VS_OUTPUT In) : COLOR
 {
 	float4	OUT;
 
+// アルファが少しでもなければ破棄 Decaleを吐き出さないようにしているので
+clip((tex2D(DecaleSamp, In.Tex).a - 0.999f));
+
+
 	//	ピクセル色決定
 	OUT = In.Color * tex2D(DecaleSamp, In.Tex);
 	OUT.a = 1.0f;
@@ -247,6 +251,9 @@ technique copy
 		SrcBlend = SrcAlpha;		// 現在描いてる方
 		DestBlend = InvSrcAlpha;	// 描かれている方
 		CullMode = CCW;				// カリングの仕様
+
+		AlphaRef = 0x00000080;
+		AlphaFunc = GREATEREQUAL;	// αがAlphaRef以上ならOK
 
 		VertexShader = compile vs_3_0 VS_Basic();
 		PixelShader = compile ps_3_0 PS_Basic();
@@ -2405,6 +2412,52 @@ technique sky
 
 		VertexShader = compile vs_3_0 VS_Sky();
 		PixelShader = compile ps_3_0 PS_Sky();
+	}
+}
+
+//------------------------------------------------------
+//		ピクセルシェーダー	
+//------------------------------------------------------
+PS_TONEMAP PS_Evening(VS_OUTPUT_FINAL In) : COLOR
+{
+	PS_TONEMAP	OUT = (PS_TONEMAP)0;
+
+// スクリーン空間をテクスチャ座標に  NDC->UV y反転
+// const float2 ScreenTex = In.wvpPos.xy / In.wvpPos.w * float2(0.5, -0.5) + float2(0.5, 0.5);
+
+//	ピクセル色決定
+OUT.color = In.Color * tex2D(DecaleSamp, In.Tex);
+
+// 必殺暗転の値
+OUT.color.rgb *= g_fOverDriveDim;
+
+//トーンマッピング
+OUT.color.rgb *= exp2(g_fExposure);
+//OUT.color.rgb -= float3(0.05f, 0.1f, 0.3f);
+OUT.high.rgb = float3(0.25f, 0.1f, 0.05f)*g_fOverDriveDim;// 必殺暗転の値
+OUT.high.a = 1.0f;
+
+return OUT;
+}
+
+//------------------------------------------------------
+//		夕日テクニック
+//------------------------------------------------------
+technique evening
+{
+	pass P0
+	{
+		ZEnable = true;				// 奥行考慮
+		ZWriteEnable = true;		// 奥行を書き込むか
+
+		AlphaBlendEnable = true;	// アルファブレンド考慮
+		BlendOp = Add;				// ブレンド仕様
+		SrcBlend = SrcAlpha;		// 現在描いてる方
+		DestBlend = InvSrcAlpha;	// 描かれている方
+		CullMode = CCW;				// カリングの仕様
+
+		VertexShader = compile vs_3_0 VS_Sky();
+		PixelShader = compile ps_3_0 PS_Evening();
 	}
 }
 

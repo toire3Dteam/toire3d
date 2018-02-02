@@ -386,7 +386,7 @@ void Teki::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::AERIAL_ATTACK].pAttackData->pCollisionShape->pos.Set(6.5f, 10, 0);
 
 	//==============================================================================================================
-	//	スキル攻撃(キルラッシュ)
+	//	スキル攻撃(ラッシュブロウ)
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].InstanceAttackData();	// アタックデータ作成
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL].pAttackData->damage = 120;
@@ -422,7 +422,7 @@ void Teki::InitActionDatas()
 
 
 	//==============================================================================================================
-	//	第2キャラクター固有スキル(コークスクリュー)
+	//	第2キャラクター固有スキル(突進攻撃)
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].InstanceAttackData();	// アタックデータ作成
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->damage = 700;
@@ -852,7 +852,7 @@ void Teki::ThirdRushUpdate()
 	// アクション終了フラグ
 	if (GetActionState() == BASE_ACTION_STATE::NO_ACTION) return;
 
-	// キルラッシュ
+	// ラッシュブロウ
 	if (m_eSkillActionType == SKILL_ACTION_TYPE::LAND)
 	{
 		// 走り終わってたら
@@ -878,7 +878,7 @@ void Teki::ThirdRushUpdate()
 		}
 	}
 
-	// コークスクリュー
+	// 突進攻撃
 	else
 	{
 		m_pSkillActions[(int)SKILL_ACTION_TYPE::LAND2]->Execute();
@@ -918,7 +918,7 @@ void Teki::ThirdRushUpdate()
 	//// ヒットしてる状態
 	//if (GetAttackData()->bHit)
 	//{
-	//	// キルラッシュ→コークスクリュー
+	//	// ラッシュブロウ→突進攻撃
 	//	if (GetActionState() == BASE_ACTION_STATE::SKILL)
 	//	{
 	//		// 攻撃ボタン押したら
@@ -982,13 +982,13 @@ void Teki::OnInvincibleCounterSuccess()
 	// カウンター成功のSEとかエフェクトとか
 	se->Play("カウンター成功");
 
-	// コークスクリュー設定
+	// 突進攻撃設定
 	m_eSkillActionType = SKILL_ACTION_TYPE::LAND2;
 
 	// スキルステートへ
 	m_pStateMachine->ChangeState(BasePlayerState::Skill::GetInstance());
 
-	// 一定時間無敵にする(だいたいコークスクリューのフレーム)
+	// 一定時間無敵にする(だいたい突進攻撃のフレーム)
 	SetInvincible(40, 1);
 
 }
@@ -1070,7 +1070,7 @@ bool Teki::SkillAction::Land::Execute()
 			// 必殺技キャンセル
 			if (HeaveHoCancel(m_pTeki)) return false;
 
-			// コークスクリュールート
+			// 突進攻撃ルート
 			if (m_pTeki->isPushInputTRG(PLAYER_COMMAND_BIT::D, true))
 			{
 				m_pTeki->SkillExit();
@@ -1098,7 +1098,7 @@ bool Teki::SkillAction::Land::Execute()
 			m_pTeki->AddMove(Vector3((m_pTeki->m_dir == DIR::LEFT) ? -1.0f : 1.0f, 0, 0));
 			m_pTeki->MoveClampX(3.5f);
 
-			// 接近したらキルラッシュモーション
+			// 接近したらラッシュブロウモーション
 			if ((m_pTeki->GetPos() - m_pTeki->m_pTargetPlayer->GetPos()).LengthSq() < 16 * 16)
 			{
 				m_pTeki->SetActionState(BASE_ACTION_STATE::SKILL);
@@ -1176,7 +1176,7 @@ bool Teki::SkillAction::Squat::Execute()
 
 		/* キャンセルルート */
 
-		// コークスクリュー
+		// 突進攻撃
 		if (m_pTeki->isPushInputTRG(PLAYER_COMMAND_BIT::D, true))
 		{
 			m_pTeki->SkillExit();

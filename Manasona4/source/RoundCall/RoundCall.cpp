@@ -177,8 +177,8 @@ void FirstRoundCall::Render()
 
 	//m_pNumber->Render(0,0);
 	m_pBlackLine.pic->Render(0, 340);
-	m_pRollBig.pic->Render(0, 0,RS::ADD);
-	m_pRollMini.pic->Render(0, 0,RS::ADD);
+	//m_pRollBig.pic->Render(0, 0,RS::ADD);
+	//m_pRollMini.pic->Render(0, 0,RS::ADD);
 	//m_pLightLine->Render((1280/2)/2, (720/2)/2, RS::ADD);
 	m_pLightLine->Render(0, 0, RS::ADD);
 	m_pFirstFont.pic->Render(0, 0);
@@ -397,8 +397,8 @@ void RebelCall::Update()
 	m_pNumber->Update();
 	m_pCenterCircle.pic->Update();
 	m_pBG.pic->Update();
-	m_pBlackLineL.pic->Update();
-	m_pBlackLineR.pic->Update();
+	//m_pBlackLineL.pic->Update();
+	//m_pBlackLineR.pic->Update();
 	m_pFirstFont.pic->Update();
 	m_pLightRing->Update();
 	m_pLightLine->Update();
@@ -416,7 +416,7 @@ void RebelCall::Render()
 
 	
 	m_pBG.pic->Render(0, 0,shader2D, "Mask_Add");
-	m_pCenterCircle.pic->Render(0, 0, RS::ADD);
+	//m_pCenterCircle.pic->Render(0, 0, RS::ADD);
 	
 	m_pBlackLineL.pic->Render((int)m_pBlackLineL.pos.x, (int)m_pBlackLineL.pos.y);
 	m_pBlackLineR.pic->Render((int)m_pBlackLineR.pos.x, (int)m_pBlackLineR.pos.y);
@@ -629,7 +629,7 @@ void ActionCall::Render()
 {
 	if (m_bActionFlag == false) return;
 
-	m_pBG.pic->Render(0, 0, RS::ADD);
+	//m_pBG.pic->Render(0, 0, RS::ADD);
 	m_pBGRip.pic->Render(0, 0, RS::ADD);
 	m_pFirstFont.pic->Render(0, 0);
 

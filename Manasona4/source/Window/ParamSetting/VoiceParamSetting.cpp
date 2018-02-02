@@ -112,5 +112,5 @@ void VoiceParamSetting::Ctrl(int DeviceID)
 	//PlayerDataMgr->m_ConfigData.iVoiceVolume = min(100, max(0, PlayerDataMgr->m_ConfigData.iVoiceVolume));
 
 	// テストあんかけチャーハン
-	if (!voice->isPlay(VOICE_TYPE::DOWN_ATTACK, CHARACTER::ANIKI)) voice->Play(VOICE_TYPE::DOWN_ATTACK, CHARACTER::ANIKI);
+	//if (!voice->isPlay(VOICE_TYPE::DOWN_ATTACK, CHARACTER::ANIKI)) voice->Play(VOICE_TYPE::DOWN_ATTACK, CHARACTER::ANIKI);
 }

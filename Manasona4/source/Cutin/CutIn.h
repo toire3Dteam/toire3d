@@ -40,7 +40,7 @@ namespace CutInType
 
 	};
 
-	// アイル―カットイン
+	// ぶんぶんカットイン
 	class Airou :public Base
 	{
 	public:

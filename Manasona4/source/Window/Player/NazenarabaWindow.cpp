@@ -3,7 +3,7 @@
 #include "Data/SelectData.h"
 
 //+------------------------
-//  アイル―ウィンドウ
+//  ぶんぶんウィンドウ
 //+------------------------
 
 NazenarabaWindow::NazenarabaWindow(Vector2 vPos) :BaseWindow(vPos)

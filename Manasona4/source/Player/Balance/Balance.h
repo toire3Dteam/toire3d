@@ -100,7 +100,7 @@ public:
 		private:
 		};
 
-		//// コークスクリュー
+		//// 突進攻撃
 		//class Land2 :public Base
 		//{
 		//public:

@@ -14,7 +14,7 @@ namespace PlayerData
 	{
 		unsigned int PlayCount	: 16;	// 遊んだ回数(65535まで)
 		unsigned int PlayTime	: 32;	// プレイ時間(4294967295)
-		unsigned int coin		: 20;	// 真夏パチンココイン(1048575まで)
+		unsigned int coin		: 20;	// 闘魂パチンココイン(1048575まで)
 	};
 
 	struct Infomation
@@ -25,7 +25,7 @@ namespace PlayerData
 			{
 				int PlayCount;	// 遊んだ回数
 				int PlayTime;	// プレイ時間
-				int coin;		// 真夏パチンココイン
+				int coin;		// 闘魂パチンココイン
 				int BattleCount;// 対戦回数
 				int 空き枠0;
 				int 空き枠1;

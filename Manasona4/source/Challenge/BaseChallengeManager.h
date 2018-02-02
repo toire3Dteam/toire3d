@@ -47,7 +47,7 @@ protected:
 };
 
 //+-------------------------------
-// アイル―チャレンジマネージャー
+// ぶんぶんチャレンジマネージャー
 //+-------------------------------
 
 class AirouChallengeManager :public BaseChallengeManager
@@ -89,7 +89,7 @@ private:
 };
 
 //+-------------------------------
-// アラミタマチャレンジマネージャー
+// 封印されし魂チャレンジマネージャー
 //+-------------------------------
 
 class AramitamaChallengeManager :public BaseChallengeManager

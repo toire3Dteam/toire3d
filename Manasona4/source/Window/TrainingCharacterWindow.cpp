@@ -15,7 +15,7 @@ TrainingCharacterWindow::TrainingCharacterWindow(Vector2 vPos) :BaseWindow(vPos)
 	m_iSelectLength = 70;
 
 	// ポーズウィンドウに存在するアイコンを詰めていく
-	AddIconData("魂ゲージ", "アラミタマの魂ゲージの設定します。");
+	AddIconData("魂ゲージ", "封印されし魂の魂ゲージの設定します。");
 	
 	AddIconData("初期値に戻す", "初期設定に戻します。");
 	AddIconData("戻る", "このウィンドウを閉じます。");

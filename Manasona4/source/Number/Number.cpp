@@ -204,8 +204,8 @@ void Number::Render(int x, int y, int num, NUM_KIND kind,RS lpRs)
 			int digitNum = number % 10;	// àÍî‘è¨Ç≥Ç¢åÖÇì¸éË
 			number = (int)(number / 10);// êîílÇÃàÍî‘è¨Ç≥Ç¢åÖÇè¡Ç∑
 
-			m_pic->SetAngle(0.3f);
-			m_pic->Render(x - ((count * (m_picSize / 2))*m_picScale), y + count*20, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize, lpRs);// êîéöï`âÊ
+			//m_pic->SetAngle(0.3f);
+			m_pic->Render(x - ((count * (m_picSize / 2))*m_picScale), y /*+ count*20*/, m_picSize*m_picScale, m_picSize*m_picScale, digitNum*m_picSize, 0, m_picSize, m_picSize, lpRs);// êîéöï`âÊ
 
 			if (number <= 0)break;// êîílÇ™ÇOà»â∫Ç…Ç»Ç¡ÇΩÇÁÇ≥ÇÊÇ»ÇÁ
 		}

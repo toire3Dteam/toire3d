@@ -3,7 +3,7 @@
 #include "Data/SelectData.h"
 
 //+------------------------
-//  アイル―ウィンドウ
+//  ぶんぶんウィンドウ
 //+------------------------
 
 AirouWindow::AirouWindow(Vector2 vPos) :BaseWindow(vPos)
@@ -18,11 +18,11 @@ AirouWindow::AirouWindow(Vector2 vPos) :BaseWindow(vPos)
 	m_iSelectLength = 53;
 
 	// オプションウィンドウに存在するアイコンを詰めていく
-	AddIconData("■アイル―ドリル", "回転しながら突進攻撃をする。");
-	AddIconData("■アイル―スイング", "ハンマーを大きく振りロングレンジで攻撃する。");
-	AddIconData("■アイル―ドロップ", "溜めは大きいが強力な一撃を空中で行います。");
+	AddIconData("■ぶんぶんドリル", "回転しながら突進攻撃をする。");
+	AddIconData("■ぶんぶんスイング", "ハンマーを大きく振りロングレンジで攻撃する。");
+	AddIconData("■ぶんぶんドロップ", "溜めは大きいが強力な一撃を空中で行います。");
 	AddIconData("▲無敵突き", "ハンマーで突いて相手を吹き飛ばす。");
-	AddIconData("●おしおき", "無数のアイル―で相手を突き刺す必殺技。");
+	AddIconData("●おしおき", "無数のぶんぶんで相手を突き刺す必殺技。");
 
 	AddCommandData("△", 365);
 	AddCommandData("↓＋△", 365);

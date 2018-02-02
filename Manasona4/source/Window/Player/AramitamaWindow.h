@@ -5,7 +5,7 @@
 #include "../ParamSetting/RoundTimeTypeParamSetting.h"
 
 //+-------------------------------
-//	アラミタマウィンドウ
+//	封印されし魂ウィンドウ
 //+-------------------------------
 
 class AramitamaWindow : public BaseWindow

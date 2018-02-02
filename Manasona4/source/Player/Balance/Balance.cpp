@@ -470,7 +470,7 @@ void Balance::InitActionDatas()
 
 
 	//==============================================================================================================
-	//	第2キャラクター固有スキル(コークスクリュー)
+	//	第2キャラクター固有スキル(突進攻撃)
 	// 地上ヒットも空中ヒットも共通の情報
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].InstanceAttackData();	// アタックデータ作成
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->damage = 900;
@@ -504,7 +504,7 @@ void Balance::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::SKILL_SQUAT].pAttackData->pCollisionShape->pos.Set(9, 9, 0);
 
 	////==============================================================================================================
-	////	第2キャラクター固有スキル(コークスクリュー)
+	////	第2キャラクター固有スキル(突進攻撃)
 	//// 地上ヒットも空中ヒットも共通の情報
 	//m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].InstanceAttackData();	// アタックデータ作成
 	//m_ActionDatas[(int)BASE_ACTION_STATE::SKILL2].pAttackData->damage = 700;
@@ -947,7 +947,7 @@ void Balance::ThirdRushUpdate()
 	// アクション終了フラグ
 	if (GetActionState() == BASE_ACTION_STATE::NO_ACTION) return;
 
-	//// キルラッシュ
+	//// ラッシュブロウ
 	//if (m_eSkillActionType == SKILL_ACTION_TYPE::LAND)
 	//{
 	//	// 走り終わってたら
@@ -973,7 +973,7 @@ void Balance::ThirdRushUpdate()
 	//	}
 	//}
 
-	//// コークスクリュー
+	//// 突進攻撃
 	//else
 	{
 		m_pSkillActions[(int)SKILL_ACTION_TYPE::SQUAT]->Execute();
@@ -1026,13 +1026,13 @@ void Balance::OnInvincibleCounterSuccess()
 	// カウンター成功のSEとかエフェクトとか
 	se->Play("カウンター成功");
 
-	// コークスクリュー設定
+	// 突進攻撃設定
 	m_eSkillActionType = SKILL_ACTION_TYPE::LAND2;
 
 	// スキルステートへ
 	m_pStateMachine->ChangeState(BasePlayerState::Skill::GetInstance());
 
-	// 一定時間無敵にする(だいたいコークスクリューのフレーム)
+	// 一定時間無敵にする(だいたい突進攻撃のフレーム)
 	SetInvincible(40, 1);
 
 }
@@ -1053,7 +1053,7 @@ bool Balance::SkillUpdate()
 //+---------------------------------
 void Balance::InvincibleAttackInit()
 {
-	se->Play(昇竜);
+	se->Play("昇竜");
 
 }
 
@@ -1147,10 +1147,10 @@ void Balance::SkillAction::Land::Enter()
 
 bool Balance::SkillAction::Land::Execute()
 {
-	static const int IMPACT_FRAME = 34;
+	static const int IMPACT_FRAME = 28;
 
 	// 移動終わったら
-	if (m_pBalance->m_iCurrentActionFrame > 60)
+	if (m_pBalance->m_iCurrentActionFrame > 42)
 	{
 		return true;
 	}

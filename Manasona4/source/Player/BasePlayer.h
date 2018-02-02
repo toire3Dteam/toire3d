@@ -265,8 +265,8 @@ enum class EFFECT_TYPE
 	RUN,				// 走る瞬間
 	BACK_STEP,			// バックステップ
 	GUARD_BREAK,		// ガードブレイク
-	AIROU_DRILL,		// アイルードリル
-	AIROU_CIRCLE,		// アイルーサークル
+	AIROU_DRILL,		// ぶんぶんドリル
+	AIROU_CIRCLE,		// ぶんぶんサークル
 	GUARD_WAVE,			// ガードウェーブ
 	MULTIPLE_HIT,		// 多段ヒット
 	OVER_DRIVE_ACTION,	// 必殺技アクション
@@ -1182,7 +1182,7 @@ protected:
 	//------------------------------------------------------
 	Vector3 m_vPos;			// 座標
 	Vector3 m_vMove;		// 移動値
-	bool m_bMoveUpdate;		// これがtrueなら、重力とか空気抵抗とかを受ける(アイルードリルとかペルソナとかでfalseにする)
+	bool m_bMoveUpdate;		// これがtrueなら、重力とか空気抵抗とかを受ける(ぶんぶんドリルとかペルソナとかでfalseにする)
 	bool m_bSinkingUpdate;	// これがtrueなら、キャラとキャラのめり込み判定を行う
 
 	//------------------------------------------------------

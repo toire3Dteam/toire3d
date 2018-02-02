@@ -1,7 +1,7 @@
 #include "AirouChallenge.h"
 
 //+-------------------------------
-// アイル―チャレンジ
+// ぶんぶんチャレンジ
 //+-------------------------------
 
 AirouChallenge1::AirouChallenge1(int iTitleNo) : BaseChallenge(iTitleNo)

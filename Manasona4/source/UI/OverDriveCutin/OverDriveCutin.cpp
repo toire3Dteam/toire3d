@@ -208,7 +208,7 @@ void OverDriveCutin::Action()
 	m_vPos.x = -100;
 
 	m_pFont1.pPic->Action();
-	m_pFont2.pPic->Action();
+	//m_pFont2.pPic->Action();
 	m_pFont3.pPic->Action();
 
 	m_pFont1.vPos = VECTOR2_ZERO;

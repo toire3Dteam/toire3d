@@ -2,7 +2,7 @@
 #include "SceneSelect.h"
 #include "SceneSelectState.h"
 #include "SceneCollect.h"
-#include "SceneVS.h"
+#include "sceneLoading.h"
 #include "SceneMenu.h"
 #include "../BaseEntity/Message/Message.h"
 #include "../Fade/Fade.h"
@@ -50,7 +50,7 @@ void SceneSelectState::Intro::Exit(sceneSelect *pMain)
 
 void SceneSelectState::Intro::Render(sceneSelect *pMain)
 {
-	tdnText::Draw(0, 0, 0xffffffff, "Intro");
+	//tdnText::Draw(0, 0, 0xffffffff, "Intro");
 }
 
 bool SceneSelectState::Intro::OnMessage(sceneSelect *pMain, const Message & msg)
@@ -138,7 +138,7 @@ void SceneSelectState::CharaSelect::Render(sceneSelect *pMain)
 	// ƒAƒCƒRƒ“UI
 	//M_UIMgr->Render();
 
-	tdnText::Draw(0, 0, 0xffffffff, "CharaSelect");
+	//tdnText::Draw(0, 0, 0xffffffff, "CharaSelect");
 }
 
 bool SceneSelectState::CharaSelect::OnMessage(sceneSelect *pMain, const Message & msg)
@@ -300,7 +300,7 @@ void SceneSelectState::StageAndBGM::Exit(sceneSelect *pMain)
 void SceneSelectState::StageAndBGM::Render(sceneSelect *pMain)
 {
 	pMain->StageAndBGMRender();
-	tdnText::Draw(0, 0, 0xffffffff, "StageAndBGM");
+	//tdnText::Draw(0, 0, 0xffffffff, "StageAndBGM");
 	
 	//tdnText::Draw(68, 128, 0xffffffff, "m_iSelectStageNo->%d",pMain->m_iSelectStageNo);
 	//tdnText::Draw(68, 156, 0xffffffff, "m_iSelectBGMNo->%d",pMain->m_iSelectBGMNo);
@@ -396,7 +396,7 @@ void SceneSelectState::End::Execute(sceneSelect *pMain)
 			SelectDataMgr->Get()->eStage = (STAGE)(pMain->m_iSelectStageNo - 1);	// RANDOM‚Ô‚ñ‚ðˆø‚¢‚Ä‚¢‚é
 		}
 
-		MainFrameEX->ChangeScene(new sceneVS);
+		MainFrameEX->ChangeScene(new sceneLoading(new sceneMain()));
 		return;
 	}
 
@@ -415,7 +415,7 @@ void SceneSelectState::End::Exit(sceneSelect *pMain)
 
 void SceneSelectState::End::Render(sceneSelect *pMain)
 {
-	tdnText::Draw(0, 0, 0xffffffff, "End");
+	//tdnText::Draw(0, 0, 0xffffffff, "End");
 }
 
 bool SceneSelectState::End::OnMessage(sceneSelect *pMain, const Message & msg)
@@ -504,7 +504,7 @@ void SceneSelectState::BackMenu::Exit(sceneSelect *pMain)
 
 void SceneSelectState::BackMenu::Render(sceneSelect *pMain)
 {
-	tdnText::Draw(0, 0, 0xffffffff, "BackMenu");
+	//tdnText::Draw(0, 0, 0xffffffff, "BackMenu");
 }
 
 bool SceneSelectState::BackMenu::OnMessage(sceneSelect *pMain, const Message & msg)

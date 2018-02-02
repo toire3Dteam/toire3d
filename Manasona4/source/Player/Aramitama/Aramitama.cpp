@@ -40,7 +40,7 @@ Aramitama::Aramitama(SIDE side, const SideData &data) :BasePlayer(side, data)
 	BasePlayer::LoadCharacterParam("DATA/CHR/Aramitama/param.txt");
 
 
-	m_pName = "アラミタマ";
+	m_pName = "封印されし魂";
 	m_pCutinPic = new tdn2DAnim("DATA/UI/Game/OverDriveCutin/aramitama.png");
 	m_pCutinPic->OrderMoveAppeared(8, -400, +200);
 
@@ -199,7 +199,7 @@ void Aramitama::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_BACK;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	// 判定形状
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pCollisionShape->width = 7.5;
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pCollisionShape->width = 8.5;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pCollisionShape->height = 6;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH1].pAttackData->pCollisionShape->pos.Set(6, 8, 0);
 
@@ -232,7 +232,7 @@ void Aramitama::InitActionDatas()
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->places[(int)AttackData::HIT_PLACE::LAND].DamageMotion = DAMAGE_MOTION::KNOCK_BACK;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->places[(int)AttackData::HIT_PLACE::AERIAL].DamageMotion = DAMAGE_MOTION::KNOCK_DOWN;
 	// 判定形状
-	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->pCollisionShape->width = 8.5;
+	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->pCollisionShape->width = 9.5;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->pCollisionShape->height = 8;
 	m_ActionDatas[(int)BASE_ACTION_STATE::RUSH2].pAttackData->pCollisionShape->pos.Set(7, 6.0, 0);
 
@@ -670,12 +670,12 @@ void Aramitama::InitActionDatas()
 void Aramitama::InitMushiDatas()
 {
 	//==============================================================================================================
-	//	トスミタマ
+	//	トスアシスト
 	m_pMushi[(int)MUSHI_TYPE::LAND] = new MushiData("DATA/CHR/Aramitama/aramitama_mushi1.IEM", 40);
 	// 地上ヒットも空中ヒットも共通の情報
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->damage = 1200;
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->pierceLV = 0;
-	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->HitSE = "トスミタマ";
+	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->HitSE = "トスアシスト";
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->WhiffSE = "空振り1";
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->HitEffectType = EFFECT_TYPE::DAMAGE;
 	m_pMushi[(int)MUSHI_TYPE::LAND]->tagpAttackData->WhiffEffectType = EFFECT_TYPE::WHIFF;
@@ -706,7 +706,7 @@ void Aramitama::InitMushiDatas()
 
 
 	//==============================================================================================================
-	//	隕石ミタマ
+	//	隕石アシスト
 	m_pMushi[(int)MUSHI_TYPE::SQUAT] = new MushiData("DATA/CHR/Aramitama/aramitama_mushi3.IEM", 0);
 	// 地上ヒットも空中ヒットも共通の情報
 	m_pMushi[(int)MUSHI_TYPE::SQUAT]->tagpAttackData->damage = 1500;
@@ -743,7 +743,7 @@ void Aramitama::InitMushiDatas()
 
 
 	//==============================================================================================================
-	//	D虫ミタマ
+	//	D虫魂
 	m_pMushi[(int)MUSHI_TYPE::AERIAL] = new MushiData("DATA/CHR/Aramitama/aramitama_mushi2.IEM", Shot::AramitamaMushi::Aerial::c_SOJOURN_TIME);
 	// 地上ヒットも空中ヒットも共通の情報
 	m_pMushi[(int)MUSHI_TYPE::AERIAL]->tagpAttackData->damage = 300;
@@ -1102,7 +1102,7 @@ bool Aramitama::SkillAction::Land::Execute()
 	// 烙印時の処理
 	if (m_pAramitama->m_bWassyoi)
 	{
-		// トスミタマ出現フレーム
+		// トスアシスト出現フレーム
 		if (m_pAramitama->GetCurrentFrame() == 52)
 		{
 			// 発動！
@@ -1116,7 +1116,7 @@ bool Aramitama::SkillAction::Land::Execute()
 		m_pAramitama->AddMove(Vector3((m_pAramitama->m_dir == DIR::LEFT) ? -1.0f : 1.0f, 0, 0));
 		m_pAramitama->MoveClampX(2.0f);
 
-		// アラミタマ自体の横幅を増やす
+		// 封印されし魂自体の横幅を増やす
 		m_pAramitama->m_tagCharacterParam.HitSquare.width = m_pAramitama->m_tagOrgCharacterParam.HitSquare.width * 4;
 		break;
 	case FRAME_STATE::RECOVERY_HIT:
@@ -1194,7 +1194,7 @@ bool Aramitama::SkillAction::Squat::Execute()
 	// 烙印時の処理
 	if (m_pAramitama->m_bWassyoi)
 	{
-		// 隕石ミタマ出現フレーム
+		// 隕石アシスト出現フレーム
 		if (m_pAramitama->GetCurrentFrame() == 42)
 		{
 			// 発動！
@@ -1213,7 +1213,7 @@ bool Aramitama::SkillAction::Squat::Execute()
 		m_pAramitama->m_pAChargeAura->Action(m_pAramitama->GetPos(), 1.0f, 1.25f);
 
 		// チャージ音
-		se->Play("ミタマチャージ");
+		se->Play("魂チャージ");
 	}
 	
 
@@ -1306,7 +1306,7 @@ bool Aramitama::SkillAction::Aerial::Execute()
 	// 烙印時の処理
 	if (m_pAramitama->m_bWassyoi)
 	{
-		// D虫ミタマ出現フレーム
+		// D虫魂出現フレーム
 		if (m_pAramitama->GetCurrentFrame() == 45)
 		{
 			// 発動！
@@ -1403,7 +1403,7 @@ bool Aramitama::SkillAction::AerialDrop::Execute()
 	// 烙印時の処理
 	if (m_pAramitama->m_bWassyoi)
 	{
-		// D虫ミタマ出現フレーム
+		// D虫魂出現フレーム
 		if (m_pAramitama->GetCurrentFrame() == 28)
 		{
 			// 発動！

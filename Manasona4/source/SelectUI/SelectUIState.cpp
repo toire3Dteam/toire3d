@@ -43,7 +43,7 @@ void SelectUIState::Intro::Exit(SelectUI *pMain)
 }
 void SelectUIState::Intro::Render(SelectUI *pMain)
 {
-	tdnText::Draw(0, 0, 0xffffffff, "Intro");
+//	tdnText::Draw(0, 0, 0xffffffff, "Intro");
 }
 
 bool SelectUIState::Intro::OnMessage(SelectUI *pMain, const Message & msg)
@@ -74,7 +74,7 @@ void SelectUIState::FirstStep::Execute(SelectUI *pMain)
 		// 一周回る処理
 		if (pMain->m_iSelectCharacterNo <= -1)
 		{
-			pMain->m_iSelectCharacterNo = (int)CHARACTER::BALANCE - 1;
+			pMain->m_iSelectCharacterNo = (int)CHARACTER::END - 1;
 		}
 
 		// 演出
@@ -88,7 +88,7 @@ void SelectUIState::FirstStep::Execute(SelectUI *pMain)
 		pMain->m_iSelectCharacterNo++;
 		
 		// 一周回る処理
-		if (pMain->m_iSelectCharacterNo >= (int)CHARACTER::BALANCE)
+		if (pMain->m_iSelectCharacterNo >= (int)CHARACTER::END)
 		{
 			pMain->m_iSelectCharacterNo = 0;
 		}
@@ -160,7 +160,7 @@ void SelectUIState::FirstStep::Execute(SelectUI *pMain)
 		// △でランダムセレクト
 		if (tdnInput::KeyGet(KEYCODE::KEY_D, pMain->m_iDeviceID) == 3)
 		{
-			pMain->m_iSelectCharacterNo = tdnRandom::Get(0, (int)(CHARACTER::BALANCE) - 1);
+			pMain->m_iSelectCharacterNo = tdnRandom::Get(0, (int)(CHARACTER::END) - 1);
 			
 			// 演出(キャラの名前とか)
 			pMain->ActionChara();
@@ -279,7 +279,7 @@ void SelectUIState::MiddleStep::Exit(SelectUI *pMain)
 
 void SelectUIState::MiddleStep::Render(SelectUI *pMain)
 {
-	tdnText::Draw(0, 0, 0xffffffff, "MiddleStep");
+	//tdnText::Draw(0, 0, 0xffffffff, "MiddleStep");
 }
 
 bool SelectUIState::MiddleStep::OnMessage(SelectUI *pMain, const Message & msg)
@@ -394,7 +394,7 @@ void SelectUIState::SecondStep::Exit(SelectUI *pMain)
 
 void SelectUIState::SecondStep::Render(SelectUI *pMain)
 {
-	tdnText::Draw(0, 0, 0xffffffff, "SecondStep");
+	//tdnText::Draw(0, 0, 0xffffffff, "SecondStep");
 }
 
 bool SelectUIState::SecondStep::OnMessage(SelectUI *pMain, const Message & msg)
@@ -440,7 +440,7 @@ void SelectUIState::SecondToOKStep::Exit(SelectUI *pMain)
 
 void SelectUIState::SecondToOKStep::Render(SelectUI *pMain)
 {
-	tdnText::Draw(0, 0, 0xffffffff, "SecondToOKStep");
+	//tdnText::Draw(0, 0, 0xffffffff, "SecondToOKStep");
 }
 
 bool SelectUIState::SecondToOKStep::OnMessage(SelectUI *pMain, const Message & msg)
@@ -487,7 +487,7 @@ void SelectUIState::OKStep::Exit(SelectUI *pMain)
 
 void SelectUIState::OKStep::Render(SelectUI *pMain)
 {
-	tdnText::Draw(0, 0, 0xffffffff, "OKStep");
+	//tdnText::Draw(0, 0, 0xffffffff, "OKStep");
 }
 
 bool SelectUIState::OKStep::OnMessage(SelectUI *pMain, const Message & msg)
@@ -536,7 +536,7 @@ void SelectUIState::OKToSecondStep::Exit(SelectUI *pMain)
 
 void SelectUIState::OKToSecondStep::Render(SelectUI *pMain)
 {
-	tdnText::Draw(0, 0, 0xffffffff, "SecondToOKStep");
+	//tdnText::Draw(0, 0, 0xffffffff, "SecondToOKStep");
 }
 
 bool SelectUIState::OKToSecondStep::OnMessage(SelectUI *pMain, const Message & msg)

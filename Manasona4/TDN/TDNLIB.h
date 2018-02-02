@@ -3339,7 +3339,7 @@ private:
 
 
 	/****************************************/
-	//	 真夏のファイト4の絵文字サポート関数
+	//	 闘魂のファイト4の絵文字サポート関数
 	//***************************************/
 	static tdn2DObj* m_pPictograph;
 	static bool SearchPictograph(char buffer[3], int x, int y, UINT size,DWORD color, DWORD RenderFlag);
@@ -3477,7 +3477,7 @@ public:
 	//------------------------------------------------------
 	int	RayPick(Vector3* out, Vector3* pos, Vector3* vec, float *Dist);
 	int	RayPickUD(Vector3* out, Vector3* pos, Vector3* vec, float *Dist);
-	int	RayPick2(Vector3* out, const Vector3* pos, Vector3* vec, float *Dist);	// 真夏に入ってたやつ
+	int	RayPick2(Vector3* out, const Vector3* pos, Vector3* vec, float *Dist);	// 闘魂に入ってたやつ
 
 	struct NearestPointOut
 	{

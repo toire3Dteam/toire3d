@@ -176,7 +176,7 @@ std::string BaseChallengeManager::GetTitleString(int iNo)
 
 
 //+---------------------------------
-// アイル―チャレンジマネージャー
+// ぶんぶんチャレンジマネージャー
 //+---------------------------------
 
 AirouChallengeManager::AirouChallengeManager()
@@ -269,7 +269,7 @@ NazenarabaChallengeManager::NazenarabaChallengeManager()
 
 
 //+---------------------------------
-// アラミタマチャレンジマネージャー
+// 封印されし魂チャレンジマネージャー
 //+---------------------------------
 
 AramitamaChallengeManager::AramitamaChallengeManager()

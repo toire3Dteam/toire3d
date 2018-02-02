@@ -9,11 +9,11 @@
 //*****************************************************************************
 
 // キャラクターのタイプ
-enum class CHARACTER { AIROU, TEKI, NAZENARA, ARAMITAMA, ANIKI,   // (2/2)出すときは兄貴封印
-	BALANCE ,END}; // ←の後に書くキャラは隠しキャラ(エウレシア) ENDの場所を上に移せばバレない
+enum class CHARACTER { AIROU, TEKI, NAZENARA, ARAMITAMA, ANIKI, BALANCE , END    // (2/2)出すときは兄貴封印
+	}; // ←の後に書くキャラは隠しキャラ(エウレシア) ENDの場所を上に移せばバレない
 
 // パートナーのタイプ
-enum class PARTNER { MOKOI, MAYA, HETE,ATTAKAI, END };
+enum class PARTNER { MOKOI, MAYA, HETE, ATTAKAI, END };
 
 // ステージのタイプ
 enum class STAGE { SAND, SYUTEN, SEA, GARDEN, NANASATO_SITY, A, MAX };
@@ -165,13 +165,13 @@ enum class ENEMY_THROW_TECH_TYPE
 //	キャラクター固有データ
 //+-------------------------
 
-// アラミタマ用デスク
+// 封印されし魂用デスク
 struct AramitamaDesk
 {
 	int iWassyoiGauge;
 };
 
-// アラミタマのわっしょいゲージ設定
+// 封印されし魂のわっしょいゲージ設定
 enum class WASSYOI_TYPE
 {
 	NO,		// 普通
@@ -195,7 +195,7 @@ struct TrainingData
 	ENEMY_TECH_TYPE			eEnemyTech;			// 敵の受け身の設定
 	ENEMY_THROW_TECH_TYPE	eEnemyThrowTech;	// 敵のなげ抜けの設定
 	int						iEnemyLv;			// 敵のLV
-	WASSYOI_TYPE			eWassyoiType;		// アラミタマのわっしょいゲージ
+	WASSYOI_TYPE			eWassyoiType;		// 封印されし魂のわっしょいゲージ
 	TrainingData();
 };
 

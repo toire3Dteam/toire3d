@@ -5,7 +5,7 @@
 #include "../ParamSetting/RoundTimeTypeParamSetting.h"
 
 //+-------------------------------
-//	アイル―ウィンドウ
+//	ぶんぶんウィンドウ
 //+-------------------------------
 
 class AirouWindow : public BaseWindow

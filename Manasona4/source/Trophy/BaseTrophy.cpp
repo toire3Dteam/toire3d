@@ -212,7 +212,7 @@ void BaseTrophy::RenderInfo(int iX, int iY)
 FirstTrophy::FirstTrophy()
 {
 	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/first.png");
-	m_tagTrophy.sTitle = "真夏のファイト開幕";
+	m_tagTrophy.sTitle = "闘魂のファイト開幕";
 	m_tagTrophy.sText = "初めてゲームをプレイした";
 
 	// 隠しトロフィーフラグ
@@ -319,7 +319,7 @@ SSRankWinTrophy::SSRankWinTrophy()
 PowerfulEnemySSRankWinTrophy::PowerfulEnemySSRankWinTrophy()
 {
 	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/starMedal.png");
-	m_tagTrophy.sTitle = "真夏を極めし者";
+	m_tagTrophy.sTitle = "闘魂を極めし者";
 	m_tagTrophy.sText = "最高難易度のCOMにSSランクで勝利した。";
 
 	// 隠しトロフィーフラグ
@@ -367,13 +367,13 @@ AttakaiBomTrophy::AttakaiBomTrophy()
 }
 
 //+---------------------------------
-//	アイル―で100コンボ
+//	ぶんぶんで100コンボ
 //+---------------------------------
 AirouChallengeTrophy::AirouChallengeTrophy()
 {
 	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/airou.png");
 	m_tagTrophy.sTitle = "おしおき";
-	m_tagTrophy.sText = "アイル―で100コンボした。";
+	m_tagTrophy.sText = "ぶんぶんで100コンボした。";
 
 	// 隠しトロフィーフラグ
 	m_bHide = false;
@@ -416,7 +416,7 @@ BigBigDamageTrophy::BigBigDamageTrophy()
 CompleteTrophy::CompleteTrophy()
 {
 	m_tagTrophy.pIcon = new tdn2DObj("Data/Trophy/full.png");
-	m_tagTrophy.sTitle = "真夏の覇者";
+	m_tagTrophy.sTitle = "闘魂の覇者";
 	m_tagTrophy.sText = "全てのトロフィーを入手した。";
 
 	// 隠しトロフィーフラグ

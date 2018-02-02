@@ -134,7 +134,7 @@ struct EFFECT_CAMERA_INFO
 struct SHAKE_CAMERA_INFO
 {
 	float ShakePower;	// U“®‚Ì—Í(0`1)
-	int ShakeFrame;			// —h‚ê‚Ä‚éŠÔ(‘O‚Ì^‰Ä‚¾‚Æ3‚É‚µ‚Ä‚½)
+	int ShakeFrame;			// —h‚ê‚Ä‚éŠÔ(‘O‚Ì“¬°‚¾‚Æ3‚É‚µ‚Ä‚½)
 	void Set(float power, int frame){ ShakePower = power; ShakeFrame = frame; }
 };
 
