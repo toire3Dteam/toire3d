@@ -639,9 +639,9 @@ void sceneResult::CameraRender()
 	m_CameraScreen->RenderTarget();
 	CameraMgr->Activate();
 
-	// 封印
+	// 封印(2/05)封印解除
 	// 負けたプレイヤー描画
-	//m_LosePlayer->Render(shaderM,"black");
+	m_LosePlayer->Render(shaderM,"black");
 
 	// 勝ったプレイヤー描画
 	if (m_bPerformanceFlag == false)
@@ -649,11 +649,11 @@ void sceneResult::CameraRender()
 		m_WinPlayer->Render(shaderM,"copy");
 	}
 
-	//m_grand->Render(/*shaderM,"black"*/);
+	m_grand->Render(/*shaderM,"black"*/);
 
-	//m_UVEffectMgr->Render();
+	m_UVEffectMgr->Render();
 
-	//ParticleManager::Render();
+	ParticleManager::Render();
 
 	//レンダーターゲットの復元
 	tdnSystem::GetDevice()->SetRenderTarget(0, m_pBackBuffer);
